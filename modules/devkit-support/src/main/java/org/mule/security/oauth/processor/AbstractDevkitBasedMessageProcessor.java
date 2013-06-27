@@ -10,6 +10,7 @@
 
 package org.mule.security.oauth.processor;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -24,7 +25,11 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.transformer.Transformer;
+import org.mule.common.security.oauth.exception.NotAuthorizedException;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.security.oauth.OAuthAdapter;
+import org.mule.security.oauth.OnNoTokenPolicy;
 import org.mule.transformer.TransformerTemplate;
 import org.mule.transport.NullPayload;
 
@@ -34,6 +39,8 @@ import java.util.List;
 public abstract class AbstractDevkitBasedMessageProcessor extends AbstractConnectedProcessor
     implements FlowConstructAware, MuleContextAware, Startable, Disposable, Stoppable, Initialisable
 {
+
+    private String operationName;
 
     /**
      * Module object
@@ -49,52 +56,90 @@ public abstract class AbstractDevkitBasedMessageProcessor extends AbstractConnec
      */
     protected FlowConstruct flowConstruct;
 
+    public AbstractDevkitBasedMessageProcessor(String operationName)
+    {
+        this.operationName = operationName;
+    }
+
     /**
-     * Sets muleContext
+     * This final process implementation shields actual processing into abstract
+     * method {@link
+     * org.mule.security.oauth.processor.AbstractDevkitBasedMessageProcessor.
+     * doProcess(MuleEvent)} Afterwards, it performs payload transformation by
+     * invoking {@link
+     * org.mule.security.oauth.processor.AbstractDevkitBasedMessageProcessor.
+     * overwritePayload(MuleEvent, Object)} In case the processing throws
+     * {@link org.mule.common.security.oauth.exception.NotAuthorizedException}, the
+     * module object is casted to {@link org.mule.security.oauth.OAuthAdapter} and
+     * exception handling is delegated into its
+     * {@link org.mule.security.oauth.OnNoTokenPolicy}. For any other kind of
+     * exception, it is logged and wrapped into a {@link org.mule.api.MuleException}
      * 
-     * @param value Value to set
+     * @param event the current mule event.
+     * @return the mule event returned by the message processor or the
+     *         OnNoTokenPolicy in case of NotAuthorizedException
+     * @throws MuleException
      */
-    @Override
-    public final void setMuleContext(MuleContext value)
+    public final MuleEvent process(MuleEvent event) throws MuleException
     {
-        this.muleContext = value;
+        try
+        {
+            event = this.doProcess(event);
+            this.overwritePayload(event, event.getMessage().getPayload());
+        }
+        catch (MessagingException messagingException)
+        {
+            messagingException.setProcessedEvent(event);
+            throw messagingException;
+        }
+        catch (NotAuthorizedException e)
+        {
+            try
+            {
+                return this.handleNotAuthorized((OAuthAdapter) moduleObject, e, event);
+            }
+            catch (Exception ne)
+            {
+                this.handleException(event, ne);
+            }
+        }
+        catch (MuleException e)
+        {
+            throw e;
+        }
+        catch (Exception e)
+        {
+            this.handleException(event, e);
+        }
+
+        return event;
     }
 
     /**
-     * Retrieves muleContext
-     */
-    public final MuleContext getMuleContext()
-    {
-        return this.muleContext;
-    }
-
-    /**
-     * Sets flowConstruct
+     * Implementors of this class need to implement this method in order to perform
+     * actual processing
      * 
-     * @param value Value to set
+     * @param event the mule event
+     * @return a mule event
+     * @throws Exception
      */
-    @Override
-    public final void setFlowConstruct(FlowConstruct value)
+    protected abstract MuleEvent doProcess(MuleEvent event) throws Exception;
+
+    private void handleException(MuleEvent event, Throwable e) throws MuleException
     {
-        this.flowConstruct = value;
+        throw new MessagingException(CoreMessages.failedToInvoke(this.operationName), event, e);
     }
 
-    /**
-     * Retrieves flowConstruct
-     */
-    public final FlowConstruct getFlowConstruct()
+    private MuleEvent handleNotAuthorized(OAuthAdapter adapter, NotAuthorizedException e, MuleEvent event)
+        throws NotAuthorizedException
     {
-        return this.flowConstruct;
-    }
+        OnNoTokenPolicy policy = adapter.getOnNoTokenPolicy();
+        if (policy == null)
+        {
+            throw new IllegalStateException("OnNoTokenPolicy cannot be null");
+        }
 
-    /**
-     * Sets moduleObject
-     * 
-     * @param value Value to set
-     */
-    public final void setModuleObject(Object value)
-    {
-        this.moduleObject = value;
+        return policy.handleNotAuthorized(adapter, e, event);
     }
 
     /**
@@ -186,6 +231,54 @@ public abstract class AbstractDevkitBasedMessageProcessor extends AbstractConnec
     @Override
     public final void dispose()
     {
+    }
+
+    /**
+     * Sets muleContext
+     * 
+     * @param value Value to set
+     */
+    @Override
+    public final void setMuleContext(MuleContext value)
+    {
+        this.muleContext = value;
+    }
+
+    /**
+     * Retrieves muleContext
+     */
+    public final MuleContext getMuleContext()
+    {
+        return this.muleContext;
+    }
+
+    /**
+     * Sets flowConstruct
+     * 
+     * @param value Value to set
+     */
+    @Override
+    public final void setFlowConstruct(FlowConstruct value)
+    {
+        this.flowConstruct = value;
+    }
+
+    /**
+     * Retrieves flowConstruct
+     */
+    public final FlowConstruct getFlowConstruct()
+    {
+        return this.flowConstruct;
+    }
+
+    /**
+     * Sets moduleObject
+     * 
+     * @param value Value to set
+     */
+    public final void setModuleObject(Object value)
+    {
+        this.moduleObject = value;
     }
 
 }

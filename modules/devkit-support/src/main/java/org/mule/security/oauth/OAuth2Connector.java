@@ -42,8 +42,4 @@ public interface OAuth2Connector
     
     public void postAuth();
     
-    @Deprecated
-    public String getAccessTokenId();
-
-    
 }

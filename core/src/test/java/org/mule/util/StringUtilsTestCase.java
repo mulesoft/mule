@@ -14,6 +14,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 import org.junit.Test;
 
@@ -104,6 +105,30 @@ public class StringUtilsTestCase extends AbstractMuleTestCase
         assertEquals("0A0E", StringUtils.toHexString(new byte[]{10, 14}, true));
         assertEquals("0aff", StringUtils.toHexString(new byte[]{10, (byte)0xff}));
         assertEquals("0AFF", StringUtils.toHexString(new byte[]{10, (byte)0xff}, true));
+    }
+    
+    @Test
+    public void testMatch() {
+        Pattern pattern = Pattern.compile("<<([\\w]*)>>");
+        String value = "<<target>>";
+        
+        assertEquals(StringUtils.match(pattern, value, 1), "target");
+        
+        try {
+            StringUtils.match(pattern, null, 1);
+            fail("was expecting IllegalArgumentException");
+        } catch (IllegalArgumentException e) {}
+        
+        try {
+            StringUtils.match(null, value, 1);
+            fail("was expecting IllegalArgumentException");
+        } catch (IllegalArgumentException e) {}
+        
+        try {
+            StringUtils.match(pattern, "hello world!", 1);
+            fail("was expecting IllegalArgumentException");
+        } catch (IllegalArgumentException e) {}
+        
     }
 
 }

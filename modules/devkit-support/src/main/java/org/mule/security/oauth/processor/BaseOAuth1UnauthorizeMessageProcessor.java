@@ -11,7 +11,6 @@
 package org.mule.security.oauth.processor;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.security.oauth.OAuth1Adapter;
 
@@ -19,14 +18,19 @@ public abstract class BaseOAuth1UnauthorizeMessageProcessor extends AbstractDevk
     implements MessageProcessor
 {
 
+    public BaseOAuth1UnauthorizeMessageProcessor()
+    {
+        super("unauthorize");
+    }
+
     /**
      * Unauthorize the connector
      * 
      * @param event MuleEvent to be processed
-     * @throws MuleException
+     * @throws Exception
      */
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
+    protected MuleEvent doProcess(MuleEvent event) throws Exception
     {
         OAuth1Adapter adapter = this.getAdapter();
         adapter.reset();

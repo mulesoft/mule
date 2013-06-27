@@ -11,6 +11,10 @@
 package org.mule.security.oauth;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.store.ObjectDoesNotExistException;
+import org.mule.api.store.ObjectStoreException;
+import org.mule.common.security.oauth.exception.NotAuthorizedException;
 import org.mule.common.security.oauth.exception.UnableToAcquireAccessTokenException;
 import org.mule.security.oauth.callback.HttpCallbackAdapter;
 
@@ -31,8 +35,8 @@ public interface OAuth2Manager<C extends OAuth2Adapter> extends HttpCallbackAdap
 {
 
     /**
-     * Create a new adapter using the specified verifier and insert it into the
-     * pool. This adapter will be already initialized and started
+     * Create a new adapter using the specified verifier and insert it into the pool.
+     * This adapter will be already initialized and started
      * 
      * @param verifier OAuth verifier
      * @return A newly created connector
@@ -43,11 +47,11 @@ public interface OAuth2Manager<C extends OAuth2Adapter> extends HttpCallbackAdap
     /**
      * Borrow an access token from the pool
      * 
-     * @param userId User identification used to borrow the access token
+     * @param accessTokenId User identification used to borrow the access token
      * @return An existing authorized connector
      * @throws Exception If the access token cannot be retrieved
      */
-    C acquireAccessToken(String userId) throws Exception;
+    C acquireAccessToken(String accessTokenId) throws Exception;
 
     /**
      * Return an access token to the pool
@@ -101,9 +105,9 @@ public interface OAuth2Manager<C extends OAuth2Adapter> extends HttpCallbackAdap
     public boolean restoreAccessToken(OAuth2Adapter adapter);
 
     /**
-     * if refresh token is available, then it makes an http call to refresh the access token.
-     * All newly obtained tokens are set into the adapter
-     *  
+     * if refresh token is available, then it makes an http call to refresh the
+     * access token. All newly obtained tokens are set into the adapter
+     * 
      * @param adapter the connector's adapter
      * @throws UnableToAcquireAccessTokenException
      */
@@ -119,10 +123,51 @@ public interface OAuth2Manager<C extends OAuth2Adapter> extends HttpCallbackAdap
      */
     public void fetchAccessToken(OAuth2Adapter adapter, String redirectUri)
         throws UnableToAcquireAccessTokenException;
-    
+
     /**
      * Returns the mule context
      */
     public MuleContext getMuleContext();
+
+    /**
+     * Validates that there's an access token for the given adapter.
+     * 
+     * @param adapter the adapter which authorization you want to test
+     * @throws NotAuthorizedException if no access token available for this adapter
+     */
+    public void hasBeenAuthorized(OAuth2Adapter adapter) throws NotAuthorizedException;
+
+    /**
+     * This method is expected to receive the <code>MuleEvent</code> corresponding to
+     * the execution of an OAuth2 authorize processor. The event will be persisted in
+     * this manager's object store following these rules:
+     * <ul>
+     * <li>If the message payload is consumable, then it will be consumed and
+     * transformed to a <code>String</code> that is then set as payload. Failure to
+     * do this will result in exception</li>
+     * <li>If the message payload is not <code>Serializable</code> then an exception
+     * will be thrown.</li>
+     * <li>This event's key in the object store will result from replacing the
+     * event's id into the template on
+     * {@link org.mule.security.oauth.OAuthProperties.AUTHORIZATION_EVENT_KEY_TEMPLATE}
+     * </ul>
+     * 
+     * @param event a mule event
+     * @throws Exception
+     */
+    public void storeAuthorizationEvent(MuleEvent event) throws Exception;
+
+    /**
+     * Recovers a MuleEvent from the object store. The key that is fetched comes from
+     * replacing the given eventId into the template on
+     * {@link org.mule.security.oauth.OAuthProperties.AUTHORIZATION_EVENT_KEY_TEMPLATE}
+     * 
+     * @param eventId the id of the event to be restored
+     * @return a {@link org.mule.api.MuleEvent}
+     * @throws ObjectStoreException if there was an error accessing the object store
+     * @throws ObjectDoesNotExistException if there's no entry for the event id
+     */
+    public MuleEvent restoreAuthorizationEvent(String eventId)
+        throws ObjectStoreException, ObjectDoesNotExistException;
 
 }

@@ -10,7 +10,6 @@
 
 package org.mule.security.oauth.process;
 
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.devkit.ProcessInterceptor;
@@ -21,7 +20,6 @@ import org.mule.common.connection.exception.UnableToReleaseConnectionException;
 import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
 import org.mule.security.oauth.callback.ProcessCallback;
-import org.mule.security.oauth.processor.AbstractConnectedProcessor;
 import org.mule.security.oauth.processor.AbstractExpressionEvaluator;
 
 import org.slf4j.Logger;
@@ -33,73 +31,102 @@ public class ManagedAccessTokenProcessInterceptor<T> extends AbstractExpressionE
 
     private static Logger logger = LoggerFactory.getLogger(ManagedAccessTokenProcessInterceptor.class);
     private final OAuth2Manager<OAuth2Adapter> oauthManager;
-    private final MuleContext muleContext;
     private final ProcessInterceptor<T, OAuth2Adapter> next;
 
     public ManagedAccessTokenProcessInterceptor(ProcessInterceptor<T, OAuth2Adapter> next,
-                                                OAuth2Manager<OAuth2Adapter> oauthManager,
-                                                MuleContext muleContext)
+                                                OAuth2Manager<OAuth2Adapter> oauthManager)
     {
         this.next = next;
         this.oauthManager = oauthManager;
-        this.muleContext = muleContext;
     }
 
-    public T execute(ProcessCallback<T, OAuth2Adapter> processCallback, OAuth2Adapter object, MessageProcessor messageProcessor, MuleEvent event)
-    throws Exception
-{
-    OAuth2Adapter connector = null;
-    if (!processCallback.isProtected()) {
-        return processCallback.process(oauthManager.getDefaultUnauthorizedConnector());
-    }
-    if (((AbstractConnectedProcessor) messageProcessor).getAccessTokenId() == null) {
-        throw new IllegalArgumentException("The accessTokenId cannot be null");
-    }
-    String _transformedToken = ((String) evaluateAndTransform(muleContext, event, AbstractConnectedProcessor.class.getDeclaredField("_accessTokenIdType").getGenericType(), null, ((AbstractConnectedProcessor) messageProcessor).getAccessTokenId()));
-    try {
-        if (logger.isDebugEnabled()) {
-            logger.debug(("Attempting to acquire access token using from store for [accessTokenId="+ _transformedToken.toString()));
+    @Override
+    public T execute(ProcessCallback<T, OAuth2Adapter> processCallback,
+                     OAuth2Adapter object,
+                     MessageProcessor messageProcessor,
+                     MuleEvent event) throws Exception
+    {
+        OAuth2Adapter connector = null;
+        if (!processCallback.isProtected())
+        {
+            return processCallback.process(this.oauthManager.getDefaultUnauthorizedConnector());
         }
-        connector = oauthManager.acquireAccessToken(_transformedToken);
-        if (connector == null) {
-            throw new UnableToAcquireConnectionException();
-        } else {
-            if (logger.isDebugEnabled()) {
-                logger.debug((("Access token has been acquired for [accessTokenId="+ connector.getAccessTokenId())+"]"));
+
+        String accessTokenId = this.getAccessTokenId(event, messageProcessor, this.oauthManager); 
+
+        try
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(String.format(
+                    "Attempting to acquire access token using from store for [accessTokenId=%s]",
+                    accessTokenId));
             }
+            connector = oauthManager.acquireAccessToken(accessTokenId);
+            if (connector == null)
+            {
+                throw new UnableToAcquireConnectionException();
+            }
+            else
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(String.format("Access token has been acquired for [accessTokenId=%s]",
+                        accessTokenId));
+                }
+            }
+            return next.execute(processCallback, connector, messageProcessor, event);
         }
-        return next.execute(processCallback, connector, messageProcessor, event);
-    } catch (Exception e) {
-        if ((processCallback.getManagedExceptions()!= null)&&(connector!= null)) {
-            for (Class<? extends Exception> exceptionClass: processCallback.getManagedExceptions()) {
-                if (exceptionClass.isInstance(e)) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug((((("An exception ( "+ exceptionClass.getName())+") has been thrown. Destroying the access token with [accessTokenId=")+ connector.getAccessTokenId())+"]"));
-                    }
-                    try {
-                        oauthManager.destroyAccessToken(_transformedToken, connector);
-                        connector = null;
-                    } catch (Exception innerException) {
-                        logger.error(innerException.getMessage(), innerException);
+        catch (Exception e)
+        {
+            if ((processCallback.getManagedExceptions() != null) && (connector != null))
+            {
+                for (Class<? extends Exception> exceptionClass : processCallback.getManagedExceptions())
+                {
+                    if (exceptionClass.isInstance(e))
+                    {
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug(String.format(
+                                "An exception (%s) has been thrown. Destroying the access token with [accessTokenId=%s]",
+                                exceptionClass.getName(), accessTokenId));
+                        }
+                        try
+                        {
+                            oauthManager.destroyAccessToken(accessTokenId, connector);
+                            connector = null;
+                        }
+                        catch (Exception innerException)
+                        {
+                            logger.error(innerException.getMessage(), innerException);
+                        }
                     }
                 }
             }
+            throw e;
         }
-        throw e;
-    } finally {
-        try {
-            if (connector!= null) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug((("Releasing the access token back into the pool [accessTokenId="+ connector.getAccessTokenId())+"]"));
+        finally
+        {
+            try
+            {
+                if (connector != null)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug(String.format(
+                            "Releasing the access token back into the pool [accessTokenId=%s]", accessTokenId));
+                    }
+                    oauthManager.releaseAccessToken(accessTokenId, connector);
                 }
-                oauthManager.releaseAccessToken(_transformedToken, connector);
             }
-        } catch (Exception e) {
-            throw new UnableToReleaseConnectionException(e);
+            catch (Exception e)
+            {
+                throw new UnableToReleaseConnectionException(e);
+            }
         }
     }
-}
 
+    @Override
     public T execute(ProcessCallback<T, OAuth2Adapter> processCallback,
                      OAuth2Adapter object,
                      Filter filter,

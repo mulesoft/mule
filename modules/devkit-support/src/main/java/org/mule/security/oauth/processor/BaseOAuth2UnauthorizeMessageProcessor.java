@@ -12,7 +12,6 @@ package org.mule.security.oauth.processor;
 
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.common.connection.exception.UnableToAcquireConnectionException;
 import org.mule.config.i18n.CoreMessages;
@@ -31,28 +30,31 @@ public abstract class BaseOAuth2UnauthorizeMessageProcessor<T extends OAuth2Mana
 
     protected abstract Class<T> getOAuthManagerClass();
 
+    public BaseOAuth2UnauthorizeMessageProcessor()
+    {
+        super("unauthorize");
+    }
+
     /**
      * Unauthorize the connector
      * 
      * @param event MuleEvent to be processed
-     * @throws MuleException
+     * @throws Exception
      */
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
+    protected final MuleEvent doProcess(MuleEvent event) throws Exception
     {
         OAuth2Manager<OAuth2Adapter> manager = this.getOAuthManager();
         try
         {
-            String transformedToken = ((String) evaluateAndTransform(getMuleContext(), event, String.class,
-                null, getAccessTokenId()));
+            String accessTokenId = this.getAccessTokenId(event, this, manager);
 
             if (logger.isDebugEnabled())
             {
-                logger.debug("Attempting to acquire access token using from store for user "
-                             + transformedToken);
+                logger.debug("Attempting to acquire access token using from store for user " + accessTokenId);
             }
 
-            OAuth2Adapter connector = manager.acquireAccessToken(transformedToken);
+            OAuth2Adapter connector = manager.acquireAccessToken(accessTokenId);
 
             if (connector == null)
             {
@@ -63,15 +65,15 @@ public abstract class BaseOAuth2UnauthorizeMessageProcessor<T extends OAuth2Mana
                 if (logger.isDebugEnabled())
                 {
                     logger.debug(String.format("Access Token has been acquired for [tokenId= %s]",
-                        transformedToken));
+                        accessTokenId));
                 }
 
-                manager.destroyAccessToken(transformedToken, connector);
+                manager.destroyAccessToken(accessTokenId, connector);
 
                 if (logger.isDebugEnabled())
                 {
                     logger.debug(String.format(
-                        "Access token for [tokenId= %s] has been successfully destroyed", transformedToken));
+                        "Access token for [tokenId= %s] has been successfully destroyed", accessTokenId));
                 }
             }
         }

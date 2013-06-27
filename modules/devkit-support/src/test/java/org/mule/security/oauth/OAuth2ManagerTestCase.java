@@ -21,13 +21,16 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.store.ObjectStore;
-import org.mule.common.security.oauth.OAuthState;
+import org.mule.api.transformer.DataType;
+import org.mule.api.transformer.Transformer;
+import org.mule.common.security.oauth.exception.NotAuthorizedException;
 import org.mule.security.oauth.callback.RestoreAccessTokenCallback;
 import org.mule.security.oauth.callback.SaveAccessTokenCallback;
 import org.mule.security.oauth.util.HttpUtil;
 import org.mule.security.oauth.util.OAuthResponseParser;
 import org.mule.tck.size.SmallTest;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -40,21 +43,28 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mockito.stubbing.Answer;
 
+/**
+ * This class contains unit tests for
+ * {@link org.mule.security.oauth.BaseOAuth2Manager}. It doesn't make sense to test
+ * the methods about storing and retrieving authorization events here since it would
+ * require to do deep mocking on the mule message transforming logic. Such a level of
+ * mocking would greatly reduce the value of this test. Therefore, those methods are
+ * tested in the integration test
+ * {@link org.mule.test.integration.security.oauth2.OAuth2AuthorizationEventTestCase}
+ */
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public class OAuth2ManagerTestCase
 {
 
-    @Spy
-    private TestOAuth2Manager manager = new TestOAuth2Manager();
+    private TestOAuth2Manager manager;
 
     @Mock
-    private ObjectStore<OAuthState> accessTokenObjectStore = null;
+    private ObjectStore<Serializable> accessTokenObjectStore = null;
 
     private MuleContext muleContext = null;
 
@@ -63,13 +73,16 @@ public class OAuth2ManagerTestCase
 
     @Mock(extraInterfaces = {Initialisable.class, Startable.class, Stoppable.class, Disposable.class,
         MuleContextAware.class})
-    private OAuth2Adapter adapter = null;
+    private OAuth2Adapter adapter;
 
     @Mock
     private HttpUtil httpUtil;
 
     @Mock
     private OAuthResponseParser oauthResponseParser;
+
+    @Mock
+    private Transformer transformer;
 
     @Before
     public void setUp() throws Exception
@@ -80,6 +93,11 @@ public class OAuth2ManagerTestCase
                 Mockito.eq(MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME))).thenReturn(
             this.accessTokenObjectStore);
 
+        Mockito.when(
+            muleContext.getRegistry().lookupTransformer(Mockito.any(DataType.class),
+                Mockito.any(DataType.class))).thenReturn(this.transformer);
+
+        this.manager = Mockito.spy(new TestOAuth2Manager(this.objectFactory, this.adapter));
         this.manager.setMuleContext(this.muleContext);
         this.manager.setHttpUtil(this.httpUtil);
         this.manager.setOauthResponseParser(this.oauthResponseParser);
@@ -93,7 +111,6 @@ public class OAuth2ManagerTestCase
     {
         Assert.assertSame(this.manager.getAccessTokenObjectStore(), this.accessTokenObjectStore);
         Mockito.verify(this.manager).createPoolFactory(this.manager, this.accessTokenObjectStore);
-        Mockito.verify(this.manager).instantiateAdapter();
         Mockito.verify((Initialisable) this.adapter).initialise();
     }
 
@@ -138,7 +155,7 @@ public class OAuth2ManagerTestCase
         Mockito.verify(adapter).setConsumerSecret(Mockito.eq(this.adapter.getConsumerSecret()));
 
         Mockito.verify(this.manager).setCustomProperties(adapter);
-        Mockito.verify((MuleContextAware) adapter).setMuleContext(this.muleContext);
+        Mockito.verify((MuleContextAware) adapter, Mockito.atLeastOnce()).setMuleContext(this.muleContext);
     }
 
     @Test
@@ -297,6 +314,41 @@ public class OAuth2ManagerTestCase
     }
 
     @Test
+    public void hasBeenAuthorized() throws NotAuthorizedException
+    {
+        Mockito.when(this.adapter.getAccessToken()).thenReturn("accessTokenId");
+        this.manager.hasBeenAuthorized(this.adapter);
+    }
+
+    @Test
+    public void hasBeenAuthorizedWithRestore() throws NotAuthorizedException
+    {
+        RestoreAccessTokenCallback callback = Mockito.mock(RestoreAccessTokenCallback.class);
+        Mockito.when(this.adapter.getOauthRestoreAccessToken()).thenReturn(callback);
+        final String accessToken = "accessToken";
+        Mockito.when(callback.getAccessToken()).thenReturn(accessToken);
+
+        Mockito.when(this.adapter.getAccessToken()).thenReturn(null).thenAnswer(new Answer<String>()
+        {
+
+            @Override
+            public String answer(InvocationOnMock invocation) throws Throwable
+            {
+                Mockito.verify(adapter).setAccessToken(accessToken);
+                return accessToken;
+            }
+        });
+
+        this.manager.hasBeenAuthorized(this.adapter);
+    }
+
+    @Test(expected = NotAuthorizedException.class)
+    public void hasBeenAuthorizedFailure() throws NotAuthorizedException
+    {
+        this.manager.hasBeenAuthorized(this.adapter);
+    }
+
+    @Test
     public void capabilities()
     {
         for (ModuleCapability capability : ModuleCapability.values())
@@ -312,41 +364,5 @@ public class OAuth2ManagerTestCase
                 Assert.assertFalse(this.manager.isCapableOf(capability));
             }
         }
-    }
-
-    private class TestOAuth2Manager extends BaseOAuth2Manager<OAuth2Adapter>
-    {
-
-        private final transient Logger logger = LoggerFactory.getLogger(TestOAuth2Manager.class);
-
-        @Override
-        protected Logger getLogger()
-        {
-            return logger;
-        }
-
-        @Override
-        protected KeyedPoolableObjectFactory createPoolFactory(OAuth2Manager<OAuth2Adapter> oauthManager,
-                                                               ObjectStore<OAuthState> objectStore)
-        {
-            return objectFactory;
-        }
-
-        @Override
-        protected void fetchCallbackParameters(OAuth2Adapter adapter, String response)
-        {
-        }
-
-        @Override
-        protected void setCustomProperties(OAuth2Adapter adapter)
-        {
-        }
-
-        @Override
-        protected OAuth2Adapter instantiateAdapter()
-        {
-            return adapter;
-        }
-
     }
 }

@@ -10,6 +10,7 @@
 
 package org.mule.security.oauth;
 
+import org.mule.api.NameableObject;
 import org.mule.common.security.oauth.exception.UnableToAcquireAccessTokenException;
 import org.mule.common.security.oauth.exception.UnableToAcquireRequestTokenException;
 
@@ -17,7 +18,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public interface OAuth2Adapter extends OAuthAdapter, OAuth2Connector
+public interface OAuth2Adapter extends OAuthAdapter, OAuth2Connector, NameableObject
 {
 
     /**
@@ -39,7 +40,7 @@ public interface OAuth2Adapter extends OAuthAdapter, OAuth2Connector
 
     public boolean hasTokenExpired();
 
-    public void refreshAccessToken(String accessTokenUrl) throws UnableToAcquireAccessTokenException;
+    public void refreshAccessToken() throws UnableToAcquireAccessTokenException;
 
     /**
      * Retrieve access token

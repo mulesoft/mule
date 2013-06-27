@@ -67,6 +67,18 @@ public interface OAuthAdapter extends Serializable
      */
     public RestoreAccessTokenCallback getOauthRestoreAccessToken();
 
+    /**
+     * Checks if the adapter has been authorized. If it was not, then in trows
+     * {@link org.mule.common.security.oauth.exception.NotAuthorizedException}
+     * 
+     * @throws NotAuthorizedException if the adapter hasn't been authorized
+     */
     public void hasBeenAuthorized() throws NotAuthorizedException;
+
+    /**
+     * @return a non-null instance of {@link org.mule.security.oauth.OnNoTokenPolicy}
+     *         that specifies the behavior to take when token is not set
+     */
+    public OnNoTokenPolicy getOnNoTokenPolicy();
 
 }

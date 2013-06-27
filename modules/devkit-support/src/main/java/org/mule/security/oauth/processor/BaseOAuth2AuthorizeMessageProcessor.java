@@ -13,11 +13,13 @@ package org.mule.security.oauth.processor;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.common.security.oauth.AuthorizationParameter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
+import org.mule.security.oauth.OAuthProperties;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -34,37 +36,60 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
     public final void start() throws MuleException
     {
         OAuth2Manager<OAuth2Adapter> module = this.getOAuthManager();
-        FetchAccessTokenMessageProcessor fetchAccessTokenMessageProcessor = new OAuth2FetchAccessTokenMessageProcessor((OAuth2Manager<OAuth2Adapter>) module);
+        FetchAccessTokenMessageProcessor fetchAccessTokenMessageProcessor = new OAuth2FetchAccessTokenMessageProcessor(
+            (OAuth2Manager<OAuth2Adapter>) module, this.getAccessTokenId());
+
         this.startCallback(module, fetchAccessTokenMessageProcessor);
-        
+
         if (this.getAccessTokenUrl() != null)
         {
             fetchAccessTokenMessageProcessor.setAccessTokenUrl(this.getAccessTokenUrl());
         }
         else
         {
-            fetchAccessTokenMessageProcessor.setAccessTokenUrl(module.getDefaultUnauthorizedConnector().getAccessTokenUrl());
+            fetchAccessTokenMessageProcessor.setAccessTokenUrl(module.getDefaultUnauthorizedConnector()
+                .getAccessTokenUrl());
         }
     }
 
-    @SuppressWarnings("unchecked")
-    protected OAuth2Manager<OAuth2Adapter> getOAuthManager()
+    /**
+     * Starts the OAuth authorization process
+     * 
+     * @param event MuleEvent to be processed
+     * @throws Exception
+     */
+    @Override
+    protected final MuleEvent doProcess(MuleEvent event) throws Exception
     {
-        try
-        {
-            Object maybeAManager = this.findOrCreate(this.getOAuthManagerClass(), false, null);
-            if (!(maybeAManager instanceof OAuth2Manager))
-            {
-                throw new IllegalStateException(String.format(
-                    "Object of class %s does not implement OAuth2Manager", this.getOAuthManagerClass()
-                        .getCanonicalName()));
-            }
+        OAuth2Manager<OAuth2Adapter> moduleObject = this.getOAuthManager();
 
-            return (OAuth2Manager<OAuth2Adapter>) maybeAManager;
-        }
-        catch (Exception e)
+        String transformedAuthorizationUrl = this.toString(event, this.getAuthorizationUrl());
+        String transformedAccessTokenUrl = this.toString(event, this.getAccessTokenUrl());
+
+        moduleObject.getDefaultUnauthorizedConnector().setAccessTokenUrl(transformedAccessTokenUrl);
+        String location = moduleObject.buildAuthorizeUrl(this.getExtraParameters(event, moduleObject),
+            transformedAuthorizationUrl, this.getOauthCallback().getUrl());
+
+        MuleMessage message = event.getMessage();
+
+        moduleObject.storeAuthorizationEvent(event);
+        this.notifyAuthorizeStart(event);
+
+        message.setOutboundProperty(OAuthProperties.HTTP_STATUS, "302");
+        message.setOutboundProperty(OAuthProperties.CALLBACK_LOCATION, location);
+
+        return event;
+    }
+
+    private void setState(Map<String, String> extraParameters, MuleEvent event)
+    {
+        String state = this.getState();
+
+        if (state != null)
         {
-            throw new RuntimeException(e);
+            state = String.format(OAuthProperties.EVENT_STATE_TEMPLATE, event.getId())
+                    + this.toString(event, state);
+            extraParameters.put("state", state);
         }
     }
 
@@ -75,10 +100,7 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
             .getAuthorizationParameters();
 
         Map<String, String> extraParameters = new HashMap<String, String>();
-        if (this.getState() != null)
-        {
-            extraParameters.put("state", this.toString(event, this.getState()));
-        }
+        this.setState(extraParameters, event);
 
         if (params != null)
         {
@@ -117,36 +139,25 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
 
     }
 
-    /**
-     * Starts the OAuth authorization process
-     * 
-     * @param event MuleEvent to be processed
-     * @throws MuleException
-     */
-    public final MuleEvent process(MuleEvent event) throws MuleException
+    @SuppressWarnings("unchecked")
+    protected OAuth2Manager<OAuth2Adapter> getOAuthManager()
     {
         try
         {
-            OAuth2Manager<OAuth2Adapter> moduleObject = this.getOAuthManager();
+            Object maybeAManager = this.findOrCreate(this.getOAuthManagerClass(), false, null);
+            if (!(maybeAManager instanceof OAuth2Manager))
+            {
+                throw new IllegalStateException(String.format(
+                    "Object of class %s does not implement OAuth2Manager", this.getOAuthManagerClass()
+                        .getCanonicalName()));
+            }
 
-            String transformedAuthorizationUrl = this.toString(event, this.getAuthorizationUrl());
-            String transformedAccessTokenUrl = this.toString(event, this.getAccessTokenUrl());
-
-            moduleObject.getDefaultUnauthorizedConnector().setAccessTokenUrl(transformedAccessTokenUrl);
-            String location = moduleObject.buildAuthorizeUrl(this.getExtraParameters(event, moduleObject),
-                transformedAuthorizationUrl, this.getOauthCallback().getUrl());
-
-            event.getMessage().setOutboundProperty("http.status", "302");
-            event.getMessage().setOutboundProperty("Location", location);
-
-            return event;
+            return (OAuth2Manager<OAuth2Adapter>) maybeAManager;
         }
         catch (Exception e)
         {
-            throw new MessagingException(CoreMessages.failedToInvoke("authorize"), event, e);
+            throw new RuntimeException(e);
         }
     }
-
-  
 
 }

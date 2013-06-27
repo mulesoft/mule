@@ -10,13 +10,27 @@
 
 package org.mule.security.oauth.processor;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.security.oauth.notification.OAuthAuthorizeNotification;
 
-public abstract class FetchAccessTokenMessageProcessor implements MessageProcessor
+public abstract class FetchAccessTokenMessageProcessor extends AbstractDevkitBasedMessageProcessor
+    implements MessageProcessor
 {
 
     private String redirectUri;
     private String accessTokenUrl = null;
+
+    public FetchAccessTokenMessageProcessor()
+    {
+        super("fetch-access-token");
+    }
+
+    protected void notifyCallbackReception(MuleEvent event)
+    {
+        muleContext.fireNotification(new OAuthAuthorizeNotification(event,
+            OAuthAuthorizeNotification.OAUTH_AUTHORIZATION_END));
+    }
 
     /**
      * Sets redirectUri

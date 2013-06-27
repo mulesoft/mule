@@ -39,6 +39,7 @@ public class TestOAuth2Adapter
     private OAuth2Manager<OAuth2Adapter> manager;
     private MuleContext muleContext;
 
+    private String name;
     private boolean postAuth = false;
     private boolean start = false;
     private boolean stop = false;
@@ -51,6 +52,7 @@ public class TestOAuth2Adapter
     private String authorizationUrl;
     private String accessTokenUrl;
     private String refreshToken;
+    private OnNoTokenPolicy onNoTokenPolicy;
 
     public TestOAuth2Adapter(OAuth2Manager<OAuth2Adapter> manager)
     {
@@ -222,14 +224,6 @@ public class TestOAuth2Adapter
     }
 
     @Override
-    @Deprecated
-    public String getAccessTokenId()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public String authorize(Map<String, String> extraParameters, String accessTokenUrl, String redirectUri)
         throws UnableToAcquireRequestTokenException
     {
@@ -252,7 +246,7 @@ public class TestOAuth2Adapter
     }
 
     @Override
-    public void refreshAccessToken(String accessTokenUrl) throws UnableToAcquireAccessTokenException
+    public void refreshAccessToken() throws UnableToAcquireAccessTokenException
     {
         // TODO Auto-generated method stub
 
@@ -356,4 +350,27 @@ public class TestOAuth2Adapter
         return muleContext;
     }
 
+    @Override
+    public String getName()
+    {
+        return name;
+    }
+
+    @Override
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    @Override
+    public OnNoTokenPolicy getOnNoTokenPolicy()
+    {
+        return onNoTokenPolicy;
+    }
+
+    public void setOnNoTokenPolicy(OnNoTokenPolicy onNoTokenPolicy)
+    {
+        this.onNoTokenPolicy = onNoTokenPolicy;
+    }
+    
 }

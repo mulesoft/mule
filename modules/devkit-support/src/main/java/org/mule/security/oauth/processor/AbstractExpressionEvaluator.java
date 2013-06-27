@@ -14,11 +14,14 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionManager;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.MessageTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.TransformerMessagingException;
+import org.mule.common.connection.exception.UnableToAcquireConnectionException;
+import org.mule.security.oauth.OAuth2Manager;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.TemplateParser;
 
@@ -496,6 +499,35 @@ public abstract class AbstractExpressionEvaluator
         else
         {
             return source;
+        }
+    }
+
+    protected String getAccessTokenId(MuleEvent event,
+                                      MessageProcessor processor,
+                                      OAuth2Manager<?> oauthManager)
+        throws UnableToAcquireConnectionException
+    {
+
+        Object accessTokenId = null;
+
+        if (processor instanceof AbstractConnectedProcessor)
+        {
+            accessTokenId = ((AbstractConnectedProcessor) processor).getAccessTokenId();
+        }
+
+        if (accessTokenId == null)
+        {
+            accessTokenId = oauthManager.getDefaultUnauthorizedConnector().getName();
+        }
+
+        try
+        {
+            return (String) this.evaluateAndTransform(event.getMuleContext(), event, String.class, null, accessTokenId);
+        }
+        catch (Exception e)
+        {
+            throw new UnableToAcquireConnectionException(String.format(
+                "Could not transform accessTokenId %s", accessTokenId), e);
         }
     }
 

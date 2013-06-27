@@ -24,8 +24,10 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.security.oauth.DefaultHttpCallback;
 import org.mule.security.oauth.callback.HttpCallbackAdapter;
+import org.mule.security.oauth.notification.OAuthAuthorizeNotification;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public abstract class AbstractAuthorizeMessageProcessor extends AbstractDevkitBasedMessageProcessor
@@ -38,25 +40,42 @@ public abstract class AbstractAuthorizeMessageProcessor extends AbstractDevkitBa
     private String accessTokenUrl = null;
     private HttpCallback oauthCallback;
     private String state;
-    
+
+    public AbstractAuthorizeMessageProcessor()
+    {
+        super("authorize");
+    }
+
     protected abstract String getAuthCodeRegex();
-    
-    protected void startCallback(HttpCallbackAdapter adapter, FetchAccessTokenMessageProcessor fetchAccessTokenMessageProcessor) throws MuleException
+
+    protected void startCallback(HttpCallbackAdapter adapter,
+                                 FetchAccessTokenMessageProcessor fetchAccessTokenMessageProcessor)
+        throws MuleException
     {
         if (oauthCallback == null)
         {
-            oauthCallback = new DefaultHttpCallback(Arrays.asList(
-                new ExtractAuthorizationCodeMessageProcessor(Pattern.compile(this.getAuthCodeRegex())), fetchAccessTokenMessageProcessor, this.listener),
-                getMuleContext(), adapter.getDomain(),
+            oauthCallback = new DefaultHttpCallback(this.buildCallbackProcessorList(
+                new ExtractAuthorizationCodeMessageProcessor(Pattern.compile(this.getAuthCodeRegex())),
+                fetchAccessTokenMessageProcessor, this.listener), getMuleContext(), adapter.getDomain(),
                 adapter.getLocalPort(), adapter.getRemotePort(), adapter.getPath(), adapter.getAsync(),
                 getFlowConstruct().getExceptionListener(), adapter.getConnector());
-            
+
             fetchAccessTokenMessageProcessor.setRedirectUri(oauthCallback.getUrl());
             oauthCallback.start();
         }
     }
-    
-    
+
+    protected List<MessageProcessor> buildCallbackProcessorList(MessageProcessor... processors)
+    {
+        return Arrays.asList(processors);
+    }
+
+    protected void notifyAuthorizeStart(MuleEvent event)
+    {
+        muleContext.fireNotification(new OAuthAuthorizeNotification(event,
+            OAuthAuthorizeNotification.OAUTH_AUTHORIZATION_BEGIN));
+    }
+
     @Override
     public final void stop() throws MuleException
     {
@@ -65,7 +84,7 @@ public abstract class AbstractAuthorizeMessageProcessor extends AbstractDevkitBa
             this.oauthCallback.stop();
         }
     }
-    
+
     protected String toString(MuleEvent event, Object value)
     {
         try
@@ -81,12 +100,13 @@ public abstract class AbstractAuthorizeMessageProcessor extends AbstractDevkitBa
             throw new RuntimeException(e);
         }
     }
-    
+
     /**
      * Sets listener
      * 
      * @param value Value to set
      */
+    @Override
     public void setListener(MessageProcessor value)
     {
         this.listener = value;
@@ -157,5 +177,5 @@ public abstract class AbstractAuthorizeMessageProcessor extends AbstractDevkitBa
     {
         return state;
     }
-    
+
 }

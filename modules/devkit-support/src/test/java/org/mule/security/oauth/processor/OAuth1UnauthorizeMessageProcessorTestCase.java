@@ -11,7 +11,6 @@
 package org.mule.security.oauth.processor;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.security.oauth.OAuth1Adapter;
 import org.mule.tck.size.SmallTest;
 
@@ -30,18 +29,21 @@ public class OAuth1UnauthorizeMessageProcessorTestCase
     @Mock
     private OAuth1Adapter adapter;
     private TestUnathorizeMessageProcessor processor;
+    private MuleEvent event;
 
     @Before
     public void setUp()
     {
         this.processor = new TestUnathorizeMessageProcessor();
         this.processor.setModuleObject(this.adapter);
+        this.event = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
+        Mockito.when(this.event.getMessage().getPayload()).thenReturn("");
     }
 
     @Test
     public void unathorize() throws Exception
     {
-        this.processor.process(Mockito.mock(MuleEvent.class));
+        this.processor.process(this.event);
         Mockito.verify(this.adapter).reset();
     }
 

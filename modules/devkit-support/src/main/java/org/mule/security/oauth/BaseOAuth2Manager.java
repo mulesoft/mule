@@ -10,8 +10,12 @@
 
 package org.mule.security.oauth;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
@@ -25,10 +29,13 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStore;
-import org.mule.common.security.oauth.OAuthState;
+import org.mule.api.store.ObjectStoreException;
+import org.mule.common.security.oauth.exception.NotAuthorizedException;
 import org.mule.common.security.oauth.exception.UnableToAcquireAccessTokenException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.security.oauth.callback.DefaultHttpCallbackAdapter;
 import org.mule.security.oauth.callback.RestoreAccessTokenCallback;
 import org.mule.security.oauth.callback.SaveAccessTokenCallback;
@@ -38,6 +45,7 @@ import org.mule.security.oauth.util.HttpUtil;
 import org.mule.security.oauth.util.HttpUtilImpl;
 import org.mule.security.oauth.util.OAuthResponseParser;
 
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Date;
@@ -65,7 +73,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
      * Flow Construct
      */
     protected FlowConstruct flowConstruct;
-    private ObjectStore<OAuthState> accessTokenObjectStore;
+    private ObjectStore<Serializable> accessTokenObjectStore;
 
     /**
      * Access Token Pool Factory
@@ -106,7 +114,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
      *         {@link org.apache.commons.pool.KeyedPoolableObjectFactory}
      */
     protected abstract KeyedPoolableObjectFactory createPoolFactory(OAuth2Manager<OAuth2Adapter> oauthManager,
-                                                                    ObjectStore<OAuthState> objectStore);
+                                                                    ObjectStore<Serializable> objectStore);
 
     /**
      * Populates the adapter with custom properties not accessible from the base
@@ -125,26 +133,31 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
      */
     protected abstract void fetchCallbackParameters(OAuth2Adapter adapter, String response);
 
+    public BaseOAuth2Manager()
+    {
+        this.defaultUnauthorizedConnector = this.instantiateAdapter();
+    }
+
     @Override
     public final void initialise() throws InitialisationException
     {
         super.initialise();
         GenericKeyedObjectPool.Config config = new GenericKeyedObjectPool.Config();
         config.testOnBorrow = true;
-        if (accessTokenObjectStore == null)
+        if (this.accessTokenObjectStore == null)
         {
-            accessTokenObjectStore = muleContext.getRegistry().lookupObject(
+            this.accessTokenObjectStore = muleContext.getRegistry().lookupObject(
                 MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME);
-            if (accessTokenObjectStore == null)
+            if (this.accessTokenObjectStore == null)
             {
                 throw new InitialisationException(
                     CoreMessages.createStaticMessage("There is no default user object store on this Mule instance."),
                     this);
             }
         }
-        accessTokenPoolFactory = this.createPoolFactory(this, this.accessTokenObjectStore);
-        accessTokenPool = new GenericKeyedObjectPool(accessTokenPoolFactory, config);
-        defaultUnauthorizedConnector = this.instantiateAdapter();
+
+        this.accessTokenPoolFactory = this.createPoolFactory(this, this.accessTokenObjectStore);
+        this.accessTokenPool = new GenericKeyedObjectPool(accessTokenPoolFactory, config);
 
         if (defaultUnauthorizedConnector instanceof Initialisable)
         {
@@ -238,22 +251,24 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
      * {@inheritDoc}
      */
     @Override
-    public final OAuth2Adapter acquireAccessToken(String userId) throws Exception
+    public final OAuth2Adapter acquireAccessToken(String accessTokenId) throws Exception
     {
         if (getLogger().isDebugEnabled())
         {
             getLogger().debug(
-                String.format("Pool Statistics before acquiring [key %s] [active=%d] [idle=%d]", userId,
-                    accessTokenPool.getNumActive(userId), accessTokenPool.getNumIdle(userId)));
+                String.format("Pool Statistics before acquiring [key %s] [active=%d] [idle=%d]",
+                    accessTokenId, accessTokenPool.getNumActive(accessTokenId),
+                    accessTokenPool.getNumIdle(accessTokenId)));
         }
 
-        OAuth2Adapter object = ((OAuth2Adapter) accessTokenPool.borrowObject(userId));
+        OAuth2Adapter object = ((OAuth2Adapter) accessTokenPool.borrowObject(accessTokenId));
 
         if (getLogger().isDebugEnabled())
         {
             getLogger().debug(
-                String.format("Pool Statistics after acquiring [key %s] [active=%d] [idle=%d]", userId,
-                    accessTokenPool.getNumActive(userId), accessTokenPool.getNumIdle(userId)));
+                String.format("Pool Statistics after acquiring [key %s] [active=%d] [idle=%d]",
+                    accessTokenId, accessTokenPool.getNumActive(accessTokenId),
+                    accessTokenPool.getNumIdle(accessTokenId)));
         }
         return object;
     }
@@ -412,6 +427,23 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
      * {@inheritDoc}
      */
     @Override
+    public final void hasBeenAuthorized(OAuth2Adapter adapter) throws NotAuthorizedException
+    {
+        if (adapter.getAccessToken() == null)
+        {
+            this.restoreAccessToken(adapter);
+            if (adapter.getAccessToken() == null)
+            {
+                throw new NotAuthorizedException(
+                    "This connector has not yet been authorized, please authorize by calling \"authorize\".");
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public final void refreshAccessToken(OAuth2Adapter adapter) throws UnableToAcquireAccessTokenException
     {
         if (getLogger().isDebugEnabled())
@@ -434,6 +466,68 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
 
         adapter.setAccessToken(null);
         this.fetchAndExtract(adapter, builder.toString());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void storeAuthorizationEvent(MuleEvent event) throws Exception
+    {
+        MuleMessage message = event.getMessage();
+
+        if (message instanceof DefaultMuleMessage)
+        {
+            DefaultMuleMessage dmm = (DefaultMuleMessage) message;
+            if (dmm.isConsumable())
+            {
+                try
+                {
+                    message.setPayload(message.getPayload(String.class));
+                }
+                catch (Exception e)
+                {
+                    throw new MessagingException(
+                        MessageFactory.createStaticMessage(String.format(
+                            "event can't be persisted because payload of class %s couldn't be consumed into a string",
+                            message.getPayload().getClass().getCanonicalName())), event, e);
+                }
+            }
+        }
+
+        if (!(message.getPayload() instanceof Serializable))
+        {
+            throw new MessagingException(
+                MessageFactory.createStaticMessage(String.format(
+                    "In order to perform the OAuth authorization dance the mule event needs to be stored in the object store. However, the message has a payload of class %s which is not serializable.",
+                    message.getPayload().getClass().getCanonicalName())), event);
+        }
+
+        try
+        {
+            this.accessTokenObjectStore.store(this.buildAuthorizationEventKey(event.getId()), event);
+        }
+        catch (ObjectStoreException e)
+        {
+            throw new MessagingException(
+                MessageFactory.createStaticMessage("Exception was thrown when trying to store the message into object store. Please check that all message properties are serializable"),
+                event, e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MuleEvent restoreAuthorizationEvent(String eventId)
+        throws ObjectStoreException, ObjectDoesNotExistException
+    {
+        return (MuleEvent) this.accessTokenObjectStore.retrieve(this.buildAuthorizationEventKey(eventId));
+    }
+
+    private String buildAuthorizationEventKey(String eventId)
+    {
+        return String.format(OAuthProperties.AUTHORIZATION_EVENT_KEY_TEMPLATE, eventId);
     }
 
     private void fetchAndExtract(OAuth2Adapter adapter, String requestBody)
@@ -562,6 +656,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     /**
      * Returns true if this module implements such capability
      */
+    @Override
     public final boolean isCapableOf(ModuleCapability capability)
     {
         if (capability == ModuleCapability.LIFECYCLE_CAPABLE)
@@ -580,7 +675,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public <T> ProcessTemplate<T, OAuth2Adapter> getProcessTemplate()
     {
         return (ProcessTemplate<T, OAuth2Adapter>) new OAuthProcessTemplate(this);
@@ -640,6 +735,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         return this.muleContext;
     }
 
+    @Override
     public final void setMuleContext(MuleContext muleContext)
     {
         this.muleContext = muleContext;
@@ -669,7 +765,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     /**
      * Retrieves accessTokenObjectStore
      */
-    public ObjectStore<OAuthState> getAccessTokenObjectStore()
+    public ObjectStore<Serializable> getAccessTokenObjectStore()
     {
         return this.accessTokenObjectStore;
     }
@@ -679,7 +775,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
      * 
      * @param value Value to set
      */
-    public void setAccessTokenObjectStore(ObjectStore<OAuthState> value)
+    public void setAccessTokenObjectStore(ObjectStore<Serializable> value)
     {
         this.accessTokenObjectStore = value;
     }
@@ -700,5 +796,50 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     public void setOauthResponseParser(OAuthResponseParser oauthResponseParser)
     {
         this.oauthResponseParser = oauthResponseParser;
+    }
+
+    /**
+     * Sets authorizationUrl
+     * 
+     * @param value Value to set
+     */
+    public void setAuthorizationUrl(String value)
+    {
+        this.defaultUnauthorizedConnector.setAuthorizationUrl(value);
+    }
+
+    /**
+     * Sets accessTokenUrl
+     * 
+     * @param value Value to set
+     */
+    public void setAccessTokenUrl(String value)
+    {
+        this.defaultUnauthorizedConnector.setAccessTokenUrl(value);
+    }
+
+    /**
+     * Sets consumerKey
+     * 
+     * @param value Value to set
+     */
+    public void setConsumerKey(String value)
+    {
+        this.defaultUnauthorizedConnector.setConsumerKey(value);
+    }
+
+    /**
+     * Sets consumerSecret
+     * 
+     * @param value Value to set
+     */
+    public void setConsumerSecret(String value)
+    {
+        this.defaultUnauthorizedConnector.setConsumerSecret(value);
+    }
+    
+    protected void setDefaultUnauthorizedConnector(OAuth2Adapter defaultUnauthorizedConnector)
+    {
+        this.defaultUnauthorizedConnector = defaultUnauthorizedConnector;
     }
 }
