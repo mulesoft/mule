@@ -229,7 +229,7 @@ public abstract class AbstractDevkitBasedMessageProcessor extends AbstractConnec
     }
 
     @Override
-    public final void dispose()
+    public void dispose()
     {
     }
 
