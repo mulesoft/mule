@@ -23,6 +23,7 @@ import org.mule.context.DefaultMuleContextFactory;
 import java.io.StringBufferInputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -56,14 +57,30 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         return doGetArtifact(element, callback, true);
     }
     
-    private MuleArtifact doGetArtifact(org.w3c.dom.Element element, XmlConfigurationCallback callback, boolean embedInFlow)
+    private MuleArtifact doGetArtifact(org.w3c.dom.Element element, final XmlConfigurationCallback callback, boolean embedInFlow)
                     throws MuleArtifactFactoryException
     {
-    	ConfigResource config = null;
+    	ConfigResource config;
         Document document = DocumentHelper.createDocument();
         
         // the rootElement is the root of the document
         Element rootElement = document.addElement("mule", "http://www.mulesoft.org/schema/mule/core");
+
+        org.w3c.dom.Element[] placeholders = callback.getPropertyPlaceholders();
+        for (org.w3c.dom.Element placeholder : placeholders)
+        {
+            try
+            {
+                Element newPlaceHolder = convert(placeholder);
+                rootElement.add(newPlaceHolder);
+            }
+            catch (ParserConfigurationException e)
+            {
+                throw new MuleArtifactFactoryException("Error parsing XML", e);
+            }
+
+        }
+
         
         // the parentElement is the parent of the element we are adding
         Element parentElement = rootElement;
@@ -121,15 +138,18 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         }
         MuleContext muleContext = null;
         SpringXmlConfigurationBuilder builder = null;
+        Map<String, String> environmentProperties = callback.getEnvironmentProperties();
+        Properties systemProperties = System.getProperties();
+        Map<Object,Object> originalSystemProperties = new HashMap<Object, Object>(systemProperties);
         try
         {
-        	MuleContextFactory factory = new DefaultMuleContextFactory();
-            builder = new SpringXmlConfigurationBuilder(
-                    new ConfigResource[]{config});
+            systemProperties.putAll(environmentProperties);
+            MuleContextFactory factory = new DefaultMuleContextFactory();
+            builder = new SpringXmlConfigurationBuilder(new ConfigResource[]{config});
             muleContext = factory.createMuleContext(builder);
             muleContext.start();
             
-            MuleArtifact artifact = null;
+            MuleArtifact artifact;
             if (embedInFlow)
             {
                 Pipeline pipeline = (Pipeline)muleContext.getRegistry().lookupFlowConstruct(flowName);
@@ -147,6 +167,9 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         {
         	dispose(builder, muleContext);
         	throw new MuleArtifactFactoryException("Error initializing", e);	
+        } finally {
+            systemProperties.clear();
+            systemProperties.putAll(originalSystemProperties);
         }
     }
     
