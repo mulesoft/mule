@@ -101,6 +101,16 @@ public abstract class XmlConfigurationMuleArtifactFactoryTestCase extends Abstra
                 return null;
             }
         }
+
+        public Element[] getPropertyPlaceholders()
+        {
+            return new Element[0];
+        }
+
+        public Map<String, String> getEnvironmentProperties()
+        {
+            return null;
+        }
     }
 }
 
