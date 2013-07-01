@@ -8,11 +8,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.paging;
+package org.mule.streaming;
 
 import org.mule.api.MuleException;
-import org.mule.api.paging.PagingDelegate;
-import org.mule.api.paging.Producer;
+import org.mule.api.streaming.PagingDelegate;
+import org.mule.api.streaming.Producer;
 
 import java.util.List;
 

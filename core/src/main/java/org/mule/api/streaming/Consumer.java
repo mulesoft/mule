@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.paging;
+package org.mule.api.streaming;
 
 import org.mule.api.Closeable;
 
@@ -17,8 +17,8 @@ import java.util.NoSuchElementException;
 public interface Consumer<T> extends Closeable
 {
 
-    public T consume(Producer<T> producer) throws NoSuchElementException;
+    public T consume() throws NoSuchElementException;
     
-    public boolean isConsumed(Producer<T> producer);
+    public boolean isConsumed();
 
 }

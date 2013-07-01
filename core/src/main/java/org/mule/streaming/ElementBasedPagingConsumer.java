@@ -8,31 +8,38 @@
  * LICENSE.txt file.
  */
 
-package org.mule.paging;
+package org.mule.streaming;
 
 import org.mule.api.MuleException;
-import org.mule.api.paging.Consumer;
-import org.mule.api.paging.Producer;
+import org.mule.api.streaming.Consumer;
+import org.mule.api.streaming.Producer;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ElementBasedPagingConsumer<T> implements Consumer<T>
 {
 
+    private static final transient Logger logger = LoggerFactory.getLogger(ElementBasedPagingConsumer.class);
+
+    private Producer<T> producer;
     private List<T> currentPage = null;
     private int index;
     private int pageSize;
 
-    public ElementBasedPagingConsumer()
+    public ElementBasedPagingConsumer(Producer<T> producer)
     {
+        this.producer = producer;
         this.reset();
     }
 
     @Override
-    public T consume(Producer<T> producer) throws NoSuchElementException
+    public T consume() throws NoSuchElementException
     {
-        if (this.isConsumed(producer))
+        if (this.isConsumed())
         {
             throw new NoSuchElementException();
         }
@@ -44,12 +51,26 @@ public class ElementBasedPagingConsumer<T> implements Consumer<T>
     }
 
     @Override
-    public boolean isConsumed(Producer<T> producer)
+    public boolean isConsumed()
     {
         if (this.index >= this.pageSize)
         {
-            this.loadNextPage(producer);
-            return this.pageSize == 0;
+            this.loadNextPage(this.producer);
+            if (this.pageSize == 0)
+            {
+                try
+                {
+                    this.close();
+                }
+                catch (MuleException e)
+                {
+                    if (logger.isWarnEnabled())
+                    {
+                        logger.warn("Expection was trapped trying to close consumer", e);
+                    }
+                }
+                return true;
+            }
         }
 
         return false;
@@ -59,6 +80,7 @@ public class ElementBasedPagingConsumer<T> implements Consumer<T>
     public void close() throws MuleException
     {
         this.currentPage = null;
+        this.producer.close();
     }
 
     private void reset()

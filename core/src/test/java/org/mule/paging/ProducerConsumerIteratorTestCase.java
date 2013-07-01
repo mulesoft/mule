@@ -11,9 +11,12 @@
 package org.mule.paging;
 
 import org.mule.api.MuleException;
-import org.mule.api.paging.Consumer;
-import org.mule.api.paging.PagingDelegate;
-import org.mule.api.paging.Producer;
+import org.mule.api.streaming.Consumer;
+import org.mule.api.streaming.PagingDelegate;
+import org.mule.api.streaming.Producer;
+import org.mule.streaming.ConsumerIterator;
+import org.mule.streaming.ElementBasedPagingConsumer;
+import org.mule.streaming.PagingDelegateProducer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +48,7 @@ public class ProducerConsumerIteratorTestCase
                     counter++;
                     String value = RandomStringUtils.randomAlphabetic(5000);
                     numberOfBytes += value.length() * 2;
-                    numberOfMegabytes = numberOfBytes / (1024*1024);
+                    numberOfMegabytes = numberOfBytes / (1024 * 1024);
                     page.add(value);
                 }
 
@@ -58,28 +61,23 @@ public class ProducerConsumerIteratorTestCase
         public void close() throws MuleException
         {
         };
-        
-        @Override
-        public int getTotalSize() throws UnsupportedOperationException
-        {
-            return TOP;
-        }
     };
 
     @Test
     public void iterateStreaming() throws Exception
     {
         Producer<String> producer = new PagingDelegateProducer<String>(this.delegate);
-        Consumer<String> consumer = new ElementBasedPagingConsumer<String>();
+        Consumer<String> consumer = new ElementBasedPagingConsumer<String>(producer);
 
-        ProducerConsumerIterator<String> it = new ProducerConsumerIterator<String>(producer, consumer);
-        
+        ConsumerIterator<String> it = new ConsumerIterator<String>(consumer);
+
         int count = 0;
-        while (it.hasNext()) {
+        while (it.hasNext())
+        {
             it.next();
             count++;
         }
-        
+
         Assert.assertEquals(count, TOP);
         it.close();
     }

@@ -8,24 +8,21 @@
  * LICENSE.txt file.
  */
 
-package org.mule.paging;
+package org.mule.streaming;
 
 import org.mule.api.Closeable;
 import org.mule.api.MuleException;
-import org.mule.api.paging.Consumer;
-import org.mule.api.paging.Producer;
+import org.mule.api.streaming.Consumer;
 
 import java.util.Iterator;
 
-public class ProducerConsumerIterator<T> implements Iterator<T>, Closeable
+public class ConsumerIterator<T> implements Iterator<T>, Closeable
 {
 
-    private Producer<T> producer;
     private Consumer<T> consumer;
 
-    public ProducerConsumerIterator(Producer<T> producer, Consumer<T> consumer)
+    public ConsumerIterator(Consumer<T> consumer)
     {
-        this.producer = producer;
         this.consumer = consumer;
     }
 
@@ -33,19 +30,18 @@ public class ProducerConsumerIterator<T> implements Iterator<T>, Closeable
     public void close() throws MuleException
     {
         this.consumer.close();
-        this.producer.close();
     }
 
     @Override
     public boolean hasNext()
     {
-        return !this.consumer.isConsumed(this.producer);
+        return !this.consumer.isConsumed();
     }
 
     @Override
     public T next()
     {
-        return this.consumer.consume(this.producer);
+        return this.consumer.consume();
     }
 
     public void remove()

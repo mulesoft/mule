@@ -8,27 +8,37 @@
  * LICENSE.txt file.
  */
 
-package org.mule.paging;
+package org.mule.streaming;
 
 import org.mule.api.MuleException;
-import org.mule.api.paging.Consumer;
-import org.mule.api.paging.Producer;
+import org.mule.api.streaming.Consumer;
+import org.mule.api.streaming.Producer;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PagedBasedPagingConsumer<T> implements Consumer<T>
 {
 
+    private static transient final Logger logger = LoggerFactory.getLogger(PagedBasedPagingConsumer.class);
+
+    private Producer<T> producer;
     private List<T> currentPage = null;
+
+    public PagedBasedPagingConsumer(Producer<T> producer)
+    {
+        this.producer = producer;
+    }
 
     @Override
     @SuppressWarnings("unchecked")
-    public T consume(Producer<T> producer) throws NoSuchElementException
+    public T consume() throws NoSuchElementException
     {
-        if (this.isConsumed(producer))
+        if (this.isConsumed())
         {
             throw new NoSuchElementException();
         }
@@ -37,20 +47,37 @@ public class PagedBasedPagingConsumer<T> implements Consumer<T>
     }
 
     @Override
-    public boolean isConsumed(Producer<T> producer)
+    public boolean isConsumed()
     {
         if (CollectionUtils.isEmpty(this.currentPage))
         {
-            this.loadNextPage(producer);
+            this.loadNextPage(this.producer);
         }
 
-        return !CollectionUtils.isEmpty(this.currentPage);
+        if (CollectionUtils.isEmpty(this.currentPage))
+        {
+            try
+            {
+                this.close();
+            }
+            catch (MuleException e)
+            {
+                if (logger.isWarnEnabled())
+                {
+                    logger.warn("Expection was trapped trying to close consumer", e);
+                }
+            }
+            return true;
+        }
+
+        return false;
     }
 
     @Override
     public void close() throws MuleException
     {
         this.currentPage = null;
+        this.producer.close();
     }
 
     private void loadNextPage(Producer<T> producer)

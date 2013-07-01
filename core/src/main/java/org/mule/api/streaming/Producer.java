@@ -8,17 +8,15 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.paging;
+package org.mule.api.streaming;
 
 import org.mule.api.Closeable;
 
 import java.util.List;
 
-public interface PagingDelegate<T> extends Closeable
+public interface Producer<T> extends Closeable
 {
 
-    public List<T> getPage();
-
-    public int getTotalSize() throws UnsupportedOperationException;
-
+    public List<T> produce();
+    
 }

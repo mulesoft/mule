@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.paging;
+package org.mule.api.streaming;
 
 public enum PagingOutputStrategy
 {

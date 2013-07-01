@@ -8,15 +8,15 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.paging;
+package org.mule.api.streaming;
 
 import org.mule.api.Closeable;
 
 import java.util.List;
 
-public interface Producer<T> extends Closeable
+public interface PagingDelegate<T> extends Closeable
 {
 
-    public List<T> produce();
-    
+    public List<T> getPage();
+
 }
