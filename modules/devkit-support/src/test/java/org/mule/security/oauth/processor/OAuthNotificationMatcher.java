@@ -1,11 +1,3 @@
-package org.mule.security.oauth.processor;
-import org.mule.api.MuleEvent;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.security.oauth.notification.OAuthAuthorizeNotification;
-
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-
 /*
  * $Id$
  * --------------------------------------------------------------------------------------
@@ -15,6 +7,15 @@ import org.hamcrest.Description;
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+package org.mule.security.oauth.processor;
+
+import org.mule.api.MuleEvent;
+import org.mule.api.context.notification.ServerNotification;
+import org.mule.security.oauth.notification.OAuthAuthorizeNotification;
+
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 
 public class OAuthNotificationMatcher extends BaseMatcher<ServerNotification>
 {
