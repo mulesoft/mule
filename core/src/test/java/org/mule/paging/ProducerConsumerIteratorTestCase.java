@@ -12,7 +12,7 @@ package org.mule.paging;
 
 import org.mule.api.MuleException;
 import org.mule.api.streaming.Consumer;
-import org.mule.api.streaming.StreamingDelegate;
+import org.mule.api.streaming.PagingDelegate;
 import org.mule.api.streaming.Producer;
 import org.mule.streaming.ConsumerIterator;
 import org.mule.streaming.ElementBasedPagingConsumer;
@@ -31,7 +31,7 @@ public class ProducerConsumerIteratorTestCase
     private static final int PAGE_SIZE = 100;
     private static final int TOP = 3000;
 
-    private StreamingDelegate<String> delegate = new StreamingDelegate<String>()
+    private PagingDelegate<String> delegate = new PagingDelegate<String>()
     {
 
         long counter = 0;
