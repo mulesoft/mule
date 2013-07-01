@@ -138,13 +138,13 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
 
         this.setCustomAdapterProperties(connector, state);
 
-        if (connector instanceof Initialisable)
-        {
-            ((Initialisable) connector).initialise();
-        }
         if (connector instanceof MuleContextAware)
         {
             ((MuleContextAware) connector).setMuleContext(oauthManager.getMuleContext());
+        }
+        if (connector instanceof Initialisable)
+        {
+            ((Initialisable) connector).initialise();
         }
         if (connector instanceof Startable)
         {
