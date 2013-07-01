@@ -620,9 +620,9 @@
 /mule-standalone-${productVersion}/lib/opt/rome-0.9.jar
 /mule-standalone-${productVersion}/lib/opt/saaj-api-1.3-osgi.jar
 /mule-standalone-${productVersion}/lib/opt/saaj-impl-1.3-osgi.jar
-/mule-standalone-${productVersion}/lib/opt/saxon-8.9.0.4-osgi.jar
-/mule-standalone-${productVersion}/lib/opt/saxon-dom-8.9.0.4-osgi.jar
-/mule-standalone-${productVersion}/lib/opt/saxon-xqj-8.9.0.4.jar
+/mule-standalone-${productVersion}/lib/opt/saxon-9.1.0.8.jar
+/mule-standalone-${productVersion}/lib/opt/saxon-9.1.0.8-dom.jar
+/mule-standalone-${productVersion}/lib/opt/saxon-9.1.0.8-xqj.jar
 /mule-standalone-${productVersion}/lib/opt/servlet-api-2.5-20081211.jar
 /mule-standalone-${productVersion}/lib/opt/signpost-core-1.2.1.2.jar
 /mule-standalone-${productVersion}/lib/opt/smack-3.1.0.jar
