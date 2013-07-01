@@ -143,7 +143,7 @@
         <oroVersion>2.0.8</oroVersion>
         <quartzVersion>1.8.5</quartzVersion>
         <saajVersion>1.3</saajVersion>
-        <saxonVersion>8.9.0.4</saxonVersion>
+        <saxonVersion>9.1.0.8</saxonVersion>
         <slf4jVersion>1.6.1</slf4jVersion>
         <smackVersion>3.1.0</smackVersion>
         <springOsgiVersion>1.0.2</springOsgiVersion>
