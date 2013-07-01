@@ -40,6 +40,6 @@ public interface OAuth2Connector
     
     public Set<AuthorizationParameter<?>> getAuthorizationParameters();
     
-    public void postAuth();
+    public void postAuth() throws Exception;
     
 }

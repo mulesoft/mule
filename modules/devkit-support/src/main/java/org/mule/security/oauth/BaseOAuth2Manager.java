@@ -627,7 +627,16 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         }
 
         this.fetchCallbackParameters(adapter, response);
-        adapter.postAuth();
+        try
+        {
+            adapter.postAuth();
+        }
+        catch (Exception e)
+        {
+            throw new UnableToAcquireAccessTokenException(
+                "Adapter was successfuly retrieved but an exception was found after invoking the postAuth() method",
+                e);
+        }
     }
 
     private void saveAccessToken(OAuth2Adapter adapter)
@@ -837,7 +846,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     {
         this.defaultUnauthorizedConnector.setConsumerSecret(value);
     }
-    
+
     protected void setDefaultUnauthorizedConnector(OAuth2Adapter defaultUnauthorizedConnector)
     {
         this.defaultUnauthorizedConnector = defaultUnauthorizedConnector;
