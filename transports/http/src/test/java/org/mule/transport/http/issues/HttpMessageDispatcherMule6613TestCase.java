@@ -25,7 +25,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class HttpMessageDispatcherMule6844TestCase extends FunctionalTestCase
+public class HttpMessageDispatcherMule6613TestCase extends FunctionalTestCase
 {
 
     @Override
