@@ -47,6 +47,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+//import javax.xml.xquery.XQDataSource;
+
 /**
  * The XQuery Module gives users the ability to perform XQuery transformations on XML messages in Mule
  */
