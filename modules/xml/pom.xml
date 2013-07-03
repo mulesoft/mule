@@ -104,23 +104,21 @@
 
         <!-- XSLT Support -->
         <dependency>
-            <groupId>net.sourceforge.saxon</groupId>
+            <groupId>net.sf.saxon</groupId>
             <artifactId>saxon</artifactId>
-            <version>${saxonVersion}</version>
+            <version>${saxonVersion}-osgi</version>
         </dependency>
         <dependency>
-            <groupId>net.sourceforge.saxon</groupId>
-            <artifactId>saxon</artifactId>
-            <version>${saxonVersion}</version>
-            <classifier>dom</classifier>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>saxon-dom</artifactId>
+            <version>${saxonVersion}-osgi</version>
         </dependency>
 
         <!-- XQuery support -->
         <dependency>
-            <groupId>net.sourceforge.saxon</groupId>
-            <artifactId>saxon</artifactId>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>saxon-xqj</artifactId>
             <version>${saxonVersion}</version>
-            <classifier>xqj</classifier>
         </dependency>
 
         <!-- JAXB support (JDK 5 only) -->
