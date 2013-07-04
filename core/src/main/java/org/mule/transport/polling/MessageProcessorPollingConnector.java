@@ -17,6 +17,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.transport.AbstractConnector;
 
+@Deprecated
 public class MessageProcessorPollingConnector extends AbstractConnector
 {
 

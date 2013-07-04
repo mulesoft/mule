@@ -23,6 +23,20 @@ import org.mule.component.simple.LogComponent;
 import org.mule.component.simple.NullComponent;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.config.spring.factories.*;
+import org.mule.config.spring.factories.ChoiceRouterFactoryBean;
+import org.mule.config.spring.factories.CompositeMessageSourceFactoryBean;
+import org.mule.config.spring.factories.DefaultMemoryQueueStoreFactoryBean;
+import org.mule.config.spring.factories.DefaultPersistentQueueStoreFactoryBean;
+import org.mule.config.spring.factories.FileQueueStoreFactoryBean;
+import org.mule.config.spring.factories.InboundEndpointFactoryBean;
+import org.mule.config.spring.factories.MessageProcessorFilterPairFactoryBean;
+import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
+import org.mule.config.spring.factories.PollingMessageSourceFactoryBean;
+import org.mule.config.spring.factories.PollingSchedulerMessageSourceFactoryBean;
+import org.mule.config.spring.factories.QueueProfileFactoryBean;
+import org.mule.config.spring.factories.SimpleMemoryQueueStoreFactoryBean;
+import org.mule.config.spring.factories.SubflowMessageProcessorChainFactoryBean;
+import org.mule.config.spring.factories.TransactionalMessageProcessorsFactoryBean;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
@@ -137,7 +151,6 @@ import org.mule.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.routing.CollectionSplitter;
 import org.mule.routing.DynamicAll;
 import org.mule.routing.DynamicFirstSuccessful;
-import org.mule.routing.DynamicRoundRobin;
 import org.mule.routing.ExpressionMessageInfoMapping;
 import org.mule.routing.ExpressionSplitter;
 import org.mule.routing.FirstSuccessful;
@@ -224,6 +237,7 @@ import org.mule.transformer.simple.RemoveSessionVariableTransformer;
 import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.transformer.simple.SetPayloadTransformer;
 import org.mule.transformer.simple.StringAppendTransformer;
+import org.mule.transport.polling.schedule.FixedFrequencySchedulerFactory;
 import org.mule.util.store.InMemoryObjectStore;
 import org.mule.util.store.ManagedObjectStore;
 import org.mule.util.store.TextFileObjectStore;
@@ -407,7 +421,11 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         // Message Sources
         registerBeanDefinitionParser("custom-source", new ChildDefinitionParser("messageSource", null, MessageSource.class));
         registerBeanDefinitionParser("composite-source", new ChildDefinitionParser("messageSource", CompositeMessageSourceFactoryBean.class));
+
+
         registerBeanDefinitionParser("poll", new ChildEndpointDefinitionParser(PollingMessageSourceFactoryBean.class));
+        registerBeanDefinitionParser("fixed-frequency-scheduler", new ChildDefinitionParser("schedulerFactory", FixedFrequencySchedulerFactory.class));
+
 
         // Poll overrides
         registerBeanDefinitionParser("watermark", new ChildDefinitionParser("override", WatermarkFactoryBean.class));

@@ -11,21 +11,67 @@
 package org.mule.config.spring.factories;
 
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.schedule.SchedulerFactory;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.polling.MessageProcessorPollingMessageReceiver;
 import org.mule.transport.polling.MessageProcessorPollingOverride;
 import sun.net.ProgressMeteringPolicy;
+import org.mule.transport.polling.PollingMessageSource;
 
+@Deprecated
 public class PollingMessageSourceFactoryBean extends InboundEndpointFactoryBean
 {
+
+    public static final String DISABLE_POLL_SCHEDULER = "disable.poll.scheduler";
+
+    protected SchedulerFactory<PollingMessageSource> schedulerFactory;
 
     protected MessageProcessor messageProcessor;
     protected MessageProcessorPollingOverride override;
     protected Long frequency;
+
+    @Override
+    public Object getObject() throws Exception
+    {
+        if (isSchedulerFeatureDisabled())
+        {
+            return super.getObject();
+        }
+        else{
+            PollingSchedulerMessageSourceFactoryBean factoryBean = new PollingSchedulerMessageSourceFactoryBean();
+            factoryBean.setFrequency(frequency);
+            factoryBean.setMessageProcessor(messageProcessor);
+            factoryBean.setSchedulerFactory(schedulerFactory);
+            factoryBean.setMuleContext(muleContext);
+
+            return factoryBean.getObject();
+
+        }
+    }
+
+    @Override
+    public Class<?> getObjectType()
+    {
+        if (isSchedulerFeatureDisabled())
+        {
+            return super.getObjectType();
+        }
+        else{
+            return PollingMessageSource.class;
+
+        }
+    }
+
+    private Boolean isSchedulerFeatureDisabled()
+    {
+        return Boolean.valueOf(System.getProperty(DISABLE_POLL_SCHEDULER, "false"));
+    }
 
     @Override
     public Object doGetObject() throws Exception
@@ -61,5 +107,11 @@ public class PollingMessageSourceFactoryBean extends InboundEndpointFactoryBean
     {
         this.frequency = frequency;
     }
+
+    public void setSchedulerFactory(SchedulerFactory<PollingMessageSource> schedulerFactory)
+    {
+        this.schedulerFactory = schedulerFactory;
+    }
+
 
 }

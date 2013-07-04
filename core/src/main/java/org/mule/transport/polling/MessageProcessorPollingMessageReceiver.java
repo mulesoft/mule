@@ -15,6 +15,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
@@ -28,6 +29,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.processor.chain.SimpleMessageProcessorChainBuilder;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.NullPayload;
@@ -35,6 +37,7 @@ import org.mule.util.StringUtils;
 
 import java.util.Map;
 
+@Deprecated
 public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessageReceiver
 {
     public static final String SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME = MuleProperties.ENDPOINT_PROPERTY_PREFIX + "sourceMessageProcessor";
@@ -90,6 +93,26 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
                 @Override
                 public MuleEvent process() throws Exception
                 {
+                    SimpleMessageProcessorChainBuilder builder = new SimpleMessageProcessorChainBuilder();
+
+                    builder.chain(sourceMessageProcessor, new MessageProcessor()
+                    {
+                        @Override
+                        public MuleEvent process(MuleEvent event) throws MuleException
+                        {
+                            if (isNewMessage(event))
+                            {
+                                routeMessage(event.getMessage());
+                            } else
+                            {
+                                // TODO DF: i18n
+                                logger.info(String.format("Polling of '%s' returned null, the flow will not be invoked.",
+                                                          sourceMessageProcessor));
+                            }
+                            return null;
+                        }
+                    } );
+
                     MuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, (Map<String, Object>) null,
                                                                  connector.getMuleContext());
                     ImmutableEndpoint ep = endpoint;

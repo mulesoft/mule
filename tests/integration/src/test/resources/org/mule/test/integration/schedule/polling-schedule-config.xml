@@ -20,32 +20,14 @@
         </static-component>
     </flow>
 
-    <flow name="pollfoo" processingStrategy="queued-asynchronous">
+    <flow name="pollfoo">
         <poll>
-            <fixed-frequency-scheduler frequency="2" timeUnit="DAYS"/>
+            <fixed-frequency-scheduler frequency="2000"/>
             <outbound-endpoint ref="foo"/>
         </poll>
-        <component class="org.mule.test.integration.PollingTestCase$FooComponent"/>
+        <component class="org.mule.test.integration.schedule.PollScheduleTestCase$FooComponent"/>
     </flow>
 
-    <flow name="pollbar" processingStrategy="synchronous">
-        <poll frequency="1000">
-            <static-component>
-                <return-data>bar</return-data>
-            </static-component>
-        </poll>
-        <component class="org.mule.test.integration.PollingTestCase$BarComponent" />
-    </flow>
 
-    <flow name="pollbarNever">
-        <poll>
-            <!-- Will not run unless my test takes 200 days -->
-            <fixed-frequency-scheduler frequency="4" timeUnit="DAYS" startDelay="200"/>
-            <static-component>
-                <return-data>barNever</return-data>
-            </static-component>
-        </poll>
-        <component class="org.mule.test.integration.PollingTestCase$BarComponent" />
-    </flow>
 
 </mule>
