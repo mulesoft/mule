@@ -7,12 +7,13 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 
 	<flow name="receiverTestFlow">
 		<http:inbound-endpoint exchange-pattern="request-response"
-			host="localhost" port="4444" path="receive" />
+			host="localhost" port="${port1}" path="receive" />
 		<vm:outbound-endpoint path="callback" exchange-pattern="one-way" />
 	</flow>
 
 	<flow name="senderTestFlow">
+		<vm:inbound-endpoint path="send" exchange-pattern="one-way"/>
 		<http:outbound-endpoint exchange-pattern="one-way"
-			host="localhost" port="4444" path="/receive" method="POST" />
+			host="localhost" port="${port1}" path="/receive" method="POST" />
 	</flow>
 </mule>

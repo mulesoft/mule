@@ -44,6 +44,7 @@ import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 import javax.activation.URLDataSource;
 
+import org.apache.commons.httpclient.ContentLengthInputStream;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
@@ -319,8 +320,11 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
         return new URI(endpointAddress);
     }
 
-    protected void setupEntityMethod(Object src, String encoding, MuleMessage msg,
-        EntityEnclosingMethod postMethod) throws UnsupportedEncodingException, TransformerException
+    protected void setupEntityMethod(Object src,
+                                     String encoding,
+                                     MuleMessage msg,
+                                     EntityEnclosingMethod postMethod)
+        throws UnsupportedEncodingException, TransformerException
     {
         // Dont set a POST payload if the body is a Null Payload.
         // This way client calls can control if a POST body is posted explicitly
@@ -374,14 +378,19 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             }
             if (src instanceof String)
             {
-                postMethod.setRequestEntity(new StringRequestEntity(src.toString(), outboundMimeType, encoding));
+                postMethod.setRequestEntity(new StringRequestEntity(src.toString(), outboundMimeType,
+                    encoding));
                 return;
             }
 
             if (src instanceof InputStream)
             {
                 postMethod.setRequestEntity(new InputStreamRequestEntity((InputStream) src, outboundMimeType));
-                postMethod.setContentChunked(true);
+                // chunking a ContentLenghtInputStream results on content being corrupted
+                if (!(src instanceof ContentLengthInputStream))
+                {
+                    postMethod.setContentChunked(true);
+                }
             }
             else if (src instanceof byte[])
             {
@@ -416,7 +425,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
         for (String headerName : msg.getOutboundPropertyNames())
         {
             String headerValue = ObjectUtils.getString(msg.getOutboundProperty(headerName), null);
-                
+
             if (headerName.startsWith(MuleProperties.PROPERTY_PREFIX))
             {
                 // Define Mule headers a custom headers
@@ -424,7 +433,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
                 httpMethod.addRequestHeader(headerName, headerValue);
 
             }
-            
+
             else if (!HttpConstants.RESPONSE_HEADER_NAMES.containsKey(headerName)
                      && !HttpConnector.HTTP_INBOUND_PROPERTIES.contains(headerName)
                      && !HttpConnector.HTTP_COOKIES_PROPERTY.equals(headerName))

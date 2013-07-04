@@ -13,9 +13,8 @@ package org.mule.transport.http.issues;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.client.DefaultLocalMuleClient;
-import org.mule.construct.Flow;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,15 +22,19 @@ import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpMessageDispatcherMule6613TestCase extends FunctionalTestCase
+public class HttpOutboundStreamingTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort port = new DynamicPort("port1");
 
     @Override
     protected String getConfigResources()
     {
-        return "streaming-outbound-mule-6613.xml";
+        return "http-streaming-outbound.xml";
     }
 
     @Test
@@ -50,7 +53,7 @@ public class HttpMessageDispatcherMule6613TestCase extends FunctionalTestCase
             {
                 return payload.length() - index;
             }
-            
+
             @Override
             public int read() throws IOException
             {
@@ -58,7 +61,7 @@ public class HttpMessageDispatcherMule6613TestCase extends FunctionalTestCase
                 {
                     return -1;
                 }
-                
+
                 int value = payload.charAt(index);
                 this.index++;
 
@@ -78,15 +81,12 @@ public class HttpMessageDispatcherMule6613TestCase extends FunctionalTestCase
             }
         };
 
-        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("senderTestFlow");
-
-        MuleClient client = new DefaultLocalMuleClient(muleContext);
-        flow.process(getTestEvent(stream, MessageExchangePattern.ONE_WAY)).getMessage();
-
         MuleMessage responseMessage = null;
         try
         {
-            responseMessage = client.request("vm://callback", 600000);
+            MuleClient client = muleContext.getClient();
+            client.dispatch("vm://send", getTestEvent(stream, MessageExchangePattern.ONE_WAY).getMessage());
+            responseMessage = client.request("vm://callback", 10000);
         }
         finally
         {
