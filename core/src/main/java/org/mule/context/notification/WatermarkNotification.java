@@ -11,11 +11,11 @@ import java.util.Map;
  * Custom Notification with metadata included. The metadata is useful to represent status of the event and custom
  * properties.
  */
-public class CustomMetadataNotification extends CustomNotification implements BlockingServerEvent
+public class WatermarkNotification implements BlockingServerEvent
 {
     static
     {
-        registerAction("custom event", CustomMetadataNotification.CUSTOM_EVENT_EVENT_ACTION);
+        registerAction("custom event", WatermarkNotification.CUSTOM_EVENT_EVENT_ACTION);
     }
 
     public static final int CUSTOM_EVENT_EVENT_ACTION = 120000;
@@ -37,9 +37,9 @@ public class CustomMetadataNotification extends CustomNotification implements Bl
      */
     protected final Map<String, String> metaData;
 
-    public CustomMetadataNotification(final MuleEvent source, final MessageProcessor processor,
-                                      final String name, final Map<String, String> metaData,
-                                      int action)
+    public WatermarkNotification(final MuleEvent source, final MessageProcessor processor,
+                                 final String name, final Map<String, String> metaData,
+                                 int action)
     {
         super(source, action);
 
@@ -48,10 +48,10 @@ public class CustomMetadataNotification extends CustomNotification implements Bl
         this.metaData = metaData;
     }
 
-    public CustomMetadataNotification(final MuleEvent source, final MessageProcessor processor,
-                                      final String name, final Map<String, String> metaData)
+    public WatermarkNotification(final MuleEvent source, final MessageProcessor processor,
+                                 final String name, final Map<String, String> metaData)
     {
-        super(source, CustomMetadataNotification.CUSTOM_EVENT_EVENT_ACTION);
+        super(source, WatermarkNotification.CUSTOM_EVENT_EVENT_ACTION);
 
         this.processor = processor;
         this.name = name;

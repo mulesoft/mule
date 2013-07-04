@@ -2,20 +2,17 @@ package org.mule.transport.polling.watermark.builder;
 
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.store.ObjectStore;
+import org.mule.api.store.ObjectStoreManager;
 import org.mule.context.notification.NotificationException;
-import org.mule.processor.chain.SimpleMessageProcessorChainBuilder;
-import org.mule.transport.polling.watermark.WatermarkRetrieveMessageProcessor;
-import org.mule.transport.polling.watermark.WatermarkStorePipelineListener;
+import org.mule.transport.polling.watermark.Watermark;
+import org.mule.transport.polling.watermark.WatermarkPipelineListener;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.namespace.QName;
 
@@ -27,13 +24,14 @@ import org.apache.commons.logging.LogFactory;
  * The default configuration of the watermark. If the user defines a watermark configuration in the xml, then this class
  * is instantiated
  */
-public class DefaultWatermarkConfiguration implements WatermarkConfiguration, MuleContextAware
+public class DefaultWatermarkFactory implements WatermarkFactory, MuleContextAware
 {
 
+    public static final String WATERMARK_OBJECT_STORE_NAME = "watermarkObjectStore";
     /**
      * Logger to notify errors.
      */
-    private static Log logger = LogFactory.getLog(DefaultWatermarkConfiguration.class);
+    private static Log logger = LogFactory.getLog(DefaultWatermarkFactory.class);
 
     /**
      * The watermark variable that will end up being the object store key. This variable is also the name of the flow
@@ -70,52 +68,32 @@ public class DefaultWatermarkConfiguration implements WatermarkConfiguration, Mu
     private Map<QName, Object> annotations = new HashMap<QName, Object>();
 
 
-    /**
-     * If there is a message source configured it creates a chain of message processors where the first message processor
-     * is the {@link org.mule.transport.polling.watermark.WatermarkRetrieveMessageProcessor}
-     *
-     * @see WatermarkConfiguration#buildMessageSourceFrom(org.mule.api.processor.MessageProcessor)
-     */
-    @Override
-    public MessageProcessor buildMessageSourceFrom(MessageProcessor processor)
+    public Watermark buildFor(FlowConstruct flowConstruct)
     {
-        WatermarkRetrieveMessageProcessor watermarkSource =
-                WatermarkRetrieveMessageProcessor.create(muleContext, objectStore, variable, defaultExpression, annotations);
+        checkDefaultObjectStore();
 
-        if (processor != null)
-        {
-            MessageProcessorChainBuilder chainBuilder = new SimpleMessageProcessorChainBuilder();
-            try
-            {
-                return chainBuilder.chain(processor, watermarkSource).build();
-            }
-            catch (MuleException e)
-            {
-                return processor;
-            }
-        }
-        return watermarkSource;
-    }
+        Watermark watermark = Watermark.create(muleContext, objectStore, variable, defaultExpression,
+                                               updateExpression, annotations);
 
-    /**
-     * Registers a {@link org.mule.transport.polling.watermark.WatermarkStorePipelineListener} as listener of the flowConstruct passed as parameter.
-     *
-     * @see WatermarkConfiguration#registerPipelineNotificationListener(org.mule.api.construct.FlowConstruct)
-     */
-    @Override
-    public void registerPipelineNotificationListener(FlowConstruct flowConstruct)
-    {
         try
         {
-            WatermarkStorePipelineListener watermarkListener =
-                    WatermarkStorePipelineListener.create(muleContext, objectStore, variable, updateExpression, annotations);
-            watermarkListener.setFlowConstruct(flowConstruct);
-            muleContext.registerListener(watermarkListener);
+            muleContext.registerListener(new WatermarkPipelineListener(watermark, flowConstruct));
         }
         catch (NotificationException e)
         {
             logger.error("The watermark processor could not be registered, the watermark will not be updated at the end" +
                          "of the flow.");
+        }
+
+        return watermark;
+    }
+
+    private void checkDefaultObjectStore()
+    {
+        if ( objectStore == null ){
+            ObjectStoreManager objectStoreManager = (ObjectStoreManager) muleContext.getRegistry().get(
+                    MuleProperties.OBJECT_STORE_MANAGER);
+            objectStore = objectStoreManager.getObjectStore(WATERMARK_OBJECT_STORE_NAME);
         }
     }
 
