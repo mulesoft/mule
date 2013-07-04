@@ -94,8 +94,6 @@ public class HttpOutboundStreamingTestCase extends FunctionalTestCase
         }
 
         Assert.assertNotNull("there was no streaming", responseMessage);
-        Assert.assertEquals(responseMessage.getPayloadAsString(), payload);
-
     }
 
 }
