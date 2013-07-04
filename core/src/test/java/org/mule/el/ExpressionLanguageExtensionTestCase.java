@@ -141,6 +141,17 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
     }
 
     @Test
+    public void testMuleMessageAvailableAsVariable() throws Exception
+    {
+        MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
+        mvel.initialise();
+
+        MuleMessage message = new DefaultMuleMessage("foo", muleContext);
+        mvel.evaluate("p=m.uniqueId",message);
+        Assert.assertEquals(message.getUniqueId(),message.getPayload());
+    }
+
+    @Test
     public void testFunction() throws RegistrationException, InitialisationException
     {
         MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
@@ -206,6 +217,14 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
             context.addVariable("appShortcut", context.getVariable("app"));
             context.addFinalVariable("final", "final");
             context.addAlias("p", "message.payload");
+            try
+            {
+                context.addVariable("m",context.getVariable(MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE));
+            }
+            catch (Exception e)
+            {
+                //continue - test will fail.
+            }
             context.declareFunction("f", new ExpressionLanguageFunction()
             {
                 @Override
