@@ -9,9 +9,15 @@
  */
 package org.mule.test.integration;
 
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.api.schedule.Scheduler;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.transport.polling.PollingMessageSource;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
@@ -34,6 +40,9 @@ public class PollingTestCase extends FunctionalTestCase
     @Test
     public void testPolling() throws Exception
     {
+        Collection<Scheduler> schedulers = muleContext.getRegistry().lookupScheduler(PollingMessageSource.allPollSchedulers());
+        assertEquals(3, schedulers.size());
+
         Thread.sleep(5000);
         synchronized (foo)
         {
@@ -57,8 +66,17 @@ public class PollingTestCase extends FunctionalTestCase
     {
         public boolean process(String s)
         {
+            try
+            {
+                Thread.sleep(6000);
+            }
+            catch (InterruptedException e)
+            {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
             synchronized (foo)
             {
+
                 if (foo.size() < 10)
                 {
                     foo.add(s);
@@ -73,6 +91,8 @@ public class PollingTestCase extends FunctionalTestCase
     {
         public boolean process(String s)
         {
+            System.out.print(System.currentTimeMillis());
+
             synchronized (bar)
             {
                 if (bar.size() < 10)
