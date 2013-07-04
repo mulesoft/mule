@@ -16,11 +16,11 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.NameableObject;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.devkit.ProcessAdapter;
 import org.mule.api.devkit.ProcessTemplate;
 import org.mule.api.devkit.capability.Capabilities;
 import org.mule.api.devkit.capability.ModuleCapability;
@@ -39,7 +39,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.security.oauth.callback.DefaultHttpCallbackAdapter;
 import org.mule.security.oauth.callback.RestoreAccessTokenCallback;
 import org.mule.security.oauth.callback.SaveAccessTokenCallback;
-import org.mule.security.oauth.process.OAuthProcessTemplate;
+import org.mule.security.oauth.process.ManagedAccessTokenProcessTemplate;
 import org.mule.security.oauth.util.DefaultOAuthResponseParser;
 import org.mule.security.oauth.util.HttpUtil;
 import org.mule.security.oauth.util.HttpUtilImpl;
@@ -57,7 +57,7 @@ import org.slf4j.Logger;
 
 public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends DefaultHttpCallbackAdapter
     implements MuleContextAware, Initialisable, Capabilities, Startable, Stoppable, Disposable,
-    OAuth2Manager<OAuth2Adapter>, ProcessAdapter<OAuth2Adapter>
+    OAuth2Manager<OAuth2Adapter>, NameableObject
 {
 
     private OAuth2Adapter defaultUnauthorizedConnector;
@@ -340,8 +340,6 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         urlBuilder.append("response_type=code&");
         urlBuilder.append("client_id=");
         urlBuilder.append(this.getDefaultUnauthorizedConnector().getConsumerKey());
-        urlBuilder.append("&redirect_uri=");
-        urlBuilder.append(redirectUri);
         for (String parameter : extraParameters.keySet())
         {
             urlBuilder.append("&");
@@ -349,6 +347,8 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
             urlBuilder.append("=");
             urlBuilder.append(extraParameters.get(parameter));
         }
+        urlBuilder.append("&redirect_uri=");
+        urlBuilder.append(redirectUri);
 
         if (getLogger().isDebugEnabled())
         {
@@ -684,10 +684,10 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public <T> ProcessTemplate<T, OAuth2Adapter> getProcessTemplate()
     {
-        return (ProcessTemplate<T, OAuth2Adapter>) new OAuthProcessTemplate(this);
+        return (ProcessTemplate<T, OAuth2Adapter>) new ManagedAccessTokenProcessTemplate<T>(this,
+            this.muleContext);
     }
 
     /**
@@ -850,5 +850,47 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     protected void setDefaultUnauthorizedConnector(OAuth2Adapter defaultUnauthorizedConnector)
     {
         this.defaultUnauthorizedConnector = defaultUnauthorizedConnector;
+    }
+
+    /**
+     * Sets oauthRestoreAccessToken
+     * 
+     * @param value Value to set
+     */
+    public void setOauthRestoreAccessToken(RestoreAccessTokenCallback value)
+    {
+        this.defaultUnauthorizedConnector.setOauthRestoreAccessToken(value);
+    }
+
+    /**
+     * Sets oauthSaveAccessToken
+     * 
+     * @param value Value to set
+     */
+    public void setOauthSaveAccessToken(SaveAccessTokenCallback value)
+    {
+        this.defaultUnauthorizedConnector.setOauthSaveAccessToken(value);
+    }
+
+    public String getConsumerKey()
+    {
+        return this.defaultUnauthorizedConnector.getConsumerKey();
+    }
+
+    public String getConsumerSecret()
+    {
+        return this.defaultUnauthorizedConnector.getConsumerSecret();
+    }
+
+    @Override
+    public String getName()
+    {
+        return this.defaultUnauthorizedConnector.getName();
+    }
+
+    @Override
+    public void setName(String name)
+    {
+        this.defaultUnauthorizedConnector.setName(name);
     }
 }

@@ -108,14 +108,26 @@ public class OAuth2FetchAccessTokenProcessorTestCase
         Mockito.verify(this.restoredEvent.getMessage()).setProperty("state", state, PropertyScope.INBOUND);
     }
 
-    @Test(expected = MessagingException.class)
+    @Test
     public void badState() throws Exception
     {
         this.incomingState = "bad state";
         this.exception = true;
 
         Mockito.when(event.getMessage().getInboundProperty("state")).thenReturn(incomingState);
-        this.adapterWithUrlUsingConfigAsId();
+        final String accessTokenUrl = "accessTokenUrl";
+        final String redirectUri = "redirectUri";
+        final String accessTokenId = "accessTokenId";
+
+        this.processor.setRedirectUri(redirectUri);
+
+        OAuth2Adapter adapter = Mockito.mock(OAuth2Adapter.class);
+
+        Mockito.when(this.manager.createAdapter(verifier)).thenReturn(adapter);
+        Mockito.when(this.manager.getDefaultUnauthorizedConnector().getName()).thenReturn(accessTokenId);
+        Mockito.when(adapter.getAccessTokenUrl()).thenReturn(accessTokenUrl);
+        
+        Assert.assertSame(this.event, this.processor.process(this.event));
     }
 
     @Test(expected = MessagingException.class)

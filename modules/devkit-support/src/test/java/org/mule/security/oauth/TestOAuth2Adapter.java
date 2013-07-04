@@ -367,7 +367,8 @@ public class TestOAuth2Adapter
     {
         return onNoTokenPolicy;
     }
-
+    
+    @Override
     public void setOnNoTokenPolicy(OnNoTokenPolicy onNoTokenPolicy)
     {
         this.onNoTokenPolicy = onNoTokenPolicy;

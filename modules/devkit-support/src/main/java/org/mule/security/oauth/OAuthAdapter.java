@@ -80,5 +80,7 @@ public interface OAuthAdapter extends Serializable
      *         that specifies the behavior to take when token is not set
      */
     public OnNoTokenPolicy getOnNoTokenPolicy();
+    
+    public void setOnNoTokenPolicy(OnNoTokenPolicy policy);
 
 }

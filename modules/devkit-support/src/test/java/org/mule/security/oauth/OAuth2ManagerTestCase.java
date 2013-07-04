@@ -172,10 +172,10 @@ public class OAuth2ManagerTestCase
 
         Assert.assertEquals(
             this.manager.buildAuthorizeUrl(extraParameters, null, redirectUri),
-            "authorizationUrl?response_type=code&client_id=consumerKey&redirect_uri=redirectUri&extra1=extra1&extra2=extra2");
+            "authorizationUrl?response_type=code&client_id=consumerKey&extra1=extra1&extra2=extra2&redirect_uri=redirectUri");
 
         Assert.assertEquals(this.manager.buildAuthorizeUrl(extraParameters, "custom", redirectUri),
-            "custom?response_type=code&client_id=consumerKey&redirect_uri=redirectUri&extra1=extra1&extra2=extra2");
+            "custom?response_type=code&client_id=consumerKey&extra1=extra1&extra2=extra2&redirect_uri=redirectUri");
     }
 
     @Test

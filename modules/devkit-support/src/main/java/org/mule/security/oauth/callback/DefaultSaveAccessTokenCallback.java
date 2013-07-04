@@ -21,7 +21,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DefaultSaveAccessTokenCallback
+public class DefaultSaveAccessTokenCallback implements SaveAccessTokenCallback
 {
 
     /**
@@ -56,6 +56,7 @@ public class DefaultSaveAccessTokenCallback
         this.messageProcessor = value;
     }
 
+    @Override
     public void saveAccessToken(String accessToken, String accessTokenSecret)
     {
         MuleEvent event = RequestContext.getEvent();
