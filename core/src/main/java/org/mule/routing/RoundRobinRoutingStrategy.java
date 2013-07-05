@@ -45,7 +45,7 @@ public class RoundRobinRoutingStrategy extends AbstractRoutingStrategy
     @Override
     public MuleEvent route(MuleEvent event, List<MessageProcessor> messageProcessors) throws MessagingException
     {
-        if(!messageProcessors.isEmpty())
+        if(messageProcessors != null && !messageProcessors.isEmpty())
         {
             String id = identifiableDynamicRouteResolver.getRouteIdentifier(event);
             Short nextMessageProcessor = 0;
