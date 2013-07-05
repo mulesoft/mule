@@ -73,6 +73,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
+                    <!-- NOTE: Forcing TransformerFactory xalan provider -->
+                    <argLine>-Xms64m -Xmx256m -Djavax.xml.transform.TransformerFactory=org.apache.xalan.processor.TransformerFactoryImpl</argLine>
                     <useSystemClassLoader>false</useSystemClassLoader>
                     <forkMode>always</forkMode>
                 </configuration>

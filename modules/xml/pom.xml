@@ -11,6 +11,18 @@
     <name>XML Extensions</name>
     <description>Functionality for working with XML</description>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- NOTE: Forcing TransformerFactory xalan provider -->
+                    <argLine>-Xms64m -Xmx256m -Djavax.xml.transform.TransformerFactory=org.apache.xalan.processor.TransformerFactoryImpl</argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
