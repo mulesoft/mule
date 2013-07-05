@@ -236,6 +236,7 @@ import org.mule.transformer.simple.RemoveSessionVariableTransformer;
 import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.transformer.simple.SetPayloadTransformer;
 import org.mule.transformer.simple.StringAppendTransformer;
+import org.mule.transport.polling.watermark.builder.DefaultWatermarkConfiguration;
 import org.mule.util.store.InMemoryObjectStore;
 import org.mule.util.store.ManagedObjectStore;
 import org.mule.util.store.TextFileObjectStore;
@@ -420,6 +421,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("custom-source", new ChildDefinitionParser("messageSource", null, MessageSource.class));
         registerBeanDefinitionParser("composite-source", new ChildDefinitionParser("messageSource", CompositeMessageSourceFactoryBean.class));
         registerBeanDefinitionParser("poll", new ChildEndpointDefinitionParser(PollingMessageSourceFactoryBean.class));
+        registerBeanDefinitionParser("watermark", new ChildDefinitionParser("watermark", DefaultWatermarkConfiguration.class));
 
         // Models
         registerBeanDefinitionParser("model", new ModelDefinitionParser());

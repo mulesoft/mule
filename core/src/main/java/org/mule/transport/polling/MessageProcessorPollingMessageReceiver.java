@@ -12,13 +12,13 @@ package org.mule.transport.polling;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.execution.ExecutionCallback;
@@ -31,15 +31,35 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.NullPayload;
+import org.mule.transport.polling.watermark.builder.WatermarkConfiguration;
 import org.mule.util.StringUtils;
 
 import java.util.Map;
 
+/**
+ * Poll receiver. Is the one who does the polling action.
+ */
 public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessageReceiver
 {
+
+    /**
+     * The configured message source name. The poll contains a message source that is executed before executing the flow
+     * construct
+     */
     public static final String SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME = MuleProperties.ENDPOINT_PROPERTY_PREFIX + "sourceMessageProcessor";
 
+    /**
+     * The Watermark configuration name. The poll configuration admits watermark configuration in order to store a
+     * watermark value in the object store and retrieve it every time the poll is executed.
+     */
+    public static final String WATERMARK_PROPERTY_NAME = MuleProperties.ENDPOINT_PROPERTY_PREFIX + "watermark";
+
+
+    /**
+     * The poll message source. This is the one who is going to get the Mule event to execute the flow.
+     */
     protected MessageProcessor sourceMessageProcessor;
+
 
     public MessageProcessorPollingMessageReceiver(Connector connector,
                                                   FlowConstruct flowConstruct,
@@ -48,21 +68,20 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
         super(connector, flowConstruct, endpoint);
     }
 
+    /**
+     * Sets the source message processor and the activates the watermark configuration.
+     *
+     * @throws InitialisationException In case initialization fails.
+     */
     @Override
     protected void doInitialise() throws InitialisationException
     {
         super.doInitialise();
 
-        sourceMessageProcessor = (MessageProcessor) endpoint.getProperty(SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME);
+        checkWatermark();
 
-        if (sourceMessageProcessor instanceof OutboundEndpoint
-            && !((OutboundEndpoint) sourceMessageProcessor).getExchangePattern().hasResponse())
-        {
-            // TODO DF: i18n
-            throw new InitialisationException(CoreMessages.createStaticMessage(String.format(
-                "The endpoint %s does not return responses and therefore can't be used for polling.",
-                sourceMessageProcessor)), this);
-        }
+        sourceMessageProcessor = watermark().buildMessageSourceFrom(configuredMessageSource());
+        watermark().registerPipelineNotificationListener(this.getFlowConstruct());
 
         Long tempPolling = (Long) endpoint.getProperties().get(AbstractConnector.PROPERTY_POLLING_FREQUENCY);
         if (tempPolling != null)
@@ -83,24 +102,20 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
                 public MuleEvent process() throws Exception
                 {
                     MuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, (Map<String, Object>) null,
-                            connector.getMuleContext());
-                    ImmutableEndpoint ep = endpoint;
-                    if (sourceMessageProcessor instanceof ImmutableEndpoint)
-                    {
-                        ep = (ImmutableEndpoint) sourceMessageProcessor;
-                    }
+                                                                 connector.getMuleContext());
 
-                    MuleEvent event = new DefaultMuleEvent(request, ep.getExchangePattern(), flowConstruct);
+                    MuleEvent event = new DefaultMuleEvent(request, MessageExchangePattern.REQUEST_RESPONSE, flowConstruct);
 
                     MuleEvent sourceEvent = sourceMessageProcessor.process(event);
                     if (isNewMessage(sourceEvent))
                     {
                         routeMessage(sourceEvent.getMessage());
-                    } else
+                    }
+                    else
                     {
                         // TODO DF: i18n
                         logger.info(String.format("Polling of '%s' returned null, the flow will not be invoked.",
-                                sourceMessageProcessor));
+                                                  sourceMessageProcessor));
                     }
                     return null;
                 }
@@ -121,9 +136,11 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
     {
         return true;
     }
-    
-    // Only consider response for source message processor a new message if it is not
-    // null and payload is not NullPayload
+
+    /**
+     * Only consider response for source message processor a new message if it is not
+     * null and payload is not NullPayload
+     */
     protected boolean isNewMessage(MuleEvent sourceEvent)
     {
         if (sourceEvent != null && !VoidMuleEvent.getInstance().equals(sourceEvent) && sourceEvent.getMessage() != null)
@@ -140,4 +157,35 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
         }
         return false;
     }
+
+    private void checkWatermark() throws InitialisationException
+    {
+        if ( watermark() == null ){
+            throw new InitialisationException(CoreMessages.createStaticMessage(
+                    "The watermark configuration must not be null"), this);
+        }
+    }
+
+    private WatermarkConfiguration watermark()
+    {
+        return (WatermarkConfiguration) endpoint.getProperty(WATERMARK_PROPERTY_NAME);
+    }
+
+    private MessageProcessor configuredMessageSource() throws InitialisationException
+    {
+        MessageProcessor configuredMessageSource = (MessageProcessor) endpoint.getProperty(SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME);
+
+        if (configuredMessageSource instanceof OutboundEndpoint
+            && !((OutboundEndpoint) configuredMessageSource).getExchangePattern().hasResponse())
+        {
+            // TODO DF: i18n
+            throw new InitialisationException(CoreMessages.createStaticMessage(String.format(
+                    "The endpoint %s does not return responses and therefore can't be used for polling.",
+                    sourceMessageProcessor)), this);
+        }
+
+        return configuredMessageSource;
+    }
+
+
 }
