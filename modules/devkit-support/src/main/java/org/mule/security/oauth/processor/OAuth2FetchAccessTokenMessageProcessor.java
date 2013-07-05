@@ -108,13 +108,9 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
             }
         }
 
-        String eventId = null;
+        String eventId = StringUtils.match(EVENT_ID_PATTERN, state, 1);
 
-        try
-        {
-            eventId = StringUtils.match(EVENT_ID_PATTERN, state, 1);
-        }
-        catch (IllegalArgumentException e)
+        if (StringUtils.isBlank(eventId))
         {
             if (logger.isWarnEnabled())
             {
@@ -122,7 +118,6 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
                     "Could not fetch original event id for callback with state %s. Will continue with new event without restoring previous one",
                     state));
             }
-
             return event;
         }
 
