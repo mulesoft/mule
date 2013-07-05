@@ -9,7 +9,11 @@
  */
 package org.mule.routing;
 
-import org.mule.api.*;
+
+import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.config.i18n.CoreMessages;
