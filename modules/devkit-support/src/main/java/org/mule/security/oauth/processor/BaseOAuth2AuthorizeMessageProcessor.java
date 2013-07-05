@@ -123,9 +123,13 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
                 try
                 {
                     Object value = field.get(this);
-                    Object transformed = this.evaluateAndTransform(getMuleContext(), event,
-                        parameter.getType(), null, value);
-                    extraParameters.put(parameter.getName(), this.toString(event, transformed).toLowerCase());
+                    if (value != null)
+                    {
+                        Object transformed = this.evaluateAndTransform(getMuleContext(), event,
+                            parameter.getType(), null, value);
+                        extraParameters.put(parameter.getName(), this.toString(event, transformed)
+                            .toLowerCase());
+                    }
                 }
                 catch (IllegalAccessException e)
                 {

@@ -893,4 +893,16 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     {
         this.defaultUnauthorizedConnector.setName(name);
     }
+    
+    @Override
+    public OnNoTokenPolicy getOnNoTokenPolicy()
+    {
+        return this.defaultUnauthorizedConnector.getOnNoTokenPolicy();
+    }
+    
+    @Override
+    public void setOnNoTokenPolicy(OnNoTokenPolicy policy)
+    {
+        this.defaultUnauthorizedConnector.setOnNoTokenPolicy(policy);
+    }
 }

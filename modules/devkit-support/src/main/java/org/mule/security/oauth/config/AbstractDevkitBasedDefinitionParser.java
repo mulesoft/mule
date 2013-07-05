@@ -33,7 +33,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
-public abstract class AbstractDefinitionParser implements BeanDefinitionParser
+public abstract class AbstractDevkitBasedDefinitionParser implements BeanDefinitionParser
 {
 
     /**
@@ -41,7 +41,7 @@ public abstract class AbstractDefinitionParser implements BeanDefinitionParser
      */
     private TemplateParser.PatternInfo patternInfo;
 
-    public AbstractDefinitionParser()
+    public AbstractDevkitBasedDefinitionParser()
     {
         patternInfo = TemplateParser.createMuleStyleParser().getStyle();
     }
@@ -82,7 +82,7 @@ public abstract class AbstractDefinitionParser implements BeanDefinitionParser
 
     protected ManagedList parseList(Element element,
                                     String childElementName,
-                                    AbstractDefinitionParser.ParseDelegate parserDelegate)
+                                    AbstractDevkitBasedDefinitionParser.ParseDelegate parserDelegate)
     {
         ManagedList managedList = new ManagedList();
         List<Element> childDomElements = DomUtils.getChildElementsByTagName(element, childElementName);
@@ -112,7 +112,7 @@ public abstract class AbstractDefinitionParser implements BeanDefinitionParser
                                            String fieldName,
                                            String parentElementName,
                                            String childElementName,
-                                           AbstractDefinitionParser.ParseDelegate parserDelegate)
+                                           AbstractDevkitBasedDefinitionParser.ParseDelegate parserDelegate)
     {
         Element domElement = DomUtils.getChildElementByTagName(element, parentElementName);
         if (domElement != null)
@@ -131,7 +131,7 @@ public abstract class AbstractDefinitionParser implements BeanDefinitionParser
 
     protected ManagedSet parseSet(Element element,
                                   String childElementName,
-                                  AbstractDefinitionParser.ParseDelegate parserDelegate)
+                                  AbstractDevkitBasedDefinitionParser.ParseDelegate parserDelegate)
     {
         ManagedSet managedSet = new ManagedSet();
         List<Element> childDomElements = DomUtils.getChildElementsByTagName(element, childElementName);
@@ -161,7 +161,7 @@ public abstract class AbstractDefinitionParser implements BeanDefinitionParser
                                           String fieldName,
                                           String parentElementName,
                                           String childElementName,
-                                          AbstractDefinitionParser.ParseDelegate parserDelegate)
+                                          AbstractDevkitBasedDefinitionParser.ParseDelegate parserDelegate)
     {
         Element domElement = DomUtils.getChildElementByTagName(element, parentElementName);
         if (domElement != null)
@@ -184,7 +184,7 @@ public abstract class AbstractDefinitionParser implements BeanDefinitionParser
                                                      String parentElementName,
                                                      String childElementName,
                                                      String defaultValue,
-                                                     AbstractDefinitionParser.ParseDelegate parserDelegate)
+                                                     AbstractDevkitBasedDefinitionParser.ParseDelegate parserDelegate)
     {
         Element domElement = DomUtils.getChildElementByTagName(element, parentElementName);
         if (domElement != null)
@@ -207,7 +207,7 @@ public abstract class AbstractDefinitionParser implements BeanDefinitionParser
 
     protected ManagedMap parseMap(Element element,
                                   String childElementName,
-                                  AbstractDefinitionParser.ParseDelegate parserDelegate)
+                                  AbstractDevkitBasedDefinitionParser.ParseDelegate parserDelegate)
     {
         ManagedMap managedMap = new ManagedMap();
         List<Element> childDomElements = DomUtils.getChildElementsByTagName(element, childElementName);
@@ -257,7 +257,7 @@ public abstract class AbstractDefinitionParser implements BeanDefinitionParser
                                           String fieldName,
                                           String parentElementName,
                                           String childElementName,
-                                          AbstractDefinitionParser.ParseDelegate parserDelegate)
+                                          AbstractDevkitBasedDefinitionParser.ParseDelegate parserDelegate)
     {
         Element domElement = DomUtils.getChildElementByTagName(element, parentElementName);
         if (domElement != null)
@@ -280,7 +280,7 @@ public abstract class AbstractDefinitionParser implements BeanDefinitionParser
                                                      String parentElementName,
                                                      String childElementName,
                                                      String defaultValue,
-                                                     AbstractDefinitionParser.ParseDelegate parserDelegate)
+                                                     AbstractDevkitBasedDefinitionParser.ParseDelegate parserDelegate)
     {
         Element domElement = DomUtils.getChildElementByTagName(element, parentElementName);
         if (domElement != null)
@@ -307,7 +307,7 @@ public abstract class AbstractDefinitionParser implements BeanDefinitionParser
                                                       String parentElementName,
                                                       String childElementName,
                                                       String defaultValue,
-                                                      AbstractDefinitionParser.ParseDelegate parserDelegate)
+                                                      AbstractDevkitBasedDefinitionParser.ParseDelegate parserDelegate)
     {
         Element domElement = DomUtils.getChildElementByTagName(element, parentElementName);
         if (domElement != null)

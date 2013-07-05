@@ -28,8 +28,8 @@ import org.mule.api.transformer.Transformer;
 import org.mule.common.security.oauth.exception.NotAuthorizedException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.security.oauth.OAuthAdapter;
 import org.mule.security.oauth.OnNoTokenPolicy;
+import org.mule.security.oauth.OnNoTokenPolicyAware;
 import org.mule.transformer.TransformerTemplate;
 import org.mule.transport.NullPayload;
 
@@ -84,8 +84,7 @@ public abstract class AbstractDevkitBasedMessageProcessor extends AbstractConnec
     {
         try
         {
-            event = this.doProcess(event);
-            this.overwritePayload(event, event.getMessage().getPayload());
+            return this.doProcess(event);
         }
         catch (MessagingException messagingException)
         {
@@ -96,7 +95,7 @@ public abstract class AbstractDevkitBasedMessageProcessor extends AbstractConnec
         {
             try
             {
-                return this.handleNotAuthorized((OAuthAdapter) moduleObject, e, event);
+                return this.handleNotAuthorized((OnNoTokenPolicyAware) moduleObject, e, event);
             }
             catch (Exception ne)
             {
@@ -130,16 +129,17 @@ public abstract class AbstractDevkitBasedMessageProcessor extends AbstractConnec
         throw new MessagingException(CoreMessages.failedToInvoke(this.operationName), event, e);
     }
 
-    private MuleEvent handleNotAuthorized(OAuthAdapter adapter, NotAuthorizedException e, MuleEvent event)
-        throws NotAuthorizedException
+    private MuleEvent handleNotAuthorized(OnNoTokenPolicyAware policyAware,
+                                          NotAuthorizedException e,
+                                          MuleEvent event) throws NotAuthorizedException
     {
-        OnNoTokenPolicy policy = adapter.getOnNoTokenPolicy();
+        OnNoTokenPolicy policy = policyAware.getOnNoTokenPolicy();
         if (policy == null)
         {
             throw new IllegalStateException("OnNoTokenPolicy cannot be null");
         }
 
-        return policy.handleNotAuthorized(adapter, e, event);
+        return policy.handleNotAuthorized(policyAware, e, event);
     }
 
     /**

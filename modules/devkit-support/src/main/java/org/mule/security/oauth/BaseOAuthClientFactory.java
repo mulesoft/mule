@@ -18,6 +18,7 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.common.security.oauth.OAuthState;
+import org.mule.common.security.oauth.exception.NotAuthorizedException;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -117,10 +118,12 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
             throw new IllegalArgumentException("Invalid key type");
         }
 
-        if (!this.objectStore.contains(((String) key)))
+        if (!this.objectStore.contains((String) key))
         {
-            throw new RuntimeException(
-                (("There is no access token stored under the key " + ((String) key)) + ". You need to call the <authorize> message processor. The key will be given to you via a flow variable after the OAuth dance is completed. You can extract it using flowVars['tokenId']."));
+            throw new NotAuthorizedException(
+                String.format(
+                    "There is no access token stored under the key %s . You need to call the <authorize> message processor. The key will be given to you via a flow variable after the OAuth dance is completed. You can extract it using flowVars['tokenId'].",
+                    key));
         }
 
         OAuthState state = this.retrieveOAuthState((String) key, true);

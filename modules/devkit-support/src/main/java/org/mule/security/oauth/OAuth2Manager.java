@@ -34,7 +34,7 @@ import org.apache.commons.pool.KeyedPoolableObjectFactory;
  * @param <C> Actual connector object that represents a connection
  */
 public interface OAuth2Manager<C extends OAuth2Adapter>
-    extends HttpCallbackAdapter, ProcessAdapter<OAuth2Adapter>
+    extends HttpCallbackAdapter, ProcessAdapter<OAuth2Adapter>, OnNoTokenPolicyAware
 {
 
     /**

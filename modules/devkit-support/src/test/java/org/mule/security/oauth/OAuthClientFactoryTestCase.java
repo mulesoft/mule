@@ -14,6 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.common.security.oauth.OAuthState;
+import org.mule.common.security.oauth.exception.NotAuthorizedException;
 import org.mule.tck.size.SmallTest;
 
 import java.io.Serializable;
@@ -68,7 +69,7 @@ public class OAuthClientFactoryTestCase
         this.factory.makeObject(new Object());
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test(expected = NotAuthorizedException.class)
     public void makeObjectWithNotExistentKey() throws Exception
     {
         Mockito.when(this.objectStore.contains(KEY)).thenReturn(false);
