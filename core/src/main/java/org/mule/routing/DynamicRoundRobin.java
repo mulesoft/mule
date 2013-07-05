@@ -21,12 +21,13 @@ import org.mule.api.processor.MessageProcessor;
 /**
  * RoundRobin divides the messages it receives among its target routes in round-robin
  * fashion. The set of routes is obtained dynamically using a {@link org.mule.routing.DynamicRouteResolver}
- *
+ * <p/>
  * This includes messages received on all threads, so there is no guarantee
  * that messages received from a splitter are sent to consecutively numbered targets.
  */
 public class DynamicRoundRobin implements MessageProcessor, Initialisable, MuleContextAware
 {
+
     private RoundRobinRoutingStrategy routingStrategy;
     private MuleContext muleContext;
     private DynamicRouteResolver dynamicRouteResolver;

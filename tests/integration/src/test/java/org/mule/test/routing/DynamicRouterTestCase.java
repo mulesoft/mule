@@ -10,18 +10,20 @@
 
 package org.mule.test.routing;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
 import org.mule.tck.junit4.FunctionalTestCase;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import org.junit.Before;
+import org.junit.Test;
 
 public abstract class DynamicRouterTestCase extends FunctionalTestCase
 {
+
     protected static final String LETTER_A = "a";
     protected static final String LETTER_B = "b";
     protected static final String LETTER_C = "c";
