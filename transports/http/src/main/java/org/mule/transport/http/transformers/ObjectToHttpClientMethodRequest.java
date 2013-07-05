@@ -386,11 +386,6 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             if (src instanceof InputStream)
             {
                 postMethod.setRequestEntity(new InputStreamRequestEntity((InputStream) src, outboundMimeType));
-                // chunking a ContentLenghtInputStream results on content being corrupted
-                if (!(src instanceof ContentLengthInputStream))
-                {
-                    postMethod.setContentChunked(true);
-                }
             }
             else if (src instanceof byte[])
             {
