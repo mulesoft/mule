@@ -50,7 +50,7 @@ public class IdentifiableCustomRouteResolver implements IdentifiableDynamicRoute
         {
             try
             {
-                event.getMessage().setPayload(event.getMessage().getPayloadAsString() + letter);
+                event.getMessage().setPayload(letter);
                 return event;
             }
             catch (Exception e)

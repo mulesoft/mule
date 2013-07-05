@@ -23,8 +23,13 @@ public class DynamicRouteResolverAdapter implements IdentifiableDynamicRouteReso
 
     public DynamicRouteResolverAdapter(final DynamicRouteResolver dynamicRouteResolver)
     {
+        this(dynamicRouteResolver, UUID.getUUID());
+    }
+
+    public DynamicRouteResolverAdapter(final DynamicRouteResolver dynamicRouteResolver, final String id)
+    {
         this.dynamicRouteResolver = dynamicRouteResolver;
-        id = UUID.getUUID();
+        this.id = id;
     }
 
     @Override
@@ -39,7 +44,8 @@ public class DynamicRouteResolverAdapter implements IdentifiableDynamicRouteReso
     }
 
     @Override
-    public List<MessageProcessor> resolveRoutes(MuleEvent event) throws MessagingException {
+    public List<MessageProcessor> resolveRoutes(MuleEvent event) throws MessagingException
+    {
         return dynamicRouteResolver.resolveRoutes(event);
     }
 }
