@@ -18,6 +18,7 @@ import java.util.List;
 
 public class DynamicRouteResolverAdapter implements IdentifiableDynamicRouteResolver
 {
+
     private final DynamicRouteResolver dynamicRouteResolver;
     private final String id;
 
@@ -33,9 +34,10 @@ public class DynamicRouteResolverAdapter implements IdentifiableDynamicRouteReso
     }
 
     @Override
-    public String getRouteIdentifier(MuleEvent event) throws MessagingException {
+    public String getRouteIdentifier(MuleEvent event) throws MessagingException
+    {
 
-        if(dynamicRouteResolver instanceof IdentifiableDynamicRouteResolver)
+        if (dynamicRouteResolver instanceof IdentifiableDynamicRouteResolver)
         {
             return ((IdentifiableDynamicRouteResolver) dynamicRouteResolver).getRouteIdentifier(event);
         }

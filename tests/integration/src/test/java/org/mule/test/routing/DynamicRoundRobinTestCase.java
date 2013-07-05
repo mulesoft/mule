@@ -9,15 +9,17 @@
  */
 package org.mule.test.routing;
 
-import org.junit.Test;
-import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
-
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+import org.mule.api.MuleEvent;
+import org.mule.construct.Flow;
+
+import org.junit.Test;
+
 public class DynamicRoundRobinTestCase extends DynamicRouterTestCase
 {
+
     private static final String DYNAMIC_ROUND_ROBIN = "dynamicRoundRobin";
     private static final String DYNAMIC_ROUND_ROBIN_CUSTOM_ID = "dynamicRoundRobinWithCustomId";
 
@@ -74,7 +76,8 @@ public class DynamicRoundRobinTestCase extends DynamicRouterTestCase
 
 
     @Override
-    public String getFlowName() {
+    public String getFlowName()
+    {
         return DYNAMIC_ROUND_ROBIN;
     }
 }

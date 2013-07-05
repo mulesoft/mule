@@ -25,14 +25,15 @@ import java.util.Map;
 /**
  * Routing strategy that divides the messages it receives among its target routes in round-robin
  * fashion. The set of routes is obtained dynamically using a {@link org.mule.routing.DynamicRouteResolver}.
- *
+ * <p/>
  * This includes messages received on all threads, so there is no guarantee
  * that messages received from a splitter are sent to consecutively numbered targets.
  */
 public class RoundRobinRoutingStrategy extends AbstractRoutingStrategy
 {
+
     private final IdentifiableDynamicRouteResolver identifiableDynamicRouteResolver;
-    private Map<String,Short> roundRobinState = new HashMap<String,Short>();
+    private Map<String, Short> roundRobinState = new HashMap<String, Short>();
 
     public RoundRobinRoutingStrategy(final MuleContext muleContext, final IdentifiableDynamicRouteResolver identifiableDynamicRouteResolver)
     {
@@ -43,7 +44,7 @@ public class RoundRobinRoutingStrategy extends AbstractRoutingStrategy
     @Override
     public MuleEvent route(MuleEvent event, List<MessageProcessor> messageProcessors) throws MessagingException
     {
-        if(messageProcessors == null || messageProcessors.isEmpty())
+        if (messageProcessors == null || messageProcessors.isEmpty())
         {
             throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), event, null);
         }
@@ -52,10 +53,10 @@ public class RoundRobinRoutingStrategy extends AbstractRoutingStrategy
         Short nextMessageProcessor = 0;
         synchronized (this)
         {
-            if(roundRobinState.containsKey(id))
+            if (roundRobinState.containsKey(id))
             {
                 Short lastMessageProcessor = roundRobinState.get(id);
-                nextMessageProcessor = (short) (lastMessageProcessor + 1 >= messageProcessors.size()? 0 : lastMessageProcessor + 1);
+                nextMessageProcessor = (short) (lastMessageProcessor + 1 >= messageProcessors.size() ? 0 : lastMessageProcessor + 1);
                 roundRobinState.put(id, nextMessageProcessor);
             }
             else

@@ -17,6 +17,7 @@ import org.mule.api.MuleEvent;
  */
 public interface IdentifiableDynamicRouteResolver extends DynamicRouteResolver
 {
+
     /**
      * Returns an identifier of the {@link org.mule.routing.DynamicRouteResolver}.
      *

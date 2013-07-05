@@ -22,6 +22,7 @@ import org.junit.Test;
 
 public class DynamicAllTestCase extends DynamicRouterTestCase
 {
+
     private static final String DYNAMIC_ALL = "dynamicAll";
 
 
@@ -32,7 +33,8 @@ public class DynamicAllTestCase extends DynamicRouterTestCase
     }
 
     @Override
-    public String getFlowName() {
+    public String getFlowName()
+    {
         return "dynamicAll";
     }
 

@@ -21,6 +21,7 @@ import java.util.List;
 
 public class IdentifiableCustomRouteResolver implements IdentifiableDynamicRouteResolver
 {
+
     private final String ID_EXPRESSION = "#[flowVars['id']]";
 
     static List<MessageProcessor> routes = new ArrayList<MessageProcessor>();
@@ -32,7 +33,8 @@ public class IdentifiableCustomRouteResolver implements IdentifiableDynamicRoute
     }
 
     @Override
-    public String getRouteIdentifier(MuleEvent event) throws MessagingException {
+    public String getRouteIdentifier(MuleEvent event) throws MessagingException
+    {
         return event.getMuleContext().getExpressionManager().parse(ID_EXPRESSION, event);
     }
 
@@ -40,6 +42,7 @@ public class IdentifiableCustomRouteResolver implements IdentifiableDynamicRoute
     {
 
         private String letter;
+
         public AddLetterMessageProcessor(String letter)
         {
             this.letter = letter;

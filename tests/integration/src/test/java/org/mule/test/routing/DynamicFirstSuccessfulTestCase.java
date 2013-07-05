@@ -15,6 +15,7 @@ import org.junit.Test;
 
 public class DynamicFirstSuccessfulTestCase extends DynamicRouterTestCase
 {
+
     private static final String DYNAMIC_FIRST_SUCCESSFUL = "dynamicFirstSuccessful";
     private static final String DYNAMIC_FIRST_SUCCESSFUL_WITH_EXPRESSION = "dynamicFirstSuccessfulWithExpression";
     private static final String LETTER_F = "f";
@@ -28,7 +29,8 @@ public class DynamicFirstSuccessfulTestCase extends DynamicRouterTestCase
     }
 
     @Override
-    public String getFlowName() {
+    public String getFlowName()
+    {
         return DYNAMIC_FIRST_SUCCESSFUL;
     }
 
