@@ -149,6 +149,7 @@ import org.mule.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.routing.CollectionSplitter;
 import org.mule.routing.DynamicAll;
 import org.mule.routing.DynamicFirstSuccessful;
+import org.mule.routing.DynamicRoundRobin;
 import org.mule.routing.ExpressionMessageInfoMapping;
 import org.mule.routing.ExpressionSplitter;
 import org.mule.routing.FirstSuccessful;
@@ -569,6 +570,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("first-successful", new ChildDefinitionParser("messageProcessor", FirstSuccessful.class));
         registerBeanDefinitionParser("until-successful", new ChildDefinitionParser("messageProcessor", UntilSuccessful.class));
         registerBeanDefinitionParser("round-robin", new ChildDefinitionParser("messageProcessor", RoundRobin.class));
+        registerBeanDefinitionParser("dynamic-round-robin", new RouterDefinitionParser(DynamicRoundRobin.class));
         registerBeanDefinitionParser("dynamic-first-successful", new RouterDefinitionParser(DynamicFirstSuccessful.class));
         registerBeanDefinitionParser("dynamic-all", new RouterDefinitionParser(DynamicAll.class));
         registerMuleBeanDefinitionParser("custom-route-resolver", new ParentDefinitionParser())
