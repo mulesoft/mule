@@ -692,9 +692,9 @@
          -->
 
         <dependency>
-            <groupId>net.sf.saxon</groupId>
+            <groupId>net.sourceforge.saxon</groupId>
             <artifactId>saxon</artifactId>
-            <version>${saxonVersion}-osgi</version>
+            <version>${saxonVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
