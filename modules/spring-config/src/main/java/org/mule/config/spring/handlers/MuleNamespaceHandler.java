@@ -22,19 +22,7 @@ import org.mule.component.simple.EchoComponent;
 import org.mule.component.simple.LogComponent;
 import org.mule.component.simple.NullComponent;
 import org.mule.component.simple.PassThroughComponent;
-import org.mule.config.spring.factories.ChoiceRouterFactoryBean;
-import org.mule.config.spring.factories.CompositeMessageSourceFactoryBean;
-import org.mule.config.spring.factories.DefaultMemoryQueueStoreFactoryBean;
-import org.mule.config.spring.factories.DefaultPersistentQueueStoreFactoryBean;
-import org.mule.config.spring.factories.FileQueueStoreFactoryBean;
-import org.mule.config.spring.factories.InboundEndpointFactoryBean;
-import org.mule.config.spring.factories.MessageProcessorFilterPairFactoryBean;
-import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
-import org.mule.config.spring.factories.PollingMessageSourceFactoryBean;
-import org.mule.config.spring.factories.QueueProfileFactoryBean;
-import org.mule.config.spring.factories.SimpleMemoryQueueStoreFactoryBean;
-import org.mule.config.spring.factories.SubflowMessageProcessorChainFactoryBean;
-import org.mule.config.spring.factories.TransactionalMessageProcessorsFactoryBean;
+import org.mule.config.spring.factories.*;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
@@ -419,6 +407,9 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("custom-source", new ChildDefinitionParser("messageSource", null, MessageSource.class));
         registerBeanDefinitionParser("composite-source", new ChildDefinitionParser("messageSource", CompositeMessageSourceFactoryBean.class));
         registerBeanDefinitionParser("poll", new ChildEndpointDefinitionParser(PollingMessageSourceFactoryBean.class));
+
+        // Poll overrides
+        registerBeanDefinitionParser("watermark", new ChildDefinitionParser("override", WatermarkFactoryBean.class));
 
         // Models
         registerBeanDefinitionParser("model", new ModelDefinitionParser());
