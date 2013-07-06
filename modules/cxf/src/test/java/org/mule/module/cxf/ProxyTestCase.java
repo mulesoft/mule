@@ -14,7 +14,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -25,6 +24,8 @@ import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.ForceXalanTransformerFactory;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.concurrent.Latch;
 
@@ -71,6 +72,9 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
         + "</soap:Body>"
         + "<!-- comment 7 -->"
         + "</soap:Envelope>";
+
+    @Rule
+    public SystemProperty useXalan = new ForceXalanTransformerFactory();
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
