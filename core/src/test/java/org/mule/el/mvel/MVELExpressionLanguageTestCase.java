@@ -59,6 +59,7 @@ import javax.activation.DataHandler;
 import javax.activation.MimeType;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -377,6 +378,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testConcurrentEvaluation() throws Exception
     {
         muleContext.getRegistry().registerObject("dummy-el-extension", new DummyExpressionLanguageExtension());
