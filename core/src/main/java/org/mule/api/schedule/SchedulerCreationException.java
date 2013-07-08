@@ -8,17 +8,25 @@
  * LICENSE.txt file.
  */
 
-package org.mule.tck.junit4.rule;
+package org.mule.api.schedule;
 
 /**
- * Adds a system property to force the usage of xalan transformer factory
+ * <p>
+ * This exception is thrown if a {@link Scheduler} could not be created.
+ * </p>
+ *
+ * @since 3.5.0
  */
-public class ForceXalanTransformerFactory extends SystemProperty
+public class SchedulerCreationException extends RuntimeException
 {
 
-    public ForceXalanTransformerFactory()
+    public SchedulerCreationException(String s, Throwable throwable)
     {
-        super("javax.xml.transform.TransformerFactory", "org.apache.xalan.processor.TransformerFactoryImpl");
+        super(s, throwable);
     }
 
+    public SchedulerCreationException(String s)
+    {
+        super(s);
+    }
 }

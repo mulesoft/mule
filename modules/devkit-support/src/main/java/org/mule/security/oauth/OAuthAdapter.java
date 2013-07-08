@@ -16,7 +16,7 @@ import org.mule.security.oauth.callback.SaveAccessTokenCallback;
 
 import java.io.Serializable;
 
-public interface OAuthAdapter extends Serializable, OnNoTokenPolicyAware
+public interface OAuthAdapter extends Serializable
 {
 
     /**
@@ -74,5 +74,11 @@ public interface OAuthAdapter extends Serializable, OnNoTokenPolicyAware
      * @throws NotAuthorizedException if the adapter hasn't been authorized
      */
     public void hasBeenAuthorized() throws NotAuthorizedException;
+
+    /**
+     * @return a non-null instance of {@link org.mule.security.oauth.OnNoTokenPolicy}
+     *         that specifies the behavior to take when token is not set
+     */
+    public OnNoTokenPolicy getOnNoTokenPolicy();
 
 }

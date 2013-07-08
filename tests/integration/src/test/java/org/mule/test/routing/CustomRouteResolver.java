@@ -34,7 +34,6 @@ public class CustomRouteResolver implements DynamicRouteResolver
     {
 
         private String letter;
-
         public AddLetterMessageProcessor(String letter)
         {
             this.letter = letter;
@@ -45,7 +44,7 @@ public class CustomRouteResolver implements DynamicRouteResolver
         {
             try
             {
-                event.getMessage().setPayload(letter);
+                event.getMessage().setPayload(event.getMessage().getPayloadAsString() + letter);
                 return event;
             }
             catch (Exception e)
@@ -55,7 +54,6 @@ public class CustomRouteResolver implements DynamicRouteResolver
         }
 
     }
-
     public static class FailingMessageProcessor implements MessageProcessor
     {
 
@@ -68,9 +66,7 @@ public class CustomRouteResolver implements DynamicRouteResolver
 
     public static class AddLetterTHenFailsMessageProcessor implements MessageProcessor
     {
-
         private String letter;
-
         public AddLetterTHenFailsMessageProcessor(String letter)
         {
             this.letter = letter;

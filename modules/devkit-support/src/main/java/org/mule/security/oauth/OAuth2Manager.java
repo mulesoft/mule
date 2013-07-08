@@ -12,8 +12,6 @@ package org.mule.security.oauth;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.devkit.ProcessAdapter;
-import org.mule.api.devkit.ProcessTemplate;
 import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.common.security.oauth.exception.NotAuthorizedException;
@@ -33,8 +31,7 @@ import org.apache.commons.pool.KeyedPoolableObjectFactory;
  * 
  * @param <C> Actual connector object that represents a connection
  */
-public interface OAuth2Manager<C extends OAuth2Adapter>
-    extends HttpCallbackAdapter, ProcessAdapter<OAuth2Adapter>, OnNoTokenPolicyAware
+public interface OAuth2Manager<C extends OAuth2Adapter> extends HttpCallbackAdapter
 {
 
     /**
@@ -172,7 +169,5 @@ public interface OAuth2Manager<C extends OAuth2Adapter>
      */
     public MuleEvent restoreAuthorizationEvent(String eventId)
         throws ObjectStoreException, ObjectDoesNotExistException;
-
-    public <T> ProcessTemplate<T, OAuth2Adapter> getProcessTemplate();
 
 }

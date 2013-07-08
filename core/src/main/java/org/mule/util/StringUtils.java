@@ -139,9 +139,9 @@ public class StringUtils extends org.apache.commons.lang.StringUtils
      * @param pattern the pattern to use as regexp
      * @param value the value to evaluate
      * @param matchIndex the group index to be returned
-     * @return the value of the group at the given index. <code>null</code> if no
-     *         match found
-     * @throws IllegalArgumentException if pattern or value are null.
+     * @return the value of the group at the given index
+     * @throws IllegalArgumentException if no match found at the given index. Also if
+     *             value or pattern are null
      */
     public static String match(Pattern pattern, String value, int matchIndex) throws IllegalArgumentException
     {
@@ -155,7 +155,9 @@ public class StringUtils extends org.apache.commons.lang.StringUtils
             return matcher.group(matchIndex);
         }
 
-        return null;
+        throw new IllegalArgumentException(String.format(
+            "String %s did not produced any match for pattern %s at index %d", value, pattern.pattern(),
+            matchIndex));
     }
 
     // lookup tables needed for toHexString(byte[], boolean)

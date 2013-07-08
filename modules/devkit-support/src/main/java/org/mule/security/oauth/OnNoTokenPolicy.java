@@ -32,7 +32,7 @@ public enum OnNoTokenPolicy
     EXCEPTION
     {
         @Override
-        public MuleEvent handleNotAuthorized(Object source, NotAuthorizedException e, MuleEvent event)
+        public MuleEvent handleNotAuthorized(OAuthAdapter adapter, NotAuthorizedException e, MuleEvent event)
             throws NotAuthorizedException
         {
             throw e;
@@ -47,7 +47,7 @@ public enum OnNoTokenPolicy
     STOP_FLOW
     {
         @Override
-        public MuleEvent handleNotAuthorized(Object source, NotAuthorizedException e, MuleEvent event)
+        public MuleEvent handleNotAuthorized(OAuthAdapter adapter, NotAuthorizedException e, MuleEvent event)
             throws NotAuthorizedException
         {
             if (logger.isWarnEnabled())
@@ -60,14 +60,14 @@ public enum OnNoTokenPolicy
                     builder.append(" [accessTokenId = ").append(e.getAccessTokenId()).append("]");
                 }
 
-                if (source instanceof MetadataAware)
+                if (adapter instanceof MetadataAware)
                 {
-                    MetadataAware metadata = (MetadataAware) source;
+                    MetadataAware metadata = (MetadataAware) adapter;
                     builder.append(" [connector= ").append(metadata.getModuleName());
                 }
                 else
                 {
-                    builder.append(" [source class= ").append(source.getClass().getCanonicalName());
+                    builder.append(" [adapter class= ").append(adapter.getClass().getCanonicalName());
                 }
 
                 logger.warn(builder.toString());
@@ -84,7 +84,7 @@ public enum OnNoTokenPolicy
      * {@link org.mule.common.security.oauth.exception.NotAuthorizedException}
      * according to each policy
      * 
-     * @param source the unauthorized connector
+     * @param adapter the unauthorized connector
      * @param e the exception thrown
      * @param event the current mule event
      * @return the same event that was received or a new/modified one. It could also
@@ -93,7 +93,7 @@ public enum OnNoTokenPolicy
      * @throws NotAuthorizedException if the policy decides to simply bubble up the
      *             exception
      */
-    public abstract MuleEvent handleNotAuthorized(Object source,
+    public abstract MuleEvent handleNotAuthorized(OAuthAdapter adapter,
                                                   NotAuthorizedException e,
                                                   MuleEvent event) throws NotAuthorizedException;
 

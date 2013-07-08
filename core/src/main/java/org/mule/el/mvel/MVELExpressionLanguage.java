@@ -147,8 +147,6 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     public <T> T evaluate(String expression, MuleEvent event, Map<String, Object> vars)
     {
         MVELExpressionLanguageContext factory = createExpressionLanguageContext();
-        factory.addPrivateVariable(MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE,
-                event.getMessage());
         if (vars != null)
         {
             factory.appendFactory(new CachedMapVariableResolverFactory(vars));
@@ -160,6 +158,8 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         {
             factory.localFactory.appendFactory(createVariableVariableResolverFactory(event));
         }
+        factory.addPrivateVariable(MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE,
+            event.getMessage());
         return (T) evaluateInternal(expression, factory);
     }
 
@@ -168,13 +168,14 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     public <T> T evaluate(String expression, MuleMessage message)
     {
         MVELExpressionLanguageContext factory = createExpressionLanguageContext();
-        factory.addPrivateVariable(MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE, message);
         factory.appendFactory(createMessageVariableResolverFactory(message));
+
         factory.appendFactory(createGlobalVariableResolverFactory(factory));
         if (autoResolveVariables)
         {
             factory.localFactory.appendFactory(createVariableVariableResolverFactory(message));
         }
+        factory.addPrivateVariable(MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE, message);
         return (T) evaluateInternal(expression, factory);
     }
 
@@ -183,7 +184,6 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     public <T> T evaluate(String expression, MuleMessage message, Map<String, Object> vars)
     {
         MVELExpressionLanguageContext factory = createExpressionLanguageContext();
-        factory.addPrivateVariable(MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE, message);
         if (vars != null)
         {
             factory.appendFactory(new CachedMapVariableResolverFactory(vars));
@@ -195,6 +195,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         {
             factory.localFactory.appendFactory(createVariableVariableResolverFactory(message));
         }
+        factory.addPrivateVariable(MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE, message);
         return (T) evaluateInternal(expression, factory);
     }
 

@@ -22,8 +22,6 @@ import org.mule.security.oauth.OAuth2Manager;
 import org.mule.security.oauth.OAuthProperties;
 import org.mule.util.StringUtils;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
@@ -94,31 +92,19 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
     private MuleEvent restoreOriginalEvent(MuleEvent event) throws MuleException
     {
         String state = event.getMessage().getInboundProperty("state");
-        if (!StringUtils.isBlank(state))
+
+        String eventId = null;
+
+        try
         {
-            try
-            {
-                state = URLDecoder.decode(state, "UTF-8");
-            }
-            catch (UnsupportedEncodingException e)
-            {
-                throw new MessagingException(
-                    MessageFactory.createStaticMessage("State query param had invalid encoding: " + state),
-                    event);
-            }
+            eventId = StringUtils.match(EVENT_ID_PATTERN, state, 1);
         }
-
-        String eventId = StringUtils.match(EVENT_ID_PATTERN, state, 1);
-
-        if (StringUtils.isBlank(eventId))
+        catch (IllegalArgumentException e)
         {
-            if (logger.isWarnEnabled())
-            {
-                logger.warn(String.format(
-                    "Could not fetch original event id for callback with state %s. Will continue with new event without restoring previous one",
-                    state));
-            }
-            return event;
+            throw new MessagingException(
+                MessageFactory.createStaticMessage(String.format(
+                    "Could not fetch original event for callback with state %s. Could not extract original event id",
+                    state)), event);
         }
 
         if (logger.isDebugEnabled())
@@ -155,4 +141,5 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
 
         return restoredEvent;
     }
+
 }

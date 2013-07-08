@@ -10,12 +10,23 @@
 package org.mule.test.integration;
 
 import org.mule.api.config.MuleProperties;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.schedule.SchedulerFactoryPostProcessor;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.config.spring.factories.WatermarkFactoryBean;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.api.schedule.Scheduler;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.polling.MessageProcessorPollingConnector;
+import org.mule.transport.polling.PollingMessageSource;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -25,20 +36,11 @@ import static org.junit.Assert.assertTrue;
 
 public class PollingTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/polling-config.xml";
-    }
-
-    /**
-     * Check that a poll without watermark works
-     */
-    @Test
-    public void testPolling() throws Exception
-    {
-        executePollOf("pollWithoutWatermark");
-        Thread.sleep(2000);
     }
 
 
@@ -52,7 +54,7 @@ public class PollingTestCase extends FunctionalTestCase
     public void pollWithNoKeyInTheObjectStore() throws Exception
     {
         executePollOf("nameNotDefinedWatermarkObjectStoreFlow");
-        Thread.sleep(1000);
+        Thread.sleep(3000);
         ObjectStore os = getDefaultObjectStore();
         assertTrue(os.contains("test1"));
         assertEquals("noKey", os.retrieve("test1"));
@@ -67,7 +69,7 @@ public class PollingTestCase extends FunctionalTestCase
     public void pollChangeKeyValueWithNoKeyInTheObjectStore() throws Exception
     {
         executePollOf("changeWatermarkWihtNotDefinedWatermarkObjectStoreFlow");
-        Thread.sleep(1000);
+        Thread.sleep(3000);
         ObjectStore os = getDefaultObjectStore();
         assertTrue(os.contains("test2"));
         assertEquals("keyPresent", os.retrieve("test2"));
@@ -83,7 +85,7 @@ public class PollingTestCase extends FunctionalTestCase
     {
         getDefaultObjectStore().store("test3", "testValue");
         executePollOf("usingWatermarkFlow");
-        Thread.sleep(2000);
+        Thread.sleep(3000);
         ObjectStore os = getDefaultObjectStore();
         assertTrue(os.contains("test3"));
         assertEquals("keyPresent", os.retrieve("test3"));
@@ -98,7 +100,7 @@ public class PollingTestCase extends FunctionalTestCase
     {
         getDefaultObjectStore().store("test4", "testValue");
         executePollOf("watermarkWithKeyAsAnExpression");
-        Thread.sleep(2000);
+        Thread.sleep(3000);
         ObjectStore os = getDefaultObjectStore();
         assertTrue(os.contains("test4"));
         assertEquals("keyPresent", os.retrieve("test4"));
@@ -110,10 +112,10 @@ public class PollingTestCase extends FunctionalTestCase
     {
         getDefaultObjectStore().store("test5", "testValue");
         executePollOf("watermarkWithUpdateExpression");
-        Thread.sleep(2000);
+        Thread.sleep(3000);
         ObjectStore os = getDefaultObjectStore();
         assertTrue(os.contains("test5"));
-        assertEquals(Boolean.TRUE, os.retrieve("test5"));
+        assertEquals("valueUpdated", os.retrieve("test5"));
     }
 
     @Test
@@ -121,7 +123,7 @@ public class PollingTestCase extends FunctionalTestCase
     {
         getDefaultObjectStore().store("test", "testValue");
         executePollOf("watermarkWithAnnotations");
-        Thread.sleep(2000);
+        Thread.sleep(3000);
         ObjectStore os = getDefaultObjectStore();
         assertTrue(os.contains("test6"));
         assertEquals("keyPresent", os.retrieve("test6"));
@@ -135,16 +137,60 @@ public class PollingTestCase extends FunctionalTestCase
 
     private void executePollOf(String flowName) throws Exception
     {
-        MessageProcessorPollingConnector connector = muleContext.getRegistry().lookupObject("connector.polling.mule.default");
-        AbstractPollingMessageReceiver messageReceiver = (AbstractPollingMessageReceiver) connector.lookupReceiver(flowName + "~");
-        messageReceiver.performPoll();
+        Scheduler scheduler = muleContext.getRegistry().lookupScheduler(PollingMessageSource.flowPollingSchedulers(flowName)).iterator().next();
+        scheduler.schedule();
     }
 
-    public static class FooComponent
-    {
-        public boolean process(String s)
+
+    public static class PollStopper implements SchedulerFactoryPostProcessor{
+
+        @Override
+        public Scheduler process(final Scheduler scheduler)
         {
-            return true;
+            return new Scheduler()
+            {
+                @Override
+                public void schedule() throws Exception
+                {
+                    scheduler.schedule();
+                }
+
+                @Override
+                public void dispose()
+                {
+                    scheduler.dispose();
+                }
+
+                @Override
+                public void initialise() throws InitialisationException
+                {
+                    scheduler.initialise();
+                }
+
+                @Override
+                public void setName(String name)
+                {
+                    scheduler.setName(name);
+                }
+
+                @Override
+                public String getName()
+                {
+                    return scheduler.getName();
+                }
+
+                @Override
+                public void start() throws MuleException
+                {
+                    // Does nothing
+                }
+
+                @Override
+                public void stop() throws MuleException
+                {
+                    // Does Nothing
+                }
+            };
         }
     }
   }

@@ -21,7 +21,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DefaultRestoreAccessTokenCallback implements RestoreAccessTokenCallback
+public class DefaultRestoreAccessTokenCallback
 {
 
     /**
@@ -58,7 +58,6 @@ public class DefaultRestoreAccessTokenCallback implements RestoreAccessTokenCall
         this.messageProcessor = value;
     }
 
-    @Override
     public void restoreAccessToken()
     {
         MuleEvent event = RequestContext.getEvent();
@@ -114,13 +113,11 @@ public class DefaultRestoreAccessTokenCallback implements RestoreAccessTokenCall
         }
     }
 
-    @Override
     public String getAccessToken()
     {
         return restoredAccessToken;
     }
 
-    @Override
     public String getAccessTokenSecret()
     {
         return restoredAccessTokenSecret;
