@@ -93,19 +93,21 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
 
     private MuleEvent restoreOriginalEvent(MuleEvent event) throws MuleException
     {
+
         String state = event.getMessage().getInboundProperty("state");
-        if (!StringUtils.isBlank(state))
+        if (StringUtils.isEmpty(state))
         {
-            try
-            {
-                state = URLDecoder.decode(state, "UTF-8");
-            }
-            catch (UnsupportedEncodingException e)
-            {
-                throw new MessagingException(
-                    MessageFactory.createStaticMessage("State query param had invalid encoding: " + state),
-                    event);
-            }
+            return event;
+        }
+
+        try
+        {
+            state = URLDecoder.decode(state, "UTF-8");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new MessagingException(
+                MessageFactory.createStaticMessage("State query param had invalid encoding: " + state), event);
         }
 
         String eventId = StringUtils.match(EVENT_ID_PATTERN, state, 1);
@@ -142,12 +144,13 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
                 "Error retrieving authorization event %s from object store", eventId)), event, e);
         }
 
-        try
+        String cleanedState = StringUtils.match(ORIGINAL_STATE_PATTERN, state, 1);
+
+        if (cleanedState != null)
         {
-            restoredEvent.getMessage().setProperty("state",
-                StringUtils.match(ORIGINAL_STATE_PATTERN, state, 1), PropertyScope.INBOUND);
+            restoredEvent.getMessage().setProperty("state", cleanedState, PropertyScope.INBOUND);
         }
-        catch (IllegalArgumentException e)
+        else
         {
             // user did not use the state at all, just blank it
             restoredEvent.getMessage().setProperty("state", StringUtils.EMPTY, PropertyScope.INBOUND);
