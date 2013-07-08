@@ -1,3 +1,13 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
 package org.mule.transport.polling;
 
 import org.mule.DefaultMuleEvent;
@@ -16,7 +26,10 @@ import java.io.OutputStream;
 
 /**
  * <p>
- *     Implementation of {@link RoutingMessageTemplate} for poll elements.
+ * Implementation of {@link RoutingMessageTemplate} for poll elements.
+ * </p>
+ * <p>
+ * Poll elements
  * </p>
  *
  * @since 3.5.0
@@ -48,7 +61,7 @@ public class PollMessageRouter extends RoutingMessageTemplate
 
         interceptor.prepareRouting(originalEvent, muleEvent);
 
-        return  routeEvent(muleEvent);
+        return routeEvent(muleEvent);
     }
 
     @Override
@@ -79,7 +92,10 @@ public class PollMessageRouter extends RoutingMessageTemplate
     @Override
     protected MuleEvent handleResponse(MuleEvent resultEvent) throws MuleException
     {
-        interceptor.postProcessRouting(resultEvent);
+        if (resultEvent != null)
+        {
+            interceptor.postProcessRouting(resultEvent);
+        }
         return super.handleResponse(resultEvent);
     }
 }

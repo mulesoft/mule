@@ -1,5 +1,16 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
 package org.mule.transport.polling;
 
+import static org.mule.config.i18n.CoreMessages.pollSourceReturnedNull;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -129,6 +140,11 @@ public class PollingMessageSource implements MessageSource,
      */
     private FlowConstruct flowConstruct;
 
+    /**
+     * <p>
+     * Override intercepting class
+     * </p>
+     */
     protected MessageProcessorPollingOverride override;
 
 
@@ -178,7 +194,8 @@ public class PollingMessageSource implements MessageSource,
         eventBuilder.initialise();
         schedulerFactory.create(schedulerNameOf(this), this);
 
-       if (override == null) {
+        if (override == null)
+        {
             override = new NoOverride();
         }
     }
@@ -203,13 +220,11 @@ public class PollingMessageSource implements MessageSource,
                     MuleEvent process = eventBuilder.process(event);
                     if (process != null)
                     {
-                        messageRouter(interceptor).routeEvent(process, null) ;
+                        messageRouter(interceptor).routeEvent(process, null);
                     }
                     else
                     {
-                        // TODO DF: i18n
-                        logger.info(String.format("Polling of '%s' returned null, the flow will not be invoked.",
-                                                  this));
+                        logger.info(pollSourceReturnedNull(flowConstruct.getName()));
                     }
                     return null;
                 }
@@ -273,7 +288,10 @@ public class PollingMessageSource implements MessageSource,
      */
     private static class NoOverride extends MessageProcessorPollingOverride
     {
-        private MessageProcessorPollingInterceptor noOpInterceptor = new MessageProcessorPollingInterceptor() {};
+
+        private MessageProcessorPollingInterceptor noOpInterceptor = new MessageProcessorPollingInterceptor()
+        {
+        };
 
         @Override
         public MessageProcessorPollingInterceptor interceptor()
@@ -281,9 +299,6 @@ public class PollingMessageSource implements MessageSource,
             return noOpInterceptor;
         }
     }
-
-
-
 
 
 }

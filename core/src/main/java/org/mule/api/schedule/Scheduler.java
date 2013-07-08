@@ -1,3 +1,13 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
 package org.mule.api.schedule;
 
 import org.mule.api.NameableObject;
@@ -22,7 +32,7 @@ import org.mule.api.lifecycle.Lifecycle;
  * Scheduler creation. This can me omitted if this is not desired.
  * </p>
  * <p>
- * Each scheduler is thought to schedule a single job. Check the {@link SchedulerFactory#create(Object)} to see the
+ * Each scheduler is thought to schedule a single job. Check the {@link SchedulerFactory#create(String, Object)}  to see the
  * creation of the scheduler for more details.
  * </p>
  *

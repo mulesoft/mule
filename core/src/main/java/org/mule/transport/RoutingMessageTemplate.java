@@ -40,21 +40,6 @@ public abstract class RoutingMessageTemplate
         this.sessionHandler = sessionHandler;
     }
 
-    public MuleEvent routeMessage(MuleMessage message, OutputStream outputStream)
-            throws MuleException
-    {
-
-        warnIfMuleClientSendUsed(message);
-
-        propagateRootMessageIdProperty(message);
-
-        MuleEvent muleEvent = createMuleEvent(message, outputStream);
-
-        applyInboundTransformers(muleEvent);
-
-        return routeEvent(muleEvent);
-    }
-
     public MuleEvent routeEvent(MuleEvent originalEvent, OutputStream outputStream)
             throws MuleException
     {
@@ -68,6 +53,22 @@ public abstract class RoutingMessageTemplate
     protected abstract void fireResponseNotification(MuleEvent resultEvent);
 
     protected abstract void applyResponseTransformers(MuleEvent resultEvent) throws MuleException;
+
+
+    protected MuleEvent routeMessage(MuleMessage message, OutputStream outputStream)
+            throws MuleException
+    {
+
+        warnIfMuleClientSendUsed(message);
+
+        propagateRootMessageIdProperty(message);
+
+        MuleEvent muleEvent = createMuleEvent(message, outputStream);
+
+        applyInboundTransformers(muleEvent);
+
+        return routeEvent(muleEvent);
+    }
 
 
     protected void warnIfMuleClientSendUsed(MuleMessage message)

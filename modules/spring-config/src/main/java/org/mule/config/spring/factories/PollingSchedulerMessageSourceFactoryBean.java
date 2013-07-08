@@ -1,3 +1,14 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+
 package org.mule.config.spring.factories;
 
 import org.mule.api.MuleContext;
@@ -16,6 +27,8 @@ import org.springframework.beans.factory.FactoryBean;
  * <p>
  * {@link FactoryBean} of a Poll element.
  * </p>
+ *
+ * @since 3.5.0
  */
 public class PollingSchedulerMessageSourceFactoryBean implements FactoryBean, MuleContextAware
 {
@@ -34,6 +47,11 @@ public class PollingSchedulerMessageSourceFactoryBean implements FactoryBean, Mu
      */
     protected SchedulerFactory<PollingMessageSource> schedulerFactory;
 
+    /**
+     * <p>
+     *     {@link MessageProcessorPollingOverride} configured inside the poll element
+     * </p>
+     */
     protected MessageProcessorPollingOverride override;
 
     /**
@@ -44,6 +62,8 @@ public class PollingSchedulerMessageSourceFactoryBean implements FactoryBean, Mu
      * TODO: remove this for 4.0.0
      */
     private long frequency;
+
+
     private MuleContext context;
 
     @Override
