@@ -808,6 +808,63 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="abstract-poll-override" abstract="true" type="abstractPollOverrideType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for poll overrides
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractPollOverrideType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
+    <xsd:element name="watermark" type="watermarkType" substitutionGroup="abstract-poll-override">
+        <xsd:annotation>
+            <xsd:documentation>
+                Defines watermark based synchronization parameters
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="watermarkType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractPollOverrideType">
+                <xsd:attribute name="variable" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The key that is going to be used to store/retrieve the watermark
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="default-expression" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The default value to be used for the watermark
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="update-expression" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The expression to be used to update the watermark
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="object-store-ref" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The object store where the watermark is going to be stored
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
     <xsd:element name="logger" type="loggerType" substitutionGroup="abstract-observer-message-processor">
         <xsd:annotation>
     <xsd:documentation>
@@ -3424,6 +3481,10 @@
     <xsd:complexType name="pollInboundEndpointType">
         <xsd:complexContent>
             <xsd:extension base="abstractMessageSourceType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-poll-override" minOccurs="0" maxOccurs="1"/>
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint"/>
+                </xsd:sequence>
                 <xsd:sequence>
                 <xsd:element ref="abstract-scheduler" minOccurs="0" maxOccurs="1"/>
                 <xsd:group ref="messageProcessorOrOutboundEndpoint"/>

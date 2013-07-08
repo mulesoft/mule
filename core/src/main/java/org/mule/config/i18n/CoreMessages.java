@@ -1404,4 +1404,7 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 343);
     }
 
+    public static Message watermarkRequiresSynchronousProcessing() {
+        return factory.createMessage(BUNDLE_PATH, 345);
+    }
 }

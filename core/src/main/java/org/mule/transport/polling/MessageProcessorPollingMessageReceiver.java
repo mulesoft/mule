@@ -15,7 +15,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
@@ -29,7 +28,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.processor.chain.SimpleMessageProcessorChainBuilder;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.NullPayload;
@@ -37,12 +35,13 @@ import org.mule.util.StringUtils;
 
 import java.util.Map;
 
-@Deprecated
 public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessageReceiver
 {
     public static final String SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME = MuleProperties.ENDPOINT_PROPERTY_PREFIX + "sourceMessageProcessor";
+    public static final String POLL_OVERRIDE_PROPERTY_NAME = MuleProperties.ENDPOINT_PROPERTY_PREFIX + "pollOverride";
 
     protected MessageProcessor sourceMessageProcessor;
+    protected MessageProcessorPollingOverride override;
 
     public MessageProcessorPollingMessageReceiver(Connector connector,
                                                   FlowConstruct flowConstruct,
@@ -67,6 +66,11 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
                 sourceMessageProcessor)), this);
         }
 
+        override = (MessageProcessorPollingOverride) endpoint.getProperty(POLL_OVERRIDE_PROPERTY_NAME);
+        if (override == null) {
+            override = new NoOverride();
+        }
+
         Long tempPolling = (Long) endpoint.getProperties().get(AbstractConnector.PROPERTY_POLLING_FREQUENCY);
         if (tempPolling != null)
         {
@@ -85,25 +89,7 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
                 @Override
                 public MuleEvent process() throws Exception
                 {
-                    SimpleMessageProcessorChainBuilder builder = new SimpleMessageProcessorChainBuilder();
-
-                    builder.chain(sourceMessageProcessor, new MessageProcessor()
-                    {
-                        @Override
-                        public MuleEvent process(MuleEvent event) throws MuleException
-                        {
-                            if (isNewMessage(event))
-                            {
-                                routeMessage(event.getMessage());
-                            } else
-                            {
-                                // TODO DF: i18n
-                                logger.info(String.format("Polling of '%s' returned null, the flow will not be invoked.",
-                                                          sourceMessageProcessor));
-                            }
-                            return null;
-                        }
-                    } );
+                    MessageProcessorPollingInterceptor interceptor = override.interceptor();
 
                     MuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, (Map<String, Object>) null,
                             connector.getMuleContext());
@@ -114,11 +100,14 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
                     }
 
                     MuleEvent event = new DefaultMuleEvent(request, ep.getExchangePattern(), flowConstruct);
+                    event = interceptor.prepareSourceEvent(event);
 
                     MuleEvent sourceEvent = sourceMessageProcessor.process(event);
                     if (isNewMessage(sourceEvent))
                     {
-                        routeMessage(sourceEvent.getMessage());
+                        event = interceptor.prepareRouting(sourceEvent, createMuleEvent(sourceEvent.getMessage(), null));
+                        routeEvent(event);
+                        interceptor.postProcessRouting(event);
                     } else
                     {
                         // TODO DF: i18n
@@ -162,5 +151,19 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
             }
         }
         return false;
+    }
+
+    /**
+     * Override implementation that doesn't change anything. Used as a default when no override is defined
+     */
+    private static class NoOverride extends MessageProcessorPollingOverride
+    {
+        private MessageProcessorPollingInterceptor noOpInterceptor = new MessageProcessorPollingInterceptor() {};
+
+        @Override
+        public MessageProcessorPollingInterceptor interceptor()
+        {
+            return noOpInterceptor;
+        }
     }
 }

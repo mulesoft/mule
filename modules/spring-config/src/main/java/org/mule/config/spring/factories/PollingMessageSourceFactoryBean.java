@@ -20,6 +20,8 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.polling.MessageProcessorPollingMessageReceiver;
+import org.mule.transport.polling.MessageProcessorPollingOverride;
+import sun.net.ProgressMeteringPolicy;
 import org.mule.transport.polling.PollingMessageSource;
 
 @Deprecated
@@ -31,6 +33,7 @@ public class PollingMessageSourceFactoryBean extends InboundEndpointFactoryBean
     protected SchedulerFactory<PollingMessageSource> schedulerFactory;
 
     protected MessageProcessor messageProcessor;
+    protected MessageProcessorPollingOverride override;
     protected Long frequency;
 
     @Override
@@ -76,6 +79,7 @@ public class PollingMessageSourceFactoryBean extends InboundEndpointFactoryBean
         uriBuilder = new URIBuilder("polling://" + hashCode(), muleContext);
 
         properties.put(MessageProcessorPollingMessageReceiver.SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME, messageProcessor);
+        properties.put(MessageProcessorPollingMessageReceiver.POLL_OVERRIDE_PROPERTY_NAME, override);
         properties.put(AbstractConnector.PROPERTY_POLLING_FREQUENCY, frequency);
 
         EndpointFactory ef = muleContext.getEndpointFactory();
@@ -93,6 +97,10 @@ public class PollingMessageSourceFactoryBean extends InboundEndpointFactoryBean
     public void setMessageProcessor(MessageProcessor messageProcessor)
     {
         this.messageProcessor = messageProcessor;
+    }
+
+    public void setOverride(MessageProcessorPollingOverride override) {
+        this.override = override;
     }
 
     public void setFrequency(Long frequency)
