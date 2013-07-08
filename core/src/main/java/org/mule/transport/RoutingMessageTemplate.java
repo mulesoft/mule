@@ -55,6 +55,12 @@ public abstract class RoutingMessageTemplate
         return routeEvent(muleEvent);
     }
 
+    public MuleEvent routeEvent(MuleEvent originalEvent, OutputStream outputStream)
+            throws MuleException
+    {
+        return routeMessage(originalEvent.getMessage(), outputStream);
+    }
+
     protected abstract void applyInboundTransformers(MuleEvent muleEvent) throws MuleException;
 
     protected abstract MuleEvent doCreateEvent(MuleMessage message, ResponseOutputStream ros, MuleSession session);
@@ -161,6 +167,11 @@ public abstract class RoutingMessageTemplate
             return muleEvent;
         }
 
+        return handleResponse(resultEvent);
+    }
+
+    protected MuleEvent handleResponse(MuleEvent resultEvent) throws MuleException
+    {
         if (exchangePattern.hasResponse() && resultEvent != null
             && !VoidMuleEvent.getInstance().equals(resultEvent))
         {

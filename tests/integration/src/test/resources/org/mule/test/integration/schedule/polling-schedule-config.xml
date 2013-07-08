@@ -29,5 +29,24 @@
     </flow>
 
 
+    <flow name="pollbar" processingStrategy="synchronous">
+        <poll frequency="1000">
+            <static-component>
+                <return-data>bar</return-data>
+            </static-component>
+        </poll>
+        <component class="org.mule.test.integration.schedule.PollScheduleTestCase$BarComponent" />
+    </flow>
+
+    <flow name="pollbarNever">
+        <poll>
+            <!-- Will not run unless my test takes 200 days -->
+            <fixed-frequency-scheduler frequency="4" timeUnit="DAYS" startDelay="200"/>
+            <static-component>
+                <return-data>barNever</return-data>
+            </static-component>
+        </poll>
+        <component class="org.mule.test.integration.schedule.PollScheduleTestCase$BarComponent" />
+    </flow>
 
 </mule>

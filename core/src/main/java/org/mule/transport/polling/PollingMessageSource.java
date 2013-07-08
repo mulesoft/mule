@@ -129,6 +129,9 @@ public class PollingMessageSource implements MessageSource,
      */
     private FlowConstruct flowConstruct;
 
+    protected MessageProcessorPollingOverride override;
+
+
     /**
      * <p>
      * The {@link Flow} is executed with a initial source {@link MuleEvent}. That {@link MuleEvent} is created by the
@@ -150,10 +153,12 @@ public class PollingMessageSource implements MessageSource,
 
 
     public PollingMessageSource(LifecycleAwareMessageProcessorWrapper eventBuilder,
-                                SchedulerFactory<PollingMessageSource> schedulerFactory)
+                                SchedulerFactory<PollingMessageSource> schedulerFactory,
+                                MessageProcessorPollingOverride override)
     {
         this.eventBuilder = eventBuilder;
         this.schedulerFactory = schedulerFactory;
+        this.override = override;
     }
 
 
@@ -172,6 +177,10 @@ public class PollingMessageSource implements MessageSource,
         // TODO: Does it make sense to do outbound endpoint exchange pattern here?
         eventBuilder.initialise();
         schedulerFactory.create(schedulerNameOf(this), this);
+
+       if (override == null) {
+            override = new NoOverride();
+        }
     }
 
     public void run()
@@ -184,12 +193,17 @@ public class PollingMessageSource implements MessageSource,
                 @Override
                 public MuleEvent process() throws Exception
                 {
+                    MessageProcessorPollingInterceptor interceptor = override.interceptor();
+
+
                     MuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, (Map<String, Object>) null, context);
                     MuleEvent event = new DefaultMuleEvent(request, MessageExchangePattern.REQUEST_RESPONSE, flowConstruct);
+                    event = interceptor.prepareSourceEvent(event);
+
                     MuleEvent process = eventBuilder.process(event);
                     if (process != null)
                     {
-                        messageRouter().routeMessage(process.getMessage(), null);
+                        messageRouter(interceptor).routeEvent(process, null) ;
                     }
                     else
                     {
@@ -200,11 +214,11 @@ public class PollingMessageSource implements MessageSource,
                     return null;
                 }
 
-                private PollMessageRouter messageRouter()
+                private PollMessageRouter messageRouter(MessageProcessorPollingInterceptor interceptor)
                 {
                     return new PollMessageRouter(listener,
                                                  MessageExchangePattern.ONE_WAY,
-                                                 new NullSessionHandler(), flowConstruct);
+                                                 new NullSessionHandler(), flowConstruct, interceptor);
                 }
             });
         }
@@ -254,7 +268,19 @@ public class PollingMessageSource implements MessageSource,
     }
 
 
+    /**
+     * Override implementation that doesn't change anything. Used as a default when no override is defined
+     */
+    private static class NoOverride extends MessageProcessorPollingOverride
+    {
+        private MessageProcessorPollingInterceptor noOpInterceptor = new MessageProcessorPollingInterceptor() {};
 
+        @Override
+        public MessageProcessorPollingInterceptor interceptor()
+        {
+            return noOpInterceptor;
+        }
+    }
 
 
 

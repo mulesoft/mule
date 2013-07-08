@@ -49,6 +49,7 @@ public class PollingMessageSourceFactoryBean extends InboundEndpointFactoryBean
             factoryBean.setMessageProcessor(messageProcessor);
             factoryBean.setSchedulerFactory(schedulerFactory);
             factoryBean.setMuleContext(muleContext);
+            factoryBean.setOverride(override);
 
             return factoryBean.getObject();
 
