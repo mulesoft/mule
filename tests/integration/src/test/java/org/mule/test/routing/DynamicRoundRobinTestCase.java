@@ -15,6 +15,10 @@ import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Test;
 
 public class DynamicRoundRobinTestCase extends DynamicRouterTestCase
@@ -22,6 +26,14 @@ public class DynamicRoundRobinTestCase extends DynamicRouterTestCase
 
     private static final String DYNAMIC_ROUND_ROBIN = "dynamicRoundRobin";
     private static final String DYNAMIC_ROUND_ROBIN_CUSTOM_ID = "dynamicRoundRobinWithCustomId";
+    private static final String MULTIPLE_ROUND_ROBIN = "multipleDynamicRoundRobin";
+    private static final String MULTIPLE_ROUND_ROBIN_WITH_ID = "multipleDynamicRoundRobinWithId";
+    private static final String ID = "id";
+    private static final String FIRST_ROUTER_VAR = "first-router";
+    private static final boolean FIRST_ROUTER = true;
+    private static final int ID_1 = 1;
+    private static final int ID_2 = 2;
+    private static final int ID_3 = 3;
 
     @Override
     protected String getConfigResources()
@@ -32,10 +44,7 @@ public class DynamicRoundRobinTestCase extends DynamicRouterTestCase
     @Test
     public void withRoutes() throws Exception
     {
-        CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_A));
-        CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_B));
-        CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_C));
-        CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_D));
+        initCustomResolver();
         Flow testFlow = getTestFlow(DYNAMIC_ROUND_ROBIN);
         runFlowAndAssertResponse(testFlow, LETTER_A);
         runFlowAndAssertResponse(testFlow, LETTER_B);
@@ -50,30 +59,81 @@ public class DynamicRoundRobinTestCase extends DynamicRouterTestCase
     @Test
     public void withRoutesAndCustomId() throws Exception
     {
+        initIdentifiableCustomRouteResolver();
+        Flow testFlow = getTestFlow(DYNAMIC_ROUND_ROBIN_CUSTOM_ID);
+        runFlowAndAssertResponse(testFlow, Collections.<String, Object>singletonMap(ID, ID_1), LETTER_A);
+        runFlowAndAssertResponse(testFlow, Collections.<String, Object>singletonMap(ID, ID_1), LETTER_B);
+        runFlowAndAssertResponse(testFlow, Collections.<String, Object>singletonMap(ID, ID_2), LETTER_A);
+        runFlowAndAssertResponse(testFlow, Collections.<String, Object>singletonMap(ID, ID_1), LETTER_C);
+        runFlowAndAssertResponse(testFlow, Collections.<String, Object>singletonMap(ID, ID_2), LETTER_B);
+        runFlowAndAssertResponse(testFlow, Collections.<String, Object>singletonMap(ID, ID_3), LETTER_A);
+        runFlowAndAssertResponse(testFlow, Collections.<String, Object>singletonMap(ID, ID_1), LETTER_D);
+        runFlowAndAssertResponse(testFlow, Collections.<String, Object>singletonMap(ID, ID_2), LETTER_C);
+    }
+
+    @Test
+    public void testMultipleDynamicRouters() throws Exception
+    {
+        initCustomResolver();
+        Flow testFlow = getTestFlow(MULTIPLE_ROUND_ROBIN);
+        runFlowAndAssertResponse(testFlow, Collections.<String, Object>singletonMap(FIRST_ROUTER_VAR, FIRST_ROUTER), LETTER_A);
+        runFlowAndAssertResponse(testFlow, Collections.<String, Object>singletonMap(FIRST_ROUTER_VAR, FIRST_ROUTER), LETTER_B);
+        runFlowAndAssertResponse(testFlow, Collections.<String, Object>singletonMap(FIRST_ROUTER_VAR, !FIRST_ROUTER), LETTER_A);
+        runFlowAndAssertResponse(testFlow, Collections.<String, Object>singletonMap(FIRST_ROUTER_VAR, FIRST_ROUTER), LETTER_C);
+        runFlowAndAssertResponse(testFlow, Collections.<String, Object>singletonMap(FIRST_ROUTER_VAR, !FIRST_ROUTER), LETTER_B);
+    }
+
+    @Test
+    public void testMultipleDynamicRoutersWithId() throws Exception
+    {
+        initIdentifiableCustomRouteResolver();
+        Flow testFlow = getTestFlow(MULTIPLE_ROUND_ROBIN_WITH_ID);
+        runFlowAndAssertResponse(testFlow, getFlowVarsMap(FIRST_ROUTER, ID_1), LETTER_A);
+        runFlowAndAssertResponse(testFlow, getFlowVarsMap(FIRST_ROUTER, ID_1), LETTER_B);
+        runFlowAndAssertResponse(testFlow, getFlowVarsMap(FIRST_ROUTER, ID_2), LETTER_A);
+        runFlowAndAssertResponse(testFlow, getFlowVarsMap(!FIRST_ROUTER, ID_1), LETTER_A);
+        runFlowAndAssertResponse(testFlow, getFlowVarsMap(!FIRST_ROUTER, ID_2), LETTER_A);
+        runFlowAndAssertResponse(testFlow, getFlowVarsMap(!FIRST_ROUTER, ID_1), LETTER_B);
+    }
+
+    private Map<String, Object> getFlowVarsMap(boolean firstRouter, int id)
+    {
+        Map<String, Object> flowVars = new HashMap<String, Object>();
+        flowVars.put(FIRST_ROUTER_VAR, firstRouter);
+        flowVars.put(ID, id);
+        return flowVars;
+    }
+
+    private void initCustomResolver()
+    {
+        CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_A));
+        CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_B));
+        CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_C));
+        CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_D));
+    }
+
+    private void initIdentifiableCustomRouteResolver()
+    {
         IdentifiableCustomRouteResolver.routes.add(new IdentifiableCustomRouteResolver.AddLetterMessageProcessor(LETTER_A));
         IdentifiableCustomRouteResolver.routes.add(new IdentifiableCustomRouteResolver.AddLetterMessageProcessor(LETTER_B));
         IdentifiableCustomRouteResolver.routes.add(new IdentifiableCustomRouteResolver.AddLetterMessageProcessor(LETTER_C));
         IdentifiableCustomRouteResolver.routes.add(new IdentifiableCustomRouteResolver.AddLetterMessageProcessor(LETTER_D));
-        Flow testFlow = getTestFlow(DYNAMIC_ROUND_ROBIN_CUSTOM_ID);
-        runFlowAndAssertResponse(testFlow, 1, LETTER_A);
-        runFlowAndAssertResponse(testFlow, 1, LETTER_B);
-        runFlowAndAssertResponse(testFlow, 2, LETTER_A);
-        runFlowAndAssertResponse(testFlow, 1, LETTER_C);
-        runFlowAndAssertResponse(testFlow, 2, LETTER_B);
-        runFlowAndAssertResponse(testFlow, 3, LETTER_A);
-        runFlowAndAssertResponse(testFlow, 1, LETTER_D);
-        runFlowAndAssertResponse(testFlow, 2, LETTER_C);
     }
 
-    private MuleEvent runFlowAndAssertResponse(Flow flow, Object flowVar, Object expectedMessage) throws Exception
+    private MuleEvent runFlowAndAssertResponse(Flow flow, Map<String, Object> flowVars, Object expectedMessage) throws Exception
     {
         MuleEvent event = getTestEvent(TEST_MESSAGE);
-        event.setFlowVariable("id", flowVar);
+        if(flowVars != null)
+        {
+            for(String key : flowVars.keySet())
+            {
+                event.setFlowVariable(key, flowVars.get(key));
+            }
+        }
         MuleEvent response = flow.process(event);
         assertThat(response.getMessageAsString(), is(expectedMessage));
         return response;
     }
-
 
     @Override
     public String getFlowName()
