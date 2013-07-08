@@ -21,7 +21,9 @@ import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
 import org.mule.security.oauth.OAuthProperties;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -83,13 +85,20 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
 
     private void setState(Map<String, String> extraParameters, MuleEvent event)
     {
-        String state = this.getState();
+        String state = String.format(OAuthProperties.EVENT_STATE_TEMPLATE, event.getId());
 
-        if (state != null)
+        if (this.getState() != null)
         {
-            state = String.format(OAuthProperties.EVENT_STATE_TEMPLATE, event.getId())
-                    + this.toString(event, state);
-            extraParameters.put("state", state);
+            state += this.toString(event, this.getState());
+        }
+
+        try
+        {
+            extraParameters.put("state", URLEncoder.encode(state, "UTF-8"));
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new RuntimeException("Error found URL Encoding the state argument", e);
         }
     }
 

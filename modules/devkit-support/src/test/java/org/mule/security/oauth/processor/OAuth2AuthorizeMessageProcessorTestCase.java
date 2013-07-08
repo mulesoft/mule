@@ -24,6 +24,7 @@ import org.mule.security.oauth.notification.OAuthAuthorizeNotification;
 import org.mule.tck.size.SmallTest;
 
 import java.lang.reflect.Type;
+import java.net.URLDecoder;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -78,10 +79,20 @@ public class OAuth2AuthorizeMessageProcessorTestCase
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void process() throws Exception
     {
-        final String state = "state";
+        this.doProcess("state");
+    }
+
+    @Test
+    public void processWithoutState() throws Exception
+    {
+        this.doProcess("");
+    }
+
+    @SuppressWarnings("unchecked")
+    private void doProcess(final String state) throws Exception
+    {
         final String authorizeUrl = "authorizeUrl";
         final String customField = "customField";
         final String anotherCustomField = "anotherCustomField";
@@ -103,7 +114,7 @@ public class OAuth2AuthorizeMessageProcessorTestCase
                     Map<String, String> parameters = (Map<String, String>) invocation.getArguments()[0];
                     String expectedState = String.format(OAuthProperties.EVENT_STATE_TEMPLATE, eventId)
                                            + state;
-                    Assert.assertEquals(expectedState, parameters.get("state"));
+                    Assert.assertEquals(expectedState, URLDecoder.decode(parameters.get("state"), "UTF-8"));
                     Assert.assertEquals(customField.toLowerCase(), parameters.get("customField"));
                     Assert.assertEquals(anotherCustomField.toLowerCase(),
                         parameters.get("anotherCustomField"));
