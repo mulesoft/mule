@@ -33,7 +33,7 @@
         <component class="org.mule.test.integration.PollingTestCase$FooComponent"/>
     </flow>
 
-    <flow name="nameNotDefinedWatermarkObjectStoreFlow">
+    <flow name="nameNotDefinedWatermarkObjectStoreFlow" processingStrategy="synchronous">
         <poll frequency="1000">
             <watermark variable="test" default-expression="#[string:noKey]"/>
             <outbound-endpoint ref="foo"/>
@@ -41,7 +41,7 @@
         <logger message="Executed With watermark"/>
     </flow>
 
-    <flow name="changeWatermarkWihtNotDefinedWatermarkObjectStoreFlow">
+    <flow name="changeWatermarkWihtNotDefinedWatermarkObjectStoreFlow" processingStrategy="synchronous">
         <poll frequency="1000">
             <watermark variable="test" default-expression="#[string:noKey]"/>
             <outbound-endpoint ref="foo"/>
@@ -51,7 +51,7 @@
     </flow>
 
 
-    <flow name="usingWatermarkFlow">
+    <flow name="usingWatermarkFlow" processingStrategy="synchronous">
         <poll frequency="1000">
             <watermark variable="test" default-expression="#[string:noKey]"/>
             <outbound-endpoint ref="foo"/>
@@ -61,7 +61,7 @@
         <component class="org.mule.test.integration.PollingTestCase$FooComponent"/>
     </flow>
 
-    <flow name="watermarkWithKeyAsAnExpression">
+    <flow name="watermarkWithKeyAsAnExpression" processingStrategy="synchronous">
         <poll frequency="1000">
             <watermark variable="#[flowVars['test']==null ? 'default' : 'test']" default-expression="#[string:noKey]"/>
             <outbound-endpoint ref="foo"/>
@@ -72,7 +72,7 @@
     </flow>
 
 
-    <flow name="watermarkWithUpdateExpression">
+    <flow name="watermarkWithUpdateExpression" processingStrategy="synchronous">
         <poll frequency="1000">
             <watermark variable="test" default-expression="#[string:noKey]" update-expression="#[payload]"/>
             <outbound-endpoint ref="foo"/>
@@ -83,7 +83,7 @@
     </flow>
 
 
-    <flow name="watermarkWithAnnotations">
+    <flow name="watermarkWithAnnotations" processingStrategy="synchronous">
         <poll frequency="1000">
             <watermark variable="test" default-expression="#[string:noKey]" doc:name="watermark"/>
             <outbound-endpoint ref="foo"/>

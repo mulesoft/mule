@@ -7,7 +7,9 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreManager;
+import org.mule.construct.Flow;
 import org.mule.context.notification.NotificationException;
+import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.transport.polling.watermark.Watermark;
 import org.mule.transport.polling.watermark.WatermarkPipelineListener;
 
@@ -21,8 +23,11 @@ import org.apache.commons.logging.LogFactory;
 
 
 /**
- * The default configuration of the watermark. If the user defines a watermark configuration in the xml, then this class
- * is instantiated
+ * <p>
+ * Default factory of the {@link Watermark} class.
+ * </p>
+ *
+ * @since 3.5.0
  */
 public class DefaultWatermarkFactory implements WatermarkFactory, MuleContextAware
 {
@@ -68,8 +73,9 @@ public class DefaultWatermarkFactory implements WatermarkFactory, MuleContextAwa
     private Map<QName, Object> annotations = new HashMap<QName, Object>();
 
 
-    public Watermark buildFor(FlowConstruct flowConstruct)
+    public Watermark createFor(FlowConstruct flowConstruct) throws Exception
     {
+        checkFlowProcessingStrategy(flowConstruct);
         checkDefaultObjectStore();
 
         Watermark watermark = Watermark.create(muleContext, objectStore, variable, defaultExpression,
@@ -88,9 +94,26 @@ public class DefaultWatermarkFactory implements WatermarkFactory, MuleContextAwa
         return watermark;
     }
 
+    private void checkFlowProcessingStrategy(FlowConstruct flowConstruct) throws Exception
+    {
+        if (flowConstruct instanceof Flow)
+        {
+            if (!isSynchronuosFlow((Flow) flowConstruct))
+            {
+                throw new Exception("Flow processing strategy must be Synchronous for flow " + flowConstruct.getName());
+            }
+        }
+    }
+
+    private boolean isSynchronuosFlow(Flow flowConstruct)
+    {
+        return (((Flow) flowConstruct).getProcessingStrategy() instanceof SynchronousProcessingStrategy);
+    }
+
     private void checkDefaultObjectStore()
     {
-        if ( objectStore == null ){
+        if (objectStore == null)
+        {
             ObjectStoreManager objectStoreManager = (ObjectStoreManager) muleContext.getRegistry().get(
                     MuleProperties.OBJECT_STORE_MANAGER);
             objectStore = objectStoreManager.getObjectStore(WATERMARK_OBJECT_STORE_NAME);

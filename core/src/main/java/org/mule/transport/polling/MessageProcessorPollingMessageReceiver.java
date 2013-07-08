@@ -31,7 +31,8 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.NullPayload;
-import org.mule.transport.polling.watermark.builder.WatermarkConfiguration;
+import org.mule.transport.polling.watermark.Watermark;
+import org.mule.transport.polling.watermark.builder.WatermarkFactory;
 import org.mule.util.StringUtils;
 
 import java.util.Map;
@@ -49,8 +50,8 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
     public static final String SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME = MuleProperties.ENDPOINT_PROPERTY_PREFIX + "sourceMessageProcessor";
 
     /**
-     * The Watermark configuration name. The poll configuration admits watermark configuration in order to store a
-     * watermark value in the object store and retrieve it every time the poll is executed.
+     * The Watermark factory name. The poll configuration admits watermarkFactory configuration in order to store a
+     * watermarkFactory value in the object store and retrieve it every time the poll is executed.
      */
     public static final String WATERMARK_PROPERTY_NAME = MuleProperties.ENDPOINT_PROPERTY_PREFIX + "watermark";
 
@@ -59,6 +60,7 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
      * The poll message source. This is the one who is going to get the Mule event to execute the flow.
      */
     protected MessageProcessor sourceMessageProcessor;
+    private Watermark watermark;
 
 
     public MessageProcessorPollingMessageReceiver(Connector connector,
@@ -69,7 +71,7 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
     }
 
     /**
-     * Sets the source message processor and the activates the watermark configuration.
+     * Sets the source message processor and the activates the watermarkFactory configuration.
      *
      * @throws InitialisationException In case initialization fails.
      */
@@ -80,13 +82,25 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
 
         checkWatermark();
 
-        sourceMessageProcessor = watermark().buildMessageSourceFrom(configuredMessageSource());
-        watermark().registerPipelineNotificationListener(this.getFlowConstruct());
+        sourceMessageProcessor = configuredMessageSource();
+        watermark = createWatermark();
 
         Long tempPolling = (Long) endpoint.getProperties().get(AbstractConnector.PROPERTY_POLLING_FREQUENCY);
         if (tempPolling != null)
         {
             setFrequency(tempPolling);
+        }
+    }
+
+    private Watermark createWatermark() throws InitialisationException
+    {
+        try
+        {
+            return watermarkFactory().createFor(flowConstruct);
+        }
+        catch (Exception e)
+        {
+            throw new InitialisationException(e, this);
         }
     }
 
@@ -105,6 +119,8 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
                                                                  connector.getMuleContext());
 
                     MuleEvent event = new DefaultMuleEvent(request, MessageExchangePattern.REQUEST_RESPONSE, flowConstruct);
+
+                    event = watermark.retrieve(event);
 
                     MuleEvent sourceEvent = sourceMessageProcessor.process(event);
                     if (isNewMessage(sourceEvent))
@@ -160,15 +176,15 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
 
     private void checkWatermark() throws InitialisationException
     {
-        if ( watermark() == null ){
+        if ( watermarkFactory() == null ){
             throw new InitialisationException(CoreMessages.createStaticMessage(
-                    "The watermark configuration must not be null"), this);
+                    "The watermark factory must not be null"), this);
         }
     }
 
-    private WatermarkConfiguration watermark()
+    private WatermarkFactory watermarkFactory()
     {
-        return (WatermarkConfiguration) endpoint.getProperty(WATERMARK_PROPERTY_NAME);
+        return (WatermarkFactory) endpoint.getProperty(WATERMARK_PROPERTY_NAME);
     }
 
     private MessageProcessor configuredMessageSource() throws InitialisationException

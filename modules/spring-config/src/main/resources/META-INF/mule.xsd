@@ -841,7 +841,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="object-store-ref" type="xsd:string" use="optional" default="_defaultUserObjectStore">
+                <xsd:attribute name="object-store-ref" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
                             The object store where the watermark is going to be stored

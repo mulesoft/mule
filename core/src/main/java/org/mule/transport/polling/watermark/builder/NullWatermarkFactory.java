@@ -13,13 +13,11 @@ import javax.xml.namespace.QName;
 
 /**
  * Null Pattern. If no watermark configuration is defined in the xml, then this class is instantiated.
+ *
+ * @since 3.5.0
  */
 public class NullWatermarkFactory implements WatermarkFactory
 {
-
-
-
-
     @Override
     public Object getAnnotation(QName name)
     {
@@ -39,7 +37,7 @@ public class NullWatermarkFactory implements WatermarkFactory
     }
 
     @Override
-    public Watermark buildFor(FlowConstruct flowConstruct)
+    public Watermark createFor(FlowConstruct flowConstruct)
     {
         return new Watermark(null,null,null,null,null){
             @Override
@@ -53,6 +51,6 @@ public class NullWatermarkFactory implements WatermarkFactory
             {
                 // DOES NOTHING...
             }
-        };  //To change body of implemented methods use File | Settings | File Templates.
+        };
     }
 }

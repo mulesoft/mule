@@ -1,13 +1,15 @@
 package org.mule.api.context.notification;
 
+import org.mule.context.notification.WatermarkNotification;
+
+
 /**
- * Created with IntelliJ IDEA.
- * User: fernandofederico
- * Date: 7/4/13
- * Time: 6:02 PM
- * To change this template use File | Settings | File Templates.
+ * <p>Listener of {@link WatermarkNotification}</p>
+ *
+ * @param <T> The {@link WatermarkNotification}
+ * @since 3.5.0
  */
-public interface WatermarkNotificationListener
+public interface WatermarkNotificationListener<T extends WatermarkNotification> extends ServerNotificationListener<WatermarkNotification>
 {
 
 }

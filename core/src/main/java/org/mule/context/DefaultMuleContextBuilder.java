@@ -32,6 +32,7 @@ import org.mule.api.context.notification.RoutingNotificationListener;
 import org.mule.api.context.notification.SecurityNotificationListener;
 import org.mule.api.context.notification.ServiceNotificationListener;
 import org.mule.api.context.notification.TransactionNotificationListener;
+import org.mule.api.context.notification.WatermarkNotificationListener;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.i18n.Message;
@@ -52,6 +53,7 @@ import org.mule.context.notification.SecurityNotification;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.context.notification.ServiceNotification;
 import org.mule.context.notification.TransactionNotification;
+import org.mule.context.notification.WatermarkNotification;
 import org.mule.lifecycle.MuleContextLifecycleManager;
 import org.mule.util.ClassUtils;
 import org.mule.util.SplashScreen;
@@ -255,6 +257,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         manager.addInterfaceToType(ManagementNotificationListener.class,
                                    ManagementNotification.class);
         manager.addInterfaceToType(CustomNotificationListener.class, CustomNotification.class);
+        manager.addInterfaceToType(WatermarkNotificationListener.class, WatermarkNotification.class);
         manager.addInterfaceToType(ConnectionNotificationListener.class,
                                    ConnectionNotification.class);
         manager.addInterfaceToType(RegistryNotificationListener.class,

@@ -12,27 +12,22 @@ package org.mule.test.integration;
 import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.context.notification.CustomNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.registry.RegistrationException;
+import org.mule.api.context.notification.WatermarkNotificationListener;
 import org.mule.api.store.ObjectStore;
-import org.mule.api.transport.MessageReceiver;
-import org.mule.construct.Flow;
-import org.mule.context.notification.CustomMetadataNotification;
+import org.mule.api.store.ObjectStoreManager;
+import org.mule.context.notification.WatermarkNotification;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.polling.MessageProcessorPollingConnector;
-import org.mule.transport.polling.watermark.WatermarkAction;
+import org.mule.transport.polling.watermark.Watermark;
+import org.mule.transport.polling.watermark.builder.DefaultWatermarkFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.event.Initializable;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -47,7 +42,7 @@ public class PollingTestCase extends FunctionalTestCase
 
     public static final QName DOCUMENTATION_NAME = new QName("http://www.mulesoft.org/schema/mule/documentation", "name");
     private static List<String> registeredValues = new ArrayList<String>();
-    private static List<CustomMetadataNotification> registeredNotification = new ArrayList<CustomMetadataNotification>();
+    private static List<WatermarkNotification> registeredNotification = new ArrayList<WatermarkNotification>();
 
     @Override
     protected String getConfigResources()
@@ -143,7 +138,7 @@ public class PollingTestCase extends FunctionalTestCase
     @Test
     public void validateNotificationFiring() throws Exception
     {
-        muleContext.registerListener(new WatermarkNotificationListener());
+        muleContext.registerListener(new MyListener());
         getDafultObjectStore().store("test", "testValue");
         executePollOf("watermarkWithKeyAsAnExpression");
         Thread.sleep(2000);
@@ -152,8 +147,8 @@ public class PollingTestCase extends FunctionalTestCase
         assertEquals("keyPresent", os.retrieve("test"));
         assertNotSame(-1, registeredValues.indexOf("noKey"));
 
-        assertEquals(WatermarkAction.WATERMARK_RETRIEVED_ACTION_NAME, registeredNotification.get(0).getName());
-        assertEquals(WatermarkAction.WATERMARK_STORED_ATTRIBUTE_NAME, registeredNotification.get(1).getName());
+        assertEquals(Watermark.WATERMARK_RETRIEVED_ACTION_NAME, registeredNotification.get(0).getName());
+        assertEquals(Watermark.WATERMARK_STORED_ATTRIBUTE_NAME, registeredNotification.get(1).getName());
     }
 
     @Test
@@ -171,7 +166,7 @@ public class PollingTestCase extends FunctionalTestCase
     @Test
     public void watermarkWithAnnotations() throws Exception
     {
-        muleContext.registerListener(new WatermarkNotificationListener());
+        muleContext.registerListener(new MyListener());
         getDafultObjectStore().store("test", "testValue");
         executePollOf("watermarkWithAnnotations");
         Thread.sleep(2000);
@@ -179,16 +174,16 @@ public class PollingTestCase extends FunctionalTestCase
         assertTrue(os.contains("test"));
         assertEquals("keyPresent", os.retrieve("test"));
 
-        assertEquals(WatermarkAction.WATERMARK_RETRIEVED_ACTION_NAME, registeredNotification.get(0).getName());
-        assertEquals("watermark", ((AnnotatedObject) registeredNotification.get(0).getProcessor()).getAnnotation(DOCUMENTATION_NAME));
-        assertEquals(WatermarkAction.WATERMARK_STORED_ATTRIBUTE_NAME, registeredNotification.get(1).getName());
-        assertEquals("watermark", ((AnnotatedObject) registeredNotification.get(1).getProcessor()).getAnnotation(DOCUMENTATION_NAME));
+        assertEquals(Watermark.WATERMARK_RETRIEVED_ACTION_NAME, registeredNotification.get(0).getName());
+        assertEquals("watermark", ((AnnotatedObject) registeredNotification.get(0).getAnnotatedGenerator()).getAnnotation(DOCUMENTATION_NAME));
+        assertEquals(Watermark.WATERMARK_STORED_ATTRIBUTE_NAME, registeredNotification.get(1).getName());
+        assertEquals("watermark", ((AnnotatedObject) registeredNotification.get(1).getAnnotatedGenerator()).getAnnotation(DOCUMENTATION_NAME));
 
     }
 
     private ObjectStore getDafultObjectStore()
     {
-        return muleContext.getRegistry().lookupObject(MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME);
+        return ((ObjectStoreManager) muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_MANAGER)).getObjectStore(DefaultWatermarkFactory.WATERMARK_OBJECT_STORE_NAME);
     }
 
     private void executePollOf(String flowName) throws Exception
@@ -208,13 +203,13 @@ public class PollingTestCase extends FunctionalTestCase
         }
     }
 
-    public class WatermarkNotificationListener implements CustomNotificationListener<CustomMetadataNotification>
+    public class MyListener implements WatermarkNotificationListener<WatermarkNotification>
     {
 
         @Override
-        public void onNotification(ServerNotification notification)
+        public void onNotification(WatermarkNotification notification)
         {
-            registeredNotification.add((CustomMetadataNotification) notification);
+            registeredNotification.add(notification);
         }
     }
 
