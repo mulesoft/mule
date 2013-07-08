@@ -6,6 +6,7 @@ import org.mule.api.processor.LifecycleAwareMessageProcessorWrapper;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessors;
 import org.mule.api.schedule.SchedulerFactory;
+import org.mule.transport.polling.MessageProcessorPollingOverride;
 import org.mule.transport.polling.PollingMessageSource;
 import org.mule.transport.polling.schedule.FixedFrequencySchedulerFactory;
 
@@ -33,6 +34,8 @@ public class PollingSchedulerMessageSourceFactoryBean implements FactoryBean, Mu
      */
     protected SchedulerFactory<PollingMessageSource> schedulerFactory;
 
+    protected MessageProcessorPollingOverride override;
+
     /**
      * <p>
      * Kept for backward compatibility only. To support poll with frequency configured. If the poll element has a
@@ -48,10 +51,10 @@ public class PollingSchedulerMessageSourceFactoryBean implements FactoryBean, Mu
     {
         if (schedulerFactory == null)
         {
-            return new PollingMessageSource(sourceBuilder(), defaultSchedulerFactory());
+            return new PollingMessageSource(sourceBuilder(), defaultSchedulerFactory(), override);
         }
 
-        return new PollingMessageSource(sourceBuilder(), schedulerFactory);
+        return new PollingMessageSource(sourceBuilder(), schedulerFactory, override);
     }
 
     private LifecycleAwareMessageProcessorWrapper sourceBuilder()
@@ -98,5 +101,10 @@ public class PollingSchedulerMessageSourceFactoryBean implements FactoryBean, Mu
     public void setMuleContext(MuleContext context)
     {
         this.context = context;
+    }
+
+    public void setOverride(MessageProcessorPollingOverride override)
+    {
+        this.override = override;
     }
 }

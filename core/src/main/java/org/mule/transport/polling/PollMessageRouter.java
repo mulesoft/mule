@@ -12,6 +12,8 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.SessionHandler;
 import org.mule.transport.RoutingMessageTemplate;
 
+import java.io.OutputStream;
+
 /**
  * <p>
  *     Implementation of {@link RoutingMessageTemplate} for poll elements.
@@ -24,14 +26,30 @@ public class PollMessageRouter extends RoutingMessageTemplate
 
 
     private FlowConstruct flowConstruct;
+    private MessageProcessorPollingInterceptor interceptor;
 
     public PollMessageRouter(MessageProcessor listener,
-                             MessageExchangePattern exchangePattern, SessionHandler sessionHandler, FlowConstruct flowConstruct)
+                             MessageExchangePattern exchangePattern, SessionHandler sessionHandler, FlowConstruct flowConstruct,
+                             MessageProcessorPollingInterceptor interceptor)
     {
         super(listener, exchangePattern, sessionHandler);
         this.flowConstruct = flowConstruct;
+        this.interceptor = interceptor;
     }
 
+    @Override
+    public MuleEvent routeEvent(MuleEvent originalEvent, OutputStream outputStream) throws MuleException
+    {
+        warnIfMuleClientSendUsed(originalEvent.getMessage());
+
+        propagateRootMessageIdProperty(originalEvent.getMessage());
+
+        MuleEvent muleEvent = createMuleEvent(originalEvent.getMessage(), outputStream);
+
+        interceptor.prepareRouting(originalEvent, muleEvent);
+
+        return  routeEvent(muleEvent);
+    }
 
     @Override
     protected void applyInboundTransformers(MuleEvent muleEvent) throws MuleException
@@ -55,8 +73,13 @@ public class PollMessageRouter extends RoutingMessageTemplate
     @Override
     protected void applyResponseTransformers(MuleEvent resultEvent) throws MuleException
     {
-        // No response transformer for poll
+        // no response for Polling
     }
 
-
+    @Override
+    protected MuleEvent handleResponse(MuleEvent resultEvent) throws MuleException
+    {
+        interceptor.postProcessRouting(resultEvent);
+        return super.handleResponse(resultEvent);
+    }
 }

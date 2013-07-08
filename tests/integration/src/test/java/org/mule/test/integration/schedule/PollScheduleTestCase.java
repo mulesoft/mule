@@ -18,6 +18,7 @@ public class PollScheduleTestCase extends FunctionalTestCase
 {
 
     private static List<String> foo = new ArrayList<String>();
+    private static List<String> bar = new ArrayList<String>();
 
     @Override
     protected String getConfigResources()
@@ -38,6 +39,16 @@ public class PollScheduleTestCase extends FunctionalTestCase
             for (String s : foo)
             {
                 assertEquals(s, "foo");
+            }
+        }
+
+        synchronized (bar)
+        {
+            bar.size();
+            assertTrue(bar.size() > 0);
+            for (String s : bar)
+            {
+                assertEquals(s, "bar");
             }
         }
 
@@ -86,22 +97,30 @@ public class PollScheduleTestCase extends FunctionalTestCase
 
         public boolean process(String s)
         {
-            System.out.println(System.currentTimeMillis());
-
-            try
-            {
-                Thread.sleep(6000);
-            }
-            catch (InterruptedException e)
-            {
-
-            }
             synchronized (foo)
             {
 
                 if (foo.size() < 10)
                 {
                     foo.add(s);
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    public static class BarComponent
+    {
+
+        public boolean process(String s)
+        {
+            synchronized (bar)
+            {
+
+                if (bar.size() < 10)
+                {
+                    bar.add(s);
                     return true;
                 }
             }

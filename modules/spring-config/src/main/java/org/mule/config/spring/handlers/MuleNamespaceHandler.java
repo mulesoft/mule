@@ -224,6 +224,7 @@ import org.mule.transformer.simple.RemoveSessionVariableTransformer;
 import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.transformer.simple.SetPayloadTransformer;
 import org.mule.transformer.simple.StringAppendTransformer;
+import org.mule.transport.polling.schedule.FixedFrequencySchedulerFactory;
 import org.mule.util.store.InMemoryObjectStore;
 import org.mule.util.store.ManagedObjectStore;
 import org.mule.util.store.TextFileObjectStore;
