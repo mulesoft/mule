@@ -19,4 +19,11 @@ public interface PagingDelegate<T> extends Closeable
 
     public List<T> getPage();
 
+    /**
+     * returns the total amount of items in the unpaged resultset. In some scenarios,
+     * it might not be possible/convenient to actually retrieve this value. -1 is
+     * returned in such a case.
+     */
+    public int getTotalResults();
+
 }

@@ -61,6 +61,12 @@ public class ProducerConsumerIteratorTestCase
         public void close() throws MuleException
         {
         };
+        
+        @Override
+        public int getTotalResults()
+        {
+            return TOP;
+        }
     };
 
     @Test

@@ -11,6 +11,7 @@
 package org.mule.streaming;
 
 import org.mule.api.MuleException;
+import org.mule.api.streaming.ClosedConsumerException;
 import org.mule.api.streaming.Consumer;
 import org.mule.api.streaming.Producer;
 
@@ -21,6 +22,12 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Implementation of {@link org.mule.api.streaming.Consumer} that obains data from an
+ * instance of {@link org.mule.api.streaming.Producer} and returns the elements in
+ * the same pages as the producer returns them. This implementation is not
+ * thread-safe
+ */
 public class PagedBasedPagingConsumer<T> implements Consumer<T>
 {
 
@@ -28,54 +35,87 @@ public class PagedBasedPagingConsumer<T> implements Consumer<T>
 
     private Producer<T> producer;
     private List<T> currentPage = null;
+    private boolean closed = false;
 
     public PagedBasedPagingConsumer(Producer<T> producer)
     {
         this.producer = producer;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @SuppressWarnings("unchecked")
     public T consume() throws NoSuchElementException
     {
+        if (this.closed)
+        {
+            throw new ClosedConsumerException("this consumer is already closed");
+        }
+
         if (this.isConsumed())
         {
             throw new NoSuchElementException();
         }
 
-        return (T) this.currentPage;
+        T page = (T) this.currentPage;
+        this.currentPage = null;
+
+        return page;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isConsumed()
     {
-        if (CollectionUtils.isEmpty(this.currentPage))
+        if (this.closed)
         {
-            this.loadNextPage(this.producer);
+            return true;
         }
 
         if (CollectionUtils.isEmpty(this.currentPage))
         {
-            try
+            this.loadNextPage(this.producer);
+
+            if (CollectionUtils.isEmpty(this.currentPage))
             {
-                this.close();
-            }
-            catch (MuleException e)
-            {
-                if (logger.isWarnEnabled())
+                try
                 {
-                    logger.warn("Expection was trapped trying to close consumer", e);
+                    this.close();
                 }
+                catch (MuleException e)
+                {
+                    if (logger.isWarnEnabled())
+                    {
+                        logger.warn("Expection was trapped trying to close consumer", e);
+                    }
+                }
+                return true;
             }
-            return true;
         }
 
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int totalAvailable()
+    {
+        return this.producer.totalAvailable();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void close() throws MuleException
     {
+        this.closed = true;
         this.currentPage = null;
         this.producer.close();
     }

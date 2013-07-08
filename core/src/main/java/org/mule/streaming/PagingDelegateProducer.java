@@ -16,6 +16,10 @@ import org.mule.api.streaming.Producer;
 
 import java.util.List;
 
+/**
+ * Implementation of {@link org.mule.api.streaming.Producer} that uses an instance of
+ * {@link org.mule.api.streaming.PagingDelegate} to get its results
+ */
 public class PagingDelegateProducer<T> implements Producer<T>
 {
 
@@ -26,12 +30,27 @@ public class PagingDelegateProducer<T> implements Producer<T>
         this.delegate = delegate;
     }
 
+    /**
+     * Asks the delegate for the next page
+     */
     @Override
     public List<T> produce()
     {
         return this.delegate.getPage();
     }
 
+    /**
+     * Returns the total amount of available results informed by delegate
+     */
+    @Override
+    public int totalAvailable()
+    {
+        return this.delegate.getTotalResults();
+    }
+
+    /**
+     * Closes the delegate
+     */
     @Override
     public void close() throws MuleException
     {

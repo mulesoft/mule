@@ -14,6 +14,11 @@ import org.mule.api.Closeable;
 
 import java.util.NoSuchElementException;
 
+/**
+ * General interface for components able to consume data from any specific resource
+ * or stream. Implementing this interface does not guarantee thread safeness. Check
+ * each particular implementation for information about that
+ */
 public interface Consumer<T> extends Closeable
 {
 
@@ -21,23 +26,29 @@ public interface Consumer<T> extends Closeable
      * Retrieves the next available item.
      * 
      * @return an object of type T if available
-     * @throws NoSuchElementException if no more items are available
+     * @throws {@link org.mule.api.streaming.ClosedConsumerException.ClosedConsumerException}
+     *         if the consumer is already closed
      */
     public T consume() throws NoSuchElementException;
 
     /**
-     * Returns <code>true</code> if no more items are available. When the resource
-     * has been fully consumed and this method returns <code>true</code>,
-     * implementors of this class are require to invoke the {@link
-     * org.mule.api.Closeable.close()} method before returning in order to release
-     * resources as quickly as possible. Users of this component are still required
-     * to invoke the same close method when they're finish with it. This is so to
-     * account for the case in which a consumer needs to be released before being
-     * fully consumed
+     * Returns <code>true</code> if no more items are available or if the consumer
+     * was closed. When this method returns <code>true</code>, implementors of this
+     * class are require to invoke the {@link org.mule.api.Closeable.close()} method
+     * before returning in order to release resources as quickly as possible. Users
+     * of this component who no longer need this require before it is fully consumed
+     * are also required to close it.
      * 
      * @return <code>true</code> if no more items are available. <code>false</code>
      *         otherwise
      */
     public boolean isConsumed();
+
+    /**
+     * returns the total amount of items available for consumption. In some
+     * scenarios, it might not be possible/convenient to actually retrieve this
+     * value. -1 is returned in such a case.
+     */
+    public int totalAvailable();
 
 }

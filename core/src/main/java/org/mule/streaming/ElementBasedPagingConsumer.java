@@ -11,6 +11,7 @@
 package org.mule.streaming;
 
 import org.mule.api.MuleException;
+import org.mule.api.streaming.ClosedConsumerException;
 import org.mule.api.streaming.Consumer;
 import org.mule.api.streaming.Producer;
 
@@ -20,6 +21,11 @@ import java.util.NoSuchElementException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Implementation of {@link org.mule.api.streaming.Consumer} that obains data from an
+ * instance of {@link org.mule.api.streaming.Producer} and returns the elements one
+ * by one. This implementation is not thread-safe.
+ */
 public class ElementBasedPagingConsumer<T> implements Consumer<T>
 {
 
@@ -29,6 +35,7 @@ public class ElementBasedPagingConsumer<T> implements Consumer<T>
     private List<T> currentPage = null;
     private int index;
     private int pageSize;
+    private boolean closed = false;
 
     public ElementBasedPagingConsumer(Producer<T> producer)
     {
@@ -36,9 +43,17 @@ public class ElementBasedPagingConsumer<T> implements Consumer<T>
         this.reset();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T consume() throws NoSuchElementException
     {
+        if (this.closed)
+        {
+            throw new ClosedConsumerException("this consumer is already closed");
+        }
+
         if (this.isConsumed())
         {
             throw new NoSuchElementException();
@@ -50,9 +65,17 @@ public class ElementBasedPagingConsumer<T> implements Consumer<T>
         return element;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isConsumed()
     {
+        if (this.closed)
+        {
+            return true;
+        }
+
         if (this.index >= this.pageSize)
         {
             this.loadNextPage(this.producer);
@@ -76,9 +99,22 @@ public class ElementBasedPagingConsumer<T> implements Consumer<T>
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int totalAvailable()
+    {
+        return this.producer.totalAvailable();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void close() throws MuleException
     {
+        this.closed = true;
         this.currentPage = null;
         this.producer.close();
     }

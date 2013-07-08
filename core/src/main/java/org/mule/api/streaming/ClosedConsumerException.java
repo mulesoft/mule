@@ -10,20 +10,21 @@
 
 package org.mule.api.streaming;
 
-import org.mule.api.Closeable;
-
-import java.util.List;
-
-public interface Producer<T> extends Closeable
+/**
+ * Exception to signal that a consumer you're trying to access is already closed
+ */
+public class ClosedConsumerException extends RuntimeException
 {
 
-    public List<T> produce();
-    
-    /**
-     * returns the total amount of items available for consumption. In some
-     * scenarios, it might not be possible/convenient to actually retrieve this
-     * value. -1 is returned in such a case.
-     */
-    public int totalAvailable();
-    
+    private static final long serialVersionUID = -342147990165817320L;
+
+    public ClosedConsumerException()
+    {
+        super();
+    }
+
+    public ClosedConsumerException(String message)
+    {
+        super(message);
+    }
 }
