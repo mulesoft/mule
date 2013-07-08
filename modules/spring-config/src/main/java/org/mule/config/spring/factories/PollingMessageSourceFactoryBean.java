@@ -21,7 +21,9 @@ import org.mule.endpoint.URIBuilder;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.polling.MessageProcessorPollingMessageReceiver;
 import org.mule.transport.polling.MessageProcessorPollingOverride;
+
 import sun.net.ProgressMeteringPolicy;
+
 import org.mule.transport.polling.PollingMessageSource;
 
 @Deprecated
@@ -36,6 +38,14 @@ public class PollingMessageSourceFactoryBean extends InboundEndpointFactoryBean
     protected MessageProcessorPollingOverride override;
     protected Long frequency;
 
+    /**
+     * <p>
+     * Kept for backward compatibility. If the compatibility check for poll is enabled then it creates the poll based
+     * on the old poll implementation. If not then it creates poll with the new implementations (delegating the creation
+     * to {@link PollingSchedulerMessageSourceFactoryBean}
+     * </p>
+     * TODO: Remove this for 4.0.0 and use {@link PollingSchedulerMessageSourceFactoryBean} instead.
+     */
     @Override
     public Object getObject() throws Exception
     {
@@ -43,7 +53,8 @@ public class PollingMessageSourceFactoryBean extends InboundEndpointFactoryBean
         {
             return super.getObject();
         }
-        else{
+        else
+        {
             PollingSchedulerMessageSourceFactoryBean factoryBean = new PollingSchedulerMessageSourceFactoryBean();
             factoryBean.setFrequency(frequency);
             factoryBean.setMessageProcessor(messageProcessor);
@@ -63,7 +74,8 @@ public class PollingMessageSourceFactoryBean extends InboundEndpointFactoryBean
         {
             return super.getObjectType();
         }
-        else{
+        else
+        {
             return PollingMessageSource.class;
 
         }
@@ -91,7 +103,7 @@ public class PollingMessageSourceFactoryBean extends InboundEndpointFactoryBean
         else
         {
             throw new ConfigurationException(
-                MessageFactory.createStaticMessage("EndpointFactory not found in Registry"));
+                    MessageFactory.createStaticMessage("EndpointFactory not found in Registry"));
         }
     }
 
@@ -100,7 +112,8 @@ public class PollingMessageSourceFactoryBean extends InboundEndpointFactoryBean
         this.messageProcessor = messageProcessor;
     }
 
-    public void setOverride(MessageProcessorPollingOverride override) {
+    public void setOverride(MessageProcessorPollingOverride override)
+    {
         this.override = override;
     }
 

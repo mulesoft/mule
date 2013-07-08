@@ -1,5 +1,17 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
 package org.mule.api.schedule;
 
+import static org.mule.config.i18n.CoreMessages.couldNotRegisterNewScheduler;
+import static org.mule.config.i18n.CoreMessages.objectIsNull;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
@@ -110,7 +122,7 @@ public abstract class SchedulerFactory<T> implements MuleContextAware
         }
         catch (MuleException e)
         {
-            logger.error("Could not register the scheduler " + scheduler.getName() + " in the registry", e);
+            logger.error(couldNotRegisterNewScheduler(scheduler.getName()), e);
         }
     }
 
@@ -124,7 +136,7 @@ public abstract class SchedulerFactory<T> implements MuleContextAware
     {
         if (postProcessedScheduler == null)
         {
-            throw new SchedulerCreationException("The scheduler cannot be null");
+            throw new SchedulerCreationException(objectIsNull("scheduler").toString());
         }
     }
 
