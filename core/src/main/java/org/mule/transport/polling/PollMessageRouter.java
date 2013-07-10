@@ -29,7 +29,8 @@ import java.io.OutputStream;
  * Implementation of {@link RoutingMessageTemplate} for poll elements.
  * </p>
  * <p>
- * Poll elements
+ * Poll elements  don't apply Inbound/outbound transformers, but they execute a {@link MessageProcessorPollingInterceptor}
+ * before and after routing the event.
  * </p>
  *
  * @since 3.5.0
@@ -37,8 +38,18 @@ import java.io.OutputStream;
 public class PollMessageRouter extends RoutingMessageTemplate
 {
 
-
+    /**
+     * <p>
+     * The {@link FlowConstruct} where the poll is created
+     * </p>
+     */
     private FlowConstruct flowConstruct;
+
+    /**
+     * <p>
+     * The Polling interceptor
+     * </p>
+     */
     private MessageProcessorPollingInterceptor interceptor;
 
     public PollMessageRouter(MessageProcessor listener,
