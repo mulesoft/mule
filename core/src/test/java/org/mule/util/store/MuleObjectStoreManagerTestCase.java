@@ -9,154 +9,33 @@
  */
 package org.mule.util.store;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.store.ListableObjectStore;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.hamcrest.core.Is;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.mockito.Mockito;
 
-@RunWith(Parameterized.class)
-public class MuleObjectStoreManagerTestCase extends AbstractMuleContextTestCase
+@SmallTest
+public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase
 {
 
-    public static final String OBJECT_KEY = "key";
-    public static final String OBJECT_KEY_VALUE_1 = "value";
-    public static final String OBJECT_KEY_VALUE_2 = "anotherValue";
-    private final ObjectStoreFactory objectStoreFactory;
-
-    public MuleObjectStoreManagerTestCase(ObjectStoreFactory objectStoreFactory)
-    {
-        this.objectStoreFactory = objectStoreFactory;
-    }
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {new ObjectStoreFactory(false)},
-                {new ObjectStoreFactory(true)}
-        });
-    }
-
-    @Before
-    public void injectMuleContext()
-    {
-        objectStoreFactory.setMuleObjectStoreManager(muleContext.getRegistry().<MuleObjectStoreManager>get(MuleProperties.OBJECT_STORE_MANAGER));
-    }
+    private MuleObjectStoreManager storeManager = new MuleObjectStoreManager();
 
     @Test
-    public void partitionObjectStoreDoesNotCollide() throws Exception
+    public void disposesStore() throws ObjectStoreException
     {
-        ObjectStore os = objectStoreFactory.createObjectStore("myOs");
-        ObjectStore os2 = objectStoreFactory.createObjectStore("myOs2");
-        os.store(OBJECT_KEY, OBJECT_KEY_VALUE_1);
-        os2.store(OBJECT_KEY, OBJECT_KEY_VALUE_2);
-        assertThat(os.contains(OBJECT_KEY), is(true));
-        assertThat((String) os.retrieve(OBJECT_KEY), is(OBJECT_KEY_VALUE_1));
-        assertThat(os2.contains(OBJECT_KEY),is(true));
-        assertThat((String) os2.retrieve(OBJECT_KEY), is(OBJECT_KEY_VALUE_2));
-        assertThat((String) os.remove(OBJECT_KEY), is(OBJECT_KEY_VALUE_1));
-        assertThat((String) os2.remove(OBJECT_KEY), is(OBJECT_KEY_VALUE_2));
+        DisposableObjectStore store = Mockito.mock(DisposableObjectStore.class);
+
+        storeManager.disposeStore(store);
+
+        Mockito.verify(store).dispose();
     }
 
-    @Ignore //Behavior must be reviewed. It allows more than maxEntries objects.
-    @Test(expected = ObjectStoreException.class)
-    public void maxEntriesIshonored() throws Exception
+    public static interface DisposableObjectStore extends ObjectStore, Disposable
     {
-        ObjectStore os = objectStoreFactory.createObjectStore("myOs", 5,0,60000);
-        int maxEntries = 5;
-        for (int i = 0; i < maxEntries; i++)
-        {
-            os.store(i, i);
-        }
-        os.store(OBJECT_KEY, OBJECT_KEY_VALUE_1);
+
     }
-
-    @Test
-    public void expirationIntervalWithLowTTL() throws Exception
-    {
-        int maxEntries = 5;
-        int entryTTL = 10;
-        ListableObjectStore os = objectStoreFactory.createObjectStore("myOs", maxEntries, entryTTL,100);
-        for (int i = 0; i < maxEntries; i++)
-        {
-            os.store(i,i);
-        }
-        os.store(OBJECT_KEY, OBJECT_KEY_VALUE_1);
-        Thread.sleep(entryTTL*30);
-        assertThat(os.allKeys().isEmpty(), is(true));
-    }
-
-    @Test
-    public void expirationIntervalWithHighTTLPersistentObjectStore() throws Exception
-    {
-        int maxEntries = 5;
-        int entryTTL = 10000;
-        ListableObjectStore os = objectStoreFactory.createObjectStore("myOs", maxEntries, entryTTL,100);
-        for (int i = 0; i < maxEntries; i++)
-        {
-            os.store(i,i);
-        }
-        os.store(OBJECT_KEY, OBJECT_KEY_VALUE_1);
-        Thread.sleep(entryTTL/5);
-        assertThat(os.allKeys().size(),is(maxEntries));
-        for (int i = 1; i < maxEntries; i++)
-        {
-            assertThat(os.contains(i),is(true));
-        }
-        assertThat(os.contains(OBJECT_KEY), is(true));
-    }
-
-    @Test
-    public void storeUsingBigKey() throws Exception
-    {
-        ListableObjectStore os = objectStoreFactory.createObjectStore("myOs");
-        StringBuffer bigKey = new StringBuffer();
-        for (int i = 0; i < 50; i++)
-        {
-            bigKey.append("abcdefghijklmnopqrstuvwxyz");
-        }
-        os.store(bigKey.toString(),1);
-        assertThat((Integer) os.retrieve(bigKey.toString()), Is.is(1));
-    }
-
-    private static class ObjectStoreFactory
-    {
-        private final boolean isPersistent;
-        private MuleObjectStoreManager muleObjectStoreManager;
-
-        public ObjectStoreFactory(boolean isPersistent)
-        {
-            this.isPersistent = isPersistent;
-        }
-
-        public void setMuleObjectStoreManager(MuleObjectStoreManager muleObjectStoreManager)
-        {
-            this.muleObjectStoreManager = muleObjectStoreManager;
-        }
-
-        public <T extends ObjectStore<? extends Serializable>> T createObjectStore(String name)
-        {
-            return muleObjectStoreManager.getObjectStore(name,isPersistent);
-        }
-
-        public <T extends ObjectStore<? extends Serializable>> T createObjectStore(String name, int maxEntries, int entryTTL, int expirationInterval)
-        {
-            return muleObjectStoreManager.getObjectStore(name,isPersistent, maxEntries, entryTTL, expirationInterval);
-        }
-    }
-
 }
