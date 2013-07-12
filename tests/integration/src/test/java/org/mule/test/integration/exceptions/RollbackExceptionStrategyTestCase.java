@@ -18,6 +18,7 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.hamcrest.core.IsNull;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
@@ -268,6 +269,7 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testRedeliveryPolicyRedefinition() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(EXPECTED_DELIVERED_TIMES);
@@ -290,6 +292,7 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testInboundEndpointMaxRedeliveryTakesPrecendence() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(EXPECTED_DELIVERED_TIMES);
