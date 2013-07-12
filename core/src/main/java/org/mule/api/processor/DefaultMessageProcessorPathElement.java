@@ -24,7 +24,7 @@ public class DefaultMessageProcessorPathElement implements MessageProcessorPathE
     public DefaultMessageProcessorPathElement(MessageProcessor messageProcessor, String name)
     {
         this.messageProcessor = messageProcessor;
-        this.name = name;
+        this.name = escape(name);
         this.children = new ArrayList<MessageProcessorPathElement>();
     }
 
@@ -85,5 +85,17 @@ public class DefaultMessageProcessorPathElement implements MessageProcessorPathE
     public String getPath()
     {
         return parent == null ? "/" + getName() : parent.getPath() + "/" + getName();
+    }
+
+    private String escape(String name)
+    {
+        StringBuilder builder = new StringBuilder(name.length() * 2);
+        char previous = ' ';
+        for (char c : name.toCharArray())
+        {
+            builder.append(c == '/' && previous != '\\' ? "\\/" : c);
+            previous = c;
+        }
+        return builder.toString();
     }
 }

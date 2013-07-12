@@ -241,7 +241,19 @@
         <logger/>
     </flow>
 
+    <flow name="subflow/With/Slash">
+        <vm:inbound-endpoint path="in-subflow3" exchange-pattern="request-response"/>
+        <echo-component/>
+        <flow-ref name="subflow/call"/>
+        <logger/>
+    </flow>
+
     <sub-flow name="subflow-call">
+        <splitter expression="#[{'one'}]"/>
+        <logger/>
+    </sub-flow>
+
+    <sub-flow name="subflow/call">
         <splitter expression="#[{'one'}]"/>
         <logger/>
     </sub-flow>
