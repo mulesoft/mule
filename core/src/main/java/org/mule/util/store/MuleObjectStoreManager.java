@@ -287,5 +287,10 @@ public class MuleObjectStoreManager
                 //there is nothing we can do
             }
         }
+
+        if (store instanceof Disposable)
+        {
+            ((Disposable) store).dispose();
+        }
     }
 }
