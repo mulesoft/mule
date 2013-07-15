@@ -36,11 +36,16 @@ import org.mule.transport.NullPayload;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractDevkitBasedMessageProcessor extends AbstractConnectedProcessor
+public abstract class AbstractDevkitBasedMessageProcessor extends AbstractExpressionEvaluator
     implements FlowConstructAware, MuleContextAware, Startable, Disposable, Stoppable, Initialisable
 {
 
     private String operationName;
+
+    /**
+     * Only used on OAuth enabled connectors
+     */
+    private String accessTokenId;
 
     /**
      * Module object
@@ -279,6 +284,16 @@ public abstract class AbstractDevkitBasedMessageProcessor extends AbstractConnec
     public final void setModuleObject(Object value)
     {
         this.moduleObject = value;
+    }
+
+    public String getAccessTokenId()
+    {
+        return accessTokenId;
+    }
+
+    public void setAccessTokenId(String accessTokenId)
+    {
+        this.accessTokenId = accessTokenId;
     }
 
 }

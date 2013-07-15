@@ -510,9 +510,9 @@ public abstract class AbstractExpressionEvaluator
 
         Object accessTokenId = null;
 
-        if (processor instanceof AbstractConnectedProcessor)
+        if (processor instanceof AbstractDevkitBasedMessageProcessor)
         {
-            accessTokenId = ((AbstractConnectedProcessor) processor).getAccessTokenId();
+            accessTokenId = ((AbstractDevkitBasedMessageProcessor) processor).getAccessTokenId();
         }
 
         if (accessTokenId == null)
