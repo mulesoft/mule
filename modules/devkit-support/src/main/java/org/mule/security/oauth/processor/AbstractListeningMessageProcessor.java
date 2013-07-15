@@ -149,7 +149,7 @@ public abstract class AbstractListeningMessageProcessor extends AbstractDevkitBa
      * @throws UnsupportedOperationException
      */
     @Override
-    protected final MuleEvent doProcess(MuleEvent event) throws Exception
+    protected MuleEvent doProcess(MuleEvent event) throws Exception
     {
         throw new UnsupportedOperationException("Listening message processors cannot execute this method");
     }
