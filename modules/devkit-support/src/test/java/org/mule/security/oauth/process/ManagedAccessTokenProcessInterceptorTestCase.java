@@ -18,7 +18,7 @@ import org.mule.common.connection.exception.UnableToAcquireConnectionException;
 import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
 import org.mule.security.oauth.callback.ProcessCallback;
-import org.mule.security.oauth.processor.AbstractConnectedProcessor;
+import org.mule.security.oauth.processor.AbstractDevkitBasedMessageProcessor;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ public class ManagedAccessTokenProcessInterceptorTestCase
     private ProcessCallback<Object, OAuth2Adapter> callback;
 
     @Mock(extraInterfaces = MessageProcessor.class)
-    private AbstractConnectedProcessor processor;
+    private AbstractDevkitBasedMessageProcessor processor;
 
     @Mock
     private OAuth2Adapter adapter;

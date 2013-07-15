@@ -10,6 +10,7 @@
 
 package org.mule.security.oauth.processor;
 
+import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -51,7 +52,7 @@ public class OAuth2FetchAccessTokenProcessorTestCase
     private OAuth2FetchAccessTokenMessageProcessor processor;
     private MuleEvent event;
     private MuleEvent restoredEvent;
-    
+
     @Mock
     private MuleContext muleContext;
 
@@ -94,11 +95,11 @@ public class OAuth2FetchAccessTokenProcessorTestCase
         if (!exception)
         {
             Mockito.verify(this.manager).restoreAuthorizationEvent(eventId);
+            Assert.assertSame(RequestContext.getEvent(), this.restoredEvent);
+            Mockito.verify(this.muleContext).fireNotification(
+                Mockito.argThat(new OAuthNotificationMatcher(
+                    OAuthAuthorizeNotification.OAUTH_AUTHORIZATION_END, this.event)));
         }
-        
-        Mockito.verify(this.muleContext).fireNotification(
-            Mockito.argThat(new OAuthNotificationMatcher(
-                OAuthAuthorizeNotification.OAUTH_AUTHORIZATION_END, this.event)));
     }
 
     @Test
@@ -126,7 +127,7 @@ public class OAuth2FetchAccessTokenProcessorTestCase
         Mockito.when(this.manager.createAdapter(verifier)).thenReturn(adapter);
         Mockito.when(this.manager.getDefaultUnauthorizedConnector().getName()).thenReturn(accessTokenId);
         Mockito.when(adapter.getAccessTokenUrl()).thenReturn(accessTokenUrl);
-        
+
         Assert.assertSame(this.event, this.processor.process(this.event));
     }
 
@@ -138,13 +139,12 @@ public class OAuth2FetchAccessTokenProcessorTestCase
             new ObjectDoesNotExistException());
         this.adapterWithUrlUsingConfigAsId();
     }
-    
+
     @Test(expected = MessagingException.class)
     public void failToRestoreAuthorizationEvent() throws Exception
     {
         this.exception = true;
-        Mockito.when(this.manager.restoreAuthorizationEvent(eventId)).thenThrow(
-            new ObjectStoreException());
+        Mockito.when(this.manager.restoreAuthorizationEvent(eventId)).thenThrow(new ObjectStoreException());
         this.adapterWithUrlUsingConfigAsId();
     }
 

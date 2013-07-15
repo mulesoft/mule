@@ -10,6 +10,7 @@
 
 package org.mule.security.oauth.processor;
 
+import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -51,8 +52,8 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
     @Override
     protected MuleEvent doProcess(MuleEvent event) throws Exception
     {
-        this.notifyCallbackReception(event);
         MuleEvent restoredEvent = this.restoreOriginalEvent(event);
+        this.notifyCallbackReception(event);
 
         try
         {
@@ -93,7 +94,6 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
 
     private MuleEvent restoreOriginalEvent(MuleEvent event) throws MuleException
     {
-
         String state = event.getMessage().getInboundProperty("state");
         if (StringUtils.isEmpty(state))
         {
@@ -156,6 +156,7 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
             restoredEvent.getMessage().setProperty("state", StringUtils.EMPTY, PropertyScope.INBOUND);
         }
 
+        RequestContext.setEvent(restoredEvent);
         return restoredEvent;
     }
 }
