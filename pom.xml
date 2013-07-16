@@ -2035,6 +2035,24 @@
             </distributionManagement>
         </profile>
         <profile>
+            <id>cloudbees</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <distributionManagement>
+                <repository>
+                    <id>cloudbees-private-release-repository</id>
+                    <name>Cloudbees Release Repository</name>
+                    <url>dav:https://repository-muleion.forge.cloudbees.com/release/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>cloudbees-private-snapshot-repository</id>
+                    <name>Cloudbees Snapshot Repository</name>
+                    <url>dav:https://repository-muleion.forge.cloudbees.com/snapshot/</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+        <profile>
             <id>default</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
