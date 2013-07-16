@@ -27,6 +27,7 @@ import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.polling.MessageProcessorPollingConnector;
+import org.mule.util.store.ObjectStorePartition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +46,7 @@ public class WatermarkPollingTestCase extends FunctionalTestCase
     public static final String OS_KEY5 = "test5";
     public static final String OS_KEY6 = "test6";
     public static final String OS_KEY7 = "test7";
+    public static final String OS_KEY8 = "test8";
     public static final String PRE_EXISTENT_OS_VALUE = "testValue";
     public static final String DEFAULT_VALUE_WHEN_KEY_NOT_PRESENT = "noKey";
     public static final String MODIFIED_KEY_VALUE = "keyPresent";
@@ -67,6 +69,12 @@ public class WatermarkPollingTestCase extends FunctionalTestCase
         foo.clear();
     }
 
+    @Test
+    public void testThatOsIsUserObjectStore()
+    {
+        ObjectStore defaultUserObjectStore = muleContext.getRegistry().lookupObject("_defaultUserObjectStore");
+        assertEquals(defaultUserObjectStore, ((ObjectStorePartition) getDefaultObjectStore()).getBaseStore());
+    }
     /**
      * Scenario:
      * <p>
@@ -199,6 +207,30 @@ public class WatermarkPollingTestCase extends FunctionalTestCase
     /**
      * Scenario:
      * <p>
+     * Object store defined
+     * The update expression is defined.
+     * The key is already present in the Object store
+     * The flow fails to execute
+     * </p>
+     * Result:
+     * <p/>
+     * The watermark is not updated
+     * <p/>
+     */
+    @Test
+    public void watermarkWithObjectStore() throws Exception
+    {
+        ObjectStore os = muleContext.getRegistry().lookupObject("_defaultInMemoryObjectStore");
+        os.store(OS_KEY8, PRE_EXISTENT_OS_VALUE);
+        executePollOf("watermarkWithObjectStore");
+        assertTrue(os.contains(OS_KEY8));
+        assertEquals(RESULT_OF_UPDATE_EXPRESSION, os.retrieve(OS_KEY8));
+        assertTrue(foo.contains(RESULT_OF_UPDATE_EXPRESSION));
+    }
+
+    /**
+     * Scenario:
+     * <p>
      * No object store defined
      * The update expression is defined.
      * The key is already present in the Object store
@@ -219,6 +251,7 @@ public class WatermarkPollingTestCase extends FunctionalTestCase
         assertEquals(PRE_EXISTENT_OS_VALUE, os.retrieve(OS_KEY6));
         assertFalse(foo.contains(RESULT_OF_UPDATE_EXPRESSION));
     }
+
 
     /**
      * Scenario:

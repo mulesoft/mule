@@ -18,6 +18,7 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.transport.polling.watermark.Watermark;
+import org.mule.util.store.MuleObjectStoreManager;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
@@ -32,7 +33,7 @@ public class WatermarkFactoryBean extends AbstractFactoryBean<Watermark> impleme
     private String variable;
     private String defaultExpression;
     private String updateExpression;
-    private String objectStoreRef;
+    private ObjectStore objectStore;
 
     private Map<QName, Object> annotations = new HashMap<QName, Object>();
 
@@ -47,22 +48,19 @@ public class WatermarkFactoryBean extends AbstractFactoryBean<Watermark> impleme
     @Override
     protected Watermark createInstance() throws Exception
     {
-        ObjectStore<?> os;
-        if (objectStoreRef == null)
+        ObjectStore<?> os = objectStore;
+        if (os == null)
         {
-            ObjectStoreManager mgr = (ObjectStoreManager) registry.get(MuleProperties.OBJECT_STORE_MANAGER);
-            os = mgr.getObjectStore(MULE_WATERMARK_PARTITION);
+            MuleObjectStoreManager mgr = (MuleObjectStoreManager) registry.get(MuleProperties.OBJECT_STORE_MANAGER);
+            os = mgr.getUserObjectStore(MULE_WATERMARK_PARTITION, true);
         }
-        else
-        {
-            os = registry.get(objectStoreRef);
-        }
+
         return new Watermark(os, variable, defaultExpression, updateExpression);
     }
 
-    public void setObjectStoreRef(String objectStoreRef)
+    public void setObjectStore(ObjectStore objectStore)
     {
-        this.objectStoreRef = objectStoreRef;
+        this.objectStore = objectStore;
     }
 
     public void setVariable(String variable) {

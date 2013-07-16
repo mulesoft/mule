@@ -99,6 +99,16 @@
         <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
     </flow>
 
+    <flow name="watermarkWithObjectStore" processingStrategy="synchronous">
+        <poll frequency="1000">
+            <watermark variable="test8" default-expression="#[string:noKey]" update-expression="#[payload]" object-store-ref="_defaultInMemoryObjectStore"/>
+            <outbound-endpoint ref="foo"/>
+        </poll>
+        <set-payload value="#[string:valueUpdated]"/>
+        <set-variable variableName="test8" value="keyPresent"/>
+        <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
+    </flow>
+
     <flow name="failingFlowWithWatermark" processingStrategy="synchronous">
         <poll frequency="1000">
             <watermark variable="test6" default-expression="#[string:noKey]" update-expression="#[payload]"/>
