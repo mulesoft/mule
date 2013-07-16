@@ -84,15 +84,14 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
         ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
         try
         {
-            executionTemplate.execute(new ExecutionCallback<MuleEvent>()
+            final MessageProcessorPollingInterceptor interceptor = override.interceptor();
+            MuleEvent muleEvent = executionTemplate.execute(new ExecutionCallback<MuleEvent>()
             {
                 @Override
                 public MuleEvent process() throws Exception
                 {
-                    MessageProcessorPollingInterceptor interceptor = override.interceptor();
-
                     MuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, (Map<String, Object>) null,
-                            connector.getMuleContext());
+                                                                 connector.getMuleContext());
                     ImmutableEndpoint ep = endpoint;
                     if (sourceMessageProcessor instanceof ImmutableEndpoint)
                     {
@@ -108,15 +107,20 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
                         event = interceptor.prepareRouting(sourceEvent, createMuleEvent(sourceEvent.getMessage(), null));
                         routeEvent(event);
                         interceptor.postProcessRouting(event);
-                    } else
+                    }
+                    else
                     {
                         // TODO DF: i18n
                         logger.info(String.format("Polling of '%s' returned null, the flow will not be invoked.",
-                                sourceMessageProcessor));
+                                                  sourceMessageProcessor));
                     }
                     return null;
                 }
             });
+            if ( muleEvent != null )
+            {
+                interceptor.postProcessRouting(muleEvent);
+            }
         }
         catch (MessagingException e)
         {

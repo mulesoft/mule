@@ -5,7 +5,6 @@
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
-      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
       xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
@@ -14,7 +13,6 @@
 
     <vm:endpoint path="foo" exchange-pattern="request-response" name="foo"/>
 
-
     <flow name="echo">
         <inbound-endpoint ref="foo"/>
         <static-component>
@@ -22,74 +20,20 @@
         </static-component>
     </flow>
 
-
-    <flow name="pollWithoutWatermark">
+    <flow name="pollfoo">
         <poll frequency="1000">
-            <processor-chain>
-                <set-payload value="pollWithoutWatermark"/>
-                <outbound-endpoint ref="foo"/>
-            </processor-chain>
+            <outbound-endpoint ref="foo"/>
         </poll>
         <component class="org.mule.test.integration.PollingTestCase$FooComponent"/>
     </flow>
 
-    <flow name="nameNotDefinedWatermarkObjectStoreFlow" processingStrategy="synchronous">
+    <flow name="pollbar">
         <poll frequency="1000">
-            <watermark variable="test1" default-expression="#[string:noKey]"/>
-            <outbound-endpoint ref="foo"/>
+            <static-component>
+                <return-data>bar</return-data>
+            </static-component>
         </poll>
-        <logger message="Executed With watermark"/>
+        <component class="org.mule.test.integration.PollingTestCase$BarComponent" />
     </flow>
 
-    <flow name="changeWatermarkWihtNotDefinedWatermarkObjectStoreFlow" processingStrategy="synchronous">
-        <poll frequency="1000">
-            <watermark variable="test2" default-expression="#[string:noKey]"/>
-            <outbound-endpoint ref="foo"/>
-        </poll>
-        <set-variable variableName="test2" value="keyPresent"/>
-        <logger level="ERROR" message="Executed With watermark #[test2]"/>
-    </flow>
-
-
-    <flow name="usingWatermarkFlow" processingStrategy="synchronous">
-        <poll frequency="1000">
-            <watermark variable="test3" default-expression="#[string:noKey]" />
-            <outbound-endpoint ref="foo"/>
-        </poll>
-        <set-payload value="#[test3]"/>
-        <set-variable variableName="test3" value="keyPresent"/>
-        <component class="org.mule.test.integration.PollingTestCase$FooComponent"/>
-    </flow>
-
-    <flow name="watermarkWithKeyAsAnExpression" processingStrategy="synchronous">
-        <poll frequency="1000">
-            <watermark variable="#['test4']" default-expression="#[string:noKey]"/>
-            <outbound-endpoint ref="foo"/>
-        </poll>
-        <set-payload value="sss"/>
-        <set-variable variableName="test4" value="keyPresent"/>
-        <component class="org.mule.test.integration.PollingTestCase$FooComponent"/>
-    </flow>
-
-
-    <flow name="watermarkWithUpdateExpression" processingStrategy="synchronous">
-        <poll frequency="1000">
-            <watermark variable="test5" default-expression="#[string:noKey]" update-expression="#[payload]"/>
-            <outbound-endpoint ref="foo"/>
-        </poll>
-        <set-payload value="#[string:valueUpdated]"/>
-        <set-variable variableName="test5" value="keyPresent"/>
-        <component class="org.mule.test.integration.PollingTestCase$FooComponent"/>
-    </flow>
-
-
-    <flow name="watermarkWithAnnotations" processingStrategy="synchronous">
-        <poll frequency="1000">
-            <watermark variable="test6" default-expression="#[string:noKey]" doc:name="watermark"/>
-            <outbound-endpoint ref="foo"/>
-        </poll>
-        <set-payload value="#[string:valueUpdated]"/>
-        <set-variable variableName="test6" value="keyPresent"/>
-        <component class="org.mule.test.integration.PollingTestCase$FooComponent"/>
-    </flow>
 </mule>
