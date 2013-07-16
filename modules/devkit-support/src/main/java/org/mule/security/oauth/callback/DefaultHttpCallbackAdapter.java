@@ -29,7 +29,7 @@ public class DefaultHttpCallbackAdapter implements Initialisable, HttpCallbackAd
     private Boolean async = false;
 
     /**
-     * Retrieves localPort
+     * {@inheritDoc}
      */
     public Integer getLocalPort()
     {
@@ -37,9 +37,7 @@ public class DefaultHttpCallbackAdapter implements Initialisable, HttpCallbackAd
     }
 
     /**
-     * Sets localPort
-     * 
-     * @param value Value to set
+     * {@inheritDoc}
      */
     public void setLocalPort(Integer value)
     {
@@ -47,7 +45,7 @@ public class DefaultHttpCallbackAdapter implements Initialisable, HttpCallbackAd
     }
 
     /**
-     * Retrieves remotePort
+     * {@inheritDoc}
      */
     public Integer getRemotePort()
     {
@@ -55,9 +53,7 @@ public class DefaultHttpCallbackAdapter implements Initialisable, HttpCallbackAd
     }
 
     /**
-     * Sets remotePort
-     * 
-     * @param value Value to set
+     * {@inheritDoc}
      */
     public void setRemotePort(Integer value)
     {
@@ -65,7 +61,7 @@ public class DefaultHttpCallbackAdapter implements Initialisable, HttpCallbackAd
     }
 
     /**
-     * Retrieves domain
+     * {@inheritDoc}
      */
     public String getDomain()
     {
@@ -73,9 +69,7 @@ public class DefaultHttpCallbackAdapter implements Initialisable, HttpCallbackAd
     }
 
     /**
-     * Sets domain
-     * 
-     * @param value Value to set
+     * {@inheritDoc}
      */
     public void setDomain(String value)
     {
@@ -83,7 +77,7 @@ public class DefaultHttpCallbackAdapter implements Initialisable, HttpCallbackAd
     }
 
     /**
-     * Retrieves path
+     * {@inheritDoc}
      */
     public String getPath()
     {
@@ -91,9 +85,7 @@ public class DefaultHttpCallbackAdapter implements Initialisable, HttpCallbackAd
     }
 
     /**
-     * Sets path
-     * 
-     * @param value Value to set
+     * {@inheritDoc}
      */
     public void setPath(String value)
     {
@@ -101,7 +93,7 @@ public class DefaultHttpCallbackAdapter implements Initialisable, HttpCallbackAd
     }
 
     /**
-     * Retrieves connector
+     * {@inheritDoc}
      */
     public Connector getConnector()
     {
@@ -109,9 +101,7 @@ public class DefaultHttpCallbackAdapter implements Initialisable, HttpCallbackAd
     }
 
     /**
-     * Sets connector
-     * 
-     * @param value Value to set
+     * {@inheritDoc}
      */
     public void setConnector(Connector value)
     {
@@ -119,7 +109,7 @@ public class DefaultHttpCallbackAdapter implements Initialisable, HttpCallbackAd
     }
 
     /**
-     * Retrieves async
+     * {@inheritDoc}
      */
     public Boolean getAsync()
     {
@@ -127,9 +117,7 @@ public class DefaultHttpCallbackAdapter implements Initialisable, HttpCallbackAd
     }
 
     /**
-     * Sets async
-     * 
-     * @param value Value to set
+     * {@inheritDoc}
      */
     public void setAsync(Boolean value)
     {

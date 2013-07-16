@@ -18,18 +18,76 @@ import org.mule.api.transport.Connector;
 public interface HttpCallbackAdapter
 {
 
-    Integer getLocalPort();
+    /**
+     * Retrieves localPort
+     */
+    public Integer getLocalPort();
 
-    Integer getRemotePort();
+    /**
+     * Retrieves remotePort
+     */
+    public Integer getRemotePort();
 
-    String getDomain();
+    /**
+     * Retrieves domain
+     */
+    public String getDomain();
 
-    Connector getConnector();
+    /**
+     * Retrieves connector
+     */
+    public Connector getConnector();
 
-    Boolean getAsync();
+    /**
+     * Retrieves async
+     */
+    public Boolean getAsync();
 
-    String getPath();
+    /**
+     * Retrieves path
+     */
+    public String getPath();
+
+    /**
+     * Sets localPort
+     * 
+     * @param value Value to set
+     */
+    public void setLocalPort(Integer value);
+
+    /**
+     * Sets remotePort
+     * 
+     * @param value Value to set
+     */
+    public void setRemotePort(Integer value);
+
+    /**
+     * Sets domain
+     * 
+     * @param value Value to set
+     */
+    public void setDomain(String value);
+
+    /**
+     * Sets path
+     * 
+     * @param value Value to set
+     */
+    public void setPath(String value);
+
+    /**
+     * Sets connector
+     * 
+     * @param value Value to set
+     */
+    public void setConnector(Connector value);
+
+    /**
+     * Sets async
+     * 
+     * @param value Value to set
+     */
+    public void setAsync(Boolean value);
 
 }
-
-
