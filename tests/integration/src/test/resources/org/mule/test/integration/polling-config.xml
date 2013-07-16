@@ -36,4 +36,5 @@
         <component class="org.mule.test.integration.PollingTestCase$BarComponent" />
     </flow>
 
+
 </mule>
