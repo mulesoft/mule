@@ -14,6 +14,7 @@ import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.transport.PropertyScope;
@@ -77,11 +78,15 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
             this.oauthManager.getAccessTokenPoolFactory().passivateObject(transformedAccessTokenId,
                 oauthAdapter);
 
-            restoredEvent.getMessage().setInvocationProperty(OAuthProperties.VERIFIER,
+            MuleMessage message = restoredEvent.getMessage();
+
+            message.setInvocationProperty(OAuthProperties.VERIFIER,
                 event.getMessage().getInvocationProperty(OAuthProperties.VERIFIER));
 
-            restoredEvent.getMessage().setInvocationProperty(OAuthProperties.ACCESS_TOKEN_ID,
-                transformedAccessTokenId);
+            message.setInvocationProperty(OAuthProperties.ACCESS_TOKEN_ID, transformedAccessTokenId);
+
+            message.removeProperty(OAuthProperties.HTTP_STATUS, PropertyScope.OUTBOUND);
+            message.removeProperty(OAuthProperties.CALLBACK_LOCATION, PropertyScope.OUTBOUND);
         }
         catch (Exception e)
         {
