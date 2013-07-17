@@ -99,6 +99,11 @@ public class OAuth2FetchAccessTokenProcessorTestCase
             Mockito.verify(this.muleContext).fireNotification(
                 Mockito.argThat(new OAuthNotificationMatcher(
                     OAuthAuthorizeNotification.OAUTH_AUTHORIZATION_END, this.event)));
+
+            Mockito.verify(this.restoredEvent.getMessage()).removeProperty(OAuthProperties.HTTP_STATUS,
+                PropertyScope.OUTBOUND);
+            Mockito.verify(this.restoredEvent.getMessage()).removeProperty(OAuthProperties.CALLBACK_LOCATION,
+                PropertyScope.OUTBOUND);
         }
     }
 
