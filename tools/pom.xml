@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule</groupId>
         <artifactId>mule</artifactId>
-        <version>3.5.0-andes-RC2</version>
+        <version>3.5.0-andes</version>
     </parent>
     <groupId>org.mule.tools</groupId>
     <artifactId>mule-tools</artifactId>
