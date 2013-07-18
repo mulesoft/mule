@@ -15,6 +15,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
+import org.mule.api.el.ExpressionLanguage;
 import org.mule.api.model.Model;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
@@ -24,6 +25,7 @@ import org.mule.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.el.mvel.MVELExpressionLanguage;
 import org.mule.endpoint.DefaultEndpointFactory;
 import org.mule.execution.MuleMessageProcessingManager;
+import org.mule.expression.DefaultExpressionManager;
 import org.mule.management.stats.DefaultProcessingTimeWatcher;
 import org.mule.model.seda.SedaModel;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
@@ -96,6 +98,22 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         configureSystemModel(registry);
         
         registry.registerObject(MuleProperties.OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguage(muleContext));
+
+        if (muleContext.getExpressionManager() instanceof DefaultExpressionManager)
+        {
+            ExpressionLanguage expressionLanguage = ((DefaultExpressionManager) muleContext.getExpressionManager()).getExpressionLanguage();
+
+            if (expressionLanguage == null)
+            {
+                throw new IllegalStateException("Expression language was not properly initialized");
+            }
+
+            registry.registerObject(MuleProperties.OBJECT_EXPRESSION_LANGUAGE, expressionLanguage);
+        }
+        else
+        {
+            registry.registerObject(MuleProperties.OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguage(muleContext));
+        }
     }
 
     protected void configureQueueManager(MuleContext muleContext) throws RegistrationException

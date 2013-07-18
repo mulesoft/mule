@@ -21,7 +21,6 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.DataType;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.expression.DefaultExpressionManager;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 import org.mule.util.IOUtils;
@@ -71,10 +70,6 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     {
         this.muleContext = muleContext;
         System.setProperty("mvel2.compiler.allow_override_all_prophandling", "true");
-        if (muleContext.getExpressionManager() instanceof DefaultExpressionManager)
-        {
-            ((DefaultExpressionManager) muleContext.getExpressionManager()).setExpressionLanguage(this);
-        }
     }
 
     @Override
