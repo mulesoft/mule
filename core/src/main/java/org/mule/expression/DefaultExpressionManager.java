@@ -35,7 +35,6 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -673,5 +672,10 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
     public void setExpressionLanguage(ExpressionLanguage expressionLanguage)
     {
         this.expressionLanguage = expressionLanguage;
+    }
+
+    public ExpressionLanguage getExpressionLanguage()
+    {
+        return expressionLanguage;
     }
 }
