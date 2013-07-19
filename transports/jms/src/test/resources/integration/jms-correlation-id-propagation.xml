@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+    xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
+
+    <flow name="sendToQueueIn">
+        <vm:inbound-endpoint path="in" exchange-pattern="one-way" />
+        <script:component>
+            <script:script engine="groovy">
+                import org.mule.api.config.MuleProperties;
+
+                message.setOutboundProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, "custom-cid");
+            </script:script>
+        </script:component>
+        <jms:outbound-endpoint queue="in" connector-ref="jmsConnector" />
+    </flow>
+
+    <flow name="passFromQueueInToQueueOut">
+        <jms:inbound-endpoint queue="in" connector-ref="jmsConnector" />
+        <jms:outbound-endpoint queue="out" />
+    </flow>
+
+    <flow name="consumeFromQueueOut">
+        <jms:inbound-endpoint queue="out" connector-ref="jmsConnector" />
+        <vm:outbound-endpoint path="out" exchange-pattern="one-way" />
+    </flow>
+
+</mule>
