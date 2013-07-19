@@ -12,12 +12,11 @@ package org.mule.test.el;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.el.ExpressionLanguage;
 import org.mule.api.expression.ExpressionManager;
-import org.mule.el.mvel.MVELExpressionLanguage;
+import org.mule.el.mvel.MVELExpressionLanguageWrapper;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.text.DateFormat;
@@ -49,7 +48,7 @@ public class ExpressionLanguageConfigTestCase extends FunctionalTestCase
     public void testExpressionLanguage()
     {
         assertNotNull(el);
-        assertEquals(MVELExpressionLanguage.class, el.getClass());
+        assertEquals(MVELExpressionLanguageWrapper.class, el.getClass());
     }
 
     @Test
