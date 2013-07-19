@@ -10,6 +10,7 @@
 
 package org.mule.security.oauth.processor;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -52,6 +53,7 @@ public class OAuth2FetchAccessTokenProcessorTestCase
     private OAuth2FetchAccessTokenMessageProcessor processor;
     private MuleEvent event;
     private MuleEvent restoredEvent;
+    private MuleMessage restoredMessage;
 
     @Mock
     private MuleContext muleContext;
@@ -64,7 +66,9 @@ public class OAuth2FetchAccessTokenProcessorTestCase
         this.incomingState = String.format(OAuthProperties.EVENT_STATE_TEMPLATE + "%s", eventId, state);
         this.exception = false;
 
+        this.restoredMessage = Mockito.mock(DefaultMuleMessage.class, Mockito.RETURNS_DEEP_STUBS);
         this.restoredEvent = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
+        Mockito.when(this.restoredEvent.getMessage()).thenReturn(this.restoredMessage);
 
         this.manager = Mockito.mock(OAuth2Manager.class, Mockito.RETURNS_DEEP_STUBS);
         Mockito.when(this.manager.restoreAuthorizationEvent(eventId)).thenReturn(restoredEvent);
