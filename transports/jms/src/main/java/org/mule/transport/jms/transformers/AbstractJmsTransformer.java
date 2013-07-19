@@ -158,17 +158,18 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
 
             Object value = message.getOutboundProperty(key);
 
-            if (MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(key))
-            {
-                msg.setJMSCorrelationID(message.getCorrelationId());
-            }
-
             // We don't want to set the ReplyTo property again as it will be set
             // using JMSReplyTo
             if (!(MuleProperties.MULE_REPLY_TO_PROPERTY.equals(key) && value instanceof Destination))
             {
                 setJmsPropertySanitizeKeyIfNecessary(msg, key, value);
             }
+        }
+
+        // MULE-6577: Copy Mule message correlation id to JMS message correlation id.
+        if (message.getCorrelationId() != null)
+        {
+            msg.setJMSCorrelationID(message.getCorrelationId());
         }
     }
 
