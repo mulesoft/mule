@@ -94,7 +94,7 @@
 
     <bean name="_defaultRetryPolicyTemplate" class="org.mule.retry.policies.NoRetryPolicyTemplate"/>
 
-    <bean name="_muleExpressionLanguage" class="org.mule.el.mvel.MVELExpressionLanguage">
+    <bean name="_muleExpressionLanguage" class="org.mule.el.mvel.MVELExpressionLanguageWrapper">
         <constructor-arg ref="_muleContext"/>
     </bean>
 
