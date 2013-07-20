@@ -1,4 +1,14 @@
-package org.mule;
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+package org.mule.test.integration.el;
 
 import static org.junit.Assert.assertSame;
 import org.mule.api.MuleContext;
@@ -16,7 +26,7 @@ public class ExpressionLanguageExtensionTestCase extends FunctionalTestCase
     @Override
     protected String getConfigResources()
     {
-        return "expression-language-extension-config.xml";
+        return "org/mule/el/expression-language-extension-config.xml";
     }
 
     @Test

@@ -7,6 +7,6 @@
 
     <flow name="createsExpressionLanguage">
         <vm:inbound-endpoint path="testInput" exchange-pattern="request-response"/>
-        <component class="org.mule.ExpressionLanguageExtensionTestCase$ExpressionLanguageFactory"/>
+        <component class="org.mule.test.integration.el.ExpressionLanguageExtensionTestCase$ExpressionLanguageFactory"/>
     </flow>
 </mule>
