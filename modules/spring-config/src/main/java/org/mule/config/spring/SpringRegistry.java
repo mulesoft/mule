@@ -24,8 +24,11 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -146,6 +149,82 @@ public class SpringRegistry extends AbstractRegistry
             {
                 logger.debug(e);
                 return null;
+            }
+        }
+    }
+    
+    @Override
+    public boolean existObject(String key)
+    {
+        if (StringUtils.isBlank(key))
+        {
+            logger.warn(
+                    MessageFactory.createStaticMessage("Detected a lookup attempt with an empty or null key"),
+                    new Throwable().fillInStackTrace());
+            return false;
+        }
+
+        if (key.equals(SPRING_APPLICATION_CONTEXT) && applicationContext != null)
+        {
+            return true;
+        }
+        else
+        {
+            try
+            {
+                //this will prevent a call into the AbstractBeanFactory.markBeanAsCreated(...)
+ 	 	 	 	//which saves ALL the names into a HashSet.  For URL based configuration,
+ 	 	 	 	//this can leak memory
+ 	 	 	 	if (applicationContext.getAutowireCapableBeanFactory() instanceof AbstractBeanFactory) {
+ 	 	 	 		((AbstractBeanFactory)applicationContext.getAutowireCapableBeanFactory()).getMergedBeanDefinition(key);
+ 	 	 	 		return true;
+ 	 	 	 	} else {
+ 	 	 	 		return applicationContext.getBean(key) != null;
+ 	 	 	 	}
+ 	 	 	 	
+            }
+            catch (BeansException e)
+            {
+                logger.debug(e);
+                return false;
+            }
+        }
+    }
+    
+    @Override
+    public <T> boolean existObject(String key, Class<T> type)
+    {
+        if (StringUtils.isBlank(key))
+        {
+            logger.warn(
+                    MessageFactory.createStaticMessage("Detected a lookup attempt with an empty or null key"),
+                    new Throwable().fillInStackTrace());
+            return false;
+        }
+
+        if (key.equals(SPRING_APPLICATION_CONTEXT) && applicationContext != null)
+        {
+            return true;
+        }
+        else
+        {
+            try
+            {
+                //this will prevent a call into the AbstractBeanFactory.markBeanAsCreated(...)
+ 	 	 	 	//which saves ALL the names into a HashSet.  For URL based configuration,
+ 	 	 	 	//this can leak memory
+ 	 	 	 	if (applicationContext.getAutowireCapableBeanFactory() instanceof AbstractBeanFactory) {
+ 	 	 	 		BeanDefinition bdn = ((AbstractBeanFactory)applicationContext.getAutowireCapableBeanFactory()).getMergedBeanDefinition(key);
+ 	 	 	 		return bdn.getBeanClassName().equals(type.getName());
+ 	 	 	 	} else {
+ 	 	 	 		return applicationContext.getBean(key, type) != null;
+ 	 	 	 	}
+ 	 	 	 	
+            }
+            catch (BeansException e)
+            {
+                logger.debug(e);
+                return false;
             }
         }
     }

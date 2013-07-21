@@ -126,6 +126,29 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
         return (T) obj;
     }
 
+    public boolean existObject(String key)
+    {
+        Iterator<Registry> it = getRegistries().iterator();
+        while (it.hasNext())
+        {
+            if (((Registry) it.next()).existObject(key))
+            	return true;
+        }
+        return false;
+    }
+    
+    public <T> boolean existObject(String key, Class<T> type)
+    {
+        Iterator<Registry> it = getRegistries().iterator();
+        while (it.hasNext())
+        {
+            if (((Registry) it.next()).existObject(key, type))
+            	return true;
+        }
+        return false;
+    }
+
+    
     public <T> T lookupObject(Class<T> type) throws RegistrationException
     {
         Object object;

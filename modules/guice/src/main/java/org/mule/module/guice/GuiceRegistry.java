@@ -95,6 +95,42 @@ public class GuiceRegistry extends AbstractRegistry
         return null;
     }
 
+    public boolean existObject(String key)
+    {
+        //Guice isn't really supposed to work this way but in Mule we need to look up objects by name only sometimes
+        for (Map.Entry<Key<?>, Binding<?>> entry : injector.getBindings().entrySet())
+        {
+            if (entry.getKey().getAnnotation() instanceof Named)
+            {
+                String name = ((Named) entry.getKey().getAnnotation()).value();
+                if (name.equals(key))
+                {
+                    return entry.getValue().getProvider().get() != null;
+                }
+            }
+        }
+        return false;
+    }
+
+    public <T> boolean existObject(String key, Class<T> type)
+    {
+        //Guice isn't really supposed to work this way but in Mule we need to look up objects by name only sometimes
+        for (Map.Entry<Key<?>, Binding<?>> entry : injector.getBindings().entrySet())
+        {
+            if (entry.getKey().getAnnotation() instanceof Named)
+            {
+                String name = ((Named) entry.getKey().getAnnotation()).value();
+                if (name.equals(key))
+                {
+                	Object o = entry.getValue().getProvider().get();
+                    return o != null && type.isAssignableFrom(o.getClass());
+                }
+            }
+        }
+        return false;
+    }
+
+    
     @Override
     public <T> T lookupObject(Class<T> type) throws RegistrationException
     {

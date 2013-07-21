@@ -62,6 +62,8 @@ public interface MuleRegistry extends Registry
     // /////////////////////////////////////////////////////////////////////////
 
     Connector lookupConnector(String name);
+    
+    boolean existConnector(String name);
 
     /**
      * Looks-up endpoint builders which can be used to repeatably create endpoints with the same configuration.

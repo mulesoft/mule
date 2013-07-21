@@ -128,7 +128,15 @@ public class MuleRegistryHelper implements MuleRegistry
     {
         return (Connector) registry.lookupObject(name);
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
+    public boolean existConnector(String name)
+    {
+        return registry.existObject(name, Connector.class);
+    }
+    
     /**
      * Removed this method from {@link Registry} API as it should only be used
      * internally and may confuse users. The {@link EndpointFactory} should be used
@@ -677,6 +685,24 @@ public class MuleRegistryHelper implements MuleRegistry
         return (T) registry.lookupObject(key);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean existObject(String key)
+    {
+        return registry.existObject(key);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> boolean existObject(String key, Class<T> type)
+    {
+        return registry.existObject(key, type);
+    }
+    
     /**
      * {@inheritDoc}
      */

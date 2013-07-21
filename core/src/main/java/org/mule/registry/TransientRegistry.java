@@ -161,6 +161,18 @@ public class TransientRegistry extends AbstractRegistry
         return registryMap.<T>get(key);
     }
 
+    public boolean existObject(String key)
+    {
+        return registryMap.contains(key);
+    }
+
+    public <T> boolean existObject(String key, Class<T> type)
+    {
+    	Object obj = registryMap.get(key);
+        return  obj != null && type.isAssignableFrom(obj.getClass());
+    }
+
+    
     @SuppressWarnings("unchecked")
     public <T> Collection<T> lookupObjects(Class<T> returntype)
     {
@@ -420,6 +432,20 @@ public class TransientRegistry extends AbstractRegistry
             {
                 readLock.lock();
                 return (T) registry.get(key);
+            }
+            finally
+            {
+                readLock.unlock();
+            }
+        }
+        
+        public boolean contains(String key)
+        {
+            Lock readLock = registryLock.readLock();
+            try
+            {
+                readLock.lock();
+                return registry.containsKey(key);
             }
             finally
             {

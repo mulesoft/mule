@@ -34,6 +34,18 @@ public interface Registry extends Initialisable, Disposable
      */
     <T> T lookupObject(String key);
 
+    /** 
+     * Check if single object exist by name. 
+     * @return true if exist or false if not found
+     */
+    boolean existObject(String key);
+    
+    /** 
+     * Check if single object exist by name and type. 
+     * @return true if exist or false if not found
+     */
+    <T> boolean existObject(String key, Class<T> type);
+    
     /**
      * Look up all objects of a given type.
      *

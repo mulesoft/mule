@@ -64,7 +64,7 @@ public final class ObjectNameHelper
         // We can't check local edpoints right now but the chances of conflict are
         // very small and will be
         // reported during JMX object registration
-        while (muleContext.getRegistry().lookupObject(tempName) != null)
+        while (muleContext.getRegistry().existObject(tempName))
         {
             i++;
             tempName = name + SEPARATOR + i;
@@ -83,7 +83,7 @@ public final class ObjectNameHelper
         // reported during JMX object registration
         try
         {
-            while (muleContext.getRegistry().lookupConnector(tempName) != null)
+            while (muleContext.getRegistry().existConnector(tempName))
             {
                 i++;
                 tempName = name + SEPARATOR + i;
