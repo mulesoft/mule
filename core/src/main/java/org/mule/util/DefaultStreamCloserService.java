@@ -10,19 +10,20 @@
 
 package org.mule.util;
 
+import org.mule.api.Closeable;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.util.StreamCloser;
 import org.mule.api.util.StreamCloserService;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
 
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 
 /**
@@ -32,7 +33,7 @@ import org.xml.sax.InputSource;
 public class DefaultStreamCloserService implements StreamCloserService
 {
 
-    private static final Log log = LogFactory.getLog(DefaultStreamCloserService.class);
+    private static final Logger log = LoggerFactory.getLogger(DefaultStreamCloserService.class);
 
     private MuleContext muleContext;
     private StreamCloser coreStreamTypesCloser = new CoreStreamTypesCloser();
@@ -47,20 +48,16 @@ public class DefaultStreamCloserService implements StreamCloserService
             }
             else
             {
-                Iterator closers = muleContext.getRegistry().lookupObjects(StreamCloser.class).iterator();
-                while (closers.hasNext())
+                for (StreamCloser closer : muleContext.getRegistry().lookupObjects(StreamCloser.class))
                 {
-                    StreamCloser closer = (StreamCloser) closers.next();
                     if (closer.canClose(stream.getClass()))
                     {
                         closer.close(stream);
-                    }
-                    else
-                    {
-                        log.debug("Unable to find an StreamCloser for the stream type: " + stream.getClass()
-                                  + ", the stream: " + stream + " will not be closed.");
+                        return;
                     }
                 }
+                log.debug("Unable to find an StreamCloser for the stream type: " + stream.getClass()
+                          + ", the stream: " + stream + " will not be closed.");
             }
         }
         catch (Exception e)
@@ -83,6 +80,7 @@ public class DefaultStreamCloserService implements StreamCloserService
             return InputStream.class.isAssignableFrom(streamType)
                    || InputSource.class.isAssignableFrom(streamType)
                    || StreamSource.class.isAssignableFrom(streamType)
+                   || Closeable.class.isAssignableFrom(streamType)
                    || (SAXSource.class.isAssignableFrom(streamType) && !streamType.getName().endsWith(
                        "StaxSource"));
         }
@@ -97,7 +95,7 @@ public class DefaultStreamCloserService implements StreamCloserService
                 }
                 catch (IOException e)
                 {
-                    // no-op
+                    this.logCloseException(stream, e);
                 }
             }
             else if (stream instanceof InputSource)
@@ -116,6 +114,18 @@ public class DefaultStreamCloserService implements StreamCloserService
                 }
                 catch (IOException e)
                 {
+                    this.logCloseException(stream, e);
+                }
+            }
+            else if (stream instanceof Closeable)
+            {
+                try
+                {
+                    ((Closeable) stream).close();
+                }
+                catch (MuleException e)
+                {
+                    this.logCloseException(stream, e);
                 }
             }
         }
@@ -131,7 +141,16 @@ public class DefaultStreamCloserService implements StreamCloserService
                 payload.getCharacterStream().close();
             }
         }
-        
+
+        private void logCloseException(Object stream, Throwable e)
+        {
+            if (log.isWarnEnabled())
+            {
+                log.warn("Exception was found trying to close resource of class "
+                         + stream.getClass().getCanonicalName(), e);
+            }
+        }
+
     }
 
 }
