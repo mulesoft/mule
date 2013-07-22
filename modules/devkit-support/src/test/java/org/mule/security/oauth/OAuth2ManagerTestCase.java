@@ -60,6 +60,8 @@ import org.mockito.stubbing.Answer;
 @RunWith(MockitoJUnitRunner.class)
 public class OAuth2ManagerTestCase
 {
+    
+    private static final String SCOPE = "myScope";
 
     private TestOAuth2Manager manager;
 
@@ -97,6 +99,8 @@ public class OAuth2ManagerTestCase
             muleContext.getRegistry().lookupTransformer(Mockito.any(DataType.class),
                 Mockito.any(DataType.class))).thenReturn(this.transformer);
 
+        Mockito.when(this.adapter.getScope()).thenReturn(SCOPE);
+        
         this.manager = Mockito.spy(new TestOAuth2Manager(this.objectFactory, this.adapter));
         this.manager.setMuleContext(this.muleContext);
         this.manager.setHttpUtil(this.httpUtil);
@@ -172,10 +176,10 @@ public class OAuth2ManagerTestCase
 
         Assert.assertEquals(
             this.manager.buildAuthorizeUrl(extraParameters, null, redirectUri),
-            "authorizationUrl?response_type=code&client_id=consumerKey&extra1=extra1&extra2=extra2&redirect_uri=redirectUri");
+            "authorizationUrl?response_type=code&client_id=consumerKey&scope=myScope&extra1=extra1&extra2=extra2&redirect_uri=redirectUri");
 
         Assert.assertEquals(this.manager.buildAuthorizeUrl(extraParameters, "custom", redirectUri),
-            "custom?response_type=code&client_id=consumerKey&extra1=extra1&extra2=extra2&redirect_uri=redirectUri");
+            "custom?response_type=code&client_id=consumerKey&scope=myScope&extra1=extra1&extra2=extra2&redirect_uri=redirectUri");
     }
 
     @Test

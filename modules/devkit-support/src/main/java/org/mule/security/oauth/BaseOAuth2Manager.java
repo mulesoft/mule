@@ -51,6 +51,7 @@ import java.net.URLEncoder;
 import java.util.Date;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.slf4j.Logger;
@@ -336,19 +337,24 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         {
             urlBuilder.append(this.getDefaultUnauthorizedConnector().getAuthorizationUrl());
         }
-        urlBuilder.append("?");
-        urlBuilder.append("response_type=code&");
-        urlBuilder.append("client_id=");
-        urlBuilder.append(this.getDefaultUnauthorizedConnector().getConsumerKey());
-        for (String parameter : extraParameters.keySet())
+
+        urlBuilder.append("?")
+            .append("response_type=code&")
+            .append("client_id=")
+            .append(this.getDefaultUnauthorizedConnector().getConsumerKey());
+
+        String scope = this.getDefaultUnauthorizedConnector().getScope();
+        if (!StringUtils.isBlank(scope))
         {
-            urlBuilder.append("&");
-            urlBuilder.append(parameter);
-            urlBuilder.append("=");
-            urlBuilder.append(extraParameters.get(parameter));
+            urlBuilder.append("&scope=").append(scope);
         }
-        urlBuilder.append("&redirect_uri=");
-        urlBuilder.append(redirectUri);
+
+        for (Map.Entry<String, String> entry : extraParameters.entrySet())
+        {
+            urlBuilder.append("&").append(entry.getKey()).append("=").append(entry.getValue());
+        }
+
+        urlBuilder.append("&redirect_uri=").append(redirectUri);
 
         if (getLogger().isDebugEnabled())
         {
@@ -893,13 +899,13 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     {
         this.defaultUnauthorizedConnector.setName(name);
     }
-    
+
     @Override
     public OnNoTokenPolicy getOnNoTokenPolicy()
     {
         return this.defaultUnauthorizedConnector.getOnNoTokenPolicy();
     }
-    
+
     @Override
     public void setOnNoTokenPolicy(OnNoTokenPolicy policy)
     {
