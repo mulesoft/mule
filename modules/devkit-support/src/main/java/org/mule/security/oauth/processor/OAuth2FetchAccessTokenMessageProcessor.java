@@ -149,16 +149,17 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
                 "Error retrieving authorization event %s from object store", eventId)), event, e);
         }
 
+        MuleMessage restoredMessage = restoredEvent.getMessage();
         String cleanedState = StringUtils.match(ORIGINAL_STATE_PATTERN, state, 1);
 
         if (cleanedState != null)
         {
-            restoredEvent.getMessage().setProperty("state", cleanedState, PropertyScope.INBOUND);
+            restoredMessage.setProperty("state", cleanedState, PropertyScope.INBOUND);
         }
         else
         {
             // user did not use the state at all, just blank it
-            restoredEvent.getMessage().setProperty("state", StringUtils.EMPTY, PropertyScope.INBOUND);
+            restoredMessage.setProperty("state", StringUtils.EMPTY, PropertyScope.INBOUND);
         }
 
         RequestContext.setEvent(restoredEvent);
