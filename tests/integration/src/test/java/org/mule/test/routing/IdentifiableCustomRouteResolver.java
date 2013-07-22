@@ -10,17 +10,19 @@
 package org.mule.test.routing;
 
 import org.mule.api.DefaultMuleException;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.routing.DynamicRouteResolver;
+import org.mule.routing.IdentifiableDynamicRouteResolver;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomRouteResolver implements DynamicRouteResolver
+public class IdentifiableCustomRouteResolver implements IdentifiableDynamicRouteResolver
 {
+
+    private final String ID_EXPRESSION = "#[flowVars['id']]";
 
     static List<MessageProcessor> routes = new ArrayList<MessageProcessor>();
 
@@ -28,6 +30,12 @@ public class CustomRouteResolver implements DynamicRouteResolver
     public List<MessageProcessor> resolveRoutes(MuleEvent event)
     {
         return routes;
+    }
+
+    @Override
+    public String getRouteIdentifier(MuleEvent event) throws MessagingException
+    {
+        return event.getMuleContext().getExpressionManager().parse(ID_EXPRESSION, event);
     }
 
     public static class AddLetterMessageProcessor implements MessageProcessor
@@ -56,37 +64,4 @@ public class CustomRouteResolver implements DynamicRouteResolver
 
     }
 
-    public static class FailingMessageProcessor implements MessageProcessor
-    {
-
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            throw new DefaultMuleException(CoreMessages.createStaticMessage(""));
-        }
-    }
-
-    public static class AddLetterTHenFailsMessageProcessor implements MessageProcessor
-    {
-
-        private String letter;
-
-        public AddLetterTHenFailsMessageProcessor(String letter)
-        {
-            this.letter = letter;
-        }
-
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            try
-            {
-                event.getMessage().setPayload(event.getMessage().getPayloadAsString() + letter);
-            }
-            catch (Exception e)
-            {
-            }
-            throw new DefaultMuleException(CoreMessages.createStaticMessage(""));
-        }
-    }
 }
