@@ -21,4 +21,35 @@
         </dynamic-round-robin>
     </flow>
 
+    <flow name="multipleDynamicRoundRobin">
+        <choice>
+            <when expression="#[flowVars['first-router']]">
+                <dynamic-round-robin>
+                    <custom-route-resolver ref="beanRouteResolver" />
+                </dynamic-round-robin>
+            </when>
+            <otherwise>
+                <dynamic-round-robin>
+                    <custom-route-resolver ref="beanRouteResolver" />
+                </dynamic-round-robin>
+            </otherwise>
+        </choice>
+    </flow>
+
+    <flow name="multipleDynamicRoundRobinWithId">
+        <choice>
+            <when expression="#[flowVars['first-router']]">
+                <dynamic-round-robin>
+                    <custom-route-resolver ref="identifiableRouteResolver" />
+                </dynamic-round-robin>
+            </when>
+            <otherwise>
+                <dynamic-round-robin>
+                    <custom-route-resolver ref="identifiableRouteResolver" />
+                </dynamic-round-robin>
+            </otherwise>
+        </choice>
+    </flow>
+
+
 </mule>
