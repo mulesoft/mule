@@ -11,6 +11,7 @@
 package org.mule.security.oauth;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -343,18 +344,27 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
             .append("client_id=")
             .append(this.getDefaultUnauthorizedConnector().getConsumerKey());
 
-        String scope = this.getDefaultUnauthorizedConnector().getScope();
-        if (!StringUtils.isBlank(scope))
+        try
         {
-            urlBuilder.append("&scope=").append(scope);
-        }
+            if (!StringUtils.isBlank(this.getScope()))
+            {
+                urlBuilder.append("&scope=").append(URLEncoder.encode(this.getScope(), "UTF-8"));
+            }
 
-        for (Map.Entry<String, String> entry : extraParameters.entrySet())
+            for (Map.Entry<String, String> entry : extraParameters.entrySet())
+            {
+                urlBuilder.append("&")
+                    .append(entry.getKey())
+                    .append("=")
+                    .append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+            }
+
+            urlBuilder.append("&redirect_uri=").append(URLEncoder.encode(redirectUri, "UTF-8"));
+        }
+        catch (UnsupportedEncodingException e)
         {
-            urlBuilder.append("&").append(entry.getKey()).append("=").append(entry.getValue());
+            throw new RuntimeException(e);
         }
-
-        urlBuilder.append("&redirect_uri=").append(redirectUri);
 
         if (getLogger().isDebugEnabled())
         {

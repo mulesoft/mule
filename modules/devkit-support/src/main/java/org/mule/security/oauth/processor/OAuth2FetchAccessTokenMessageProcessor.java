@@ -23,7 +23,6 @@ import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
 import org.mule.security.oauth.OAuthProperties;
 import org.mule.util.StringUtils;
-import org.mule.util.store.DeserializationPostInitialisable;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -148,18 +147,6 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
         {
             throw new MessagingException(MessageFactory.createStaticMessage(String.format(
                 "Error retrieving authorization event %s from object store", eventId)), event, e);
-        }
-
-        if (restoredEvent instanceof DeserializationPostInitialisable)
-        {
-            try
-            {
-                DeserializationPostInitialisable.Implementation.init(restoredEvent, this.muleContext);
-            }
-            catch (Exception e)
-            {
-                throw new RuntimeException(e);
-            }
         }
 
         MuleMessage restoredMessage = restoredEvent.getMessage();

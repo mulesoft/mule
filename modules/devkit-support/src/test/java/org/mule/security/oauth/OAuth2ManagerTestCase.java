@@ -99,12 +99,11 @@ public class OAuth2ManagerTestCase
             muleContext.getRegistry().lookupTransformer(Mockito.any(DataType.class),
                 Mockito.any(DataType.class))).thenReturn(this.transformer);
 
-        Mockito.when(this.adapter.getScope()).thenReturn(SCOPE);
-        
         this.manager = Mockito.spy(new TestOAuth2Manager(this.objectFactory, this.adapter));
         this.manager.setMuleContext(this.muleContext);
         this.manager.setHttpUtil(this.httpUtil);
         this.manager.setOauthResponseParser(this.oauthResponseParser);
+        this.manager.setScope(SCOPE);
 
         this.manager.initialise();
         this.manager.start();
