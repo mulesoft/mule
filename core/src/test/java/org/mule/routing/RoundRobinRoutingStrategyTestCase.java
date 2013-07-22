@@ -30,7 +30,8 @@ public class RoundRobinRoutingStrategyTestCase extends AbstractDynamicRoundRobin
     private RoundRobinRoutingStrategy roundRobinRoutingStrategy;
 
     @Before
-    public void setUp() {
+    public void setUp()
+    {
         roundRobinRoutingStrategy = new RoundRobinRoutingStrategy(muleContext, new IdentifiableDynamicRouteResolver()
         {
             @Override
