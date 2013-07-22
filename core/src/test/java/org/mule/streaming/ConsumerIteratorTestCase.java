@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.paging;
+package org.mule.streaming;
 
 import org.mule.api.MuleException;
 import org.mule.api.streaming.Consumer;
@@ -17,6 +17,7 @@ import org.mule.api.streaming.Producer;
 import org.mule.streaming.ConsumerIterator;
 import org.mule.streaming.ElementBasedPagingConsumer;
 import org.mule.streaming.PagingDelegateProducer;
+import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,8 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class ProducerConsumerIteratorTestCase
+@SmallTest
+public class ConsumerIteratorTestCase
 {
 
     private static final int PAGE_SIZE = 100;
@@ -35,8 +37,6 @@ public class ProducerConsumerIteratorTestCase
     {
 
         long counter = 0;
-        long numberOfBytes = 0;
-        long numberOfMegabytes = 0;
 
         public List<String> getPage()
         {
@@ -47,8 +47,6 @@ public class ProducerConsumerIteratorTestCase
                 {
                     counter++;
                     String value = RandomStringUtils.randomAlphabetic(5000);
-                    numberOfBytes += value.length() * 2;
-                    numberOfMegabytes = numberOfBytes / (1024 * 1024);
                     page.add(value);
                 }
 
@@ -61,7 +59,7 @@ public class ProducerConsumerIteratorTestCase
         public void close() throws MuleException
         {
         };
-        
+
         @Override
         public int getTotalResults()
         {
@@ -72,10 +70,7 @@ public class ProducerConsumerIteratorTestCase
     @Test
     public void iterateStreaming() throws Exception
     {
-        Producer<String> producer = new PagingDelegateProducer<String>(this.delegate);
-        Consumer<String> consumer = new ElementBasedPagingConsumer<String>(producer);
-
-        ConsumerIterator<String> it = new ConsumerIterator<String>(consumer);
+        ConsumerIterator<String> it = this.newIterator();
 
         int count = 0;
         while (it.hasNext())
@@ -86,6 +81,35 @@ public class ProducerConsumerIteratorTestCase
 
         Assert.assertEquals(count, TOP);
         it.close();
+    }
+
+    @Test
+    public void closedIterator() throws Exception
+    {
+        ConsumerIterator<String> it = this.newIterator();
+        it.close();
+        Assert.assertFalse(it.hasNext());
+    }
+
+    @Test
+    public void closedConsumer() throws Exception
+    {
+        Producer<String> producer = new PagingDelegateProducer<String>(this.delegate);
+        Consumer<String> consumer = new ElementBasedPagingConsumer<String>(producer);
+
+        ConsumerIterator<String> it = new ConsumerIterator<String>(consumer);
+
+        consumer.close();
+        Assert.assertFalse(it.hasNext());
+    }
+
+    private ConsumerIterator<String> newIterator()
+    {
+        Producer<String> producer = new PagingDelegateProducer<String>(this.delegate);
+        Consumer<String> consumer = new ElementBasedPagingConsumer<String>(producer);
+
+        ConsumerIterator<String> it = new ConsumerIterator<String>(consumer);
+        return it;
     }
 
 }

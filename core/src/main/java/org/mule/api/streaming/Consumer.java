@@ -16,8 +16,9 @@ import java.util.NoSuchElementException;
 
 /**
  * General interface for components able to consume data from any specific resource
- * or stream. Implementing this interface does not guarantee thread safeness. Check
- * each particular implementation for information about that
+ * or stream, following the Producer-Consumer design pattern. Implementing this
+ * interface does not guarantee thread safeness. Check each particular implementation
+ * for information about that
  */
 public interface Consumer<T> extends Closeable
 {

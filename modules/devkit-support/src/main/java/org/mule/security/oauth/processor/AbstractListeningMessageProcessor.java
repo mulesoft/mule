@@ -18,6 +18,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.callback.SourceCallback;
+import org.mule.api.devkit.AbstractDevkitBasedMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 
 import java.util.Map;

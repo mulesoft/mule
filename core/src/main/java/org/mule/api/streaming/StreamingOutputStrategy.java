@@ -10,9 +10,20 @@
 
 package org.mule.api.streaming;
 
+/**
+ * This enum lists the possible ways to navigate a streaming data feed.
+ * 
+ */
 public enum StreamingOutputStrategy
 {
 
+    /**
+     * This option means that the items should be returned one element at a time
+     */
     ELEMENT,
+    
+    /**
+     * This option means that the items should be grouped in pages
+     */
     PAGE
 }

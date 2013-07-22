@@ -12,6 +12,7 @@ package org.mule.security.oauth.processor;
 
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
+import org.mule.api.devkit.AbstractDevkitBasedMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.common.connection.exception.UnableToAcquireConnectionException;
 import org.mule.config.i18n.CoreMessages;

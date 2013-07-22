@@ -14,9 +14,21 @@ import org.mule.api.Closeable;
 
 import java.util.List;
 
+/**
+ * A PagingDelegate is a {@link org.mule.api.Closeable} capable of consuming a data
+ * feed in pages. Implementing this interface does not guarantee thread safeness.
+ * Check each particular implementation for information about that
+ */
 public interface PagingDelegate<T> extends Closeable
 {
 
+    /**
+     * Returns the next page of items. If the return value is <code>null</code> or an
+     * empty list, then it means no more items are available
+     * 
+     * @return a populated list of elements. <code>null</code> or an empty list, then
+     *         it means no more items are available
+     */
     public List<T> getPage();
 
     /**

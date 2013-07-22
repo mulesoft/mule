@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.security.oauth.processor;
+package org.mule.api.devkit;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -30,6 +30,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.security.oauth.OnNoTokenPolicy;
 import org.mule.security.oauth.OnNoTokenPolicyAware;
+import org.mule.security.oauth.processor.AbstractExpressionEvaluator;
 import org.mule.transformer.TransformerTemplate;
 import org.mule.transport.NullPayload;
 

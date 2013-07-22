@@ -13,6 +13,7 @@ package org.mule.security.oauth.processor;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.devkit.AbstractDevkitBasedMessageProcessor;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.DataType;
