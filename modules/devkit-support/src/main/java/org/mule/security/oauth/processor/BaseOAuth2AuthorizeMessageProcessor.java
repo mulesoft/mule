@@ -91,15 +91,8 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
         {
             state += this.toString(event, this.getState());
         }
-
-        try
-        {
-            extraParameters.put("state", URLEncoder.encode(state, "UTF-8"));
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            throw new RuntimeException("Error found URL Encoding the state argument", e);
-        }
+        
+        extraParameters.put("state", state);
     }
 
     private Map<String, String> getExtraParameters(MuleEvent event, OAuth2Manager<OAuth2Adapter> moduleObject)
@@ -149,7 +142,6 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
         }
 
         return extraParameters;
-
     }
 
     @SuppressWarnings("unchecked")
