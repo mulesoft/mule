@@ -77,7 +77,7 @@ public class OAuth2FetchAccessTokenProcessorTestCase
         Mockito.when(event.getMessage().getInboundProperty("state")).thenReturn(incomingState);
 
         Mockito.when(
-            event.getMuleContext()
+            this.restoredEvent.getMuleContext()
                 .getExpressionManager()
                 .parse(Mockito.anyString(), Mockito.any(MuleMessage.class))).thenAnswer(new Answer<String>()
         {

@@ -31,6 +31,7 @@ import org.mule.security.oauth.util.OAuthResponseParser;
 import org.mule.tck.size.SmallTest;
 
 import java.io.Serializable;
+import java.net.URLDecoder;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -60,8 +61,8 @@ import org.mockito.stubbing.Answer;
 @RunWith(MockitoJUnitRunner.class)
 public class OAuth2ManagerTestCase
 {
-    
-    private static final String SCOPE = "myScope";
+
+    private static final String SCOPE = "<<myScope>>";
 
     private TestOAuth2Manager manager;
 
@@ -162,7 +163,7 @@ public class OAuth2ManagerTestCase
     }
 
     @Test
-    public void buildAuthorizeUrl()
+    public void buildAuthorizeUrl() throws Exception
     {
         final Map<String, String> extraParameters = new LinkedHashMap<String, String>();
         extraParameters.put("extra1", "extra1");
@@ -174,11 +175,12 @@ public class OAuth2ManagerTestCase
         Mockito.when(adapter.getConsumerKey()).thenReturn("consumerKey");
 
         Assert.assertEquals(
-            this.manager.buildAuthorizeUrl(extraParameters, null, redirectUri),
-            "authorizationUrl?response_type=code&client_id=consumerKey&scope=myScope&extra1=extra1&extra2=extra2&redirect_uri=redirectUri");
+            URLDecoder.decode(this.manager.buildAuthorizeUrl(extraParameters, null, redirectUri), "UTF-8"),
+            "authorizationUrl?response_type=code&client_id=consumerKey&scope=<<myScope>>&extra1=extra1&extra2=extra2&redirect_uri=redirectUri");
 
-        Assert.assertEquals(this.manager.buildAuthorizeUrl(extraParameters, "custom", redirectUri),
-            "custom?response_type=code&client_id=consumerKey&scope=myScope&extra1=extra1&extra2=extra2&redirect_uri=redirectUri");
+        Assert.assertEquals(
+            URLDecoder.decode(this.manager.buildAuthorizeUrl(extraParameters, "custom", redirectUri), "UTF-8"),
+            "custom?response_type=code&client_id=consumerKey&scope=<<myScope>>&extra1=extra1&extra2=extra2&redirect_uri=redirectUri");
     }
 
     @Test
