@@ -519,15 +519,23 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
                     message.getPayload().getClass().getCanonicalName())), event);
         }
 
-        try
+        String key = this.buildAuthorizationEventKey(event.getId());
+        synchronized (event)
         {
-            this.accessTokenObjectStore.store(this.buildAuthorizationEventKey(event.getId()), event);
-        }
-        catch (ObjectStoreException e)
-        {
-            throw new MessagingException(
-                MessageFactory.createStaticMessage("Exception was thrown when trying to store the message into object store. Please check that all message properties are serializable"),
-                event, e);
+            try
+            {
+                if (this.accessTokenObjectStore.contains(key))
+                {
+                    this.accessTokenObjectStore.remove(key);
+                }
+                this.accessTokenObjectStore.store(key, event);
+            }
+            catch (ObjectStoreException e)
+            {
+                throw new MessagingException(
+                    MessageFactory.createStaticMessage("Exception was thrown when trying to store the message into object store. Please check that all message properties are serializable"),
+                    event, e);
+            }
         }
     }
 

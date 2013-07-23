@@ -72,8 +72,8 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
                                                                                               .getName()
                                                                                           : this.getAccessTokenId();
 
-            transformedAccessTokenId = (String) this.evaluateAndTransform(event.getMuleContext(), event,
-                String.class, null, transformedAccessTokenId);
+            transformedAccessTokenId = (String) this.evaluateAndTransform(restoredEvent.getMuleContext(),
+                restoredEvent, String.class, null, transformedAccessTokenId);
 
             this.oauthManager.getAccessTokenPoolFactory().passivateObject(transformedAccessTokenId,
                 oauthAdapter);
