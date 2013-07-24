@@ -102,9 +102,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void deploysZipOnStartup() throws Exception
     {
-        final URL url = getClass().getResource("/dummy-app.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url);
+        addPackedAppFromResource("/dummy-app.zip");
 
         deploymentService.start();
 
@@ -125,9 +123,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         deploymentService.start();
 
-        final URL url = getClass().getResource("/dummy-app.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url);
+        addPackedAppFromResource("/dummy-app.zip");
 
         assertDeploymentSuccess(deploymentListener, "dummy-app");
         assertAppsDir(NONE, new String[] {"dummy-app"}, true);
@@ -143,9 +139,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void deploysBrokenZipOnStartup() throws Exception
     {
-        final URL url = getClass().getResource("/overridden.properties");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url, "brokenApp.zip");
+        addPackedAppFromResource("/overridden.properties", "brokenApp.zip");
 
         deploymentService.start();
 
@@ -165,9 +159,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         deploymentService.start();
 
-        final URL url = getClass().getResource("/overridden.properties");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url, "brokenApp.zip");
+        addPackedAppFromResource("/overridden.properties", "brokenApp.zip");
 
         assertDeploymentFailure(deploymentListener, "brokenApp");
 
@@ -185,9 +177,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         deploymentService.start();
 
-        final URL url = getClass().getResource("/dummy-app.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url);
+        addPackedAppFromResource("/dummy-app.zip");
 
         assertDeploymentSuccess(deploymentListener, "dummy-app");
 
@@ -195,7 +185,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
 
         reset(deploymentListener);
-        addAppArchive(url);
+
+        addPackedAppFromResource("/dummy-app.zip");
 
         assertUndeploymentSuccess(deploymentListener, "dummy-app");
         assertDeploymentSuccess(deploymentListener, "dummy-app");
@@ -206,9 +197,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void redeploysZipDeployedAfterStartup() throws Exception
     {
-        final URL url = getClass().getResource("/dummy-app.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url);
+        addPackedAppFromResource("/dummy-app.zip");
 
         deploymentService.start();
 
@@ -218,7 +207,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
 
         reset(deploymentListener);
-        addAppArchive(url);
+
+        addPackedAppFromResource("/dummy-app.zip");
 
         assertUndeploymentSuccess(deploymentListener, "dummy-app");
         assertDeploymentSuccess(deploymentListener, "dummy-app");
@@ -247,13 +237,14 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertNotNull("Test app file not found " + url, url);
 
         addExplodedApp(url, "dummy-app");
-        addAppArchive(url);
+
+        addPackedAppFromResource("/dummy-app.zip");
 
         deploymentService.start();
 
         assertDeploymentSuccess(deploymentListener, "dummy-app");
 
-        addAppArchive(getClass().getResource("/empty-app.zip"));
+        addPackedAppFromResource("/empty-app.zip");
 
         assertDeploymentSuccess(deploymentListener, "empty-app");
 
@@ -550,9 +541,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void redeploysZipAppOnConfigChanges() throws Exception
     {
-        final URL url = getClass().getResource("/dummy-app.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url);
+        addPackedAppFromResource("/dummy-app.zip");
 
         deploymentService.start();
 
@@ -590,9 +579,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
     public void doBrokenAppArchiveTest() throws Exception
     {
-        final URL url = getClass().getResource("/broken-app.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url);
+        addPackedAppFromResource("/broken-app.zip");
 
         deploymentService.start();
 
@@ -627,9 +614,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void deploysInvalidZipAppOnStartup() throws Exception
     {
-        final URL url = getClass().getResource("/empty-app.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url, "app with spaces.zip");
+        addPackedAppFromResource("/empty-app.zip", "app with spaces.zip");
 
         deploymentService.start();
         assertDeploymentFailure(deploymentListener, "app with spaces");
@@ -650,9 +635,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         deploymentService.start();
 
-        final URL url = getClass().getResource("/empty-app.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url, "app with spaces.zip");
+        addPackedAppFromResource("/empty-app.zip", "app with spaces.zip");
 
         assertDeploymentFailure(deploymentListener, "app with spaces");
 
@@ -670,9 +653,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void testDeployAppNameWithZipSuffix() throws Exception
     {
-        final URL url = getClass().getResource("/empty-app.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url, "empty-app.zip.zip");
+        addPackedAppFromResource("/empty-app.zip", "empty-app.zip.zip");
 
         deploymentService.start();
 
@@ -689,11 +670,9 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void deploysPackedAppsInOrderWhenAppArgumentIsUsed() throws Exception
     {
-        final URL url = getClass().getResource("/empty-app.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url, "1.zip");
-        addAppArchive(url, "2.zip");
-        addAppArchive(url, "3.zip");
+        addPackedAppFromResource("/empty-app.zip", "1.zip");
+        addPackedAppFromResource("/empty-app.zip", "2.zip");
+        addPackedAppFromResource("/empty-app.zip", "3.zip");
 
         Map<String, Object> startupOptions = new HashMap<String, Object>();
         startupOptions.put("app", "3:1:2");
@@ -747,9 +726,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void deploysAppJustOnce() throws Exception
     {
-        final URL url = getClass().getResource("/dummy-app.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url);
+        addPackedAppFromResource("/dummy-app.zip");
 
         Map<String, Object> startupOptions = new HashMap<String, Object>();
         startupOptions.put("app", "dummy-app:dummy-app:dummy-app");
@@ -787,9 +764,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         // NOTE: need an integration test like this because DefaultMuleApplication
         // class cannot be unit tested.
-        final URL url = getClass().getResource("/dummy-app.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url);
+        addPackedAppFromResource("/dummy-app.zip");
 
         deploymentService.start();
 
@@ -802,9 +777,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void undeploysStoppedApp() throws Exception
     {
-        final URL url = getClass().getResource("/dummy-app.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url);
+        addPackedAppFromResource("/dummy-app.zip");
 
         deploymentService.start();
 
@@ -818,10 +791,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void undeploysApplicationRemovingAnchorFile() throws Exception
     {
-        final URL url = getClass().getResource("/dummy-app.zip");
-        assertNotNull("Test app file not found " + url, url);
+        addPackedAppFromResource("/dummy-app.zip");
 
-        addAppArchive(url);
         deploymentService.start();
 
         assertDeploymentSuccess(deploymentListener, "dummy-app");
@@ -834,9 +805,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void undeploysAppCompletelyEvenOnStoppingException() throws Exception
     {
-        final URL url = getClass().getResource("/empty-app.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url);
+        addPackedAppFromResource("/empty-app.zip");
 
         TestApplicationFactory appFactory = new TestApplicationFactory(new MuleApplicationClassLoaderFactory());
         appFactory.setFailOnStopApplication(true);
@@ -856,9 +825,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void undeploysAppCompletelyEvenOnDisposingException() throws Exception
     {
-        final URL url = getClass().getResource("/empty-app.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url);
+        addPackedAppFromResource("/empty-app.zip");
 
         TestApplicationFactory appFactory = new TestApplicationFactory(new MuleApplicationClassLoaderFactory());
         appFactory.setFailOnDisposeApplication(true);
@@ -877,17 +844,15 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void deploysIncompleteZipAppOnStartup() throws Exception
     {
-        final URL url = getClass().getResource("/incompleteApp.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url, "incompleteApp.zip");
+        addPackedAppFromResource("/incompleteApp.zip");
 
         deploymentService.start();
+
         assertDeploymentFailure(deploymentListener, "incompleteApp");
 
         // Deploys another app to confirm that DeploymentService has execute the updater thread
-        final URL extraApp = getClass().getResource("/dummy-app.zip");
-        assertNotNull("Test app file not found " + extraApp, extraApp);
-        addAppArchive(extraApp);
+        addPackedAppFromResource("/dummy-app.zip");
+
         assertDeploymentSuccess(deploymentListener, "dummy-app");
 
         // Check that the failed application folder is still there
@@ -901,16 +866,13 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         deploymentService.start();
 
-        final URL url = getClass().getResource("/incompleteApp.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url, "incompleteApp.zip");
+        addPackedAppFromResource("/incompleteApp.zip");
 
         assertDeploymentFailure(deploymentListener, "incompleteApp");
 
         // Deploys another app to confirm that DeploymentService has execute the updater thread
-        final URL extraApp = getClass().getResource("/dummy-app.zip");
-        assertNotNull("Test app file not found " + extraApp, extraApp);
-        addAppArchive(extraApp);
+        addPackedAppFromResource("/dummy-app.zip");
+
         assertDeploymentSuccess(deploymentListener, "dummy-app");
 
         // Check that the failed application folder is still there
@@ -934,9 +896,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertDeploymentFailure(deploymentListener, "incompleteApp");
 
         // Deploys another app to confirm that DeploymentService has execute the updater thread
-        final URL extraApp = getClass().getResource("/dummy-app.zip");
-        assertNotNull("Test app file not found " + extraApp, extraApp);
-        addAppArchive(extraApp);
+        addPackedAppFromResource("/dummy-app.zip");
+
         assertDeploymentSuccess(deploymentListener, "dummy-app");
 
         // Check that the failed application folder is still there
@@ -948,23 +909,19 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void redeploysZipAppAfterDeploymentErrorOnStartup() throws Exception
     {
-        final URL url = getClass().getResource("/incompleteApp.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url, "incompleteApp.zip");
+        addPackedAppFromResource("/incompleteApp.zip");
+
         deploymentService.start();
 
         assertDeploymentFailure(deploymentListener, "incompleteApp");
 
         // Deploys another app to confirm that DeploymentService has execute the updater thread
-        final URL extraApp = getClass().getResource("/dummy-app.zip");
-        assertNotNull("Test app file not found " + extraApp, extraApp);
-        addAppArchive(extraApp);
+        addPackedAppFromResource("/dummy-app.zip");
+
         assertDeploymentSuccess(deploymentListener, "dummy-app");
 
         // Deploys another app to confirm that DeploymentService has execute the updater thread
-        final URL fixedApp = getClass().getResource("/empty-app.zip");
-        assertNotNull("Test app file not found " + extraApp, extraApp);
-        addAppArchive(fixedApp, "incompleteApp.zip");
+        addPackedAppFromResource("/empty-app.zip", "incompleteApp.zip");
         assertDeploymentSuccess(deploymentListener, "incompleteApp");
 
         assertEquals("Failed app still appears as zombie after a successful redeploy", 0, deploymentService.getZombieMap().size());
@@ -975,22 +932,17 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         deploymentService.start();
 
-        final URL url = getClass().getResource("/incompleteApp.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url, "incompleteApp.zip");
+        addPackedAppFromResource("/incompleteApp.zip");
 
         assertDeploymentFailure(deploymentListener, "incompleteApp");
 
         // Deploys another app to confirm that DeploymentService has execute the updater thread
-        final URL extraApp = getClass().getResource("/dummy-app.zip");
-        assertNotNull("Test app file not found " + extraApp, extraApp);
-        addAppArchive(extraApp);
+        addPackedAppFromResource("/dummy-app.zip");
+
         assertDeploymentSuccess(deploymentListener, "dummy-app");
 
         // Deploys another app to confirm that DeploymentService has execute the updater thread
-        final URL fixedApp = getClass().getResource("/empty-app.zip");
-        assertNotNull("Test app file not found " + extraApp, extraApp);
-        addAppArchive(fixedApp, "incompleteApp.zip");
+        addPackedAppFromResource("/empty-app.zip", "incompleteApp.zip");
         assertDeploymentSuccess(deploymentListener, "incompleteApp");
 
         assertEquals("Failed app still appears as zombie after a successful redeploy", 0, deploymentService.getZombieMap().size());
@@ -1000,17 +952,13 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void redeploysInvalidZipAppAfterSuccessfulDeploymentOnStartup() throws IOException
     {
-        final URL fixedApp = getClass().getResource("/empty-app.zip");
-        assertNotNull("Test app file not found " + fixedApp, fixedApp);
-        addAppArchive(fixedApp, "empty-app.zip");
+        addPackedAppFromResource("/empty-app.zip");
 
         deploymentService.start();
 
         assertDeploymentSuccess(deploymentListener, "empty-app");
 
-        final URL url = getClass().getResource("/incompleteApp.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url, "empty-app.zip");
+        addPackedAppFromResource("/incompleteApp.zip", "empty-app.zip");
 
         assertDeploymentFailure(deploymentListener, "empty-app");
 
@@ -1023,17 +971,10 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         deploymentService.start();
 
-        final URL fixedApp = getClass().getResource("/empty-app.zip");
-        assertNotNull("Test app file not found " + fixedApp, fixedApp);
-        addAppArchive(fixedApp, "empty-app.zip");
-
-
+        addPackedAppFromResource("/empty-app.zip");
         assertDeploymentSuccess(deploymentListener, "empty-app");
 
-        final URL url = getClass().getResource("/incompleteApp.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url, "empty-app.zip");
-
+        addPackedAppFromResource("/incompleteApp.zip", "empty-app.zip");
         assertDeploymentFailure(deploymentListener, "empty-app");
 
         final Map.Entry<URL, Long> zombie = deploymentService.getZombieMap().entrySet().iterator().next();
@@ -1043,9 +984,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void redeploysInvalidZipAppAfterFailedDeploymentOnStartup() throws IOException
     {
-        final URL url = getClass().getResource("/incompleteApp.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url, "incompleteApp.zip");
+        addPackedAppFromResource("/incompleteApp.zip");
 
         deploymentService.start();
 
@@ -1053,7 +992,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         reset(deploymentListener);
 
-        addAppArchive(url, "incompleteApp.zip");
+        addPackedAppFromResource("/incompleteApp.zip");
 
         assertDeploymentFailure(deploymentListener, "incompleteApp");
 
@@ -1066,16 +1005,12 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         deploymentService.start();
 
-        final URL url = getClass().getResource("/incompleteApp.zip");
-        assertNotNull("Test app file not found " + url, url);
-        addAppArchive(url, "incompleteApp.zip");
-
+        addPackedAppFromResource("/incompleteApp.zip");
         assertDeploymentFailure(deploymentListener, "incompleteApp");
 
         reset(deploymentListener);
 
-        addAppArchive(url, "incompleteApp.zip");
-
+        addPackedAppFromResource("/incompleteApp.zip");
         assertDeploymentFailure(deploymentListener, "incompleteApp");
 
         final Map.Entry<URL, Long> zombie = deploymentService.getZombieMap().entrySet().iterator().next();
@@ -1097,9 +1032,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertDeploymentFailure(deploymentListener, "incompleteApp");
 
         // Deploys another app to confirm that DeploymentService has execute the updater thread
-        final URL extraApp = getClass().getResource("/dummy-app.zip");
-        assertNotNull("Test app file not found " + extraApp, extraApp);
-        addAppArchive(extraApp);
+        addPackedAppFromResource("/dummy-app.zip");
+
         assertDeploymentSuccess(deploymentListener, "dummy-app");
 
         // Deploys another app to confirm that DeploymentService has execute the updater thread
@@ -1333,9 +1267,17 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     /**
      * Copies a given app archive to the apps folder for deployment.
      */
-    private void addAppArchive(URL url) throws IOException
+    private void addPackedAppFromResource(String resource) throws IOException
     {
-        addAppArchive(url, null);
+        addPackedAppFromResource(resource, null);
+    }
+
+    private void addPackedAppFromResource(String resource, String targetName) throws IOException
+    {
+        URL url = getClass().getResource(resource);
+        assertNotNull("Test resource not found: " + url, url);
+
+        addAppArchive(url, targetName);
     }
 
     /**
