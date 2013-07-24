@@ -98,8 +98,6 @@ public class DefaultMuleApplication implements Application
             logger.info(miniSplash(String.format("New app '%s'", descriptor.getAppName())));
         }
 
-        createAnchorFile(getAppName());
-
         // convert to absolute paths
         final String[] configResources = descriptor.getConfigResources();
         absoluteResourcePaths = new String[configResources.length];
@@ -147,6 +145,9 @@ public class DefaultMuleApplication implements Application
         try
         {
             this.muleContext.start();
+            // save app's state in the marker file
+            File marker = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), String.format("%s-anchor.txt", getAppName()));
+            FileUtils.writeStringToFile(marker, ANCHOR_FILE_BLURB);
 
             // null CCL ensures we log at 'system' level
             // TODO create a more usable wrapper for any logger to be logged at sys level
@@ -162,6 +163,13 @@ public class DefaultMuleApplication implements Application
             }
         }
         catch (MuleException e)
+        {
+            // log it here so it ends up in app log, sys log will only log a message without stacktrace
+            logger.error(null, ExceptionUtils.getRootCause(e));
+            // TODO add app name to the exception field
+            throw new DeploymentStartException(CoreMessages.createStaticMessage(ExceptionUtils.getRootCauseMessage(e)), e);
+        }
+        catch (IOException e)
         {
             // log it here so it ends up in app log, sys log will only log a message without stacktrace
             logger.error(null, ExceptionUtils.getRootCause(e));
@@ -474,22 +482,6 @@ public class DefaultMuleApplication implements Application
         final String muleHome = System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
         String configPath = String.format("%s/apps/%s/%s", muleHome, getAppName(), path);
         return new File(configPath);
-    }
-
-    private void createAnchorFile(String appName)
-    {
-        try
-        {
-            File marker = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), String.format("%s-anchor.txt", appName));
-            FileUtils.writeStringToFile(marker, ANCHOR_FILE_BLURB);
-        }
-        catch (IOException e)
-        {
-            // log it here so it ends up in app log, sys log will only log a message without stacktrace
-            logger.error(null, ExceptionUtils.getRootCause(e));
-            // TODO add app name to the exception field
-            throw new DeploymentInitException(CoreMessages.createStaticMessage(ExceptionUtils.getRootCauseMessage(e)), e);
-        }
     }
 
     protected class ConfigFileWatcher extends AbstractFileWatcher
