@@ -39,6 +39,8 @@ import org.mule.util.StringUtils;
 import org.mule.util.UUID;
 import org.mule.util.store.DeserializationPostInitialisable;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -1701,7 +1703,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             out.writeBoolean(false);
             byte[] serializablePayload = getPayloadAsBytes();
             out.writeInt(serializablePayload.length);
-            out.write(serializablePayload);
+            new DataOutputStream(out).write(serializablePayload);
         }
         out.writeObject(serializeAttachments(inboundAttachments));
         out.writeObject(serializeAttachments(outboundAttachments));
@@ -1761,7 +1763,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         {
             int payloadSize = in.readInt();
             byte[] serializedPayload = new byte[payloadSize];
-            in.read(serializedPayload);
+            new DataInputStream(in).readFully(serializedPayload);
             payload = serializedPayload;
         }
         inboundAttachments = deserializeAttachments((Map<String, SerializedDataHandler>)in.readObject());
