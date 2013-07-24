@@ -38,6 +38,11 @@ public class DefaultApplicationFactory implements ApplicationFactory
 
     public Application createApp(String appName) throws IOException
     {
+        if (appName.contains(" "))
+        {
+            throw new IllegalArgumentException("Mule application name may not contain spaces: " + appName);
+        }
+
         AppBloodhound bh = new DefaultAppBloodhound();
         final ApplicationDescriptor descriptor = bh.fetch(appName);
 
