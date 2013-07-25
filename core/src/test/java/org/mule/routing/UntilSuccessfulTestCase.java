@@ -29,6 +29,7 @@ import org.mule.util.store.SimpleMemoryObjectStore;
 
 import java.io.ByteArrayInputStream;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
@@ -119,6 +120,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testSuccessfulDeliveryAckExpression() throws Exception
     {
         untilSuccessful.setAckExpression("#[string:ACK]");
