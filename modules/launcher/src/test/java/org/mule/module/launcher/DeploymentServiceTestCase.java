@@ -64,6 +64,9 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     protected MuleDeploymentService deploymentService;
     protected DeploymentListener deploymentListener;
 
+    //@Rule
+    //public SystemProperty changeChangeInterval = new SystemProperty(MuleDeploymentService.CHANGE_CHECK_INTERVAL_PROPERTY, "100");
+
     @Override
     protected void doSetUp() throws Exception
     {
