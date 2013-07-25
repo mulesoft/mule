@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
@@ -58,6 +59,7 @@ public class JdbcBridgeFunctionalTestCase extends AbstractJdbcFunctionalTestCase
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testBridgeSuccess() throws Exception
     {
         List<?> results = execSqlQuery("SELECT * FROM TEST");
