@@ -62,7 +62,7 @@ public abstract class AbstractDevkitBasedPageableMessageProcessor extends Abstra
         return event;
     }
 
-    protected abstract PagingDelegate<?> getPagingDelegate(MuleEvent event, PagingConfiguration pagingConfiguration);
+    protected abstract PagingDelegate<?> getPagingDelegate(MuleEvent event, PagingConfiguration pagingConfiguration) throws Exception;
 
     public void setOutputStrategy(StreamingOutputStrategy outputStrategy)
     {
