@@ -13,6 +13,7 @@ package org.mule.transport.ajax;
 import org.cometd.Client;
 import org.cometd.Message;
 import org.cometd.MessageListener;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
@@ -79,6 +80,7 @@ public class AjaxRPCFunctionalTestCase extends AbstractServiceAndFlowTestCase
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testDispatchReceiveSimple() throws Exception
     {
         final Latch latch = new Latch();

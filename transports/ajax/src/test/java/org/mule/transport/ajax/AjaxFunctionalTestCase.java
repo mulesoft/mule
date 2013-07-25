@@ -13,7 +13,6 @@ package org.mule.transport.ajax;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -33,6 +32,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.cometd.Client;
 import org.cometd.Message;
 import org.cometd.MessageListener;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
@@ -152,6 +152,7 @@ public class AjaxFunctionalTestCase extends AbstractServiceAndFlowTestCase
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testClientPublishWithString() throws Exception
     {
         MuleClient muleClient = muleContext.getClient();
