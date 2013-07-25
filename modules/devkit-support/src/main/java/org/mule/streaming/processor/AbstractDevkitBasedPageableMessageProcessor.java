@@ -14,6 +14,7 @@ import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.devkit.AbstractDevkitBasedMessageProcessor;
 import org.mule.api.streaming.Consumer;
+import org.mule.api.streaming.PagingConfiguration;
 import org.mule.api.streaming.PagingDelegate;
 import org.mule.api.streaming.Producer;
 import org.mule.api.streaming.StreamingOutputStrategy;
@@ -26,6 +27,8 @@ public abstract class AbstractDevkitBasedPageableMessageProcessor extends Abstra
 {
 
     private StreamingOutputStrategy outputStrategy = StreamingOutputStrategy.ELEMENT;
+    private boolean paging;
+    private int pageSize;
 
     public AbstractDevkitBasedPageableMessageProcessor(String operationName)
     {
@@ -36,7 +39,8 @@ public abstract class AbstractDevkitBasedPageableMessageProcessor extends Abstra
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected final MuleEvent doProcess(MuleEvent event) throws Exception
     {
-        PagingDelegate<?> delegate = this.getPagingDelegate();
+        
+        PagingDelegate<?> delegate = this.getPagingDelegate(event, new PagingConfiguration(this.isPaging(), this.getPageSize()));
         Producer<?> producer = new PagingDelegateProducer(delegate);
         Consumer<?> consumer = null;
 
@@ -58,11 +62,36 @@ public abstract class AbstractDevkitBasedPageableMessageProcessor extends Abstra
         return event;
     }
 
-    protected abstract PagingDelegate<?> getPagingDelegate();
+    protected abstract PagingDelegate<?> getPagingDelegate(MuleEvent event, PagingConfiguration pagingConfiguration);
 
     public void setOutputStrategy(StreamingOutputStrategy outputStrategy)
     {
         this.outputStrategy = outputStrategy;
+    }
+
+    public boolean isPaging()
+    {
+        return paging;
+    }
+
+    public void setPaging(boolean paging)
+    {
+        this.paging = paging;
+    }
+
+    public int getPageSize()
+    {
+        return pageSize;
+    }
+
+    public void setPageSize(int pageSize)
+    {
+        this.pageSize = pageSize;
+    }
+
+    public StreamingOutputStrategy getOutputStrategy()
+    {
+        return outputStrategy;
     }
 
 }

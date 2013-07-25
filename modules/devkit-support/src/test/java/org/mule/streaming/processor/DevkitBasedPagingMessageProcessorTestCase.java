@@ -12,6 +12,7 @@ package org.mule.streaming.processor;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.streaming.PagingConfiguration;
 import org.mule.api.streaming.PagingDelegate;
 import org.mule.api.streaming.StreamingOutputStrategy;
 import org.mule.streaming.ConsumerIterator;
@@ -37,6 +38,8 @@ public class DevkitBasedPagingMessageProcessorTestCase
     public void elementBasedIteratior() throws Exception {
         TestPagingProcessor processor = new TestPagingProcessor();
         processor.setOutputStrategy(StreamingOutputStrategy.ELEMENT);
+        processor.setPageSize(PAGE_SIZE);
+        processor.setPaging(true);
         
         MuleEvent event = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
         
@@ -62,6 +65,8 @@ public class DevkitBasedPagingMessageProcessorTestCase
     public void pagedBasedIterator() throws Exception {
         TestPagingProcessor processor = new TestPagingProcessor();
         processor.setOutputStrategy(StreamingOutputStrategy.PAGE);
+        processor.setPageSize(PAGE_SIZE);
+        processor.setPaging(true);
         
         MuleEvent event = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
         
@@ -102,8 +107,10 @@ public class DevkitBasedPagingMessageProcessorTestCase
         }
 
         @Override
-        protected PagingDelegate<?> getPagingDelegate()
+        protected PagingDelegate<?> getPagingDelegate(MuleEvent event, PagingConfiguration pagingConfiguration)
         {
+//            This delegate doesn't care about the pagingConfiguration because what I want to test is the MP not the
+//            actual behaviour of the delegate
             return new PagingDelegate<String>()
             {
 
