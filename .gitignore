@@ -20,7 +20,7 @@ target/
 *.settings
 /svnmerge-commit-message.txt
 /activemq-data
-
+bin/
 /modules/launcher/src/it/test-01-plugin-impl-1/build.log
 
 .pom.xml.swp
