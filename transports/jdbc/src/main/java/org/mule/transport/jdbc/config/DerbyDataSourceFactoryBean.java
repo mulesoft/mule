@@ -49,7 +49,6 @@ public class DerbyDataSourceFactoryBean extends AbstractDataSourceFactoryBean
     public void destroy() throws Exception {
     	super.destroy();
     	// call org.apache.derby.iapi.services.monitor.Monitor.getMonitor().shutdown();
-    	logger.warn("destroying derby data source factory bean", new Exception());
     	Class clazz = Class.forName("org.apache.derby.iapi.services.monitor.Monitor");
     	Object monitor = clazz.getMethod("getMonitor", new Class[] {})
     			.invoke(clazz, new Object[] {});
