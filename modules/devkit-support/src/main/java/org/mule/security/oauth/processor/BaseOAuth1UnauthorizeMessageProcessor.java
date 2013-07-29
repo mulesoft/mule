@@ -11,7 +11,6 @@
 package org.mule.security.oauth.processor;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.devkit.AbstractDevkitBasedMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.security.oauth.OAuth1Adapter;
 

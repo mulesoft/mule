@@ -12,7 +12,6 @@ package org.mule.security.oauth.processor;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
-import org.mule.api.devkit.AbstractDevkitBasedMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.common.security.oauth.exception.NotAuthorizedException;
 import org.mule.security.oauth.OAuthAdapter;

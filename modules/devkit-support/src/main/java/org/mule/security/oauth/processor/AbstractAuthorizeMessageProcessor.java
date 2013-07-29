@@ -15,7 +15,6 @@ import org.mule.api.MuleException;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.devkit.AbstractDevkitBasedMessageProcessor;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;

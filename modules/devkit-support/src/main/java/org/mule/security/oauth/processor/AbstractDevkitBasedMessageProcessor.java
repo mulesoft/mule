@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.devkit;
+package org.mule.security.oauth.processor;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -30,13 +30,15 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.security.oauth.OnNoTokenPolicy;
 import org.mule.security.oauth.OnNoTokenPolicyAware;
-import org.mule.security.oauth.processor.AbstractExpressionEvaluator;
 import org.mule.transformer.TransformerTemplate;
 import org.mule.transport.NullPayload;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+ * TODO: Move this class to a more generic package like org.mule.api.devkit on Mule 4.0
+ */
 public abstract class AbstractDevkitBasedMessageProcessor extends AbstractExpressionEvaluator
     implements FlowConstructAware, MuleContextAware, Startable, Disposable, Stoppable, Initialisable
 {

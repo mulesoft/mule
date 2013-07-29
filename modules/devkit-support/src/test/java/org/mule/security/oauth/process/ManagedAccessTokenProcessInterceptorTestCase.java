@@ -12,13 +12,13 @@ package org.mule.security.oauth.process;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.devkit.AbstractDevkitBasedMessageProcessor;
 import org.mule.api.devkit.ProcessInterceptor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.common.connection.exception.UnableToAcquireConnectionException;
 import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
 import org.mule.security.oauth.callback.ProcessCallback;
+import org.mule.security.oauth.processor.AbstractDevkitBasedMessageProcessor;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;

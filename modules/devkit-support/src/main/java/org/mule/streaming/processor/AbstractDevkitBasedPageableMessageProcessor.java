@@ -12,12 +12,12 @@ package org.mule.streaming.processor;
 
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
-import org.mule.api.devkit.AbstractDevkitBasedMessageProcessor;
 import org.mule.api.streaming.Consumer;
 import org.mule.api.streaming.PagingConfiguration;
 import org.mule.api.streaming.PagingDelegate;
 import org.mule.api.streaming.Producer;
 import org.mule.api.streaming.StreamingOutputStrategy;
+import org.mule.security.oauth.processor.AbstractDevkitBasedMessageProcessor;
 import org.mule.streaming.ConsumerIterator;
 import org.mule.streaming.ElementBasedPagingConsumer;
 import org.mule.streaming.PagedBasedPagingConsumer;
