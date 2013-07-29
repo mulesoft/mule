@@ -16,19 +16,22 @@ import org.mule.api.streaming.Consumer;
 import org.mule.api.streaming.PagingConfiguration;
 import org.mule.api.streaming.PagingDelegate;
 import org.mule.api.streaming.Producer;
-import org.mule.api.streaming.StreamingOutputStrategy;
+import org.mule.api.streaming.StreamingOutputUnit;
 import org.mule.security.oauth.processor.AbstractDevkitBasedMessageProcessor;
 import org.mule.streaming.ConsumerIterator;
 import org.mule.streaming.ElementBasedPagingConsumer;
 import org.mule.streaming.PagedBasedPagingConsumer;
 import org.mule.streaming.PagingDelegateProducer;
 
+import java.util.ArrayList;
+
 public abstract class AbstractDevkitBasedPageableMessageProcessor extends AbstractDevkitBasedMessageProcessor
 {
 
-    private StreamingOutputStrategy outputStrategy = StreamingOutputStrategy.ELEMENT;
-    private boolean paging;
-    private int pageSize;
+    private StreamingOutputUnit outputUnit = StreamingOutputUnit.ELEMENT;
+    private int fetchSize;
+    private int firstPage;
+    private int lastPage;
 
     public AbstractDevkitBasedPageableMessageProcessor(String operationName)
     {
@@ -39,22 +42,29 @@ public abstract class AbstractDevkitBasedPageableMessageProcessor extends Abstra
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected final MuleEvent doProcess(MuleEvent event) throws Exception
     {
+
+        PagingDelegate<?> delegate = this.getPagingDelegate(event, new PagingConfiguration(this.fetchSize,
+            this.firstPage, this.lastPage, this.outputUnit));
         
-        PagingDelegate<?> delegate = this.getPagingDelegate(event, new PagingConfiguration(this.isPaging(), this.getPageSize()));
+        if (delegate == null) {
+            event.getMessage().setPayload(new ArrayList<Object>().iterator());
+            return event;
+        }
+        
         Producer<?> producer = new PagingDelegateProducer(delegate);
         Consumer<?> consumer = null;
 
-        if (this.outputStrategy == StreamingOutputStrategy.ELEMENT)
+        if (this.outputUnit == StreamingOutputUnit.ELEMENT)
         {
             consumer = new ElementBasedPagingConsumer(producer);
         }
-        else if (this.outputStrategy == StreamingOutputStrategy.PAGE)
+        else if (this.outputUnit == StreamingOutputUnit.PAGE)
         {
             consumer = new PagedBasedPagingConsumer(producer);
         }
         else
         {
-            throw new DefaultMuleException("Unsupported outputStrategy " + this.outputStrategy);
+            throw new DefaultMuleException("Unsupported outputStrategy " + this.outputUnit);
         }
 
         event.getMessage().setPayload(new ConsumerIterator(consumer));
@@ -62,36 +72,28 @@ public abstract class AbstractDevkitBasedPageableMessageProcessor extends Abstra
         return event;
     }
 
-    protected abstract PagingDelegate<?> getPagingDelegate(MuleEvent event, PagingConfiguration pagingConfiguration) throws Exception;
+    protected abstract PagingDelegate<?> getPagingDelegate(MuleEvent event,
+                                                           PagingConfiguration pagingConfiguration)
+        throws Exception;
 
-    public void setOutputStrategy(StreamingOutputStrategy outputStrategy)
+    public void setOutputUnit(StreamingOutputUnit outputUnit)
     {
-        this.outputStrategy = outputStrategy;
+        this.outputUnit = outputUnit;
     }
 
-    public boolean isPaging()
+    public void setFetchSize(int fetchSize)
     {
-        return paging;
+        this.fetchSize = fetchSize;
     }
 
-    public void setPaging(boolean paging)
+    public void setFirstPage(int firstPage)
     {
-        this.paging = paging;
+        this.firstPage = firstPage;
     }
 
-    public int getPageSize()
+    public void setLastPage(int lastPage)
     {
-        return pageSize;
-    }
-
-    public void setPageSize(int pageSize)
-    {
-        this.pageSize = pageSize;
-    }
-
-    public StreamingOutputStrategy getOutputStrategy()
-    {
-        return outputStrategy;
+        this.lastPage = lastPage;
     }
 
 }

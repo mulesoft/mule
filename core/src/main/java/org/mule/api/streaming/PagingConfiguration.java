@@ -10,48 +10,43 @@
 
 package org.mule.api.streaming;
 
-import java.io.Serializable;
-
 /**
  * 
  */
-public class PagingConfiguration implements Serializable
+public class PagingConfiguration
 {
 
-    private static final long serialVersionUID = 3647804910350935195L;
+    private int fetchSize;
+    private int firstPage;
+    private int lastPage;
+    private StreamingOutputUnit outputUnit;
+
+    public PagingConfiguration(int fetchSize, int firstPage, int lastPage, StreamingOutputUnit outputUnit)
+    {
+        this.fetchSize = fetchSize;
+        this.firstPage = firstPage;
+        this.lastPage = lastPage;
+        this.outputUnit = outputUnit;
+    }
+
+    public int getFetchSize()
+    {
+        return fetchSize;
+    }
+
+    public int getFirstPage()
+    {
+        return firstPage;
+    }
+
+    public int getLastPage()
+    {
+        return lastPage;
+    }
     
-    private boolean paging = false;
-    private int pageSize = 100;
-
-    public PagingConfiguration()
+    public StreamingOutputUnit getOutputUnit()
     {
-    }
-
-    public PagingConfiguration(boolean paging, int pageSize)
-    {
-        this();
-        this.paging = paging;
-        this.pageSize = pageSize;
-    }
-
-    public boolean isPaging()
-    {
-        return paging;
-    }
-
-    public void setPaging(boolean paging)
-    {
-        this.paging = paging;
-    }
-
-    public int getPageSize()
-    {
-        return pageSize;
-    }
-
-    public void setPageSize(int pageSize)
-    {
-        this.pageSize = pageSize;
+        return outputUnit;
     }
 
 }

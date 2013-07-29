@@ -14,7 +14,7 @@ package org.mule.api.streaming;
  * This enum lists the possible ways to navigate a streaming data feed.
  * 
  */
-public enum StreamingOutputStrategy
+public enum StreamingOutputUnit
 {
 
     /**
