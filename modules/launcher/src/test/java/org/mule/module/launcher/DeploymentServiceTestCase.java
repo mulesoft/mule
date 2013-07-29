@@ -68,7 +68,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     protected DeploymentListener deploymentListener;
 
     @Rule
-    public SystemProperty changeChangeInterval = new SystemProperty(MuleDeploymentService.CHANGE_CHECK_INTERVAL_PROPERTY, "200");
+    public SystemProperty changeChangeInterval = new SystemProperty(MuleDeploymentService.CHANGE_CHECK_INTERVAL_PROPERTY, "50");
 
     @Override
     protected void doSetUp() throws Exception
@@ -1307,6 +1307,14 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         {
             File tempFolder = new File(muleHome, appName);
             FileUtils.unzip(new File(url.toURI()), tempFolder);
+
+            // Under some platforms, file.lastModified is managed at second level, not milliseconds.
+            // Need to update the config file lastModified ere to ensure that is different from previous value
+            File configFile = new File(tempFolder, "mule-config.xml");
+            if (configFile.exists())
+            {
+                configFile.setLastModified(System.currentTimeMillis() + 1000);
+            }
 
             File appFolder = new File(appsDir, appName);
 
