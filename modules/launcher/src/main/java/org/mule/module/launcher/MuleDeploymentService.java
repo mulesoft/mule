@@ -68,6 +68,7 @@ public class MuleDeploymentService implements DeploymentService
     public static final String INSTALL_OPERATION_HAS_BEEN_INTERRUPTED = "Install operation has been interrupted";
 
     protected static final int DEFAULT_CHANGES_CHECK_INTERVAL_MS = 5000;
+    public static final String CHANGE_CHECK_INTERVAL_PROPERTY = "mule.launcher.changeCheckInterval";
 
     protected ScheduledExecutorService appDirMonitorTimer;
 
@@ -233,7 +234,7 @@ public class MuleDeploymentService implements DeploymentService
 
     protected void scheduleChangeMonitor(File appsDir)
     {
-        final int reloadIntervalMs = DEFAULT_CHANGES_CHECK_INTERVAL_MS;
+        final int reloadIntervalMs = getChangesCheckIntervalMs();
         appDirMonitorTimer = Executors.newSingleThreadScheduledExecutor(new AppDeployerMonitorThreadFactory());
 
         appDirMonitorTimer.scheduleWithFixedDelay(new AppDirWatcher(appsDir),
@@ -244,6 +245,19 @@ public class MuleDeploymentService implements DeploymentService
         if (logger.isInfoEnabled())
         {
             logger.info(miniSplash(String.format("Mule is up and kicking (every %dms)", reloadIntervalMs)));
+        }
+    }
+
+    public static int getChangesCheckIntervalMs()
+    {
+        try
+        {
+            String value = System.getProperty(CHANGE_CHECK_INTERVAL_PROPERTY);
+            return Integer.parseInt(value);
+        }
+        catch (NumberFormatException e)
+        {
+            return DEFAULT_CHANGES_CHECK_INTERVAL_MS;
         }
     }
 
@@ -276,7 +290,7 @@ public class MuleDeploymentService implements DeploymentService
             appDirMonitorTimer.shutdown();
             try
             {
-                appDirMonitorTimer.awaitTermination(DEFAULT_CHANGES_CHECK_INTERVAL_MS, TimeUnit.MILLISECONDS);
+                appDirMonitorTimer.awaitTermination(getChangesCheckIntervalMs(), TimeUnit.MILLISECONDS);
             }
             catch (InterruptedException e)
             {

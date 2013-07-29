@@ -30,6 +30,7 @@ import org.mule.util.concurrent.Latch;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -76,6 +77,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testMoveOnlyStreaming() throws Exception
     {
         File inFile = initForRequest();
@@ -109,6 +111,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testNoMoveNoDeleteStreaming() throws Exception
     {
         File inFile = initForRequest();

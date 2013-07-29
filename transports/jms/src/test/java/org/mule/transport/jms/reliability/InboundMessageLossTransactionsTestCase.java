@@ -10,9 +10,12 @@
 
 package org.mule.transport.jms.reliability;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.Ignore;
+import org.junit.Test;
 
 
 /**
@@ -31,6 +34,10 @@ public class InboundMessageLossTransactionsTestCase extends InboundMessageLossTe
         return "reliability/activemq-config.xml, reliability/inbound-message-loss-transactions.xml";
     }
 
+
+    @Test
+    @Ignore("MULE-6926: flaky test")
+    @Override
     public void testComponentException() throws Exception
     {
         putMessageOnQueue("componentException");

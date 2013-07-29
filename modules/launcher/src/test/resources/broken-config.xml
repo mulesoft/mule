@@ -4,5 +4,5 @@
        xsi:schemaLocation="
             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <description>Empty Mule Application</description>
+    <description>Empty Mule Application</description
 </mule>
