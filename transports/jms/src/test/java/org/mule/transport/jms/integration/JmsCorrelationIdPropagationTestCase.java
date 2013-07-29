@@ -17,6 +17,10 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -26,6 +30,7 @@ import org.junit.Test;
 public class JmsCorrelationIdPropagationTestCase extends AbstractJmsFunctionalTestCase
 {
     private final static String CUSTOM_CORRELATION_ID = "custom-cid";
+    private final static int RECEIVE_TIMEOUT = 2 * AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
 
     @Override
     protected String getConfigResources()
@@ -38,11 +43,24 @@ public class JmsCorrelationIdPropagationTestCase extends AbstractJmsFunctionalTe
     {
         MuleClient muleClient = new MuleClient(muleContext);
 
-        muleClient.dispatch("vm://in", TEST_MESSAGE, null);
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put(MuleProperties.MULE_CORRELATION_ID_PROPERTY, CUSTOM_CORRELATION_ID);
+
+        muleClient.dispatch("vm://in", TEST_MESSAGE, properties);
 
         MuleMessage response = muleClient.request("vm://out", RECEIVE_TIMEOUT);
 
         assertNotNull(response);
-        assertEquals(CUSTOM_CORRELATION_ID, response.getOutboundProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY));
+        assertEquals(getCustomCorrelationId(), response.getOutboundProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY));
+    }
+
+    /**
+     * Returns the custom correlation id.
+     *
+     * @return The custom correlation id.
+     */
+    protected String getCustomCorrelationId()
+    {
+        return CUSTOM_CORRELATION_ID;
     }
 }
