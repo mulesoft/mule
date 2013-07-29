@@ -30,6 +30,7 @@ import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.MuleApplicationClassLoaderFactory;
 import org.mule.module.launcher.application.TestApplicationFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
@@ -48,14 +49,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 {
 
-    protected static final int DEPLOYMENT_TIMEOUT = 20000;
+    protected static final int DEPLOYMENT_TIMEOUT = 10000;
     protected static final String[] NONE = new String[0];
     protected static final int ONE_HOUR_IN_MILLISECONDS = 3600000;
 
@@ -64,8 +67,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     protected MuleDeploymentService deploymentService;
     protected DeploymentListener deploymentListener;
 
-    //@Rule
-    //public SystemProperty changeChangeInterval = new SystemProperty(MuleDeploymentService.CHANGE_CHECK_INTERVAL_PROPERTY, "100");
+    @Rule
+    public SystemProperty changeChangeInterval = new SystemProperty(MuleDeploymentService.CHANGE_CHECK_INTERVAL_PROPERTY, "200");
 
     @Override
     protected void doSetUp() throws Exception
@@ -142,7 +145,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void deploysBrokenZipOnStartup() throws Exception
     {
-        addPackedAppFromResource("/overridden.properties", "brokenApp.zip");
+        addPackedAppFromResource("/broken-app.zip", "brokenApp.zip");
 
         deploymentService.start();
 
@@ -162,7 +165,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         deploymentService.start();
 
-        addPackedAppFromResource("/overridden.properties", "brokenApp.zip");
+        addPackedAppFromResource("/broken-app.zip", "brokenApp.zip");
 
         assertDeploymentFailure(deploymentListener, "brokenApp");
 
@@ -437,7 +440,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         reset(deploymentListener);
 
         File originalConfigFile = new File(appsDir + "/dummy-app", "mule-config.xml");
-        URL url = getClass().getResource("/overridden.properties");
+        URL url = getClass().getResource("/broken-config.xml");
         File newConfigFile = new File(url.toURI());
         FileUtils.copyFile(newConfigFile, originalConfigFile);
 
@@ -457,7 +460,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         reset(deploymentListener);
 
         File originalConfigFile = new File(appsDir + "/dummy-app", "mule-config.xml");
-        URL url = getClass().getResource("/overridden.properties");
+        URL url = getClass().getResource("/broken-config.xml");
         File newConfigFile = new File(url.toURI());
         FileUtils.copyFile(newConfigFile, originalConfigFile);
 
@@ -1001,7 +1004,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertDeploymentSuccess(deploymentListener, "dummy-app");
 
-        // Deploys another app to confirm that DeploymentService has execute the updater thread
+        // Redeploys a fixed version for incompleteApp
         addExplodedAppFromResource("/empty-app.zip", "incompleteApp");
 
         assertDeploymentSuccess(deploymentListener, "incompleteApp");
@@ -1246,11 +1249,21 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
      */
     private void addAppArchive(URL url, String targetFile) throws IOException
     {
-        // copy is not atomic, copy to a temp file and rename instead (rename is atomic)
-        final String tempFileName = new File((targetFile == null ? url.getFile() : targetFile) + ".part").getName();
-        final File tempFile = new File(appsDir, tempFileName);
-        FileUtils.copyURLToFile(url, tempFile);
-        tempFile.renameTo(new File(StringUtils.removeEnd(tempFile.getAbsolutePath(), ".part")));
+        ReentrantLock lock = deploymentService.getLock();
+
+        lock.lock();
+        try
+        {
+            // copy is not atomic, copy to a temp file and rename instead (rename is atomic)
+            final String tempFileName = new File((targetFile == null ? url.getFile() : targetFile) + ".part").getName();
+            final File tempFile = new File(appsDir, tempFileName);
+            FileUtils.copyURLToFile(url, tempFile);
+            tempFile.renameTo(new File(StringUtils.removeEnd(tempFile.getAbsolutePath(), ".part")));
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     private void addExplodedAppFromResource(String resource) throws IOException, URISyntaxException
@@ -1287,17 +1300,27 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
      */
     private void addExplodedApp(URL url, String appName) throws IOException, URISyntaxException
     {
-        File tempFolder = new File(muleHome, appName);
-        FileUtils.unzip(new File(url.toURI()), tempFolder);
+        ReentrantLock lock = deploymentService.getLock();
 
-        File appFolder = new File(appsDir, appName);
-
-        if (appFolder.exists())
+        lock.lock();
+        try
         {
-            FileUtils.deleteTree(appFolder);
-        }
+            File tempFolder = new File(muleHome, appName);
+            FileUtils.unzip(new File(url.toURI()), tempFolder);
 
-        FileUtils.moveDirectory(tempFolder, appFolder);
+            File appFolder = new File(appsDir, appName);
+
+            if (appFolder.exists())
+            {
+                FileUtils.deleteTree(appFolder);
+            }
+
+            FileUtils.moveDirectory(tempFolder, appFolder);
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     /**
