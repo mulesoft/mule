@@ -2,24 +2,15 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-    xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
     xsi:schemaLocation="
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
-        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd">
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
 
     <endpoint name="in" address="${inbound.destination}" exchange-pattern="one-way" connector-ref="jmsConnector" />
     <endpoint name="out" address="${outbound.destination}" exchange-pattern="one-way" connector-ref="jmsConnector"/>
 
     <flow name="sendToQueueIn">
         <vm:inbound-endpoint path="in" exchange-pattern="one-way" />
-        <script:component>
-            <script:script engine="groovy">
-                import org.mule.api.config.MuleProperties;
-
-                message.setOutboundProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, "custom-cid");
-            </script:script>
-        </script:component>
         <outbound-endpoint ref="in" />
     </flow>
 
