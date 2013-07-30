@@ -266,21 +266,29 @@ public class MuleDeploymentService implements DeploymentService
     {
         stopAppDirMonitorTimer();
 
-        // tear down apps in reverse order
-        Collections.reverse(applications);
-        for (Application application : applications)
+        lock.lock();
+        try
         {
-            try
+            // tear down apps in reverse order
+            Collections.reverse(applications);
+
+            for (Application application : applications)
             {
-                application.stop();
-                application.dispose();
-            }
-            catch (Throwable t)
-            {
-                logger.error(t);
+                try
+                {
+                    application.stop();
+                    application.dispose();
+                }
+                catch (Throwable t)
+                {
+                    logger.error(t);
+                }
             }
         }
-
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     private void stopAppDirMonitorTimer()
