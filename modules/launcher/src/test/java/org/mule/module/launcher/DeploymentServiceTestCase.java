@@ -712,11 +712,10 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void tracksAppConfigUpdateTime() throws Exception
     {
-        final URL url = getClass().getResource("/dummy-app.zip");
-        File appFolder = new File(appsDir.getPath(), "dummy-app");
-        FileUtils.unzip(new File(url.toURI()), appFolder);
+        addExplodedAppFromResource("/dummy-app.zip");
 
         // Sets a modification time in the future
+        File appFolder = new File(appsDir.getPath(), "dummy-app");
         File configFile = new File(appFolder, "mule-config.xml");
         configFile.setLastModified(System.currentTimeMillis() + ONE_HOUR_IN_MILLISECONDS);
 
@@ -854,12 +853,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         deploymentService.start();
 
-        File appDir = new File(appsDir, "incompleteApp");
-        final URL url = getClass().getResource("/incompleteApp.zip");
-        assertNotNull("Test app file not found " + url, url);
-
-        final File source = new File(url.toURI());
-        FileUtils.unzip(source, appDir);
+        addPackedAppFromResource("/incompleteApp.zip");
 
         assertDeploymentFailure(deploymentListener, "incompleteApp");
 
@@ -990,12 +984,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         deploymentService.start();
 
-        File appDir = new File(appsDir, "incompleteApp");
-        final URL url = getClass().getResource("/incompleteApp.zip");
-        assertNotNull("Test app file not found " + url, url);
-
-        final File source = new File(url.toURI());
-        FileUtils.unzip(source, appDir);
+        addPackedAppFromResource("/incompleteApp.zip");
 
         assertDeploymentFailure(deploymentListener, "incompleteApp");
 
