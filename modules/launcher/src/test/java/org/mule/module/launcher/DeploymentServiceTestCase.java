@@ -18,6 +18,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -54,6 +55,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.verification.VerificationMode;
 
 public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 {
@@ -68,7 +70,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     protected DeploymentListener deploymentListener;
 
     @Rule
-    public SystemProperty changeChangeInterval = new SystemProperty(MuleDeploymentService.CHANGE_CHECK_INTERVAL_PROPERTY, "50");
+    public SystemProperty changeChangeInterval = new SystemProperty(MuleDeploymentService.CHANGE_CHECK_INTERVAL_PROPERTY, "10");
 
     @Override
     protected void doSetUp() throws Exception
@@ -300,6 +302,24 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         String appName = URLDecoder.decode(new File(zombie.getKey().getFile()).getName(), "UTF-8");
         assertEquals("Wrong URL tagged as zombie.", "app with spaces", appName);
         assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+    }
+
+    @Test
+    public void deploysInvalidExplodedOnlyOnce() throws Exception
+    {
+        deploymentService.start();
+
+        addExplodedAppFromResource("/dummy-app.zip", "app with spaces");
+        assertDeploymentFailure(deploymentListener, "app with spaces", atLeast(1));
+
+        addExplodedAppFromResource("/dummy-app.zip");
+        assertDeploymentSuccess(deploymentListener, "dummy-app");
+
+        addExplodedAppFromResource("/empty-app.zip");
+        assertDeploymentSuccess(deploymentListener, "empty-app");
+
+        // After three update cycles should have only one deployment failure notification for the broken app
+        assertDeploymentFailure(deploymentListener, "app with spaces");
     }
 
     @Test
@@ -1127,6 +1147,11 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
     private void assertDeploymentFailure(final DeploymentListener listener, final String appName)
     {
+        assertDeploymentFailure(listener, appName, times(1));
+    }
+
+    private void assertDeploymentFailure(final DeploymentListener listener, final String appName, final VerificationMode mode)
+    {
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
         prober.check(new Probe()
         {
@@ -1134,7 +1159,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
             {
                 try
                 {
-                    verify(listener).onDeploymentFailure(eq(appName), any(Throwable.class));
+                    verify(listener, mode).onDeploymentFailure(eq(appName), any(Throwable.class));
                     return true;
                 }
                 catch (AssertionError e)
