@@ -965,7 +965,15 @@ public class FileUtils extends org.apache.commons.io.FileUtils
 
         if (isFile(url))
         {
-            timeStamp = new File(url.getFile()).lastModified();
+            try
+            {
+                String file = URLDecoder.decode(url.getFile(), "UTF-8");
+                timeStamp = new File(file).lastModified();
+            }
+            catch (UnsupportedEncodingException e)
+            {
+                // Ignore
+            }
         }
 
         return timeStamp;
