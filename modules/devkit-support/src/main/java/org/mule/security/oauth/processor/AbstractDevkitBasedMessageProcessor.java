@@ -36,9 +36,10 @@ import org.mule.transport.NullPayload;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * TODO: Move this class to a more generic package like org.mule.api.devkit on Mule 4.0
+/**
+ * Base class for Devkit generated message processors
  */
+//TODO: Move this class to a more generic package like org.mule.api.devkit on Mule 4.0
 public abstract class AbstractDevkitBasedMessageProcessor extends AbstractExpressionEvaluator
     implements FlowConstructAware, MuleContextAware, Startable, Disposable, Stoppable, Initialisable
 {

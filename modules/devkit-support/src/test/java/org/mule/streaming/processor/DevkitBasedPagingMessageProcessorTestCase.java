@@ -19,7 +19,6 @@ import org.mule.streaming.ConsumerIterator;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.RandomStringUtils;
@@ -101,25 +100,6 @@ public class DevkitBasedPagingMessageProcessorTestCase
         MuleEvent event = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
         processor.process(event);
     }
-    
-    @Test
-    public void nullDelegate() throws Exception
-    {
-        TestPagingProcessor processor = Mockito.spy(this.newProcessor());
-        Mockito.doReturn(null).when(processor).getPagingDelegate(Mockito.any(MuleEvent.class), Mockito.any(PagingConfiguration.class));
-        
-        MuleEvent event = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
-        
-        @SuppressWarnings("rawtypes")
-        ArgumentCaptor<Iterator> captor = ArgumentCaptor.forClass(Iterator.class);
-
-        processor.process(event);
-        
-        Mockito.verify(event.getMessage()).setPayload(captor.capture());
-        
-        Iterator<?> it = (Iterator<?>) captor.getValue();
-        Assert.assertFalse(it.hasNext());
-    }
 
     private class TestPagingProcessor extends AbstractDevkitBasedPageableMessageProcessor
     {
@@ -180,7 +160,7 @@ public class DevkitBasedPagingMessageProcessorTestCase
             Assert.assertEquals(config.getFetchSize(), PAGE_SIZE);
         }
     }
-    
+
     private TestPagingProcessor newProcessor()
     {
         TestPagingProcessor processor = new TestPagingProcessor();
