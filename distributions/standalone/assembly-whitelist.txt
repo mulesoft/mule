@@ -429,7 +429,7 @@
 # /lib/mule
 #
 /mule-standalone-${productVersion}/lib/mule
-/mule-standalone-${productVersion}/lib/mule/mule-common-0.14.0-SNAPSHOT.jar
+/mule-standalone-${productVersion}/lib/mule/mule-common-${productVersion}-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-core-${productVersion}-tests.jar
 /mule-standalone-${productVersion}/lib/mule/mule-core-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-annotations-${productVersion}.jar
