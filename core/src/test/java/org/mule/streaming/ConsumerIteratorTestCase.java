@@ -102,6 +102,12 @@ public class ConsumerIteratorTestCase
         consumer.close();
         Assert.assertFalse(it.hasNext());
     }
+    
+    @Test
+    public void size() throws Exception {
+        ConsumerIterator<String> it = this.newIterator();
+        Assert.assertEquals(it.size(), TOP);
+    }
 
     private ConsumerIterator<String> newIterator()
     {
