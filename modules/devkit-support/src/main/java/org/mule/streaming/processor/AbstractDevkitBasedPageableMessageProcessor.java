@@ -72,7 +72,8 @@ public abstract class AbstractDevkitBasedPageableMessageProcessor extends Abstra
      * 
      * @return a {@link MuleEvent}
      * @throws IllegalArgumentException is firstPage is lower than zero or if
-     *             lastPage is lower than zero and firstPage
+     *             lastPage is lower than zero and firstPage or if fetchSize is lower
+     *             than zero
      */
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -122,6 +123,11 @@ public abstract class AbstractDevkitBasedPageableMessageProcessor extends Abstra
 
     private PagingConfiguration makeConfiguration()
     {
+        if (this.fetchSize <= 0)
+        {
+            throw new IllegalArgumentException("Fetch size cannot be lower than zero");
+        }
+
         if (this.firstPage < 0)
         {
             throw new IllegalArgumentException("First page index cannot be lower than zero");

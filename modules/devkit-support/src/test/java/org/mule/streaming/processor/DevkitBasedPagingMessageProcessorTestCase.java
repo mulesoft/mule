@@ -10,6 +10,7 @@
 
 package org.mule.streaming.processor;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.streaming.PagingConfiguration;
@@ -98,7 +99,7 @@ public class DevkitBasedPagingMessageProcessorTestCase
         Mockito.doReturn(null)
             .when(processor)
             .getPagingDelegate(Mockito.any(MuleEvent.class), Mockito.any(PagingConfiguration.class));
-        
+
         MuleEvent event = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
         processor.process(event);
     }
@@ -108,6 +109,37 @@ public class DevkitBasedPagingMessageProcessorTestCase
     {
         TestPagingProcessor processor = this.newProcessor();
         processor.setOutputUnit(null);
+
+        MuleEvent event = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
+        processor.process(event);
+    }
+
+    @Test(expected = MessagingException.class)
+    public void invalidFetchSize() throws Exception
+    {
+        TestPagingProcessor processor = this.newProcessor();
+        processor.setFetchSize(0);
+
+        MuleEvent event = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
+        processor.process(event);
+    }
+    
+    @Test(expected = MessagingException.class)
+    public void invalidFirstPage() throws Exception
+    {
+        TestPagingProcessor processor = this.newProcessor();
+        processor.setFirstPage(-1);
+
+        MuleEvent event = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
+        processor.process(event);
+    }
+    
+    @Test(expected = MessagingException.class)
+    public void invalidLastPage() throws Exception
+    {
+        TestPagingProcessor processor = this.newProcessor();
+        processor.setFirstPage(10);
+        processor.setLastPage(8);
 
         MuleEvent event = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
         processor.process(event);
