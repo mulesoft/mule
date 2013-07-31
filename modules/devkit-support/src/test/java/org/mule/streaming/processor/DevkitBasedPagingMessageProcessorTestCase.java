@@ -92,6 +92,18 @@ public class DevkitBasedPagingMessageProcessorTestCase
     }
 
     @Test(expected = MuleException.class)
+    public void nullDelegate() throws Exception
+    {
+        TestPagingProcessor processor = Mockito.spy(this.newProcessor());
+        Mockito.doReturn(null)
+            .when(processor)
+            .getPagingDelegate(Mockito.any(MuleEvent.class), Mockito.any(PagingConfiguration.class));
+        
+        MuleEvent event = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
+        processor.process(event);
+    }
+
+    @Test(expected = MuleException.class)
     public void nullPagingStrategy() throws Exception
     {
         TestPagingProcessor processor = this.newProcessor();

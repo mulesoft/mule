@@ -11,14 +11,29 @@
 package org.mule.api.streaming;
 
 /**
- * 
+ * Inmutable pojo to carry pagination parameters
  */
 public class PagingConfiguration
 {
 
+    /**
+     * The amount of items to fetch on each invocation to the data source
+     */
     private int fetchSize;
+    
+    /**
+     * Zero-based index of the first page to be returned
+     */
     private int firstPage;
+    
+    /**
+     * Zero-based index of the top page to be returned. -1 means do not limit
+     */
     private int lastPage;
+    
+    /**
+     * Specifies whether to iterate through each individual element or whole pages of fetchSize elements
+     */
     private StreamingOutputUnit outputUnit;
 
     public PagingConfiguration(int fetchSize, int firstPage, int lastPage, StreamingOutputUnit outputUnit)
