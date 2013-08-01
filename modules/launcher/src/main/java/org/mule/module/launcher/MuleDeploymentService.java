@@ -362,7 +362,15 @@ public class MuleDeploymentService implements DeploymentService
 
     protected void onApplicationInstalled(Application a)
     {
-        applications.add(a);
+        trackApplication(a);
+    }
+
+    private void trackApplication(Application application)
+    {
+        Application previousApplication = findApplication(application.getAppName());
+        applications.remove(previousApplication);
+
+        applications.add(application);
     }
 
     protected void undeploy(Application app)
@@ -405,7 +413,7 @@ public class MuleDeploymentService implements DeploymentService
             try
             {
                 application = guardedInstallFrom(appArchiveUrl);
-                applications.add(application);
+                trackApplication(application);
             }
             catch (Throwable t)
             {
