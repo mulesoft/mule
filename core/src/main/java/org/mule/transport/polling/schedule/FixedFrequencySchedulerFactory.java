@@ -1,10 +1,18 @@
+/*
+ * $Id\$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
 package org.mule.transport.polling.schedule;
 
 
-import static org.mule.transport.polling.PollingMessageSource.schedulerNameOf;
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.schedule.SchedulerFactory;
-import org.mule.transport.polling.PollingMessageSource;
 
 import java.util.concurrent.TimeUnit;
 
@@ -15,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @since 3.5.0
  */
-public class FixedFrequencySchedulerFactory extends SchedulerFactory<PollingMessageSource>
+public class FixedFrequencySchedulerFactory extends SchedulerFactory<Runnable>
 {
 
     /**
@@ -35,17 +43,10 @@ public class FixedFrequencySchedulerFactory extends SchedulerFactory<PollingMess
 
 
     @Override
-    protected Scheduler doCreate(String name, final PollingMessageSource job)
+    protected Scheduler doCreate(String name, final Runnable job)
     {
         FixedFrequencyScheduler fixedFrequencyScheduler = new FixedFrequencyScheduler(name,
-                                                                                      frequency, startDelay, new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                job.run();
-            }
-        }, timeUnit);
+                                                                                      frequency, startDelay, job, timeUnit);
         return fixedFrequencyScheduler;
     }
 

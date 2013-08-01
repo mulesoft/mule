@@ -99,8 +99,6 @@ public abstract class SchedulerFactory<T> implements MuleContextAware
             return scheduler;
         }
 
-        scheduler = runInnerPostProcessors(scheduler);
-
         Map<String, SchedulerFactoryPostProcessor> postProcessors = context.getRegistry()
                 .lookupByType(SchedulerFactoryPostProcessor.class);
         for (SchedulerFactoryPostProcessor postProcessor : postProcessors.values())
@@ -108,6 +106,8 @@ public abstract class SchedulerFactory<T> implements MuleContextAware
             scheduler = postProcessor.process(scheduler);
             checkNull(scheduler);
         }
+
+        scheduler = runInnerPostProcessors(scheduler);
 
         registerScheduler(scheduler);
 

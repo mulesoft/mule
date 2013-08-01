@@ -1,3 +1,13 @@
+/*
+ * $Id\$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
 package org.mule.test.integration.schedule;
 
 
@@ -12,6 +22,8 @@ import org.junit.Test;
 /**
  * This test checks that a Scheduler can be stopped, executed and started. Also shows how a customer can set his own
  * scheduler in mule config.
+ *
+ * It also shows the way users can add a new Scheduler as a spring bean.
  */
 public class RunningScheduleTestCase extends FunctionalTestCase
 {

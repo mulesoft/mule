@@ -1419,5 +1419,9 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 347, flowName);
     }
 
+    public static Message wrongMessageSource(String endpoint)
+    {
+        return factory.createMessage(BUNDLE_PATH, 348, endpoint);
+    }
 
 }

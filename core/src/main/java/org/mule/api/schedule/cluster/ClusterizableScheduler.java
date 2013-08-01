@@ -24,7 +24,7 @@ import org.mule.api.schedule.Scheduler;
  *
  * @since 3.5.0
  */
-public interface ClusterizableScheduler extends Scheduler
+public interface ClusterizableScheduler<T> extends Scheduler<T>
 {
 
 }

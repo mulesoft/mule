@@ -25,7 +25,7 @@ import org.mule.lifecycle.PrimaryNodeLifecycleNotificationListener;
  *
  * @since 3.5.0
  */
-public class ClusterizableSchedulerWrapper implements Scheduler
+public class ClusterizableSchedulerWrapper<T> implements Scheduler<T>
 {
 
     /**
@@ -36,14 +36,14 @@ public class ClusterizableSchedulerWrapper implements Scheduler
     /**
      * <p>The {@link ClusterizableScheduler} that is wrapped</p>
      */
-    private final ClusterizableScheduler delegateScheduler;
+    private final ClusterizableScheduler<T> delegateScheduler;
 
     /**
      * <p>The Primary node listener</p>
      */
     private PrimaryNodeLifecycleNotificationListener listener;
 
-    public ClusterizableSchedulerWrapper(MuleContext muleContext, ClusterizableScheduler delegateScheduler)
+    public ClusterizableSchedulerWrapper(MuleContext muleContext, ClusterizableScheduler<T> delegateScheduler)
     {
         this.muleContext = muleContext;
         this.delegateScheduler = delegateScheduler;
@@ -53,6 +53,12 @@ public class ClusterizableSchedulerWrapper implements Scheduler
     public void schedule() throws Exception
     {
         delegateScheduler.schedule();
+    }
+
+    @Override
+    public T getJob()
+    {
+        return delegateScheduler.getJob();
     }
 
     @Override

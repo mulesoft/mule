@@ -1,3 +1,13 @@
+/*
+ * $Id\$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
 package org.mule.transport.polling.schedule;
 
 import org.mule.api.MuleException;
@@ -11,7 +21,6 @@ import org.mule.lifecycle.SimpleLifecycleManager;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
@@ -28,7 +37,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @since 3.5.0
  */
-public class FixedFrequencyScheduler implements ClusterizableScheduler
+public class FixedFrequencyScheduler implements ClusterizableScheduler<Runnable>
 {
 
     protected transient Log logger = LogFactory.getLog(getClass());
@@ -174,6 +183,12 @@ public class FixedFrequencyScheduler implements ClusterizableScheduler
 
     }
 
+    @Override
+    public Runnable getJob()
+    {
+        return job;
+    }
+
     /**
      * <p>
      * Checks that the {@link FixedFrequencyScheduler#automaticExecutor} is terminated and, if not, it terminates the
@@ -241,6 +256,7 @@ public class FixedFrequencyScheduler implements ClusterizableScheduler
     {
         return !lifecycleManager.getState().isStarted() && !lifecycleManager.getState().isStarting();
     }
+
 
 
 }

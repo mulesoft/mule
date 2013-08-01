@@ -22,68 +22,21 @@ import org.mule.transport.AbstractConnector;
 import org.mule.transport.polling.MessageProcessorPollingMessageReceiver;
 import org.mule.transport.polling.MessageProcessorPollingOverride;
 
-import sun.net.ProgressMeteringPolicy;
+import org.mule.transport.polling.schedule.FixedFrequencySchedulerFactory;
 
-import org.mule.transport.polling.PollingMessageSource;
-
-@Deprecated
 public class PollingMessageSourceFactoryBean extends InboundEndpointFactoryBean
 {
-
-    public static final String DISABLE_POLL_SCHEDULER = "disable.poll.scheduler";
-
-    protected SchedulerFactory<PollingMessageSource> schedulerFactory;
-
+    protected SchedulerFactory<Runnable> schedulerFactory;
     protected MessageProcessor messageProcessor;
     protected MessageProcessorPollingOverride override;
     protected Long frequency;
 
-    /**
-     * <p>
-     * Kept for backward compatibility. If the compatibility check for poll is enabled then it creates the poll based
-     * on the old poll implementation. If not then it creates poll with the new implementations (delegating the creation
-     * to {@link PollingSchedulerMessageSourceFactoryBean}
-     * </p>
-     * TODO: Remove this for 4.0.0 and use {@link PollingSchedulerMessageSourceFactoryBean} instead.
-     */
-    @Override
-    public Object getObject() throws Exception
+    private FixedFrequencySchedulerFactory defaultSchedulerFactory()
     {
-        if (isSchedulerFeatureDisabled())
-        {
-            return super.getObject();
-        }
-        else
-        {
-            PollingSchedulerMessageSourceFactoryBean factoryBean = new PollingSchedulerMessageSourceFactoryBean();
-            factoryBean.setFrequency(frequency);
-            factoryBean.setMessageProcessor(messageProcessor);
-            factoryBean.setSchedulerFactory(schedulerFactory);
-            factoryBean.setMuleContext(muleContext);
-            factoryBean.setOverride(override);
-
-            return factoryBean.getObject();
-
-        }
-    }
-
-    @Override
-    public Class<?> getObjectType()
-    {
-        if (isSchedulerFeatureDisabled())
-        {
-            return super.getObjectType();
-        }
-        else
-        {
-            return PollingMessageSource.class;
-
-        }
-    }
-
-    private Boolean isSchedulerFeatureDisabled()
-    {
-        return Boolean.valueOf(System.getProperty(DISABLE_POLL_SCHEDULER, "false"));
+        FixedFrequencySchedulerFactory factory = new FixedFrequencySchedulerFactory();
+        factory.setFrequency(frequency);
+        factory.setMuleContext(muleContext);
+        return factory;
     }
 
     @Override
@@ -94,6 +47,7 @@ public class PollingMessageSourceFactoryBean extends InboundEndpointFactoryBean
         properties.put(MessageProcessorPollingMessageReceiver.SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME, messageProcessor);
         properties.put(MessageProcessorPollingMessageReceiver.POLL_OVERRIDE_PROPERTY_NAME, override);
         properties.put(AbstractConnector.PROPERTY_POLLING_FREQUENCY, frequency);
+        properties.put("scheduler", schedulerFactory == null ? defaultSchedulerFactory() : schedulerFactory);
 
         EndpointFactory ef = muleContext.getEndpointFactory();
         if (ef != null)
@@ -122,7 +76,7 @@ public class PollingMessageSourceFactoryBean extends InboundEndpointFactoryBean
         this.frequency = frequency;
     }
 
-    public void setSchedulerFactory(SchedulerFactory<PollingMessageSource> schedulerFactory)
+    public void setSchedulerFactory(SchedulerFactory<Runnable> schedulerFactory)
     {
         this.schedulerFactory = schedulerFactory;
     }

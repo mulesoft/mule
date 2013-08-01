@@ -1,3 +1,13 @@
+/*
+ * $Id\$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
 package org.mule.test.integration.schedule;
 
 import org.mule.api.MuleException;
@@ -11,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.beans.factory.BeanNameAware;
 
-public class MockScheduler implements Scheduler, BeanNameAware
+public class MockScheduler implements Scheduler<Runnable>, BeanNameAware
 {
 
     private AtomicInteger count = new AtomicInteger(0);
@@ -23,6 +33,12 @@ public class MockScheduler implements Scheduler, BeanNameAware
     public void schedule() throws Exception
     {
         task.run();
+    }
+
+    @Override
+    public Runnable getJob()
+    {
+        return task;
     }
 
     @Override
