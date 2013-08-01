@@ -11,19 +11,24 @@
 package org.mule.streaming.processor;
 
 import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.streaming.PagingConfiguration;
 import org.mule.api.streaming.PagingDelegate;
 import org.mule.api.streaming.StreamingOutputUnit;
+import org.mule.api.transformer.TransformerException;
+import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.streaming.ConsumerIterator;
 import org.mule.tck.size.SmallTest;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -32,18 +37,27 @@ import org.mockito.Mockito;
 public class DevkitBasedPagingMessageProcessorTestCase
 {
 
-    private static final int PAGE_SIZE = 100;
+    private static final String PAGE_SIZE = "100";
     private static final int TOP = 1000;
-    private static final int FIRST_PAGE = 0;
-    private static final int LAST_PAGE = 10;
+    private static final String FIRST_PAGE = "0";
+    private static final String LAST_PAGE = "10";
+
+    private MuleEvent event;
+    private MuleContext muleContext;
+
+    @Before
+    public void setUp()
+    {
+        this.muleContext = Mockito.mock(MuleContext.class, Mockito.RETURNS_DEEP_STUBS);
+        this.event = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
+        Mockito.when(this.event.getMuleContext()).thenReturn(this.muleContext);
+    }
 
     @Test
     public void elementBasedIteratior() throws Exception
     {
         TestPagingProcessor processor = this.newProcessor();
         processor.setOutputUnit(StreamingOutputUnit.ELEMENT);
-
-        MuleEvent event = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
 
         @SuppressWarnings("rawtypes")
         ArgumentCaptor<ConsumerIterator> captor = ArgumentCaptor.forClass(ConsumerIterator.class);
@@ -70,8 +84,6 @@ public class DevkitBasedPagingMessageProcessorTestCase
         TestPagingProcessor processor = this.newProcessor();
         processor.setOutputUnit(StreamingOutputUnit.PAGE);
 
-        MuleEvent event = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
-
         @SuppressWarnings("rawtypes")
         ArgumentCaptor<ConsumerIterator> captor = ArgumentCaptor.forClass(ConsumerIterator.class);
 
@@ -82,11 +94,12 @@ public class DevkitBasedPagingMessageProcessorTestCase
         @SuppressWarnings("unchecked")
         ConsumerIterator<List<String>> it = (ConsumerIterator<List<String>>) captor.getValue();
 
-        for (int i = 0; i < TOP / PAGE_SIZE; i++)
+        int pageSize = Integer.valueOf(PAGE_SIZE);
+        for (int i = 0; i < TOP / pageSize; i++)
         {
             Assert.assertTrue(it.hasNext());
             List<String> page = it.next();
-            Assert.assertTrue(page != null && page.size() == PAGE_SIZE);
+            Assert.assertTrue(page != null && page.size() == pageSize);
         }
 
         Assert.assertFalse(it.hasNext());
@@ -100,7 +113,6 @@ public class DevkitBasedPagingMessageProcessorTestCase
             .when(processor)
             .getPagingDelegate(Mockito.any(MuleEvent.class), Mockito.any(PagingConfiguration.class));
 
-        MuleEvent event = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
         processor.process(event);
     }
 
@@ -110,7 +122,6 @@ public class DevkitBasedPagingMessageProcessorTestCase
         TestPagingProcessor processor = this.newProcessor();
         processor.setOutputUnit(null);
 
-        MuleEvent event = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
         processor.process(event);
     }
 
@@ -118,30 +129,27 @@ public class DevkitBasedPagingMessageProcessorTestCase
     public void invalidFetchSize() throws Exception
     {
         TestPagingProcessor processor = this.newProcessor();
-        processor.setFetchSize(0);
+        processor.setFetchSize("0");
 
-        MuleEvent event = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
         processor.process(event);
     }
-    
+
     @Test(expected = MessagingException.class)
     public void invalidFirstPage() throws Exception
     {
         TestPagingProcessor processor = this.newProcessor();
-        processor.setFirstPage(-1);
+        processor.setFirstPage("-1");
 
-        MuleEvent event = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
         processor.process(event);
     }
-    
+
     @Test(expected = MessagingException.class)
     public void invalidLastPage() throws Exception
     {
         TestPagingProcessor processor = this.newProcessor();
-        processor.setFirstPage(10);
-        processor.setLastPage(8);
+        processor.setFirstPage("10");
+        processor.setLastPage("8");
 
-        MuleEvent event = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
         processor.process(event);
     }
 
@@ -172,7 +180,7 @@ public class DevkitBasedPagingMessageProcessorTestCase
                     if (counter < TOP)
                     {
                         List<String> page = new ArrayList<String>(100);
-                        for (int i = 0; i < PAGE_SIZE; i++)
+                        for (int i = 0; i < Integer.valueOf(PAGE_SIZE); i++)
                         {
                             counter++;
                             String value = RandomStringUtils.randomAlphabetic(5000);
@@ -199,15 +207,34 @@ public class DevkitBasedPagingMessageProcessorTestCase
 
         private void assertPagingConfiguration(PagingConfiguration config)
         {
-            Assert.assertEquals(config.getLastPage(), LAST_PAGE);
-            Assert.assertEquals(config.getFirstPage(), FIRST_PAGE);
-            Assert.assertEquals(config.getFetchSize(), PAGE_SIZE);
+            Assert.assertEquals(config.getLastPage(), Integer.valueOf(LAST_PAGE).intValue());
+            Assert.assertEquals(config.getFirstPage(), Integer.valueOf(FIRST_PAGE).intValue());
+            Assert.assertEquals(config.getFetchSize(), Integer.valueOf(PAGE_SIZE).intValue());
+        }
+
+        @Override
+        protected Object evaluateAndTransform(MuleContext muleContext,
+                                              MuleEvent event,
+                                              Type expectedType,
+                                              String expectedMimeType,
+                                              Object source)
+            throws TransformerException, TransformerMessagingException
+        {
+            if (Integer.class.equals(expectedType) && source instanceof String)
+            {
+                return Integer.valueOf((String) source);
+            }
+            else
+            {
+                return super.evaluateAndTransform(muleContext, event, expectedType, expectedMimeType, source);
+            }
         }
     }
 
     private TestPagingProcessor newProcessor()
     {
         TestPagingProcessor processor = new TestPagingProcessor();
+        processor.setMuleContext(this.muleContext);
         processor.setOutputUnit(StreamingOutputUnit.ELEMENT);
         processor.setFetchSize(PAGE_SIZE);
         processor.setFirstPage(FIRST_PAGE);

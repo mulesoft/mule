@@ -12,6 +12,7 @@ package org.mule.streaming.processor;
 
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.streaming.Consumer;
 import org.mule.api.streaming.PagingConfiguration;
 import org.mule.api.streaming.PagingDelegate;
@@ -43,19 +44,19 @@ public abstract class AbstractDevkitBasedPageableMessageProcessor extends Abstra
     /**
      * The number of elements to obtain on each invocation to the data source
      */
-    private int fetchSize;
+    private String fetchSize;
 
     /**
      * Zero-based index of the first page to return. This value has to be equals or
      * greater than zero
      */
-    private int firstPage;
+    private String firstPage;
 
     /**
      * Zero-based index of the last page to return. -1 means no limit. If not -1,
      * then it cannot be lower than {@link firstPage}
      */
-    private int lastPage;
+    private String lastPage;
 
     public AbstractDevkitBasedPageableMessageProcessor(String operationName)
     {
@@ -79,7 +80,7 @@ public abstract class AbstractDevkitBasedPageableMessageProcessor extends Abstra
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected final MuleEvent doProcess(MuleEvent event) throws Exception
     {
-        PagingDelegate<?> delegate = this.getPagingDelegate(event, this.makeConfiguration());
+        PagingDelegate<?> delegate = this.getPagingDelegate(event, this.makeConfiguration(event));
 
         if (delegate == null)
         {
@@ -121,24 +122,41 @@ public abstract class AbstractDevkitBasedPageableMessageProcessor extends Abstra
                                                            PagingConfiguration pagingConfiguration)
         throws Exception;
 
-    private PagingConfiguration makeConfiguration()
+    private PagingConfiguration makeConfiguration(MuleEvent event) throws MuleException
     {
-        if (this.fetchSize <= 0)
+        int transformedFetchSize = this.toInt(event, this.fetchSize);
+        int transformedFirstPage = this.toInt(event, this.firstPage);
+        int transformedLastPage = this.toInt(event, this.lastPage);
+
+        if (transformedFetchSize <= 0)
         {
             throw new IllegalArgumentException("Fetch size cannot be lower than zero");
         }
 
-        if (this.firstPage < 0)
+        if (transformedFirstPage < 0)
         {
             throw new IllegalArgumentException("First page index cannot be lower than zero");
         }
 
-        if (this.lastPage > -1 && this.lastPage < this.firstPage)
+        if (transformedLastPage > -1 && transformedLastPage < transformedFirstPage)
         {
             throw new IllegalArgumentException("Last page index cannot be lower than first page index");
         }
 
-        return new PagingConfiguration(this.fetchSize, this.firstPage, this.lastPage, this.outputUnit);
+        return new PagingConfiguration(transformedFetchSize, transformedFirstPage, transformedLastPage,
+            this.outputUnit);
+    }
+
+    private int toInt(MuleEvent event, Object source) throws MuleException
+    {
+        try
+        {
+            return (Integer) this.evaluateAndTransform(muleContext, event, Integer.class, null, source);
+        }
+        catch (Exception e)
+        {
+            throw new DefaultMuleException("Error evaluating paging expressions " + source, e);
+        }
     }
 
     public void setOutputUnit(StreamingOutputUnit outputUnit)
@@ -146,17 +164,17 @@ public abstract class AbstractDevkitBasedPageableMessageProcessor extends Abstra
         this.outputUnit = outputUnit;
     }
 
-    public void setFetchSize(int fetchSize)
+    public void setFetchSize(String fetchSize)
     {
         this.fetchSize = fetchSize;
     }
 
-    public void setFirstPage(int firstPage)
+    public void setFirstPage(String firstPage)
     {
         this.firstPage = firstPage;
     }
 
-    public void setLastPage(int lastPage)
+    public void setLastPage(String lastPage)
     {
         this.lastPage = lastPage;
     }
