@@ -139,7 +139,7 @@
         <dependency>
             <groupId>org.mule.common</groupId>
             <artifactId>mule-common</artifactId>
-            <version>3.4.1-RC3</version>
+            <version>3.4.1</version>
         </dependency>
 
         <!-- test dependencies -->
