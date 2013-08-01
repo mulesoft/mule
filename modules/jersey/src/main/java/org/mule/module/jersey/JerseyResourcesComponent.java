@@ -228,13 +228,12 @@ public class JerseyResourcesComponent extends AbstractComponent
         setComponents(javaComponents);
     }
 
-    public void setExceptionMapper(ExceptionMapper<?> exceptionMapper)
-    {
-        exceptionMappers.add(exceptionMapper);
+    public void setExceptionMappers(List<ExceptionMapper<?>> exceptionMappers ) {
+       this.exceptionMappers.addAll(exceptionMappers);
     }
 
-    public void setContextResolver(ContextResolver<?> contextResolver)
-    {
-       contextResolvers.add(contextResolver);
+    public void setContextResolvers(List<ContextResolver<?>> contextResolvers ) {
+        this.contextResolvers.addAll(contextResolvers);
     }
+
 }
