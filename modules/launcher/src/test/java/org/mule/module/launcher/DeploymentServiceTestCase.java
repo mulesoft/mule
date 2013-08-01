@@ -502,8 +502,13 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         URL url = getClass().getResource("/empty-config.xml");
         File newConfigFile = new File(url.toURI());
         FileUtils.copyFile(newConfigFile, originalConfigFile);
-
         assertDeploymentSuccess(deploymentListener, "incompleteApp");
+
+        addPackedAppFromResource("/dummy-app.zip");
+        assertDeploymentSuccess(deploymentListener, "dummy-app");
+
+        // Check that the failed application folder is still there
+        assertAppFolderIsMaintained("incompleteApp");
     }
 
     @Test
@@ -524,6 +529,12 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         FileUtils.copyFile(newConfigFile, originalConfigFile);
 
         assertDeploymentSuccess(deploymentListener, "incompleteApp");
+
+        addPackedAppFromResource("/dummy-app.zip");
+        assertDeploymentSuccess(deploymentListener, "dummy-app");
+
+        // Check that the failed application folder is still there
+        assertAppFolderIsMaintained("incompleteApp");
     }
 
 
@@ -867,6 +878,34 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         final Map.Entry<URL, Long> zombie = deploymentService.getZombieMap().entrySet().iterator().next();
         assertEquals("Wrong URL tagged as zombie.", "incompleteApp", new File(zombie.getKey().getFile()).getParentFile().getName());
     }
+
+    //@Test
+    //public void redeploysOkAfterIncompleteZipAppOnStartupWhenConfigIsUpdated() throws Exception
+    //{
+    //    addPackedAppFromResource("/incompleteApp.zip");
+    //
+    //    deploymentService.start();
+    //
+    //    assertDeploymentFailure(deploymentListener, "incompleteApp");
+    //
+    //
+    //    File originalConfigFile = new File(appsDir + "/incompleteApp", "mule-config.xml");
+    //    URL url = getClass().getResource("/empty-config.xml");
+    //    File newConfigFile = new File(url.toURI());
+    //    FileUtils.copyFile(newConfigFile, originalConfigFile);
+    //
+    //
+    //
+    //    // Deploys another app to confirm that DeploymentService has execute the updater thread
+    //    addPackedAppFromResource("/dummy-app.zip");
+    //
+    //    assertDeploymentSuccess(deploymentListener, "dummy-app");
+    //
+    //    // Check that the failed application folder is still there
+    //    assertAppFolderIsMaintained("broken-xml-app");
+    //    final Map.Entry<URL, Long> zombie = deploymentService.getZombieMap().entrySet().iterator().next();
+    //    assertEquals("Wrong URL tagged as zombie.", "incompleteApp", new File(zombie.getKey().getFile()).getParentFile().getName());
+    //}
 
     @Test
     public void mantainsAppFolderOnExplodedAppDeploymentError() throws Exception
