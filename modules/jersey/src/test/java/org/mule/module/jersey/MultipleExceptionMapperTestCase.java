@@ -27,10 +27,10 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class MultipleContextResolverTestCase extends AbstractServiceAndFlowTestCase
+public class MultipleExceptionMapperTestCase extends AbstractServiceAndFlowTestCase
 {
-    public MultipleContextResolverTestCase(ConfigVariant variant, String configResources)
-    {
+
+    public MultipleExceptionMapperTestCase(ConfigVariant variant, String configResources) {
         super(variant, configResources);
     }
 
@@ -38,28 +38,34 @@ public class MultipleContextResolverTestCase extends AbstractServiceAndFlowTestC
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "multiple-context-resolver-conf-flow.xml"},
+                {ConfigVariant.SERVICE, "multiple-exception-mapper-conf-flow.xml"},
         });
-    }      
-    
-
+    }
 
     @Test
     @Ignore
-    public void testMultipleContextResolver() throws Exception
+    public void testBeanBadRequestException() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+        Map<String, String> props = new HashMap<String, String>();
+        props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
+        MuleMessage result = client.send("http://localhost:63081/helloworld/throwBadRequestException", "", props);
+        assertEquals((Integer)400, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
+
+    }
+
+    @Test
+    @Ignore
+    public void testHelloWorlException() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
 
         Map<String, String> props = new HashMap<String, String>();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
-        MuleMessage result = client.send("http://localhost:63081/helloworld/sayHelloWorldWithJson", "", props);
-        assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
-        assertEquals(getHelloWorldMessage(), result.getPayloadAsString());
+        MuleMessage result = client.send("http://localhost:63081/helloworld/throwException", "", props);
+        assertEquals( (Integer)503, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
+
     }
 
-
-    private String getHelloWorldMessage () {
-        return "{\"message\":\"Hello World \",\"number\":0}";
-    }
 
 }
