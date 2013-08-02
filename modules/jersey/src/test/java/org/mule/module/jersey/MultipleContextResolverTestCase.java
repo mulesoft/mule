@@ -45,7 +45,7 @@ public class MultipleContextResolverTestCase extends AbstractServiceAndFlowTestC
 
 
     @Test
-    @Ignore
+
     public void testMultipleContextResolver() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

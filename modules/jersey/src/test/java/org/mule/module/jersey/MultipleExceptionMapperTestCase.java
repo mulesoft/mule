@@ -43,7 +43,7 @@ public class MultipleExceptionMapperTestCase extends AbstractServiceAndFlowTestC
     }
 
     @Test
-    @Ignore
+
     public void testBeanBadRequestException() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -55,7 +55,6 @@ public class MultipleExceptionMapperTestCase extends AbstractServiceAndFlowTestC
     }
 
     @Test
-    @Ignore
     public void testHelloWorlException() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
