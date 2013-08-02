@@ -10,6 +10,8 @@
 
 package org.mule.module.jersey.exception;
 
+import org.mule.transformer.types.MimeTypes;
+
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
@@ -18,6 +20,6 @@ public class BeanBadRequestExceptionMapper implements ExceptionMapper<BeanBadReq
     public Response toResponse(BeanBadRequestException exception)
     {
         int status = Response.Status.BAD_REQUEST.getStatusCode();
-        return Response.status(status).entity(exception.getMessage()).type("text/plain").build();
+        return Response.status(status).entity(exception.getMessage()).type(MimeTypes.TEXT).build();
     }
 }
