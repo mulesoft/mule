@@ -20,6 +20,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.mule.module.jersey.exception.BeanBadRequestException;
 import org.mule.module.jersey.exception.HelloWorldException;
 
 @Path("/helloworld")
@@ -80,4 +81,22 @@ public class HelloWorldResource
     {
         throw new HelloWorldException("This is an exception");
     }
+
+    @GET
+    @Produces("application/json")
+    @Path("/sayHelloWorldWithJson")
+    public HelloWorld sayHelloWorldWithJson()
+    {
+        HelloWorld hello = new HelloWorld();
+        hello.setMessage("Hello World ");
+        return hello;
+    }
+
+    @GET
+    @Produces("text/plain")
+    @Path("/throwBadRequestException")
+    public HelloWorld throwHelloBeanException() throws BeanBadRequestException {
+        throw  new BeanBadRequestException("beans are rotten");
+    }
+
 }
