@@ -11,8 +11,6 @@
 package org.mule.config.spring.factories;
 
 import org.mule.api.config.ConfigurationException;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.schedule.SchedulerFactory;
@@ -21,7 +19,6 @@ import org.mule.endpoint.URIBuilder;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.polling.MessageProcessorPollingMessageReceiver;
 import org.mule.transport.polling.MessageProcessorPollingOverride;
-
 import org.mule.transport.polling.schedule.FixedFrequencySchedulerFactory;
 
 public class PollingMessageSourceFactoryBean extends InboundEndpointFactoryBean
@@ -46,8 +43,8 @@ public class PollingMessageSourceFactoryBean extends InboundEndpointFactoryBean
 
         properties.put(MessageProcessorPollingMessageReceiver.SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME, messageProcessor);
         properties.put(MessageProcessorPollingMessageReceiver.POLL_OVERRIDE_PROPERTY_NAME, override);
+        properties.put(MessageProcessorPollingMessageReceiver.SCHEDULER_FACTORY_PROPERTY_NAME, schedulerFactory == null ? defaultSchedulerFactory() : schedulerFactory);
         properties.put(AbstractConnector.PROPERTY_POLLING_FREQUENCY, frequency);
-        properties.put("scheduler", schedulerFactory == null ? defaultSchedulerFactory() : schedulerFactory);
 
         EndpointFactory ef = muleContext.getEndpointFactory();
         if (ef != null)
