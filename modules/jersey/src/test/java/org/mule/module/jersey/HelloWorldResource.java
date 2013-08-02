@@ -80,4 +80,14 @@ public class HelloWorldResource
     {
         throw new HelloWorldException("This is an exception");
     }
+
+    @GET
+    @Produces("application/json")
+    @Path("/sayHelloWorldWithJson")
+    public HelloWorld sayHelloWorldWithJson()
+    {
+        HelloWorld hello = new HelloWorld();
+        hello.setMessage("Hello World ");
+        return hello;
+    }
 }
