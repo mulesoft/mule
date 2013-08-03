@@ -11,7 +11,6 @@
 package org.mule.security.oauth;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -89,6 +88,8 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
 
     private HttpUtil httpUtil;
     private OAuthResponseParser oauthResponseParser;
+    
+    private String defaultAccessTokenId;
 
     /**
      * @return the logger to be used when logging messages.
@@ -928,5 +929,16 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     public void setOnNoTokenPolicy(OnNoTokenPolicy policy)
     {
         this.defaultUnauthorizedConnector.setOnNoTokenPolicy(policy);
+    }
+    
+    @Override
+    public String getDefaultAccessTokenId()
+    {
+        return this.defaultAccessTokenId;
+    }
+    
+    public void setDefaultAccessTokenId(String defaultAccessTokenId)
+    {
+        this.defaultAccessTokenId = defaultAccessTokenId;
     }
 }

@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import org.springframework.util.StringUtils;
+
 public abstract class AbstractExpressionEvaluator
 {
 
@@ -517,12 +519,20 @@ public abstract class AbstractExpressionEvaluator
 
         if (accessTokenId == null)
         {
-            accessTokenId = oauthManager.getDefaultUnauthorizedConnector().getName();
+            if (oauthManager.getDefaultAccessTokenId() != null)
+            {
+                accessTokenId = oauthManager.getDefaultAccessTokenId();
+            }
+            else
+            {
+                accessTokenId = oauthManager.getDefaultUnauthorizedConnector().getName();
+            }
         }
 
         try
         {
-            return (String) this.evaluateAndTransform(event.getMuleContext(), event, String.class, null, accessTokenId);
+            return (String) this.evaluateAndTransform(event.getMuleContext(), event, String.class, null,
+                accessTokenId);
         }
         catch (Exception e)
         {
@@ -530,5 +540,4 @@ public abstract class AbstractExpressionEvaluator
                 "Could not transform accessTokenId %s", accessTokenId), e);
         }
     }
-
 }

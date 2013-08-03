@@ -12,14 +12,19 @@ package org.mule.security.oauth.processor;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.callback.HttpCallback;
+import org.mule.api.callback.HttpCallbackFactory;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.common.security.oauth.AuthorizationParameter;
 import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
 import org.mule.security.oauth.OAuthProperties;
+import org.mule.security.oauth.callback.HttpCallbackAdapter;
 import org.mule.security.oauth.notification.OAuthAuthorizeNotification;
 import org.mule.tck.size.SmallTest;
 
@@ -34,6 +39,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -54,22 +60,37 @@ public class OAuth2AuthorizeMessageProcessorTestCase
     @Mock
     private MuleContext muleContext;
 
+    private HttpCallbackFactory callbackFactory;
+
     @Before
     @SuppressWarnings("unchecked")
-    public void setUp()
+    public void setUp() throws Exception
     {
         this.manager = Mockito.mock(OAuth2Manager.class, Mockito.RETURNS_DEEP_STUBS);
         this.event = Mockito.mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
         Mockito.when(this.event.getId()).thenReturn(eventId);
 
-        this.processor = new TestAuthorizeMessageProcessor();
-        HttpCallback callback = Mockito.mock(HttpCallback.class);
+        HttpCallback callback = this.initCallbackFactoryMock();
 
         Mockito.when(callback.getUrl()).thenReturn("url");
-        this.processor.setOauthCallback(callback);
+
+        this.processor = new TestAuthorizeMessageProcessor();
+        this.processor.setCallbackFactory(callbackFactory);
 
         this.processor.setModuleObject(this.manager);
         this.processor.setMuleContext(this.muleContext);
+        this.processor.start();
+    }
+
+    private HttpCallback initCallbackFactoryMock() throws MuleException
+    {
+        this.callbackFactory = Mockito.mock(HttpCallbackFactory.class);
+        HttpCallback callback = Mockito.mock(HttpCallback.class);
+        Mockito.when(
+            callbackFactory.createCallback(Mockito.any(HttpCallbackAdapter.class), Mockito.any(String.class),
+                Mockito.any(FetchAccessTokenMessageProcessor.class), Mockito.any(MessageProcessor.class),
+                Mockito.any(MuleContext.class), Mockito.any(FlowConstruct.class))).thenReturn(callback);
+        return callback;
     }
 
     @Test
@@ -88,6 +109,50 @@ public class OAuth2AuthorizeMessageProcessorTestCase
     public void processWithoutState() throws Exception
     {
         this.doProcess("");
+    }
+
+    @Test
+    public void processWithDefaultAccessTokenId() throws Exception
+    {
+        final String defaultAccessTokenId = "default";
+        Mockito.when(this.manager.getDefaultAccessTokenId()).thenReturn(defaultAccessTokenId);
+        this.assertAccessTokenId(defaultAccessTokenId);
+    }
+    
+    @Test
+    public void processWithProcessorLevelAccessTokenId() throws Exception
+    {
+        final String accessTokenId = "processor";
+        this.processor.setAccessTokenId(accessTokenId);
+        this.assertAccessTokenId(accessTokenId);
+    }
+    
+    @Test
+    public void processWithConfiNameAsTokenId() throws Exception
+    {
+        final String accessTokenId = "name";
+        Mockito.when(this.manager.getDefaultUnauthorizedConnector().getName()).thenReturn(accessTokenId);
+        this.assertAccessTokenId(accessTokenId);
+    }
+
+    private void assertAccessTokenId(String accessTokenId) throws Exception
+    {
+        this.initCallbackFactoryMock();
+        
+        this.processor.setOauthCallback(null);
+        this.processor.setCallbackFactory(callbackFactory);
+        this.processor.start();
+        
+        this.doProcess("");
+        ArgumentCaptor<FetchAccessTokenMessageProcessor> captor = ArgumentCaptor.forClass(FetchAccessTokenMessageProcessor.class);
+
+        Mockito.verify(this.callbackFactory).createCallback(Mockito.any(OAuth2Manager.class), Mockito.anyString(),
+            captor.capture(), Mockito.any(MessageProcessor.class), Mockito.any(MuleContext.class),
+            Mockito.any(FlowConstruct.class));
+
+        FetchAccessTokenMessageProcessor processor = captor.getValue();
+        Assert.assertEquals(processor.getAccessTokenId(), accessTokenId);
+
     }
 
     @SuppressWarnings("unchecked")

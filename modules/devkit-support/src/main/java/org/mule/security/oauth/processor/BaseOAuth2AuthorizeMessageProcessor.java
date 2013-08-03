@@ -21,12 +21,12 @@ import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
 import org.mule.security.oauth.OAuthProperties;
 
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import org.springframework.util.StringUtils;
 
 public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manager<OAuth2Adapter>> extends
     AbstractAuthorizeMessageProcessor
@@ -37,9 +37,20 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
     @Override
     public final void start() throws MuleException
     {
+        super.start();
+        
         OAuth2Manager<OAuth2Adapter> module = this.getOAuthManager();
+
+        String accessTokenId = this.getAccessTokenId();
+        if (StringUtils.isEmpty(accessTokenId)) {
+            accessTokenId = module.getDefaultAccessTokenId();
+            if (StringUtils.isEmpty(accessTokenId)) {
+                accessTokenId = module.getDefaultUnauthorizedConnector().getName();
+            }
+        }
+
         FetchAccessTokenMessageProcessor fetchAccessTokenMessageProcessor = new OAuth2FetchAccessTokenMessageProcessor(
-            (OAuth2Manager<OAuth2Adapter>) module, this.getAccessTokenId());
+            (OAuth2Manager<OAuth2Adapter>) module, accessTokenId);
 
         this.startCallback(module, fetchAccessTokenMessageProcessor);
 
@@ -91,7 +102,7 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
         {
             state += this.toString(event, this.getState());
         }
-        
+
         extraParameters.put("state", state);
     }
 

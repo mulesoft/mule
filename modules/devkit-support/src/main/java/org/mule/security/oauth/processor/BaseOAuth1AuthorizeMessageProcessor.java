@@ -29,6 +29,7 @@ public abstract class BaseOAuth1AuthorizeMessageProcessor extends AbstractAuthor
     @Override
     public void start() throws MuleException
     {
+        super.start();
         OAuth1Adapter moduleObject = this.getAdapter();
         OAuth1Manager manager = moduleObject.getOauth1Manager();
         OAuth1FetchAccessTokenMessageProcessor fetchAccessTokenMessageProcessor = new OAuth1FetchAccessTokenMessageProcessor(

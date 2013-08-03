@@ -12,6 +12,7 @@ package org.mule.security.oauth;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.NamedObject;
 import org.mule.api.devkit.ProcessAdapter;
 import org.mule.api.devkit.ProcessTemplate;
 import org.mule.api.store.ObjectDoesNotExistException;
@@ -25,7 +26,7 @@ import java.util.Map;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
 
 /**
- * Wrapper around {@link org.mule.api.annotations.oauth.OAuth} annotated class that
+ * Wrapper around {@link org.mule.api.annotations.oauth.OAuth2} annotated class that
  * will infuse it with access token management capabilities.
  * <p/>
  * It can receive a {@link org.mule.config.PoolingProfile} which is a configuration
@@ -34,7 +35,7 @@ import org.apache.commons.pool.KeyedPoolableObjectFactory;
  * @param <C> Actual connector object that represents a connection
  */
 public interface OAuth2Manager<C extends OAuth2Adapter>
-    extends HttpCallbackAdapter, ProcessAdapter<OAuth2Adapter>, OnNoTokenPolicyAware
+    extends HttpCallbackAdapter, ProcessAdapter<OAuth2Adapter>, OnNoTokenPolicyAware, NamedObject
 {
 
     /**
@@ -174,5 +175,7 @@ public interface OAuth2Manager<C extends OAuth2Adapter>
         throws ObjectStoreException, ObjectDoesNotExistException;
 
     public <T> ProcessTemplate<T, OAuth2Adapter> getProcessTemplate();
+
+    public String getDefaultAccessTokenId();
 
 }

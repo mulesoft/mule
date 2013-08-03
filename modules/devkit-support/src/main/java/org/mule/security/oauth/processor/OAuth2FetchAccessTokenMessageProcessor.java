@@ -67,10 +67,12 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
             }
             oauthAdapter.fetchAccessToken(this.getRedirectUri());
 
-            String transformedAccessTokenId = StringUtils.isBlank(this.getAccessTokenId())
-                                                                                          ? this.oauthManager.getDefaultUnauthorizedConnector()
-                                                                                              .getName()
-                                                                                          : this.getAccessTokenId();
+            String transformedAccessTokenId = this.getAccessTokenId();
+
+            if (StringUtils.isEmpty(transformedAccessTokenId))
+            {
+                transformedAccessTokenId = this.oauthManager.getDefaultUnauthorizedConnector().getName();
+            }
 
             transformedAccessTokenId = (String) this.evaluateAndTransform(restoredEvent.getMuleContext(),
                 restoredEvent, String.class, null, transformedAccessTokenId);
