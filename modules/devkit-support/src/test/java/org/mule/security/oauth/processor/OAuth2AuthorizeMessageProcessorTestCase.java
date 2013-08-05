@@ -118,7 +118,7 @@ public class OAuth2AuthorizeMessageProcessorTestCase
         Mockito.when(this.manager.getDefaultAccessTokenId()).thenReturn(defaultAccessTokenId);
         this.assertAccessTokenId(defaultAccessTokenId);
     }
-    
+
     @Test
     public void processWithProcessorLevelAccessTokenId() throws Exception
     {
@@ -126,7 +126,7 @@ public class OAuth2AuthorizeMessageProcessorTestCase
         this.processor.setAccessTokenId(accessTokenId);
         this.assertAccessTokenId(accessTokenId);
     }
-    
+
     @Test
     public void processWithConfiNameAsTokenId() throws Exception
     {
@@ -138,17 +138,17 @@ public class OAuth2AuthorizeMessageProcessorTestCase
     private void assertAccessTokenId(String accessTokenId) throws Exception
     {
         this.initCallbackFactoryMock();
-        
+
         this.processor.setOauthCallback(null);
         this.processor.setCallbackFactory(callbackFactory);
         this.processor.start();
-        
+
         this.doProcess("");
         ArgumentCaptor<FetchAccessTokenMessageProcessor> captor = ArgumentCaptor.forClass(FetchAccessTokenMessageProcessor.class);
 
-        Mockito.verify(this.callbackFactory).createCallback(Mockito.any(OAuth2Manager.class), Mockito.anyString(),
-            captor.capture(), Mockito.any(MessageProcessor.class), Mockito.any(MuleContext.class),
-            Mockito.any(FlowConstruct.class));
+        Mockito.verify(this.callbackFactory).createCallback(Mockito.any(OAuth2Manager.class),
+            Mockito.anyString(), captor.capture(), Mockito.any(MessageProcessor.class),
+            Mockito.any(MuleContext.class), Mockito.any(FlowConstruct.class));
 
         FetchAccessTokenMessageProcessor processor = captor.getValue();
         Assert.assertEquals(processor.getAccessTokenId(), accessTokenId);

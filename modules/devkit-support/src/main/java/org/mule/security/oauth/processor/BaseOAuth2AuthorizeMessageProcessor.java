@@ -38,13 +38,15 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
     public final void start() throws MuleException
     {
         super.start();
-        
+
         OAuth2Manager<OAuth2Adapter> module = this.getOAuthManager();
 
         String accessTokenId = this.getAccessTokenId();
-        if (StringUtils.isEmpty(accessTokenId)) {
+        if (StringUtils.isEmpty(accessTokenId))
+        {
             accessTokenId = module.getDefaultAccessTokenId();
-            if (StringUtils.isEmpty(accessTokenId)) {
+            if (StringUtils.isEmpty(accessTokenId))
+            {
                 accessTokenId = module.getDefaultUnauthorizedConnector().getName();
             }
         }

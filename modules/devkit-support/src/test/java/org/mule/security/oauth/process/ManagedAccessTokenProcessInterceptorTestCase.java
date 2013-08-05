@@ -109,6 +109,19 @@ public class ManagedAccessTokenProcessInterceptorTestCase
     }
 
     @Test
+    public void withDefaultAccessTokenId() throws Exception
+    {
+        Mockito.when(this.callback.isProtected()).thenReturn(true);
+        Mockito.when(this.manager.getDefaultAccessTokenId()).thenReturn(ACCESS_TOKEN_ID);
+        Mockito.when(this.manager.acquireAccessToken(ACCESS_TOKEN_ID)).thenReturn(this.adapter);
+
+        this.interceptor.execute(callback, this.adapter, (MessageProcessor) this.processor, this.event);
+        Mockito.verify(this.manager).acquireAccessToken(ACCESS_TOKEN_ID);
+        Mockito.verify(this.next).execute(this.callback, this.adapter, (MessageProcessor) this.processor,
+            this.event);
+    }
+
+    @Test
     public void withCustomAccessTokenId() throws Exception
     {
         Mockito.when(this.callback.isProtected()).thenReturn(true);

@@ -17,9 +17,28 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.security.oauth.callback.HttpCallbackAdapter;
 import org.mule.security.oauth.processor.FetchAccessTokenMessageProcessor;
 
+/**
+ * Factory class for instances of {@link org.mule.api.callback.HttpCallback} that are
+ * used on the OAuth dance
+ */
 public interface HttpCallbackFactory
 {
 
+    /**
+     * returns a new callback that has not been started
+     * 
+     * @param adapter adapter holding the callback configuration
+     * @param authCodeRegex uncompiled regular expression to extract the
+     *            authorization code
+     * @param fetchAccessTokenMessageProcessor an instance of
+     *            {@link org.mule.security.oauth.processor.FetchAccessTokenMessageProcessor}
+     * @param listener a message processor to invoke when the callback has been
+     *            received
+     * @param muleContext a {@link MuleContext}
+     * @param flowConstruct the construct of the flow where this callback lives
+     * @return
+     * @throws MuleException
+     */
     public HttpCallback createCallback(HttpCallbackAdapter adapter,
                                        String authCodeRegex,
                                        FetchAccessTokenMessageProcessor fetchAccessTokenMessageProcessor,

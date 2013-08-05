@@ -58,12 +58,14 @@ public abstract class AbstractAuthorizeMessageProcessor extends AbstractDevkitBa
                                  FetchAccessTokenMessageProcessor fetchAccessTokenMessageProcessor)
         throws MuleException
     {
-        if (oauthCallback == null)
+        if (this.oauthCallback == null)
         {
-            oauthCallback = this.callbackFactory.createCallback(adapter, this.getAuthCodeRegex(),
+            this.oauthCallback = this.callbackFactory.createCallback(adapter, this.getAuthCodeRegex(),
                 fetchAccessTokenMessageProcessor, this.listener, muleContext, flowConstruct);
-            oauthCallback.start();
+            this.oauthCallback.start();
         }
+        
+        fetchAccessTokenMessageProcessor.setRedirectUri(this.oauthCallback.getUrl());
     }
 
     protected void notifyAuthorizeStart(MuleEvent event)
