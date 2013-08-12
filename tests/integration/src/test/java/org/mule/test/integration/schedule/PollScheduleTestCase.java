@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -32,6 +33,12 @@ public class PollScheduleTestCase extends FunctionalTestCase
 
     private static List<String> foo = new ArrayList<String>();
     private static List<String> bar = new ArrayList<String>();
+
+    @BeforeClass
+    public static void setProperties(){
+        System.setProperty("frequency.days", "4");
+        System.setProperty("frequency.millis", "2000");
+    }
 
     @Override
     protected String getConfigResources()
