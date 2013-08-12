@@ -257,6 +257,13 @@ public class FixedFrequencyScheduler implements ClusterizableScheduler<Runnable>
         return !lifecycleManager.getState().isStarted() && !lifecycleManager.getState().isStarting();
     }
 
+    public long getFrequency()
+    {
+        return frequency;
+    }
 
-
+    public TimeUnit getTimeUnit()
+    {
+        return timeUnit;
+    }
 }
