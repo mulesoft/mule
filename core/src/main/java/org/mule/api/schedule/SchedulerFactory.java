@@ -52,7 +52,7 @@ public abstract class SchedulerFactory<T> implements MuleContextAware
      * Mule context. Should never be null. In case of being null then the post processing is discarded
      * </p>
      */
-    private MuleContext context;
+    protected MuleContext context;
 
     /**
      * <p>
