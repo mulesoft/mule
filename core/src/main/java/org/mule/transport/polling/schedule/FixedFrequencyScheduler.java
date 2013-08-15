@@ -17,6 +17,8 @@ import org.mule.api.schedule.Scheduler;
 import org.mule.api.schedule.cluster.ClusterizableScheduler;
 import org.mule.lifecycle.DefaultLifecycleManager;
 import org.mule.lifecycle.SimpleLifecycleManager;
+import org.mule.transport.AbstractPollingMessageReceiver;
+import org.mule.transport.PollingReceiverWorker;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,7 +39,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @since 3.5.0
  */
-public class FixedFrequencyScheduler implements ClusterizableScheduler<Runnable>
+public class FixedFrequencyScheduler extends PollScheduler
 {
 
     protected transient Log logger = LogFactory.getLog(getClass());
@@ -47,10 +49,6 @@ public class FixedFrequencyScheduler implements ClusterizableScheduler<Runnable>
      */
     private ScheduledExecutorService automaticExecutor;
 
-    /**
-     * <p>The task to be executed</p>
-     */
-    private Runnable job;
     /**
      * <p>The {@link TimeUnit} of the scheduler</p>
      */
@@ -66,10 +64,7 @@ public class FixedFrequencyScheduler implements ClusterizableScheduler<Runnable>
      */
     private long startDelay;
 
-    /**
-     * <p>The {@link Scheduler} name used as an identifier in the {@link org.mule.api.registry.MuleRegistry}</p>
-     */
-    private String name;
+
 
     /**
      * <p>
@@ -80,13 +75,13 @@ public class FixedFrequencyScheduler implements ClusterizableScheduler<Runnable>
 
     private ExecutorService onDemandExecutor;
 
-    public FixedFrequencyScheduler(String name, long frequency, long startDelay, Runnable job, TimeUnit timeUnit)
+    public FixedFrequencyScheduler(String name, long frequency, long startDelay, PollingReceiverWorker job, TimeUnit timeUnit)
     {
+        super(name, job);
         this.frequency = frequency;
         this.startDelay = startDelay;
         this.job = job;
         this.timeUnit = timeUnit;
-        this.name = name;
         lifecycleManager = new DefaultLifecycleManager<Scheduler>(name, this);
     }
 
@@ -183,12 +178,6 @@ public class FixedFrequencyScheduler implements ClusterizableScheduler<Runnable>
 
     }
 
-    @Override
-    public Runnable getJob()
-    {
-        return job;
-    }
-
     /**
      * <p>
      * Checks that the {@link FixedFrequencyScheduler#automaticExecutor} is terminated and, if not, it terminates the
@@ -232,19 +221,6 @@ public class FixedFrequencyScheduler implements ClusterizableScheduler<Runnable>
         {
             logger.error("The Scheduler " + name + " could not be disposed");
         }
-    }
-
-    @Override
-    public void setName(String name)
-    {
-
-        this.name = name;
-    }
-
-    @Override
-    public String getName()
-    {
-        return name;
     }
 
     private boolean isNotStopped()

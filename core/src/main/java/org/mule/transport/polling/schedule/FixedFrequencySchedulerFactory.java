@@ -13,6 +13,7 @@ package org.mule.transport.polling.schedule;
 
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.schedule.SchedulerFactory;
+import org.mule.transport.PollingReceiverWorker;
 
 import java.util.concurrent.TimeUnit;
 
@@ -23,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @since 3.5.0
  */
-public class FixedFrequencySchedulerFactory extends SchedulerFactory<Runnable>
+public class FixedFrequencySchedulerFactory extends SchedulerFactory<PollingReceiverWorker>
 {
 
     /**
@@ -43,7 +44,7 @@ public class FixedFrequencySchedulerFactory extends SchedulerFactory<Runnable>
 
 
     @Override
-    protected Scheduler doCreate(String name, final Runnable job)
+    protected Scheduler doCreate(String name, final PollingReceiverWorker job)
     {
         FixedFrequencyScheduler fixedFrequencyScheduler = new FixedFrequencyScheduler(name,
                                                                                       frequency, startDelay, job, timeUnit);
