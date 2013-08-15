@@ -97,7 +97,8 @@ public class MuleManifest
         return getManifestProperty("Dev-List-Email");
     }
 
-    public static Manifest getManifest()
+    // synchronize this method as manifest initialized here.
+    public static synchronized Manifest getManifest()
     {
         if (manifest == null)
         {
