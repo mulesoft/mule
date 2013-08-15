@@ -109,7 +109,8 @@ public class MuleManifest
 		return getManifestProperty("Recommended-Jdks");
 	}
 
-    public static Manifest getManifest()
+    // synchronize this method as manifest initialized here.
+    public static synchronized Manifest getManifest()
     {
         if (manifest == null)
         {
