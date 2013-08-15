@@ -10,11 +10,13 @@
 
 package org.mule.transport.polling;
 
+import static org.mule.config.i18n.CoreMessages.pollSourceReturnedNull;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
@@ -26,21 +28,126 @@ import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.schedule.SchedulerFactory;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.NullPayload;
+import org.mule.util.Predicate;
 import org.mule.util.StringUtils;
 
 import java.util.Map;
 
+/**
+ * <p>
+ * Polling {@link org.mule.api.source.MessageSource}.
+ * </p>
+ * <p>
+ * The {@link MessageProcessorPollingMessageReceiver} is responsible of creating a {@link org.mule.api.schedule.Scheduler}
+ * at the initialization phase. This {@link org.mule.api.schedule.Scheduler} can be stopped/started and executed by using the {@link org.mule.api.registry.MuleRegistry}
+ * interface, this way users can manipulate poll from outside mule server.
+ * </p>
+ */
 public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessageReceiver
 {
+
+    /**
+     * <p>
+     * The {@link InboundEndpoint} property for poll that contains the poll message source. Which is configured inside
+     * the poll element in the XML configuration
+     * </p>
+     */
     public static final String SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME = MuleProperties.ENDPOINT_PROPERTY_PREFIX + "sourceMessageProcessor";
+
+    /**
+     * <p>
+     * The {@link InboundEndpoint} property for poll that contains the {@link MessageProcessorPollingOverride}
+     * </p>
+     */
     public static final String POLL_OVERRIDE_PROPERTY_NAME = MuleProperties.ENDPOINT_PROPERTY_PREFIX + "pollOverride";
 
+    /**
+     * <p>
+     * The {@link InboundEndpoint} property for poll that contains the {@link SchedulerFactory}
+     * </p>
+     */
+    public static final String SCHEDULER_FACTORY_PROPERTY_NAME = MuleProperties.ENDPOINT_PROPERTY_PREFIX + "schedulerFactory";
+
+    /**
+     * <p>
+     * The Polling transport name identifier. Used to create the scheduler name
+     * </p>
+     */
+    private static final String POLLING_TRANSPORT = "polling";
+
+    /**
+     * <p>
+     * Format string for all the Polling Schedulers name.
+     * </p>
+     */
+    private static final String POLLING_SCHEDULER_NAME_FORMAT = POLLING_TRANSPORT + "://%s/%s";
+
+
+    /**
+     * <p>
+     * Helper method to create {@link org.mule.api.schedule.Scheduler} names
+     * </p>
+     */
+    private static String schedulerNameOf(MessageProcessorPollingMessageReceiver source)
+    {
+        return String.format(POLLING_SCHEDULER_NAME_FORMAT, source.flowConstruct.getName(), source.hashCode());
+    }
+
+    /**
+     * @return Predicate used to request the  {@link org.mule.api.registry.MuleRegistry} all the polling {@link org.mule.api.schedule.Scheduler}
+     */
+    public static Predicate<String> allPollSchedulers()
+    {
+        return new Predicate<String>()
+        {
+            @Override
+            public boolean evaluate(String s)
+            {
+                return s.startsWith(POLLING_TRANSPORT + "://");
+            }
+        };
+    }
+
+    /**
+     * @return Predicate used to request the  {@link org.mule.api.registry.MuleRegistry} all the polling {@link org.mule.api.schedule.Scheduler}
+     *         for a particular {@link org.mule.construct.Flow}
+     */
+    public static Predicate<String> flowPollingSchedulers(final String flowName)
+    {
+        return new Predicate<String>()
+        {
+            @Override
+            public boolean evaluate(String s)
+            {
+                return s.startsWith(POLLING_TRANSPORT + "://" + flowName);
+            }
+        };
+    }
+
+
+    /**
+     * <p>
+     * The poll message source, configured inside the poll element in the xml configuration. i.e.:
+     * <pre>
+     * {@code
+     * <poll>
+     *       <sfdc:query query=""/>
+     * </poll>
+     * </pre>
+     * </p>
+     */
     protected MessageProcessor sourceMessageProcessor;
+
+    /**
+     * <p>
+     * The {@link MessageProcessorPollingOverride} that affects the routing of the {@link MuleEvent}
+     * </p>
+     */
     protected MessageProcessorPollingOverride override;
 
     public MessageProcessorPollingMessageReceiver(Connector connector,
@@ -51,35 +158,14 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
     }
 
     @Override
-    protected void doInitialise() throws InitialisationException
+    public void poll() throws Exception
     {
-        super.doInitialise();
-
-        sourceMessageProcessor = (MessageProcessor) endpoint.getProperty(SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME);
-
-        if (sourceMessageProcessor instanceof OutboundEndpoint
-            && !((OutboundEndpoint) sourceMessageProcessor).getExchangePattern().hasResponse())
-        {
-            // TODO DF: i18n
-            throw new InitialisationException(CoreMessages.createStaticMessage(String.format(
-                "The endpoint %s does not return responses and therefore can't be used for polling.",
-                sourceMessageProcessor)), this);
-        }
-
-        override = (MessageProcessorPollingOverride) endpoint.getProperty(POLL_OVERRIDE_PROPERTY_NAME);
-        if (override == null) {
-            override = new NoOverride();
-        }
-
-        Long tempPolling = (Long) endpoint.getProperties().get(AbstractConnector.PROPERTY_POLLING_FREQUENCY);
-        if (tempPolling != null)
-        {
-            setFrequency(tempPolling);
-        }
+        MuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, (Map<String, Object>) null,
+                                                     connector.getMuleContext());
+        pollWith(request);
     }
 
-    @Override
-    public void poll() throws Exception
+    public void pollWith(final MuleMessage request) throws Exception
     {
         ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
         try
@@ -90,8 +176,7 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
                 @Override
                 public MuleEvent process() throws Exception
                 {
-                    MuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, (Map<String, Object>) null,
-                                                                 connector.getMuleContext());
+
                     ImmutableEndpoint ep = endpoint;
                     if (sourceMessageProcessor instanceof ImmutableEndpoint)
                     {
@@ -110,14 +195,12 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
                     }
                     else
                     {
-                        // TODO DF: i18n
-                        logger.info(String.format("Polling of '%s' returned null, the flow will not be invoked.",
-                                                  sourceMessageProcessor));
+                        logger.info(pollSourceReturnedNull(flowConstruct.getName()));
                     }
                     return null;
                 }
             });
-            if ( muleEvent != null )
+            if (muleEvent != null)
             {
                 interceptor.postProcessRouting(muleEvent);
             }
@@ -132,12 +215,46 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
         }
     }
 
+    /**
+     * <p>
+     * On the Initialization phase it.
+     * <ul>
+     * <li>Calls the {@link SchedulerFactory} to create the scheduler</li>
+     * <li>Gets the Poll the message source</li>
+     * <li>Gets the Poll override</li>
+     * </ul>
+     * </p>
+     */
+    @Override
+    protected void doInitialise() throws InitialisationException
+    {
+        super.doInitialise();
+
+        sourceMessageProcessor = getSourceMessageProcessor();
+        override = getPollOverride();
+
+        getSchedulerFactory().create(schedulerNameOf(this), createWork());
+    }
+
     @Override
     protected boolean pollOnPrimaryInstanceOnly()
     {
         return true;
     }
-    
+
+    @Override
+    protected void doStart() throws MuleException
+    {
+        // The initialization phase if handled by the scheduler
+    }
+
+    @Override
+    protected void doStop() throws MuleException
+    {
+        // The stop phase if handled by the scheduler
+    }
+
+
     // Only consider response for source message processor a new message if it is not
     // null and payload is not NullPayload
     protected boolean isNewMessage(MuleEvent sourceEvent)
@@ -157,12 +274,48 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
         return false;
     }
 
+    private MessageProcessorPollingOverride getPollOverride()
+    {
+        MessageProcessorPollingOverride override = (MessageProcessorPollingOverride) endpoint.getProperty(POLL_OVERRIDE_PROPERTY_NAME);
+        if (override == null)
+        {
+            override = new NoOverride();
+        }
+
+        return override;
+    }
+
+    private MessageProcessor getSourceMessageProcessor() throws InitialisationException
+    {
+        MessageProcessor messageSource = (MessageProcessor) endpoint.getProperty(SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME);
+        validate(messageSource);
+        return messageSource;
+    }
+
+    private void validate(MessageProcessor messageSource) throws InitialisationException
+    {
+        if (messageSource instanceof OutboundEndpoint
+            && !((OutboundEndpoint) messageSource).getExchangePattern().hasResponse())
+        {
+            throw new InitialisationException(CoreMessages.wrongMessageSource(messageSource.toString()), this);
+        }
+    }
+
+
+    private SchedulerFactory<Runnable> getSchedulerFactory()
+    {
+        return (SchedulerFactory<Runnable>) endpoint.getProperty(SCHEDULER_FACTORY_PROPERTY_NAME);
+    }
+
     /**
      * Override implementation that doesn't change anything. Used as a default when no override is defined
      */
     private static class NoOverride extends MessageProcessorPollingOverride
     {
-        private MessageProcessorPollingInterceptor noOpInterceptor = new MessageProcessorPollingInterceptor() {};
+
+        private MessageProcessorPollingInterceptor noOpInterceptor = new MessageProcessorPollingInterceptor()
+        {
+        };
 
         @Override
         public MessageProcessorPollingInterceptor interceptor()
@@ -170,4 +323,6 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
             return noOpInterceptor;
         }
     }
+
+
 }

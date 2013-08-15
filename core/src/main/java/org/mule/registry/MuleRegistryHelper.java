@@ -33,6 +33,7 @@ import org.mule.api.registry.ServiceDescriptorFactory;
 import org.mule.api.registry.ServiceException;
 import org.mule.api.registry.ServiceType;
 import org.mule.api.registry.TransformerResolver;
+import org.mule.api.schedule.Scheduler;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Converter;
 import org.mule.api.transformer.DataType;
@@ -41,6 +42,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.types.SimpleDataType;
+import org.mule.util.Predicate;
 import org.mule.util.SpiUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.UUID;
@@ -107,11 +109,11 @@ public class MuleRegistryHelper implements MuleRegistry
 
     public void fireLifecycle(String phase) throws LifecycleException
     {
-        if(Initialisable.PHASE_NAME.equals(phase))
+        if (Initialisable.PHASE_NAME.equals(phase))
         {
             registry.initialise();
         }
-        else if(Disposable.PHASE_NAME.equals(phase))
+        else if (Disposable.PHASE_NAME.equals(phase))
         {
             registry.dispose();
         }
@@ -198,8 +200,8 @@ public class MuleRegistryHelper implements MuleRegistry
      * {@inheritDoc}
      *
      * @deprecated use {@link #lookupTransformer(org.mule.api.transformer.DataType, org.mule.api.transformer.DataType)} instead.  This
-     * method should only be used internally to discover transformers, typically a user does not need ot do this
-     * directly
+     *             method should only be used internally to discover transformers, typically a user does not need ot do this
+     *             directly
      */
     @Deprecated
     public Transformer lookupTransformer(Class inputType, Class outputType) throws TransformerException
@@ -211,8 +213,8 @@ public class MuleRegistryHelper implements MuleRegistry
      * {@inheritDoc}
      *
      * @deprecated use {@link #lookupTransformer(org.mule.api.transformer.DataType, org.mule.api.transformer.DataType)} instead.  This
-     * method should only be used internally to discover transformers, typically a user does not need ot do this
-     * directly
+     *             method should only be used internally to discover transformers, typically a user does not need ot do this
+     *             directly
      */
     @Deprecated
     public List<Transformer> lookupTransformers(Class input, Class output)
@@ -237,7 +239,7 @@ public class MuleRegistryHelper implements MuleRegistry
         if (trans != null)
         {
             Transformer concurrentlyAddedTransformer = (Transformer) exactTransformerCache.putIfAbsent(
-                dataTypePairHash, trans);
+                    dataTypePairHash, trans);
             if (concurrentlyAddedTransformer != null)
             {
                 return concurrentlyAddedTransformer;
@@ -308,7 +310,7 @@ public class MuleRegistryHelper implements MuleRegistry
         }
 
         List<Transformer> concurrentlyAddedTransformers = (List<Transformer>) transformerListCache.putIfAbsent(
-            dataTypePairHash, results);
+                dataTypePairHash, results);
         if (concurrentlyAddedTransformers != null)
         {
             return concurrentlyAddedTransformers;
@@ -589,6 +591,34 @@ public class MuleRegistryHelper implements MuleRegistry
         registry.unregisterObject(agentName, Agent.class);
     }
 
+    @Override
+    public void registerScheduler(Scheduler scheduler) throws MuleException
+    {
+        registry.registerObject(scheduler.getName(), scheduler);
+    }
+
+    @Override
+    public void unregisterScheduler(Scheduler scheduler) throws MuleException
+    {
+        registry.unregisterObject(scheduler.getName(), scheduler);
+    }
+
+    @Override
+    public Collection<Scheduler> lookupScheduler(Predicate<String> schedulerNamePredicate)
+    {
+        Collection<Scheduler> schedulers = new ArrayList<Scheduler>();
+        Map<String, Scheduler> registeredSchedulers = lookupByType(Scheduler.class);
+        for (Scheduler registeredScheduler : registeredSchedulers.values())
+        {
+            if (schedulerNamePredicate.evaluate(registeredScheduler.getName()))
+            {
+                schedulers.add(registeredScheduler);
+            }
+        }
+
+        return schedulers;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -701,7 +731,7 @@ public class MuleRegistryHelper implements MuleRegistry
     @SuppressWarnings("unchecked")
     public <T> T get(String key)
     {
-        return (T)registry.get(key);
+        return (T) registry.get(key);
     }
 
     public <T> Map<String, T> lookupByType(Class<T> type)
@@ -753,6 +783,7 @@ public class MuleRegistryHelper implements MuleRegistry
      * Returns the name for the object passed in.  If the object implements {@link org.mule.api.NameableObject}, then
      * {@link org.mule.api.NameableObject#getName()} will be returned, otherwise a name is generated using the class name
      * and a generated UUID.
+     *
      * @param obj the object to inspect
      * @return the name for this object
      */
@@ -810,6 +841,7 @@ public class MuleRegistryHelper implements MuleRegistry
 
     private class TransformerResolverComparator implements Comparator<TransformerResolver>
     {
+
         public int compare(TransformerResolver transformerResolver, TransformerResolver transformerResolver1)
         {
             if (transformerResolver.getClass().equals(TypeBasedTransformerResolver.class))

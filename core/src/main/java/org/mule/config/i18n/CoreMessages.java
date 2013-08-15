@@ -1404,7 +1404,24 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 343);
     }
 
-    public static Message watermarkRequiresSynchronousProcessing() {
+    public static Message watermarkRequiresSynchronousProcessing()
+    {
         return factory.createMessage(BUNDLE_PATH, 345);
     }
+
+    public static Message couldNotRegisterNewScheduler(String schedulerName)
+    {
+        return factory.createMessage(BUNDLE_PATH, 346, schedulerName);
+    }
+
+    public static Message pollSourceReturnedNull(String flowName)
+    {
+        return factory.createMessage(BUNDLE_PATH, 347, flowName);
+    }
+
+    public static Message wrongMessageSource(String endpoint)
+    {
+        return factory.createMessage(BUNDLE_PATH, 348, endpoint);
+    }
+
 }

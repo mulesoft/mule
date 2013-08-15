@@ -10,10 +10,6 @@
 
 package org.mule.transport.polling.watermark;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationException;
@@ -31,6 +27,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Poll override that provides watermarking functionality:
