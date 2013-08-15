@@ -91,7 +91,7 @@
 # /lib/mule
 #
 /mule-standalone-nodocs-${productVersion}/lib/mule
-/mule-standalone-nodocs-${productVersion}/lib/mule/mule-common-${productVersion}-SNAPSHOT.jar
+/mule-standalone-nodocs-${productVersion}/lib/mule/mule-common-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-core-${productVersion}-tests.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-core-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-annotations-${productVersion}.jar
