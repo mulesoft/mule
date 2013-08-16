@@ -126,17 +126,15 @@ public class CronScheduler extends PollScheduler implements MuleContextAware
             jobName = job.getReceiver().getReceiverKey();
             groupName = job.getReceiver().getEndpoint().getName();
 
-            CronTrigger cronTrigger = new CronTrigger(getName(), groupName, jobName, groupName, cronExpression);
-            quartzScheduler.scheduleJob(jobDetail(jobName, groupName, job), cronTrigger);
+            quartzScheduler.addJob(jobDetail(jobName, groupName, job), true);
+
+            quartzScheduler.start();
         }
         catch (SchedulerException e)
         {
             throw new InitialisationException(couldNotCreateScheduler(), e, this);
         }
-        catch (ParseException e)
-        {
-            throw new InitialisationException(invalidCronExpression(), e, this);
-        }
+
     }
 
     @Override
@@ -146,16 +144,25 @@ public class CronScheduler extends PollScheduler implements MuleContextAware
         {
             if (quartzScheduler.isStarted())
             {
-                quartzScheduler.resumeAll();
+                if (quartzScheduler.getTrigger(getName(), groupName) == null)
+                {
+                    CronTrigger cronTrigger = new CronTrigger(getName(), groupName, jobName, groupName, cronExpression);
+                    quartzScheduler.scheduleJob(cronTrigger);
+                }
+                else
+                {
+                    quartzScheduler.resumeAll();
+                }
             }
-            else
-            {
-                quartzScheduler.start();
-            }
+
         }
         catch (SchedulerException e)
         {
             throw new DefaultMuleException(couldNotScheduleJob(), e);
+        }
+        catch (ParseException e)
+        {
+            throw new DefaultMuleException(invalidCronExpression(), e);
         }
     }
 
@@ -170,6 +177,11 @@ public class CronScheduler extends PollScheduler implements MuleContextAware
         {
             throw new DefaultMuleException(couldNotPauseSchedulers(), e);
         }
+    }
+
+    public String getCronExpression()
+    {
+        return cronExpression;
     }
 
     @Override
