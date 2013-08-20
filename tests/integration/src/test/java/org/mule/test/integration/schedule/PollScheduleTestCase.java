@@ -15,6 +15,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleException;
 import org.mule.api.schedule.Scheduler;
+import org.mule.api.schedule.Schedulers;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.polling.MessageProcessorPollingMessageReceiver;
 
@@ -116,7 +117,7 @@ public class PollScheduleTestCase extends FunctionalTestCase
     private void runSchedulersOnce() throws Exception
     {
         Collection<Scheduler> schedulers = muleContext.getRegistry().lookupScheduler(
-                MessageProcessorPollingMessageReceiver.flowPollingSchedulers("pollfoo"));
+                Schedulers.flowPollingSchedulers("pollfoo"));
 
         for (Scheduler scheduler : schedulers)
         {
@@ -127,7 +128,7 @@ public class PollScheduleTestCase extends FunctionalTestCase
     private void stopSchedulers() throws MuleException
     {
         Collection<Scheduler> schedulers = muleContext.getRegistry().lookupScheduler(
-                MessageProcessorPollingMessageReceiver.flowPollingSchedulers("pollfoo"));
+                Schedulers.flowPollingSchedulers("pollfoo"));
 
         for (Scheduler scheduler : schedulers)
         {

@@ -78,7 +78,7 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
      * The Polling transport name identifier. Used to create the scheduler name
      * </p>
      */
-    private static final String POLLING_TRANSPORT = "polling";
+    public static final String POLLING_TRANSPORT = "polling";
 
     /**
      * <p>
@@ -98,36 +98,7 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
         return String.format(POLLING_SCHEDULER_NAME_FORMAT, source.flowConstruct.getName(), source.hashCode());
     }
 
-    /**
-     * @return Predicate used to request the  {@link org.mule.api.registry.MuleRegistry} all the polling {@link org.mule.api.schedule.Scheduler}
-     */
-    public static Predicate<String> allPollSchedulers()
-    {
-        return new Predicate<String>()
-        {
-            @Override
-            public boolean evaluate(String s)
-            {
-                return s.startsWith(POLLING_TRANSPORT + "://");
-            }
-        };
-    }
 
-    /**
-     * @return Predicate used to request the  {@link org.mule.api.registry.MuleRegistry} all the polling {@link org.mule.api.schedule.Scheduler}
-     *         for a particular {@link org.mule.construct.Flow}
-     */
-    public static Predicate<String> flowPollingSchedulers(final String flowName)
-    {
-        return new Predicate<String>()
-        {
-            @Override
-            public boolean evaluate(String s)
-            {
-                return s.startsWith(POLLING_TRANSPORT + "://" + flowName);
-            }
-        };
-    }
 
 
     /**

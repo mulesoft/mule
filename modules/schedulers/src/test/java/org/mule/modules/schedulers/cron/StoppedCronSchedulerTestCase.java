@@ -3,8 +3,8 @@ package org.mule.modules.schedulers.cron;
 import static junit.framework.Assert.assertEquals;
 
 import org.mule.api.schedule.Scheduler;
+import org.mule.api.schedule.Schedulers;
 import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.transport.polling.MessageProcessorPollingMessageReceiver;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,7 +52,7 @@ public class StoppedCronSchedulerTestCase  extends FunctionalTestCase
     private void runSchedulersOnce() throws Exception
     {
         Collection<Scheduler> schedulers = muleContext.getRegistry().lookupScheduler(
-                MessageProcessorPollingMessageReceiver.flowPollingSchedulers("pollfoo"));
+                Schedulers.flowPollingSchedulers("pollfoo"));
 
         for (Scheduler scheduler : schedulers)
         {

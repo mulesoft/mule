@@ -12,6 +12,7 @@ package org.mule.test.integration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.mule.api.schedule.Scheduler;
+import org.mule.api.schedule.Schedulers;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.polling.MessageProcessorPollingMessageReceiver;
 
@@ -36,7 +37,7 @@ public class PollingTestCase extends FunctionalTestCase
     @Test
     public void testPolling() throws Exception
     {
-        Collection<Scheduler> schedulers = muleContext.getRegistry().lookupScheduler(MessageProcessorPollingMessageReceiver.allPollSchedulers());
+        Collection<Scheduler> schedulers = muleContext.getRegistry().lookupScheduler(Schedulers.allPollSchedulers());
         assertEquals(3, schedulers.size());
 
         Thread.sleep(5000);
