@@ -1,7 +1,6 @@
 package org.mule.transport.polling.schedule;
 
-import org.mule.api.schedule.cluster.ClusterizableScheduler;
-import org.mule.transport.AbstractPollingMessageReceiver;
+import org.mule.api.schedule.Scheduler;
 import org.mule.transport.PollingReceiverWorker;
 
 
@@ -12,7 +11,7 @@ import org.mule.transport.PollingReceiverWorker;
  *
  * @since 3.5.0
  */
-public abstract class PollScheduler implements ClusterizableScheduler<PollingReceiverWorker>
+public abstract class PollScheduler implements Scheduler<PollingReceiverWorker>
 {
 
     protected PollingReceiverWorker job;

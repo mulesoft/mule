@@ -15,7 +15,6 @@ import static org.mule.config.i18n.CoreMessages.objectIsNull;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.schedule.cluster.ClusterizableFactoryPostProcessor;
 
 import java.util.Map;
 
@@ -32,9 +31,6 @@ import org.apache.commons.logging.LogFactory;
  * instance of the scheduler.
  * </p>
  * <p>
- * Apart from the set of {@link SchedulerFactoryPostProcessor} in the registry the factory processes internal
- * {@link SchedulerFactoryPostProcessor}. For example, {@link ClusterizableFactoryPostProcessor}
- * </p>
  * <p>
  * The {@link SchedulerFactory} also registers the {@link Scheduler} into the mule registry.
  * </p>
@@ -107,8 +103,6 @@ public abstract class SchedulerFactory<T> implements MuleContextAware
             checkNull(scheduler);
         }
 
-        scheduler = runInnerPostProcessors(scheduler);
-
         registerScheduler(scheduler);
 
         return scheduler;
@@ -124,12 +118,6 @@ public abstract class SchedulerFactory<T> implements MuleContextAware
         {
             logger.error(couldNotRegisterNewScheduler(scheduler.getName()), e);
         }
-    }
-
-    private Scheduler runInnerPostProcessors(Scheduler scheduler)
-    {
-        scheduler = new ClusterizableFactoryPostProcessor(context).process(scheduler);
-        return scheduler;
     }
 
     private void checkNull(Scheduler postProcessedScheduler)
