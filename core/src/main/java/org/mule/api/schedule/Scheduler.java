@@ -38,7 +38,7 @@ import org.mule.api.lifecycle.Lifecycle;
  *
  * @since 3.5.0
  */
-public interface Scheduler<T> extends Lifecycle, NameableObject
+public interface Scheduler extends Lifecycle, NameableObject
 {
 
     /**
@@ -56,8 +56,4 @@ public interface Scheduler<T> extends Lifecycle, NameableObject
     void schedule() throws Exception;
 
 
-    /**
-     * @return <p>The Job that is executed by the {@link Scheduler}</p>
-     */
-    T getJob();
 }

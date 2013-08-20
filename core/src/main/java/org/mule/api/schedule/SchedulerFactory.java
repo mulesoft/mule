@@ -69,7 +69,7 @@ public abstract class SchedulerFactory<T> implements MuleContextAware
         checkNull(scheduler);
 
 
-        Scheduler postProcessedScheduler = postProcess(scheduler);
+        Scheduler postProcessedScheduler = postProcess(job,scheduler);
 
         checkNull(postProcessedScheduler);
 
@@ -88,7 +88,7 @@ public abstract class SchedulerFactory<T> implements MuleContextAware
      */
     protected abstract Scheduler doCreate(String name, T job);
 
-    private Scheduler postProcess(Scheduler scheduler)
+    private Scheduler postProcess(T job, Scheduler scheduler)
     {
         if (context == null)
         {
@@ -99,7 +99,7 @@ public abstract class SchedulerFactory<T> implements MuleContextAware
                 .lookupByType(SchedulerFactoryPostProcessor.class);
         for (SchedulerFactoryPostProcessor postProcessor : postProcessors.values())
         {
-            scheduler = postProcessor.process(scheduler);
+            scheduler = postProcessor.process(job, scheduler);
             checkNull(scheduler);
         }
 

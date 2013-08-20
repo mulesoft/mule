@@ -64,8 +64,8 @@ public class SchedulerFactoryTest
         }
         finally
         {
-            verify(postProcessor2, never()).process(null);
-            verify(postProcessor1, never()).process(null);
+            verify(postProcessor2, never()).process(null, null);
+            verify(postProcessor1, never()).process(null, null);
         }
 
     }
@@ -77,17 +77,18 @@ public class SchedulerFactoryTest
     public void muleContextIsNullThenAvoidPostProcessing()
     {
         commonMockBehaviour(postProcessors());
+        Object job = new Object();
 
         SchedulerFactory factory = factory(mockScheduler, null);
 
         try
         {
-            assertEquals(mockScheduler, factory.create(NAME,new Object()));
+            assertEquals(mockScheduler, factory.create(NAME, job));
         }
         finally
         {
-            verify(postProcessor2, never()).process(null);
-            verify(postProcessor1, never()).process(null);
+            verify(postProcessor2, never()).process(job,null);
+            verify(postProcessor1, never()).process(job,null);
         }
     }
 
@@ -97,10 +98,11 @@ public class SchedulerFactoryTest
     @Test
     public void createTheScheduler()
     {
+        Object job = new Object();
         commonMockBehaviour(singlePostProcessor());
-        when(postProcessor1.process(mockScheduler)).thenReturn(mockScheduler);
+        when(postProcessor1.process(job,mockScheduler)).thenReturn(mockScheduler);
 
-        assertEquals(mockScheduler, factory(mockScheduler, muleContext).create(NAME,new Object()));
+        assertEquals(mockScheduler, factory(mockScheduler, muleContext).create(NAME,job));
     }
 
     private Map<String, SchedulerFactoryPostProcessor> postProcessors()

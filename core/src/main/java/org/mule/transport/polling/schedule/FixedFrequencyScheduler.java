@@ -14,7 +14,6 @@ import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.schedule.Scheduler;
-import org.mule.api.schedule.cluster.ClusterizableScheduler;
 import org.mule.lifecycle.DefaultLifecycleManager;
 import org.mule.lifecycle.SimpleLifecycleManager;
 import org.mule.transport.AbstractPollingMessageReceiver;
@@ -32,9 +31,6 @@ import org.apache.commons.logging.LogFactory;
 /**
  * <p>
  * {@link Scheduler} that runs a task giving a fixed period of time.
- * </p>
- * <p>
- * It is a {@link ClusterizableScheduler} so it will start only on a primary instance of a cluster.
  * </p>
  *
  * @since 3.5.0

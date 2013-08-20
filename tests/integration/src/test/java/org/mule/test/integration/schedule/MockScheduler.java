@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.beans.factory.BeanNameAware;
 
-public class MockScheduler implements Scheduler<Runnable>, BeanNameAware
+public class MockScheduler implements Scheduler, BeanNameAware
 {
 
     private AtomicInteger count = new AtomicInteger(0);
@@ -33,12 +33,6 @@ public class MockScheduler implements Scheduler<Runnable>, BeanNameAware
     public void schedule() throws Exception
     {
         task.run();
-    }
-
-    @Override
-    public Runnable getJob()
-    {
-        return task;
     }
 
     @Override

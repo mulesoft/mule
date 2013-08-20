@@ -11,7 +11,7 @@ import org.mule.transport.PollingReceiverWorker;
  *
  * @since 3.5.0
  */
-public abstract class PollScheduler implements Scheduler<PollingReceiverWorker>
+public abstract class PollScheduler implements Scheduler
 {
 
     protected PollingReceiverWorker job;
@@ -25,12 +25,6 @@ public abstract class PollScheduler implements Scheduler<PollingReceiverWorker>
     {
         this.name = name;
         this.job = job;
-    }
-
-    @Override
-    public PollingReceiverWorker getJob()
-    {
-        return job;
     }
 
     @Override
