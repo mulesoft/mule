@@ -43,7 +43,7 @@ public class FixedFrequencyScheduler extends PollScheduler
     /**
      * <p>Thread executor service</p>
      */
-    private ScheduledExecutorService automaticExecutor;
+    private ExecutorService executor;
 
     /**
      * <p>The {@link TimeUnit} of the scheduler</p>
@@ -69,8 +69,6 @@ public class FixedFrequencyScheduler extends PollScheduler
      */
     private final SimpleLifecycleManager<Scheduler> lifecycleManager;
 
-    private ExecutorService onDemandExecutor;
-
     public FixedFrequencyScheduler(String name, long frequency, long startDelay, PollingReceiverWorker job, TimeUnit timeUnit)
     {
         super(name, job);
@@ -83,7 +81,7 @@ public class FixedFrequencyScheduler extends PollScheduler
 
     /**
      * <p>
-     * Creates the {@link FixedFrequencyScheduler#automaticExecutor} that is going to be used to launch schedules
+     * Creates the {@link FixedFrequencyScheduler#executor} that is going to be used to launch schedules
      * </p>
      */
     @Override
@@ -96,8 +94,7 @@ public class FixedFrequencyScheduler extends PollScheduler
                 @Override
                 public void onTransition(String phaseName, Scheduler object) throws MuleException
                 {
-                    automaticExecutor = Executors.newSingleThreadScheduledExecutor();
-                    onDemandExecutor = Executors.newSingleThreadExecutor();
+                    executor = Executors.newSingleThreadScheduledExecutor();
                 }
             });
         }
@@ -124,8 +121,9 @@ public class FixedFrequencyScheduler extends PollScheduler
                 @Override
                 public void onTransition(String phaseName, Scheduler object) throws MuleException
                 {
-                    onDemandExecutor.shutdown();
-                    automaticExecutor.scheduleAtFixedRate(job, startDelay, frequency, timeUnit);
+                    executor.shutdown();
+                    executor = Executors.newSingleThreadScheduledExecutor();
+                    ((ScheduledExecutorService) executor).scheduleAtFixedRate(job, startDelay, frequency, timeUnit);
 
                 }
             });
@@ -149,8 +147,8 @@ public class FixedFrequencyScheduler extends PollScheduler
                 @Override
                 public void onTransition(String phaseName, Scheduler object) throws MuleException
                 {
-                    automaticExecutor.shutdown();
-                    onDemandExecutor = Executors.newSingleThreadExecutor();
+                    executor.shutdown();
+                    executor = Executors.newSingleThreadExecutor();
                 }
             });
         }
@@ -165,18 +163,13 @@ public class FixedFrequencyScheduler extends PollScheduler
     @Override
     public void schedule() throws MuleException
     {
-        if ( automaticExecutor.isShutdown() ){
-            onDemandExecutor.submit(job);
-        }
-        else {
-            automaticExecutor.submit(job);
-        }
 
+        executor.submit(job);
     }
 
     /**
      * <p>
-     * Checks that the {@link FixedFrequencyScheduler#automaticExecutor} is terminated and, if not, it terminates the
+     * Checks that the {@link FixedFrequencyScheduler#executor} is terminated and, if not, it terminates the
      * scheduling abruptly
      * </p>
      */
@@ -190,21 +183,21 @@ public class FixedFrequencyScheduler extends PollScheduler
                 @Override
                 public void onTransition(String phaseName, Scheduler object) throws MuleException
                 {
-                    if (!automaticExecutor.isTerminated())
+                    if (!executor.isTerminated())
                     {
                         try
                         {
-                            automaticExecutor.awaitTermination(5000, TimeUnit.MILLISECONDS);
+                            executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
                         }
                         catch (InterruptedException e)
                         {
-                            automaticExecutor.shutdownNow();
+                            executor.shutdownNow();
                         }
                         finally
                         {
-                            if (!automaticExecutor.isTerminated())
+                            if (!executor.isTerminated())
                             {
-                                automaticExecutor.shutdownNow();
+                                executor.shutdownNow();
                             }
                         }
                     }
