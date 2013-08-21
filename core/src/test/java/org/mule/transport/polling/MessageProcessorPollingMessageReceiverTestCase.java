@@ -26,6 +26,7 @@ import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.NullPayload;
+import org.mule.transport.polling.schedule.FixedFrequencySchedulerFactory;
 
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -118,7 +119,7 @@ public class MessageProcessorPollingMessageReceiverTestCase extends AbstractMule
         EndpointURIEndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
         builder.setProperty(MessageProcessorPollingMessageReceiver.SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME,
             processor);
-
+        builder.setProperty(MessageProcessorPollingMessageReceiver.SCHEDULER_FACTORY_PROPERTY_NAME, schedulerFactory());
         InboundEndpoint inboundEndpoint = muleContext.getEndpointFactory().getInboundEndpoint(builder);
 
         MessageProcessorPollingMessageReceiver receiver = new MessageProcessorPollingMessageReceiver(
@@ -126,6 +127,13 @@ public class MessageProcessorPollingMessageReceiverTestCase extends AbstractMule
 
         receiver.initialise();
         return receiver;
+    }
+
+    private FixedFrequencySchedulerFactory schedulerFactory()
+    {
+        FixedFrequencySchedulerFactory factory = new FixedFrequencySchedulerFactory();
+        factory.setFrequency(1000);
+        return factory;
     }
 
 }
