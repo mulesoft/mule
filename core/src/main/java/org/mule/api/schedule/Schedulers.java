@@ -47,7 +47,7 @@ public class Schedulers
             @Override
             public boolean evaluate(String s)
             {
-                return s.startsWith(MessageProcessorPollingMessageReceiver.POLLING_TRANSPORT + "://" + flowName);
+                return s.startsWith(MessageProcessorPollingMessageReceiver.POLLING_TRANSPORT + "://" + flowName + "/");
             }
         };
     }

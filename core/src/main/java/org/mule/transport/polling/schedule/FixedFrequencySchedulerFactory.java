@@ -35,12 +35,12 @@ public class FixedFrequencySchedulerFactory extends SchedulerFactory<PollingRece
     /**
      * <p>The frequency of the scheduler in timeUnit</p>
      */
-    private long frequency;
+    private long frequency = 1000l;
 
     /**
      * <p>The time in timeUnit that it has to wait before executing the first task</p>
      */
-    private long startDelay = 0l;
+    private long startDelay = 1000l;
 
 
     @Override

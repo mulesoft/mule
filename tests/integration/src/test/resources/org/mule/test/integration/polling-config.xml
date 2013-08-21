@@ -22,7 +22,7 @@
 
     <flow name="pollfoo" processingStrategy="queued-asynchronous">
         <poll>
-            <fixed-frequency-scheduler frequency="2" timeUnit="DAYS"/>
+            <fixed-frequency-scheduler frequency="1000" timeUnit="MILLISECONDS"/>
             <outbound-endpoint ref="foo"/>
         </poll>
         <component class="org.mule.test.integration.PollingTestCase$FooComponent"/>

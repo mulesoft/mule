@@ -45,6 +45,7 @@ public class FixedFrequencyScheduler extends PollScheduler
      */
     private ExecutorService executor;
 
+
     /**
      * <p>The {@link TimeUnit} of the scheduler</p>
      */

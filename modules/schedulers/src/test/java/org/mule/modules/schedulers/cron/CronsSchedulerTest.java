@@ -16,7 +16,6 @@ import org.mule.api.MuleException;
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.schedule.Schedulers;
 import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.transport.polling.MessageProcessorPollingMessageReceiver;
 
 import java.util.ArrayList;
 import java.util.Collection;

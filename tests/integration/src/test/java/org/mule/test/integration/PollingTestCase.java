@@ -63,14 +63,6 @@ public class PollingTestCase extends FunctionalTestCase
     {
         public boolean process(String s)
         {
-            try
-            {
-                Thread.sleep(6000);
-            }
-            catch (InterruptedException e)
-            {
-
-            }
             synchronized (foo)
             {
 
@@ -88,8 +80,6 @@ public class PollingTestCase extends FunctionalTestCase
     {
         public boolean process(String s)
         {
-            System.out.print(System.currentTimeMillis());
-
             synchronized (bar)
             {
                 if (bar.size() < 10)
