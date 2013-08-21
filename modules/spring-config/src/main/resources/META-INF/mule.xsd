@@ -3419,6 +3419,58 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="abstract-scheduler" abstract="true" type="abstractSchedulerType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for shedulers
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractSchedulerType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="fixedSchedulerType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractSchedulerType">
+                <xsd:attribute name="frequency" type="substitutableLong" default="1000">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Polling frequency in milliseconds. Default frequency is 1000ms (1s).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="timeUnit" default="MILLISECONDS">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The time unit for the frequency value
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="MILLISECONDS"/>
+                            <xsd:enumeration value="SECONDS"/>
+                            <xsd:enumeration value="MINUTES"/>
+                            <xsd:enumeration value="DAYS"/>
+                            <xsd:enumeration value="HOURS"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+                <xsd:attribute name="startDelay" type="substitutableLong" default="0">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The delay time in time units that sheduler needs to wait before start
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="fixed-frequency-scheduler" type="fixedSchedulerType" substitutionGroup="abstract-scheduler"/>
+
     <xsd:element name="poll" type="pollInboundEndpointType" substitutionGroup="abstract-message-source">
         <xsd:annotation>
             <xsd:documentation>
@@ -3430,13 +3482,14 @@
         <xsd:complexContent>
             <xsd:extension base="abstractMessageSourceType">
                 <xsd:sequence>
+                    <xsd:element ref="abstract-scheduler" minOccurs="0" maxOccurs="1"/>
                     <xsd:element ref="abstract-poll-override" minOccurs="0" maxOccurs="1"/>
                     <xsd:group ref="messageProcessorOrOutboundEndpoint"/>
                 </xsd:sequence>
                 <xsd:attribute name="frequency"  type="substitutableLong" default="1000">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Polling frequency in milliseconds. Default frequency is 1000ms (1s).
+                            Polling frequency in milliseconds. Default frequency is 1000ms (1s). Deprecated since 3.5.0. use fixed-frequency-scheduler instead
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
