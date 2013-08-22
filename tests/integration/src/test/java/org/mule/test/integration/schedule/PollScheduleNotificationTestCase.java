@@ -11,11 +11,13 @@
 package org.mule.test.integration.schedule;
 
 
-import static junit.framework.Assert.assertEquals;
 import org.mule.api.AnnotatedObject;
 import org.mule.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +30,7 @@ public class PollScheduleNotificationTestCase extends FunctionalTestCase
 {
 
     public static final QName NAME = new QName("http://www.mulesoft.org/schema/mule/documentation", "name");
+    Prober prober = new PollingProber(5000, 100l);
 
     @Override
     protected String getConfigResources()
@@ -38,11 +41,22 @@ public class PollScheduleNotificationTestCase extends FunctionalTestCase
     @Test
     public void validateNotificationsAreSent() throws InterruptedException
     {
-        MyListener listener = new MyListener();
+        final MyListener listener = new MyListener();
         muleContext.getNotificationManager().addListener(listener);
-        Thread.sleep(5000);
+        prober.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return listener.getNotifications().size() > 1 && "pollName".equals(listener.getNotifications().get(0));
+            }
 
-        assertEquals("pollName", listener.getNotifications().get(0));
+            @Override
+            public String describeFailure()
+            {
+                return "The notification was never sent";
+            }
+        });
 
     }
     class MyListener implements EndpointMessageNotificationListener<EndpointMessageNotification>{

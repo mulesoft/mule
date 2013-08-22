@@ -12,12 +12,13 @@ package org.mule.test.integration.schedule;
 
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleException;
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.schedule.Schedulers;
 import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.transport.polling.MessageProcessorPollingMessageReceiver;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,6 +35,8 @@ public class PollScheduleTestCase extends FunctionalTestCase
 
     private static List<String> foo = new ArrayList<String>();
     private static List<String> bar = new ArrayList<String>();
+
+    Prober workingPollProber = new PollingProber(5000, 1000l);
 
     @BeforeClass
     public static void setProperties(){
@@ -61,10 +64,22 @@ public class PollScheduleTestCase extends FunctionalTestCase
     @Test
     public void test() throws Exception
     {
-        waitForPollElements();
+        workingPollProber.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return (foo.size() > 2 && checkCollectionValues(foo, "foo")) &&
+                       (bar.size() > 2 && checkCollectionValues(bar, "bar"));
+            }
 
-        checkForFooCollectionToBeFilled();
-        checkForBarCollectionToBeFilled();
+            @Override
+            public String describeFailure()
+            {
+                return "The collections foo and bar are not correctly filled";
+            }
+        });
+
 
         stopSchedulers();
 
@@ -78,7 +93,7 @@ public class PollScheduleTestCase extends FunctionalTestCase
 
         runSchedulersOnce();
 
-        waitForPollElements();
+        Thread.sleep(200);
 
         assertEquals(fooElementsAfterStopping + 1, foo.size());
     }
@@ -88,31 +103,20 @@ public class PollScheduleTestCase extends FunctionalTestCase
         Thread.sleep(2000);
     }
 
-    private void checkForFooCollectionToBeFilled()
+
+
+    private boolean checkCollectionValues(List<String> coll, String value)
     {
-        synchronized (foo)
+        for (String s : coll)
         {
-            foo.size();
-            assertTrue(foo.size() > 0);
-            for (String s : foo)
-            {
-                assertEquals(s, "foo");
+            if ( !s.equals(value) ){
+                return false;
             }
         }
+
+        return true;
     }
 
-    private void checkForBarCollectionToBeFilled()
-    {
-        synchronized (bar)
-        {
-            bar.size();
-            assertTrue(bar.size() > 0);
-            for (String s : bar)
-            {
-                assertEquals(s, "bar");
-            }
-        }
-    }
 
     private void runSchedulersOnce() throws Exception
     {
