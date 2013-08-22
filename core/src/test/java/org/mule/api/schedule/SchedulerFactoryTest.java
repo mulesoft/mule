@@ -36,41 +36,42 @@ public class SchedulerFactoryTest
     private MuleRegistry muleRegistry = mock(MuleRegistry.class);
     private SchedulerFactoryPostProcessor postProcessor2 = mock(SchedulerFactoryPostProcessor.class);
 
-
     /**
-     * If the {@link Scheduler} created is null then throw an {@link SchedulerCreationException}
+     * If the {@link Scheduler} created is null then throw an
+     * {@link SchedulerCreationException}
      */
     @Test(expected = SchedulerCreationException.class)
     public void checkCreationOfNullScheduler()
     {
-        factory(null, null).create(NAME,new Object());
+        factory(null, null).create(NAME, this.newRunnable());
     }
 
     /**
-     * If the {@link Scheduler} post processed is null then throw {@link SchedulerCreationException}
+     * If the {@link Scheduler} post processed is null then throw
+     * {@link SchedulerCreationException}
      */
     @Test(expected = SchedulerCreationException.class)
     public void postProcessMethodMustNeverReturnANullScheduler()
     {
         commonMockBehaviour(singlePostProcessor());
 
-        factory(mockScheduler, muleContext).create(NAME, new Object());
+        factory(mockScheduler, muleContext).create(NAME, this.newRunnable());
     }
 
-
     /**
-     * If the {@link Scheduler} post processed is null then throw {@link SchedulerCreationException}
+     * If the {@link Scheduler} post processed is null then throw
+     * {@link SchedulerCreationException}
      */
     @Test(expected = SchedulerCreationException.class)
     public void postProcessorMustNeverReturnANullScheduler()
     {
         commonMockBehaviour(postProcessors());
 
-        SchedulerFactory factory = factory(mockScheduler, muleContext);
+        SchedulerFactory<Runnable> factory = factory(mockScheduler, muleContext);
 
         try
         {
-            factory.create(NAME,new Object());
+            factory.create(NAME, this.newRunnable());
         }
         finally
         {
@@ -89,16 +90,16 @@ public class SchedulerFactoryTest
         commonMockBehaviour(postProcessors());
         Object job = new Object();
 
-        SchedulerFactory factory = factory(mockScheduler, null);
+        SchedulerFactory<Runnable> factory = factory(mockScheduler, null);
 
         try
         {
-            assertEquals(mockScheduler, factory.create(NAME, job));
+            assertEquals(mockScheduler, factory.create(NAME, this.newRunnable()));
         }
         finally
         {
-            verify(postProcessor2, never()).process(job,null);
-            verify(postProcessor1, never()).process(job,null);
+            verify(postProcessor2, never()).process(job, null);
+            verify(postProcessor1, never()).process(job, null);
         }
     }
 
@@ -110,9 +111,9 @@ public class SchedulerFactoryTest
     {
         Object job = new Object();
         commonMockBehaviour(singlePostProcessor());
-        when(postProcessor1.process(job,mockScheduler)).thenReturn(mockScheduler);
+        when(postProcessor1.process(job, mockScheduler)).thenReturn(mockScheduler);
 
-        assertEquals(mockScheduler, factory(mockScheduler, muleContext).create(NAME,job));
+        assertEquals(mockScheduler, factory(mockScheduler, muleContext).create(NAME, this.newRunnable()));
     }
 
     private Map<String, SchedulerFactoryPostProcessor> postProcessors()
@@ -125,7 +126,8 @@ public class SchedulerFactoryTest
     private void commonMockBehaviour(Map<String, SchedulerFactoryPostProcessor> registeredPostProcessors)
     {
         when(muleContext.getRegistry()).thenReturn(muleRegistry);
-        when(muleRegistry.lookupByType(SchedulerFactoryPostProcessor.class)).thenReturn(registeredPostProcessors);
+        when(muleRegistry.lookupByType(SchedulerFactoryPostProcessor.class)).thenReturn(
+            registeredPostProcessors);
     }
 
     private Map<String, SchedulerFactoryPostProcessor> singlePostProcessor()
@@ -135,14 +137,27 @@ public class SchedulerFactoryTest
         return registeredPostProcessors;
     }
 
-    private SchedulerFactory factory(Scheduler schedulerToReturn, MuleContext muleContext)
+    private SchedulerFactory<Runnable> factory(Scheduler schedulerToReturn, MuleContext muleContext)
     {
         TestedSchedulerFactory factory = new TestedSchedulerFactory(schedulerToReturn);
         factory.setMuleContext(muleContext);
         return factory;
     }
 
-    private class TestedSchedulerFactory extends SchedulerFactory<Object>
+    private Runnable newRunnable()
+    {
+        return new Runnable()
+        {
+
+            @Override
+            public void run()
+            {
+                // no-op
+            }
+        };
+    }
+
+    private class TestedSchedulerFactory extends SchedulerFactory<Runnable>
     {
 
         private Scheduler schedulerToReturn;
@@ -153,11 +168,10 @@ public class SchedulerFactoryTest
         }
 
         @Override
-        protected Scheduler doCreate(String name, Object job)
+        protected Scheduler doCreate(String name, Runnable job)
         {
             return schedulerToReturn;
         }
     }
-
 
 }

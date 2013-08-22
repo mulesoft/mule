@@ -43,7 +43,7 @@ import org.quartz.impl.StdSchedulerFactory;
  *
  * @since 3.5.0
  */
-public class CronScheduler extends PollScheduler implements MuleContextAware
+public class CronScheduler extends PollScheduler<PollingReceiverWorker> implements MuleContextAware
 {
 
     protected transient Log logger = LogFactory.getLog(getClass());

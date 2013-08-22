@@ -11,7 +11,6 @@
 package org.mule.transport.polling.schedule;
 
 import org.mule.api.schedule.Scheduler;
-import org.mule.transport.PollingReceiverWorker;
 
 
 /**
@@ -21,17 +20,17 @@ import org.mule.transport.PollingReceiverWorker;
  *
  * @since 3.5.0
  */
-public abstract class PollScheduler implements Scheduler
+public abstract class PollScheduler<T extends Runnable> implements Scheduler
 {
 
-    protected PollingReceiverWorker job;
+    protected T job;
 
     /**
      * <p>The {@link org.mule.api.schedule.Scheduler} name used as an identifier in the {@link org.mule.api.registry.MuleRegistry}</p>
      */
     protected String name;
 
-    protected PollScheduler(String name,PollingReceiverWorker job)
+    protected PollScheduler(String name, T job)
     {
         this.name = name;
         this.job = job;

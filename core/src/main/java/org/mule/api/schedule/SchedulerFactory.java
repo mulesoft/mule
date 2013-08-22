@@ -38,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
  * @param <T> is the type of the scheduler job (what is the scheduler going to execute)
  * @since 3.5.0
  */
-public abstract class SchedulerFactory<T> implements MuleContextAware
+public abstract class SchedulerFactory<T extends Runnable> implements MuleContextAware
 {
 
     protected transient Log logger = LogFactory.getLog(getClass());

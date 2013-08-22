@@ -16,8 +16,6 @@ import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.schedule.Scheduler;
 import org.mule.lifecycle.DefaultLifecycleManager;
 import org.mule.lifecycle.SimpleLifecycleManager;
-import org.mule.transport.AbstractPollingMessageReceiver;
-import org.mule.transport.PollingReceiverWorker;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,7 +33,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @since 3.5.0
  */
-public class FixedFrequencyScheduler extends PollScheduler
+public class FixedFrequencyScheduler<T extends Runnable> extends PollScheduler<T>
 {
 
     protected transient Log logger = LogFactory.getLog(getClass());
@@ -70,7 +68,7 @@ public class FixedFrequencyScheduler extends PollScheduler
      */
     private final SimpleLifecycleManager<Scheduler> lifecycleManager;
 
-    public FixedFrequencyScheduler(String name, long frequency, long startDelay, PollingReceiverWorker job, TimeUnit timeUnit)
+    public FixedFrequencyScheduler(String name, long frequency, long startDelay, T job, TimeUnit timeUnit)
     {
         super(name, job);
         this.frequency = frequency;
