@@ -15,8 +15,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.api.MuleContext;
 import org.mule.api.registry.MuleRegistry;
+import org.mule.tck.size.SmallTest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +28,7 @@ import org.junit.Test;
 /**
  * Test to validate the interface {@link SchedulerFactory} interface
  */
+@SmallTest
 public class SchedulerFactoryTest
 {
 
