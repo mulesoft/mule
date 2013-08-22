@@ -109,11 +109,11 @@ public class SchedulerFactoryTest
     @Test
     public void createTheScheduler()
     {
-        Object job = new Object();
+        Runnable job = this.newRunnable();
         commonMockBehaviour(singlePostProcessor());
         when(postProcessor1.process(job, mockScheduler)).thenReturn(mockScheduler);
 
-        assertEquals(mockScheduler, factory(mockScheduler, muleContext).create(NAME, this.newRunnable()));
+        assertEquals(mockScheduler, factory(mockScheduler, muleContext).create(NAME, job));
     }
 
     private Map<String, SchedulerFactoryPostProcessor> postProcessors()
