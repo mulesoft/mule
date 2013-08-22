@@ -12,7 +12,6 @@ package org.mule.streaming;
 
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
-import org.mule.api.streaming.PagingDelegate;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;

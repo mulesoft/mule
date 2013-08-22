@@ -17,15 +17,15 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.common.connection.exception.UnableToAcquireConnectionException;
 import org.mule.common.connection.exception.UnableToReleaseConnectionException;
+import org.mule.devkit.processor.ExpressionEvaluatorSupport;
 import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
 import org.mule.security.oauth.callback.ProcessCallback;
-import org.mule.security.oauth.processor.AbstractExpressionEvaluator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ManagedAccessTokenProcessInterceptor<T> extends AbstractExpressionEvaluator
+public class ManagedAccessTokenProcessInterceptor<T> extends ExpressionEvaluatorSupport
     implements ProcessInterceptor<T, OAuth2Adapter>
 {
 

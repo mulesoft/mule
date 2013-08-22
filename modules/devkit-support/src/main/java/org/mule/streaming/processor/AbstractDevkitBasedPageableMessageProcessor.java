@@ -13,26 +13,27 @@ package org.mule.streaming.processor;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.streaming.Consumer;
-import org.mule.api.streaming.PagingConfiguration;
-import org.mule.api.streaming.PagingDelegate;
-import org.mule.api.streaming.Producer;
-import org.mule.api.streaming.StreamingOutputUnit;
-import org.mule.security.oauth.processor.AbstractDevkitBasedMessageProcessor;
+import org.mule.devkit.processor.DevkitBasedMessageProcessor;
+import org.mule.streaming.Consumer;
 import org.mule.streaming.ConsumerIterator;
 import org.mule.streaming.ElementBasedPagingConsumer;
 import org.mule.streaming.PagedBasedPagingConsumer;
+import org.mule.streaming.PagingConfiguration;
+import org.mule.streaming.PagingDelegate;
 import org.mule.streaming.PagingDelegateProducer;
+import org.mule.streaming.PagingDelegateWrapper;
+import org.mule.streaming.Producer;
+import org.mule.streaming.StreamingOutputUnit;
 
 import java.util.Iterator;
 
 /**
  * Base class for devkit generated pageable message processors. This processor
- * automatically takes care of obtaining a
- * {@link org.mule.api.streaming.PagingDelegate} and returning a
- * {@link org.mule.streaming.ConsumerIterator.ConsumerIterator} accordingly
+ * automatically takes care of obtaining a {@link org.mule.streaming.PagingDelegate}
+ * and returning a {@link org.mule.streaming.ConsumerIterator.ConsumerIterator}
+ * accordingly
  */
-public abstract class AbstractDevkitBasedPageableMessageProcessor extends AbstractDevkitBasedMessageProcessor
+public abstract class AbstractDevkitBasedPageableMessageProcessor extends DevkitBasedMessageProcessor
 {
 
     /**
@@ -67,7 +68,7 @@ public abstract class AbstractDevkitBasedPageableMessageProcessor extends Abstra
      * This method sets the message payload to an instance of
      * {@link org.mule.streaming.ConsumerIterator.ConsumerIterator} configured
      * accordingly to the configured outputUnit and the
-     * {@link org.mule.api.streaming.PagingDelegate} obtained by invoking {@link
+     * {@link org.mule.streaming.PagingDelegate} obtained by invoking {@link
      * org.mule.streaming.processor.AbstractDevkitBasedPageableMessageProcessor.
      * getPagingDelegate(MuleEvent, PagingConfiguration)}
      * 
@@ -86,6 +87,8 @@ public abstract class AbstractDevkitBasedPageableMessageProcessor extends Abstra
         {
             throw new DefaultMuleException("Obtained paging delegate cannot be null");
         }
+
+        delegate = new PagingDelegateWrapper(delegate);
 
         Producer<?> producer = new PagingDelegateProducer(delegate);
         Consumer<?> consumer = null;
@@ -109,13 +112,12 @@ public abstract class AbstractDevkitBasedPageableMessageProcessor extends Abstra
     }
 
     /**
-     * Implement this method to return the
-     * {@link org.mule.api.streaming.PagingDelegate} to be used when paging. This
-     * method should never return <code>null</code>
+     * Implement this method to return the {@link org.mule.streaming.PagingDelegate}
+     * to be used when paging. This method should never return <code>null</code>
      * 
      * @param event the current mule event
      * @param pagingConfiguration paging configuration parameters
-     * @return a not null {@link org.mule.api.streaming.PagingDelegate}
+     * @return a not null {@link org.mule.streaming.PagingDelegate}
      * @throws Exception
      */
     protected abstract PagingDelegate<?> getPagingDelegate(MuleEvent event,

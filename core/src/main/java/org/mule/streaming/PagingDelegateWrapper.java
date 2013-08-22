@@ -11,7 +11,6 @@
 package org.mule.streaming;
 
 import org.mule.api.MuleException;
-import org.mule.api.streaming.PagingDelegate;
 import org.mule.util.CollectionUtils;
 
 import java.util.List;
@@ -20,23 +19,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Base implementation of {@link PagingDelegate} that takes care of some basic
- * concerns such as logging, auto closing the delegate if the consumer has been fully
- * consumed, etc.
+ * This implementation of {@link PagingDelegate} takes care of enforcing some basic
+ * behaviour of the delegate contract so that users don't have to. Concerns such as
+ * logging, auto closing the delegate if the consumer has been fully consumed, etc
+ * are addressed here
  */
-public abstract class BasePagingDelegate<T> implements PagingDelegate<T>
+public class PagingDelegateWrapper<T> extends PagingDelegate<T>
 {
 
-    private static final Logger logger = LoggerFactory.getLogger(BasePagingDelegate.class);
+    private static final Logger logger = LoggerFactory.getLogger(PagingDelegateWrapper.class);
 
+    private PagingDelegate<T> wrapped;
     private boolean closed = false;
 
+    public PagingDelegateWrapper(PagingDelegate<T> wrapped)
+    {
+        this.wrapped = wrapped;
+    }
+
     /**
-     * {@inheritDoc} This base implementation already takes care of returning
+     * {@inheritDoc} This implementation already takes care of returning
      * <code>null</code> if the delegate is closed or if the obtained page is
-     * <code>null</code> or empty. It delegates into {@link
-     * org.mule.streaming.BasePagingDelegate.doGetPage()} to actually obtain the
-     * page.
+     * <code>null</code> or empty. It delegates into the wrapped instance to actually
+     * obtain the page.
      */
     public List<T> getPage()
     {
@@ -49,7 +54,7 @@ public abstract class BasePagingDelegate<T> implements PagingDelegate<T>
             return null;
         }
 
-        List<T> page = this.doGetPage();
+        List<T> page = this.wrapped.getPage();
         if (CollectionUtils.isEmpty(page))
         {
             try
@@ -71,27 +76,24 @@ public abstract class BasePagingDelegate<T> implements PagingDelegate<T>
     }
 
     /**
-     * Implement this method to actually fetch the page
-     */
-    protected abstract List<T> doGetPage();
-
-    /**
-     * Sets the closed flag to true and then delegates into {@link
-     * org.mule.streaming.BasePagingDelegate.doClose()}
+     * {@inheritDoc} Sets the closed flag to true and then delegates into the wrapped
+     * instance
      */
     @Override
     public void close() throws MuleException
     {
         this.closed = true;
-        this.doClose();
+        this.wrapped.close();
     }
 
     /**
-     * Implement this to actually release any pending resources
-     * 
-     * @throws MuleException
+     * {@inheritDoc} Delegetes into the wrapped instance
      */
-    protected abstract void doClose() throws MuleException;
+    @Override
+    public int getTotalResults()
+    {
+        return this.wrapped.getTotalResults();
+    }
 
     private void handleCloseException(Throwable t)
     {

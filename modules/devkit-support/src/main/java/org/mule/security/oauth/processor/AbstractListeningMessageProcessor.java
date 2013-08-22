@@ -19,10 +19,11 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.callback.SourceCallback;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.devkit.processor.DevkitBasedMessageProcessor;
 
 import java.util.Map;
 
-public abstract class AbstractListeningMessageProcessor extends AbstractDevkitBasedMessageProcessor
+public abstract class AbstractListeningMessageProcessor extends DevkitBasedMessageProcessor
     implements SourceCallback
 {
 

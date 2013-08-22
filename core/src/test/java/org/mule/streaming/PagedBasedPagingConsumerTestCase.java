@@ -11,9 +11,6 @@
 package org.mule.streaming;
 
 import org.mule.api.MuleException;
-import org.mule.api.streaming.ClosedConsumerException;
-import org.mule.api.streaming.Consumer;
-import org.mule.api.streaming.Producer;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;

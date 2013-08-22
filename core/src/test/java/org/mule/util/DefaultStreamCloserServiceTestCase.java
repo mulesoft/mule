@@ -12,8 +12,8 @@ package org.mule.util;
 
 import org.mule.api.Closeable;
 import org.mule.api.MuleContext;
-import org.mule.api.streaming.Consumer;
 import org.mule.api.util.StreamCloser;
+import org.mule.streaming.Consumer;
 import org.mule.tck.size.SmallTest;
 
 import java.io.ByteArrayInputStream;

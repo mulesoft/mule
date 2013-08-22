@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.streaming;
+package org.mule.streaming;
 
 /**
  * This enum lists the possible ways to navigate a streaming data feed.

@@ -11,9 +11,6 @@
 package org.mule.streaming;
 
 import org.mule.api.MuleException;
-import org.mule.api.streaming.ClosedConsumerException;
-import org.mule.api.streaming.Consumer;
-import org.mule.api.streaming.Producer;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -23,8 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link org.mule.api.streaming.Consumer} that obains data from an
- * instance of {@link org.mule.api.streaming.Producer} and returns the elements in
+ * Implementation of {@link org.mule.streaming.Consumer} that obains data from an
+ * instance of {@link org.mule.streaming.Producer} and returns the elements in
  * the same pages as the producer returns them. This implementation is not
  * thread-safe
  */

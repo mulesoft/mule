@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.streaming;
+package org.mule.streaming;
 
 import org.mule.api.Closeable;
 
@@ -16,10 +16,10 @@ import java.util.List;
 
 /**
  * A PagingDelegate is a {@link org.mule.api.Closeable} capable of consuming a data
- * feed in pages. Implementing this interface does not guarantee thread safeness.
- * Check each particular implementation for information about that
+ * feed in pages. Implementing this class does not guarantee thread safeness. Check
+ * each particular implementation for information about that
  */
-public interface PagingDelegate<T> extends Closeable
+public abstract class PagingDelegate<T> implements Closeable
 {
 
     /**
@@ -29,13 +29,13 @@ public interface PagingDelegate<T> extends Closeable
      * @return a populated list of elements. <code>null</code> or an empty list, then
      *         it means no more items are available
      */
-    public List<T> getPage();
+    public abstract List<T> getPage();
 
     /**
      * returns the total amount of items in the unpaged resultset. In some scenarios,
      * it might not be possible/convenient to actually retrieve this value. -1 is
      * returned in such a case.
      */
-    public int getTotalResults();
+    public abstract int getTotalResults();
 
 }

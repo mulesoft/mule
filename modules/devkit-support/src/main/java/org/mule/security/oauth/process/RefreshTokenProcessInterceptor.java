@@ -15,14 +15,14 @@ import org.mule.api.MuleMessage;
 import org.mule.api.devkit.ProcessInterceptor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
+import org.mule.devkit.processor.ExpressionEvaluatorSupport;
 import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.callback.ProcessCallback;
-import org.mule.security.oauth.processor.AbstractExpressionEvaluator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RefreshTokenProcessInterceptor<T> extends AbstractExpressionEvaluator
+public class RefreshTokenProcessInterceptor<T> extends ExpressionEvaluatorSupport
     implements ProcessInterceptor<T, OAuth2Adapter>
 {
 

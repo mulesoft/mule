@@ -14,12 +14,12 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.streaming.PagingConfiguration;
-import org.mule.api.streaming.PagingDelegate;
-import org.mule.api.streaming.StreamingOutputUnit;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.streaming.ConsumerIterator;
+import org.mule.streaming.PagingConfiguration;
+import org.mule.streaming.PagingDelegate;
+import org.mule.streaming.StreamingOutputUnit;
 import org.mule.tck.size.SmallTest;
 
 import java.lang.reflect.Type;

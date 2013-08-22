@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.streaming;
+package org.mule.streaming;
 
 import org.mule.api.Closeable;
 

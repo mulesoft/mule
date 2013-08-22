@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.streaming;
+package org.mule.streaming;
 
 /**
  * Exception to signal that a consumer you're trying to access is already closed

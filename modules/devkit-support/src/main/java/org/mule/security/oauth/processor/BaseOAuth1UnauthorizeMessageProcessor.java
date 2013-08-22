@@ -12,9 +12,10 @@ package org.mule.security.oauth.processor;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.devkit.processor.DevkitBasedMessageProcessor;
 import org.mule.security.oauth.OAuth1Adapter;
 
-public abstract class BaseOAuth1UnauthorizeMessageProcessor extends AbstractDevkitBasedMessageProcessor
+public abstract class BaseOAuth1UnauthorizeMessageProcessor extends DevkitBasedMessageProcessor
     implements MessageProcessor
 {
 

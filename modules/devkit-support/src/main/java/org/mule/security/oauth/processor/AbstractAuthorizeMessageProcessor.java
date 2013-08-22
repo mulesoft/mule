@@ -23,11 +23,12 @@ import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.TransformerMessagingException;
+import org.mule.devkit.processor.DevkitBasedMessageProcessor;
 import org.mule.security.oauth.callback.DefaultHttpCallbackFactory;
 import org.mule.security.oauth.callback.HttpCallbackAdapter;
 import org.mule.security.oauth.notification.OAuthAuthorizeNotification;
 
-public abstract class AbstractAuthorizeMessageProcessor extends AbstractDevkitBasedMessageProcessor
+public abstract class AbstractAuthorizeMessageProcessor extends DevkitBasedMessageProcessor
     implements FlowConstructAware, MuleContextAware, Initialisable, Startable, Stoppable,
     InterceptingMessageProcessor
 {

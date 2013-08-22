@@ -11,9 +11,6 @@
 package org.mule.streaming;
 
 import org.mule.api.MuleException;
-import org.mule.api.streaming.Consumer;
-import org.mule.api.streaming.PagingDelegate;
-import org.mule.api.streaming.Producer;
 import org.mule.streaming.ConsumerIterator;
 import org.mule.streaming.ElementBasedPagingConsumer;
 import org.mule.streaming.PagingDelegateProducer;

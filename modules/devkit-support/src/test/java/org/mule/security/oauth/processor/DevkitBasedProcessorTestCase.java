@@ -14,6 +14,7 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.common.security.oauth.exception.NotAuthorizedException;
+import org.mule.devkit.processor.DevkitBasedMessageProcessor;
 import org.mule.security.oauth.OAuthAdapter;
 import org.mule.security.oauth.OnNoTokenPolicy;
 import org.mule.tck.size.SmallTest;
@@ -31,7 +32,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class DevkitBasedProcessorTestCase
 {
 
-    private AbstractDevkitBasedMessageProcessor processor;
+    private DevkitBasedMessageProcessor processor;
 
     @Mock
     private Object testStrategy;
@@ -75,7 +76,7 @@ public class DevkitBasedProcessorTestCase
         Assert.assertNull(this.processor.process(this.event));
     }
 
-    private class TestProcessor extends AbstractDevkitBasedMessageProcessor implements MessageProcessor
+    private class TestProcessor extends DevkitBasedMessageProcessor implements MessageProcessor
     {
 
         private TestProcessor()

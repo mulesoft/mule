@@ -11,14 +11,12 @@
 package org.mule.streaming;
 
 import org.mule.api.MuleException;
-import org.mule.api.streaming.PagingDelegate;
-import org.mule.api.streaming.Producer;
 
 import java.util.List;
 
 /**
- * Implementation of {@link org.mule.api.streaming.Producer} that uses an instance of
- * {@link org.mule.api.streaming.PagingDelegate} to get its results
+ * Implementation of {@link org.mule.streaming.Producer} that uses an instance of
+ * {@link org.mule.streaming.PagingDelegate} to get its results
  */
 public class PagingDelegateProducer<T> implements Producer<T>
 {

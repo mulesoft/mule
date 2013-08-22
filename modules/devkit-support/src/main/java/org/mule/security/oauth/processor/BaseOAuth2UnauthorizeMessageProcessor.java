@@ -15,15 +15,15 @@ import org.mule.api.MuleEvent;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.common.connection.exception.UnableToAcquireConnectionException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.devkit.processor.DevkitBasedMessageProcessor;
 import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public abstract class BaseOAuth2UnauthorizeMessageProcessor<T extends OAuth2Manager<OAuth2Adapter>> extends
-    AbstractDevkitBasedMessageProcessor implements MessageProcessor
+    DevkitBasedMessageProcessor implements MessageProcessor
 {
 
     private static Logger logger = LoggerFactory.getLogger(BaseOAuth2UnauthorizeMessageProcessor.class);

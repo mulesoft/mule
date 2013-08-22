@@ -12,13 +12,12 @@ package org.mule.streaming;
 
 import org.mule.api.Closeable;
 import org.mule.api.MuleException;
-import org.mule.api.streaming.Consumer;
 
 import java.util.Iterator;
 
 /**
  * Implementation of {@link java.util.Iterator} that takes its elements from a
- * {@link org.mule.api.streaming.Consumer}. This iterator also implements
+ * {@link org.mule.streaming.Consumer}. This iterator also implements
  * {@link org.mule.api.Closeable}. Closing this iterator will cause the underlying
  * consumer to be closed. If for any reason the underlying consumer gets closed
  * (either because this iterator closed it or some other reason), then this iterator

@@ -12,9 +12,10 @@ package org.mule.security.oauth.processor;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.devkit.processor.DevkitBasedMessageProcessor;
 import org.mule.security.oauth.notification.OAuthAuthorizeNotification;
 
-public abstract class FetchAccessTokenMessageProcessor extends AbstractDevkitBasedMessageProcessor
+public abstract class FetchAccessTokenMessageProcessor extends DevkitBasedMessageProcessor
     implements MessageProcessor
 {
 
