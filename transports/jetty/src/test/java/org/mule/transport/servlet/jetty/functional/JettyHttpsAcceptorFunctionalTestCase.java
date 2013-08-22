@@ -23,8 +23,12 @@ public class JettyHttpsAcceptorFunctionalTestCase extends AbstractJettyAcceptorF
     }
 
     @Test
-    public void test() throws Exception {
+    public void testDefaultAcceptors() throws Exception {
         assertAcceptors("connector-default-acceptors", "flow-default-acceptors", 1);
+    }
+
+    @Test
+    public void testAdditionalAcceptors() throws Exception {
         assertAcceptors("connector-ten-acceptors", "flow-ten-acceptors", 10);
     }
 }
