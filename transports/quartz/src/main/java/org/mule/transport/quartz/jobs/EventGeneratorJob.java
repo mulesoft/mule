@@ -10,6 +10,7 @@
 
 package org.mule.transport.quartz.jobs;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
@@ -116,7 +117,7 @@ public class EventGeneratorJob implements Job
         }
         catch (Exception e)
         {
-            muleContext.getExceptionListener().handleException(e);
+            receiver.getFlowConstruct().getExceptionListener().handleException(e, ((MessagingException) e).getEvent());
         }
     }
 }
