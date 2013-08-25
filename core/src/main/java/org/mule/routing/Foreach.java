@@ -18,6 +18,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorPathElement;
+import org.mule.api.routing.filter.Filter;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.expression.ExpressionConfig;
@@ -176,6 +177,16 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
         splitter.setCounterVariableName(counterVariableName);
         splitter.setMuleContext(muleContext);
         messageProcessors.add(0, splitter);
+        messageProcessors.add(new MessageFilter(new Filter()
+        {
+
+            @Override
+            public boolean accept(MuleMessage message)
+            {
+                return false;
+            }
+        }));
+
         try
         {
             this.ownedMessageProcessor = new DefaultMessageProcessorChainBuilder().chain(messageProcessors)
