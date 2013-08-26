@@ -52,6 +52,7 @@ public class URIBuilder implements AnnotatedObject
 {
     private static final String DOTS = ":";
     private static final String DOTS_SLASHES = DOTS + "//";
+    private static final String SLASH = "/";
     private static final String QUERY = "?";
     private static final String AND = "&";
     private static final String EQUALS = "=";
@@ -248,6 +249,7 @@ public class URIBuilder implements AnnotatedObject
         StringBuffer buffer = new StringBuffer();
         appendMeta(buffer);
         OrderedQueryParameters uriQueries = appendAddress(buffer);
+        removeRootTrailingSlash(buffer);
         uriQueries.override(queryMap);
         buffer.append(uriQueries.toString());
         return buffer.toString();
@@ -336,6 +338,27 @@ public class URIBuilder implements AnnotatedObject
                 buffer.append("/");
             }
             buffer.append(path);
+        }
+    }
+
+    private void removeRootTrailingSlash(StringBuffer buffer)
+    {
+        int lastIndex = buffer.length() - 1;
+
+        if (lastIndex >= 0 && buffer.charAt(lastIndex) == SLASH.charAt(0))
+        {
+            int start = 0;
+            int index = buffer.indexOf(DOTS_SLASHES);
+
+            if (index != -1)
+            {
+                start = index + DOTS_SLASHES.length();
+            }
+
+            if (buffer.indexOf(SLASH, start) == lastIndex)
+            {
+                buffer.deleteCharAt(lastIndex);
+            }
         }
     }
 
