@@ -25,6 +25,6 @@ public class JettyHttpAcceptorTenFunctionalTestCase extends AbstractJettyAccepto
 
     @Test
     public void testAdditionalAcceptors() throws Exception {
-        assertAcceptors("connector-ten-acceptors", "flow-ten-acceptors", 10);
+        assertAcceptors("connector-ten-acceptors", "flow-ten-acceptors", 10, Protocol.http);
     }
 }
