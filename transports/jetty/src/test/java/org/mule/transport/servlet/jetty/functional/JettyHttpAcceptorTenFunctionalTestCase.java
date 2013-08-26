@@ -4,7 +4,6 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.servlet.jetty.functional;
 
 import org.junit.Test;
@@ -13,8 +12,7 @@ import org.junit.Test;
  * Functional tests that underlying Jetty acceptor threads may be changed in Mule Jetty HTTP connector.
  * Verifies the number of acceptor threads may be modified through configuration.
  */
-public class JettyHttpAcceptorTenFunctionalTestCase extends AbstractJettyAcceptorFunctionalTestCase
-{
+public class JettyHttpAcceptorTenFunctionalTestCase extends AbstractJettyAcceptorFunctionalTestCase {
 
     @Override
     protected String getConfigResources()
@@ -23,8 +21,7 @@ public class JettyHttpAcceptorTenFunctionalTestCase extends AbstractJettyAccepto
     }
 
     @Test
-    public void testAdditionalAcceptors() throws Exception
-    {
-        assertAcceptors("connector-ten-acceptors", "flow-ten-acceptors", 10, Protocol.http);
+    public void testAdditionalAcceptors() throws Exception {
+        assertAcceptors("connector-ten-acceptors", "flow-ten-acceptors", 10);
     }
 }
