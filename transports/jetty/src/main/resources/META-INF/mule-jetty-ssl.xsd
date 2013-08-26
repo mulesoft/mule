@@ -67,7 +67,7 @@
                 <xsd:attribute name="acceptors" type="mule:substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The number of Jetty "acceptor" threads to use. May be increased for improved throughput. Defaults to 1.
+                            The number of Jetty "acceptor" threads to use. May be increased for improved throughput. Defaults: 1
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

@@ -12,22 +12,11 @@
        http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd
        http://www.mulesoft.org/schema/mule/jetty-ssl http://www.mulesoft.org/schema/mule/jetty-ssl/current/mule-jetty-ssl.xsd">
 
-    <jetty:connector name="connector-default-acceptors">
-        <jetty:tls-client path="clientKeystore" storePassword="mulepassword"/>
-        <jetty:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
-        <jetty:tls-server path="trustStore" storePassword="mulepassword"/>
-    </jetty:connector>
-
     <jetty:connector name="connector-ten-acceptors" acceptors="10">
         <jetty:tls-client path="clientKeystore" storePassword="mulepassword"/>
         <jetty:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
         <jetty:tls-server path="trustStore" storePassword="mulepassword"/>
     </jetty:connector>
-
-    <flow name="flow-default-acceptors">
-        <inbound-endpoint address="jetty-ssl:https://localhost:${port1}" exchange-pattern="request-response" connector-ref="connector-default-acceptors"/>
-        <test:component appendString=" received"/>
-    </flow>
 
     <flow name="flow-ten-acceptors">
         <inbound-endpoint address="jetty-ssl:https://localhost:${port2}" exchange-pattern="request-response" connector-ref="connector-ten-acceptors"/>

@@ -13,22 +13,18 @@ package org.mule.transport.servlet.jetty.functional;
 import org.junit.Test;
 
 /**
- * Functional tests that underlying Jetty acceptor threads may be changed in Mule Jetty HTTP connector
+ * Functional tests that underlying Jetty acceptor threads may be changed in Mule Jetty HTTP connector.
+ * Verifies the default number of acceptor threads.
  */
-public class JettyHttpAcceptorFunctionalTestCase extends AbstractJettyAcceptorFunctionalTestCase {
+public class JettyHttpAcceptorDefaultFunctionalTestCase extends AbstractJettyAcceptorFunctionalTestCase {
 
     @Override
     protected String getConfigResources() {
-        return "jetty-http-acceptors-functional-test.xml";
+        return "jetty-http-acceptors-default-functional-test.xml";
     }
 
     @Test
     public void testDefaultAcceptors() throws Exception {
         assertAcceptors("connector-default-acceptors", "flow-default-acceptors", 1);
-    }
-
-    @Test
-    public void testAdditionalAcceptors() throws Exception {
-        assertAcceptors("connector-ten-acceptors", "flow-ten-acceptors", 10);
     }
 }
