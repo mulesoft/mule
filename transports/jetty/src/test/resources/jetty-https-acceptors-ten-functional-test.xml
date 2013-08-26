@@ -19,7 +19,7 @@
     </jetty:connector>
 
     <flow name="flow-ten-acceptors">
-        <inbound-endpoint address="jetty-ssl:https://localhost:${port2}" exchange-pattern="request-response" connector-ref="connector-ten-acceptors"/>
+        <inbound-endpoint address="jetty-ssl:https://localhost:${port1}" exchange-pattern="request-response" connector-ref="connector-ten-acceptors"/>
         <test:component appendString=" received"/>
     </flow>
 

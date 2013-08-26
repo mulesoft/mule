@@ -21,6 +21,6 @@ public class JettyHttpsAcceptorDefaultFunctionalTestCase extends AbstractJettyAc
 
     @Test
     public void testDefaultAcceptors() throws Exception {
-        assertAcceptors("connector-default-acceptors", "flow-default-acceptors", 1);
+        assertAcceptors("connector-default-acceptors", "flow-default-acceptors", 1, Protocol.https);
     }
 }

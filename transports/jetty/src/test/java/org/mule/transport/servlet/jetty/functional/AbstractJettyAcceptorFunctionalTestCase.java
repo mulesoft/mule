@@ -10,6 +10,8 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.mortbay.thread.QueuedThreadPool;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.Connector;
 import org.mule.construct.Flow;
@@ -19,6 +21,8 @@ import org.mule.transport.servlet.jetty.JettyHttpConnector;
 
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Functional tests that Jetty acceptor threads may be changed (from default of 1).
  * Implementors should define a Mule config containing a single Jetty connector
@@ -26,40 +30,48 @@ import java.util.Set;
  */
 public abstract class AbstractJettyAcceptorFunctionalTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort port1 = new DynamicPort("port1");
+    enum Protocol {
+        http, https
+    }
 
     @Rule
-    public DynamicPort port2 = new DynamicPort("port2");
+    public DynamicPort port1 = new DynamicPort("port1");
 
     @Override
     protected String getConfigResources() {
         return null;
     }
 
-    void assertAcceptors(final String connectorName, final String flowName, final int acceptors) {
-        // verify the acceptor config is passed down into the application defined connector
-        Connector conn = muleContext.getRegistry().lookupConnector(connectorName);
-        Assert.assertNotNull(conn);
-        Assert.assertThat(conn, CoreMatchers.instanceOf(JettyHttpConnector.class));
-        JettyHttpConnector cnn = (JettyHttpConnector) conn;
-        Assert.assertEquals(acceptors, cnn.getAcceptors());
+    void assertAcceptors(final String connectorName, final String flowName, final int acceptors, final Protocol protocol) throws Exception {
+        assertGlobalConnector(connectorName, acceptors);
+        assertFlowConnector(flowName, acceptors);
+        assertThreads(acceptors);
+        assertRequest(protocol);
+    }
 
+    void assertFlowConnector(String flowName, int acceptors) {
         // verify the acceptor config is passed down into the connector used by the endpoint
         final Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(flowName);
         Assert.assertNotNull(flow);
         final InboundEndpoint endpoint = (InboundEndpoint) flow.getMessageSource();
         Assert.assertNotNull(endpoint);
-        conn = endpoint.getConnector();
+        final Connector conn = endpoint.getConnector();
         Assert.assertNotNull(conn);
         Assert.assertThat(conn, CoreMatchers.instanceOf(JettyHttpConnector.class));
-        cnn = (JettyHttpConnector) conn;
+        final JettyHttpConnector cnn = (JettyHttpConnector) conn;
         Assert.assertEquals(acceptors, cnn.getAcceptors());
-
-        assertAcceptors(acceptors);
     }
 
-    void assertAcceptors(final int acceptors) {
+    void assertGlobalConnector(final String connectorName, final int acceptors) {
+        // verify the acceptor config is passed down into the application defined connector
+        final Connector conn = muleContext.getRegistry().lookupConnector(connectorName);
+        Assert.assertNotNull(conn);
+        Assert.assertThat(conn, CoreMatchers.instanceOf(JettyHttpConnector.class));
+        final JettyHttpConnector cnn = (JettyHttpConnector) conn;
+        Assert.assertEquals(acceptors, cnn.getAcceptors());
+    }
+
+    void assertThreads(final int acceptors) {
         final Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
         int actual = 0;
         for (final Thread th : threadSet) {
@@ -69,5 +81,12 @@ public abstract class AbstractJettyAcceptorFunctionalTestCase extends Functional
             }
         }
         Assert.assertEquals(acceptors, actual);
+    }
+
+    void assertRequest(final Protocol protocol) throws Exception {
+        final MuleClient client = muleContext.getClient();
+        final MuleMessage message = client.send(String.format("%s://localhost:%s", protocol, port1.getNumber()), TEST_MESSAGE, null);
+        assertEquals("200", message.getInboundProperty("http.status"));
+        assertEquals(TEST_MESSAGE + " received", message.getPayloadAsString());
     }
 }
