@@ -9,11 +9,9 @@
  */
 package org.mule.context.notification.processors;
 
-import static org.junit.Assert.assertNotNull;
-
+import static junit.framework.Assert.assertNotNull;
 import org.mule.context.notification.Node;
 import org.mule.context.notification.RestrictedNode;
-import org.mule.context.notification.processors.AbstractMessageProcessorNotificationTestCase;
 import org.mule.module.client.MuleClient;
 
 import java.util.Arrays;
@@ -100,6 +98,8 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
                 .serial(pre()) //foreach
                 .serial(prePost())    //logger-loop-1
                 .serial(prePost())    //logger-loop-2
+                .serial(prePost())    // ?
+                .serial(prePost())    // ?
                 .serial(post())
                 .serial(prePost())    //MP after the Scope
 
