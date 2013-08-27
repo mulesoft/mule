@@ -13,16 +13,6 @@ package org.mule.module.xml.stax;
 import java.util.ArrayList;
 import java.util.List;
 
-import javanet.staxutils.events.AttributeEvent;
-import javanet.staxutils.events.CDataEvent;
-import javanet.staxutils.events.CharactersEvent;
-import javanet.staxutils.events.CommentEvent;
-import javanet.staxutils.events.EndDocumentEvent;
-import javanet.staxutils.events.EndElementEvent;
-import javanet.staxutils.events.NamespaceEvent;
-import javanet.staxutils.events.StartDocumentEvent;
-import javanet.staxutils.events.StartElementEvent;
-
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
@@ -32,6 +22,17 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.XMLEvent;
+
+import javanet.staxutils.events.AbstractCharactersEvent;
+import javanet.staxutils.events.AttributeEvent;
+import javanet.staxutils.events.CDataEvent;
+import javanet.staxutils.events.CharactersEvent;
+import javanet.staxutils.events.CommentEvent;
+import javanet.staxutils.events.EndDocumentEvent;
+import javanet.staxutils.events.EndElementEvent;
+import javanet.staxutils.events.NamespaceEvent;
+import javanet.staxutils.events.StartDocumentEvent;
+import javanet.staxutils.events.StartElementEvent;
 
 public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 {
@@ -604,7 +605,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
             }
             else
             {
-                return ((CharactersEvent) current).getData();
+                return ((AbstractCharactersEvent) current).getData();
             }
         }
         else
