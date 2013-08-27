@@ -72,6 +72,7 @@ public class MuleEndpointURI implements EndpointURI
     private String resourceInfo;
     private boolean dynamic;
     private transient MuleContext muleContext;
+    private Properties serviceOverrides;
 
     MuleEndpointURI(String address,
                     String endpointName,
@@ -127,6 +128,12 @@ public class MuleEndpointURI implements EndpointURI
     public MuleEndpointURI(String uri, MuleContext muleContext) throws EndpointException
     {
         this(uri, null, muleContext);
+    }
+
+    public MuleEndpointURI(String uri, MuleContext muleContext, Properties serviceOverrides) throws EndpointException
+    {
+        this(uri, null, muleContext);
+        this.serviceOverrides = serviceOverrides;
     }
 
     /**
@@ -214,7 +221,7 @@ public class MuleEndpointURI implements EndpointURI
         {
             String scheme = getFullScheme();
             TransportServiceDescriptor sd;
-            sd = (TransportServiceDescriptor) muleContext.getRegistry().lookupServiceDescriptor(ServiceType.TRANSPORT, scheme, null);
+            sd = (TransportServiceDescriptor) muleContext.getRegistry().lookupServiceDescriptor(ServiceType.TRANSPORT, scheme, serviceOverrides);
             if (sd == null)
             {
                 throw new ServiceException(CoreMessages.noServiceTransportDescriptor(scheme));
