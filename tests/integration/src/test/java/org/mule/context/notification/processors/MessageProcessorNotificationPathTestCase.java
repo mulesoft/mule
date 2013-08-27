@@ -66,7 +66,7 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
     @Test
     public void scopes() throws Exception
     {
-        testFlowPaths("foreach", "/0", "/0/0", "/0/1", "/1");
+        testFlowPaths("foreach", "/0", "/0/0", "/1");
         testFlowPaths("enricher", "/0", "/0/0", "/1", "/1/0", "/1/0/0", "/1/0/1");
         testFlowPaths("until-successful", "/0", "/0/0", "/0/0/0", "/0/0/1");
         testFlowPaths("async", "/0", "/0/0", "/0/1");
