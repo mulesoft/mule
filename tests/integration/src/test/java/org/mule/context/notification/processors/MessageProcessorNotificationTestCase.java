@@ -98,8 +98,6 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
                 .serial(pre()) //foreach
                 .serial(prePost())    //logger-loop-1
                 .serial(prePost())    //logger-loop-2
-                .serial(prePost())    // ?
-                .serial(prePost())    // ?
                 .serial(post())
                 .serial(prePost())    //MP after the Scope
 
