@@ -87,7 +87,7 @@ public class CronsSchedulerTest extends FunctionalTestCase
             assertTrue(foo.size() > 0);
             for (String s : foo)
             {
-                assertEquals(s, "foo");
+                assertEquals("foo", s);
             }
         }
     }
@@ -100,7 +100,7 @@ public class CronsSchedulerTest extends FunctionalTestCase
             assertTrue(bar.size() > 0);
             for (String s : bar)
             {
-                assertEquals(s, "bar");
+                assertEquals("bar", s);
             }
         }
     }

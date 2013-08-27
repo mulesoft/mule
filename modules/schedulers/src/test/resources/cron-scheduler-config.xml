@@ -41,14 +41,4 @@
        <component class="org.mule.modules.schedulers.cron.CronsSchedulerTest$BarComponent"/>
     </flow>
 
-    <flow name="pollbarNever">
-        <poll>
-            <schedulers:cron-scheduler expression="* 8/8 * * * ?"/>
-            <static-component>
-                <return-data>barNever</return-data>
-            </static-component>
-        </poll>
-        <component class="org.mule.modules.schedulers.cron.CronsSchedulerTest$BarComponent"/>
-    </flow>
-
 </mule>
