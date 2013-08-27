@@ -162,6 +162,15 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
         assertEquals("http://localhost:8080/test/", result);
     }
 
+    @Test
+    public void testConstructAddressWithParamsInRootPath() {
+        String address = "http://localhost:8080/?key1=value1";
+        URIBuilder uri = new URIBuilder();
+        uri.setAddress(address);
+        String result = uri.getEncodedConstructor();
+        assertEquals(address, result);
+    }
+
     private URIBuilder createURIBuilder(String host, int port, String protocol, String path)
     {
         URIBuilder builder = new URIBuilder();

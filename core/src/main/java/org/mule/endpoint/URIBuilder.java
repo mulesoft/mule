@@ -249,9 +249,9 @@ public class URIBuilder implements AnnotatedObject
         StringBuffer buffer = new StringBuffer();
         appendMeta(buffer);
         OrderedQueryParameters uriQueries = appendAddress(buffer);
-        removeRootTrailingSlash(buffer);
         uriQueries.override(queryMap);
         buffer.append(uriQueries.toString());
+        removeRootTrailingSlash(buffer);
         return buffer.toString();
     }
 
