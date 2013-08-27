@@ -19,7 +19,6 @@ import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.streaming.ConsumerIterator;
 import org.mule.streaming.PagingConfiguration;
 import org.mule.streaming.PagingDelegate;
-import org.mule.streaming.StreamingOutputUnit;
 import org.mule.tck.size.SmallTest;
 
 import java.lang.reflect.Type;
@@ -39,8 +38,6 @@ public class DevkitBasedPagingMessageProcessorTestCase
 
     private static final String PAGE_SIZE = "100";
     private static final int TOP = 1000;
-    private static final String FIRST_PAGE = "0";
-    private static final String LAST_PAGE = "10";
 
     private MuleEvent event;
     private MuleContext muleContext;
@@ -57,7 +54,6 @@ public class DevkitBasedPagingMessageProcessorTestCase
     public void elementBasedIteratior() throws Exception
     {
         TestPagingProcessor processor = this.newProcessor();
-        processor.setOutputUnit(StreamingOutputUnit.ELEMENT);
 
         @SuppressWarnings("rawtypes")
         ArgumentCaptor<ConsumerIterator> captor = ArgumentCaptor.forClass(ConsumerIterator.class);
@@ -78,33 +74,6 @@ public class DevkitBasedPagingMessageProcessorTestCase
         Assert.assertFalse(it.hasNext());
     }
 
-    @Test
-    public void pagedBasedIterator() throws Exception
-    {
-        TestPagingProcessor processor = this.newProcessor();
-        processor.setOutputUnit(StreamingOutputUnit.PAGE);
-
-        @SuppressWarnings("rawtypes")
-        ArgumentCaptor<ConsumerIterator> captor = ArgumentCaptor.forClass(ConsumerIterator.class);
-
-        processor.process(event);
-
-        Mockito.verify(event.getMessage()).setPayload(captor.capture());
-
-        @SuppressWarnings("unchecked")
-        ConsumerIterator<List<String>> it = (ConsumerIterator<List<String>>) captor.getValue();
-
-        int pageSize = Integer.valueOf(PAGE_SIZE);
-        for (int i = 0; i < TOP / pageSize; i++)
-        {
-            Assert.assertTrue(it.hasNext());
-            List<String> page = it.next();
-            Assert.assertTrue(page != null && page.size() == pageSize);
-        }
-
-        Assert.assertFalse(it.hasNext());
-    }
-
     @Test(expected = MuleException.class)
     public void nullDelegate() throws Exception
     {
@@ -112,15 +81,6 @@ public class DevkitBasedPagingMessageProcessorTestCase
         Mockito.doReturn(null)
             .when(processor)
             .getPagingDelegate(Mockito.any(MuleEvent.class), Mockito.any(PagingConfiguration.class));
-
-        processor.process(event);
-    }
-
-    @Test(expected = MuleException.class)
-    public void nullPagingStrategy() throws Exception
-    {
-        TestPagingProcessor processor = this.newProcessor();
-        processor.setOutputUnit(null);
 
         processor.process(event);
     }
@@ -134,26 +94,8 @@ public class DevkitBasedPagingMessageProcessorTestCase
         processor.process(event);
     }
 
-    @Test(expected = MessagingException.class)
-    public void invalidFirstPage() throws Exception
-    {
-        TestPagingProcessor processor = this.newProcessor();
-        processor.setFirstPage("-1");
-
-        processor.process(event);
-    }
-
-    @Test(expected = MessagingException.class)
-    public void invalidLastPage() throws Exception
-    {
-        TestPagingProcessor processor = this.newProcessor();
-        processor.setFirstPage("10");
-        processor.setLastPage("8");
-
-        processor.process(event);
-    }
-
     private class TestPagingProcessor extends AbstractDevkitBasedPageableMessageProcessor
+  
     {
 
         private TestPagingProcessor()
@@ -207,8 +149,6 @@ public class DevkitBasedPagingMessageProcessorTestCase
 
         private void assertPagingConfiguration(PagingConfiguration config)
         {
-            Assert.assertEquals(config.getLastPage(), Integer.valueOf(LAST_PAGE).intValue());
-            Assert.assertEquals(config.getFirstPage(), Integer.valueOf(FIRST_PAGE).intValue());
             Assert.assertEquals(config.getFetchSize(), Integer.valueOf(PAGE_SIZE).intValue());
         }
 
@@ -235,10 +175,7 @@ public class DevkitBasedPagingMessageProcessorTestCase
     {
         TestPagingProcessor processor = new TestPagingProcessor();
         processor.setMuleContext(this.muleContext);
-        processor.setOutputUnit(StreamingOutputUnit.ELEMENT);
         processor.setFetchSize(PAGE_SIZE);
-        processor.setFirstPage(FIRST_PAGE);
-        processor.setLastPage(LAST_PAGE);
 
         return processor;
     }

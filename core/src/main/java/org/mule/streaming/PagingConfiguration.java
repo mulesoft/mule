@@ -21,47 +21,14 @@ public class PagingConfiguration
      */
     private int fetchSize;
     
-    /**
-     * Zero-based index of the first page to be returned
-     */
-    private int firstPage;
-    
-    /**
-     * Zero-based index of the top page to be returned. -1 means do not limit
-     */
-    private int lastPage;
-    
-    /**
-     * Specifies whether to iterate through each individual element or whole pages of fetchSize elements
-     */
-    private StreamingOutputUnit outputUnit;
-
-    public PagingConfiguration(int fetchSize, int firstPage, int lastPage, StreamingOutputUnit outputUnit)
+    public PagingConfiguration(int fetchSize)
     {
         this.fetchSize = fetchSize;
-        this.firstPage = firstPage;
-        this.lastPage = lastPage;
-        this.outputUnit = outputUnit;
     }
 
     public int getFetchSize()
     {
         return fetchSize;
-    }
-
-    public int getFirstPage()
-    {
-        return firstPage;
-    }
-
-    public int getLastPage()
-    {
-        return lastPage;
-    }
-    
-    public StreamingOutputUnit getOutputUnit()
-    {
-        return outputUnit;
     }
 
 }
