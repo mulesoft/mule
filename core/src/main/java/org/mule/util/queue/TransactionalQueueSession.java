@@ -147,7 +147,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
             }
             catch (InterruptedException iex)
             {
-                if (queueManager.getMuleContext().isStopping())
+                if (!queueManager.getMuleContext().isStopping())
                 {
                     throw iex;
                 }
