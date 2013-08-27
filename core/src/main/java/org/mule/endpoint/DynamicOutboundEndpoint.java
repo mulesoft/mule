@@ -34,11 +34,13 @@ import org.mule.api.transport.Connector;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.processor.AbstractRedeliveryPolicy;
+import org.mule.transport.AbstractConnector;
 import org.mule.util.ObjectNameHelper;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.logging.Log;
@@ -123,7 +125,7 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
 
         try
         {
-            final MuleEndpointURI resultUri = new MuleEndpointURI(newUriString, getMuleContext());
+            final MuleEndpointURI resultUri = new MuleEndpointURI(newUriString, getMuleContext(), getServiceOverrides());
             resultUri.initialise();
 
             return resultUri;
@@ -132,6 +134,24 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
         {
             throw new DispatchException(CoreMessages.templateCausedMalformedEndpoint(uriTemplate, newUriString), event, this, e);
         }
+    }
+
+    private Properties getServiceOverrides() throws EndpointException
+    {
+        Properties properties = null;
+
+        if (builder instanceof AbstractEndpointBuilder)
+        {
+            Connector connector = ((AbstractEndpointBuilder) this.builder).getConnector();
+
+            if (connector instanceof AbstractConnector && ((AbstractConnector) connector).getServiceOverrides() != null)
+            {
+                properties = new Properties();
+                properties.putAll(((AbstractConnector) connector).getServiceOverrides());
+            }
+        }
+
+        return properties;
     }
 
     protected String parseURIString(String uri, MuleMessage message)
