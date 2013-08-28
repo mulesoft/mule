@@ -142,8 +142,8 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     @Override
     public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
     {
-        //skip the splitter that is added at the beginning
-        List<MessageProcessor> mps = getOwnedMessageProcessors().subList(1, getOwnedMessageProcessors().size());
+        //skip the splitter that is added at the beginning and the filter at the end
+        List<MessageProcessor> mps = getOwnedMessageProcessors().subList(1, getOwnedMessageProcessors().size() - 1);
         NotificationUtils.addMessageProcessorPathElements(mps, pathElement);
     }
 
