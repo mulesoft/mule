@@ -11,7 +11,8 @@
     <jetty:connector name="connector-default-acceptors"/>
 
     <flow name="flow-default-acceptors">
-        <jetty:inbound-endpoint address="http://localhost:${port1}" exchange-pattern="request-response" connector-ref="connector-default-acceptors"/>
+        <jetty:inbound-endpoint address="http://localhost:${port1}" exchange-pattern="request-response"
+                                connector-ref="connector-default-acceptors"/>
         <test:component appendString=" received"/>
     </flow>
 

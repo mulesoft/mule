@@ -16,15 +16,18 @@ import org.junit.Test;
  * Functional tests that underlying Jetty acceptor threads may be changed in Mule Jetty HTTPS (TLS) connector.
  * Verifies the number of acceptor threads may be modified through configuration.
  */
-public class JettyHttpsAcceptorTenFunctionalTestCase extends AbstractJettyAcceptorFunctionalTestCase {
+public class JettyHttpsAcceptorTenFunctionalTestCase extends AbstractJettyAcceptorFunctionalTestCase
+{
 
     @Override
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "jetty-https-acceptors-ten-functional-test.xml";
     }
 
     @Test
-    public void testAdditionalAcceptors() throws Exception {
+    public void testAdditionalAcceptors() throws Exception
+    {
         assertAcceptors("connector-ten-acceptors", "flow-ten-acceptors", 10, Protocol.https);
     }
 }
