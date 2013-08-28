@@ -189,25 +189,9 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
             throw new RoutingException(CoreMessages.noCorrelationId(), event, timeoutMessageProcessor);
         }
 
-        // indicates interleaved EventGroup removal (very rare)
-        boolean lookupMiss = false;
-
         // spinloop for the EventGroup lookup
         while (true)
         {
-            if (lookupMiss)
-            {
-                try
-                {
-                    // recommended over Thread.yield()
-                    Thread.sleep(1);
-                }
-                catch (InterruptedException interrupted)
-                {
-                    Thread.currentThread().interrupt();
-                }
-            }
-
             try
             {
                 if (isGroupAlreadyProcessed(groupId))
