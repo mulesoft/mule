@@ -113,6 +113,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-pgp-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-rss-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-scripting-${productVersion}.jar
+/mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-schedulers-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-spring-config-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-spring-extras-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-spring-security-${productVersion}.jar
