@@ -5,7 +5,6 @@
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/jetty-ssl http://www.mulesoft.org/schema/mule/jetty-ssl/current/mule-jetty-ssl.xsd">
 
 

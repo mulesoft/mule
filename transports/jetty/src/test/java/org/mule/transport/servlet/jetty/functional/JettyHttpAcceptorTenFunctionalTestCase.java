@@ -12,7 +12,8 @@ import org.junit.Test;
  * Functional tests that underlying Jetty acceptor threads may be changed in Mule Jetty HTTP connector.
  * Verifies the number of acceptor threads may be modified through configuration.
  */
-public class JettyHttpAcceptorTenFunctionalTestCase extends AbstractJettyAcceptorFunctionalTestCase {
+public class JettyHttpAcceptorTenFunctionalTestCase extends AbstractJettyAcceptorFunctionalTestCase
+{
 
     @Override
     protected String getConfigResources()
@@ -21,7 +22,8 @@ public class JettyHttpAcceptorTenFunctionalTestCase extends AbstractJettyAccepto
     }
 
     @Test
-    public void testAdditionalAcceptors() throws Exception {
+    public void testAdditionalAcceptors() throws Exception
+    {
         assertAcceptors("connector-ten-acceptors", "flow-ten-acceptors", 10, Protocol.http);
     }
 }
