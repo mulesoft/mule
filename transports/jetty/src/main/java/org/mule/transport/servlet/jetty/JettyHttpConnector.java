@@ -411,9 +411,11 @@ public class JettyHttpConnector extends AbstractConnector
 
     /**
      * Get the number of "acceptor" threads Jetty should use
-     * @return  the number of threads
+     *
+     * @return the number of threads
      */
-    public int getAcceptors() {
+    public int getAcceptors()
+    {
         return acceptors;
     }
 
@@ -422,7 +424,8 @@ public class JettyHttpConnector extends AbstractConnector
      *
      * @param acceptors the number of threads
      */
-    public void setAcceptors(final int acceptors) {
+    public void setAcceptors(final int acceptors)
+    {
         this.acceptors = acceptors;
     }
 
