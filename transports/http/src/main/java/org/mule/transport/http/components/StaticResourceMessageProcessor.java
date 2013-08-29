@@ -41,6 +41,7 @@ import javax.activation.MimetypesFileTypeMap;
 public class StaticResourceMessageProcessor implements MessageProcessor, Initialisable
 {
     public static final String DEFAULT_MIME_TYPE = "application/octet-stream";
+    public static final String ROOT_PATH = "/";
 
     private String resourceBase;
     private String defaultFile = "index.html";
@@ -65,8 +66,11 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
         String path = event.getMessage().getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY);
         String contextPath = event.getMessage().getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
 
-        // Remove the contextPath from the endpoint from the request as this isn't part of the path.
-        path = path.substring(contextPath.length());
+        if (!ROOT_PATH.equals(contextPath))
+        {
+            // Remove the contextPath from the endpoint from the request as this isn't part of the path.
+            path = path.substring(contextPath.length());
+        }
 
         File file = new File(resourceBase + path);
         MuleEvent resultEvent = event;
