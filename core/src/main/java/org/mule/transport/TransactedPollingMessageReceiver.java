@@ -176,11 +176,14 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
                 }
             }
         }
+        catch (MessagingException e)
+        {
+            //Already handled by exception strategy
+        }
         catch (Exception e)
         {
             getConnector().getMuleContext().handleException(e);
         }
-
     }
 
     /**
