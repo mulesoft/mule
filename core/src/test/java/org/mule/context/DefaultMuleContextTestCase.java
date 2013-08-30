@@ -10,16 +10,22 @@
 
 package org.mule.context;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
+import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.registry.ServiceType;
 import org.mule.config.ExceptionHelper;
 
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.mockito.internal.verification.VerificationModeFactory;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.SpiUtils;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.verify;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -31,6 +37,9 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase
     public static final String INITIAL_VALUE = "500";
     public static final String VALUE_AFTER_REDEPLOY = "222";
     public static final String TEST_PROTOCOL = "test2";
+
+    private SystemExceptionHandler mockSystemExceptionHandler = Mockito.mock(SystemExceptionHandler.class);
+    private MessagingException mockMessagingException = Mockito.mock(MessagingException.class);
 
     @Test
     public void testClearExceptionHelperCacheForAppWhenDispose() throws Exception
@@ -58,6 +67,15 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase
         ctx.setExecutionClassLoader(getClass().getClassLoader());
         value = ExceptionHelper.getErrorMapping(TEST_PROTOCOL, IllegalArgumentException.class, ctx);
         assertThat(value, is(VALUE_AFTER_REDEPLOY));
+    }
+
+    @Test
+    public void callSystemExceptionHandlerWhenExceptionIsMessagingException() throws Exception
+    {
+        MuleContext context = new DefaultMuleContextFactory().createMuleContext();
+        context.setExceptionListener(mockSystemExceptionHandler);
+        context.handleException(mockMessagingException);
+        verify(mockSystemExceptionHandler, VerificationModeFactory.times(1)).handleException(mockMessagingException,null);
     }
 
 }
