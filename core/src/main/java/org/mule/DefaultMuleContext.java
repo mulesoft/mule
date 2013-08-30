@@ -10,9 +10,7 @@
 
 package org.mule;
 
-import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.SingleResourceTransactionFactoryManager;
@@ -700,15 +698,7 @@ public class DefaultMuleContext implements MuleContext
 
     public void handleException(Exception e, RollbackSourceCallback rollbackMethod)
     {
-        if (e instanceof MessagingException)
-        {
-            MuleEvent event = ((MessagingException) e).getEvent();
-            event.getFlowConstruct().getExceptionListener().handleException(e, event);
-        }
-        else
-        {
-            getExceptionListener().handleException(e, rollbackMethod);
-        }
+        getExceptionListener().handleException(e, rollbackMethod);
     }
 
     public void handleException(Exception e)
