@@ -19,6 +19,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.store.ObjectAlreadyExistsException;
@@ -27,8 +29,6 @@ import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.PropertyScope;
-import org.mule.api.execution.ExecutionCallback;
-import org.mule.api.execution.ExecutionTemplate;
 import org.mule.construct.Flow;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.transport.AbstractPollingMessageReceiver;
@@ -220,16 +220,17 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                             try
                             {
                                 filesBeingProcessingObjectStore.store(fileAbsolutePath, fileAbsolutePath);
+
                                 if (logger.isDebugEnabled())
                                 {
-                                    logger.debug(String.format("Flag for $ stored successfully.", fileAbsolutePath));
+                                    logger.debug(String.format("Flag for '%s' stored successfully.", fileAbsolutePath));
                                 }
                             }
                             catch (ObjectAlreadyExistsException e)
                             {
                                 if (logger.isDebugEnabled())
                                 {
-                                    logger.debug(String.format("Flag for %s being processed is on. Skipping file.", fileAbsolutePath));
+                                    logger.debug(String.format("Flag for '%s' being processed is on. Skipping file.", fileAbsolutePath));
                                 }
                                 continue;
                             }
@@ -263,21 +264,11 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         //TODO RM*: This can be put in a Filter. Also we can add an AndFileFilter/OrFileFilter to allow users to
         //combine file filters (since we can only pass a single filter to File.listFiles, we would need to wrap
         //the current And/Or filters to extend {@link FilenameFilter}
-        boolean checkFileAge = fileConnector.getCheckFileAge();
-        if (checkFileAge)
+        if (fileConnector.getCheckFileAge() && !isAgedFile(file, fileConnector.getFileAge()))
         {
-            long fileAge = fileConnector.getFileAge();
-            long lastMod = file.lastModified();
-            long now = System.currentTimeMillis();
-            long thisFileAge = now - lastMod;
-            if (thisFileAge < fileAge)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("The file has not aged enough yet, will return nothing for: " + file);
-                }
-                return;
-            }
+            removeProcessingMark(file.getAbsolutePath());
+
+            return;
         }
 
         // Perform some quick checks to make sure file can be processed
@@ -330,7 +321,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             if (moveToPattern != null)
             {
                 destinationFileName = fileConnector.getFilenameParser().getFilename(fileParserMessasge,
-                    moveToPattern);
+                                                                                    moveToPattern);
             }
             // don't use new File() directly, see MULE-1112
             destinationFile = FileUtils.newFile(moveDir, destinationFileName);
@@ -347,18 +338,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                     @Override
                     public void fileClose(File file)
                     {
-                        try
-                        {
-                            if (logger.isDebugEnabled())
-                            {
-                                logger.debug(String.format("Removing processing flag for $ ", file.getAbsolutePath()));
-                            }
-                            filesBeingProcessingObjectStore.remove(file.getAbsolutePath());
-                        }
-                        catch (ObjectStoreException e)
-                        {
-                            logger.warn("Failure trying to remove file " + originalSourceFile + " from list of files under processing");
-                        }
+                        removeProcessingMark(file.getAbsolutePath());
                     }
                 });
                 message = createMuleMessage(payload, encoding);
@@ -402,6 +382,49 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
+    /**
+     * Indicates whether or not file is older than the specified age
+     *
+     * @param file    file to check
+     * @param fileAge target file age in milliseconds
+     * @return true if the file is older than the fileAge, false otherwise
+     */
+    protected boolean isAgedFile(File file, long fileAge)
+    {
+        final long lastMod = file.lastModified();
+        final long now = System.currentTimeMillis();
+        final long thisFileAge = now - lastMod;
+
+        if (thisFileAge < fileAge)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("The file has not aged enough yet, will return nothing for: " + file);
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private void removeProcessingMark(String fileAbsolutePath)
+    {
+        try
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(String.format("Removing processing flag for '%s'", fileAbsolutePath));
+            }
+
+            filesBeingProcessingObjectStore.remove(fileAbsolutePath);
+        }
+        catch (ObjectStoreException e)
+        {
+            logger.warn(String.format("Failure trying to remove file '%s' from list of files under processing", fileAbsolutePath));
+        }
+    }
+
     private void processWithoutStreaming(String originalSourceFile, final String originalSourceFileName, final File sourceFile,final File destinationFile, ExecutionTemplate<MuleEvent> executionTemplate, final MuleMessage finalMessage) throws DefaultMuleException
     {
         try
@@ -435,18 +458,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
         finally
         {
-            try
-            {
-                filesBeingProcessingObjectStore.remove(originalSourceFile);
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug(String.format("Removing processing flag for $ ", originalSourceFile));
-                }
-            }
-            catch (ObjectStoreException e)
-            {
-                logger.warn("Failure trying to remove file " + originalSourceFile + " from list of files under processing");
-            }
+            removeProcessingMark(originalSourceFile);
         }
     }
 
@@ -535,7 +547,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     }
 
     private void moveAndDelete(final File sourceFile, File destinationFile,
-        String sourceFileOriginalName, MuleMessage message) throws MuleException
+                               String sourceFileOriginalName, MuleMessage message) throws MuleException
     {
         // If we are moving the file to a read directory, move it there now and
         // hand over a reference to the
@@ -551,7 +563,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             {
                 // move didn't work - bail out (will attempt rollback)
                 throw new DefaultMuleException(FileMessages.failedToMoveFile(
-                    sourceFile.getAbsolutePath(), destinationFile.getAbsolutePath()));
+                        sourceFile.getAbsolutePath(), destinationFile.getAbsolutePath()));
             }
 
             // create new Message for destinationFile
