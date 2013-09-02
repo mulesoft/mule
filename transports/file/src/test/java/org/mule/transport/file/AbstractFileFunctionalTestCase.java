@@ -130,7 +130,7 @@ public abstract class AbstractFileFunctionalTestCase extends AbstractServiceAndF
         return createDataFile(folder, testMessage, null);
     }
     
-    protected File createDataFile(File folder, final String testMessage, String encoding) throws Exception
+    public static File createDataFile(File folder, final String testMessage, String encoding) throws Exception
     {
         File temp = File.createTempFile("mule-file-test-", ".txt");
         FileUtils.writeStringToFile(temp, testMessage, encoding);
