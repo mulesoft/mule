@@ -16,9 +16,14 @@ import org.mule.api.store.ObjectStoreException;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Implementation of {@link Producer} to stream the contents of a
+ * {@link org.mule.api.store.ListableObjectStore}
+ */
 public class ListableObjectStoreProducer<T extends Serializable> implements Producer<T>
 {
 
@@ -53,7 +58,7 @@ public class ListableObjectStoreProducer<T extends Serializable> implements Prod
     {
         if (this.objectStore == null || !this.keys.hasNext())
         {
-            return null;
+            return Collections.emptyList();
         }
 
         try
