@@ -12,6 +12,9 @@ package org.mule.transport.file;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mule.transport.file.FileTestUtils.createDataFile;
+import static org.mule.transport.file.FileTestUtils.createFolder;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 
