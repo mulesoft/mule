@@ -10,8 +10,9 @@
 
 package org.mule.transport.file.reliability;
 
+import static org.mule.transport.file.FileTestUtils.createDataFile;
+import static org.mule.transport.file.FileTestUtils.createFolder;
 import org.mule.api.MuleEventContext;
-import org.mule.api.construct.FlowConstruct;
 import org.mule.construct.Flow;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -20,6 +21,8 @@ import org.mule.tck.probe.Probe;
 import java.io.File;
 
 import org.junit.Test;
+
+import org.mule.transport.file.FileTestUtils;
 import org.mule.util.concurrent.Latch;
 
 

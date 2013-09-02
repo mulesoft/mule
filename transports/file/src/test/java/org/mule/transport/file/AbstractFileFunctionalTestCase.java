@@ -125,32 +125,4 @@ public abstract class AbstractFileFunctionalTestCase extends AbstractServiceAndF
         FileUtils.deleteTree(tmpDir);
     }
 
-    protected File createDataFile(File folder, final String testMessage) throws Exception
-    {
-        return createDataFile(folder, testMessage, null);
-    }
-    
-    public static File createDataFile(File folder, final String testMessage, String encoding) throws Exception
-    {
-        File temp = File.createTempFile("mule-file-test-", ".txt");
-        FileUtils.writeStringToFile(temp, testMessage, encoding);
-
-        // Copies temp file to target
-        File target = new File(folder, temp.getName());
-        target.deleteOnExit();
-        FileUtils.renameFile(temp, target);
-
-        return target;
-
-    }
-
-    protected File createFolder(String name)
-    {
-        File result = FileUtils.newFile(name);
-        result.delete();
-        result.mkdir();
-        result.deleteOnExit();
-
-        return result;
-    }
 }
