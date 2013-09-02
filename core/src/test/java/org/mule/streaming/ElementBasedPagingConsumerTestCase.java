@@ -27,7 +27,7 @@ public class ElementBasedPagingConsumerTestCase extends AbstractPagingConsumerTe
 
     private Consumer<Integer> consumer;
     private Producer<Integer> producer;
-
+    
     @Before
     public void setUp()
     {
@@ -35,7 +35,7 @@ public class ElementBasedPagingConsumerTestCase extends AbstractPagingConsumerTe
         this.producer = Mockito.spy(new TestProducer());
         this.consumer = Mockito.spy(new ElementBasedPagingConsumer<Integer>(this.producer));
     }
-
+    
     @Test(expected = ClosedConsumerException.class)
     public void happyPath() throws Exception
     {
@@ -75,7 +75,7 @@ public class ElementBasedPagingConsumerTestCase extends AbstractPagingConsumerTe
         Assert.assertTrue(this.consumer.isConsumed());
         this.consumer.consume();
     }
-
+    
     @Test
     public void totalAvailable()
     {
@@ -88,7 +88,7 @@ public class ElementBasedPagingConsumerTestCase extends AbstractPagingConsumerTe
         this.consumer.close();
         this.consumer.close();
     }
-
+    
     private class TestProducer implements Producer<Integer>
     {
 
@@ -123,5 +123,6 @@ public class ElementBasedPagingConsumerTestCase extends AbstractPagingConsumerTe
             return totalCount;
         };
     }
+
 
 }
