@@ -12,6 +12,7 @@ package org.mule.transport.file;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mule.transport.file.FileTestUtils.createDataFile;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -45,7 +46,7 @@ public class FileAgeAndPollingFrequencyInteractionTestCase extends FunctionalTes
     public void processesFileOnNextPollWhenFileIsOldEnough() throws Exception
     {
         File tmpDir = FileUtils.openDirectory(".mule/in");
-        dataFile = AbstractFileFunctionalTestCase.createDataFile(tmpDir, TEST_MESSAGE, "UTF-8");
+        dataFile = createDataFile(tmpDir, TEST_MESSAGE, "UTF-8");
 
         muleContext.start();
 

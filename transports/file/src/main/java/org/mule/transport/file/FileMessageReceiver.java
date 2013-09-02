@@ -359,7 +359,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     }
 
     /**
-     * Indicates whether or not file is older that the specified age
+     * Indicates whether or not file is older than the specified age
      *
      * @param file    file to check
      * @param fileAge target file age in milliseconds

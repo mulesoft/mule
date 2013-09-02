@@ -11,6 +11,8 @@
 package org.mule.transport.file.reliability;
 
 import static org.junit.Assert.fail;
+import static org.mule.transport.file.FileTestUtils.createDataFile;
+import static org.mule.transport.file.FileTestUtils.createFolder;
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.exception.DefaultSystemExceptionStrategy;
@@ -19,6 +21,7 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.transport.file.AbstractFileMoveDeleteTestCase;
+import org.mule.transport.file.FileTestUtils;
 
 import java.io.File;
 import java.util.concurrent.CountDownLatch;
