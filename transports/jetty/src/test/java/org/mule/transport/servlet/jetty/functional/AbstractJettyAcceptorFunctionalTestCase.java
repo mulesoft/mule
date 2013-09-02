@@ -21,8 +21,6 @@ import org.mule.api.transport.Connector;
 import org.mule.construct.Flow;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.tck.probe.PollingProber;
-import org.mule.tck.probe.Probe;
 import org.mule.transport.servlet.jetty.JettyHttpConnector;
 
 import java.util.Set;
@@ -80,33 +78,17 @@ public abstract class AbstractJettyAcceptorFunctionalTestCase extends Functional
 
     protected void assertThreads(final int acceptors)
     {
-        PollingProber prober = new PollingProber(5000, 50);
-
-        prober.check(new Probe()
+        final Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+        int actual = 0;
+        for (final Thread th : threadSet)
         {
-            int actual;
-
-            public boolean isSatisfied()
+            if (th.getClass().equals(QueuedThreadPool.PoolThread.class)
+                && th.getName().contains("Acceptor"))
             {
-                final Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
-                actual = 0;
-                for (final Thread th : threadSet)
-                {
-                    if (th.getClass().equals(QueuedThreadPool.PoolThread.class)
-                        && th.getName().contains("Acceptor"))
-                    {
-                        actual = actual + 1;
-                    }
-                }
-
-                return actual == acceptors;
+                actual = actual + 1;
             }
-
-            public String describeFailure()
-            {
-                return String.format("Expected '%s' acceptor threads but there are '%s'", acceptors, actual);
-            }
-        });
+        }
+        assertEquals(acceptors, actual);
     }
 
     protected void assertRequest(final Protocol protocol) throws Exception
