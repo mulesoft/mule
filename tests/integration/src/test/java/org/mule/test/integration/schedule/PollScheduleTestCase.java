@@ -12,6 +12,7 @@ package org.mule.test.integration.schedule;
 
 
 import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleException;
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.schedule.Schedulers;
@@ -39,7 +40,8 @@ public class PollScheduleTestCase extends FunctionalTestCase
     Prober workingPollProber = new PollingProber(5000, 1000l);
 
     @BeforeClass
-    public static void setProperties(){
+    public static void setProperties()
+    {
         System.setProperty("frequency.days", "4");
         System.setProperty("frequency.millis", "2000");
     }
@@ -53,7 +55,7 @@ public class PollScheduleTestCase extends FunctionalTestCase
 
     /**
      * This test validate that the polls can be stopped and run on demand.
-     *
+     * <p/>
      * It checks correct functionality of polls.
      * Stop the schedulers
      * Waits for the polls to be executed (they shouldn't, as they are stopped)
