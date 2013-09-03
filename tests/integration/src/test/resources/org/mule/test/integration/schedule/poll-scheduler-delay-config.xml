@@ -13,42 +13,36 @@
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-    <vm:endpoint path="foo" exchange-pattern="request-response" name="foo"/>
 
-    <flow name="echo">
-        <inbound-endpoint ref="foo"/>
-        <static-component>
-            <return-data>foo</return-data>
-        </static-component>
-    </flow>
-
-    <flow name="pollfoo">
-        <poll doc:name="watermark">
-            <fixed-frequency-scheduler frequency="${frequency.millis}"/>
-            <outbound-endpoint ref="foo"/>
-        </poll>
-        <component class="org.mule.test.integration.schedule.PollScheduleTestCase$FooComponent"/>
-    </flow>
-
-
-    <flow name="pollbar" processingStrategy="synchronous">
-        <poll frequency="1000">
-            <static-component>
-                <return-data>bar</return-data>
-            </static-component>
-        </poll>
-        <component class="org.mule.test.integration.schedule.PollScheduleTestCase$BarComponent"/>
-    </flow>
-
-    <flow name="pollbarNever">
+    <flow name="negative">
         <poll>
-            <!-- Will not run unless my test takes 200 days -->
-            <fixed-frequency-scheduler frequency="${frequency.days}" timeUnit="DAYS" startDelay="200"/>
+            <fixed-frequency-scheduler frequency="${frequency.millis}" startDelay="-500"/>
             <static-component>
-                <return-data>barNever</return-data>
+                <return-data>negative</return-data>
             </static-component>
         </poll>
-        <component class="org.mule.test.integration.schedule.PollScheduleTestCase$BarComponent"/>
+        <component class="org.mule.test.integration.schedule.PollScheduleDelayTestCase$NegativeComponent"/>
     </flow>
+
+    <flow name="zero">
+        <poll>
+            <fixed-frequency-scheduler frequency="${frequency.millis}" startDelay="0"/>
+            <static-component>
+                <return-data>zero</return-data>
+            </static-component>
+        </poll>
+        <component class="org.mule.test.integration.schedule.PollScheduleDelayTestCase$ZeroComponent"/>
+    </flow>
+
+    <flow name="positive">
+        <poll>
+            <fixed-frequency-scheduler frequency="${frequency.millis}" startDelay="500"/>
+            <static-component>
+                <return-data>positive</return-data>
+            </static-component>
+        </poll>
+        <component class="org.mule.test.integration.schedule.PollScheduleDelayTestCase$PositiveComponent"/>
+    </flow>
+
 
 </mule>

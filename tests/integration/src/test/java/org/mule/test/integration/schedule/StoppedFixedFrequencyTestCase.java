@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id\$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -7,10 +7,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
-package org.mule.modules.schedulers.cron;
+package org.mule.test.integration.schedule;
 
 import static junit.framework.Assert.assertEquals;
+
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.schedule.Schedulers;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -22,7 +22,7 @@ import java.util.List;
 import org.junit.Test;
 
 
-public class StoppedCronSchedulerTestCase extends FunctionalTestCase
+public class StoppedFixedFrequencyTestCase extends FunctionalTestCase
 {
 
     private static List<String> foo = new ArrayList<String>();
@@ -30,7 +30,7 @@ public class StoppedCronSchedulerTestCase extends FunctionalTestCase
     @Override
     protected String getConfigResources()
     {
-        return "cron-scheduler-stopped-config.xml";
+        return "org/mule/test/integration/schedule/poll-scheduler-stopped-config.xml";
     }
 
     @Test
@@ -42,6 +42,7 @@ public class StoppedCronSchedulerTestCase extends FunctionalTestCase
         assertEquals(1, foo.size());
     }
 
+
     public static class FooComponent
     {
 
@@ -49,8 +50,11 @@ public class StoppedCronSchedulerTestCase extends FunctionalTestCase
         {
             synchronized (foo)
             {
+
                 foo.add(s);
+
             }
+
             return false;
         }
     }

@@ -59,14 +59,16 @@ public class PollScheduleNotificationTestCase extends FunctionalTestCase
         });
 
     }
-    class MyListener implements EndpointMessageNotificationListener<EndpointMessageNotification>{
+
+    class MyListener implements EndpointMessageNotificationListener<EndpointMessageNotification>
+    {
 
         List<String> notifications = new ArrayList<String>();
 
         @Override
         public void onNotification(EndpointMessageNotification notification)
         {
-            notifications.add((String) ((AnnotatedObject)notification.getImmutableEndpoint()).getAnnotation(NAME));
+            notifications.add((String) ((AnnotatedObject) notification.getImmutableEndpoint()).getAnnotation(NAME));
         }
 
         public List<String> getNotifications()

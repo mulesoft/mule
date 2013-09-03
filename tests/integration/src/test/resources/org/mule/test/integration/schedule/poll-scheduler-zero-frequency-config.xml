@@ -13,18 +13,14 @@
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-
-    <notifications dynamic="true">
-        <notification event="ENDPOINT-MESSAGE"/>
-    </notifications>
-
-    <flow name="pollfoo">
-        <poll doc:name="pollName">
-            <fixed-frequency-scheduler frequency="2000"/>
-            <logger message="testing poll execution notification "/>
+    <flow name="zero">
+        <poll>
+            <fixed-frequency-scheduler frequency="0"/>
+            <static-component>
+                <return-data>zero</return-data>
+            </static-component>
         </poll>
-        <logger level="ERROR" message="testing poll execution notification "/>
+        <component class="org.mule.test.integration.schedule.PollScheduleFrequencyTestCase$ZeroComponent"/>
     </flow>
-
 
 </mule>

@@ -10,7 +10,7 @@
 
     <!-- Example of how a scheduler can be defined as a spring bean, and monitored by mule API -->
     <spring:beans>
-        <spring:bean class="org.mule.test.integration.schedule.MockScheduler" name="testScheduler" />
+        <spring:bean class="org.mule.test.integration.schedule.MockScheduler" name="testScheduler"/>
     </spring:beans>
 
 </mule>
