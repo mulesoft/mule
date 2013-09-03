@@ -32,12 +32,12 @@
 
 
     <flow name="pollbar" processingStrategy="synchronous">
-        <poll frequency="1000">
+        <poll frequency="1000" >
             <static-component>
                 <return-data>bar</return-data>
             </static-component>
         </poll>
-        <component class="org.mule.test.integration.schedule.PollScheduleTestCase$BarComponent"/>
+        <component class="org.mule.test.integration.schedule.PollScheduleTestCase$BarComponent" />
     </flow>
 
     <flow name="pollbarNever">
@@ -48,7 +48,7 @@
                 <return-data>barNever</return-data>
             </static-component>
         </poll>
-        <component class="org.mule.test.integration.schedule.PollScheduleTestCase$BarComponent"/>
+        <component class="org.mule.test.integration.schedule.PollScheduleTestCase$BarComponent" />
     </flow>
 
 </mule>

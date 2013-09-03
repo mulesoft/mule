@@ -21,9 +21,9 @@
     <flow name="pollfoo">
         <poll doc:name="pollName">
             <fixed-frequency-scheduler frequency="2000"/>
-            <logger message="testing poll execution notification "/>
+            <logger message="testing poll execution notification " />
         </poll>
-        <logger level="ERROR" message="testing poll execution notification "/>
+        <logger level="ERROR" message="testing poll execution notification " />
     </flow>
 
 

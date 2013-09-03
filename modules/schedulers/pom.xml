@@ -16,19 +16,18 @@
              <groupId>org.quartz-scheduler</groupId>
              <artifactId>quartz</artifactId>
              <version>${quartzVersion}</version>
-             <scope>provided</scope>
          </dependency>
          <dependency>
              <groupId>org.mule</groupId>
              <artifactId>mule-core</artifactId>
              <version>${project.version}</version>
-             <scope>provided</scope>
+
          </dependency>
          <dependency>
              <groupId>org.mule.modules</groupId>
              <artifactId>mule-module-spring-config</artifactId>
              <version>${project.version}</version>
-             <scope>provided</scope>
+
          </dependency>
          <dependency>
              <groupId>org.mule.tests</groupId>

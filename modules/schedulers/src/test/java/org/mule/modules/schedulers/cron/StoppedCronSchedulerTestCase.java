@@ -22,9 +22,8 @@ import java.util.List;
 import org.junit.Test;
 
 
-public class StoppedCronSchedulerTestCase extends FunctionalTestCase
+public class StoppedCronSchedulerTestCase  extends FunctionalTestCase
 {
-
     private static List<String> foo = new ArrayList<String>();
 
     @Override
@@ -42,6 +41,7 @@ public class StoppedCronSchedulerTestCase extends FunctionalTestCase
         assertEquals(1, foo.size());
     }
 
+
     public static class FooComponent
     {
 
@@ -49,8 +49,11 @@ public class StoppedCronSchedulerTestCase extends FunctionalTestCase
         {
             synchronized (foo)
             {
+
                 foo.add(s);
+
             }
+
             return false;
         }
     }
