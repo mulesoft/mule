@@ -292,10 +292,6 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
             cnn.setProtocol("SSL_TLS");
         }
 
-        // get (from parent Mule connector) and set number of acceptor threads into the underlying SSL connector
-        cnn.setAcceptors(getAcceptors());
-
-        // set trust and keystore params
         if (tls.getKeyStore() != null) cnn.setKeystore(tls.getKeyStore());
         if (tls.getKeyPassword() != null) cnn.setKeyPassword(tls.getKeyPassword());
         if (tls.getKeyStoreType() != null) cnn.setKeystoreType(tls.getKeyStoreType());
