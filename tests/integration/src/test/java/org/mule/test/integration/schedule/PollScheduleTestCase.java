@@ -142,39 +142,22 @@ public class PollScheduleTestCase extends FunctionalTestCase
         }
     }
 
-    public static class FooComponent
+
+    public static class FooComponent extends ComponentProcessor
     {
 
-        public boolean process(String s)
+        public FooComponent()
         {
-            synchronized (foo)
-            {
-
-                if (foo.size() < 10)
-                {
-                    foo.add(s);
-                    return true;
-                }
-            }
-            return false;
+            this.myCollection = foo;
         }
     }
 
-    public static class BarComponent
+    public static class BarComponent extends ComponentProcessor
     {
 
-        public boolean process(String s)
+        public BarComponent()
         {
-            synchronized (bar)
-            {
-
-                if (bar.size() < 10)
-                {
-                    bar.add(s);
-                    return true;
-                }
-            }
-            return false;
+            this.myCollection = bar;
         }
     }
 }

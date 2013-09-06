@@ -12,14 +12,8 @@ package org.mule.tck.config;
 
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.context.notification.MuleContextNotification;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.util.concurrent.Latch;
-
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -27,7 +21,7 @@ import org.junit.runners.Parameterized;
 /**
  * A base test class, that starts a muleContext with the given configuration,
  * to check for an invalid argument or configuration error that cannot be
- * detected with an xml validator.
+ * detected with an xml validator.<p/>
  * Parameters are set with the @Parameters annotation, as an array with a
  * {mule-config.xml, testName} tuple. In the test, startMuleContext has to
  * be called and then check for your expected failure.
@@ -67,31 +61,7 @@ public abstract class AbstractTestConfigurationFailure extends AbstractMuleConte
 
     public static void startMuleContext() throws MuleException
     {
-        final AtomicReference<Latch> contextStartedLatch = new AtomicReference<Latch>();
-
-        contextStartedLatch.set(new Latch());
-        muleContext.registerListener(new MuleContextNotificationListener<MuleContextNotification>()
-        {
-            @Override
-            public void onNotification(MuleContextNotification notification)
-            {
-                if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
-                {
-                    contextStartedLatch.get().countDown();
-                }
-            }
-        });
-
         muleContext.start();
-
-        try
-        {
-            contextStartedLatch.get().await(20, TimeUnit.SECONDS);
-        }
-        catch (InterruptedException e)
-        {
-            e.printStackTrace();
-        }
     }
 
 

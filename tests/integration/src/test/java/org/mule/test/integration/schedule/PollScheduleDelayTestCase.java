@@ -1,5 +1,5 @@
 /*
- * $Id\$
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -13,28 +13,26 @@ package org.mule.test.integration.schedule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
-
 
 public class PollScheduleDelayTestCase extends FunctionalTestCase
 {
 
-    private static List<String> negative = new ArrayList<String>();
-    private static List<String> zero = new ArrayList<String>();
-    private static List<String> positive = new ArrayList<String>();
+    private static final List<String> negativeFlowResponses = new ArrayList<String>();
+    private static final List<String> zeroFlowResponses = new ArrayList<String>();
+    private static final List<String> positiveFlowResponses = new ArrayList<String>();
 
-    @BeforeClass
-    public static void setProperties()
-    {
-        System.setProperty("frequency.millis", "100");
-    }
+    @Rule
+    public SystemProperty systemProperty = new SystemProperty("frequency.millis","100");
 
     @Override
     protected String getConfigResources()
@@ -43,122 +41,67 @@ public class PollScheduleDelayTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void test() throws Exception
+    public void testPollStartDelay() throws Exception
     {
-        checkForNegativeCollectionToBeFilled();
-        checkForZeroCollectionToBeFilled();
-        checkForPositiveCollectionToBeEmpty(true);
+        waitForPollElements();
+
+        assertCollectionToBeFilledWithContent(negativeFlowResponses, "negative");
+        assertCollectionToBeFilledWithContent(zeroFlowResponses, "zero");
+        try{
+            assertCollectionToBeFilledWithContent(positiveFlowResponses, "positive");
+            fail("Collection wasn't empty");
+        }catch(AssertionError error){
+            assertEquals("java.lang.AssertionError", error.toString());
+        }
 
         waitForPollElements();
 
-        checkForNegativeCollectionToBeFilled();
-        checkForZeroCollectionToBeFilled();
-        checkForPositiveCollectionToBeEmpty(false);
+        assertCollectionToBeFilledWithContent(negativeFlowResponses, "negative");
+        assertCollectionToBeFilledWithContent(zeroFlowResponses, "zero");
+        assertCollectionToBeFilledWithContent(positiveFlowResponses, "positive");
     }
 
     private void waitForPollElements() throws InterruptedException
     {
-        Thread.sleep(3000);
+        Thread.sleep(300);
     }
 
-    private void checkForNegativeCollectionToBeFilled()
+    private void assertCollectionToBeFilledWithContent(List<String> collection, String expectedContent)
     {
-        synchronized (negative)
+        synchronized (collection)
         {
-            negative.size();
-            assertTrue(negative.size() > 0);
-            for (String s : negative)
+            assertTrue(collection.size() > 0);
+            for (String s : collection)
             {
-                assertEquals(s, "negative");
+                assertEquals(s, expectedContent);
             }
         }
     }
 
-    private void checkForZeroCollectionToBeFilled()
+    public static class NegativeComponent extends ComponentProcessor
     {
-        synchronized (zero)
+
+        public NegativeComponent()
         {
-            zero.size();
-            assertTrue(zero.size() > 0);
-            for (String s : zero)
-            {
-                assertEquals(s, "zero");
-            }
+            this.myCollection = negativeFlowResponses;
         }
     }
 
-    private void checkForPositiveCollectionToBeEmpty(boolean isEmpty)
+    public static class ZeroComponent extends ComponentProcessor
     {
-        synchronized (positive)
+
+        public ZeroComponent()
         {
-            positive.size();
-            if (isEmpty)
-            {
-                assertEquals(0, positive.size());
-            }
-            else
-            {
-                assertTrue(positive.size() > 0);
-            }
-            for (String s : positive)
-            {
-                assertEquals(s, "positive");
-            }
+            this.myCollection = zeroFlowResponses;
         }
     }
 
-
-    public static class NegativeComponent
+    public static class PositiveComponent extends ComponentProcessor
     {
 
-        public boolean process(String s)
+        public PositiveComponent()
         {
-            synchronized (negative)
-            {
-
-                if (negative.size() < 10)
-                {
-                    negative.add(s);
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
-
-    public static class ZeroComponent
-    {
-
-        public boolean process(String s)
-        {
-            synchronized (zero)
-            {
-
-                if (zero.size() < 10)
-                {
-                    zero.add(s);
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
-
-    public static class PositiveComponent
-    {
-
-        public boolean process(String s)
-        {
-            synchronized (positive)
-            {
-
-                if (positive.size() < 10)
-                {
-                    positive.add(s);
-                    return true;
-                }
-            }
-            return false;
+            this.myCollection = positiveFlowResponses;
         }
     }
 }

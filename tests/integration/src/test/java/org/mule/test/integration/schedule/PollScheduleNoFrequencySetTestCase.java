@@ -24,7 +24,7 @@ import org.junit.Test;
 public class PollScheduleNoFrequencySetTestCase extends FunctionalTestCase
 {
 
-    private static List<String> foo = new ArrayList<String>();
+    private static List<String> flowResponse = new ArrayList<String>();
 
     @Override
     protected String getConfigResources()
@@ -53,32 +53,23 @@ public class PollScheduleNoFrequencySetTestCase extends FunctionalTestCase
 
     private void checkForFooCollectionToBeFilled(int min, int max)
     {
-        synchronized (foo)
+        synchronized (flowResponse)
         {
-            foo.size();
-            assertTrue(foo.size() >= min && foo.size() <= max);
-            for (String s : foo)
+            flowResponse.size();
+            assertTrue(flowResponse.size() >= min && flowResponse.size() <= max);
+            for (String s : flowResponse)
             {
                 assertEquals(s, "foo");
             }
         }
     }
 
-    public static class FooComponent
+    public static class FooComponent extends ComponentProcessor
     {
 
-        public boolean process(String s)
+        public FooComponent()
         {
-            synchronized (foo)
-            {
-
-                if (foo.size() < 10)
-                {
-                    foo.add(s);
-                    return true;
-                }
-            }
-            return false;
+            this.myCollection = flowResponse;
         }
     }
 }

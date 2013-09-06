@@ -25,7 +25,7 @@ import org.junit.Test;
 public class StoppedFixedFrequencyTestCase extends FunctionalTestCase
 {
 
-    private static List<String> foo = new ArrayList<String>();
+    private static List<String> stoppedFlowResponse = new ArrayList<String>();
 
     @Override
     protected String getConfigResources()
@@ -39,23 +39,16 @@ public class StoppedFixedFrequencyTestCase extends FunctionalTestCase
         runSchedulersOnce();
         Thread.sleep(6000);
 
-        assertEquals(1, foo.size());
+        assertEquals(1, stoppedFlowResponse.size());
     }
 
 
-    public static class FooComponent
+    public static class FooComponent extends ComponentProcessor
     {
 
-        public boolean process(String s)
+        public FooComponent()
         {
-            synchronized (foo)
-            {
-
-                foo.add(s);
-
-            }
-
-            return false;
+            this.myCollection = stoppedFlowResponse;
         }
     }
 

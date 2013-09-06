@@ -12,15 +12,18 @@ package org.mule.test.integration.schedule;
 
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.mule.api.MuleException;
 import org.mule.tck.config.AbstractTestConfigurationFailure;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
@@ -36,19 +39,16 @@ public class PollScheduleFrequencyTestCase extends AbstractTestConfigurationFail
         });
     }
 
-    private static List<String> negative = new ArrayList<String>();
-    private static List<String> zero = new ArrayList<String>();
+    private static List<String> negativeFlowResponses = new ArrayList<String>();
+    private static List<String> zeroFlowResponses = new ArrayList<String>();
 
     public PollScheduleFrequencyTestCase(String confResources, String expected)
     {
         super(confResources, expected);
     }
 
-    @Override
-    public void doSetUp()
-    {
-        System.setProperty("frequency.millis", "100");
-    }
+    @Rule
+    public SystemProperty systemProperty = new SystemProperty("frequency.millis","100");
 
     @Test
     public void testConfig()
@@ -56,6 +56,7 @@ public class PollScheduleFrequencyTestCase extends AbstractTestConfigurationFail
         try
         {
             startMuleContext();
+            fail("Context started properly");
         }
         catch (MuleException mExp)
         {
@@ -68,39 +69,21 @@ public class PollScheduleFrequencyTestCase extends AbstractTestConfigurationFail
         }
     }
 
-    public static class NegativeComponent
+    public static class NegativeComponent extends ComponentProcessor
     {
 
-        public boolean process(String s)
+        public NegativeComponent()
         {
-            synchronized (negative)
-            {
-
-                if (negative.size() < 10)
-                {
-                    negative.add(s);
-                    return true;
-                }
-            }
-            return false;
+            this.myCollection = negativeFlowResponses;
         }
     }
 
-    public static class ZeroComponent
+    public static class ZeroComponent extends ComponentProcessor
     {
 
-        public boolean process(String s)
+        public ZeroComponent()
         {
-            synchronized (zero)
-            {
-
-                if (zero.size() < 10)
-                {
-                    zero.add(s);
-                    return true;
-                }
-            }
-            return false;
+            this.myCollection = zeroFlowResponses;
         }
     }
 }
