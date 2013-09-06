@@ -31,7 +31,7 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-public class JsonSchemaValidationTestCase extends AbstractMuleContextTestCase
+public class JsonSchemaXsdValidationTestCase extends AbstractMuleContextTestCase
 {
     private static final String EXPECTED_JSON =
         "{" +
@@ -173,7 +173,7 @@ public class JsonSchemaValidationTestCase extends AbstractMuleContextTestCase
 
     private static class Resolver implements LSResourceResolver
     {
-        private String schema = IOUtils.toString(JsonSchemaValidationTestCase.class.getClassLoader().getResourceAsStream("customer.xsd"));
+        private String schema = IOUtils.toString(JsonSchemaXsdValidationTestCase.class.getClassLoader().getResourceAsStream("customer.xsd"));
 
         @Override
         public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId, String baseURI)

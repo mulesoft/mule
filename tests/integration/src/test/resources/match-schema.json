@@ -1,0 +1,32 @@
+{
+    "$schema": "http://json-schema.org/draft-03/schema",
+    "properties": {
+        "homeTeam": {
+            "description": "Code of the home team",
+            "type": "string",
+            "maxLength": 3,
+            "minLength": 3
+        },
+        "awayTeam": {
+            "description": "Code of the away team",
+            "type": "string",
+            "maxLength": 3,
+            "minLength": 3
+        },
+        "date": {
+            "description": "The date on which the match will be played",
+            "type": "string",
+            "format": "date-time"
+        },
+        "homeTeamScore": {
+            "description": "Goals scored by the home team",
+            "type": "integer"
+        },
+        "awayTeamScore": {
+            "description": "Goals scored by the away tam",
+            "type": "integer"
+        }
+    },
+    "required": true,
+    "type": "object"
+}
