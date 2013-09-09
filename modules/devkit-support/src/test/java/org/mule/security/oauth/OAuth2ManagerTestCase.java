@@ -24,8 +24,6 @@ import org.mule.api.store.ObjectStore;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.common.security.oauth.exception.NotAuthorizedException;
-import org.mule.security.oauth.callback.RestoreAccessTokenCallback;
-import org.mule.security.oauth.callback.SaveAccessTokenCallback;
 import org.mule.security.oauth.util.HttpUtil;
 import org.mule.security.oauth.util.OAuthResponseParser;
 import org.mule.tck.size.SmallTest;
@@ -44,9 +42,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 /**
  * This class contains unit tests for
@@ -72,7 +68,7 @@ public class OAuth2ManagerTestCase
     private MuleContext muleContext = null;
 
     @Mock
-    private KeyedPoolableObjectFactory objectFactory = null;
+    private KeyedPoolableObjectFactory<String, OAuth2Adapter> objectFactory = null;
 
     @Mock(extraInterfaces = {Initialisable.class, Startable.class, Stoppable.class, Disposable.class,
         MuleContextAware.class})
@@ -184,26 +180,6 @@ public class OAuth2ManagerTestCase
     }
 
     @Test
-    public void restoreTokenWithCallback()
-    {
-        RestoreAccessTokenCallback callback = Mockito.mock(RestoreAccessTokenCallback.class);
-        Mockito.when(this.adapter.getOauthRestoreAccessToken()).thenReturn(callback);
-        final String accessToken = "accessToken";
-        Mockito.when(callback.getAccessToken()).thenReturn(accessToken);
-
-        Assert.assertTrue(this.manager.restoreAccessToken(this.adapter));
-
-        Mockito.verify(callback).restoreAccessToken();
-        Mockito.verify(adapter).setAccessToken(Mockito.eq(accessToken));
-    }
-
-    @Test
-    public void restoreTokenWithoutCallback()
-    {
-        Assert.assertFalse(this.manager.restoreAccessToken(this.adapter));
-    }
-
-    @Test
     public void fetchAccessToken() throws Exception
     {
         final String accessTokenUrl = "accessTokenUrl";
@@ -221,9 +197,6 @@ public class OAuth2ManagerTestCase
         final String accessToken = "accessToken";
         final String refreshToken = "refreshToken";
         final Date expiration = new Date();
-
-        SaveAccessTokenCallback saveCallback = Mockito.mock(SaveAccessTokenCallback.class);
-        Mockito.when(this.adapter.getOauthSaveAccessToken()).thenReturn(saveCallback);
 
         Mockito.when(adapter.getOauthVerifier()).thenReturn(oauthVerifier);
         Mockito.when(adapter.getConsumerKey()).thenReturn(consumerKey);
@@ -249,8 +222,6 @@ public class OAuth2ManagerTestCase
         Mockito.verify(this.adapter).setAccessToken(accessToken);
         Mockito.verify(this.adapter).setExpiration(expiration);
         Mockito.verify(this.adapter).setRefreshToken(refreshToken);
-        Mockito.verify(this.adapter).getOauthSaveAccessToken();
-        Mockito.verify(saveCallback).saveAccessToken(Mockito.anyString(), Mockito.anyString());
 
         Mockito.verify(adapter).postAuth();
         Mockito.verify(this.manager).fetchCallbackParameters(this.adapter, response);
@@ -274,9 +245,6 @@ public class OAuth2ManagerTestCase
         final String accessToken = "accessToken";
         final String refreshToken = "refreshToken";
         final Date expiration = new Date();
-
-        SaveAccessTokenCallback saveCallback = Mockito.mock(SaveAccessTokenCallback.class);
-        Mockito.when(this.adapter.getOauthSaveAccessToken()).thenReturn(saveCallback);
 
         Mockito.when(adapter.getOauthVerifier()).thenReturn(oauthVerifier);
         Mockito.when(adapter.getConsumerKey()).thenReturn(consumerKey);
@@ -304,9 +272,6 @@ public class OAuth2ManagerTestCase
         Mockito.verify(this.adapter).setAccessToken(accessToken);
         Mockito.verify(this.adapter).setExpiration(expiration);
         Mockito.verify(this.adapter).setRefreshToken(refreshToken);
-        Mockito.verify(this.adapter).getOauthSaveAccessToken();
-        Mockito.verify(saveCallback).saveAccessToken(Mockito.anyString(), Mockito.anyString());
-
         Mockito.verify(adapter).postAuth();
         Mockito.verify(this.manager).fetchCallbackParameters(this.adapter, response);
 
@@ -322,28 +287,6 @@ public class OAuth2ManagerTestCase
     public void hasBeenAuthorized() throws NotAuthorizedException
     {
         Mockito.when(this.adapter.getAccessToken()).thenReturn("accessTokenId");
-        this.manager.hasBeenAuthorized(this.adapter);
-    }
-
-    @Test
-    public void hasBeenAuthorizedWithRestore() throws NotAuthorizedException
-    {
-        RestoreAccessTokenCallback callback = Mockito.mock(RestoreAccessTokenCallback.class);
-        Mockito.when(this.adapter.getOauthRestoreAccessToken()).thenReturn(callback);
-        final String accessToken = "accessToken";
-        Mockito.when(callback.getAccessToken()).thenReturn(accessToken);
-
-        Mockito.when(this.adapter.getAccessToken()).thenReturn(null).thenAnswer(new Answer<String>()
-        {
-
-            @Override
-            public String answer(InvocationOnMock invocation) throws Throwable
-            {
-                Mockito.verify(adapter).setAccessToken(accessToken);
-                return accessToken;
-            }
-        });
-
         this.manager.hasBeenAuthorized(this.adapter);
     }
 

@@ -83,7 +83,7 @@ public interface OAuth2Manager<C extends OAuth2Adapter>
     /**
      * Retrieves accessTokenPoolFactory
      */
-    public KeyedPoolableObjectFactory getAccessTokenPoolFactory();
+    public KeyedPoolableObjectFactory<String, OAuth2Adapter> getAccessTokenPoolFactory();
 
     /**
      * Generates the full URL of an authorization endpoint including query params
@@ -97,16 +97,6 @@ public interface OAuth2Manager<C extends OAuth2Adapter>
     public String buildAuthorizeUrl(Map<String, String> extraParameters,
                                     String authorizationUrl,
                                     String redirectUri);
-
-    /**
-     * Tries to use the adapter's restore an access token to retrieve the token. If
-     * the token is successfuly retrieved then it is set into the given adapter
-     * 
-     * @param adapter the adapter on which the access token will be set upon success
-     * @return <code>true</code> if a token could be retrieved and set into the
-     *         adapter. <code>false</code> otherwise
-     */
-    public boolean restoreAccessToken(OAuth2Adapter adapter);
 
     /**
      * if refresh token is available, then it makes an http call to refresh the

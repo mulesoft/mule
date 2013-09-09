@@ -23,10 +23,10 @@ public class TestOAuth2Manager extends BaseOAuth2Manager<OAuth2Adapter>
 
     private final transient Logger logger = LoggerFactory.getLogger(TestOAuth2Manager.class);
 
-    private KeyedPoolableObjectFactory objectFactory;
+    private KeyedPoolableObjectFactory<String, OAuth2Adapter> objectFactory;
     private OAuth2Adapter adapter;
 
-    public TestOAuth2Manager(KeyedPoolableObjectFactory objectFactory, OAuth2Adapter adapter)
+    public TestOAuth2Manager(KeyedPoolableObjectFactory<String, OAuth2Adapter> objectFactory, OAuth2Adapter adapter)
     {
         this.objectFactory = objectFactory;
         this.adapter = adapter;
@@ -40,7 +40,7 @@ public class TestOAuth2Manager extends BaseOAuth2Manager<OAuth2Adapter>
     }
 
     @Override
-    protected KeyedPoolableObjectFactory createPoolFactory(OAuth2Manager<OAuth2Adapter> oauthManager,
+    protected KeyedPoolableObjectFactory<String, OAuth2Adapter> createPoolFactory(OAuth2Manager<OAuth2Adapter> oauthManager,
                                                            ObjectStore<Serializable> objectStore)
     {
         return objectFactory;
