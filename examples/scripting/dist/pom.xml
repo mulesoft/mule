@@ -9,7 +9,7 @@
     <description>A simple example that demonstrates Mule's JSR-223 Scripting support.</description>
 
     <properties>
-        <muleVersion>3.5.0-bighorn-RC1</muleVersion>
+        <muleVersion>3.5.0-bighorn-RC2-SNAPSHOT</muleVersion>
     </properties>
 
     <dependencies>
