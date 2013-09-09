@@ -11,8 +11,6 @@
 package org.mule.security.oauth;
 
 import org.mule.common.security.oauth.exception.NotAuthorizedException;
-import org.mule.security.oauth.callback.RestoreAccessTokenCallback;
-import org.mule.security.oauth.callback.SaveAccessTokenCallback;
 
 import java.io.Serializable;
 
@@ -38,34 +36,6 @@ public interface OAuthAdapter extends Serializable, OnNoTokenPolicyAware
     public void setAccessToken(String accessToken);
 
     public void setAuthorizationUrl(String authorizationUrl);
-
-    /**
-     * Set the callback to be called when the access token and secret need to be
-     * saved for later restoration
-     * 
-     * @param saveCallback Callback to be called
-     */
-    public void setOauthSaveAccessToken(SaveAccessTokenCallback saveCallback);
-
-    /**
-     * Set the callback to be called when the access token and secret need to be
-     * restored
-     * 
-     * @param restoreCallback Callback to be called
-     */
-    public void setOauthRestoreAccessToken(RestoreAccessTokenCallback restoreCallback);
-
-    /**
-     * Get the callback to be called when the access token and secret need to be
-     * saved for later restoration
-     */
-    public SaveAccessTokenCallback getOauthSaveAccessToken();
-
-    /**
-     * Get the callback to be called when the access token and secret need to be
-     * restored
-     */
-    public RestoreAccessTokenCallback getOauthRestoreAccessToken();
 
     /**
      * Checks if the adapter has been authorized. If it was not, then in trows

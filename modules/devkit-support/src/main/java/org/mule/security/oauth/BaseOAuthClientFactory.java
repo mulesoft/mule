@@ -32,7 +32,7 @@ import org.apache.commons.pool.KeyedPoolableObjectFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFactory
+public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFactory<String, OAuth2Adapter>
 {
 
     private static transient Logger logger = LoggerFactory.getLogger(BaseOAuthClientFactory.class);
@@ -108,17 +108,11 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
      * {@link org.mule.security.oauth.OAuth2Connector.postAuth()} method is invoked.
      * 
      * @param the key of the object at the object store
-     * @throws IllegalArgumentException if key is not a String
      */
     @Override
-    public final Object makeObject(Object key) throws Exception
+    public final OAuth2Adapter makeObject(String key) throws Exception
     {
-        if (!(key instanceof String))
-        {
-            throw new IllegalArgumentException("Invalid key type");
-        }
-
-        if (!this.objectStore.contains((String) key))
+        if (!this.objectStore.contains(key))
         {
             throw new NotAuthorizedException(
                 String.format(
@@ -258,18 +252,13 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
      * 
      * @param key the key of the object at the object store
      * @param obj an instance of {@link org.mule.security.oauth.OAuth2Adapter}
-     * @throws IllegalArgumetException if key is not a string or if obj is not an
-     *             instance of the type returned by {@link
+     * @throws IllegalArgumetException if obj is not an instance of the type returned
+     *             by {@link
      *             org.mule.security.oauth.BaseOAuthClientFactory.getAdapterClass()}
      */
     @Override
-    public final void destroyObject(Object key, Object obj) throws Exception
+    public final void destroyObject(String key, OAuth2Adapter obj) throws Exception
     {
-        if (!(key instanceof String))
-        {
-            throw new IllegalArgumentException("Invalid key type");
-        }
-
         if (!this.getAdapterClass().isInstance(obj))
         {
             throw new IllegalArgumentException("Invalid connector type");
@@ -292,20 +281,13 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
      * 
      * @param key the key of the object at the object store
      * @param obj an instance of {@link org.mule.security.oauth.OAuth2Adapter}
-     * @throws IllegalArgumetException if key is not a string or if obj is not an
+     * @throws IllegalArgumetException if obj is not an
      *             instance of the type returned by {@link
      *             org.mule.security.oauth.BaseOAuthClientFactory.getAdapterClass()}
      */
     @Override
-    public final boolean validateObject(Object key, Object obj)
+    public final boolean validateObject(String key, OAuth2Adapter obj)
     {
-        if (!(key instanceof String))
-        {
-            throw new IllegalArgumentException("Invalid key type");
-        }
-
-        String k = (String) key;
-
         if (!this.getAdapterClass().isInstance(obj))
         {
             throw new IllegalArgumentException("Invalid connector type");
@@ -315,12 +297,12 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
 
         try
         {
-            if (!this.objectStore.contains(k))
+            if (!this.objectStore.contains(key))
             {
                 return false;
             }
 
-            OAuthState state = this.retrieveOAuthState(k, true);
+            OAuthState state = this.retrieveOAuthState(key, true);
 
             if (connector.getAccessToken() == null)
             {
@@ -354,7 +336,7 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
      * This default implementation does nothing
      */
     @Override
-    public void activateObject(Object key, Object obj) throws Exception
+    public void activateObject(String key, OAuth2Adapter obj) throws Exception
     {
     }
 
@@ -365,20 +347,13 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
      * 
      * @param key the key of the object at the object store
      * @param obj an instance of {@link org.mule.security.oauth.OAuth2Adapter}
-     * @throws IllegalArgumetException if key is not a string or if obj is not an
+     * @throws IllegalArgumetException if obj is not an
      *             instance of the type returned by {@link
      *             org.mule.security.oauth.BaseOAuthClientFactory.getAdapterClass()}
      */
     @Override
-    public final void passivateObject(Object key, Object obj) throws Exception
+    public final void passivateObject(String key, OAuth2Adapter obj) throws Exception
     {
-        if (!(key instanceof String))
-        {
-            throw new IllegalArgumentException("Invalid key type");
-        }
-
-        String k = (String) key;
-
         if (!this.getAdapterClass().isInstance(obj))
         {
             throw new IllegalArgumentException("Invalid connector type");
@@ -388,10 +363,10 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
 
         OAuthState state = null;
 
-        if (this.objectStore.contains(k))
+        if (this.objectStore.contains(key))
         {
-            state = this.retrieveOAuthState(k, false);
-            this.objectStore.remove(k);
+            state = this.retrieveOAuthState(key, false);
+            this.objectStore.remove(key);
         }
 
         if (state == null)
@@ -406,7 +381,7 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
 
         this.setCustomStateProperties(connector, state);
 
-        this.objectStore.store(k, state);
+        this.objectStore.store(key, state);
     }
 
 }
