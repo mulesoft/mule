@@ -14,6 +14,10 @@
 
     <vm:endpoint path="foo" exchange-pattern="request-response" name="foo"/>
 
+    <spring:beans>
+        <spring:bean class="org.mule.test.integration.watermark.WatermarkPollingTestCase$PollStopper"/>
+    </spring:beans>
+
 
     <flow name="echo">
         <inbound-endpoint ref="foo"/>
@@ -58,6 +62,34 @@
         </poll>
         <set-payload value="#[test3]"/>
         <set-variable variableName="test3" value="keyPresent"/>
+        <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
+    </flow>
+
+
+    <flow name="usingWatermarkFlowWithNullValue" processingStrategy="synchronous">
+        <poll frequency="1000">
+            <watermark variable="testNull" default-expression="#[null]" update-expression="#[string:noWatermark]"/>
+            <outbound-endpoint ref="foo"/>
+        </poll>
+        <choice>
+            <when expression="#[testNull != null]">
+                <set-payload value="#[testNull]"/>
+                <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
+            </when>
+            <otherwise>
+                <logger level="ERROR" message="Watermark value is null as expected"/>
+            </otherwise>
+        </choice>
+
+    </flow>
+
+    <flow name="usingWatermarkFlowWithNullUpdateValue" processingStrategy="synchronous">
+        <poll frequency="1000">
+            <watermark variable="testUpdateAsNull" default-expression="#[string:defaultValue]" update-expression="#[null]"/>
+            <outbound-endpoint ref="foo"/>
+        </poll>
+
+        <set-payload value="#[testUpdateAsNull]"/>
         <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
     </flow>
 
@@ -135,7 +167,6 @@
 
     </flow>
 
-    <spring:bean name="pollStopper" class="org.mule.test.integration.watermark.WatermarkPollingTestCase$PollStopper"/>
 
 
 </mule>

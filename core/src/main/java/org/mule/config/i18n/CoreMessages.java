@@ -1424,4 +1424,13 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 348, endpoint);
     }
 
+    public static Message notSerializableWatermark()
+    {
+        return factory.createMessage(BUNDLE_PATH, 349);
+    }
+
+    public static Message nullWatermark()
+    {
+        return factory.createMessage(BUNDLE_PATH, 350);
+    }
 }
