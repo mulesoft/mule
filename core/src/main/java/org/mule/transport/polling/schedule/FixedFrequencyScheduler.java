@@ -186,7 +186,7 @@ public class FixedFrequencyScheduler<T extends Runnable> extends PollScheduler<T
                     {
                         try
                         {
-                            executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
+                            executor.awaitTermination(1000, TimeUnit.MILLISECONDS);
                         }
                         catch (InterruptedException e)
                         {
