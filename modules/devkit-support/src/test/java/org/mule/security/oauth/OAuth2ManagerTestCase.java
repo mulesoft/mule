@@ -24,12 +24,11 @@ import org.mule.api.store.ObjectStore;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.common.security.oauth.exception.NotAuthorizedException;
-import org.mule.security.oauth.callback.RestoreAccessTokenCallback;
-import org.mule.security.oauth.callback.SaveAccessTokenCallback;
 import org.mule.security.oauth.util.HttpUtil;
 import org.mule.security.oauth.util.OAuthResponseParser;
 import org.mule.tck.size.SmallTest;
 
+import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.net.URLDecoder;
 import java.util.Date;
@@ -44,9 +43,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 /**
  * This class contains unit tests for
@@ -63,6 +60,7 @@ public class OAuth2ManagerTestCase
 {
 
     private static final String SCOPE = "<<myScope>>";
+    private static final String ACCESS_TOKEN_ID = "accessTokenId";
 
     private TestOAuth2Manager manager;
 
@@ -72,7 +70,7 @@ public class OAuth2ManagerTestCase
     private MuleContext muleContext = null;
 
     @Mock
-    private KeyedPoolableObjectFactory objectFactory = null;
+    private KeyedPoolableObjectFactory<String, OAuth2Adapter> objectFactory = null;
 
     @Mock(extraInterfaces = {Initialisable.class, Startable.class, Stoppable.class, Disposable.class,
         MuleContextAware.class})
@@ -86,6 +84,9 @@ public class OAuth2ManagerTestCase
 
     @Mock
     private Transformer transformer;
+
+    @Mock
+    private RefreshTokenManager refreshTokenManager;
 
     @Before
     public void setUp() throws Exception
@@ -105,6 +106,7 @@ public class OAuth2ManagerTestCase
         this.manager.setHttpUtil(this.httpUtil);
         this.manager.setOauthResponseParser(this.oauthResponseParser);
         this.manager.setScope(SCOPE);
+        this.manager.setRefreshTokenManager(this.refreshTokenManager);
 
         this.manager.initialise();
         this.manager.start();
@@ -184,26 +186,6 @@ public class OAuth2ManagerTestCase
     }
 
     @Test
-    public void restoreTokenWithCallback()
-    {
-        RestoreAccessTokenCallback callback = Mockito.mock(RestoreAccessTokenCallback.class);
-        Mockito.when(this.adapter.getOauthRestoreAccessToken()).thenReturn(callback);
-        final String accessToken = "accessToken";
-        Mockito.when(callback.getAccessToken()).thenReturn(accessToken);
-
-        Assert.assertTrue(this.manager.restoreAccessToken(this.adapter));
-
-        Mockito.verify(callback).restoreAccessToken();
-        Mockito.verify(adapter).setAccessToken(Mockito.eq(accessToken));
-    }
-
-    @Test
-    public void restoreTokenWithoutCallback()
-    {
-        Assert.assertFalse(this.manager.restoreAccessToken(this.adapter));
-    }
-
-    @Test
     public void fetchAccessToken() throws Exception
     {
         final String accessTokenUrl = "accessTokenUrl";
@@ -221,9 +203,6 @@ public class OAuth2ManagerTestCase
         final String accessToken = "accessToken";
         final String refreshToken = "refreshToken";
         final Date expiration = new Date();
-
-        SaveAccessTokenCallback saveCallback = Mockito.mock(SaveAccessTokenCallback.class);
-        Mockito.when(this.adapter.getOauthSaveAccessToken()).thenReturn(saveCallback);
 
         Mockito.when(adapter.getOauthVerifier()).thenReturn(oauthVerifier);
         Mockito.when(adapter.getConsumerKey()).thenReturn(consumerKey);
@@ -249,8 +228,6 @@ public class OAuth2ManagerTestCase
         Mockito.verify(this.adapter).setAccessToken(accessToken);
         Mockito.verify(this.adapter).setExpiration(expiration);
         Mockito.verify(this.adapter).setRefreshToken(refreshToken);
-        Mockito.verify(this.adapter).getOauthSaveAccessToken();
-        Mockito.verify(saveCallback).saveAccessToken(Mockito.anyString(), Mockito.anyString());
 
         Mockito.verify(adapter).postAuth();
         Mockito.verify(this.manager).fetchCallbackParameters(this.adapter, response);
@@ -275,9 +252,6 @@ public class OAuth2ManagerTestCase
         final String refreshToken = "refreshToken";
         final Date expiration = new Date();
 
-        SaveAccessTokenCallback saveCallback = Mockito.mock(SaveAccessTokenCallback.class);
-        Mockito.when(this.adapter.getOauthSaveAccessToken()).thenReturn(saveCallback);
-
         Mockito.when(adapter.getOauthVerifier()).thenReturn(oauthVerifier);
         Mockito.when(adapter.getConsumerKey()).thenReturn(consumerKey);
         Mockito.when(adapter.getConsumerSecret()).thenReturn(consumerSecret);
@@ -295,7 +269,7 @@ public class OAuth2ManagerTestCase
         Mockito.when(this.oauthResponseParser.extractRefreshToken(refreshTokenPattern, response)).thenReturn(
             refreshToken);
 
-        this.manager.refreshAccessToken(adapter);
+        this.manager.refreshAccessToken(adapter, accessToken);
 
         Mockito.verify(this.adapter).setAccessToken(null);
         Mockito.verify(this.httpUtil).post(
@@ -304,9 +278,6 @@ public class OAuth2ManagerTestCase
         Mockito.verify(this.adapter).setAccessToken(accessToken);
         Mockito.verify(this.adapter).setExpiration(expiration);
         Mockito.verify(this.adapter).setRefreshToken(refreshToken);
-        Mockito.verify(this.adapter).getOauthSaveAccessToken();
-        Mockito.verify(saveCallback).saveAccessToken(Mockito.anyString(), Mockito.anyString());
-
         Mockito.verify(adapter).postAuth();
         Mockito.verify(this.manager).fetchCallbackParameters(this.adapter, response);
 
@@ -315,35 +286,13 @@ public class OAuth2ManagerTestCase
     @Test(expected = IllegalStateException.class)
     public void refreshWithoutToken() throws Exception
     {
-        this.manager.refreshAccessToken(this.adapter);
+        this.manager.refreshAccessToken(this.adapter, "myToken");
     }
 
     @Test
     public void hasBeenAuthorized() throws NotAuthorizedException
     {
-        Mockito.when(this.adapter.getAccessToken()).thenReturn("accessTokenId");
-        this.manager.hasBeenAuthorized(this.adapter);
-    }
-
-    @Test
-    public void hasBeenAuthorizedWithRestore() throws NotAuthorizedException
-    {
-        RestoreAccessTokenCallback callback = Mockito.mock(RestoreAccessTokenCallback.class);
-        Mockito.when(this.adapter.getOauthRestoreAccessToken()).thenReturn(callback);
-        final String accessToken = "accessToken";
-        Mockito.when(callback.getAccessToken()).thenReturn(accessToken);
-
-        Mockito.when(this.adapter.getAccessToken()).thenReturn(null).thenAnswer(new Answer<String>()
-        {
-
-            @Override
-            public String answer(InvocationOnMock invocation) throws Throwable
-            {
-                Mockito.verify(adapter).setAccessToken(accessToken);
-                return accessToken;
-            }
-        });
-
+        Mockito.when(this.adapter.getAccessToken()).thenReturn(ACCESS_TOKEN_ID);
         this.manager.hasBeenAuthorized(this.adapter);
     }
 
@@ -369,5 +318,36 @@ public class OAuth2ManagerTestCase
                 Assert.assertFalse(this.manager.isCapableOf(capability));
             }
         }
+    }
+
+    @Test
+    public void postAuthNoFailures() throws Exception
+    {
+        this.manager.postAuth(this.adapter, ACCESS_TOKEN_ID);
+        Mockito.verify(this.adapter).postAuth();
+    }
+
+    @Test(expected = FileNotFoundException.class)
+    public void postAuthWithRefreshableException() throws Exception
+    {
+        Mockito.doThrow(FileNotFoundException.class).when(this.adapter).postAuth();
+        this.manager.postAuth(this.adapter, ACCESS_TOKEN_ID);
+        Mockito.verify(this.refreshTokenManager).refreshToken(adapter, ACCESS_TOKEN_ID);
+    }
+
+    @Test(expected = FileNotFoundException.class)
+    public void postAuthWithRefreshableExceptionButNoAccessTokenId() throws Exception
+    {
+        Mockito.doThrow(FileNotFoundException.class).when(this.adapter).postAuth();
+        this.manager.postAuth(this.adapter, null);
+        Mockito.verify(this.refreshTokenManager, Mockito.never()).refreshToken(adapter, Mockito.anyString());
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void postAuthWithNonRefreshableException() throws Exception
+    {
+        Mockito.doThrow(RuntimeException.class).when(this.adapter).postAuth();
+        this.manager.postAuth(this.adapter, ACCESS_TOKEN_ID);
+        Mockito.verify(this.refreshTokenManager, Mockito.never()).refreshToken(adapter, Mockito.anyString());
     }
 }

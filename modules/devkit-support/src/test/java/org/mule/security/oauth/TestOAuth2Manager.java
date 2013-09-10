@@ -12,7 +12,10 @@ package org.mule.security.oauth;
 
 import org.mule.api.store.ObjectStore;
 
+import java.io.FileNotFoundException;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
 import org.slf4j.Logger;
@@ -23,10 +26,10 @@ public class TestOAuth2Manager extends BaseOAuth2Manager<OAuth2Adapter>
 
     private final transient Logger logger = LoggerFactory.getLogger(TestOAuth2Manager.class);
 
-    private KeyedPoolableObjectFactory objectFactory;
+    private KeyedPoolableObjectFactory<String, OAuth2Adapter> objectFactory;
     private OAuth2Adapter adapter;
 
-    public TestOAuth2Manager(KeyedPoolableObjectFactory objectFactory, OAuth2Adapter adapter)
+    public TestOAuth2Manager(KeyedPoolableObjectFactory<String, OAuth2Adapter> objectFactory, OAuth2Adapter adapter)
     {
         this.objectFactory = objectFactory;
         this.adapter = adapter;
@@ -40,7 +43,7 @@ public class TestOAuth2Manager extends BaseOAuth2Manager<OAuth2Adapter>
     }
 
     @Override
-    protected KeyedPoolableObjectFactory createPoolFactory(OAuth2Manager<OAuth2Adapter> oauthManager,
+    protected KeyedPoolableObjectFactory<String, OAuth2Adapter> createPoolFactory(OAuth2Manager<OAuth2Adapter> oauthManager,
                                                            ObjectStore<Serializable> objectStore)
     {
         return objectFactory;
@@ -60,6 +63,15 @@ public class TestOAuth2Manager extends BaseOAuth2Manager<OAuth2Adapter>
     protected OAuth2Adapter instantiateAdapter()
     {
         return adapter;
+    }
+    
+    @Override
+    protected Set<Class<? extends Exception>> refreshAccessTokenOn()
+    {
+        Set<Class<? extends Exception>> exceptions = new HashSet<Class<? extends Exception>>();
+        exceptions.add(FileNotFoundException.class);
+        
+        return exceptions;
     }
 
 }

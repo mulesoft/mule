@@ -31,9 +31,8 @@ public class ManagedAccessTokenProcessTemplate<P> implements ProcessTemplate<P, 
     {
         ProcessInterceptor<P, OAuth2Adapter> processCallbackProcessInterceptor = new ProcessCallbackProcessInterceptor<P, OAuth2Adapter>();
 
-        @SuppressWarnings("unchecked")
-        ProcessInterceptor<P, OAuth2Adapter> refreshTokenProcessInterceptor = (ProcessInterceptor<P, OAuth2Adapter>) new RefreshTokenProcessInterceptor(
-            processCallbackProcessInterceptor);
+        ProcessInterceptor<P, OAuth2Adapter> refreshTokenProcessInterceptor = (ProcessInterceptor<P, OAuth2Adapter>) new RefreshTokenProcessInterceptor<P>(
+            processCallbackProcessInterceptor, muleContext);
 
         ProcessInterceptor<P, OAuth2Adapter> managedAccessTokenProcessInterceptor = new ManagedAccessTokenProcessInterceptor<P>(
             refreshTokenProcessInterceptor, oauthManager);

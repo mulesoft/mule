@@ -22,8 +22,6 @@ import org.mule.common.security.oauth.AuthorizationParameter;
 import org.mule.common.security.oauth.exception.NotAuthorizedException;
 import org.mule.common.security.oauth.exception.UnableToAcquireAccessTokenException;
 import org.mule.common.security.oauth.exception.UnableToAcquireRequestTokenException;
-import org.mule.security.oauth.callback.RestoreAccessTokenCallback;
-import org.mule.security.oauth.callback.SaveAccessTokenCallback;
 
 import java.util.Date;
 import java.util.Map;
@@ -89,34 +87,6 @@ public class TestOAuth2Adapter
     public void setAuthorizationUrl(String authorizationUrl)
     {
         this.authorizationUrl = authorizationUrl;
-    }
-
-    @Override
-    public void setOauthSaveAccessToken(SaveAccessTokenCallback saveCallback)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setOauthRestoreAccessToken(RestoreAccessTokenCallback restoreCallback)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public SaveAccessTokenCallback getOauthSaveAccessToken()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public RestoreAccessTokenCallback getOauthRestoreAccessToken()
-    {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
@@ -246,7 +216,7 @@ public class TestOAuth2Adapter
     }
 
     @Override
-    public void refreshAccessToken() throws UnableToAcquireAccessTokenException
+    public void refreshAccessToken(String accessTokenId) throws UnableToAcquireAccessTokenException
     {
         // TODO Auto-generated method stub
 

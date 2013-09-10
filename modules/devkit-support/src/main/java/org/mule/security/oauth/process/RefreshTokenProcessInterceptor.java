@@ -10,13 +10,16 @@
 
 package org.mule.security.oauth.process;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.devkit.ProcessInterceptor;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.devkit.processor.ExpressionEvaluatorSupport;
 import org.mule.security.oauth.OAuth2Adapter;
+import org.mule.security.oauth.RefreshTokenManager;
 import org.mule.security.oauth.callback.ProcessCallback;
 
 import org.slf4j.Logger;
@@ -28,10 +31,21 @@ public class RefreshTokenProcessInterceptor<T> extends ExpressionEvaluatorSuppor
 
     private transient static final Logger logger = LoggerFactory.getLogger(RefreshTokenProcessInterceptor.class);
     private final ProcessInterceptor<T, OAuth2Adapter> next;
+    private RefreshTokenManager refreshTokenManager;
 
-    public RefreshTokenProcessInterceptor(ProcessInterceptor<T, OAuth2Adapter> next)
+    public RefreshTokenProcessInterceptor(ProcessInterceptor<T, OAuth2Adapter> next, MuleContext context)
     {
         this.next = next;
+        try
+        {
+            this.refreshTokenManager = context.getRegistry().lookupObject(RefreshTokenManager.class);
+        }
+        catch (RegistrationException e)
+        {
+            throw new IllegalStateException(
+                "Could not create interceptor because RefreshTokenManager could not be found in the registry",
+                e);
+        }
     }
 
     public T execute(ProcessCallback<T, OAuth2Adapter> processCallback,
@@ -61,7 +75,8 @@ public class RefreshTokenProcessInterceptor<T> extends ExpressionEvaluatorSuppor
                             }
                             try
                             {
-                                object.refreshAccessToken();
+                                this.refreshTokenManager.refreshToken(object,
+                                    processCallback.getAccessTokenId());
                             }
                             catch (Exception newException)
                             {

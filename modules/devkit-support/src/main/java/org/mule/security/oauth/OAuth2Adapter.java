@@ -40,7 +40,11 @@ public interface OAuth2Adapter extends OAuthAdapter, OAuth2Connector, NameableOb
 
     public boolean hasTokenExpired();
 
-    public void refreshAccessToken() throws UnableToAcquireAccessTokenException;
+    /**
+     * @param accessTokenId
+     * @throws UnableToAcquireAccessTokenException
+     */
+    public void refreshAccessToken(String accessTokenId) throws UnableToAcquireAccessTokenException;
 
     /**
      * Retrieve access token

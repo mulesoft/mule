@@ -12,18 +12,32 @@ package org.mule.security.oauth.callback;
 
 import org.mule.api.devkit.ProcessTemplate;
 
+import java.util.List;
+
 /**
  * Callback with logic to execute within a controlled environment provided by {@link ProcessTemplate}
  *  @param <T> type of the return value of the processing execution
  * 
  */
-public interface ProcessCallback<T, O>
+public abstract class ProcessCallback<T, O>
 {
 
-    T process(O object) throws Exception;
+    private String accessTokenId;
+    
+    public abstract T process(O object) throws Exception;
 
-    java.util.List<Class<? extends Exception>> getManagedExceptions();
+    public abstract List<Class<? extends Exception>> getManagedExceptions();
 
-    boolean isProtected();
+    public abstract boolean isProtected();
 
+    public String getAccessTokenId()
+    {
+        return accessTokenId;
+    }
+
+    public void setAccessTokenId(String accessTokenId)
+    {
+        this.accessTokenId = accessTokenId;
+    }
+    
 }

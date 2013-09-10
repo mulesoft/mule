@@ -63,12 +63,6 @@ public class OAuthClientFactoryTestCase
         this.factory = Mockito.spy(new TestClientFactory(this.manager, this.objectStore));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void makeObjectWithWrongKeyType() throws Exception
-    {
-        this.factory.makeObject(new Object());
-    }
-
     @Test(expected = NotAuthorizedException.class)
     public void makeObjectWithNotExistentKey() throws Exception
     {
@@ -85,7 +79,8 @@ public class OAuthClientFactoryTestCase
 
         Assert.assertSame(connector.getManager(), this.manager);
         Mockito.verify(this.factory).setCustomAdapterProperties(connector, state);
-        Assert.assertTrue(connector.wasPostAuthCalled());
+        Mockito.verify(this.manager).postAuth(connector, KEY);
+
         Assert.assertTrue(connector.wasStarted());
         Assert.assertTrue(connector.wasInitialised());
         Assert.assertSame(connector.getMuleContext(), this.muleContext);
@@ -132,7 +127,7 @@ public class OAuthClientFactoryTestCase
         Assert.assertTrue(state.isChecked());
 
         Assert.assertSame(connector.getManager(), this.manager);
-        Assert.assertTrue(connector.wasPostAuthCalled());
+        Mockito.verify(this.manager).postAuth(connector, KEY);
         Assert.assertTrue(connector.wasStarted());
         Assert.assertTrue(connector.wasInitialised());
         Assert.assertSame(connector.getMuleContext(), this.muleContext);
@@ -149,15 +144,9 @@ public class OAuthClientFactoryTestCase
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void destroyWithIllegalKeyType() throws Exception
-    {
-        this.factory.destroyObject(new Object(), new Object());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
     public void destroyWithIllegalValueType() throws Exception
     {
-        this.factory.destroyObject(KEY, new Object());
+        this.factory.destroyObject(KEY, Mockito.mock(OAuth2Adapter.class));
     }
 
     @Test
@@ -170,15 +159,9 @@ public class OAuthClientFactoryTestCase
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void validateObjectWithIllegalKey() throws Exception
-    {
-        this.factory.validateObject(new Object(), new Object());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
     public void validateObjectOfIllegalType() throws Exception
     {
-        this.factory.validateObject(KEY, new Object());
+        this.factory.validateObject(KEY, Mockito.mock(OAuth2Adapter.class));
     }
 
     @Test
@@ -253,15 +236,9 @@ public class OAuthClientFactoryTestCase
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void passivateWithWrongKeyType() throws Exception
-    {
-        this.factory.passivateObject(new Object(), new Object());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
     public void passivateWithWrongValueType() throws Exception
     {
-        this.factory.passivateObject(KEY, new Object());
+        this.factory.passivateObject(KEY, Mockito.mock(OAuth2Adapter.class));
     }
 
     @Test

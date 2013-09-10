@@ -52,7 +52,8 @@ public class ManagedAccessTokenProcessInterceptor<T> extends ExpressionEvaluator
             return processCallback.process(this.oauthManager.getDefaultUnauthorizedConnector());
         }
 
-        String accessTokenId = this.getAccessTokenId(event, messageProcessor, this.oauthManager); 
+        String accessTokenId = this.getAccessTokenId(event, messageProcessor, this.oauthManager);
+        processCallback.setAccessTokenId(accessTokenId);
 
         try
         {
