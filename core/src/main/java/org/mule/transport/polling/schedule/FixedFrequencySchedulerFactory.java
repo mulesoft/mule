@@ -11,8 +11,10 @@
 package org.mule.transport.polling.schedule;
 
 
+import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.schedule.SchedulerFactory;
+import org.mule.util.Preconditions;
 
 import java.util.concurrent.TimeUnit;
 
@@ -57,23 +59,17 @@ public class FixedFrequencySchedulerFactory<T extends Runnable> extends Schedule
 
     public void setFrequency(long frequency)
     {
-        checkNegative(frequency, "Frequency cannot be negative");
+        checkArgument(frequency > 0, "Frequency must be greater then zero");
 
         this.frequency = frequency;
     }
 
     public void setStartDelay(long startDelay)
     {
-        checkNegative(startDelay, "Start delay cannot be negative");
+        checkArgument(startDelay > 0, "Start delay must be greater then zero");
 
         this.startDelay = startDelay;
     }
 
-    private static void checkNegative(long value, String message)
-    {
-        if (value < 0)
-        {
-            throw new IllegalArgumentException(message);
-        }
-    }
+
 }
