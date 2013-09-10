@@ -22,6 +22,12 @@ import java.util.concurrent.locks.Lock;
 
 import org.springframework.util.StringUtils;
 
+/**
+ * Implementation of {@link RefreshTokenManager} that guarantees that no refresh
+ * token is used more than once. If two threads try to refresh the same token
+ * concurrently, only one will succeed and the other one will rely on the result of
+ * the first one
+ */
 public class DefaultRefreshTokenManager implements MuleContextAware, Initialisable, RefreshTokenManager
 {
 
@@ -47,7 +53,8 @@ public class DefaultRefreshTokenManager implements MuleContextAware, Initialisab
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritDoc} This implementation uses a lock to guarantee that no refresh
+     * token is consumed more than once
      * 
      * @see org.mule.security.oauth.RefreshTokenManager#refreshToken(org.mule.security.oauth.OAuth2Adapter,
      *      java.lang.String)
@@ -67,7 +74,7 @@ public class DefaultRefreshTokenManager implements MuleContextAware, Initialisab
         {
             if (!this.refreshedTokens.contains(accessTokenId))
             {
-                adapter.refreshAccessToken();
+                adapter.refreshAccessToken(accessTokenId);
                 this.refreshedTokens.store(accessTokenId, true);
             }
         }

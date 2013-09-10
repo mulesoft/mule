@@ -120,7 +120,7 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
                     key));
         }
 
-        OAuthState state = this.retrieveOAuthState((String) key, true);
+        OAuthState state = this.retrieveOAuthState(key, true);
 
         OAuth2Adapter connector = this.getAdapterClass()
             .getConstructor(OAuth2Manager.class)
@@ -148,7 +148,7 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
             ((Startable) connector).start();
         }
 
-        connector.postAuth();
+        this.oauthManager.postAuth(connector, key);
         return connector;
     }
 

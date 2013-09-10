@@ -13,6 +13,12 @@ package org.mule.security.oauth;
 public interface RefreshTokenManager
 {
 
+    /**
+     * Refreshes the token of the given id for the given adapter.
+     * @param adapter
+     * @param accessTokenId
+     * @throws Exception
+     */
     public void refreshToken(OAuth2Adapter adapter, String accessTokenId) throws Exception;
 
 }

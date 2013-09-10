@@ -29,6 +29,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.registry.RegistrationException;
 import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
@@ -46,8 +47,10 @@ import org.mule.security.oauth.util.OAuthResponseParser;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -62,6 +65,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     private OAuth2Adapter defaultUnauthorizedConnector;
     private String applicationName;
     private String scope;
+    private RefreshTokenManager refreshTokenManager;
 
     /**
      * muleContext
@@ -115,7 +119,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
      *         {@link org.apache.commons.pool.KeyedPoolableObjectFactory}
      */
     protected abstract KeyedPoolableObjectFactory<String, OAuth2Adapter> createPoolFactory(OAuth2Manager<OAuth2Adapter> oauthManager,
-                                                                    ObjectStore<Serializable> objectStore);
+                                                                                           ObjectStore<Serializable> objectStore);
 
     /**
      * Populates the adapter with custom properties not accessible from the base
@@ -158,7 +162,8 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         }
 
         this.accessTokenPoolFactory = this.createPoolFactory(this, this.accessTokenObjectStore);
-        this.accessTokenPool = new GenericKeyedObjectPool<String, OAuth2Adapter>(accessTokenPoolFactory, config);
+        this.accessTokenPool = new GenericKeyedObjectPool<String, OAuth2Adapter>(accessTokenPoolFactory,
+            config);
 
         if (defaultUnauthorizedConnector instanceof Initialisable)
         {
@@ -174,6 +179,20 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         {
             this.oauthResponseParser = new DefaultOAuthResponseParser();
         }
+
+        if (this.refreshTokenManager == null)
+        {
+            try
+            {
+                this.refreshTokenManager = this.muleContext.getRegistry().lookupObject(
+                    RefreshTokenManager.class);
+            }
+            catch (RegistrationException e)
+            {
+                throw new InitialisationException(e, this);
+            }
+        }
+
     }
 
     /**
@@ -398,7 +417,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         {
             throw new RuntimeException(e);
         }
-        this.fetchAndExtract(adapter, builder.toString());
+        this.fetchAndExtract(adapter, builder.toString(), null);
     }
 
     /**
@@ -418,13 +437,14 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
      * {@inheritDoc}
      */
     @Override
-    public final void refreshAccessToken(OAuth2Adapter adapter) throws UnableToAcquireAccessTokenException
+    public final void refreshAccessToken(OAuth2Adapter adapter, String accessTokenId)
+        throws UnableToAcquireAccessTokenException
     {
         if (adapter.getRefreshToken() == null)
         {
             throw new IllegalStateException("Cannot refresh access token since refresh token is null");
         }
-        
+
         if (getLogger().isDebugEnabled())
         {
             getLogger().debug("Trying to refresh access token...");
@@ -440,7 +460,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         builder.append(adapter.getRefreshToken());
 
         adapter.setAccessToken(null);
-        this.fetchAndExtract(adapter, builder.toString());
+        this.fetchAndExtract(adapter, builder.toString(), accessTokenId);
     }
 
     /**
@@ -513,7 +533,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         return String.format(OAuthProperties.AUTHORIZATION_EVENT_KEY_TEMPLATE, eventId);
     }
 
-    private void fetchAndExtract(OAuth2Adapter adapter, String requestBody)
+    private void fetchAndExtract(OAuth2Adapter adapter, String requestBody, String accessTokenId)
         throws UnableToAcquireAccessTokenException
     {
         if (adapter.getAccessToken() != null)
@@ -608,7 +628,7 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         this.fetchCallbackParameters(adapter, response);
         try
         {
-            adapter.postAuth();
+            this.postAuth(adapter, accessTokenId);
         }
         catch (Exception e)
         {
@@ -617,7 +637,57 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
                 e);
         }
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void postAuth(OAuth2Adapter adapter, String accessTokenId) throws Exception
+    {
+        try
+        {
+            adapter.postAuth();
+        }
+        catch (Exception e)
+        {
+            if (accessTokenId != null)
+            {
+                for (Class<? extends Exception> clazz : this.refreshAccessTokenOn())
+                {
+                    if (clazz.isAssignableFrom(e.getClass()))
+                    {
+                        Logger logger = this.getLogger();
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug(String.format(
+                                "Tried to execute postAuth() postAuth in adapter of class %s with accessTokenId %s but token was expired. Attempting refresh",
+                                adapter.getClass().getCanonicalName(), accessTokenId));
+                        }
+                        try
+                        {
+                            this.refreshTokenManager.refreshToken(adapter, accessTokenId);
+                            adapter.postAuth();
+                        }
+                        catch (Exception re)
+                        {
+                            logger.error(String.format(
+                                "Could not refresh access token %s on adapter of class %s while attempting postAuth(). Will throw the original exception",
+                                accessTokenId, adapter.getClass().getCanonicalName()));
+                            throw e;
+                        }
+                    }
+                }
+            }
+
+            throw e;
+        }
+    }
+
+    protected Set<Class<? extends Exception>> refreshAccessTokenOn()
+    {
+        return Collections.emptySet();
+    }
+
     /**
      * Returns true if this module implements such capability
      */
@@ -852,5 +922,10 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     public void setDefaultAccessTokenId(String defaultAccessTokenId)
     {
         this.defaultAccessTokenId = defaultAccessTokenId;
+    }
+
+    public void setRefreshTokenManager(RefreshTokenManager refreshTokenManager)
+    {
+        this.refreshTokenManager = refreshTokenManager;
     }
 }

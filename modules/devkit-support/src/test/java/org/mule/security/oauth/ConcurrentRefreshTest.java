@@ -81,7 +81,7 @@ public class ConcurrentRefreshTest extends AbstractMuleContextTestCase
                 callback.setRefreshed(true);
                 return null;
             }
-        }).when(adapter).refreshAccessToken();
+        }).when(adapter).refreshAccessToken(accessTokenId);
 
         final CountDownLatch latch = new CountDownLatch(threadCount);
 
@@ -110,7 +110,7 @@ public class ConcurrentRefreshTest extends AbstractMuleContextTestCase
 
         latch.await();
 
-        Mockito.verify(adapter).refreshAccessToken();
+        Mockito.verify(adapter).refreshAccessToken(accessTokenId);
     }
 
     private class TestProcessInterceptor implements ProcessInterceptor<String, OAuth2Adapter>

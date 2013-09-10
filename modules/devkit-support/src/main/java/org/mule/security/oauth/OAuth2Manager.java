@@ -100,12 +100,18 @@ public interface OAuth2Manager<C extends OAuth2Adapter>
 
     /**
      * if refresh token is available, then it makes an http call to refresh the
-     * access token. All newly obtained tokens are set into the adapter
+     * access token. All newly obtained tokens are set into the adapter. After the
+     * token has been refreshed, {@link
+     * org.mule.security.oauth.OAuth2Manager.postAuth(OAuth2Adapter, String)} is
+     * invoked
      * 
      * @param adapter the connector's adapter
+     * @param accessTokenId the id of the token you're trying to refresh
      * @throws UnableToAcquireAccessTokenException
+     * @throws IllegalArgumentException if accessTokenId is null
      */
-    public void refreshAccessToken(OAuth2Adapter adapter) throws UnableToAcquireAccessTokenException;
+    public void refreshAccessToken(OAuth2Adapter adapter, String accessTokenId)
+        throws UnableToAcquireAccessTokenException;
 
     /**
      * Makes an http call to the adapter's accessTokenUrl and extracts the access
@@ -167,5 +173,18 @@ public interface OAuth2Manager<C extends OAuth2Adapter>
     public <T> ProcessTemplate<T, OAuth2Adapter> getProcessTemplate();
 
     public String getDefaultAccessTokenId();
+
+    /**
+     * Calls the {@link org.mule.security.oauth.OAuth2Connector.postAuth()} on the
+     * adapter. If it fails due to access token expiration and accessTokenId is not
+     * null, then the token is refresh and the operation is re-attempted. If token
+     * refreshment fails or if accessTokenId is null, then the original exception is
+     * thrown
+     * 
+     * @param adapter the connector adapter
+     * @param accessTokenId the id of the accessToken to be used
+     * @throws Exception
+     */
+    public void postAuth(OAuth2Adapter adapter, String accessTokenId) throws Exception;
 
 }
