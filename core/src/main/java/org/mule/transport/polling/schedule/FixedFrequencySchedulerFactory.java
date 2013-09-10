@@ -57,12 +57,23 @@ public class FixedFrequencySchedulerFactory<T extends Runnable> extends Schedule
 
     public void setFrequency(long frequency)
     {
+        checkNegative(frequency, "Frequency cannot be negative");
+
         this.frequency = frequency;
     }
 
     public void setStartDelay(long startDelay)
     {
+        checkNegative(startDelay, "Start delay cannot be negative");
+
         this.startDelay = startDelay;
     }
 
+    private static void checkNegative(long value, String message)
+    {
+        if (value < 0)
+        {
+            throw new IllegalArgumentException(message);
+        }
+    }
 }
