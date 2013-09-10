@@ -105,7 +105,7 @@ public class Watermark extends MessageProcessorPollingOverride
         ExpressionManager expressionManager = event.getMuleContext().getExpressionManager();
         if (expressionManager.isExpression(value) && expressionManager.isValidExpression(value)) {
             Object evaluated = expressionManager.evaluate(value, event);
-            if (! (evaluated instanceof Serializable)) {
+            if ( evaluated != null && !(evaluated instanceof Serializable)) {
                 throw new IllegalArgumentException("Expression " + value + " resolves to an object that is not serializable. It can't be used as watermark.");
             }
             return (Serializable) evaluated;
@@ -134,6 +134,10 @@ public class Watermark extends MessageProcessorPollingOverride
         {
             event.setFlowVariable(resolvedVariable, watermarkValue);
         }
+        else
+        {
+            logger.warn(CoreMessages.nullWatermark());
+        }
     }
 
     /**
@@ -145,11 +149,15 @@ public class Watermark extends MessageProcessorPollingOverride
         String resolvedVariable = resolveVariable(event);
 
         Object watermarkValue = StringUtils.isEmpty(updateExpression)
-                ? event.getFlowVariable(resolvedVariable)
-                : evaluate(updateExpression, event);
+                                ? event.getFlowVariable(resolvedVariable)
+                                : evaluate(updateExpression, event);
 
+        if (watermarkValue == null)
+        {
+            logger.warn(CoreMessages.nullWatermark());
+        }
         // TODO: externalize serializable check
-        if (watermarkValue instanceof Serializable)
+        else if (watermarkValue instanceof Serializable)
         {
             synchronized (objectStore)
             {
@@ -165,7 +173,7 @@ public class Watermark extends MessageProcessorPollingOverride
         }
         else
         {
-            logger.error("Value retrieved from event is not serializable and hence can't be saved to the object store");
+            logger.error(CoreMessages.notSerializableWatermark());
         }
     }
 

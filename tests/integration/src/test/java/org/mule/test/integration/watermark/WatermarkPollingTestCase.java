@@ -10,13 +10,12 @@
 package org.mule.test.integration.watermark;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.schedule.Scheduler;
+import org.mule.api.schedule.SchedulerFactoryPostProcessor;
+import org.mule.api.schedule.Schedulers;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreManager;
@@ -25,13 +24,11 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
-import org.mule.transport.AbstractPollingMessageReceiver;
-import org.mule.transport.polling.MessageProcessorPollingConnector;
 import org.mule.util.store.ObjectStorePartition;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -39,22 +36,22 @@ import org.junit.Test;
 public class WatermarkPollingTestCase extends FunctionalTestCase
 {
 
-    public static final String OS_KEY1 = "test1";
-    public static final String OS_KEY2 = "test2";
-    public static final String OS_KEY3 = "test3";
-    public static final String OS_KEY4 = "test4";
-    public static final String OS_KEY5 = "test5";
-    public static final String OS_KEY6 = "test6";
-    public static final String OS_KEY7 = "test7";
-    public static final String OS_KEY8 = "test8";
-    public static final String PRE_EXISTENT_OS_VALUE = "testValue";
-    public static final String DEFAULT_VALUE_WHEN_KEY_NOT_PRESENT = "noKey";
-    public static final String MODIFIED_KEY_VALUE = "keyPresent";
-    public static final String RESULT_OF_UPDATE_EXPRESSION = "valueUpdated";
+    private static final String OS_KEY1 = "test1";
+    private static final String OS_KEY2 = "test2";
+    private static final String OS_KEY3 = "test3";
+    private static final String OS_KEY4 = "test4";
+    private static final String OS_KEY5 = "test5";
+    private static final String OS_KEY6 = "test6";
+    private static final String OS_KEY7 = "test7";
+    private static final String OS_KEY8 = "test8";
+    private static final String PRE_EXISTENT_OS_VALUE = "testValue";
+    private static final String DEFAULT_VALUE_WHEN_KEY_NOT_PRESENT = "noKey";
+    private static final String MODIFIED_KEY_VALUE = "keyPresent";
+    private static final String RESULT_OF_UPDATE_EXPRESSION = "valueUpdated";
 
-    private Prober prober = new PollingProber(10000, 1000);
+    private final Prober prober = new PollingProber(3000, 500);
 
-    private static List<String> foo = new ArrayList<String>();
+    private static final List<String> foo = new ArrayList<String>();
 
     @Override
     protected String getConfigResources()
@@ -93,10 +90,21 @@ public class WatermarkPollingTestCase extends FunctionalTestCase
     public void pollWithNoKeyInTheObjectStore() throws Exception
     {
         executePollOf("nameNotDefinedWatermarkObjectStoreFlow");
-        ObjectStore os = getDefaultObjectStore();
-        assertTrue(os.contains(OS_KEY1));
-        assertEquals(DEFAULT_VALUE_WHEN_KEY_NOT_PRESENT, os.retrieve(OS_KEY1));
 
+        prober.check(new ObjectStoreProbe(getDefaultObjectStore())
+        {
+            @Override
+            boolean evaluate(ObjectStore os) throws ObjectStoreException
+            {
+                return os.contains(OS_KEY1) && DEFAULT_VALUE_WHEN_KEY_NOT_PRESENT.equals(os.retrieve(OS_KEY1));
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "The object store does not contain the key " + OS_KEY1;
+            }
+        });
     }
 
     /**
@@ -118,9 +126,21 @@ public class WatermarkPollingTestCase extends FunctionalTestCase
     public void pollChangeKeyValueWithNoKeyInTheObjectStore() throws Exception
     {
         executePollOf("changeWatermarkWihtNotDefinedWatermarkObjectStoreFlow");
-        ObjectStore os = getDefaultObjectStore();
-        assertTrue(os.contains(OS_KEY2));
-        assertEquals(MODIFIED_KEY_VALUE, os.retrieve(OS_KEY2));
+
+        prober.check(new ObjectStoreProbe(getDefaultObjectStore())
+        {
+            @Override
+            boolean evaluate(ObjectStore os) throws ObjectStoreException
+            {
+                return os.contains(OS_KEY2) && MODIFIED_KEY_VALUE.equals(os.retrieve(OS_KEY2));
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "The object store does not contain the key " + OS_KEY2;
+            }
+        });
     }
 
     /**
@@ -145,11 +165,21 @@ public class WatermarkPollingTestCase extends FunctionalTestCase
     {
         getDefaultObjectStore().store(OS_KEY3, PRE_EXISTENT_OS_VALUE);
         executePollOf("usingWatermarkFlow");
-        ObjectStore os = getDefaultObjectStore();
-        assertTrue(os.contains(OS_KEY3));
-        assertEquals(MODIFIED_KEY_VALUE, os.retrieve(OS_KEY3));
-        assertTrue(foo.contains(PRE_EXISTENT_OS_VALUE));
 
+        prober.check(new ObjectStoreProbe(getDefaultObjectStore())
+        {
+            @Override
+            boolean evaluate(ObjectStore os) throws ObjectStoreException
+            {
+                return os.contains(OS_KEY3) && MODIFIED_KEY_VALUE.equals(os.retrieve(OS_KEY3)) && foo.contains(PRE_EXISTENT_OS_VALUE);
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "The object store does not contain the key " + OS_KEY3;
+            }
+        });
     }
 
     /**
@@ -173,9 +203,20 @@ public class WatermarkPollingTestCase extends FunctionalTestCase
     {
         getDefaultObjectStore().store(OS_KEY4, PRE_EXISTENT_OS_VALUE);
         executePollOf("watermarkWithKeyAsAnExpression");
-        ObjectStore os = getDefaultObjectStore();
-        assertTrue(os.contains(OS_KEY4));
-        assertEquals(MODIFIED_KEY_VALUE, os.retrieve(OS_KEY4));
+        prober.check(new ObjectStoreProbe(getDefaultObjectStore())
+        {
+            @Override
+            boolean evaluate(ObjectStore os) throws ObjectStoreException
+            {
+                return os.contains(OS_KEY4) && MODIFIED_KEY_VALUE.equals(os.retrieve(OS_KEY4));
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "The object store does not contain the key " + OS_KEY4;
+            }
+        });
     }
 
 
@@ -198,10 +239,20 @@ public class WatermarkPollingTestCase extends FunctionalTestCase
     {
         getDefaultObjectStore().store(OS_KEY5, PRE_EXISTENT_OS_VALUE);
         executePollOf("watermarkWithUpdateExpression");
-        ObjectStore os = getDefaultObjectStore();
-        assertTrue(os.contains(OS_KEY5));
-        assertEquals(RESULT_OF_UPDATE_EXPRESSION, os.retrieve(OS_KEY5));
-        assertTrue(foo.contains(RESULT_OF_UPDATE_EXPRESSION));
+        prober.check(new ObjectStoreProbe(getDefaultObjectStore())
+        {
+            @Override
+            boolean evaluate(ObjectStore os) throws ObjectStoreException
+            {
+                return os.contains(OS_KEY5) && RESULT_OF_UPDATE_EXPRESSION.equals(os.retrieve(OS_KEY5)) && foo.contains(RESULT_OF_UPDATE_EXPRESSION);
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "The object store does not contain the key " + OS_KEY5;
+            }
+        });
     }
 
     /**
@@ -220,12 +271,24 @@ public class WatermarkPollingTestCase extends FunctionalTestCase
     @Test
     public void watermarkWithObjectStore() throws Exception
     {
-        ObjectStore os = muleContext.getRegistry().lookupObject("_defaultInMemoryObjectStore");
+        final ObjectStore os = muleContext.getRegistry().lookupObject("_defaultInMemoryObjectStore");
         os.store(OS_KEY8, PRE_EXISTENT_OS_VALUE);
         executePollOf("watermarkWithObjectStore");
-        assertTrue(os.contains(OS_KEY8));
-        assertEquals(RESULT_OF_UPDATE_EXPRESSION, os.retrieve(OS_KEY8));
-        assertTrue(foo.contains(RESULT_OF_UPDATE_EXPRESSION));
+
+        prober.check(new ObjectStoreProbe(os)
+        {
+            @Override
+            boolean evaluate(ObjectStore os) throws ObjectStoreException
+            {
+                return os.contains(OS_KEY8) && RESULT_OF_UPDATE_EXPRESSION.equals(os.retrieve(OS_KEY8)) && foo.contains(RESULT_OF_UPDATE_EXPRESSION);
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "The object store does not contain the key " + OS_KEY8;
+            }
+        });
     }
 
     /**
@@ -246,10 +309,20 @@ public class WatermarkPollingTestCase extends FunctionalTestCase
     {
         getDefaultObjectStore().store(OS_KEY6, PRE_EXISTENT_OS_VALUE);
         executePollOf("failingFlowWithWatermark");
-        ObjectStore os = getDefaultObjectStore();
-        assertTrue(os.contains(OS_KEY6));
-        assertEquals(PRE_EXISTENT_OS_VALUE, os.retrieve(OS_KEY6));
-        assertFalse(foo.contains(RESULT_OF_UPDATE_EXPRESSION));
+        prober.check(new ObjectStoreProbe(getDefaultObjectStore())
+        {
+            @Override
+            boolean evaluate(ObjectStore os) throws ObjectStoreException
+            {
+                return os.contains(OS_KEY6) && PRE_EXISTENT_OS_VALUE.equals(os.retrieve(OS_KEY6)) && !foo.contains(RESULT_OF_UPDATE_EXPRESSION);
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "The object store does not contain the key " + OS_KEY6;
+            }
+        });
     }
 
 
@@ -271,10 +344,20 @@ public class WatermarkPollingTestCase extends FunctionalTestCase
     {
         getDefaultObjectStore().store(OS_KEY7, PRE_EXISTENT_OS_VALUE);
         executePollOf("failingFlowCachedExceptionWatermark");
-        ObjectStore os = getDefaultObjectStore();
-        assertTrue(os.contains(OS_KEY7));
-        assertEquals("catchedException", os.retrieve(OS_KEY7));
-        assertFalse(foo.contains(RESULT_OF_UPDATE_EXPRESSION));
+        prober.check(new ObjectStoreProbe(getDefaultObjectStore())
+        {
+            @Override
+            boolean evaluate(ObjectStore os) throws ObjectStoreException
+            {
+                return os.contains(OS_KEY7) && "catchedException".equals(os.retrieve(OS_KEY7)) && !foo.contains(RESULT_OF_UPDATE_EXPRESSION);
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "The object store does not contain the key " + OS_KEY7;
+            }
+        });
     }
 
 
@@ -288,12 +371,67 @@ public class WatermarkPollingTestCase extends FunctionalTestCase
      * It fails the execution
      * <p/>
      */
-    @Test
+    @Test(expected = AssertionError.class)
     public void watermarkWithAsyncProcessing() throws Exception
     {
         executePollOf("watermarkWithAsyncProcessing");
-        assertFalse(foo.contains(RESULT_OF_UPDATE_EXPRESSION));
+
+        prober.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return foo.contains(RESULT_OF_UPDATE_EXPRESSION);
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "The async mp was never called, which is what was expected";
+            }
+        });
     }
+
+    @Test(expected = AssertionError.class)
+    public void watermarkWithNullDefaultExpression() throws Exception
+    {
+        executePollOf("usingWatermarkFlowWithNullValue");
+        prober.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return !foo.isEmpty();
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "The foo collection is empty, which was expected";
+            }
+        });
+    }
+
+    @Test
+    public void usingWatermarkFlowWithNullUpdateValue() throws Exception
+    {
+        executePollOf("usingWatermarkFlowWithNullUpdateValue");
+        prober.check(new ObjectStoreProbe(getDefaultObjectStore())
+        {
+            @Override
+            boolean evaluate(ObjectStore os) throws ObjectStoreException
+            {
+                return foo.contains("defaultValue") && !os.contains("testUpdateAsNull");
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "The object store is storing null values";
+            }
+        });
+    }
+
 
 
     private ObjectStore getDefaultObjectStore()
@@ -304,9 +442,11 @@ public class WatermarkPollingTestCase extends FunctionalTestCase
 
     private void executePollOf(String flowName) throws Exception
     {
-        MessageProcessorPollingConnector connector = muleContext.getRegistry().lookupObject("connector.polling.mule.default");
-        AbstractPollingMessageReceiver messageReceiver = (AbstractPollingMessageReceiver) connector.lookupReceiver(flowName + "~");
-        messageReceiver.performPoll();
+        Collection<Scheduler> schedulers = muleContext.getRegistry().lookupScheduler(Schedulers.flowPollingSchedulers(flowName));
+        for (Scheduler scheduler : schedulers ){
+            scheduler.schedule();
+        }
+
     }
 
     public static class FooComponent
@@ -322,20 +462,82 @@ public class WatermarkPollingTestCase extends FunctionalTestCase
         }
     }
 
-    public static class PollStopper implements MuleContextAware
+    public static class PollStopper implements SchedulerFactoryPostProcessor
     {
         @Override
-        public void setMuleContext(MuleContext context)
+        public Scheduler process(Object job, final Scheduler scheduler)
         {
-            Map<String, MessageProcessorPollingConnector> connectors
-                    = context.getRegistry().lookupByType(MessageProcessorPollingConnector.class);
-
-            for (MessageProcessorPollingConnector connector : connectors.values())
+            return new Scheduler()
             {
-                connector.setInitialStateStopped(true);
+                @Override
+                public void schedule() throws Exception
+                {
+                    scheduler.schedule();
+                }
+
+                @Override
+                public void dispose()
+                {
+                    scheduler.dispose();
+                }
+
+                @Override
+                public void initialise() throws InitialisationException
+                {
+                    scheduler.initialise();
+                }
+
+                @Override
+                public void setName(String name)
+                {
+                    scheduler.setName(name);
+                }
+
+                @Override
+                public String getName()
+                {
+                    return scheduler.getName();
+                }
+
+                @Override
+                public void start() throws MuleException
+                {
+                    // Do nothing
+                }
+
+                @Override
+                public void stop() throws MuleException
+                {
+                    // do Nothing
+                }
+            };
+        }
+    }
+
+    private abstract class ObjectStoreProbe implements Probe
+    {
+
+        private final ObjectStore os;
+
+        public ObjectStoreProbe(ObjectStore os)
+        {
+            this.os = os;
+        }
+
+        @Override
+        public boolean isSatisfied()
+        {
+            try
+            {
+                return evaluate(os);
+            }
+            catch (ObjectStoreException e)
+            {
+                return false;
             }
         }
 
+        abstract boolean evaluate(ObjectStore defaultObjectStore) throws ObjectStoreException;
 
     }
 }
