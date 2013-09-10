@@ -1,12 +1,4 @@
 <?xml version="1.0"?>
-<!--
-
-    Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
-    The software in this package is published under the terms of the CPAL v1.0
-    license, a copy of which has been included with this distribution in the
-    LICENSE.txt file.
-
--->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:n1="http://peoplesoft.com/MX_PURCHASE_ORDERSoapIn" xmlns:n12="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="n1 n12 xs">
     <xsl:output method="xml" indent="yes"/>
     <xsl:template match="/n12:Envelope">

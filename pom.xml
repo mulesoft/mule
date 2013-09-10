@@ -1812,6 +1812,8 @@
                         <exclude>**/*.properties</exclude>
                         <exclude>**/*.sample</exclude>
                         <exclude>**/*.md</exclude>
+                        <exclude>**/*.xsl</exclude>
+                        <exclude>**/*.html</exclude>
                         <exclude>**/build-number.txt</exclude>
 
                         <exclude>**/BndMojo.java</exclude>
@@ -1831,6 +1833,9 @@
                         <exclude>**/__artifactId__IBean.java</exclude>
                         <exclude>**/__artifactId__IBeanTestCase.java</exclude>
                     </excludes>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
                     <mapping>
                         <java>SLASHSTAR_STYLE</java>
                     </mapping>
