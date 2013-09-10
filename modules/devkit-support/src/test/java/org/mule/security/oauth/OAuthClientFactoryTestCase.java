@@ -79,7 +79,8 @@ public class OAuthClientFactoryTestCase
 
         Assert.assertSame(connector.getManager(), this.manager);
         Mockito.verify(this.factory).setCustomAdapterProperties(connector, state);
-        Assert.assertTrue(connector.wasPostAuthCalled());
+        Mockito.verify(this.manager).postAuth(connector, KEY);
+
         Assert.assertTrue(connector.wasStarted());
         Assert.assertTrue(connector.wasInitialised());
         Assert.assertSame(connector.getMuleContext(), this.muleContext);
@@ -126,7 +127,7 @@ public class OAuthClientFactoryTestCase
         Assert.assertTrue(state.isChecked());
 
         Assert.assertSame(connector.getManager(), this.manager);
-        Assert.assertTrue(connector.wasPostAuthCalled());
+        Mockito.verify(this.manager).postAuth(connector, KEY);
         Assert.assertTrue(connector.wasStarted());
         Assert.assertTrue(connector.wasInitialised());
         Assert.assertSame(connector.getMuleContext(), this.muleContext);

@@ -28,6 +28,7 @@ import org.mule.security.oauth.util.HttpUtil;
 import org.mule.security.oauth.util.OAuthResponseParser;
 import org.mule.tck.size.SmallTest;
 
+import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.net.URLDecoder;
 import java.util.Date;
@@ -59,6 +60,7 @@ public class OAuth2ManagerTestCase
 {
 
     private static final String SCOPE = "<<myScope>>";
+    private static final String ACCESS_TOKEN_ID = "accessTokenId";
 
     private TestOAuth2Manager manager;
 
@@ -83,6 +85,9 @@ public class OAuth2ManagerTestCase
     @Mock
     private Transformer transformer;
 
+    @Mock
+    private RefreshTokenManager refreshTokenManager;
+
     @Before
     public void setUp() throws Exception
     {
@@ -101,6 +106,7 @@ public class OAuth2ManagerTestCase
         this.manager.setHttpUtil(this.httpUtil);
         this.manager.setOauthResponseParser(this.oauthResponseParser);
         this.manager.setScope(SCOPE);
+        this.manager.setRefreshTokenManager(this.refreshTokenManager);
 
         this.manager.initialise();
         this.manager.start();
@@ -263,7 +269,7 @@ public class OAuth2ManagerTestCase
         Mockito.when(this.oauthResponseParser.extractRefreshToken(refreshTokenPattern, response)).thenReturn(
             refreshToken);
 
-        this.manager.refreshAccessToken(adapter);
+        this.manager.refreshAccessToken(adapter, accessToken);
 
         Mockito.verify(this.adapter).setAccessToken(null);
         Mockito.verify(this.httpUtil).post(
@@ -280,13 +286,13 @@ public class OAuth2ManagerTestCase
     @Test(expected = IllegalStateException.class)
     public void refreshWithoutToken() throws Exception
     {
-        this.manager.refreshAccessToken(this.adapter);
+        this.manager.refreshAccessToken(this.adapter, "myToken");
     }
 
     @Test
     public void hasBeenAuthorized() throws NotAuthorizedException
     {
-        Mockito.when(this.adapter.getAccessToken()).thenReturn("accessTokenId");
+        Mockito.when(this.adapter.getAccessToken()).thenReturn(ACCESS_TOKEN_ID);
         this.manager.hasBeenAuthorized(this.adapter);
     }
 
@@ -312,5 +318,36 @@ public class OAuth2ManagerTestCase
                 Assert.assertFalse(this.manager.isCapableOf(capability));
             }
         }
+    }
+
+    @Test
+    public void postAuthNoFailures() throws Exception
+    {
+        this.manager.postAuth(this.adapter, ACCESS_TOKEN_ID);
+        Mockito.verify(this.adapter).postAuth();
+    }
+
+    @Test(expected = FileNotFoundException.class)
+    public void postAuthWithRefreshableException() throws Exception
+    {
+        Mockito.doThrow(FileNotFoundException.class).when(this.adapter).postAuth();
+        this.manager.postAuth(this.adapter, ACCESS_TOKEN_ID);
+        Mockito.verify(this.refreshTokenManager).refreshToken(adapter, ACCESS_TOKEN_ID);
+    }
+
+    @Test(expected = FileNotFoundException.class)
+    public void postAuthWithRefreshableExceptionButNoAccessTokenId() throws Exception
+    {
+        Mockito.doThrow(FileNotFoundException.class).when(this.adapter).postAuth();
+        this.manager.postAuth(this.adapter, null);
+        Mockito.verify(this.refreshTokenManager, Mockito.never()).refreshToken(adapter, Mockito.anyString());
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void postAuthWithNonRefreshableException() throws Exception
+    {
+        Mockito.doThrow(RuntimeException.class).when(this.adapter).postAuth();
+        this.manager.postAuth(this.adapter, ACCESS_TOKEN_ID);
+        Mockito.verify(this.refreshTokenManager, Mockito.never()).refreshToken(adapter, Mockito.anyString());
     }
 }

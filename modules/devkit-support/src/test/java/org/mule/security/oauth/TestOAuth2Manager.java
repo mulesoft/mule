@@ -12,7 +12,10 @@ package org.mule.security.oauth;
 
 import org.mule.api.store.ObjectStore;
 
+import java.io.FileNotFoundException;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
 import org.slf4j.Logger;
@@ -60,6 +63,15 @@ public class TestOAuth2Manager extends BaseOAuth2Manager<OAuth2Adapter>
     protected OAuth2Adapter instantiateAdapter()
     {
         return adapter;
+    }
+    
+    @Override
+    protected Set<Class<? extends Exception>> refreshAccessTokenOn()
+    {
+        Set<Class<? extends Exception>> exceptions = new HashSet<Class<? extends Exception>>();
+        exceptions.add(FileNotFoundException.class);
+        
+        return exceptions;
     }
 
 }
