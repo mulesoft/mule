@@ -55,4 +55,18 @@ public class FixedFrequencySchedulerFactoryTest
         assertEquals(1000, ((FixedFrequencyScheduler) scheduler).getFrequency());
         assertEquals(TimeUnit.MILLISECONDS, ((FixedFrequencyScheduler) scheduler).getTimeUnit());
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNegativeFrequency()
+    {
+        FixedFrequencySchedulerFactory factory = new FixedFrequencySchedulerFactory();
+        factory.setFrequency(-1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNegativeStartDelay()
+    {
+        FixedFrequencySchedulerFactory factory = new FixedFrequencySchedulerFactory();
+        factory.setStartDelay(-1);
+    }
 }
