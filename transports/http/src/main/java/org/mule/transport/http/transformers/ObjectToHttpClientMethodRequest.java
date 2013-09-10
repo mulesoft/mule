@@ -9,7 +9,9 @@ package org.mule.transport.http.transformers;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleMessageCollection;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.api.transport.PropertyScope;
@@ -348,7 +350,14 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             {
                 try
                 {
-                    src = msg.getPayloadAsBytes();
+                    if (msg instanceof MuleMessageCollection)
+                    {
+                        src = msg.getPayload(DataType.BYTE_ARRAY_DATA_TYPE);
+                    }
+                    else
+                    {
+                        src = msg.getPayloadAsBytes();
+                    }
                 }
                 catch (final Exception e)
                 {
