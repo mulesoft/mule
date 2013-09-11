@@ -60,7 +60,7 @@
 
     <bean name="_muleObjectStoreManager" class="org.mule.util.store.MuleObjectStoreManager"/>
 
-    <bean name="_muleSecurityManager" class="org.mule.security.MuleSecurityManager"/>
+    <!--<bean name="_muleSecurityManager" class="org.mule.security.MuleSecurityManager"/>-->
 
     <bean name="_muleMessageProcessingManager" class="org.mule.execution.MuleMessageProcessingManager"/>
 
