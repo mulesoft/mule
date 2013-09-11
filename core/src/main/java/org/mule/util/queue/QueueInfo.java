@@ -41,7 +41,7 @@ public class QueueInfo
 
     public QueueInfo(QueueInfo other)
     {
-       this(other.name, other.muleContext, other.config);
+        this(other.name, other.muleContext, other.config);
     }
 
     public void setConfig(QueueConfiguration config)
@@ -62,7 +62,9 @@ public class QueueInfo
         }
         if (delegate == null || (config != null && !hadConfig))
         {
-            QueueInfoDelegate newDelegate = factory != null ? factory.createDelegate(this, muleContext) : new DefaultQueueInfoDelegate(capacity);
+            QueueInfoDelegate newDelegate = factory != null
+                                                           ? factory.createDelegate(this, muleContext)
+                                                           : new DefaultQueueInfoDelegate(capacity);
             delegateCanTake = newDelegate instanceof TakingQueueInfoDelegate;
             if (delegate != null && delegate instanceof DefaultQueueInfoDelegate)
             {
@@ -83,7 +85,6 @@ public class QueueInfo
         return name;
     }
 
-
     @Override
     public int hashCode()
     {
@@ -101,20 +102,17 @@ public class QueueInfo
         return delegate.offer(o, room, timeout);
     }
 
-    public Serializable poll(long timeout)
-        throws InterruptedException
+    public Serializable poll(long timeout) throws InterruptedException
     {
         return delegate.poll(timeout);
     }
 
-    public Serializable peek()
-        throws InterruptedException
+    public Serializable peek() throws InterruptedException
     {
         return delegate.peek();
     }
 
-    public void untake(Serializable item)
-        throws InterruptedException, ObjectStoreException
+    public void untake(Serializable item) throws InterruptedException, ObjectStoreException
     {
         delegate.untake(item);
     }
@@ -124,12 +122,18 @@ public class QueueInfo
         return delegate.getSize();
     }
 
+    public void clear() throws InterruptedException
+    {
+        this.delegate.clear();
+    }
+
     public ListableObjectStore<Serializable> getStore()
     {
         return config == null ? null : config.objectStore;
     }
 
-    public static synchronized void registerDelegateFactory(Class<? extends ObjectStore>storeType, QueueInfoDelegateFactory factory)
+    public static synchronized void registerDelegateFactory(Class<? extends ObjectStore> storeType,
+                                                            QueueInfoDelegateFactory factory)
     {
         delegateFactories.put(storeType, factory);
     }
@@ -148,21 +152,23 @@ public class QueueInfo
     {
         if (canTakeFromStore())
         {
-            return ((TakingQueueInfoDelegate)delegate).takeFromObjectStore(timeout);
+            return ((TakingQueueInfoDelegate) delegate).takeFromObjectStore(timeout);
         }
 
-        throw new UnsupportedOperationException("Method 'takeNextItemFromStore' is not supported for queue " + name);
+        throw new UnsupportedOperationException("Method 'takeNextItemFromStore' is not supported for queue "
+                                                + name);
     }
 
     public void writeToObjectStore(Serializable data) throws InterruptedException, ObjectStoreException
     {
         if (canTakeFromStore())
         {
-            ((TakingQueueInfoDelegate)delegate).writeToObjectStore(data);
+            ((TakingQueueInfoDelegate) delegate).writeToObjectStore(data);
             return;
         }
 
-        throw new UnsupportedOperationException("Method 'writeToObjectStore' is not supported for queue " + name);
+        throw new UnsupportedOperationException("Method 'writeToObjectStore' is not supported for queue "
+                                                + name);
     }
 
     public boolean isQueueTransient()
@@ -174,6 +180,7 @@ public class QueueInfo
     {
         return delegate instanceof TransactionalQueueInfoDelegate;
     }
+
     /**
      * A factory for creating object store-specific queue info delegates
      */

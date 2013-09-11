@@ -760,10 +760,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
 
     protected void purgeQueue(Queue queue) throws InterruptedException
     {
-        while (queue.size() > 0)
-        {
-            queue.poll(1000);
-        }
+        queue.clear();
         assertEquals("Queue must be fully consumed after successful test run. Queue size:", 0, queue.size());
     }
 

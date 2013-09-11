@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.util.queue;
 
 import org.mule.api.store.ObjectStoreException;
@@ -30,7 +31,8 @@ public interface QueueInfoDelegate
     boolean offer(Serializable o, int room, long timeout) throws InterruptedException, ObjectStoreException;
 
     /**
-     * Poll the queue for its first member, and, if there is one, remove and return it
+     * Poll the queue for its first member, and, if there is one, remove and return
+     * it
      */
     Serializable poll(long timeout) throws InterruptedException;
 
@@ -48,6 +50,11 @@ public interface QueueInfoDelegate
      * Return the size of the queue
      */
     int getSize();
+
+    /**
+     * Discards all the elements in the queue
+     */
+    void clear() throws InterruptedException;
 
     /**
      * Appends all of the elements in the specified collection to the queue (optional
