@@ -9,9 +9,6 @@
  */
 package org.mule.util.queue;
 
-import org.mule.api.store.ObjectStoreException;
-
-import java.io.Serializable;
 
 /**
  * A marker interface for a QueueInfoDelegate that needs to be rebuilt at startup

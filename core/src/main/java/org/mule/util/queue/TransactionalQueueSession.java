@@ -59,9 +59,30 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
         }
 
         @Override
-        public boolean offer(Serializable item, long timeout) throws InterruptedException, ObjectStoreException
+        public void clear() throws InterruptedException
         {
-            if (localContext != null  && !queue.isQueueTransactional())
+            if (localContext != null && !queue.isQueueTransactional())
+            {
+                ((QueueTransactionContext) localContext).clear(queue);
+            }
+            else
+            {
+                try
+                {
+                    queueManager.doClear(queue);
+                }
+                catch (ObjectStoreException e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+        @Override
+        public boolean offer(Serializable item, long timeout)
+            throws InterruptedException, ObjectStoreException
+        {
+            if (localContext != null && !queue.isQueueTransactional())
             {
                 return ((QueueTransactionContext) localContext).offer(queue, item, timeout);
             }
@@ -207,7 +228,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
         }
 
         /**
-         *  Note -- this must handle null items
+         * Note -- this must handle null items
          */
         private Serializable postProcessIfNeeded(Serializable item)
         {

@@ -166,6 +166,55 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
 
     }
+    
+    @Test
+    public void testClearWithoutTransaction() throws Exception {
+        final TransactionalQueueManager mgr = createQueueManager();
+        mgr.start();
+        
+        QueueSession s = mgr.getQueueSession();
+        Queue q = s.getQueue("queue1");
+        assertEquals("Queue size", 0, q.size());
+        q.put("String1");
+        assertEquals("Queue size", 1, q.size());
+        q.clear();
+        assertEquals("Queue size", 0, q.size());
+        
+        mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
+    }
+    
+    @Test
+    public void testClearInTransaction() throws Exception {
+        final TransactionalQueueManager mgr = createQueueManager();
+        mgr.start();
+        
+        QueueSession s = mgr.getQueueSession();
+        
+        //insert item in transaction
+        s.begin();
+        Queue q = s.getQueue("queue1");
+        assertEquals("Queue size", 0, q.size());
+        q.put("String1");
+        s.commit();
+        
+        assertEquals("Queue size", 1, q.size());
+        
+        //clear queue but rollback
+        s.begin();
+        assertEquals("Queue size", 1, q.size());
+        q.clear();
+        s.rollback();
+        assertEquals("Queue size", 1, q.size());
+        
+        //do clear in transaction
+        s.begin();
+        assertEquals("Queue size", 1, q.size());
+        q.clear();
+        s.commit();
+        assertEquals("Queue size", 0, q.size());
+        
+        mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
+    }
 
     @Test
     public void testTakePutRollbackPut() throws Exception
@@ -760,10 +809,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
 
     protected void purgeQueue(Queue queue) throws InterruptedException
     {
-        while (queue.size() > 0)
-        {
-            queue.poll(1000);
-        }
+        queue.clear();
         assertEquals("Queue must be fully consumed after successful test run. Queue size:", 0, queue.size());
     }
 
