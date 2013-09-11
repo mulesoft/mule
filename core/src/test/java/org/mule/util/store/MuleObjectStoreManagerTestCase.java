@@ -12,6 +12,8 @@ import org.mule.api.store.ObjectStoreException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.io.Serializable;
+
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -22,17 +24,35 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase
     private MuleObjectStoreManager storeManager = new MuleObjectStoreManager();
 
     @Test
-    public void disposesStore() throws ObjectStoreException
+    public void disposeDisposableStore() throws ObjectStoreException
     {
-        DisposableObjectStore store = Mockito.mock(DisposableObjectStore.class);
+        @SuppressWarnings("unchecked")
+        ObjectStore<Serializable> store = Mockito.mock(ObjectStore.class, Mockito.withSettings()
+            .extraInterfaces(Disposable.class));
 
         storeManager.disposeStore(store);
 
-        Mockito.verify(store).dispose();
+        Mockito.verify(store).clear();
+        Mockito.verify((Disposable) store).dispose();
     }
 
-    public static interface DisposableObjectStore extends ObjectStore, Disposable
+    @Test
+    public void disposePartitionableStore() throws ObjectStoreException
     {
+        String partitionName = "partition";
+        
+        @SuppressWarnings("unchecked")
+        ObjectStorePartition<Serializable> store = Mockito.mock(ObjectStorePartition.class,
+            Mockito.withSettings()
+                .extraInterfaces(Disposable.class)
+                .defaultAnswer(Mockito.RETURNS_DEEP_STUBS));
+        
+        Mockito.when(store.getPartitionName()).thenReturn(partitionName);
 
+        storeManager.disposeStore(store);
+        
+        Mockito.verify(store.getBaseStore()).disposePartition(partitionName);
+        Mockito.verify(store, Mockito.never()).clear();
+        Mockito.verify((Disposable) store).dispose();
     }
 }
