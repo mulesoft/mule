@@ -16,6 +16,8 @@ import org.mule.api.store.ObjectStoreException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.io.Serializable;
+
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -32,10 +34,11 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase
 
         storeManager.disposeStore(store);
 
+        Mockito.verify(store).clear();
         Mockito.verify(store).dispose();
     }
 
-    public static interface DisposableObjectStore extends ObjectStore, Disposable
+    public static interface DisposableObjectStore extends ObjectStore<Serializable>, Disposable
     {
 
     }

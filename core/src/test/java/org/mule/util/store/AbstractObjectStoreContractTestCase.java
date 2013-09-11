@@ -18,6 +18,8 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.Serializable;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 
 import static org.junit.Assert.fail;
@@ -89,7 +91,8 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleCo
     {
         try
         {
-            // nothing was stored in the OS yet so using any key must trigger the ObjectDoesNotExistException
+            // nothing was stored in the OS yet so using any key must trigger the
+            // ObjectDoesNotExistException
             Serializable key = createKey();
 
             getObjectStore().retrieve(key);
@@ -106,7 +109,8 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleCo
     {
         try
         {
-            // nothing was stored in the OS yet so using any key must trigger the ObjectDoesNotExistException
+            // nothing was stored in the OS yet so using any key must trigger the
+            // ObjectDoesNotExistException
             Serializable key = createKey();
 
             getObjectStore().remove(key);
@@ -116,6 +120,25 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleCo
         {
             // this one was expected
         }
+    }
+
+    @Test
+    public void clear() throws ObjectStoreException
+    {
+        Serializable key = this.createKey();
+        Serializable value = this.getStorableValue();
+        ObjectStore<Serializable> objectStore = this.getObjectStore();
+
+        objectStore.store(key, value);
+        Assert.assertTrue(objectStore.contains(key));
+
+        objectStore.clear();
+
+        Assert.assertFalse(objectStore.contains(key));
+
+        // check it's still usable
+        objectStore.store(key, value);
+        Assert.assertTrue(objectStore.contains(key));
     }
 
     @Test
