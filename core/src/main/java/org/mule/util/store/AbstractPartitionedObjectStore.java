@@ -62,5 +62,11 @@ public abstract class AbstractPartitionedObjectStore<T extends Serializable>
     {
         return remove(key, DEFAULT_PARTITION);
     }
-
+    
+    @Override
+    public void clear() throws ObjectStoreException
+    {
+        this.clear(DEFAULT_PARTITION);
+    }
+    
 }

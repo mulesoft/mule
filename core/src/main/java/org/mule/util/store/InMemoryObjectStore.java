@@ -129,6 +129,15 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
 
         throw new ObjectDoesNotExistException(CoreMessages.objectNotFound(key));
     }
+    
+    @Override
+    public void clear() throws ObjectStoreException
+    {
+        synchronized (store)
+        {
+            store.clear();
+        }
+    }
 
     @Override
     public void expire()
