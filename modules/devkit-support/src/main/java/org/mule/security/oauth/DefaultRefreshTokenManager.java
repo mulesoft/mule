@@ -11,12 +11,12 @@
 package org.mule.security.oauth;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreManager;
+import org.mule.config.i18n.MessageFactory;
 
 import java.util.concurrent.locks.Lock;
 
@@ -28,29 +28,13 @@ import org.springframework.util.StringUtils;
  * concurrently, only one will succeed and the other one will rely on the result of
  * the first one
  */
-public class DefaultRefreshTokenManager implements MuleContextAware, Initialisable, RefreshTokenManager
+public class DefaultRefreshTokenManager implements MuleContextAware, RefreshTokenManager
 {
 
     private static final int DEFAULT_EXPIRATION = 60 * 1000;
 
     private ObjectStore<Boolean> refreshedTokens;
     private MuleContext muleContext;
-
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        try
-        {
-            ObjectStoreManager osManager = this.muleContext.getRegistry().lookupObject(
-                ObjectStoreManager.class);
-            this.refreshedTokens = osManager.getObjectStore("RefreshTokenStore", false, 0,
-                DEFAULT_EXPIRATION, DEFAULT_EXPIRATION);
-        }
-        catch (RegistrationException e)
-        {
-            throw new InitialisationException(e, this);
-        }
-    }
 
     /**
      * {@inheritDoc} This implementation uses a lock to guarantee that no refresh
@@ -72,10 +56,10 @@ public class DefaultRefreshTokenManager implements MuleContextAware, Initialisab
         lock.lock();
         try
         {
-            if (!this.refreshedTokens.contains(accessTokenId))
+            if (!this.getRefreshedTokens().contains(accessTokenId))
             {
                 adapter.refreshAccessToken(accessTokenId);
-                this.refreshedTokens.store(accessTokenId, true);
+                this.getRefreshedTokens().store(accessTokenId, true);
             }
         }
         finally
@@ -83,6 +67,26 @@ public class DefaultRefreshTokenManager implements MuleContextAware, Initialisab
             lock.unlock();
         }
 
+    }
+
+    private ObjectStore<Boolean> getRefreshedTokens()
+    {
+        if (this.refreshedTokens == null)
+        {
+            try
+            {
+                ObjectStoreManager osManager = this.muleContext.getRegistry().lookupObject(
+                    ObjectStoreManager.class);
+                this.refreshedTokens = osManager.getObjectStore("RefreshTokenStore", false, 0,
+                    DEFAULT_EXPIRATION, DEFAULT_EXPIRATION);
+            }
+            catch (RegistrationException e)
+            {
+                throw new MuleRuntimeException(
+                    MessageFactory.createStaticMessage("Could not obtain ObjectStoreManager"), e);
+            }
+        }
+        return this.refreshedTokens;
     }
 
     @Override
