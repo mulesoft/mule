@@ -148,7 +148,7 @@ public class PollScheduleTestCase extends FunctionalTestCase
 
         public FooComponent()
         {
-            this.myCollection = foo;
+            super(foo);
         }
     }
 
@@ -157,7 +157,7 @@ public class PollScheduleTestCase extends FunctionalTestCase
 
         public BarComponent()
         {
-            this.myCollection = bar;
+            super(bar);
         }
     }
 }

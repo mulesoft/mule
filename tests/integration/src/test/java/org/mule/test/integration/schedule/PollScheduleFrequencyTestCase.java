@@ -1,5 +1,5 @@
 /*
- * $Id\$
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -48,15 +48,15 @@ public class PollScheduleFrequencyTestCase extends AbstractTestConfigurationFail
     }
 
     @Rule
-    public SystemProperty systemProperty = new SystemProperty("frequency.millis","100");
+    public SystemProperty systemProperty = new SystemProperty("frequency.millis", "100");
 
     @Test
     public void testConfig()
     {
         try
         {
-            startMuleContext();
-            fail("Context started properly");
+            muleContext.start();
+            fail("Context was started properly but it was expected to fail");
         }
         catch (MuleException mExp)
         {
@@ -74,7 +74,7 @@ public class PollScheduleFrequencyTestCase extends AbstractTestConfigurationFail
 
         public NegativeComponent()
         {
-            this.myCollection = negativeFlowResponses;
+            super(negativeFlowResponses);
         }
     }
 
@@ -83,7 +83,7 @@ public class PollScheduleFrequencyTestCase extends AbstractTestConfigurationFail
 
         public ZeroComponent()
         {
-            this.myCollection = zeroFlowResponses;
+            super(zeroFlowResponses);
         }
     }
 }

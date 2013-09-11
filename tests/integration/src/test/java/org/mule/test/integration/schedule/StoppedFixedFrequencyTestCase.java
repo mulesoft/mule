@@ -34,7 +34,7 @@ public class StoppedFixedFrequencyTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void test() throws Exception
+    public void testStoppedPoll() throws Exception
     {
         runSchedulersOnce();
         Thread.sleep(6000);
@@ -48,14 +48,14 @@ public class StoppedFixedFrequencyTestCase extends FunctionalTestCase
 
         public FooComponent()
         {
-            this.myCollection = stoppedFlowResponse;
+            super(stoppedFlowResponse);
         }
     }
 
     private void runSchedulersOnce() throws Exception
     {
         Collection<Scheduler> schedulers = muleContext.getRegistry().lookupScheduler(
-                Schedulers.flowPollingSchedulers("pollfoo"));
+                Schedulers.flowPollingSchedulers("pollFoo"));
 
         for (Scheduler scheduler : schedulers)
         {

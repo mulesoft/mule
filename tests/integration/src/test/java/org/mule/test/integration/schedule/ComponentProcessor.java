@@ -15,9 +15,13 @@ import java.util.List;
 public abstract class ComponentProcessor
 {
 
-    protected List<String> myCollection;
+    protected final List<String> myCollection;
 
-    public boolean process(String s)
+    public ComponentProcessor(List<String> collection){
+        myCollection = collection;
+    }
+
+    public final boolean process(String processMessage)
     {
 
         synchronized (myCollection)
@@ -25,7 +29,7 @@ public abstract class ComponentProcessor
 
             if (myCollection.size() < 10)
             {
-                myCollection.add(s);
+                myCollection.add(processMessage);
                 return true;
             }
         }

@@ -12,7 +12,7 @@
         <spring:bean class="org.mule.test.integration.schedule.PollSchedulerFactoryPostProcessor"/>
     </spring:beans>
 
-    <flow name="pollfoo" processingStrategy="synchronous">
+    <flow name="pollFoo" processingStrategy="synchronous">
         <poll>
             <fixed-frequency-scheduler frequency="2000"/>
             <static-component>

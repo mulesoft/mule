@@ -13,7 +13,6 @@ package org.mule.test.integration.schedule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -32,7 +31,7 @@ public class PollScheduleDelayTestCase extends FunctionalTestCase
     private static final List<String> positiveFlowResponses = new ArrayList<String>();
 
     @Rule
-    public SystemProperty systemProperty = new SystemProperty("frequency.millis","100");
+    public SystemProperty systemProperty = new SystemProperty("frequency.millis", "100");
 
     @Override
     protected String getConfigResources()
@@ -47,12 +46,7 @@ public class PollScheduleDelayTestCase extends FunctionalTestCase
 
         assertCollectionToBeFilledWithContent(negativeFlowResponses, "negative");
         assertCollectionToBeFilledWithContent(zeroFlowResponses, "zero");
-        try{
-            assertCollectionToBeFilledWithContent(positiveFlowResponses, "positive");
-            fail("Collection wasn't empty");
-        }catch(AssertionError error){
-            assertEquals("java.lang.AssertionError", error.toString());
-        }
+        assertCollectionToBeEmpty(positiveFlowResponses);
 
         waitForPollElements();
 
@@ -78,12 +72,20 @@ public class PollScheduleDelayTestCase extends FunctionalTestCase
         }
     }
 
+    private void assertCollectionToBeEmpty(List<String> collection)
+    {
+        synchronized (collection)
+        {
+            assertEquals(0, collection.size());
+        }
+    }
+
     public static class NegativeComponent extends ComponentProcessor
     {
 
         public NegativeComponent()
         {
-            this.myCollection = negativeFlowResponses;
+            super(negativeFlowResponses);
         }
     }
 
@@ -92,7 +94,7 @@ public class PollScheduleDelayTestCase extends FunctionalTestCase
 
         public ZeroComponent()
         {
-            this.myCollection = zeroFlowResponses;
+            super(zeroFlowResponses);
         }
     }
 
@@ -101,7 +103,7 @@ public class PollScheduleDelayTestCase extends FunctionalTestCase
 
         public PositiveComponent()
         {
-            this.myCollection = positiveFlowResponses;
+            super(positiveFlowResponses);
         }
     }
 }

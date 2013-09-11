@@ -6,7 +6,7 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
 
-    <flow name="pollfoo" processingStrategy="synchronous">
+    <flow name="poll" processingStrategy="synchronous">
         <poll>
             <static-component>
                 <return-data>foo</return-data>

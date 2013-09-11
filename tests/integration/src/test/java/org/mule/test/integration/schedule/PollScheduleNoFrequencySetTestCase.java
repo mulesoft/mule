@@ -69,7 +69,7 @@ public class PollScheduleNoFrequencySetTestCase extends FunctionalTestCase
 
         public FooComponent()
         {
-            this.myCollection = flowResponse;
+            super(flowResponse);
         }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * $Id\$
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -10,7 +10,6 @@
 
 package org.mule.tck.config;
 
-import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -23,7 +22,7 @@ import org.junit.runners.Parameterized;
  * to check for an invalid argument or configuration error that cannot be
  * detected with an xml validator.<p/>
  * Parameters are set with the @Parameters annotation, as an array with a
- * {mule-config.xml, testName} tuple. In the test, startMuleContext has to
+ * {mule-config.xml, testName} tuple. In the test, muleContext.start() has to
  * be called and then check for your expected failure.
  */
 
@@ -36,7 +35,6 @@ public abstract class AbstractTestConfigurationFailure extends AbstractMuleConte
 
     public AbstractTestConfigurationFailure(String confResources, String name)
     {
-        super();
         configResource = confResources;
         testName = name;
     }
@@ -52,17 +50,9 @@ public abstract class AbstractTestConfigurationFailure extends AbstractMuleConte
         return "Testing: " + name.getMethodName() + " (" + testName + ")";
     }
 
-
     @Override
     protected ConfigurationBuilder getBuilder() throws Exception
     {
         return new SpringXmlConfigurationBuilder(getConfigResources());
     }
-
-    public static void startMuleContext() throws MuleException
-    {
-        muleContext.start();
-    }
-
-
 }
