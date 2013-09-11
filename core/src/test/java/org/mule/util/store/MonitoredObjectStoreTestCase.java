@@ -21,19 +21,19 @@ import static org.junit.Assert.assertTrue;
 public class MonitoredObjectStoreTestCase extends AbstractMuleTestCase
 {
     private static final int EXPIRATION_INTERVAL = 500;
-    
+
     @Test
     public void testShutdownWithHangingExpireThread() throws Exception
-    {        
+    {
         ExpiringStore store = createExpiringStore();
-        
+
         // sleep some time for the expire to kick in
         Thread.sleep(EXPIRATION_INTERVAL * 2);
-        
-        // now dispose the store, this kills the expire thread 
+
+        // now dispose the store, this kills the expire thread
         // that is still active, as it is a daemon thread
         store.dispose();
-        
+
         assertTrue(store.expireStarted);
         assertFalse(store.expireFinished);
     }
@@ -43,20 +43,20 @@ public class MonitoredObjectStoreTestCase extends AbstractMuleTestCase
         ExpiringStore store = new ExpiringStore();
         store.setExpirationInterval(EXPIRATION_INTERVAL);
         store.initialise();
-        
+
         return store;
     }
-    
+
     private static class ExpiringStore extends AbstractMonitoredObjectStore<String>
     {
         protected boolean expireStarted = false;
         protected boolean expireFinished = false;
-        
+
         public ExpiringStore()
         {
             super();
         }
-        
+
         @Override
         protected void expire()
         {
@@ -71,28 +71,38 @@ public class MonitoredObjectStoreTestCase extends AbstractMuleTestCase
                 throw new RuntimeException("expire was interrupted", e);
             }
         }
-        
+
+        @Override
         public boolean contains(Serializable id) throws ObjectStoreNotAvaliableException
         {
             return false;
         }
 
+        @Override
         public String remove(Serializable id) throws ObjectStoreException
         {
             return null;
         }
 
+        @Override
         public String retrieve(Serializable id) throws ObjectStoreException
         {
             return null;
         }
 
+        @Override
         public void store(Serializable id, String item) throws ObjectStoreException
         {
             // does nothing
         }
 
+        @Override
+        public void clear()
+        {
+            // does nothing
+        }
 
+        @Override
         public boolean isPersistent()
         {
             return false;

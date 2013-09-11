@@ -138,7 +138,7 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
             }
             return containsKey;
         }
-
+        
         @Override
         public void store(Serializable key, String value) throws ObjectStoreException
         {
@@ -186,6 +186,12 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
         public boolean isPersistent()
         {
             return false;
+        }
+        
+        @Override
+        public void clear() throws ObjectStoreException
+        {
+            this.map.clear();
         }
     }
 }
