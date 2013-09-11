@@ -62,7 +62,7 @@ public class FixedFrequencySchedulerFactory<T extends Runnable> extends Schedule
 
     public void setStartDelay(long startDelay)
     {
-        checkArgument(startDelay > 0, "Start delay must be greater then zero");
+        checkArgument(startDelay >= 0, "Start delay must be greater then zero");
 
         this.startDelay = startDelay;
     }
