@@ -13,6 +13,7 @@ package org.mule.test.integration.schedule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleException;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.Predicate;
@@ -22,7 +23,7 @@ import org.junit.Test;
 /**
  * This test checks that a Scheduler can be stopped, executed and started. Also shows how a customer can set his own
  * scheduler in mule config.
- *
+ * <p/>
  * It also shows the way users can add a new Scheduler as a spring bean.
  */
 public class RunningScheduleTestCase extends FunctionalTestCase

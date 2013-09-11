@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+
+    <flow name="poll" processingStrategy="synchronous">
+        <poll>
+            <static-component>
+                <return-data>foo</return-data>
+            </static-component>
+        </poll>
+        <component class="org.mule.test.integration.schedule.PollScheduleNoFrequencySetTestCase$FooComponent"/>
+    </flow>
+
+</mule>
