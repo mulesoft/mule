@@ -1,13 +1,9 @@
 /*
- * $Id: HttpMessageReceiver.java 24837 2012-08-26 04:59:21Z pablo.lagreca $
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.http;
 
 import org.mule.DefaultMuleEvent;
