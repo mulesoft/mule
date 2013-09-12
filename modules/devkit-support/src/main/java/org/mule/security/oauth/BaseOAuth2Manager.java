@@ -235,6 +235,15 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         {
             ((Disposable) defaultUnauthorizedConnector).dispose();
         }
+
+        try
+        {
+            this.accessTokenPool.close();
+        }
+        catch (Exception e)
+        {
+            this.getLogger().warn("Exception found while trying to close access token pool", e);
+        }
     }
 
     /**
@@ -927,5 +936,10 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     public void setRefreshTokenManager(RefreshTokenManager refreshTokenManager)
     {
         this.refreshTokenManager = refreshTokenManager;
+    }
+    
+    protected void setAccessTokenPool(GenericKeyedObjectPool<String, OAuth2Adapter> accessTokenPool)
+    {
+        this.accessTokenPool = accessTokenPool;
     }
 }

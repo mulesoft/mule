@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
+import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,6 +76,9 @@ public class OAuth2ManagerTestCase
     @Mock(extraInterfaces = {Initialisable.class, Startable.class, Stoppable.class, Disposable.class,
         MuleContextAware.class})
     private OAuth2Adapter adapter;
+    
+    @Mock
+    private GenericKeyedObjectPool<String, OAuth2Adapter> accessTokenPool;
 
     @Mock
     private HttpUtil httpUtil;
@@ -349,5 +353,12 @@ public class OAuth2ManagerTestCase
         Mockito.doThrow(RuntimeException.class).when(this.adapter).postAuth();
         this.manager.postAuth(this.adapter, ACCESS_TOKEN_ID);
         Mockito.verify(this.refreshTokenManager, Mockito.never()).refreshToken(adapter, Mockito.anyString());
+    }
+    
+    @Test
+    public void closeTokenPool() throws Exception {
+        this.manager.setAccessTokenPool(this.accessTokenPool);
+        this.manager.dispose();
+        Mockito.verify(this.accessTokenPool).close();
     }
 }
