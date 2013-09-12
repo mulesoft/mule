@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.security.oauth;
 
 import org.mule.DefaultMuleMessage;
@@ -230,6 +231,15 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         if (defaultUnauthorizedConnector instanceof Disposable)
         {
             ((Disposable) defaultUnauthorizedConnector).dispose();
+        }
+
+        try
+        {
+            this.accessTokenPool.close();
+        }
+        catch (Exception e)
+        {
+            this.getLogger().warn("Exception found while trying to close access token pool", e);
         }
     }
 
@@ -923,5 +933,10 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     public void setRefreshTokenManager(RefreshTokenManager refreshTokenManager)
     {
         this.refreshTokenManager = refreshTokenManager;
+    }
+    
+    protected void setAccessTokenPool(GenericKeyedObjectPool<String, OAuth2Adapter> accessTokenPool)
+    {
+        this.accessTokenPool = accessTokenPool;
     }
 }
