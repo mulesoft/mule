@@ -69,5 +69,7 @@ public class TestOAuth2Manager extends BaseOAuth2Manager<OAuth2Adapter>
         
         return exceptions;
     }
+    
+    
 
 }
