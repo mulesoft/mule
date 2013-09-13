@@ -15,7 +15,7 @@ import java.util.concurrent.CountDownLatch;
 public abstract class SingleRequestMockHttpServer extends MockHttpServer
 {
 
-    private CountDownLatch testCompleteLatch;
+    private final CountDownLatch testCompleteLatch;
 
     public SingleRequestMockHttpServer(int listenPort, CountDownLatch startupLatch, CountDownLatch testCompleteLatch)
     {
@@ -30,7 +30,8 @@ public abstract class SingleRequestMockHttpServer extends MockHttpServer
     {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         readHttpRequest(reader);
-        out.write("HTTP/1.1 200 OK\n\n".getBytes());
+        out.write(HTTP_STATUS_LINE_OK.getBytes());
+        out.write('\n');
         out.flush();
         testCompleteLatch.countDown();
     }

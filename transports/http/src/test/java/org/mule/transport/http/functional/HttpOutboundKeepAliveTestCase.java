@@ -38,6 +38,8 @@ public class HttpOutboundKeepAliveTestCase extends AbstractMockHttpServerTestCas
     private static final String DEFAULT_KEEP_ALIVE_ONE_WAY_PATH = "vm://defaultKeepAliveOneWay";
     private static final String DEFAULT_KEEP_ALIVE_REQUEST_RESPONSE_PATH = "vm://defaultKeepAliveRequestResponse";
 
+    private static final String CONNECTION_CLOSE_VALUE = "close";
+
     @Rule
     public DynamicPort httpPort = new DynamicPort("httpPort");
 
@@ -65,38 +67,38 @@ public class HttpOutboundKeepAliveTestCase extends AbstractMockHttpServerTestCas
     }
 
     @Test
-    public void oneWayEndpointWithNoKeepAliveClosesConnection() throws MuleException
+    public void closesConnectionWhenOneWayEndpointHasNoKeepAlive() throws MuleException
     {
         assertConnectionClosed(NO_KEEP_ALIVE_ONE_WAY_PATH);
     }
 
     @Test
-    public void requestResponseEndpointWithNoKeepAliveClosesConnection() throws MuleException
+    public void closesConnectionWhenRequestResponseEndpointHasNoKeepAlive() throws MuleException
     {
         assertConnectionClosed(NO_KEEP_ALIVE_ONE_WAY_PATH);
     }
 
     @Test
-    public void oneWayEndpointWithKeepAliveReusesHttpConnection() throws MuleException
+    public void reusesConnectionWhenOneWayEndpointHasKeepAlive() throws MuleException
     {
         assertKeepAlive(KEEP_ALIVE_ONE_WAY_PATH);
     }
 
     @Test
-    public void requestResponseEndpointWithKeepAliveReusesHttpConnection() throws MuleException
+    public void reusesConnectionWhenRequestResponseEndpointHasKeepAlive() throws MuleException
     {
         assertKeepAlive(KEEP_ALIVE_REQUEST_RESPONSE_PATH);
     }
 
 
     @Test
-    public void oneWayEndpointWithDefaultKeepAliveReusesHttpConnection() throws MuleException
+    public void reusesConnectionWhenOneWayEndpointHasDefaultKeepAlive() throws MuleException
     {
         assertKeepAlive(DEFAULT_KEEP_ALIVE_ONE_WAY_PATH);
     }
 
     @Test
-    public void requestResponseEndpointWithDefaultKeepAliveReusesHttpConnection() throws MuleException
+    public void reusesConnectionWhenRequestResponseEndpointHasDefaultKeepAlive() throws MuleException
     {
         assertKeepAlive(DEFAULT_KEEP_ALIVE_REQUEST_RESPONSE_PATH);
     }
@@ -113,7 +115,7 @@ public class HttpOutboundKeepAliveTestCase extends AbstractMockHttpServerTestCas
     {
         muleContext.getClient().dispatch(NO_KEEP_ALIVE_REQUEST_RESPONSE_PATH, TEST_MESSAGE, null);
         assertRequestCount(1);
-        assertEquals("close", connectionHeader);
+        assertEquals(CONNECTION_CLOSE_VALUE, connectionHeader);
     }
 
     private void assertRequestCount(final int expectedRequestCount)
@@ -129,7 +131,7 @@ public class HttpOutboundKeepAliveTestCase extends AbstractMockHttpServerTestCas
             @Override
             public String describeFailure()
             {
-                return "Request was not received";
+                return String.format("Expected %d requests but received %d.", expectedRequestCount, requestCount);
             }
         });
     }
@@ -153,19 +155,18 @@ public class HttpOutboundKeepAliveTestCase extends AbstractMockHttpServerTestCas
             while (requestCount < MAX_REQUESTS && !closeConnection)
             {
                 HttpRequest request = parseRequest(in, muleContext.getConfiguration().getDefaultEncoding());
-                Header connHeader = request.getFirstHeader("Connection");
+                Header connHeader = request.getFirstHeader(HttpConstants.HEADER_CONNECTION);
 
                 connectionHeader = (connHeader == null) ? null : connHeader.getValue();
                 requestCount++;
 
-                closeConnection = "close".equals(connectionHeader);
+                closeConnection = CONNECTION_CLOSE_VALUE.equals(connectionHeader);
 
-                StringBuffer response = new StringBuffer("HTTP/1.1 200 OK\n");
+                StringBuffer response = new StringBuffer(HTTP_STATUS_LINE_OK);
 
                 if (closeConnection)
                 {
-                    response.append(HttpConstants.HEADER_CONNECTION);
-                    response.append(": close\n");
+                    response.append(String.format("%s: %s\n", HttpConstants.HEADER_CONNECTION, CONNECTION_CLOSE_VALUE));
                 }
                 response.append("Content-Length: 4\n\nTEST");
 

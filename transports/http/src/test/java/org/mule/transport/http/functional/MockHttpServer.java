@@ -21,6 +21,8 @@ import org.apache.commons.httpclient.HttpParser;
 public abstract class MockHttpServer extends Object implements Runnable
 {
 
+    public static final String HTTP_STATUS_LINE_OK = "HTTP/1.1 200 OK\n";
+
     private int listenPort;
     private CountDownLatch startupLatch;
 
