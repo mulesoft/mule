@@ -13,6 +13,7 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.functional.AbstractMockHttpServerTestCase;
 import org.mule.transport.http.functional.MockHttpServer;
+import org.mule.transport.http.functional.SingleRequestMockHttpServer;
 
 import java.io.BufferedReader;
 import java.util.Arrays;
@@ -62,7 +63,7 @@ public class RestServiceComponentDeleteTestCase extends AbstractMockHttpServerTe
         assertTrue(deleteRequestFound);
     }
 
-    private class SimpleHttpServer extends MockHttpServer
+    private class SimpleHttpServer extends SingleRequestMockHttpServer
     {
         public SimpleHttpServer(int listenPort, CountDownLatch startupLatch, CountDownLatch testCompleteLatch)
         {
