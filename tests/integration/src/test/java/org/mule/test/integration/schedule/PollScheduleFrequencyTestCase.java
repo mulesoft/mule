@@ -34,8 +34,7 @@ public class PollScheduleFrequencyTestCase extends AbstractTestConfigurationFail
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-                {"org/mule/test/integration/schedule/poll-scheduler-zero-frequency-config.xml", "zero frequency"},
-                {"org/mule/test/integration/schedule/poll-scheduler-negative-frequency-config.xml", "negative frequency"}
+                {"org/mule/test/integration/schedule/poll-scheduler-zero-frequency-config.xml", "zero frequency"}
         });
     }
 
@@ -66,15 +65,6 @@ public class PollScheduleFrequencyTestCase extends AbstractTestConfigurationFail
                 e = e.getCause();
             }
             assertTrue(e instanceof IllegalArgumentException);
-        }
-    }
-
-    public static class NegativeComponent extends ComponentProcessor
-    {
-
-        public NegativeComponent()
-        {
-            super(negativeFlowResponses);
         }
     }
 

@@ -26,7 +26,6 @@ import org.junit.Test;
 public class PollScheduleDelayTestCase extends FunctionalTestCase
 {
 
-    private static final List<String> negativeFlowResponses = new ArrayList<String>();
     private static final List<String> zeroFlowResponses = new ArrayList<String>();
     private static final List<String> positiveFlowResponses = new ArrayList<String>();
 
@@ -44,13 +43,11 @@ public class PollScheduleDelayTestCase extends FunctionalTestCase
     {
         waitForPollElements();
 
-        assertCollectionToBeFilledWithContent(negativeFlowResponses, "negative");
         assertCollectionToBeFilledWithContent(zeroFlowResponses, "zero");
         assertCollectionToBeEmpty(positiveFlowResponses);
 
         waitForPollElements();
 
-        assertCollectionToBeFilledWithContent(negativeFlowResponses, "negative");
         assertCollectionToBeFilledWithContent(zeroFlowResponses, "zero");
         assertCollectionToBeFilledWithContent(positiveFlowResponses, "positive");
     }
@@ -77,15 +74,6 @@ public class PollScheduleDelayTestCase extends FunctionalTestCase
         synchronized (collection)
         {
             assertEquals(0, collection.size());
-        }
-    }
-
-    public static class NegativeComponent extends ComponentProcessor
-    {
-
-        public NegativeComponent()
-        {
-            super(negativeFlowResponses);
         }
     }
 
