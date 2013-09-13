@@ -61,7 +61,9 @@
     </modules>
 
     <properties>
+        
         <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+        <licenseHeader>${session.executionRootDirectory}/LICENSE_HEADER.txt</licenseHeader>
         <coberturaVersion>2.5</coberturaVersion>
         <eclipsePluginVersion>2.5.1</eclipsePluginVersion>
         <gmavenPluginVersion>1.4</gmavenPluginVersion>
@@ -1799,7 +1801,7 @@
                 <artifactId>maven-license-plugin</artifactId>
                 <version>1.9.0</version>
                 <configuration>
-                    <header>LICENSE_HEADER.txt</header>
+                    <header>${licenseHeader}</header>
                     <excludes>
                         <exclude>target/**</exclude>                  
                         <exclude>**/.gitignore</exclude>
