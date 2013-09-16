@@ -11,6 +11,11 @@
     <name>CXF Module</name>
     <description>A Mule module for web service connectivity using CXF.</description>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
+
     <build>
         <plugins>
             <plugin>
