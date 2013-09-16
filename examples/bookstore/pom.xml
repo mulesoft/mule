@@ -13,6 +13,10 @@
     <name>Bookstore Example</name>
     <description>Bookstore Example App</description>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <build>
         <plugins>
             <!-- Run mvn war:war to build the bookstore-admin webapp as a deployable .WAR archive -->

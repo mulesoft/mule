@@ -16,6 +16,11 @@
         expressions.
     </description>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
+
     <build>
         <plugins>
             <plugin>

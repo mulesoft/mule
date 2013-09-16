@@ -11,6 +11,11 @@
     <name>Mule Bootstrap</name>
     <description>Classes used to boot up the Mule server</description>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
+
     <build>
         <plugins>
             <plugin>

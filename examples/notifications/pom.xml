@@ -11,6 +11,10 @@
     <name>Notifications Example</name>
     <description>Demonstrates capturing and firing notifications and uses AJAX to send notifications to the browser.</description>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>
