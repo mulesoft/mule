@@ -557,6 +557,7 @@
 /mule-standalone-${productVersion}/lib/opt/geronimo-j2ee-management_1.0_spec-1.1-osgi.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-jms_1.1_spec-1.1-osgi.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-jta_1.1_spec-1.1.1.jar
+/mule-standalone-${productVersion}/lib/opt/geronimo-servlet_2.5_spec-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-stax-api_1.0_spec-1.0.1.jar
 /mule-standalone-${productVersion}/lib/opt/groovy-all-1.8.6.jar
 /mule-standalone-${productVersion}/lib/opt/guava-13.0.jar
@@ -631,7 +632,6 @@
 /mule-standalone-${productVersion}/lib/opt/saxon-9.1.0.8.jar
 /mule-standalone-${productVersion}/lib/opt/saxon-9.1.0.8-dom.jar
 /mule-standalone-${productVersion}/lib/opt/saxon-9.1.0.8-xqj.jar
-/mule-standalone-${productVersion}/lib/opt/servlet-api-2.5-20081211.jar
 /mule-standalone-${productVersion}/lib/opt/signpost-core-1.2.1.2.jar
 /mule-standalone-${productVersion}/lib/opt/smack-3.1.0.jar
 /mule-standalone-${productVersion}/lib/opt/smackx-3.1.0.jar
