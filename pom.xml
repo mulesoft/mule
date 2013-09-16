@@ -112,6 +112,7 @@
         <geronimoSpecsJtaVersion>1.1.1</geronimoSpecsJtaVersion>
         <geronimoSpecsAnnotationVersion>1.1.1</geronimoSpecsAnnotationVersion>
         <geronimoSpecsStaxVersion>1.0.1</geronimoSpecsStaxVersion>
+        <geronimoSpecsServletApiVersion>1.2</geronimoSpecsServletApiVersion>
         <geronimoSpecsWsMetadataVersion>1.1.2</geronimoSpecsWsMetadataVersion>
         <hibernateVersion>3.6.0.Final</hibernateVersion>
         <jacksonVersion>1.9.11</jacksonVersion>
@@ -129,7 +130,6 @@
         <jcrVersion>1.0</jcrVersion>
         <jdomVersion>1.1.3</jdomVersion>
         <jettyVersion>6.1.26</jettyVersion>
-        <jettyServletApiVersion>2.5-20081211</jettyServletApiVersion>
         <jodaTimeVersion>1.6</jodaTimeVersion>
         <jschVersion>0.1.50</jschVersion>
         <jsr181Version>1.0-MR1</jsr181Version>
@@ -347,10 +347,10 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>servlet-api</artifactId>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-servlet_2.5_spec</artifactId>
                 <!-- servlet api jar is versioned differently -->
-                <version>${jettyServletApiVersion}</version>
+                <version>${geronimoSpecsServletApiVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.mortbay.jetty</groupId>

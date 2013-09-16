@@ -290,10 +290,10 @@
                             <archive>
                                 <manifestEntries>
                                     <More-Info>For more information go to ${productUrl}</More-Info>
-                                    <Support>Get commercial support: ${pom.organization.url}/support</Support>
+                                    <Support>Get commercial support: ${project.organization.url}/support</Support>
                                     <Description>Mule ESB and Integration Platform</Description>
                                     <License>CPAL v1.0 http://www.mulesoft.com/CPAL/</License>
-                                    <Vendor-Url>${pom.organization.url}</Vendor-Url>
+                                    <Vendor-Url>${project.organization.url}</Vendor-Url>
                                     <Product-Url>${productUrl}</Product-Url>
                                     <Build-Date>${timestamp}</Build-Date>
                                     <Dev-List-Email>dev@mule.codehaus.org</Dev-List-Email>
