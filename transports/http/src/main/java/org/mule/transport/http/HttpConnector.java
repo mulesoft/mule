@@ -643,4 +643,10 @@ public class HttpConnector extends TcpConnector
         return super.getServerSocket(uri);
     }
 
+    @Override
+    public void setKeepSendSocketOpen(boolean keepSendSocketOpen)
+    {
+        super.setKeepSendSocketOpen(keepSendSocketOpen);
+        logger.warn("keepSendSocketOpen attribute is deprecated, use keepAlive in the outbound endpoint instead");
+    }
 }
