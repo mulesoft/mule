@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.util.store;
 
 import org.mule.api.MuleContext;
@@ -303,12 +304,20 @@ public class MuleObjectStoreManager
     {
         if (store instanceof ObjectStorePartition)
         {
-            ObjectStorePartition partition= (ObjectStorePartition) store;
+            ObjectStorePartition partition = (ObjectStorePartition) store;
             partition.getBaseStore().disposePartition(partition.getPartitionName());
         }
         else
         {
-            store.clear();
+            try
+            {
+                store.clear();
+            }
+            catch (UnsupportedOperationException e)
+            {
+                logger.warn(String.format("ObjectStore of class %s does not support clearing",
+                    store.getClass().getCanonicalName()), e);
+            }
         }
 
         if (store instanceof Disposable)
