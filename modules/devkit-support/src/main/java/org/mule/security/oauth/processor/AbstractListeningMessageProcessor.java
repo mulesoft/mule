@@ -14,13 +14,19 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.callback.SourceCallback;
+import org.mule.api.processor.InternalMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChain;
+import org.mule.api.processor.MessageProcessorContainer;
+import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.devkit.processor.DevkitBasedMessageProcessor;
+import org.mule.util.NotificationUtils;
 
+import java.util.Arrays;
 import java.util.Map;
 
 public abstract class AbstractListeningMessageProcessor extends DevkitBasedMessageProcessor
-    implements SourceCallback
+    implements SourceCallback, MessageProcessorContainer
 {
 
     /**
@@ -149,6 +155,19 @@ public abstract class AbstractListeningMessageProcessor extends DevkitBasedMessa
     protected MuleEvent doProcess(MuleEvent event) throws Exception
     {
         throw new UnsupportedOperationException("Listening message processors cannot execute this method");
+    }
+
+    @Override
+    public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
+    {
+        if (messageProcessor instanceof MessageProcessorChain)
+        {
+            NotificationUtils.addMessageProcessorPathElements(((MessageProcessorChain) messageProcessor).getMessageProcessors(), pathElement.getParent());
+        }
+        else if (messageProcessor != null)
+        {
+            NotificationUtils.addMessageProcessorPathElements(Arrays.asList(messageProcessor), pathElement.getParent());
+        }
     }
 
 }
