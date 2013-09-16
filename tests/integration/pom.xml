@@ -12,6 +12,10 @@
 	<description>Tests which ensure that Mule sub projects work well together.</description>
 	<packaging>jar</packaging>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
 	<build>
 		<plugins>
 			<plugin>
