@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.config;
 
 import org.mule.api.MuleContext;
@@ -26,12 +27,21 @@ public class QueueProfile
 {
     private int maxOutstandingMessages = 0;
     private QueueStore<Serializable> objectStore;
-    
+
     public static QueueProfile newInstancePersistingToDefaultMemoryQueueStore(MuleContext muleContext)
     {
-        QueueStore<Serializable> defaultMemoryObjectStore =
-            muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME);
-        return new QueueProfile(defaultMemoryObjectStore);
+        return newInstance(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME, muleContext);
+    }
+
+    public static QueueProfile newInstanceWithPersistentQueueStore(MuleContext muleContext)
+    {
+        return newInstance(MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME, muleContext);
+    }
+
+    private static QueueProfile newInstance(String objectStoreKey, MuleContext muleContext)
+    {
+        QueueStore<Serializable> objectStore = muleContext.getRegistry().lookupObject(objectStoreKey);
+        return new QueueProfile(objectStore);
     }
 
     public QueueProfile(QueueStore<Serializable> objectStore)
@@ -51,7 +61,7 @@ public class QueueProfile
         this.maxOutstandingMessages = maxOutstandingMessages;
         this.objectStore = objectStore;
     }
-    
+
     /**
      * This specifies the number of messages that can be queued before it starts
      * blocking.
@@ -74,7 +84,8 @@ public class QueueProfile
         this.maxOutstandingMessages = maxOutstandingMessages;
     }
 
-    public QueueConfiguration configureQueue(MuleContext context, String component, QueueManager queueManager) throws InitialisationException
+    public QueueConfiguration configureQueue(MuleContext context, String component, QueueManager queueManager)
+        throws InitialisationException
     {
         if (objectStore instanceof MuleContextAware)
         {
