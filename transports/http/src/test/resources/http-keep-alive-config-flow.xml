@@ -22,14 +22,14 @@
     </flow>
     
     <flow name="ConnectorKeepAliveEpNoKeepAlive">
-        <http:inbound-endpoint address="http://localhost:${port2}/http-in" exchange-pattern="request-response" keep-alive="false"
+        <http:inbound-endpoint address="http://localhost:${port2}/http-in" exchange-pattern="request-response" keepAlive="false"
                                connector-ref="HttpConnectorKeepAlive"
                                name="inConnectorKeepAliveEpNoKeepAlive"/>
         <echo-component/>
     </flow>
     
     <flow name="ConnectorKeepAliveEpKeepAlive">
-        <http:inbound-endpoint address="http://localhost:${port3}/http-in" exchange-pattern="request-response" keep-alive="true"
+        <http:inbound-endpoint address="http://localhost:${port3}/http-in" exchange-pattern="request-response" keepAlive="true"
                                connector-ref="HttpConnectorKeepAlive"
                                name="inConnectorKeepAliveEpKeepAlive"/>
         <echo-component/>
@@ -43,14 +43,14 @@
     </flow>
     
     <flow name="ConnectorNoKeepAliveEpNoKeepAlive">
-        <http:inbound-endpoint address="http://localhost:${port5}/http-in" exchange-pattern="request-response" keep-alive="false"
+        <http:inbound-endpoint address="http://localhost:${port5}/http-in" exchange-pattern="request-response" keepAlive="false"
                                connector-ref="HttpConnectorNoKeepAlive"
                                name="inConnectorNoKeepAliveEpNoKeepAlive"/>
         <echo-component/>
     </flow>
     
     <flow name="ConnectorNoKeepAliveEpKeepAlive">
-        <http:inbound-endpoint address="http://localhost:${port6}/http-in" exchange-pattern="request-response" keep-alive="true"
+        <http:inbound-endpoint address="http://localhost:${port6}/http-in" exchange-pattern="request-response" keepAlive="true"
                                connector-ref="HttpConnectorNoKeepAlive"
                                name="inConnectorNoKeepAliveEpKeepAlive"/>
         <echo-component/>

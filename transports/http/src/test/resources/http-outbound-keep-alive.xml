@@ -11,25 +11,25 @@
 
     <flow name="keepAliveOneWay">
         <vm:inbound-endpoint path="keepAliveOneWay"/>
-        <http:outbound-endpoint address="http://localhost:${httpPort}/" method="GET" keep-alive="true" exchange-pattern="one-way"/>
+        <http:outbound-endpoint address="http://localhost:${httpPort}/" method="GET" keepAlive="true" exchange-pattern="one-way"/>
         <echo-component/>
     </flow>
 
     <flow name="keepAliveRequestResponse">
         <vm:inbound-endpoint path="keepAliveRequestResponse"/>
-        <http:outbound-endpoint address="http://localhost:${httpPort}/" method="GET" keep-alive="true" exchange-pattern="request-response"/>
+        <http:outbound-endpoint address="http://localhost:${httpPort}/" method="GET" keepAlive="true" exchange-pattern="request-response"/>
         <echo-component/>
     </flow>
 
     <flow name="noKeepAliveOneWay">
         <vm:inbound-endpoint path="noKeepAliveOneWay"/>
-        <http:outbound-endpoint address="http://localhost:${httpPort}/" method="GET" keep-alive="false" exchange-pattern="one-way"/>
+        <http:outbound-endpoint address="http://localhost:${httpPort}/" method="GET" keepAlive="false" exchange-pattern="one-way"/>
         <echo-component/>
     </flow>
 
     <flow name="noKeepAliveRequestResponse">
         <vm:inbound-endpoint path="noKeepAliveRequestResponse"/>
-        <http:outbound-endpoint address="http://localhost:${httpPort}/" method="GET" keep-alive="false" exchange-pattern="request-response"/>
+        <http:outbound-endpoint address="http://localhost:${httpPort}/" method="GET" keepAlive="false" exchange-pattern="request-response"/>
         <echo-component/>
     </flow>
 
