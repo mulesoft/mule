@@ -10,60 +10,72 @@
 
 package org.mule.transport.http.functional;
 
-import java.io.BufferedReader;
+import org.mule.transport.http.HttpRequest;
+import org.mule.transport.http.RequestLine;
+
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.CountDownLatch;
 
+import org.apache.commons.httpclient.HttpParser;
+
 public abstract class MockHttpServer extends Object implements Runnable
 {
+
+    public static final String HTTP_STATUS_LINE_OK = "HTTP/1.1 200 OK\n";
+
     private int listenPort;
     private CountDownLatch startupLatch;
-    private CountDownLatch testCompleteLatch;
 
-    public MockHttpServer(int listenPort, CountDownLatch startupLatch, CountDownLatch testCompleteLatch)
+    public MockHttpServer(int listenPort, CountDownLatch startupLatch)
     {
         this.listenPort = listenPort;
         this.startupLatch = startupLatch;
-        this.testCompleteLatch = testCompleteLatch;
     }
-    
-    protected abstract void readHttpRequest(BufferedReader reader) throws Exception;
-    
+
+    protected abstract void processRequests(InputStream in, OutputStream out) throws Exception;
+
     public void run()
     {
         try
         {
             ServerSocket serverSocket = new ServerSocket(listenPort);
-            
-            // now that we are up and running, the test may send
             startupLatch.countDown();
-            
-            Socket socket = serverSocket.accept();
-            InputStream in = socket.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-            
-            // process the contents of the HTTP request
-            readHttpRequest(reader);
-            
-            OutputStream out = socket.getOutputStream();
-            out.write("HTTP/1.1 200 OK\n\n".getBytes());
-            
+
+            Socket clientSocket = serverSocket.accept();
+
+            InputStream in = clientSocket.getInputStream();
+            OutputStream out = clientSocket.getOutputStream();
+
+            processRequests(in, out);
+
             in.close();
             out.close();
-            socket.close();
+            clientSocket.close();
             serverSocket.close();
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            throw new RuntimeException(ex);
+            throw new RuntimeException(e);
         }
-        finally
+    }
+
+
+    protected HttpRequest parseRequest(InputStream in, String encoding)
+    {
+        try
         {
-            testCompleteLatch.countDown();
+            String line = HttpParser.readLine(in, encoding);
+            RequestLine requestLine = RequestLine.parseLine(line);
+
+            return new HttpRequest(requestLine, HttpParser.parseHeaders(in, encoding), in, encoding);
+
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
         }
     }
 }

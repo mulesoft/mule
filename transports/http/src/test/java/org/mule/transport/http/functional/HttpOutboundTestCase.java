@@ -113,7 +113,7 @@ public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
         assertEquals(expectedHttpMethod, httpMethod);
     }
 
-    private class SimpleHttpServer extends MockHttpServer
+    private class SimpleHttpServer extends SingleRequestMockHttpServer
     {
         public SimpleHttpServer(int listenPort, CountDownLatch startupLatch, CountDownLatch testCompleteLatch)
         {
