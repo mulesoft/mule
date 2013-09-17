@@ -13,6 +13,8 @@ package org.mule.transport.http.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.BufferedReader;
 import java.util.ArrayList;
@@ -27,8 +29,6 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.rule.DynamicPort;
 
 public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
 {
@@ -90,7 +90,7 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
 
     }
 
-    private class SimpleHttpServer extends MockHttpServer
+    private class SimpleHttpServer extends SingleRequestMockHttpServer
     {
         public SimpleHttpServer(int listenPort, CountDownLatch startupLatch, CountDownLatch testCompleteLatch)
         {
