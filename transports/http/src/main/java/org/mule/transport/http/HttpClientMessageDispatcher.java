@@ -210,6 +210,13 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         }
 
         httpMethod.setFollowRedirects("true".equalsIgnoreCase((String)endpoint.getProperty("followRedirects")));
+
+        // keepAlive=true is the default behavior of HttpClient
+        if ("false".equalsIgnoreCase((String) endpoint.getProperty("keepAlive")))
+        {
+            httpMethod.setRequestHeader("Connection", "close");
+        }
+
         return httpMethod;
     }
 
