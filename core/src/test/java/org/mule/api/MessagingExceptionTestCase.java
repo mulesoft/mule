@@ -13,17 +13,24 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.ConnectException;
 import java.net.SocketException;
 
+import org.apache.commons.lang.SerializationException;
 import org.hamcrest.core.Is;
+import org.hamcrest.core.IsInstanceOf;
+import org.hamcrest.core.IsNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.util.SerializationUtils;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -158,5 +165,51 @@ public class MessagingExceptionTestCase extends AbstractMuleTestCase
         assertThat(exception.causedExactlyBy(SocketException.class), is(false));
         assertThat(exception.causedExactlyBy(IOException.class), is(true));
         assertThat(exception.causedExactlyBy(MessagingException.class), is(true));
+    }
+
+    @Test
+    public void testMessagingExceptionSerializationWithSerializableFailingMessageProcessor()
+    {
+        verifyMessagingExceptionSerialization(new SerializableMessageProcessor());
+    }
+
+    @Test
+    public void testMessagingExceptionSerializationWithNotSerializableFailingMessageProcessor()
+    {
+        verifyMessagingExceptionSerialization(new NotSerializableMessageProcessor());
+    }
+
+    private void verifyMessagingExceptionSerialization(MessageProcessor failingMessageProcessor)
+    {
+        MessagingException serializableException = new MessagingException(CoreMessages.createStaticMessage(""), mockEvent, failingMessageProcessor);
+        byte[] serializedMessagingException = SerializationUtils.serialize(serializableException);
+        serializableException = (MessagingException) SerializationUtils.deserialize(serializedMessagingException);
+        if (failingMessageProcessor instanceof Serializable)
+        {
+            assertThat(serializableException.getFailingMessageProcessor(), IsInstanceOf.instanceOf(SerializableMessageProcessor.class));
+        }
+        else
+        {
+            assertThat(serializableException.getFailingMessageProcessor(), IsNull.nullValue());
+        }
+    }
+
+
+    public static class SerializableMessageProcessor implements Serializable, MessageProcessor
+    {
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            return null;
+        }
+    }
+
+    public static class NotSerializableMessageProcessor implements MessageProcessor
+    {
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            return null;
+        }
     }
 }

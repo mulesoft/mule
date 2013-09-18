@@ -21,6 +21,14 @@ import org.mule.routing.filters.WildcardFilter;
 import org.mule.transport.NullPayload;
 import org.mule.util.StringUtils;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * <code>MessagingException</code> is a general message exception thrown when
  * errors specific to Message processing occur..
@@ -28,6 +36,7 @@ import org.mule.util.StringUtils;
 
 public class MessagingException extends MuleException
 {
+    protected static transient Log logger = LogFactory.getLog(MessagingException.class);
     /**
      * Serial version
      */
@@ -47,7 +56,7 @@ public class MessagingException extends MuleException
 
     private boolean causeRollback;
     private boolean handled;
-    private MessageProcessor failingMessageProcessor;
+    private transient MessageProcessor failingMessageProcessor;
 
     /**
      * @deprecated use MessagingException(Message, MuleEvent)
@@ -358,6 +367,41 @@ public class MessagingException extends MuleException
         this.muleMessage = event == null || VoidMuleEvent.getInstance().equals(event)
                                                                                      ? null
                                                                                       : event.getMessage();
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException
+    {
+        out.defaultWriteObject();
+        if (failingMessageProcessor instanceof Serializable)
+        {
+            out.writeBoolean(true);
+            out.writeObject(failingMessageProcessor);
+        }
+        else
+        {
+            out.writeBoolean(false);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(String.format("Could not serialize failing message processor %s because is not serializable",failingMessageProcessor.getClass().getName()));
+            }
+        }
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+    {
+        in.defaultReadObject();
+        boolean failingMessageProcessorIsSerializable = in.readBoolean();
+        if (failingMessageProcessorIsSerializable)
+        {
+            failingMessageProcessor = (MessageProcessor)in.readObject();
+        }
+        else
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Failing message processor is null after deserialization. Perhaps it was not serializable");
+            }
+        }
     }
 }
 
