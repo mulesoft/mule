@@ -81,13 +81,18 @@ public class QueueTransactionContext extends AbstractTransactionContext
             queue.clear();
         }
 
+        this.initializeRemoved();
+        List<Serializable> queueRemoved = this.lookupRemovedQueue(queue);
+        for (Serializable discardedItem = queue.poll(timeout); discardedItem != null; discardedItem = queue.poll(timeout))
+        {
+            queueRemoved.add(discardedItem);
+        }
+
         if (this.added != null)
         {
             List<Serializable> queueAdded = this.lookupAddedQueue(queue);
             if (!CollectionUtils.isEmpty(queueAdded))
             {
-                this.initializeRemoved();
-                List<Serializable> queueRemoved = this.lookupRemovedQueue(queue);
                 queueRemoved.addAll(queueAdded);
                 queueAdded.clear();
             }
