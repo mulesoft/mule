@@ -60,7 +60,9 @@ public class PartitionedObjectStoreWrapper<T extends Serializable> implements Li
     @Override
     public void clear() throws ObjectStoreException
     {
-        this.getStore().clear();
+        for (Serializable key : this.allKeys()) {
+            this.remove(key);
+        }
     }
 
     @Override
