@@ -126,6 +126,10 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
                 }
             }
 
+            // For message sources to work, the flow should be valid, this means needs to have a MP
+            // STUDIO-3735 and MULE-7024
+            parentElement.addElement("logger", "http://www.mulesoft.org/schema/mule/core");
+
             config = new ConfigResource("", new StringBufferInputStream(document.asXML()));
         }
         catch (Exception e)
