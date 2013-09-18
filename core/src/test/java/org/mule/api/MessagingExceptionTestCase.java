@@ -12,18 +12,24 @@ package org.mule.api;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+import org.mule.api.processor.MessageProcessor;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
+import org.mule.util.SerializationUtils;
+
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.ConnectException;
 import java.net.SocketException;
 
 import org.hamcrest.core.Is;
+import org.hamcrest.core.IsNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -159,4 +165,32 @@ public class MessagingExceptionTestCase extends AbstractMuleTestCase
         assertThat(exception.causedExactlyBy(IOException.class), is(true));
         assertThat(exception.causedExactlyBy(MessagingException.class), is(true));
     }
+
+    @Test
+    public void testMessagingExceptionSerializationWithSerializableFailingMessageProcessor()
+    {
+        verifyMessagingExceptionSerialization(Mockito.mock(MessageProcessor.class, Mockito.withSettings().serializable()));
+    }
+
+    @Test
+    public void testMessagingExceptionSerializationWithNotSerializableFailingMessageProcessor()
+    {
+        verifyMessagingExceptionSerialization(Mockito.mock(MessageProcessor.class));
+    }
+
+    private void verifyMessagingExceptionSerialization(MessageProcessor failingMessageProcessor)
+    {
+        MessagingException serializableException = new MessagingException(CoreMessages.createStaticMessage(""), mockEvent, failingMessageProcessor);
+        byte[] serializedMessagingException = SerializationUtils.serialize(serializableException);
+        serializableException = (MessagingException) SerializationUtils.deserialize(serializedMessagingException);
+        if (failingMessageProcessor instanceof Serializable)
+        {
+            assertThat(serializableException.getFailingMessageProcessor(), IsNull.notNullValue());
+        }
+        else
+        {
+            assertThat(serializableException.getFailingMessageProcessor(), IsNull.nullValue());
+        }
+    }
+
 }
