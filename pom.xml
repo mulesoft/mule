@@ -1816,6 +1816,7 @@
                         <exclude>**/*.md</exclude>
                         <exclude>**/*.xsl</exclude>
                         <exclude>**/*.html</exclude>
+                        <exclude>**/*.css</exclude>
                         <exclude>**/build-number.txt</exclude>
 
                         <exclude>**/BndMojo.java</exclude>
