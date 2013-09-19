@@ -12,15 +12,21 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 public class TcpJmsResponseTestCase extends AbstractServiceAndFlowTestCase
 {
+
+
+    @Rule
+    public DynamicPort httpPort = new DynamicPort("port");
 
     public TcpJmsResponseTestCase(ConfigVariant variant, String configResources)
     {
@@ -39,7 +45,7 @@ public class TcpJmsResponseTestCase extends AbstractServiceAndFlowTestCase
     public void testSyncResponse() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("tcp://localhost:4444", "request", null);
+        MuleMessage message = client.send("tcp://localhost:" + httpPort.getNumber(), "request", null);
         assertNotNull(message);
         assertEquals("Received: request", message.getPayloadAsString());
     }
