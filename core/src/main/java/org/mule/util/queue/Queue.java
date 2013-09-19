@@ -40,5 +40,11 @@ public interface Queue extends NamedObject
     Serializable poll(long timeout) throws InterruptedException;
 
     boolean offer(Serializable object, long timeout) throws InterruptedException, ObjectStoreException;
+    
+    /**
+     * Discards all the elements in the queue
+     * @throws InterruptedException
+     */
+    public void clear() throws InterruptedException;
 
 }
