@@ -6,8 +6,11 @@
  */
 package org.mule.test.integration.streaming;
 
+import static org.junit.Assert.assertEquals;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.file.FileExists;
 import org.mule.util.FileUtils;
 
 import java.io.File;
@@ -17,8 +20,6 @@ import java.util.Collection;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
 
 public class FileToTcpStreamingTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -58,10 +59,11 @@ public class FileToTcpStreamingTestCase extends AbstractServiceAndFlowTestCase
 
         FileUtils.stringToFile(basepath + "/in/foo.txt", text);
 
-        Thread.sleep(4000);
-
         File file = FileUtils.newFile(basepath, "out/foo.txt.processed");
-        System.out.println("reading " + file.getAbsolutePath());
+
+        PollingProber pollingProber = new PollingProber(5000, 10);
+        pollingProber.check(new FileExists(file));
+
         String result = FileUtils.readFileToString(file, "UTF8");
         assertEquals(text, result);
     }
