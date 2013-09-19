@@ -20,7 +20,7 @@
 
         <service name="TcpReceiver">
             <inbound>
-                <inbound-endpoint address="tcp://localhost:4444" exchange-pattern="request-response" />
+                <inbound-endpoint address="tcp://localhost:${port}" exchange-pattern="request-response" />
             </inbound>
             <component class="org.mule.component.simple.EchoComponent" />
             <outbound>

@@ -17,7 +17,7 @@
     <object-to-string-transformer name="toString"/>
 
     <flow name="bridge">
-        <http:inbound-endpoint host="localhost" port="4444" path="in" exchange-pattern="request-response">
+        <http:inbound-endpoint host="localhost" port="${port}" path="in" exchange-pattern="request-response">
             <transformer ref="toString"/>
         </http:inbound-endpoint>
         <test:component logMessageDetails="true"/>
