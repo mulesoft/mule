@@ -9,11 +9,11 @@ package org.mule.test.integration.transformer.response;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 
 import java.text.SimpleDateFormat;
@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import org.junit.ClassRule;
 import org.junit.Test;
 
 public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
@@ -33,6 +34,15 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
     private static String VM_OUT_IN_RESP = VM_OUTBOUND + VM_INBOUND + VM_RESPONSE;
 
     private static String CUSTOM_RESPONSE = " customResponse";
+
+    @ClassRule
+    public static DynamicPort httpPort1 = new DynamicPort("port1");
+
+    @ClassRule
+    public static DynamicPort httpPort2 = new DynamicPort("port2");
+
+    @ClassRule
+    public static DynamicPort httpPort3 = new DynamicPort("port3");
 
     public ResponseTransformerScenariosTestCase()
     {
@@ -88,7 +98,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
     public void testHttpSync() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("http://localhost:4446", "request", null);
+        MuleMessage message = client.send("http://localhost:" + httpPort2.getNumber(), "request", null);
         assertNotNull(message);
         // Ensure MuleMessageToHttpResponse was used before sending response
 
@@ -107,7 +117,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
     public void testHttpSyncResponseTransformer() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("http://localhost:4447", "request", null);
+        MuleMessage message = client.send("http://localhost:" + httpPort3.getNumber(), "request", null);
         assertNotNull(message);
 
         String server = message.getInboundProperty(HttpConstants.HEADER_SERVER);

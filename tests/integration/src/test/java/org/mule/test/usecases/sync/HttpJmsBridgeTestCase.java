@@ -12,17 +12,23 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 public class HttpJmsBridgeTestCase extends AbstractServiceAndFlowTestCase
 {
+
+    @Rule
+    public DynamicPort httpPort = new DynamicPort("port");
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -47,7 +53,7 @@ public class HttpJmsBridgeTestCase extends AbstractServiceAndFlowTestCase
         final String customHeader = "X-Custom-Header";
         headers.put(customHeader, "value");
 
-        client.dispatch("http://localhost:4444/in", payload, headers);
+        client.dispatch(String.format("http://localhost:%d/in", httpPort.getNumber()), payload, headers);
 
         MuleMessage msg = client.request("vm://out", 10000);
         assertNotNull(msg);
