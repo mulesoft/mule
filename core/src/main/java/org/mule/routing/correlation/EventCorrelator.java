@@ -542,6 +542,15 @@ public class EventCorrelator implements Startable, Stoppable
 
         public void doRun()
         {
+
+            ////TODO(pablo.kraan): is not good to have threads doing nothing in all the nodes but the primary. Need to
+            ////start the thread on the primary node only, and then use a notification schema to start a new thread
+            ////in a different node when the primary goes down.
+            if (!muleContext.isPrimaryPollingInstance())
+            {
+                return;
+            }
+
             List<EventGroup> expired = new ArrayList<EventGroup>(1);
             try
             {

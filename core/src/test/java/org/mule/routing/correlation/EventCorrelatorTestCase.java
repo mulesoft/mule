@@ -9,12 +9,13 @@
  */
 package org.mule.routing.correlation;
 
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.isA;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mule.DefaultMessageCollection;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -26,7 +27,10 @@ import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.routing.EventGroup;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.util.Collections;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,7 +40,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class EventCorrelatorTestCase
+public class EventCorrelatorTestCase extends AbstractMuleTestCase
 {
 
 
@@ -102,6 +106,48 @@ public class EventCorrelatorTestCase
         eventCorrelator.process(mockMuleEvent);
         verify(mockEventGroup, times(1)).initAfterDeserialisation(mockMuleContext);
     }
+
+    @Test
+    public void processesExpiredGroupInPrimaryNode() throws Exception
+    {
+        doExpiredGroupMonitoringTest(true);
+    }
+
+    @Test
+    public void doesNotProcessExpiredGroupInSecondaryNode() throws Exception
+    {
+        try
+        {
+            doExpiredGroupMonitoringTest(false);
+
+            fail("Expiring group monitoring thread is not supposed to do any work on a secondary node");
+        }
+        catch (AssertionError e)
+        {
+            // Expected
+        }
+    }
+
+    private void doExpiredGroupMonitoringTest(boolean primaryNode) throws Exception
+    {
+        when(mockMuleContext.isPrimaryPollingInstance()).thenReturn(primaryNode);
+
+        EventCorrelator eventCorrelator = createEventCorrelator();
+        when(mockObjectStore.allKeys()).thenReturn(Collections.singletonList(TEST_GROUP_ID));
+        when(mockEventCorrelatorCallback.createEventGroup(mockMuleEvent, TEST_GROUP_ID)).thenReturn(mockEventGroup);
+
+        eventCorrelator.start();
+
+        try
+        {
+            verify(mockObjectStore, timeout(100)).remove(TEST_GROUP_ID);
+        }
+        finally
+        {
+            eventCorrelator.stop();
+        }
+    }
+
 
     private EventCorrelator createEventCorrelator() throws Exception
     {
