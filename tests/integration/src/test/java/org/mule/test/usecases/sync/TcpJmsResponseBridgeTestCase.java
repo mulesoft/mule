@@ -6,17 +6,21 @@
  */
 package org.mule.test.usecases.sync;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.LocalMuleClient;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+
+import org.junit.Rule;
+import org.junit.Test;
 
 public class TcpJmsResponseBridgeTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public final DynamicPort tcpPort = new DynamicPort("tcpPort");
 
     @Override
     protected String getConfigResources()
@@ -27,8 +31,8 @@ public class TcpJmsResponseBridgeTestCase extends FunctionalTestCase
     @Test
     public void testSyncResponse() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("tcp://localhost:4444", "request", null);
+        LocalMuleClient client = muleContext.getClient();
+        MuleMessage message = client.send("tcp://localhost:" + tcpPort.getNumber(), "request", null);
         assertNotNull(message);
         assertEquals("Received: request", message.getPayloadAsString());
     }
