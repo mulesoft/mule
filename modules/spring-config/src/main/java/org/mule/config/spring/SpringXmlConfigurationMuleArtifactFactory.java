@@ -164,8 +164,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
                     {
                         artifact = new DefaultMuleArtifact(pipeline.getMessageProcessors().get(0));
                     }
-
-                    if (artifact == null)
+                    else
                     {
                         throw new IllegalArgumentException("artifact is null");
                     }
