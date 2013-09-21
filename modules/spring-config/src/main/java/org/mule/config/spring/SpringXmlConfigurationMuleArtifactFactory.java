@@ -126,6 +126,12 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
                 }
             }
 
+            // For message sources to work, the flow should be valid, this means needs to have a MP
+            if (embedInFlow)
+            {
+                parentElement.addElement("logger", "http://www.mulesoft.org/schema/mule/core");
+            }
+
             config = new ConfigResource("", new StringBufferInputStream(document.asXML()));
         }
         catch (Exception e)
@@ -151,8 +157,15 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
             MuleArtifact artifact;
             if (embedInFlow)
             {
-                Pipeline pipeline = (Pipeline)muleContext.getRegistry().lookupFlowConstruct(flowName);
-                artifact = new DefaultMuleArtifact(pipeline.getMessageProcessors().get(0));
+                Pipeline pipeline = (Pipeline) muleContext.getRegistry().lookupFlowConstruct(flowName);
+                if (pipeline.getMessageSource() == null)
+                {
+                    artifact = new DefaultMuleArtifact(pipeline.getMessageProcessors().get(0));
+                }
+                else
+                {
+                    artifact = new DefaultMuleArtifact(pipeline.getMessageSource());
+                }
             }
             else
             {
