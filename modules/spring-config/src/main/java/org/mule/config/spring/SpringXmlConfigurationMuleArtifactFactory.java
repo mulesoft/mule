@@ -154,13 +154,20 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
             muleContext = factory.createMuleContext(builder);
             muleContext.start();
 
-            MuleArtifact artifact;
+            MuleArtifact artifact = null;
             if (embedInFlow)
             {
-                Pipeline pipeline = (Pipeline) muleContext.getRegistry().lookupFlowConstruct(flowName);
+                Pipeline pipeline = muleContext.getRegistry().lookupObject(flowName);
                 if (pipeline.getMessageSource() == null)
                 {
-                    artifact = new DefaultMuleArtifact(pipeline.getMessageProcessors().get(0));
+                    if (pipeline.getMessageProcessors() != null && pipeline.getMessageProcessors().size() > 0)
+                    {
+                        artifact = new DefaultMuleArtifact(pipeline.getMessageProcessors().get(0));
+                    }
+                    else
+                    {
+                        throw new IllegalArgumentException("artifact is null");
+                    }
                 }
                 else
                 {
@@ -171,6 +178,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
             {
                 artifact = new DefaultMuleArtifact(muleContext.getRegistry().lookupObject(element.getAttribute("name")));
             }
+
             builders.put(artifact, builder);
             contexts.put(artifact, muleContext);
             return artifact;
