@@ -30,12 +30,12 @@ import org.w3c.dom.Element;
 
 public class MessageSourceMuleArtifactTestCase extends AbstractMuleTestCase
 {
-    private final static String VM_SCHEMA_URL = "http://www.mulesoft.org/schema/mule/vm";
+    private static final String VM_SCHEMA_URL = "http://www.mulesoft.org/schema/mule/vm";
 
     @Test
     public void createsMessageSourceArtifact() throws MuleArtifactFactoryException, DocumentException
     {
-        SpringXmlConfigurationMuleArtifactFactory factoryTest = new SpringXmlConfigurationMuleArtifactFactory();
+        SpringXmlConfigurationMuleArtifactFactory factory = new SpringXmlConfigurationMuleArtifactFactory();
         XmlConfigurationCallback callback = mock(XmlConfigurationCallback.class);
         HashMap<String, String> map = new HashMap<String, String>();
         map.put("test", "test1");
@@ -45,7 +45,7 @@ public class MessageSourceMuleArtifactTestCase extends AbstractMuleTestCase
         Element element = createElement("inbound-endpoint", VM_SCHEMA_URL, "vm");
         element.setAttribute("path", "/test");
 
-        MuleArtifact artifact = factoryTest.getArtifactForMessageProcessor(element, callback);
+        MuleArtifact artifact = factory.getArtifactForMessageProcessor(element, callback);
 
         Assert.assertFalse(artifact.hasCapability(Testable.class));
     }
