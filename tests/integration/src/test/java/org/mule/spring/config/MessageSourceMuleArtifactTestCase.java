@@ -6,6 +6,17 @@
  */
 package org.mule.spring.config;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import org.mule.common.MuleArtifact;
+import org.mule.common.MuleArtifactFactoryException;
+import org.mule.common.Testable;
+import org.mule.common.config.XmlConfigurationCallback;
+import org.mule.config.spring.SpringXmlConfigurationMuleArtifactFactory;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import java.util.HashMap;
+
 import junit.framework.Assert;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -13,50 +24,44 @@ import org.dom4j.Namespace;
 import org.dom4j.QName;
 import org.dom4j.io.DOMWriter;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.mule.common.MuleArtifact;
-import org.mule.common.MuleArtifactFactoryException;
-import org.mule.common.Testable;
-import org.mule.common.config.XmlConfigurationCallback;
-import org.mule.config.spring.SpringXmlConfigurationMuleArtifactFactory;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.util.HashMap;
 
-public class MessageSourceMuleArtifactTestCase
+public class MessageSourceMuleArtifactTestCase extends AbstractMuleTestCase
 {
+    private final static String VM_SCHEMA_URL = "http://www.mulesoft.org/schema/mule/vm";
 
     @Test
-    public void whenCallingGetArtifactForMessageSource() throws MuleArtifactFactoryException, DocumentException
+    public void createsMessageSourceArtifact() throws MuleArtifactFactoryException, DocumentException
     {
         SpringXmlConfigurationMuleArtifactFactory factoryTest = new SpringXmlConfigurationMuleArtifactFactory();
-        XmlConfigurationCallback callback = Mockito.mock(XmlConfigurationCallback.class);
+        XmlConfigurationCallback callback = mock(XmlConfigurationCallback.class);
         HashMap<String, String> map = new HashMap<String, String>();
         map.put("test", "test1");
-        Mockito.when(callback.getEnvironmentProperties()).thenReturn(map);
-        Mockito.when(callback.getPropertyPlaceholders()).thenReturn(new Element[] {});
-        Mockito.when(callback.getSchemaLocation("http://www.mulesoft.org/schema/mule/vm")).thenReturn("http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd");
-        Element element = createElement("inbound-endpoint", "http://www.mulesoft.org/schema/mule/vm", "vm");
+        when(callback.getEnvironmentProperties()).thenReturn(map);
+        when(callback.getPropertyPlaceholders()).thenReturn(new Element[] {});
+        when(callback.getSchemaLocation(VM_SCHEMA_URL)).thenReturn("http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd");
+        Element element = createElement("inbound-endpoint", VM_SCHEMA_URL, "vm");
         element.setAttribute("path", "/test");
-
 
         MuleArtifact artifact = factoryTest.getArtifactForMessageProcessor(element, callback);
 
         Assert.assertFalse(artifact.hasCapability(Testable.class));
     }
 
-    private static Element createElement(String name, String namespace, String prefix) throws DocumentException
+    private Element createElement(String name, String namespace, String prefix) throws DocumentException
     {
         org.dom4j.Element dom4jElement = DocumentHelper.createElement(new QName(name, new Namespace(prefix, namespace)));
-        org.dom4j.Document document = dom4jElement.getDocument();
-        if (document == null)
+        org.dom4j.Document dom4jDocument = dom4jElement.getDocument();
+        if (dom4jDocument == null)
         {
-            document = DocumentHelper.createDocument();
-            document.setRootElement(dom4jElement);
+            dom4jDocument = DocumentHelper.createDocument();
+            dom4jDocument.setRootElement(dom4jElement);
         }
 
         final DOMWriter writer = new DOMWriter();
-        org.w3c.dom.Document w3cDocument = writer.write(document);
+        Document w3cDocument = writer.write(dom4jDocument);
         Element w3cElement = w3cDocument.getDocumentElement();
 
 
