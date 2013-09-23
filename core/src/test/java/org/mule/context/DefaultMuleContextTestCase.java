@@ -6,26 +6,28 @@
  */
 package org.mule.context;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.verify;
+
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.registry.ServiceType;
 import org.mule.config.ExceptionHelper;
-
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.mockito.internal.verification.VerificationModeFactory;
-
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.SpiUtils;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.verify;
+import org.mule.util.store.MuleObjectStoreManager;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.net.URL;
+
+import junit.framework.Assert;
+
+import org.junit.Test;
+import org.mockito.Mockito;
+import org.mockito.internal.verification.VerificationModeFactory;
 
 public class DefaultMuleContextTestCase extends AbstractMuleTestCase
 {
@@ -72,6 +74,14 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase
         context.setExceptionListener(mockSystemExceptionHandler);
         context.handleException(mockMessagingException);
         verify(mockSystemExceptionHandler, VerificationModeFactory.times(1)).handleException(mockMessagingException,null);
+    }
+    
+    @Test
+    public void getObjectStoreManager() throws Exception
+    {
+        MuleContext context = new DefaultMuleContextFactory().createMuleContext();
+        Object osManager = context.getObjectStoreManager();
+        Assert.assertTrue(osManager instanceof MuleObjectStoreManager);
     }
 
 }

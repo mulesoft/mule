@@ -35,6 +35,7 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.store.ListableObjectStore;
+import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.transaction.TransactionManagerFactory;
 import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.DefaultMuleConfiguration;
@@ -515,6 +516,12 @@ public class DefaultMuleContext implements MuleContext
             }
         }
         return queueManager;
+    }
+    
+    @Override
+    public ObjectStoreManager getObjectStoreManager()
+    {
+        return this.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_MANAGER);
     }
 
     public void setQueueManager(QueueManager queueManager) throws RegistrationException
