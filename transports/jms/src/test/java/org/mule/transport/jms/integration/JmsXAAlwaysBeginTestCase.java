@@ -50,6 +50,7 @@ public class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testAlwaysBeginTx() throws Exception
     {
         send(scenarioNoTx);
