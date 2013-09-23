@@ -267,10 +267,10 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
             }
             else
             {
-                Object value = msg.getInvocationProperty(headerName);
+                Object value = msg.getOutboundProperty(headerName);
                 if (value == null)
                 {
-                    value = msg.getOutboundProperty(headerName);
+                    value = msg.getInvocationProperty(headerName);
                 }
                 if (value != null)
                 {
