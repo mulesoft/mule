@@ -27,6 +27,7 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.store.ListableObjectStore;
+import org.mule.api.store.ObjectStoreManager;
 import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
@@ -183,6 +184,8 @@ public interface MuleContext extends Lifecycle
      * service queues.
      */
     QueueManager getQueueManager();
+    
+    ObjectStoreManager getObjectStoreManager();
 
     AllStatistics getStatistics();
 
