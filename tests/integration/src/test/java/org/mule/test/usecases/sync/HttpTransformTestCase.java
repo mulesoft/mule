@@ -12,6 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.compression.GZipUncompressTransformer;
 import org.mule.transformer.simple.ByteArrayToSerializable;
 import org.mule.transformer.types.DataTypeFactory;
@@ -21,11 +22,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 public class HttpTransformTestCase extends AbstractServiceAndFlowTestCase
 {
+
+    @Rule
+    public DynamicPort httpPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort httpPort2 = new DynamicPort("port2");
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -44,7 +53,7 @@ public class HttpTransformTestCase extends AbstractServiceAndFlowTestCase
     public void testTransform() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("http://localhost:18080/RemoteService", "payload", null);
+        MuleMessage message = client.send(String.format("http://localhost:%d/RemoteService", httpPort1.getNumber()), "payload", null);
         assertNotNull(message);
         GZipUncompressTransformer gu = new GZipUncompressTransformer();
         gu.setMuleContext(muleContext);
@@ -58,9 +67,9 @@ public class HttpTransformTestCase extends AbstractServiceAndFlowTestCase
     public void testBinary() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        ArrayList<Integer> payload = new ArrayList();
+        ArrayList<Integer> payload = new ArrayList<Integer>();
         payload.add(42);
-        MuleMessage message = client.send("http://localhost:18081/RemoteService", SerializationUtils.serialize(payload), null);
+        MuleMessage message = client.send(String.format("http://localhost:%d/RemoteService", httpPort2.getNumber()), SerializationUtils.serialize(payload), null);
         assertNotNull(message);
         ByteArrayToSerializable bas = new ByteArrayToSerializable();
         bas.setMuleContext(muleContext);
