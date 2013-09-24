@@ -6,6 +6,7 @@
  */
 package org.mule.config.spring.parsers.assembly;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +22,7 @@ import java.util.Set;
  * {@link org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration#isCollection(String)}
  * so that several entries can be combined.
  */
-public class MapEntryCombiner implements Map
+public class MapEntryCombiner implements Map, Serializable
 {
 
     public static final String KEY = "key";
