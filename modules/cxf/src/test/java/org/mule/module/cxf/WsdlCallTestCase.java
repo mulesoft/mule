@@ -10,7 +10,9 @@
 
 package org.mule.module.cxf;
 
+import static org.junit.Assert.assertEquals;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.servlet.MuleReceiverServlet;
 import org.mule.transport.servlet.jetty.util.EmbeddedJettyServer;
 
@@ -21,15 +23,17 @@ import java.util.List;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class WsdlCallTestCase extends FunctionalTestCase
 {
 
-    //TODO(pablo.kraan): replace with a dynamic port
-    public static final int HTTP_PORT = 63088;
+    @Rule
+    public final DynamicPort jettyPort = new DynamicPort("jettyPort");
+
+    @Rule
+    public final DynamicPort httpPort = new DynamicPort("httpPort");
 
     private EmbeddedJettyServer httpServer;
 
@@ -44,7 +48,7 @@ public class WsdlCallTestCase extends FunctionalTestCase
     {
         super.doSetUp();
 
-        httpServer = new EmbeddedJettyServer(HTTP_PORT, "/", "/services/*", new MuleReceiverServlet(), muleContext);
+        httpServer = new EmbeddedJettyServer(jettyPort.getNumber(), "/", "/services/*", new MuleReceiverServlet(), muleContext);
         httpServer.start();
     }
 
@@ -62,10 +66,10 @@ public class WsdlCallTestCase extends FunctionalTestCase
     @Test
     public void testRequestWsdlWithServlets() throws Exception
     {
-        InputStream wsdlStream = new URL("http://localhost:" + HTTP_PORT
+        InputStream wsdlStream = new URL("http://localhost:" + jettyPort.getNumber()
             + "/services/mycomponent?wsdl").openStream();
 
-        String location = "http://localhost:" + HTTP_PORT + "/services/mycomponent";
+        String location = "http://localhost:" + jettyPort.getNumber() + "/services/mycomponent";
 
         Document document = new SAXReader().read(wsdlStream);
 
@@ -78,7 +82,7 @@ public class WsdlCallTestCase extends FunctionalTestCase
     @Test
     public void testRequestWsdlWithHttp() throws Exception
     {
-        String location = "http://localhost:63082/cxfService";
+        String location = "http://localhost:" + httpPort.getNumber() + "/cxfService";
         InputStream wsdlStream = new URL(location + "?wsdl").openStream();
 
         Document document = new SAXReader().read(wsdlStream);
