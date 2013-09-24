@@ -692,7 +692,7 @@
             <dependency>
                 <groupId>commons-jxpath</groupId>
                 <artifactId>commons-jxpath</artifactId>
-                <version>${commonsJxpathVersion}-osgi</version>
+                <version>${commonsJxpathVersion}</version>
                 <exclusions>
                     <!-- we want newer beanutils via core -->
                     <exclusion>
@@ -714,23 +714,23 @@
                         <groupId>xerces</groupId>
                         <artifactId>xerces</artifactId>
                     </exclusion>
+                    <!-- not required; likely a m1 POM conversion bug -->
                     <exclusion>
-                        <!-- not required; likely a m1 POM conversion bug -->
                         <groupId>ant</groupId>
                         <artifactId>ant-optional</artifactId>
                     </exclusion>
+                    <!-- exclude older jdom-b9 -->
                     <exclusion>
-                        <!-- exclude older jdom-b9 -->
                         <groupId>jdom</groupId>
                         <artifactId>jdom</artifactId>
                     </exclusion>
+                    <!-- exclude older Servlet 2.2 spec jar -->
                     <exclusion>
-                        <!-- exclude older Servlet 2.2 spec jar -->
                         <groupId>javax.servlet</groupId>
                         <artifactId>servlet-api</artifactId>
                     </exclusion>
+                    <!-- exclude older Servlet 2.2 spec jar -->
                     <exclusion>
-                        <!-- exclude older Servlet 2.2 spec jar -->
                         <groupId>servlet</groupId>
                         <artifactId>servlet-api</artifactId>
                     </exclusion>
