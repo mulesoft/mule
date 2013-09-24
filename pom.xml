@@ -644,7 +644,7 @@
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>${commonsCodecVersion}-osgi</version>
+                <version>${commonsCodecVersion}</version>
                 <exclusions>
                     <exclusion>
                         <artifactId>commons-logging</artifactId>
