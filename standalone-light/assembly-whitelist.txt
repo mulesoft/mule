@@ -278,10 +278,10 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/mailapi-1.4.3.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/msv-core-2011.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/mvel2-2.1.3.Final.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/mx4j-impl-2.1.1-osgi.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/mx4j-jmx-2.1.1-osgi.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/mx4j-remote-2.1.1-osgi.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/mx4j-tools-2.1.1-osgi.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/mx4j-impl-2.1.1.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/mx4j-jmx-2.1.1.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/mx4j-remote-2.1.1.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/mx4j-tools-2.1.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/neethi-3.0.2.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/ognl-2.7.3.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/oro-2.0.8-osgi.jar
