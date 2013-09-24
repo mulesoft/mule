@@ -928,7 +928,7 @@
             <dependency>
                 <groupId>jaxen</groupId>
                 <artifactId>jaxen</artifactId>
-                <version>${jaxenVersion}-osgi</version>
+                <version>${jaxenVersion}</version>
             </dependency>
             <!--
                 override the wss4j version that's used in the cxf module and

@@ -67,7 +67,7 @@
         <dependency>
             <groupId>jaxen</groupId>
             <artifactId>jaxen</artifactId>
-            <version>${jaxenVersion}-osgi</version>
+            <version>${jaxenVersion}</version>
             <!-- see http://jira.codehaus.org/browse/MNG-3007
                  depending on whether jaxen is resolved via dist.codehaus.org
                  or the central repo we get transitive dependencies that we

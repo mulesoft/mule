@@ -580,7 +580,7 @@
 /mule-standalone-${productVersion}/lib/opt/jaxb-api-2.1-osgi.jar
 /mule-standalone-${productVersion}/lib/opt/jaxb-impl-2.1.9-osgi.jar
 /mule-standalone-${productVersion}/lib/opt/jaxb-xjc-2.1.9-osgi.jar
-/mule-standalone-${productVersion}/lib/opt/jaxen-1.1.1-osgi.jar
+/mule-standalone-${productVersion}/lib/opt/jaxen-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/jaxws-api-2.2.1.jar
 /mule-standalone-${productVersion}/lib/opt/jboss-logging-3.0.0.Beta5.jar
 /mule-standalone-${productVersion}/lib/opt/jbossjta-4.15.0.Final.jar
