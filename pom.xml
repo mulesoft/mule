@@ -986,22 +986,22 @@
             <dependency>
                 <groupId>mx4j</groupId>
                 <artifactId>mx4j-jmx</artifactId>
-                <version>${mx4jVersion}-osgi</version>
+                <version>${mx4jVersion}</version>
             </dependency>
             <dependency>
                 <groupId>mx4j</groupId>
                 <artifactId>mx4j-impl</artifactId>
-                <version>${mx4jVersion}-osgi</version>
+                <version>${mx4jVersion}</version>
             </dependency>
             <dependency>
                 <groupId>mx4j</groupId>
                 <artifactId>mx4j-tools</artifactId>
-                <version>${mx4jVersion}-osgi</version>
+                <version>${mx4jVersion}</version>
             </dependency>
             <dependency>
                 <groupId>mx4j</groupId>
                 <artifactId>mx4j-remote</artifactId>
-                <version>${mx4jVersion}-osgi</version>
+                <version>${mx4jVersion}</version>
             </dependency>
             <dependency>
                 <groupId>asm</groupId>
