@@ -324,7 +324,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/woodstox-core-asl-4.1.4.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/wsdl4j-1.6.2.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/wss4j-1.6.9.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/xapool-1.5.0-osgi.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/xapool-1.5.0.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/xml-resolver-1.2-osgi.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/xmlpull-1.1.3.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/xmlschema-core-2.0.3.jar

@@ -167,7 +167,7 @@
 		<dependency>
 			<groupId>com.experlog</groupId>
 			<artifactId>xapool</artifactId>
-			<version>1.5.0-osgi</version>
+			<version>${xaPoolVersion}</version>
 		</dependency>
 
 
