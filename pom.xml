@@ -660,7 +660,7 @@
             <dependency>
                 <groupId>commons-httpclient</groupId>
                 <artifactId>commons-httpclient</artifactId>
-                <version>${commonsHttpClientVersion}-osgi</version>
+                <version>${commonsHttpClientVersion}</version>
                 <exclusions>
                     <exclusion>
                         <artifactId>commons-logging</artifactId>
