@@ -621,7 +621,7 @@
 /mule-standalone-${productVersion}/lib/opt/mx4j-remote-2.1.1-osgi.jar
 /mule-standalone-${productVersion}/lib/opt/mx4j-tools-2.1.1-osgi.jar
 /mule-standalone-${productVersion}/lib/opt/neethi-3.0.2.jar
-/mule-standalone-${productVersion}/lib/opt/ognl-2.7.3-osgi.jar
+/mule-standalone-${productVersion}/lib/opt/ognl-2.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/oro-2.0.8-osgi.jar
 /mule-standalone-${productVersion}/lib/opt/quartz-1.8.5.jar
 /mule-standalone-${productVersion}/lib/opt/relaxngDatatype-20020414.jar
