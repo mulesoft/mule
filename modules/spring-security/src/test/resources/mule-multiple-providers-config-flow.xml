@@ -60,7 +60,7 @@
 
     <flow name="flow">
 
-        <http:inbound-endpoint address="http://localhost:4445"
+        <http:inbound-endpoint address="http://localhost:${port1}"
             exchange-pattern="request-response">
             <mule-ss:http-security-filter
                 realm="mule-realm" securityProviders="daoAuthenticationSecurityProvider1" />
@@ -72,7 +72,7 @@
 
     <flow name="flow2">
 
-        <http:inbound-endpoint address="http://localhost:4446"
+        <http:inbound-endpoint address="http://localhost:${port2}"
             exchange-pattern="request-response">
             <mule-ss:http-security-filter
                 realm="mule-realm" securityProviders="daoAuthenticationSecurityProvider2" />
@@ -83,7 +83,7 @@
 
     <flow name="flow3">
 
-        <http:inbound-endpoint address="http://localhost:4447"
+        <http:inbound-endpoint address="http://localhost:${port3}"
             exchange-pattern="request-response">
             <mule-ss:http-security-filter
                 realm="mule-realm"

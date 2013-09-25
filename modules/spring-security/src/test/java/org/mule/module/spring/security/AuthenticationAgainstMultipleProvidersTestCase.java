@@ -7,6 +7,8 @@
 package org.mule.module.spring.security;
 
 import static org.junit.Assert.assertEquals;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -18,12 +20,21 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 public class AuthenticationAgainstMultipleProvidersTestCase extends AbstractServiceAndFlowTestCase
 {
+
+    @Rule
+    public DynamicPort httpPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort httpPort2 = new DynamicPort("port2");
+
+    @Rule
+    public DynamicPort httpPort3 = new DynamicPort("port3");
 
     public AuthenticationAgainstMultipleProvidersTestCase(ConfigVariant variant, String configResources)
     {
@@ -45,7 +56,7 @@ public class AuthenticationAgainstMultipleProvidersTestCase extends AbstractServ
         httpClient.getState().setCredentials(AuthScope.ANY, credentials);
         httpClient.getParams().setAuthenticationPreemptive(true);
 
-        PostMethod postMethod = new PostMethod("http://localhost:4445");
+        PostMethod postMethod = new PostMethod("http://localhost:" + httpPort1.getNumber());
         postMethod.setDoAuthentication(true);
         postMethod.setRequestEntity(new StringRequestEntity("hello", "text/html", "UTF-8"));
 
@@ -69,7 +80,7 @@ public class AuthenticationAgainstMultipleProvidersTestCase extends AbstractServ
         httpClient.getState().setCredentials(AuthScope.ANY, credentials);
         httpClient.getParams().setAuthenticationPreemptive(true);
 
-        PostMethod postMethod = new PostMethod("http://localhost:4446");
+        PostMethod postMethod = new PostMethod("http://localhost:" + httpPort2.getNumber());
         postMethod.setDoAuthentication(true);
         postMethod.setRequestEntity(new StringRequestEntity("hello", "text/html", "UTF-8"));
 
@@ -93,7 +104,7 @@ public class AuthenticationAgainstMultipleProvidersTestCase extends AbstractServ
         httpClient.getState().setCredentials(AuthScope.ANY, credentials);
         httpClient.getParams().setAuthenticationPreemptive(true);
 
-        PostMethod postMethod = new PostMethod("http://localhost:4447");
+        PostMethod postMethod = new PostMethod("http://localhost:" + httpPort3.getNumber());
         postMethod.setDoAuthentication(true);
         postMethod.setRequestEntity(new StringRequestEntity("hello", "text/html", "UTF-8"));
 
