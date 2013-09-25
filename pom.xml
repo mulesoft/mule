@@ -607,12 +607,12 @@
             <dependency>
                 <groupId>javax.xml.soap</groupId>
                 <artifactId>saaj-api</artifactId>
-                <version>${saajVersion}-osgi</version>
+                <version>${saajVersion}</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.xml.messaging.saaj</groupId>
                 <artifactId>saaj-impl</artifactId>
-                <version>${saajVersion}-osgi</version>
+                <version>${saajVersion}</version>
             </dependency>
             <dependency>
                 <groupId>net.java.dev.stax-utils</groupId>
