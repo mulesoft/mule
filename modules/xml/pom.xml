@@ -58,7 +58,7 @@
         <dependency>
             <groupId>xpp3</groupId>
             <artifactId>xpp3_min</artifactId>
-            <version>${xmlPullVersion}-osgi</version>
+            <version>${xmlPullVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.woodstox</groupId>
