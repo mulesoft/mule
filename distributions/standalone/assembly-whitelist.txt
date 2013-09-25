@@ -553,7 +553,7 @@
 /mule-standalone-${productVersion}/lib/opt/el-api-6.0.29.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-annotation_1.0_spec-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-ejb_2.1_spec-1.1-osgi.jar
-/mule-standalone-${productVersion}/lib/opt/geronimo-j2ee-connector_1.5_spec-1.1-osgi.jar
+/mule-standalone-${productVersion}/lib/opt/geronimo-j2ee-connector_1.5_spec-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-j2ee-management_1.0_spec-1.1-osgi.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-jms_1.1_spec-1.1-osgi.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-jta_1.1_spec-1.1.1.jar
