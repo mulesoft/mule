@@ -7,8 +7,6 @@
 
 package org.mule.module.logging;
 
-import static org.junit.Assert.fail;
-
 import org.mule.tck.probe.thread.ThreadExists;
 
 import org.junit.Test;
@@ -21,20 +19,11 @@ public class ContainerLogHandlerThreadTestCase extends AbstractLogHandlerThreadT
         super(loggerFactory, logHandlerThreadName);
     }
 
-    @Test
+    @Test(expected = AssertionError.class)
     public void doesNotStarsLogHandlerThreadOnContainerMode() throws Exception
     {
         loggerFactory.create();
 
-        try
-        {
-            prober.check(new ThreadExists(logHandlerThreadName));
-
-            fail("Log handler thread is not supposed be started when Mule is running on container mode");
-        }
-        catch (AssertionError e)
-        {
-            // Expected
-        }
+        prober.check(new ThreadExists(logHandlerThreadName));
     }
 }
