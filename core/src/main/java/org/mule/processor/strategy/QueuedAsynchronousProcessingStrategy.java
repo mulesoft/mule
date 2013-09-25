@@ -58,7 +58,10 @@ public class QueuedAsynchronousProcessingStrategy extends AsynchronousProcessing
 
     protected void initQueueStore(MuleContext muleContext)
     {
-        queueStore = muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME);
+        if (queueStore == null)
+        {
+            queueStore = muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME);
+        }
     }
 
     public Integer getQueueTimeout()
