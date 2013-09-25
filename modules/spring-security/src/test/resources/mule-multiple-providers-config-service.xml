@@ -56,7 +56,7 @@
     <model name="sample-mule-app">
         <service name="flow">
             <inbound>
-                <http:inbound-endpoint address="http://localhost:4445" exchange-pattern="request-response">
+                <http:inbound-endpoint address="http://localhost:${port1}" exchange-pattern="request-response">
                     <mule-ss:http-security-filter realm="mule-realm" 
                         securityProviders="daoAuthenticationSecurityProvider1"/>
                 </http:inbound-endpoint>
@@ -65,7 +65,7 @@
 
         <service name="flow2">
             <inbound>
-                <http:inbound-endpoint address="http://localhost:4446" exchange-pattern="request-response">
+                <http:inbound-endpoint address="http://localhost:${port2}" exchange-pattern="request-response">
                     <mule-ss:http-security-filter realm="mule-realm" 
                         securityProviders="daoAuthenticationSecurityProvider2"/>
                 </http:inbound-endpoint>
@@ -74,7 +74,7 @@
 
         <service name="flow3">
             <inbound>
-                <http:inbound-endpoint address="http://localhost:4447" exchange-pattern="request-response">
+                <http:inbound-endpoint address="http://localhost:${port3}" exchange-pattern="request-response">
                     <mule-ss:http-security-filter realm="mule-realm" 
                         securityProviders="daoAuthenticationSecurityProvider2,daoAuthenticationSecurityProvider1"/>
                 </http:inbound-endpoint>
