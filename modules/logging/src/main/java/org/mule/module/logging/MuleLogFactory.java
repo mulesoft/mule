@@ -24,6 +24,9 @@ import org.slf4j.spi.LocationAwareLogger;
 
 public class MuleLogFactory extends SLF4JLogFactory
 {
+
+    public static final String LOG_HANDLER_THREAD_NAME = "Mule.log.clogging.ref.handler";
+
     protected ConcurrentHashMap<Integer, ConcurrentMap<String, Log>> repository = new ConcurrentHashMap<Integer, ConcurrentMap<String, Log>>();
 
     protected static final Integer NO_CCL_CLASSLOADER = 0;
@@ -34,7 +37,10 @@ public class MuleLogFactory extends SLF4JLogFactory
 
     public MuleLogFactory()
     {
-        new LoggerReferenceHandler("Mule.log.clogging.ref.handler", referenceQueue, refs, repository);
+        if (MuleUtils.isStandalone())
+        {
+            new LoggerReferenceHandler(LOG_HANDLER_THREAD_NAME, referenceQueue, refs, repository);
+        }
     }
 
     public Log getInstance(String name) throws LogConfigurationException
