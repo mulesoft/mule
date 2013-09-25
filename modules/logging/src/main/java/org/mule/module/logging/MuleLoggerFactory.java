@@ -23,6 +23,9 @@ import org.slf4j.Logger;
 
 public class MuleLoggerFactory implements ILoggerFactory
 {
+
+    public static final String LOG_HANDLER_THREAD_NAME = "Mule.log.slf4j.ref.handler";
+
     protected static final Integer NO_CCL_CLASSLOADER = 0;
 
     protected ConcurrentMap<Integer, ConcurrentMap<String, Logger>> repository = new ConcurrentHashMap<Integer, ConcurrentMap<String, Logger>>();
@@ -33,7 +36,10 @@ public class MuleLoggerFactory implements ILoggerFactory
 
     public MuleLoggerFactory()
     {
-        new LoggerReferenceHandler("Mule.log.slf4j.ref.handler", referenceQueue, refs, repository);
+        if (MuleUtils.isStandalone())
+        {
+            new LoggerReferenceHandler(LOG_HANDLER_THREAD_NAME, referenceQueue, refs, repository);
+        }
     }
 
     @Override
