@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/current/mule-jdbc.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <spring:bean id="jdbcDataSource" class="org.enhydra.jdbc.standard.StandardDataSource" destroy-method="shutdown">
+        <spring:property name="driverName" value="org.apache.derby.jdbc.EmbeddedDriver"/>
+        <spring:property name="url" value="jdbc:derby:muleEmbeddedDB;sql.enforce_strict_size=true"/>
+    </spring:bean>
+
+    <jdbc:connector name="jdbcConnector" dataSource-ref="jdbcDataSource" queryTimeout="-1"/>
+
+    <flow name="main">
+        <jdbc:inbound-endpoint connector-ref="jdbcConnector" queryKey="selectQuery" pollingFrequency="200">
+            <jdbc:query key="selectQuery" value="select * from TEST"/>
+        </jdbc:inbound-endpoint>
+
+        <custom-transformer class="org.mule.transport.jdbc.functional.JdbcSerializableMuleEventTestCase$AssertSerializableEventTransformer"/>
+        <vm:outbound-endpoint path="testOut" />
+    </flow>
+
+</mule>
