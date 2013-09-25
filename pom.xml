@@ -602,7 +602,7 @@
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-impl</artifactId>
-                <version>${javaXmlBindVersion}-osgi</version>
+                <version>${javaXmlBindVersion}</version>
             </dependency>
             <dependency>
                 <groupId>javax.xml.soap</groupId>
