@@ -62,7 +62,7 @@
         <dependency>
             <groupId>com.envoisolutions.sxc</groupId>
             <artifactId>sxc-xpath</artifactId>
-            <version>${sxcVersion}-osgi</version>
+            <version>${sxcVersion}</version>
             <exclusions>
                 <exclusion>
                     <groupId>stax</groupId>
@@ -73,7 +73,7 @@
         <dependency>
             <groupId>com.envoisolutions.sxc</groupId>
             <artifactId>sxc-runtime</artifactId>
-            <version>${sxcVersion}-osgi</version>
+            <version>${sxcVersion}</version>
             <exclusions>
                 <exclusion>
                     <groupId>stax</groupId>
@@ -84,7 +84,7 @@
         <dependency>
             <groupId>com.envoisolutions.sxc</groupId>
             <artifactId>sxc-core</artifactId>
-            <version>${sxcVersion}-osgi</version>
+            <version>${sxcVersion}</version>
             <exclusions>
                 <exclusion>
                     <groupId>stax</groupId>
