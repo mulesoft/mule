@@ -16,13 +16,16 @@ import org.mule.tck.size.SmallTest;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 @SmallTest
-public class AbstractLogHandlerThreadTestCase
+public abstract class AbstractLogHandlerThreadTestCase
 {
+
+    protected static boolean createdLoggerReferenceHandler;
 
     protected final LoggerFactoryFactory loggerFactory;
     protected final String logHandlerThreadName;
@@ -43,8 +46,15 @@ public class AbstractLogHandlerThreadTestCase
         });
     }
 
+    @Before
+    public void setUp() throws Exception
+    {
+        createdLoggerReferenceHandler = false;
+    }
+
     public static interface LoggerFactoryFactory
     {
+
         Object create();
     }
 
@@ -53,7 +63,15 @@ public class AbstractLogHandlerThreadTestCase
 
         public Object create()
         {
-            return new MuleLoggerFactory();
+            return new MuleLoggerFactory()
+            {
+
+                @Override
+                protected void createLoggerReferenceHandler()
+                {
+                    createdLoggerReferenceHandler = true;
+                }
+            };
         }
     }
 
@@ -62,7 +80,14 @@ public class AbstractLogHandlerThreadTestCase
 
         public Object create()
         {
-            return new MuleLogFactory();
+            return new MuleLogFactory()
+            {
+                @Override
+                protected void createLoggerReferenceHandler()
+                {
+                    createdLoggerReferenceHandler = true;
+                }
+            };
         }
     }
 }
