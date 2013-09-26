@@ -208,7 +208,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/cxf-rt-ws-security-2.5.9.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/cxf-tools-common-2.5.9.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/cxf-wstx-msv-validation-2.5.9.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/dom4j-1.6.1-osgi.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/dom4j-1.6.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/drools-api-5.0.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/drools-compiler-5.0.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/drools-core-5.0.1.jar

@@ -896,7 +896,7 @@
             <dependency>
                 <groupId>dom4j</groupId>
                 <artifactId>dom4j</artifactId>
-                <version>${dom4jVersion}-osgi</version>
+                <version>${dom4jVersion}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>xml-apis</groupId>
