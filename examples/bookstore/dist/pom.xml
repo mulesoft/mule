@@ -12,7 +12,7 @@
     <description>Bookstore Example App</description>
 
     <properties>
-        <muleVersion>3.5.0-bighorn-RC3</muleVersion>
+        <muleVersion>3.5.0-bighorn</muleVersion>
     </properties>
 
     <dependencies>
