@@ -10,8 +10,8 @@
 
 package org.mule.module.logging;
 
+import static org.junit.Assert.assertTrue;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.tck.probe.thread.ThreadExists;
 
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -33,6 +33,6 @@ public class StandaloneLogHandlerThreadTestCase extends AbstractLogHandlerThread
     {
         loggerFactory.create();
 
-        prober.check(new ThreadExists(logHandlerThreadName));
+        assertTrue("Did not create expected LoggerReferenceHandler instance", createdLoggerReferenceHandler);
     }
 }

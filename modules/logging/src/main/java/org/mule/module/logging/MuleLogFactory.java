@@ -43,8 +43,13 @@ public class MuleLogFactory extends SLF4JLogFactory
     {
         if (MuleUtils.isStandalone())
         {
-            new LoggerReferenceHandler(LOG_HANDLER_THREAD_NAME, referenceQueue, refs, repository);
+            createLoggerReferenceHandler();
         }
+    }
+
+    protected void createLoggerReferenceHandler()
+    {
+        new LoggerReferenceHandler(LOG_HANDLER_THREAD_NAME, referenceQueue, refs, repository);
     }
 
     public Log getInstance(String name) throws LogConfigurationException
