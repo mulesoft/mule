@@ -38,10 +38,16 @@ public class MuleLoggerFactory implements ILoggerFactory
     {
         if (MuleUtils.isStandalone())
         {
-            new LoggerReferenceHandler(LOG_HANDLER_THREAD_NAME, referenceQueue, refs, repository);
+            createLoggerReferenceHandler();
         }
     }
 
+    protected void createLoggerReferenceHandler()
+    {
+        new LoggerReferenceHandler(LOG_HANDLER_THREAD_NAME, referenceQueue, refs, repository);
+    }
+
+    @Override
     public Logger getLogger(String name)
     {
         final ClassLoader ccl = Thread.currentThread().getContextClassLoader();
