@@ -10,49 +10,32 @@
 
 package org.mule.module.jersey;
 
-import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.api.client.LocalMuleClient;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
-public class MultipleContextResolverTestCase extends AbstractServiceAndFlowTestCase
+public class MultipleContextResolverTestCase extends org.mule.tck.junit4.FunctionalTestCase
 {
-    public MultipleContextResolverTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "multiple-context-resolver-conf-flow.xml"},
-        });
-    }      
-    
-
-
+    @Rule
+    public DynamicPort port = new DynamicPort("port");
     @Test
-    @Ignore
-    public void testMultipleContextResolver() throws Exception
+    public void multipleContextResolver() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        LocalMuleClient client =muleContext.getClient();
 
-        Map<String, String> props = new HashMap<String, String>();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
-        MuleMessage result = client.send("http://localhost:63081/helloworld/sayHelloWorldWithJson", "", props);
+        MuleMessage result = client.send("http://localhost:" + port.getNumber() +"/helloworld/sayHelloWorldWithJson", "", props);
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
         assertEquals(getHelloWorldMessage(), result.getPayloadAsString());
     }
@@ -62,4 +45,8 @@ public class MultipleContextResolverTestCase extends AbstractServiceAndFlowTestC
         return "{\"message\":\"Hello World \",\"number\":0}";
     }
 
+    @Override
+    protected String getConfigResources() {
+        return "multiple-context-resolver-conf-flow.xml";
+    }
 }
