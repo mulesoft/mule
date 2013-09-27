@@ -4,9 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.streaming;
 
 import org.mule.api.store.ListableObjectStore;
+import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.tck.size.SmallTest;
 
 import java.io.Serializable;
@@ -54,7 +56,13 @@ public class ListableObjectStoreProducerTestCase
             @Override
             public Serializable answer(InvocationOnMock invocation) throws Throwable
             {
-                return values.get(invocation.getArguments()[0]);
+                Serializable value = values.get(invocation.getArguments()[0]);
+                if (value == null)
+                {
+                    throw new ObjectDoesNotExistException();
+                }
+
+                return value;
             }
         });
 
@@ -84,6 +92,13 @@ public class ListableObjectStoreProducerTestCase
         }
 
         Assert.assertTrue(CollectionUtils.isEmpty(this.producer.produce()));
+    }
+
+    @Test
+    public void concurrentlyRemoved() throws Exception
+    {
+        this.values.remove("icecream");
+        this.happyPath();
     }
 
     @Test
