@@ -82,7 +82,16 @@ public abstract class EventProcessingThread extends Thread
                 logger.debug("Received request to stop processing events");
                 break;
             }
-            doRun();
+
+            try
+            {
+                doRun();
+            }
+            catch (RuntimeException e)
+            {
+                logger.warn(String.format("Caught exception on event processing thread '%s'", getName()), e);
+            }
+
             if (delay(delayTime))
             {
                 break;
