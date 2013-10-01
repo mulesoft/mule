@@ -60,8 +60,6 @@ public class EventCorrelator implements Startable, Stoppable
 
     public static final int MAX_PROCESSED_GROUPS = 50000;
 
-    protected static final long MILLI_TO_NANO_MULTIPLIER = 1000000L;
-
     private static final long ONE_DAY_IN_MILLI = 1000 * 60 * 60 * 24;
 
     protected long groupTimeToLive = ONE_DAY_IN_MILLI;
@@ -340,7 +338,7 @@ public class EventCorrelator implements Startable, Stoppable
     {
         synchronized (groupsLock)
         {
-            processedGroups.store((Serializable) id, System.nanoTime());
+            processedGroups.store((Serializable) id, System.currentTimeMillis());
         }
     }
 
@@ -541,7 +539,7 @@ public class EventCorrelator implements Startable, Stoppable
                 for (Serializable o : eventGroups.allKeys())
                 {
                     EventGroup group = (EventGroup) eventGroups.retrieve(o);
-                    if ((group.getCreated() + getTimeout() * MILLI_TO_NANO_MULTIPLIER) < System.nanoTime())
+                    if (group.getCreated() + getTimeout() < System.currentTimeMillis())
                     {
                         expired.add(group);
                     }

@@ -76,7 +76,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
                       String storePrefix)
     {
         super();
-        this.created = System.nanoTime();
+        this.created = System.currentTimeMillis();
         this.muleContext = muleContext;
         this.storePrefix = storePrefix;
 
@@ -295,7 +295,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     }
 
     /**
-     * Return the creation timestamp of the current group in nanoseconds.
+     * Return the creation timestamp of the current group in milliseconds.
      *
      * @return the timestamp when this group was instantiated.
      */
