@@ -82,7 +82,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
         }
         else
         {
-            locks.put(getAsyncReplyCorrelationId(event), new Latch());
+            locks.put(getAsyncReplyCorrelationId(event), createEventLock());
 
             sendAsyncRequest(event);
 
@@ -101,6 +101,15 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
             }
             return resultEvent;
         }
+    }
+
+    /**
+     * Creates the lock used to synchronize a given event
+     * @return a new Latch instance
+     */
+    protected Latch createEventLock()
+    {
+        return new Latch();
     }
 
     public void setTimeout(long timeout)
@@ -243,12 +252,8 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
             if (interruptedWhileWaiting)
             {
                 Thread.currentThread().interrupt();
+                return null;
             }
-        }
-
-        if (interruptedWhileWaiting)
-        {
-            Thread.currentThread().interrupt();
         }
 
         if (resultAvailable)
