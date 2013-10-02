@@ -11,6 +11,10 @@
     <name>SSL Transport</name>
     <description>A Mule transport for Socket connectivity using SSL authentication. This transport supplies a tcp Server and client implementation over SSL.</description>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.transports</groupId>
