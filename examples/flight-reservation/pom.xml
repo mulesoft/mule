@@ -11,6 +11,10 @@
     <name>Flight Reservation Example</name>
     <description>This example simulates a flight reservation system using some of the new features added in Mule 3.3.</description>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

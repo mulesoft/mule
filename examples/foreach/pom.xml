@@ -11,6 +11,10 @@
     <packaging>mule</packaging>
     <description>This example demonstrates how to use Foreach to add information to each message in a collection using some of the new features of Mule 3.3.</description>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>
