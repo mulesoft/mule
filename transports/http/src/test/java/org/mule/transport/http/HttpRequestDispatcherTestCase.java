@@ -8,17 +8,18 @@ package org.mule.transport.http;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mule.api.context.WorkManager;
 import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
 import org.mule.tck.size.SmallTest;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectorLifecycleManager;
@@ -121,7 +122,28 @@ public class HttpRequestDispatcherTestCase extends AbstractMuleTestCase
             {
                 fail("retry template should be executed");
             }
-            verify(mockExceptionListener, timeout(WAIT_TIME)).handleException(Mockito.isA(Exception.class));
+
+            Prober prober = new PollingProber(100, 1);
+            prober.check(new Probe()
+            {
+                public boolean isSatisfied()
+                {
+                    try
+                    {
+                        verify(mockExceptionListener, Mockito.atLeast(1)).handleException(Mockito.isA(Exception.class));
+                        return true;
+                    }
+                    catch (AssertionError e)
+                    {
+                        return false;
+                    }
+                }
+
+                public String describeFailure()
+                {
+                    return "Exception listener was not invoked";
+                }
+            });
         }
         finally
         {
