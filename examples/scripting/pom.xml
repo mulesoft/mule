@@ -11,6 +11,10 @@
     <packaging>mule</packaging>
     <description>A simple example that demonstrates Mule's JSR-223 Scripting support.</description>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>

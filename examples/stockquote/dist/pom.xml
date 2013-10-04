@@ -11,6 +11,7 @@
     <properties>
         <muleVersion>3.4.2-SNAPSHOT</muleVersion>
         <jaxbVersion>2.1.9-osgi</jaxbVersion>
+        <licensePath>../../../LICENSE_HEADER.txt</licensePath>
     </properties>
 
     <dependencies>

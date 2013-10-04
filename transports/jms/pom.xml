@@ -13,6 +13,10 @@
     <name>JMS Transport</name>
     <description>A Mule transport for Jms Connectivity.</description>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <build>
         <plugins>
             <plugin>

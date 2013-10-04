@@ -16,6 +16,10 @@
         Interfaces and classes required by Devkit.
     </description>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <dependencies>
         <!-- Mule Dependencies -->
         <dependency>
