@@ -95,7 +95,19 @@ public class QueueStoreConfigurationTestCase extends FunctionalTestCase
         QueuedAsynchronousProcessingStrategy queuedPipeline = (QueuedAsynchronousProcessingStrategy)pipeline;
         assertObjectStoreIsDefaultMemoryObjectStore(queuedPipeline.getQueueStore());
     }
-    
+
+    @Test
+    public void testFlowQueuedAsyncWithPersistentObjectStore()
+    {
+        Flow flow = lookupFlow("flowQueuedAsyncPersistentStore");
+
+        ProcessingStrategy pipeline = flow.getProcessingStrategy();
+        assertTrue(pipeline instanceof QueuedAsynchronousProcessingStrategy);
+
+        QueuedAsynchronousProcessingStrategy queuedPipeline = (QueuedAsynchronousProcessingStrategy) pipeline;
+        assertObjectStoreIsDefaultPersistentObjectStore(queuedPipeline.getQueueStore());
+    }
+
     private SedaService lookupService(String name)
     {
         return (SedaService) muleContext.getRegistry().lookupService(name);

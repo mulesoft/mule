@@ -6,7 +6,7 @@
  */
 package org.mule.module.logging;
 
-import org.mule.tck.probe.thread.ThreadExists;
+import static org.junit.Assert.assertFalse;
 
 import org.junit.Test;
 
@@ -18,11 +18,11 @@ public class ContainerLogHandlerThreadTestCase extends AbstractLogHandlerThreadT
         super(loggerFactory, logHandlerThreadName);
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void doesNotStarsLogHandlerThreadOnContainerMode() throws Exception
     {
         loggerFactory.create();
 
-        prober.check(new ThreadExists(logHandlerThreadName));
+        assertFalse("Created an unexpected LoggerReferenceHandler instance", createdLoggerReferenceHandler);
     }
 }
