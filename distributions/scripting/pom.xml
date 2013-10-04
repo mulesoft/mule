@@ -11,6 +11,10 @@
     <name>Mule Scripting Pack</name>
     <description>Support for additional scripting languages in Mule</description>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <build>
         <plugins>
             <plugin>

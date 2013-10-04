@@ -13,6 +13,10 @@
         Mail connector which is an aggregation of the two.
     </description>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <build>
         <plugins>
             <plugin>

@@ -11,6 +11,10 @@
     <name>TCP Transport</name>
     <description>A Mule transport for Tcp Connectivity. This transport supplies a tcp Server and client implementation.</description>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
