@@ -162,7 +162,6 @@
         <wrapperVersion>3.2.3</wrapperVersion>
         <xalanVersion>2.7.1</xalanVersion>
         <xmlPullVersion>1.1.3.4.O</xmlPullVersion>
-        <xmlResolverVersion>1.2</xmlResolverVersion>
         <xmlSecurityVersion>1.5.3</xmlSecurityVersion>
         <xstreamVersion>1.4.2</xstreamVersion>
         <xaPoolVersion>1.5.0</xaPoolVersion>
@@ -172,13 +171,11 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <!-- OSGi-ready -->
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-annotation_1.0_spec</artifactId>
                 <version>${geronimoSpecsAnnotationVersion}</version>
             </dependency>
             <dependency>
-                <!-- OSGi-ready -->
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-stax-api_1.0_spec</artifactId>
                 <version>${geronimoSpecsStaxVersion}</version>
@@ -324,7 +321,6 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <!-- OSGi-ready -->
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>jetty</artifactId>
                 <version>${jettyVersion}</version>
@@ -336,7 +332,6 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <!-- OSGi-ready -->
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>jetty-util</artifactId>
                 <version>${jettyVersion}</version>
@@ -541,22 +536,22 @@
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-ejb_2.1_spec</artifactId>
-                <version>${geronimoSpecsVersion}-osgi</version>
+                <version>${geronimoSpecsVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
-                <version>${geronimoSpecsVersion}-osgi</version>
+                <version>${geronimoSpecsVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-j2ee-management_1.0_spec</artifactId>
-                <version>${geronimoSpecsVersion}-osgi</version>
+                <version>${geronimoSpecsVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-jms_1.1_spec</artifactId>
-                <version>${geronimoSpecsVersion}-osgi</version>
+                <version>${geronimoSpecsVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
@@ -581,7 +576,7 @@
             <dependency>
                 <groupId>javax.xml.bind</groupId>
                 <artifactId>jaxb-api</artifactId>
-                <version>${jaxbApiVersion}-osgi</version>
+                <version>${jaxbApiVersion}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.xml.stream</groupId>
@@ -597,27 +592,27 @@
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-xjc</artifactId>
-                <version>${javaXmlBindVersion}-osgi</version>
+                <version>${javaXmlBindVersion}</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-impl</artifactId>
-                <version>${javaXmlBindVersion}-osgi</version>
+                <version>${javaXmlBindVersion}</version>
             </dependency>
             <dependency>
                 <groupId>javax.xml.soap</groupId>
                 <artifactId>saaj-api</artifactId>
-                <version>${saajVersion}-osgi</version>
+                <version>${saajVersion}</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.xml.messaging.saaj</groupId>
                 <artifactId>saaj-impl</artifactId>
-                <version>${saajVersion}-osgi</version>
+                <version>${saajVersion}</version>
             </dependency>
             <dependency>
                 <groupId>net.java.dev.stax-utils</groupId>
                 <artifactId>stax-utils</artifactId>
-                <version>${staxUtilsVersion}-osgi</version>
+                <version>${staxUtilsVersion}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>com.bea.xml</groupId>
@@ -644,7 +639,7 @@
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>${commonsCodecVersion}-osgi</version>
+                <version>${commonsCodecVersion}</version>
                 <exclusions>
                     <exclusion>
                         <artifactId>commons-logging</artifactId>
@@ -660,7 +655,7 @@
             <dependency>
                 <groupId>commons-httpclient</groupId>
                 <artifactId>commons-httpclient</artifactId>
-                <version>${commonsHttpClientVersion}-osgi</version>
+                <version>${commonsHttpClientVersion}</version>
                 <exclusions>
                     <exclusion>
                         <artifactId>commons-logging</artifactId>
@@ -692,7 +687,7 @@
             <dependency>
                 <groupId>commons-jxpath</groupId>
                 <artifactId>commons-jxpath</artifactId>
-                <version>${commonsJxpathVersion}-osgi</version>
+                <version>${commonsJxpathVersion}</version>
                 <exclusions>
                     <!-- we want newer beanutils via core -->
                     <exclusion>
@@ -714,23 +709,23 @@
                         <groupId>xerces</groupId>
                         <artifactId>xerces</artifactId>
                     </exclusion>
+                    <!-- not required; likely a m1 POM conversion bug -->
                     <exclusion>
-                        <!-- not required; likely a m1 POM conversion bug -->
                         <groupId>ant</groupId>
                         <artifactId>ant-optional</artifactId>
                     </exclusion>
+                    <!-- exclude older jdom-b9 -->
                     <exclusion>
-                        <!-- exclude older jdom-b9 -->
                         <groupId>jdom</groupId>
                         <artifactId>jdom</artifactId>
                     </exclusion>
+                    <!-- exclude older Servlet 2.2 spec jar -->
                     <exclusion>
-                        <!-- exclude older Servlet 2.2 spec jar -->
                         <groupId>javax.servlet</groupId>
                         <artifactId>servlet-api</artifactId>
                     </exclusion>
+                    <!-- exclude older Servlet 2.2 spec jar -->
                     <exclusion>
-                        <!-- exclude older Servlet 2.2 spec jar -->
                         <groupId>servlet</groupId>
                         <artifactId>servlet-api</artifactId>
                     </exclusion>
@@ -861,13 +856,6 @@
                 <version>1.2.1</version>
             </dependency>
             <dependency>
-                <groupId>javax.script</groupId>
-                <artifactId>script-api</artifactId>
-                <version>1.0-osgi</version>
-                <!-- we use our own retrotranslated version -->
-                <classifier>jdk14</classifier>
-            </dependency>
-            <dependency>
                 <groupId>tanukisoft</groupId>
                 <artifactId>wrapper</artifactId>
                 <version>${wrapperVersion}</version>
@@ -897,7 +885,7 @@
             <dependency>
                 <groupId>dom4j</groupId>
                 <artifactId>dom4j</artifactId>
-                <version>${dom4jVersion}-osgi</version>
+                <version>${dom4jVersion}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>xml-apis</groupId>
@@ -928,7 +916,7 @@
             <dependency>
                 <groupId>jaxen</groupId>
                 <artifactId>jaxen</artifactId>
-                <version>${jaxenVersion}-osgi</version>
+                <version>${jaxenVersion}</version>
             </dependency>
             <!--
                 override the wss4j version that's used in the cxf module and
@@ -979,39 +967,29 @@
                 <version>${xmlSecurityVersion}</version>
             </dependency>
             <dependency>
-                <groupId>xml-resolver</groupId>
-                <artifactId>xml-resolver</artifactId>
-                <version>${xmlResolverVersion}-osgi</version>
-            </dependency>
-            <dependency>
                 <groupId>mx4j</groupId>
                 <artifactId>mx4j-jmx</artifactId>
-                <version>${mx4jVersion}-osgi</version>
+                <version>${mx4jVersion}</version>
             </dependency>
             <dependency>
                 <groupId>mx4j</groupId>
                 <artifactId>mx4j-impl</artifactId>
-                <version>${mx4jVersion}-osgi</version>
+                <version>${mx4jVersion}</version>
             </dependency>
             <dependency>
                 <groupId>mx4j</groupId>
                 <artifactId>mx4j-tools</artifactId>
-                <version>${mx4jVersion}-osgi</version>
+                <version>${mx4jVersion}</version>
             </dependency>
             <dependency>
                 <groupId>mx4j</groupId>
                 <artifactId>mx4j-remote</artifactId>
-                <version>${mx4jVersion}-osgi</version>
+                <version>${mx4jVersion}</version>
             </dependency>
             <dependency>
                 <groupId>asm</groupId>
                 <artifactId>asm</artifactId>
                 <version>${asmVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.beanshell</groupId>
-                <artifactId>bsh</artifactId>
-                <version>${bshVersion}-osgi</version>
             </dependency>
             <!-- BouncyCastle deps -->
             <dependency>
