@@ -88,7 +88,7 @@
         <dependency>
             <groupId>oro</groupId>
             <artifactId>oro</artifactId>
-            <version>${oroVersion}-osgi</version>
+            <version>${oroVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>

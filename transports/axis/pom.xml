@@ -46,7 +46,7 @@
         <dependency>
             <groupId>org.apache.axis</groupId>
             <artifactId>axis</artifactId>
-            <version>1.4-osgi</version>
+            <version>1.4</version>
             <exclusions>
                 <!-- we like slf4j -->
                 <exclusion>
@@ -58,7 +58,7 @@
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jaxrpc_1.1_spec</artifactId>
-            <version>${geronimoSpecsVersion}-osgi</version>
+            <version>${geronimoSpecsVersion}</version>
         </dependency>
          <dependency>
             <groupId>javax.mail</groupId>
@@ -67,7 +67,7 @@
         <dependency>
             <groupId>commons-discovery</groupId>
             <artifactId>commons-discovery</artifactId>
-            <version>0.4-osgi</version>
+            <version>0.4</version>
             <exclusions>
                 <exclusion>
                     <artifactId>commons-logging</artifactId>
