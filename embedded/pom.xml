@@ -160,6 +160,11 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-btm</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-cxf</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
