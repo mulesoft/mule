@@ -88,6 +88,7 @@
         <antlrVersion>3.1.1</antlrVersion>
         <asmVersion>3.3.1</asmVersion>
         <aspectjVersion>1.6.11</aspectjVersion>
+        <bitronixTMVersion>2.1.4</bitronixTMVersion>
         <bshVersion>2.0b4</bshVersion>
         <bouncycastleVersion>1.46</bouncycastleVersion>
         <cglibVersion>2.2</cglibVersion>
@@ -108,7 +109,7 @@
         <cryptixJceVersion>20050328</cryptixJceVersion>
         <cryptixVersion>20050405</cryptixVersion>
         <cxfVersion>2.5.9</cxfVersion>
-        <derbyVersion>10.6.1.0</derbyVersion>
+        <derbyVersion>10.9.1.0</derbyVersion>
         <dom4jVersion>1.6.1</dom4jVersion>
         <flatpackVersion>3.1.1</flatpackVersion>
         <geronimoSpecsVersion>1.1</geronimoSpecsVersion>
@@ -420,6 +421,11 @@
                 <groupId>com.yourkit</groupId>
                 <artifactId>yjp-controller-api-redist</artifactId>
                 <version>9.0.8</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.btm</groupId>
+                <artifactId>btm</artifactId>
+                <version>${bitronixTMVersion}</version>
             </dependency>
             <!-- For unit tests only -->
             <dependency>

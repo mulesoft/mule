@@ -213,7 +213,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
     @Override
     protected List<MuleMessage> getMessages() throws Exception
     {
-        Session session = this.connector.getSessionFromTransaction();
+        Session session = this.connector.getTransactionalResource(endpoint);
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
         MessageConsumer consumer = createConsumer();
 

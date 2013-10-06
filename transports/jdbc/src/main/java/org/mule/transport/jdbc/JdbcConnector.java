@@ -26,11 +26,14 @@ import org.mule.common.TestResult;
 import org.mule.common.Testable;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.module.btm.transaction.TransactionManagerWrapper;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectException;
 import org.mule.transport.jdbc.sqlstrategy.DefaultSqlStatementStrategyFactory;
 import org.mule.transport.jdbc.sqlstrategy.SqlStatementStrategyFactory;
+import org.mule.transport.jdbc.xa.BitronixJdbcXaDataSourceProvider;
+import org.mule.transport.jdbc.xa.BitronixXaDataSourceWrapper;
 import org.mule.transport.jdbc.xa.DataSourceWrapper;
 import org.mule.util.StringUtils;
 import org.mule.util.TemplateParser;
@@ -46,6 +49,7 @@ import java.util.regex.Pattern;
 import javax.sql.DataSource;
 import javax.sql.XADataSource;
 
+import bitronix.tm.resource.jdbc.PoolingDataSource;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 
@@ -102,6 +106,7 @@ public class JdbcConnector extends AbstractConnector implements Testable
             resultSetHandler = new org.apache.commons.dbutils.handlers.MapListHandler(
                 new ColumnAliasRowProcessor());
         }
+        decorateDataSourceIfRequired();
         if (queryRunner == null)
         {
             if (this.queryTimeout >= 0)
@@ -116,9 +121,35 @@ public class JdbcConnector extends AbstractConnector implements Testable
         }
     }
 
+    private void decorateDataSourceIfRequired()
+    {
+        if (dataSource instanceof XADataSource)
+        {
+            if (muleContext.getTransactionManager() instanceof TransactionManagerWrapper)
+            {
+                //TODO change once BTM-131 gets fixed
+                BitronixJdbcXaDataSourceProvider.xaDatasourceHolder = (XADataSource) dataSource;
+                PoolingDataSource poolingDataSource = new PoolingDataSource();
+                poolingDataSource.setClassName(BitronixJdbcXaDataSourceProvider.class.getCanonicalName());
+                poolingDataSource.setMaxPoolSize(100);
+                poolingDataSource.setAcquireIncrement(1);
+                poolingDataSource.setIgnoreRecoveryFailures(true);
+                poolingDataSource.setAllowLocalTransactions(true);
+                poolingDataSource.setAutomaticEnlistingEnabled(false);
+                poolingDataSource.setUniqueName(muleContext.getConfiguration().getId() + "-" + getName());
+                poolingDataSource.init();
+                this.dataSource = new BitronixXaDataSourceWrapper(poolingDataSource);
+            }
+            else
+            {
+                this.dataSource = new DataSourceWrapper((XADataSource) dataSource);
+            }
+        }
+    }
+
     @Override
     public MessageReceiver createReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint)
-        throws Exception
+            throws Exception
     {
         Map props = endpoint.getProperties();
         if (props != null)
@@ -442,14 +473,7 @@ public class JdbcConnector extends AbstractConnector implements Testable
 
     public void setDataSource(DataSource dataSource)
     {
-        if (dataSource instanceof XADataSource)
-        {
-            this.dataSource = new DataSourceWrapper((XADataSource) dataSource);
-        }
-        else
-        {
-            this.dataSource = dataSource;
-        }
+        this.dataSource = dataSource;
     }
 
     public ResultSetHandler getResultSetHandler()
@@ -479,7 +503,7 @@ public class JdbcConnector extends AbstractConnector implements Testable
         if (queryTimeout >= 0)
         {
             ExtendedQueryRunner extendedQueryRunner = new ExtendedQueryRunner(
-                this.queryRunner.getDataSource(), queryTimeout);
+                    this.queryRunner.getDataSource(), queryTimeout);
             return extendedQueryRunner;
         }
         else
@@ -601,17 +625,17 @@ public class JdbcConnector extends AbstractConnector implements Testable
         }
         catch (Exception e)
         {
-        	// this surely doesn't cover all cases for all kinds of jdbc drivers but it is better than nothing
-        	FailureType failureType = FailureType.UNSPECIFIED;
-        	String msg = e.getMessage();
-        	if (msg != null && msg.contains("Communications link failure"))
-        	{
-        		failureType = FailureType.CONNECTION_FAILURE;
-        	}
-        	else if (msg != null && msg.contains("Access denied for user"))
-        	{
-        		failureType = FailureType.INVALID_CREDENTIALS;
-        	}
+            // this surely doesn't cover all cases for all kinds of jdbc drivers but it is better than nothing
+            FailureType failureType = FailureType.UNSPECIFIED;
+            String msg = e.getMessage();
+            if (msg != null && msg.contains("Communications link failure"))
+            {
+                failureType = FailureType.CONNECTION_FAILURE;
+            }
+            else if (msg != null && msg.contains("Access denied for user"))
+            {
+                failureType = FailureType.INVALID_CREDENTIALS;
+            }
             return new DefaultTestResult(TestResult.Status.FAILURE, e.getMessage(), failureType, e);
         }
         finally

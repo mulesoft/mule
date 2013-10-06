@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+
+    <!-- The database config is stored in derby.properties. Use a placeholder to configure all references -->
+    <spring:bean id="property-placeholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <spring:property name="placeholderPrefix" value="${"/>
+        <spring:property name="placeholderSuffix" value="}"/>
+        <spring:property name="location" value="classpath:derby.properties"/>
+    </spring:bean>
+
+    <!-- Data Source -->
+    <spring:bean id="jdbcDataSource2" class="org.apache.derby.jdbc.EmbeddedXADataSource" >
+        <spring:property name="databaseName" value="${database.name2}"/>
+    </spring:bean>
+
+</mule>

@@ -13,6 +13,7 @@ import javax.transaction.xa.Xid;
 
 public abstract class AbstractXAResourceManager extends AbstractResourceManager
 {
+
     protected Map<Xid, AbstractTransactionContext> suspendedContexts = new ConcurrentHashMap<Xid, AbstractTransactionContext>();
     protected Map<Xid, AbstractTransactionContext> activeContexts = new ConcurrentHashMap<Xid, AbstractTransactionContext>();
 
@@ -26,7 +27,7 @@ public abstract class AbstractXAResourceManager extends AbstractResourceManager
         return true;
     }
 
-    AbstractTransactionContext getTransactionalResource(Xid xid)
+    protected AbstractTransactionContext getTransactionalResource(Xid xid)
     {
         AbstractTransactionContext context = getActiveTransactionalResource(xid);
         if (context != null)
