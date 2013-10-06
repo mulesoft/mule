@@ -24,6 +24,7 @@
         <module>builders</module>
         <module>boot</module>
         <module>bpm</module>
+        <module>btm</module>
         <module>cxf</module>
         <module>devkit-support</module>
         <module>drools</module>

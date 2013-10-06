@@ -238,6 +238,7 @@ public class DefaultXASession implements XAResource
                 }
             }
             resourceManager.commitTransaction(context);
+            localContext = null;
         }
         catch (ResourceManagerException e)
         {
@@ -265,6 +266,7 @@ public class DefaultXASession implements XAResource
         try
         {
             resourceManager.rollbackTransaction(context);
+            localContext = null;
         }
         catch (ResourceManagerException e)
         {

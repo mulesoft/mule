@@ -64,9 +64,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
 
     private QueueSession getQueueSession() throws MuleException
     {
-        QueueSession session = connector.getTransactionalResource(endpoint);
-        connector.bindXaResourceIfRequired();
-        return session;
+        return connector.getTransactionalResource(endpoint);
     }
 
     @Override

@@ -52,10 +52,30 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     @Override
     protected ConfigurationBuilder getBuilder() throws Exception
     {
-        return new SpringXmlConfigurationBuilder(getConfigResources());
+        String configResources = getConfigResources();
+        if (configResources != null)
+        {
+            return new SpringXmlConfigurationBuilder(configResources);
+        }
+        String[] multipleConfigResources = getMultipleConfigResources();
+        if (multipleConfigResources != null)
+        {
+            return new SpringXmlConfigurationBuilder(multipleConfigResources);
+        }
+        throw new Exception("You must redefine getConfigResources or getMultipleConfigResources and return a not null configuration file");
     }
 
-    protected abstract String getConfigResources();
+    protected String getConfigResources()
+    {
+        return null;
+    }
+
+    protected String[] getMultipleConfigResources()
+    {
+        return null;
+    }
+
+
 
     /**
      * Returns an instance of the service's component object. Note that depending on
