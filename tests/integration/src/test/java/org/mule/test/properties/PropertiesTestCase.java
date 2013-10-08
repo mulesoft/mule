@@ -60,8 +60,7 @@ public class PropertiesTestCase extends AbstractServiceAndFlowTestCase
 
         MuleMessage msg2 = createOutboundMessage();
         client.dispatch("vm://inQueue", msg2);
-        Thread.sleep(1000);
-        response = client.request("vm://outQueue", 0);
+        response = client.request("vm://outQueue", RECEIVE_TIMEOUT);
         assertEquals(response.getPayloadAsString(), "OK");
         assertEquals("yes", response.getInboundProperty("outbound1"));
         assertEquals("no", response.getInboundProperty("outbound2"));
