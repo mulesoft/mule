@@ -10,9 +10,11 @@ package org.mule.devkit.processor;
 import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.tck.size.SmallTest;
 
 import org.junit.Test;
 
+@SmallTest
 public class DevkitBasedMessageProcessorTest
 {
 
