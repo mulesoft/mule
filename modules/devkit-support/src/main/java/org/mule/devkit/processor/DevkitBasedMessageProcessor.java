@@ -81,7 +81,7 @@ public abstract class DevkitBasedMessageProcessor extends ExpressionEvaluatorSup
      *         OnNoTokenPolicy in case of NotAuthorizedException
      * @throws MuleException
      */
-    public final MuleEvent process(MuleEvent event) throws MuleException
+    public MuleEvent process(MuleEvent event) throws MuleException
     {
         try
         {
