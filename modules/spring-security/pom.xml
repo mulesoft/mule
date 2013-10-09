@@ -14,6 +14,11 @@
         and Method interceptors to authenticate event traffic via endpoints and provide method level 
         authorization on components.
     </description>
+
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
