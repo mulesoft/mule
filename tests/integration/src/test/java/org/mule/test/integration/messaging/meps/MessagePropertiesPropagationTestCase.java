@@ -16,13 +16,18 @@ import org.mule.transport.http.HttpConstants;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
+<<<<<<< HEAD
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+=======
+@Ignore("MULE-6926: flaky test (Relies on an external server which can go offline after isDisabledInThisEnvironment is executed)")
+>>>>>>> 7474a0d... Ignoring flaky tests
 public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
 {
 
