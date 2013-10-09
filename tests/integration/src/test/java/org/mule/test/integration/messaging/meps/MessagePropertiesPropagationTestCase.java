@@ -21,8 +21,10 @@ import org.mule.transport.http.HttpConstants;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore("MULE-6926: flaky test (Relies on an external server which can go offline after isDisabledInThisEnvironment is executed)")
 public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
 {
     @Override
