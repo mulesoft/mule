@@ -151,7 +151,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
 
         try
         {
-            verify(mockObjectStore, timeout(100)).remove(TEST_GROUP_ID);
+            verify(mockObjectStore, timeout(250)).remove(TEST_GROUP_ID);
         }
         finally
         {
