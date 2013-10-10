@@ -141,7 +141,8 @@ public class PersistentObjectStorePartition<T extends Serializable>
     {
         if (!realKeyToUUIDIndex.containsKey(key))
         {
-            throw new ObjectDoesNotExistException();
+            String message = "Key does not exist: " + key;
+            throw new ObjectDoesNotExistException(CoreMessages.createStaticMessage(message));
         }
         String filename = (String) realKeyToUUIDIndex.get(key);
         File file = getValueFile(filename);
