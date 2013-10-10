@@ -9,7 +9,11 @@
     <artifactId>mule-module-jaas</artifactId>
     <packaging>jar</packaging>
     <name>Jaas Security</name>
-    <description>Mule Jaas Support exposes Jaas Authentication providers and Method interceptors to authentication event traffic via endpoints.</description>   
+    <description>Mule Jaas Support exposes Jaas Authentication providers and Method interceptors to authentication event traffic via endpoints.</description>
+
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
 
     <dependencies>
         <dependency>

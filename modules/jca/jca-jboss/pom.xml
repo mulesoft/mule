@@ -11,6 +11,10 @@
     <packaging>jar</packaging>
     <description>A Resource Adapter implementation that allows a Mule instance to be deployed to a JBoss application server and exposes Mule services via the JCA connector architecture.</description>
 
+    <properties>
+        <licensePath>../../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <build>
         <resources>
             <resource>

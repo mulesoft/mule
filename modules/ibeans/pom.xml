@@ -17,6 +17,10 @@
     </description>
     <url>http://www.muleforge.org/projects/IBEANS</url>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.ibeans</groupId>

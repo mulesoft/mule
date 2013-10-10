@@ -15,6 +15,10 @@
         the way files are written, such as whether binary output is used or the file is appended to.
     </description>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <build>
         <plugins>
             <plugin>

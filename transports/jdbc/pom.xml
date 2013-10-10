@@ -11,6 +11,10 @@
     <name>JDBC Transport</name>
     <description>A Mule transport for JDBC connectivity.</description>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <build>
          <plugins>
              <plugin>
