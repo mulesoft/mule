@@ -20,6 +20,10 @@
         </resources>
     </build>
 
+    <properties>
+        <licensePath>../../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.modules.jca</groupId>

@@ -62,6 +62,8 @@
     </modules>
 
     <properties>
+        <licensePath>LICENSE_HEADER.txt</licensePath>
+
         <!--
             The above project.url will not be picked up in the manifest,
             instead a module artifact id is erroneously substituted.
@@ -1560,6 +1562,61 @@
                 <artifactId>maven-mule-plugin</artifactId>
                 <version>1.6</version>
                 <extensions>true</extensions>
+            </plugin>
+            <plugin>
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <version>1.9.0</version>
+                <configuration>
+                    <header>${licensePath}</header>
+                    <excludes>
+                        <exclude>target/**</exclude>
+                        <exclude>**/.gitignore</exclude>
+                        <exclude>**/*.txt</exclude>
+                        <exclude>**/*.groovy</exclude>
+                        <exclude>**/*.sh</exclude>
+                        <exclude>**/*.bat</exclude>
+                        <exclude>**/*.ftl</exclude>
+                        <exclude>**/*.xml</exclude>
+                        <exclude>**/*.properties</exclude>
+                        <exclude>**/*.sample</exclude>
+                        <exclude>**/*.md</exclude>
+                        <exclude>**/*.xsl</exclude>
+                        <exclude>**/*.html</exclude>
+                        <exclude>**/*.css</exclude>
+                        <exclude>**/build-number.txt</exclude>
+
+                        <exclude>**/BndMojo.java</exclude>
+                        <exclude>**/BobberArchetype.java</exclude>
+                        <exclude>**/BobberArchetypeMojo.java</exclude>
+                        <exclude>**/DummySSLServerSocketFactory.java</exclude>
+                        <exclude>**/ConfigurationPatternArchetypeMojo.java</exclude>
+                        <exclude>**/ModuleArchetypeMojo.java</exclude>
+                        <exclude>**/MultipartConfiguration.java</exclude>
+
+                        <exclude>**/ParamReader.java</exclude>
+                        <exclude>**/Part.java</exclude>
+                        <exclude>**/ProjectArchetypeMojo.java</exclude>
+                        <exclude>**/TransportArchetypeMojo.java</exclude>
+                        <exclude>**/XMLStreamReaderToContentHandler.java</exclude>
+                        <exclude>**/WebAppDeployer.java</exclude>
+                        <exclude>**/__artifactId__IBean.java</exclude>
+                        <exclude>**/__artifactId__IBeanTestCase.java</exclude>
+                    </excludes>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                    <mapping>
+                        <java>SLASHSTAR_STYLE</java>
+                    </mapping>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

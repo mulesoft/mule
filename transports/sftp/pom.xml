@@ -12,6 +12,10 @@
     <name>SFTP Transport</name>
     <description>A Mule transport for SFTP connectivity</description>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <build>
         <plugins>
             <plugin>

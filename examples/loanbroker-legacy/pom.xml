@@ -12,6 +12,10 @@
     <name>Loan Broker Example</name>
     <description>Umbrella for different variations of the Loan Broker example.</description>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <modules>
         <module>common</module>
         <module>common-tests</module>

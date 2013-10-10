@@ -12,6 +12,10 @@
     <name>Mule Examples</name>
     <description>Mule Example Applications</description>
 
+    <properties>
+        <licensePath>../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <modules>
         <module>all-examples</module>
         <module>bookstore</module>
