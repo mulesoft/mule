@@ -89,7 +89,7 @@ public class SftpServer
     {
         try
         {
-            sshdServer.stop();
+            sshdServer.stop(true);
         }
         catch (InterruptedException e)
         {
