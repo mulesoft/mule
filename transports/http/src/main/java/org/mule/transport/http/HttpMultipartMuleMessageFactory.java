@@ -47,10 +47,6 @@ public class HttpMultipartMuleMessageFactory extends HttpMuleMessageFactory
                     break;
                 }
             }
-            if (body == null)
-            {
-                throw new IllegalArgumentException("no part named \"payload\" found");
-            }
         }
         else
         {
