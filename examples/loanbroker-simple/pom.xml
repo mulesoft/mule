@@ -11,6 +11,10 @@
     <name>Simple Loanbroker Example</name>
     <description>A simple implementation of the loanbroker example from the Enterprise Integration Patterns book using the new constructs in Mule 3</description>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <build>
          <plugins>
             <plugin>

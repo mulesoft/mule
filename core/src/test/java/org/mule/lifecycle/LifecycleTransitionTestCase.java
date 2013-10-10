@@ -1,8 +1,5 @@
 /*
- * $Id: URIBuilder.java 23505 2011-12-20 08:20:49Z mike.schilling $
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
