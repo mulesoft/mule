@@ -18,6 +18,10 @@
         jca modules
     </description>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <modules>
         <module>jca-core</module>
         <module>jca-generic</module>
