@@ -11,6 +11,11 @@
     <packaging>pom</packaging>
     <name>Mule Tests</name>
 
+    <properties>
+        <licensePath>../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
+
     <modules>
         <module>functional</module>
         <module>integration</module>

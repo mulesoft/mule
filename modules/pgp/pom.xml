@@ -16,9 +16,10 @@
 
     <properties>
         <bouncycastle.jdk>jdk16</bouncycastle.jdk>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
     </properties>
 
-    <dependencies>
+   <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>

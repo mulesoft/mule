@@ -11,6 +11,10 @@
     <name>Echo Example</name>
     <description>Is a simple component example that demonstrates how to expose a component over multiple transports (soap and stream).</description>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <build>
          <plugins>
             <plugin>
