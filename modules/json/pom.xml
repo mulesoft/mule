@@ -20,6 +20,10 @@
         </plugins>
     </build>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <dependencies>
         <!-- Mule Dependencies -->
         <dependency>

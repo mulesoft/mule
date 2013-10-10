@@ -11,6 +11,11 @@
     <name>RSS Module</name>
     <description>Mule RSS Endpoints</description>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
+
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

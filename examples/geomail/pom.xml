@@ -11,6 +11,10 @@
     <name>GeoMail Example</name>
     <description>A web based example that plots incoming emails on a world map.  This example demonstrates how to use Ajax events with Mule.</description>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <build>
          <plugins>
             <plugin>
