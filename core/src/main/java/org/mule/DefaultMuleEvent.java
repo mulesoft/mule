@@ -17,6 +17,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.Pipeline;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.processor.ProcessingDescriptor;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
@@ -361,12 +362,11 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     protected boolean resolveEventSynchronicity()
     {
         boolean syncProcessingStrategy = false;
-        if (flowConstruct != null && flowConstruct instanceof Pipeline)
+        if (flowConstruct != null && flowConstruct instanceof ProcessingDescriptor)
         {
-            syncProcessingStrategy = ((Pipeline) flowConstruct).getProcessingStrategy()
-                .getClass()
-                .equals(SynchronousProcessingStrategy.class);
+            syncProcessingStrategy = ((ProcessingDescriptor) flowConstruct).isSynchronous();
         }
+        
         return transacted
                || exchangePattern.hasResponse()
                || message.getProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY,

@@ -169,6 +169,12 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             this.messageSource = messageSource;
         }
     }
+    
+    @Override
+    public boolean isSynchronous()
+    {
+        return this.processingStrategy.getClass().equals(SynchronousProcessingStrategy.class);
+    }
 
     @Override
     public ProcessingStrategy getProcessingStrategy()
