@@ -13,6 +13,10 @@
     <name>Mule Core</name>
     <description>Mule server and core classes</description>
 
+    <properties>
+        <licensePath>../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <build>
         <plugins>
             <plugin>

@@ -10,6 +10,10 @@
     <packaging>mule</packaging>
     <name>Loan Broker BPM Example</name>
 
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.transports</groupId>
