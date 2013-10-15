@@ -35,6 +35,10 @@ public class StandaloneLogHandlerThreadTestCase extends AbstractLogHandlerThread
         {
             System.setProperty(MuleUtils.MULE_HOME, originalSystemProperty);
         }
+        else
+        {
+            System.clearProperty(MuleUtils.MULE_HOME);
+        }
 
     }
 
