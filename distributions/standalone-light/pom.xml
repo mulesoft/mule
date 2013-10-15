@@ -16,6 +16,7 @@
     <properties>
         <communityDistDir>${project.build.directory}/ce-distribution</communityDistDir>
         <communityArtifact>mule-standalone</communityArtifact>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
     </properties>
 
     <build>

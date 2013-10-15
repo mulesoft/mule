@@ -9,7 +9,11 @@
     <artifactId>mule-module-client</artifactId>
     <packaging>jar</packaging>
     <name>Mule Client</name>
-    <description>MuleClient is a simple interface for Mule clients to send and receive events from local or remote Mule Servers.</description>   
+    <description>MuleClient is a simple interface for Mule clients to send and receive events from local or remote Mule Servers.</description>
+
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
 
     <dependencies>
         <dependency>
