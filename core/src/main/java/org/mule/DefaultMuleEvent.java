@@ -273,6 +273,12 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
             rewriteEvent.isSynchronous());
     }
 
+    public DefaultMuleEvent(MuleEvent rewriteEvent, FlowConstruct flowConstruct, ReplyToHandler replyToHandler, Object replyToDestination)
+    {
+        this(rewriteEvent.getMessage(), rewriteEvent, flowConstruct, rewriteEvent.getSession(),
+             rewriteEvent.isSynchronous(), replyToHandler, replyToDestination);
+    }
+
     public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent, boolean synchronus)
     {
         this(message, rewriteEvent, rewriteEvent.getFlowConstruct(), rewriteEvent.getSession(), synchronus);
@@ -295,6 +301,17 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                                MuleSession session,
                                boolean synchronous)
     {
+        this(message, rewriteEvent, flowConstruct, session, synchronous, rewriteEvent.getReplyToHandler(), rewriteEvent.getReplyToDestination());
+    }
+
+    protected DefaultMuleEvent(MuleMessage message,
+                               MuleEvent rewriteEvent,
+                               FlowConstruct flowConstruct,
+                               MuleSession session,
+                               boolean synchronous,
+                               ReplyToHandler replyToHandler,
+                               Object replyToDestination)
+    {
         this.id = rewriteEvent.getId();
         this.flowConstruct = flowConstruct;
         this.session = session;
@@ -315,8 +332,8 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
             this.processingTime = ProcessingTime.newInstance(this);
         }
         setMessage(message);
-        this.replyToHandler = rewriteEvent.getReplyToHandler();
-        this.replyToDestination = rewriteEvent.getReplyToDestination();
+        this.replyToHandler = replyToHandler;
+        this.replyToDestination = replyToDestination;
         this.timeout = rewriteEvent.getTimeout();
         this.transacted = rewriteEvent.isTransacted();
         this.notificationsEnabled = rewriteEvent.isNotificationsEnabled();
