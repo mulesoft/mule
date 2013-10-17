@@ -39,7 +39,7 @@
     <dependencySets>
         <!-- Scripting pack libraries -->
         <dependencySet>
-            <outputDirectory>user</outputDirectory>
+            <outputDirectory>lib/user</outputDirectory>
             <scope>runtime</scope>
             <fileMode>0644</fileMode>
         </dependencySet>
