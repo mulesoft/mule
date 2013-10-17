@@ -17,19 +17,21 @@ package org.mule.transport.servlet.jetty;
 
 import java.util.ArrayList;
 
-import org.mortbay.component.AbstractLifeCycle;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.HandlerContainer;
-import org.mortbay.jetty.handler.ContextHandler;
-import org.mortbay.jetty.handler.ContextHandlerCollection;
-import org.mortbay.jetty.webapp.WebAppContext;
-import org.mortbay.log.Log;
-import org.mortbay.resource.Resource;
-import org.mortbay.util.URIUtil;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.HandlerContainer;
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.util.URIUtil;
+import org.eclipse.jetty.util.component.AbstractLifeCycle;
+import org.eclipse.jetty.util.log.Log;
+import org.eclipse.jetty.util.resource.Resource;
+import org.eclipse.jetty.webapp.WebAppContext;
 
 /**
  * A repackaged version of the Jetty WebAppDeployer which makes it possible to 
  * override the server classes of the WebAppContext;
+ *
+ * TODO: Use WebAppProvider from Jetty 8 instead of this class.
  */
 public class WebAppDeployer extends AbstractLifeCycle
 {
@@ -43,7 +45,14 @@ public class WebAppDeployer extends AbstractLifeCycle
     private ArrayList _deployed;
     private String[] serverClasses;
     private String[] systemClasses;
-    
+
+    private JettyHttpConnector connector;
+
+    public void setConnector(JettyHttpConnector connector)
+    {
+        this.connector = connector;
+    }
+
     public String[] getConfigurationClasses()
     {
         return _configurationClasses;
@@ -149,7 +158,7 @@ public class WebAppDeployer extends AbstractLifeCycle
         scan();
         
     }
-    
+
     /* ------------------------------------------------------------ */
     /** Scan for webapplications.
      * 
@@ -264,9 +273,12 @@ public class WebAppDeployer extends AbstractLifeCycle
             }
             
             // add it
-            _contexts.addHandler(wah);
+            if (connector != null)
+            {
+                connector.addHandler(wah);
+            }
             _deployed.add(wah);
-            
+
             if (_contexts.isStarted())
                 _contexts.start();  // TODO Multi exception
         }

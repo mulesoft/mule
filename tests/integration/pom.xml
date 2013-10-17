@@ -113,14 +113,14 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.mortbay.jetty</groupId>
-			<artifactId>jetty</artifactId>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
 		</dependency>
 
 		<!-- Needed for CXF -->
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>
-			<artifactId>geronimo-annotation_1.0_spec</artifactId>
+			<artifactId>geronimo-annotation_1.1_spec</artifactId>
 		</dependency>
 
 		<!-- Needed for JAX-RS -->

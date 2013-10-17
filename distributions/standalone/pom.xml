@@ -309,15 +309,6 @@
             <scope>provided</scope>
         </dependency>
         <!--
-            Exclude the transitive dependencies of the bookstore example
-         -->
-        <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jsp-2.1-jetty</artifactId>
-            <version>${jettyVersion}</version>
-            <scope>provided</scope>
-        </dependency>
-        <!--
             Exclude the transitive dependencies of the mule example launcher
          -->
         <dependency>

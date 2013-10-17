@@ -91,6 +91,7 @@
         <bshVersion>2.0b4</bshVersion>
         <bouncycastleVersion>1.46</bouncycastleVersion>
         <cglibVersion>2.2</cglibVersion>
+        <cometdVersion>6.1.26</cometdVersion>
         <commonsBeanUtilsVersion>1.8.0</commonsBeanUtilsVersion>
         <commonsCliVersion>1.2</commonsCliVersion>
         <commonsCodecVersion>1.3</commonsCodecVersion>
@@ -112,9 +113,9 @@
         <flatpackVersion>3.1.1</flatpackVersion>
         <geronimoSpecsVersion>1.1</geronimoSpecsVersion>
         <geronimoSpecsJtaVersion>1.1.1</geronimoSpecsJtaVersion>
-        <geronimoSpecsAnnotationVersion>1.1.1</geronimoSpecsAnnotationVersion>
+        <geronimoSpecsAnnotationVersion>1.0.1</geronimoSpecsAnnotationVersion>
         <geronimoSpecsStaxVersion>1.0.1</geronimoSpecsStaxVersion>
-        <geronimoSpecsServletApiVersion>1.2</geronimoSpecsServletApiVersion>
+        <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
         <geronimoSpecsWsMetadataVersion>1.1.2</geronimoSpecsWsMetadataVersion>
         <hibernateVersion>3.6.0.Final</hibernateVersion>
         <jacksonVersion>1.9.11</jacksonVersion>
@@ -130,7 +131,7 @@
         <jbpmVersion>4.4</jbpmVersion>
         <jcrVersion>1.0</jcrVersion>
         <jdomVersion>1.1.3</jdomVersion>
-        <jettyVersion>6.1.26</jettyVersion>
+        <jettyVersion>8.1.13.v20130916</jettyVersion>
         <jodaTimeVersion>1.6</jodaTimeVersion>
         <jschVersion>0.1.50</jschVersion>
         <jsr181Version>1.0-MR1</jsr181Version>
@@ -174,7 +175,7 @@
             <dependency>
                 <!-- OSGi-ready -->
                 <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-annotation_1.0_spec</artifactId>
+                <artifactId>geronimo-annotation_1.1_spec</artifactId>
                 <version>${geronimoSpecsAnnotationVersion}</version>
             </dependency>
             <dependency>
@@ -324,55 +325,94 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <!-- OSGi-ready -->
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>jetty</artifactId>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
                 <version>${jettyVersion}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>org.mortbay.jetty</groupId>
-                        <artifactId>servlet-api</artifactId>
+                        <groupId>org.eclipse.jetty.orbit</groupId>
+                        <artifactId>javax.servlet</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
-                <!-- OSGi-ready -->
-                <groupId>org.mortbay.jetty</groupId>
+                <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-util</artifactId>
                 <version>${jettyVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.mortbay.jetty</groupId>
-                        <artifactId>servlet-api</artifactId>
-                    </exclusion>
-                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-continuation</artifactId>
+                <version>${jettyVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-servlet</artifactId>
+                <version>${jettyVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-webapp</artifactId>
+                <version>${jettyVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-client</artifactId>
+                <version>${jettyVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-security</artifactId>
+                <version>${jettyVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-servlet_2.5_spec</artifactId>
+                <artifactId>geronimo-servlet_3.0_spec</artifactId>
                 <!-- servlet api jar is versioned differently -->
                 <version>${geronimoSpecsServletApiVersion}</version>
             </dependency>
             <dependency>
-                <groupId>org.mortbay.jetty</groupId>
+                <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-annotations</artifactId>
                 <version>${jettyVersion}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>geronimo-spec</groupId>
-                        <artifactId>geronimo-spec-jta</artifactId>
+                        <groupId>org.eclipse.jetty.orbit</groupId>
+                        <artifactId>javax.activation</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty.orbit</groupId>
+                        <artifactId>javax.annotation</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty.orbit</groupId>
+                        <artifactId>javax.mail.glassfish</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty.orbit</groupId>
+                        <artifactId>javax.transaction</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty.orbit</groupId>
+                        <artifactId>org.objectweb.asm</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>cometd-server</artifactId>
-                <version>${jettyVersion}</version>
+                <version>${cometdVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>cometd-client</artifactId>
-                <version>${jettyVersion}</version>
+                <version>${cometdVersion}</version>
+                <exclusions>
+                   <exclusion>
+                       <groupId>org.mortbay.jetty</groupId>
+                       <artifactId>servlet-api</artifactId>
+                   </exclusion>
+               </exclusions>
             </dependency>
             <dependency>
                 <groupId>com.yourkit</groupId>
