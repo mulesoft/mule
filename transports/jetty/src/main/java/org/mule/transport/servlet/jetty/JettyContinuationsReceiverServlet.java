@@ -20,11 +20,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.mortbay.util.ajax.Continuation;
-import org.mortbay.util.ajax.ContinuationSupport;
+import org.eclipse.jetty.continuation.Continuation;
+import org.eclipse.jetty.continuation.ContinuationSupport;
 
 public class JettyContinuationsReceiverServlet extends JettyReceiverServlet
 {
+
+    private static final String OBJECT_KEY = "object";
+
     // mutex used to make sure that the continuation is not resumed before it is suspended. 
     private Object mutex = new Object();
     
@@ -37,9 +40,9 @@ public class JettyContinuationsReceiverServlet extends JettyReceiverServlet
             
             synchronized (mutex)
             {
-                Continuation continuation = ContinuationSupport.getContinuation(request, mutex);
+                Continuation continuation = ContinuationSupport.getContinuation(request);
                 
-                if (!continuation.isPending())
+                if (continuation.isInitial())
                 {
                     // case where we are processing this request for the first time (suspend has not been called)
                     
@@ -60,8 +63,7 @@ public class JettyContinuationsReceiverServlet extends JettyReceiverServlet
                         jettyReceiver.routeMessageAsync(requestMessage, continuationsReplyTo);
                         
                         // suspend indefinitely
-                        //TODO: perhaps we can make this configurable just like Http's keepSocketAlive is
-                        continuation.suspend(0L);
+                        continuation.suspend();
                     }
                     else
                     {
@@ -75,13 +77,13 @@ public class JettyContinuationsReceiverServlet extends JettyReceiverServlet
                     if (continuation.isResumed())
                     {
                         // the continuation was resumed so the response should be there
-                        Object r = continuation.getObject();
+                        Object r = continuation.getAttribute(OBJECT_KEY);
                         // response object is either a MuleMessage of an Exception if there was an error
                         if (r instanceof MuleMessage)
                         {
                             responseMessage = (MuleMessage) r;
                             // clear the object because jetty reuses continuations for the same connection
-                            continuation.setObject(null);
+                            continuation.setAttribute(OBJECT_KEY, null);
                             
                             writeResponse(response, responseMessage);
                         }

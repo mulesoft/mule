@@ -6,7 +6,9 @@
  */
 package org.mule.transport.servlet.jetty;
 
+import static org.junit.Assert.assertEquals;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.ClassUtils;
 
 import java.io.File;
@@ -17,11 +19,13 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.FileUtils;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.Rule;
 
 public abstract class AbstractWebappsTestCase extends FunctionalTestCase
 {
+    @Rule
+    public SystemProperty baseDirProperty = new SystemProperty("baseDir", ClassUtils.getClassPathRoot(getClass()).getPath() + "../../");
+
     @Override
     protected boolean isStartContext()
     {

@@ -12,6 +12,8 @@ import org.mule.transport.ajax.embedded.AjaxConnector;
 
 import java.net.URL;
 
+import org.junit.Ignore;
+
 public class AjaxEmbeddedConnectorTestCase extends AbstractConnectorTestCase
 {
     @Override
@@ -24,6 +26,13 @@ public class AjaxEmbeddedConnectorTestCase extends AbstractConnectorTestCase
         c.setInitialStateStopped(false);
         c.setServerUrl(new URL("http://0.0.0.0:12345"));
         return c;
+    }
+
+    @Override
+    @Ignore("MULE-7068")
+    public void testConnectorLifecycle() throws Exception
+    {
+
     }
 
     @Override

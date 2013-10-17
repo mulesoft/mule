@@ -703,7 +703,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-annotation_1.0_spec</artifactId>
+            <artifactId>geronimo-annotation_1.1_spec</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -739,6 +739,22 @@
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
             <version>${cxfVersion}</version>
             <scope>test</scope>
+            <exclusions>
+                <!-- Old Jetty version -->
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-security</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-servlet_2.5_spec</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-security</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>
@@ -759,8 +775,8 @@
         <!-- for integration tests -->
         <!-- Maven classpath gets messed up and WsdlCallTestCase doesn't pass unless this is here -->
         <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty</artifactId>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
             <scope>test</scope>
         </dependency>
 
