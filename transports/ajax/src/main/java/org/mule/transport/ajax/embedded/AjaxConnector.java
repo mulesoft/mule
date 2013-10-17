@@ -31,15 +31,15 @@ import java.util.Map;
 
 import javax.servlet.Servlet;
 
+import org.eclipse.jetty.server.AbstractConnector;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.servlet.DefaultServlet;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.mortbay.cometd.AbstractBayeux;
 import org.mortbay.cometd.continuation.ContinuationCometdServlet;
-import org.mortbay.jetty.AbstractConnector;
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.handler.ContextHandlerCollection;
-import org.mortbay.jetty.nio.SelectChannelConnector;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.DefaultServlet;
-import org.mortbay.jetty.servlet.ServletHolder;
 
 /**
  * Creates an 'embedded' Ajax server using Jetty and allows Mule to receiver and send
@@ -210,7 +210,7 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
 
     void createEmbeddedServer() throws MuleException
     {
-        Connector connector = createJettyConnector();
+        AbstractConnector connector = createJettyConnector();
 
         connector.setPort(serverUrl.getPort());
         connector.setHost(serverUrl.getHost());
@@ -233,13 +233,13 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
         }
 
         ContextHandlerCollection handlerCollection = new ContextHandlerCollection();
-        Context root = new Context(handlerCollection, ROOT, Context.NO_SECURITY);
+        ServletContextHandler root = new ServletContextHandler(handlerCollection, ROOT, ServletContextHandler.NO_SECURITY);
         root.setConnectorNames(new String[]{connector.getName()});
         root.addEventListener(new MuleServletContextListener(muleContext, getName()));
 
         if (!ROOT.equals(path))
         {
-            Context resourceContext = new Context(handlerCollection, path, Context.NO_SECURITY);
+            ServletContextHandler resourceContext = new ServletContextHandler(handlerCollection, path, ServletContextHandler.NO_SECURITY);
             populateContext(resourceContext);
 
         }
@@ -263,11 +263,11 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
         holder.setInitParameter("requestAvailable", Boolean.toString(isRequestAvailable()));
 
 
-        this.getHttpServer().addHandler(handlerCollection);
+        this.addHandler(handlerCollection);
         return ajaxServlet;
     }
 
-    protected void populateContext(Context context)
+    protected void populateContext(ServletContextHandler context)
     {
         context.addServlet(DefaultServlet.class, ROOT);
         context.addServlet(JarResourceServlet.class, JarResourceServlet.DEFAULT_PATH_SPEC);

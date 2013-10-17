@@ -48,7 +48,7 @@ public class MockHttpServletRequestBuilder
         HttpServletRequest mockRequest = mock(HttpServletRequest.class);
         when(mockRequest.getMethod()).thenReturn(method);
 
-        Enumeration<?> emptyEnumeration = new Hashtable<Object, Object>().elements();
+        Enumeration<String> emptyEnumeration = new Hashtable<String, String>().elements();
         when(mockRequest.getParameterNames()).thenReturn(emptyEnumeration);
 
         when(mockRequest.getRequestURI()).thenReturn(requestUri);
@@ -71,7 +71,7 @@ public class MockHttpServletRequestBuilder
 
     private void addParameterExpectations(HttpServletRequest mockRequest)
     {
-        Enumeration<?> nameEnum = null;
+        Enumeration<String> nameEnum = null;
 
         if (parameters != null)
         {
@@ -93,7 +93,7 @@ public class MockHttpServletRequestBuilder
 
     private void addAttributeExpectations(HttpServletRequest mockRequest)
     {
-        Enumeration<?> nameEnum = null;
+        Enumeration<String> nameEnum = null;
 
         if (attributes != null)
         {
@@ -113,7 +113,7 @@ public class MockHttpServletRequestBuilder
 
     private void addHeaderExpectations(HttpServletRequest mockRequest)
     {
-        Enumeration<?> nameEnum = null;
+        Enumeration<String> nameEnum = null;
         if (headers != null)
         {
             nameEnum = keyEnumeration(headers);
@@ -123,14 +123,14 @@ public class MockHttpServletRequestBuilder
                 String key = entry.getKey();
                 Object value = entry.getValue();
 
-                Enumeration<?> valueAsEnumeration = null;
-                if ((value instanceof Enumeration<?>) == false)
+                Enumeration<String> valueAsEnumeration = null;
+                if ((value instanceof Enumeration) == false)
                 {
-                    valueAsEnumeration = new SingleElementEnumeration(value);
+                    valueAsEnumeration = new SingleElementEnumeration((String)value);
                 }
                 else
                 {
-                    valueAsEnumeration = (Enumeration<?>) value;
+                    valueAsEnumeration = (Enumeration<String>) value;
                 }
 
                 when(mockRequest.getHeaders(eq(key))).thenReturn(valueAsEnumeration);
@@ -140,17 +140,17 @@ public class MockHttpServletRequestBuilder
         when(mockRequest.getHeaderNames()).thenReturn(nameEnum);
     }
 
-    private Enumeration<?> keyEnumeration(Map<?, ?> map)
+    private Enumeration<String> keyEnumeration(Map<?, ?> map)
     {
         Set<?> keys = map.keySet();
         return new IteratorEnumeration(keys.iterator());
     }
 
-    private static class SingleElementEnumeration implements Enumeration<Object>
+    private static class SingleElementEnumeration implements Enumeration<String>
     {
-        private Object element;
+        private String element;
 
-        public SingleElementEnumeration(Object singleElement)
+        public SingleElementEnumeration(String singleElement)
         {
             super();
             element = singleElement;
@@ -161,9 +161,9 @@ public class MockHttpServletRequestBuilder
             return (element != null);
         }
 
-        public Object nextElement()
+        public String nextElement()
         {
-            Object retValue = element;
+            String retValue = element;
             if (element != null)
             {
                 element = null;

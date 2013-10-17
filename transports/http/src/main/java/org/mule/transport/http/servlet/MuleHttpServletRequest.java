@@ -16,16 +16,25 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.AsyncContext;
+import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
 import org.apache.commons.collections.iterators.IteratorEnumeration;
 
@@ -348,4 +357,73 @@ public class MuleHttpServletRequest implements HttpServletRequest
         return false;
     }
 
+    @Override
+    public boolean authenticate(HttpServletResponse httpServletResponse) throws IOException, ServletException
+    {
+        return false;
+    }
+
+    @Override
+    public ServletContext getServletContext()
+    {
+        return null;
+    }
+
+    @Override
+    public void logout() throws ServletException
+    {
+    }
+
+    @Override
+    public void login(String s, String s2) throws ServletException
+    {
+    }
+
+    @Override
+    public AsyncContext startAsync()
+    {
+        return null;
+    }
+
+    @Override
+    public boolean isAsyncStarted()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isAsyncSupported()
+    {
+        return false;
+    }
+
+    @Override
+    public Part getPart(String s) throws IOException, ServletException
+    {
+        return null;
+    }
+
+    @Override
+    public Collection<Part> getParts() throws IOException, ServletException
+    {
+        return null;
+    }
+
+    @Override
+    public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse)
+    {
+        return null;
+    }
+
+    @Override
+    public AsyncContext getAsyncContext()
+    {
+        return null;
+    }
+
+    @Override
+    public DispatcherType getDispatcherType()
+    {
+        return null;
+    }
 }

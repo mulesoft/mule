@@ -31,13 +31,14 @@ import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.bio.SocketConnector;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.bio.SocketConnector;
-import org.mortbay.jetty.servlet.ServletHandler;
 
 public class HttpMultipleCookiesTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -137,10 +138,11 @@ public class HttpMultipleCookiesTestCase extends AbstractServiceAndFlowTestCase
         connector.setPort(dynamicPort2.getNumber());
         server.setConnectors(new Connector[]{connector});
 
-        ServletHandler handler = new ServletHandler();
+        ServletContextHandler handler = new ServletContextHandler();
         server.setHandler(handler);
 
-        handler.addServletWithMapping(HelloServlet.class.getName(), "/");
+        handler.setContextPath("/");
+        handler.addServlet(new ServletHolder(HelloServlet.class), "/");
 
         server.start();
         // server.join();

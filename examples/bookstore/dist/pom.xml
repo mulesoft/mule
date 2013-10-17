@@ -49,10 +49,6 @@
             <version>${muleVersion}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.mortbay.jetty</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>org.apache.tomcat</groupId>
                     <artifactId>jsp-api</artifactId>
                 </exclusion>

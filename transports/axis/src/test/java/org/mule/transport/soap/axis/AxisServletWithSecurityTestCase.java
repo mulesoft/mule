@@ -28,9 +28,9 @@ import javax.servlet.ServletContextListener;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
 public class AxisServletWithSecurityTestCase extends FunctionalTestCase
 {
@@ -53,7 +53,7 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
         HTTP_PORT = dynamicPort.getNumber();
         httpServer = new Server(HTTP_PORT);
 
-        Context c = new Context(httpServer, "/", Context.SESSIONS);
+        ServletContextHandler c = new ServletContextHandler(httpServer, "/", ServletContextHandler.SESSIONS);
         c.addServlet(new ServletHolder(new MuleReceiverServlet()), "/services/*");
         c.addEventListener(new ServletContextListener()
         {
