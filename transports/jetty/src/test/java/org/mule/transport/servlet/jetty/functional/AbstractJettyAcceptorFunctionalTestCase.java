@@ -24,7 +24,6 @@ import org.mule.transport.servlet.jetty.JettyHttpConnector;
 import java.util.Set;
 
 import org.junit.Rule;
-import org.mortbay.thread.QueuedThreadPool;
 
 /**
  * Functional tests that Jetty acceptor threads may be changed (from default of 1).
@@ -88,8 +87,7 @@ public abstract class AbstractJettyAcceptorFunctionalTestCase extends Functional
                 actual = 0;
                 for (final Thread th : threadSet)
                 {
-                    if (th.getClass().equals(QueuedThreadPool.PoolThread.class)
-                        && th.getName().contains("Acceptor"))
+                    if (th.getName().contains("qtp") && th.getName().contains("Acceptor"))
                     {
                         actual = actual + 1;
                     }

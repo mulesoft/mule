@@ -6,7 +6,7 @@
  */
 package org.mule.transport.servlet.jetty;
 
-import org.mortbay.util.ajax.Continuation;
+import org.eclipse.jetty.continuation.Continuation;
 
 /**
  * This class wraps a continuation object and provides a way to synchronize the access to it by a mutex lock object.
@@ -26,7 +26,7 @@ public class ContinuationsReplyTo
     {
         synchronized(mutex)
         {
-            continuation.setObject(value);
+            continuation.setAttribute("object", value);
             continuation.resume();
         }
     }

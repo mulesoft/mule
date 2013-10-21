@@ -11,7 +11,7 @@ import org.mule.api.transport.MessageReceiver;
 
 import javax.servlet.Servlet;
 
-import org.mortbay.jetty.Connector;
+import org.eclipse.jetty.server.Connector;
 
 /**
  * TODO

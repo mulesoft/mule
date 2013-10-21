@@ -22,10 +22,10 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.junit.Rule;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.ServletHolder;
 
 public abstract class AbstractServletTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -48,7 +48,7 @@ public abstract class AbstractServletTestCase extends AbstractServiceAndFlowTest
 
         httpServer = new Server(httpPort.getNumber());
 
-        Context root = new Context(httpServer,"/",Context.SESSIONS);
+        ServletContextHandler root = new ServletContextHandler(httpServer, "/", ServletContextHandler.SESSIONS);
         ServletHolder holder = new ServletHolder(MuleReceiverServlet.class);
         root.addServlet(holder, context);
 

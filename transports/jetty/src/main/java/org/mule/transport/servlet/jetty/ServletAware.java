@@ -10,7 +10,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 
 import javax.servlet.Servlet;
 
-import org.mortbay.jetty.Connector;
+import org.eclipse.jetty.server.Connector;
 
 /**
  * TODO
