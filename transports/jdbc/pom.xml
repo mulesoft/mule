@@ -45,7 +45,7 @@
         <dependency>
             <groupId>com.experlog</groupId>
             <artifactId>xapool</artifactId>
-            <version>${xaPoolVersion}-osgi</version>
+            <version>${xaPoolVersion}</version>
         </dependency>
 
         <!-- Unit tests -->

@@ -33,7 +33,7 @@
         <dependency>
             <groupId>ognl</groupId>
             <artifactId>ognl</artifactId>
-            <version>${ognlVersion}-osgi</version>
+            <version>${ognlVersion}</version>
         </dependency>
          <dependency>
             <groupId>jboss</groupId>
