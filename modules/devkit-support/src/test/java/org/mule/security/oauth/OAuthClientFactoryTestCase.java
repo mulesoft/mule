@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.security.oauth;
 
 import org.mule.api.MuleContext;
@@ -12,28 +13,42 @@ import org.mule.api.store.ObjectStoreException;
 import org.mule.common.security.oauth.OAuthState;
 import org.mule.common.security.oauth.exception.NotAuthorizedException;
 import org.mule.tck.size.SmallTest;
+import org.mule.util.store.InMemoryObjectStore;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
 public class OAuthClientFactoryTestCase
 {
 
+    private static final Logger logger = LoggerFactory.getLogger(OAuthClientFactoryTestCase.class);
+
     private static final String KEY = "key";
     private static final String consumerKey = "consumerKey";
     private static final String consumerSecret = "consumerSecret";
 
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private OAuth2Manager<OAuth2Adapter> manager;
 
     private TestClientFactory factory;
@@ -41,20 +56,39 @@ public class OAuthClientFactoryTestCase
     @Mock
     private ObjectStore<Serializable> objectStore;
 
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private MuleContext muleContext;
 
+    private Map<String, Lock> locks;
+
     @Before
-    @SuppressWarnings("unchecked")
     public void setUp()
     {
-        this.manager = (OAuth2Manager<OAuth2Adapter>) Mockito.mock(OAuth2Manager.class,
-            Mockito.RETURNS_DEEP_STUBS);
+        this.locks = new HashMap<String, Lock>();
 
         Mockito.when(this.manager.getDefaultUnauthorizedConnector().getConsumerKey()).thenReturn(consumerKey);
         Mockito.when(this.manager.getDefaultUnauthorizedConnector().getConsumerSecret()).thenReturn(
             consumerSecret);
+
         Mockito.when(this.manager.getMuleContext()).thenReturn(this.muleContext);
+        Mockito.when(this.muleContext.getLockFactory().createLock(Mockito.anyString())).thenAnswer(
+            new Answer<Lock>()
+            {
+
+                @Override
+                public synchronized Lock answer(InvocationOnMock invocation) throws Throwable
+                {
+                    String key = invocation.getArguments()[0].toString();
+                    Lock lock = locks.get(key);
+                    if (lock == null)
+                    {
+                        lock = new ReentrantLock();
+                        locks.put(key, lock);
+                    }
+
+                    return lock;
+                }
+            });
 
         this.factory = Mockito.spy(new TestClientFactory(this.manager, this.objectStore));
     }
@@ -264,12 +298,7 @@ public class OAuthClientFactoryTestCase
     public void passivateUnexisting() throws Exception
     {
         Mockito.when(this.objectStore.contains(KEY)).thenReturn(false);
-        final TestOAuth2Adapter adapter = new TestOAuth2Adapter(this.manager);
-
-        adapter.setAccessToken("new access token");
-        adapter.setAccessTokenUrl("access token url");
-        adapter.setAuthorizationUrl("authorization url");
-        adapter.setRefreshToken("refresh token");
+        final TestOAuth2Adapter adapter = this.getTesteAdapter();
 
         this.factory.passivateObject(KEY, adapter);
 
@@ -290,6 +319,82 @@ public class OAuthClientFactoryTestCase
                 return null;
             }
         }).when(this.objectStore).store(Mockito.eq(KEY), Mockito.any(OAuthState.class));
+    }
+
+    @Test
+    public void objectStoreAtomicity() throws Exception
+    {
+        OAuthState state = this.registerState();
+        final int threadCount = 200;
+
+        this.objectStore = new InMemoryObjectStore<Serializable>();
+        this.objectStore.store(KEY, state);
+        this.factory = new TestClientFactory(this.manager, this.objectStore);
+
+        final TestOAuth2Adapter adapter = this.getTesteAdapter();
+        final List<Exception> exceptions = new ArrayList<Exception>();
+        final CountDownLatch latch = new CountDownLatch(threadCount);
+
+        Runnable r = new Runnable()
+        {
+
+            @Override
+            public void run()
+            {
+                try
+                {
+                    factory.makeObject(KEY);
+                    factory.passivateObject(KEY, adapter);
+                }
+                catch (Exception e)
+                {
+                    exceptions.add(e);
+                }
+                finally
+                {
+                    latch.countDown();
+                }
+            }
+        };
+
+        for (int i = 0; i < threadCount; i++)
+        {
+            new Thread(r).start();
+        }
+
+        latch.await();
+
+        if (!exceptions.isEmpty())
+        {
+            StringBuilder builder = new StringBuilder(String.format("Found %d exceptions: \n\n",
+                exceptions.size()));
+            for (int i = 0; i < exceptions.size(); i++)
+            {
+                Exception e = exceptions.get(i);
+                builder.append(String.format("Exception number %d:\n\n", i))
+                    .append("---------\n\n")
+                    .append(e.getClass().getCanonicalName()).append(" - ").append(e.getMessage());
+                for (StackTraceElement element : e.getStackTrace())
+                {
+                    builder.append("\n").append(element);
+                }
+                builder.append("---------\n\n");
+            }
+            logger.error(builder.toString());
+        }
+
+        Assert.assertTrue(exceptions.isEmpty());
+    }
+
+    private TestOAuth2Adapter getTesteAdapter()
+    {
+        final TestOAuth2Adapter adapter = new TestOAuth2Adapter(this.manager);
+
+        adapter.setAccessToken("new access token");
+        adapter.setAccessTokenUrl("access token url");
+        adapter.setAuthorizationUrl("authorization url");
+        adapter.setRefreshToken("refresh token");
+        return adapter;
     }
 
     private OAuthState registerState() throws ObjectStoreException
