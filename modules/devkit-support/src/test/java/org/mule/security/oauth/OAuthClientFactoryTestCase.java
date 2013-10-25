@@ -16,11 +16,11 @@ import org.mule.tck.size.SmallTest;
 import org.mule.util.store.InMemoryObjectStore;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -34,15 +34,11 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
 public class OAuthClientFactoryTestCase
 {
-
-    private static final Logger logger = LoggerFactory.getLogger(OAuthClientFactoryTestCase.class);
 
     private static final String KEY = "key";
     private static final String consumerKey = "consumerKey";
@@ -325,15 +321,36 @@ public class OAuthClientFactoryTestCase
     public void objectStoreAtomicity() throws Exception
     {
         OAuthState state = this.registerState();
-        final int threadCount = 200;
 
         this.objectStore = new InMemoryObjectStore<Serializable>();
         this.objectStore.store(KEY, state);
         this.factory = new TestClientFactory(this.manager, this.objectStore);
+        final AtomicInteger rejectedAccessAttemps = new AtomicInteger(0);
+        final CountDownLatch latch = new CountDownLatch(4);
+        final Lock lock = new ReentrantLock();
+
+        Mockito.when(this.muleContext.getLockFactory().createLock(Mockito.anyString())).thenAnswer(new Answer<Lock>()
+        {
+            private boolean first = true;
+
+            @Override
+            public synchronized Lock answer(InvocationOnMock invocation) throws Throwable
+            {
+                if (this.first)
+                {
+                    this.first = false;
+                }
+                else
+                {
+                    rejectedAccessAttemps.addAndGet(1);
+                }
+
+                latch.countDown();
+                return lock;
+            }
+        });
 
         final TestOAuth2Adapter adapter = this.getTesteAdapter();
-        final List<Exception> exceptions = new ArrayList<Exception>();
-        final CountDownLatch latch = new CountDownLatch(threadCount);
 
         Runnable r = new Runnable()
         {
@@ -343,47 +360,21 @@ public class OAuthClientFactoryTestCase
             {
                 try
                 {
-                    factory.makeObject(KEY);
                     factory.passivateObject(KEY, adapter);
+                    factory.makeObject(KEY);
                 }
                 catch (Exception e)
                 {
-                    exceptions.add(e);
-                }
-                finally
-                {
-                    latch.countDown();
+                    e.printStackTrace();
                 }
             }
         };
 
-        for (int i = 0; i < threadCount; i++)
-        {
-            new Thread(r).start();
-        }
+        new Thread(r).start();
+        new Thread(r).start();
+        latch.await(30, TimeUnit.SECONDS);
 
-        latch.await();
-
-        if (!exceptions.isEmpty())
-        {
-            StringBuilder builder = new StringBuilder(String.format("Found %d exceptions: \n\n",
-                exceptions.size()));
-            for (int i = 0; i < exceptions.size(); i++)
-            {
-                Exception e = exceptions.get(i);
-                builder.append(String.format("Exception number %d:\n\n", i))
-                    .append("---------\n\n")
-                    .append(e.getClass().getCanonicalName()).append(" - ").append(e.getMessage());
-                for (StackTraceElement element : e.getStackTrace())
-                {
-                    builder.append("\n").append(element);
-                }
-                builder.append("---------\n\n");
-            }
-            logger.error(builder.toString());
-        }
-
-        Assert.assertTrue(exceptions.isEmpty());
+        Assert.assertEquals(3, rejectedAccessAttemps.get());
     }
 
     private TestOAuth2Adapter getTesteAdapter()
