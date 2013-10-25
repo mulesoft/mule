@@ -23,6 +23,9 @@ import org.junit.Rule;
 
 public abstract class AbstractWebappsTestCase extends FunctionalTestCase
 {
+
+    protected static final String WEBAPP_TEST_URL = "test/hello";
+
     @Rule
     public SystemProperty baseDirProperty = new SystemProperty("baseDir", ClassUtils.getClassPathRoot(getClass()).getPath() + "../../");
 

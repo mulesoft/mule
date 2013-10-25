@@ -344,6 +344,11 @@
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-deploy</artifactId>
+                <version>${jettyVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-servlet</artifactId>
                 <version>${jettyVersion}</version>
             </dependency>
@@ -1852,7 +1857,6 @@
                         <exclude>**/ProjectArchetypeMojo.java</exclude>
                         <exclude>**/TransportArchetypeMojo.java</exclude>
                         <exclude>**/XMLStreamReaderToContentHandler.java</exclude>
-                        <exclude>**/WebAppDeployer.java</exclude>
                         <exclude>**/__artifactId__IBean.java</exclude>
                         <exclude>**/__artifactId__IBeanTestCase.java</exclude>
                     </excludes>

@@ -6,12 +6,14 @@
  */
 package org.mule.transport.servlet.jetty;
 
+import org.mule.tck.junit4.rule.DynamicPort;
+
 import org.junit.Rule;
 import org.junit.Test;
-import org.mule.tck.junit4.rule.DynamicPort;
 
 public class WebappsDefaultsTestCase extends AbstractWebappsTestCase
 {
+
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
@@ -24,6 +26,6 @@ public class WebappsDefaultsTestCase extends AbstractWebappsTestCase
     @Test
     public void webappWithDefaultsShouldBeDeployed() throws Exception
     {
-        sendRequestAndAssertCorrectResponse(String.format("http://localhost:%s/test/hello",dynamicPort.getNumber()));
+        sendRequestAndAssertCorrectResponse(String.format("http://localhost:%s/%s", dynamicPort.getNumber(), WEBAPP_TEST_URL));
     }
 }
