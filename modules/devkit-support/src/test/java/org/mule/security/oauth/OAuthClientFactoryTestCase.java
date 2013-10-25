@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.security.oauth;
 
 import org.mule.api.MuleContext;
@@ -12,13 +13,22 @@ import org.mule.api.store.ObjectStoreException;
 import org.mule.common.security.oauth.OAuthState;
 import org.mule.common.security.oauth.exception.NotAuthorizedException;
 import org.mule.tck.size.SmallTest;
+import org.mule.util.store.InMemoryObjectStore;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -34,6 +44,7 @@ public class OAuthClientFactoryTestCase
     private static final String consumerKey = "consumerKey";
     private static final String consumerSecret = "consumerSecret";
 
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private OAuth2Manager<OAuth2Adapter> manager;
 
     private TestClientFactory factory;
@@ -41,20 +52,39 @@ public class OAuthClientFactoryTestCase
     @Mock
     private ObjectStore<Serializable> objectStore;
 
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private MuleContext muleContext;
 
+    private Map<String, Lock> locks;
+
     @Before
-    @SuppressWarnings("unchecked")
     public void setUp()
     {
-        this.manager = (OAuth2Manager<OAuth2Adapter>) Mockito.mock(OAuth2Manager.class,
-            Mockito.RETURNS_DEEP_STUBS);
+        this.locks = new HashMap<String, Lock>();
 
         Mockito.when(this.manager.getDefaultUnauthorizedConnector().getConsumerKey()).thenReturn(consumerKey);
         Mockito.when(this.manager.getDefaultUnauthorizedConnector().getConsumerSecret()).thenReturn(
             consumerSecret);
+
         Mockito.when(this.manager.getMuleContext()).thenReturn(this.muleContext);
+        Mockito.when(this.muleContext.getLockFactory().createLock(Mockito.anyString())).thenAnswer(
+            new Answer<Lock>()
+            {
+
+                @Override
+                public synchronized Lock answer(InvocationOnMock invocation) throws Throwable
+                {
+                    String key = invocation.getArguments()[0].toString();
+                    Lock lock = locks.get(key);
+                    if (lock == null)
+                    {
+                        lock = new ReentrantLock();
+                        locks.put(key, lock);
+                    }
+
+                    return lock;
+                }
+            });
 
         this.factory = Mockito.spy(new TestClientFactory(this.manager, this.objectStore));
     }
@@ -264,12 +294,7 @@ public class OAuthClientFactoryTestCase
     public void passivateUnexisting() throws Exception
     {
         Mockito.when(this.objectStore.contains(KEY)).thenReturn(false);
-        final TestOAuth2Adapter adapter = new TestOAuth2Adapter(this.manager);
-
-        adapter.setAccessToken("new access token");
-        adapter.setAccessTokenUrl("access token url");
-        adapter.setAuthorizationUrl("authorization url");
-        adapter.setRefreshToken("refresh token");
+        final TestOAuth2Adapter adapter = this.getTesteAdapter();
 
         this.factory.passivateObject(KEY, adapter);
 
@@ -290,6 +315,77 @@ public class OAuthClientFactoryTestCase
                 return null;
             }
         }).when(this.objectStore).store(Mockito.eq(KEY), Mockito.any(OAuthState.class));
+    }
+
+    @Test
+    public void objectStoreAtomicity() throws Exception
+    {
+        OAuthState state = this.registerState();
+
+        this.objectStore = new InMemoryObjectStore<Serializable>();
+        this.objectStore.store(KEY, state);
+        this.factory = new TestClientFactory(this.manager, this.objectStore);
+        final AtomicInteger rejectedAccessAttemps = new AtomicInteger(0);
+        final CountDownLatch latch = new CountDownLatch(4);
+        final Lock lock = new ReentrantLock();
+
+        Mockito.when(this.muleContext.getLockFactory().createLock(Mockito.anyString())).thenAnswer(new Answer<Lock>()
+        {
+            private boolean first = true;
+
+            @Override
+            public synchronized Lock answer(InvocationOnMock invocation) throws Throwable
+            {
+                if (this.first)
+                {
+                    this.first = false;
+                }
+                else
+                {
+                    rejectedAccessAttemps.addAndGet(1);
+                }
+
+                latch.countDown();
+                return lock;
+            }
+        });
+
+        final TestOAuth2Adapter adapter = this.getTesteAdapter();
+
+        Runnable r = new Runnable()
+        {
+
+            @Override
+            public void run()
+            {
+                try
+                {
+                    factory.passivateObject(KEY, adapter);
+                    factory.makeObject(KEY);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        new Thread(r).start();
+        new Thread(r).start();
+        latch.await(5, TimeUnit.SECONDS);
+
+        Assert.assertEquals(3, rejectedAccessAttemps.get());
+    }
+
+    private TestOAuth2Adapter getTesteAdapter()
+    {
+        final TestOAuth2Adapter adapter = new TestOAuth2Adapter(this.manager);
+
+        adapter.setAccessToken("new access token");
+        adapter.setAccessTokenUrl("access token url");
+        adapter.setAuthorizationUrl("authorization url");
+        adapter.setRefreshToken("refresh token");
+        return adapter;
     }
 
     private OAuthState registerState() throws ObjectStoreException

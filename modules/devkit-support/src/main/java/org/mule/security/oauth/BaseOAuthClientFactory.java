@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.security.oauth;
 
 import org.mule.api.context.MuleContextAware;
@@ -23,6 +24,7 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
 
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
 import org.slf4j.Logger;
@@ -108,15 +110,26 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
     @Override
     public final OAuth2Adapter makeObject(String key) throws Exception
     {
-        if (!this.objectStore.contains(key))
-        {
-            throw new NotAuthorizedException(
-                String.format(
-                    "There is no access token stored under the key %s . You need to call the <authorize> message processor. The key will be given to you via a flow variable after the OAuth dance is completed. You can extract it using flowVars['tokenId'].",
-                    key));
-        }
+        OAuthState state = null;
+        Lock lock = this.getLock(key);
+        lock.lock();
 
-        OAuthState state = this.retrieveOAuthState(key, true);
+        try
+        {
+            if (!this.objectStore.contains(key))
+            {
+                throw new NotAuthorizedException(
+                    String.format(
+                        "There is no access token stored under the key %s . You need to call the <authorize> message processor. The key will be given to you via a flow variable after the OAuth dance is completed. You can extract it using flowVars['tokenId'].",
+                        key));
+            }
+
+            state = this.retrieveOAuthState(key, true);
+        }
+        finally
+        {
+            lock.unlock();
+        }
 
         OAuth2Adapter connector = this.getAdapterClass()
             .getConstructor(OAuth2Manager.class)
@@ -175,7 +188,7 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
         }
         catch (ObjectStoreException e)
         {
-            throw new RuntimeException("Error retrievin value from object store with key " + key, e);
+            throw new RuntimeException("Error retrieving value from object store with key " + key, e);
         }
 
         if (state != null && !(state instanceof OAuthState))
@@ -277,8 +290,8 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
      * 
      * @param key the key of the object at the object store
      * @param obj an instance of {@link org.mule.security.oauth.OAuth2Adapter}
-     * @throws IllegalArgumetException if obj is not an
-     *             instance of the type returned by {@link
+     * @throws IllegalArgumetException if obj is not an instance of the type returned
+     *             by {@link
      *             org.mule.security.oauth.BaseOAuthClientFactory.getAdapterClass()}
      */
     @Override
@@ -291,6 +304,8 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
 
         OAuth2Adapter connector = (OAuth2Adapter) obj;
 
+        Lock lock = this.getLock(key);
+        lock.lock();
         try
         {
             if (!this.objectStore.contains(key))
@@ -325,6 +340,10 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
             logger.warn("Could not validate object due to object store exception", e);
             return false;
         }
+        finally
+        {
+            lock.unlock();
+        }
         return true;
     }
 
@@ -343,8 +362,8 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
      * 
      * @param key the key of the object at the object store
      * @param obj an instance of {@link org.mule.security.oauth.OAuth2Adapter}
-     * @throws IllegalArgumetException if obj is not an
-     *             instance of the type returned by {@link
+     * @throws IllegalArgumetException if obj is not an instance of the type returned
+     *             by {@link
      *             org.mule.security.oauth.BaseOAuthClientFactory.getAdapterClass()}
      */
     @Override
@@ -359,25 +378,41 @@ public abstract class BaseOAuthClientFactory implements KeyedPoolableObjectFacto
 
         OAuthState state = null;
 
-        if (this.objectStore.contains(key))
+        Lock lock = this.getLock(key);
+        lock.lock();
+
+        try
         {
-            state = this.retrieveOAuthState(key, false);
-            this.objectStore.remove(key);
-        }
+            if (this.objectStore.contains(key))
+            {
+                state = this.retrieveOAuthState(key, false);
+                this.objectStore.remove(key);
+            }
+            else
+            {
+                state = new OAuthState();
+            }
 
-        if (state == null)
+            state.setAccessToken(connector.getAccessToken());
+            state.setAccessTokenUrl(connector.getAccessTokenUrl());
+            state.setAuthorizationUrl(connector.getAuthorizationUrl());
+            state.setRefreshToken(connector.getRefreshToken());
+
+            this.setCustomStateProperties(connector, state);
+
+            this.objectStore.store(key, state);
+        }
+        finally
         {
-            state = new OAuthState();
+            lock.unlock();
         }
+    }
 
-        state.setAccessToken(connector.getAccessToken());
-        state.setAccessTokenUrl(connector.getAccessTokenUrl());
-        state.setAuthorizationUrl(connector.getAuthorizationUrl());
-        state.setRefreshToken(connector.getRefreshToken());
-
-        this.setCustomStateProperties(connector, state);
-
-        this.objectStore.store(key, state);
+    private Lock getLock(String key)
+    {
+        return this.oauthManager.getMuleContext()
+            .getLockFactory()
+            .createLock(String.format("OAuthTokenKeyLock-%s", key));
     }
 
 }
