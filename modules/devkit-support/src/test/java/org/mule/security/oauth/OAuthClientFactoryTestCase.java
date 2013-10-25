@@ -372,7 +372,7 @@ public class OAuthClientFactoryTestCase
 
         new Thread(r).start();
         new Thread(r).start();
-        latch.await(30, TimeUnit.SECONDS);
+        latch.await(5, TimeUnit.SECONDS);
 
         Assert.assertEquals(3, rejectedAccessAttemps.get());
     }
