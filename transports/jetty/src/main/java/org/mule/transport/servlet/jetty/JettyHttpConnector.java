@@ -42,6 +42,11 @@ import java.util.List;
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServlet;
 
+import org.eclipse.jetty.deploy.App;
+import org.eclipse.jetty.deploy.AppLifeCycle;
+import org.eclipse.jetty.deploy.DeploymentManager;
+import org.eclipse.jetty.deploy.graph.Node;
+import org.eclipse.jetty.deploy.providers.WebAppProvider;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -52,7 +57,6 @@ import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.log.Log;
-import org.eclipse.jetty.webapp.AbstractConfiguration;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.webapp.WebInfConfiguration;
 import org.eclipse.jetty.webapp.WebXmlConfiguration;
@@ -60,7 +64,7 @@ import org.eclipse.jetty.xml.XmlConfiguration;
 
 /**
  * The <code>JettyConnector</code> can be using to embed a Jetty server to receive requests on an
- * http inound endpoint. One server is created for each connector declared, many Jetty endpoints
+ * http inbound endpoint. One server is created for each connector declared, many Jetty endpoints
  * can share the same connector.
  */
 public class JettyHttpConnector extends AbstractConnector
@@ -87,7 +91,7 @@ public class JettyHttpConnector extends AbstractConnector
 
     protected HashMap<String, ConnectorHolder> holders = new HashMap<String, ConnectorHolder>();
 
-    private WebAppDeployer deployer;
+    private ContextHandlerCollection contexts;
 
     public JettyHttpConnector(MuleContext context)
     {
@@ -116,10 +120,73 @@ public class JettyHttpConnector extends AbstractConnector
     protected void doInitialise() throws InitialisationException
     {
         httpServer = new Server();
+        contexts = new ContextHandlerCollection();
+
+        httpServer.setHandler(contexts);
 
         if (webappsConfiguration != null)
         {
-            deployer = new WebAppDeployer();
+            DeploymentManager deploymentManager = new DeploymentManager();
+            WebAppProvider webAppProvider = new WebAppProvider()
+            {
+                @Override
+                public ContextHandler createContextHandler(App app) throws Exception
+                {
+                    WebAppContext webAppContext = (WebAppContext) super.createContextHandler(app);
+                    if (webappsConfiguration.getServerClasses() != null)
+                    {
+                        webAppContext.setServerClasses(webappsConfiguration.getServerClasses());
+                    }
+                    if (webappsConfiguration.getSystemClasses() != null)
+                    {
+                        webAppContext.setSystemClasses(webappsConfiguration.getSystemClasses());
+                    }
+                    return webAppContext;
+                }
+            };
+
+            final Connector jettyConnector = createJettyConnector();
+            jettyConnector.setHost(webappsConfiguration.getHost());
+            jettyConnector.setPort(webappsConfiguration.getPort());
+
+            deploymentManager.setContexts(contexts);
+            deploymentManager.addAppProvider(webAppProvider);
+            deploymentManager.addLifeCycleBinding(new AppLifeCycle.Binding()
+            {
+                @Override
+                public String[] getBindingTargets()
+                {
+                    return new String[] {AppLifeCycle.DEPLOYING};
+                }
+
+                @Override
+                public void processBinding(Node node, App app) throws Exception
+                {
+                    ContextHandler contextHandler = app.getContextHandler();
+
+                    if (contextHandler instanceof WebAppContext)
+                    {
+                        WebAppContext webapp = (WebAppContext) contextHandler;
+                        File workDir = new File(muleContext.getConfiguration().getWorkingDirectory(),
+                                                "_exploded_wars" + webapp.getContextPath());
+                        workDir.mkdirs();
+                        webapp.setTempDirectory(workDir);
+                        webapp.setAttribute(MULE_CONTEXT_ATTRIBUTE, muleContext);
+                        webapp.setConnectorNames(new String[] {jettyConnector.getName()});
+
+                        if (logger.isInfoEnabled())
+                        {
+                            String msg = String.format("Will deploy a web app at %s://%s%s%s",
+                                                       "http", jettyConnector.getHost(),
+                                                       jettyConnector.getPort() == 80 ? StringUtils.EMPTY : ":" + jettyConnector.getPort(),
+                                                       webapp.getContextPath());
+
+                            logger.info(StringMessageUtils.getBoilerPlate(msg, '*', 70));
+                        }
+                        return;
+                    }
+                }
+            });
             String webAppDir = webappsConfiguration.getDirectory();
             if (StringUtils.isBlank(webAppDir))
             {
@@ -133,31 +200,24 @@ public class JettyHttpConnector extends AbstractConnector
                 // override only if user hasn't specified one (turn off file-mapped buffer for
                 // static files to avoid resource locking, makes webapp resources editable on the fly)
                 final URL muleDefaults = ClassUtils.getResource("org/mule/transport/jetty/webdefault.xml", getClass());
-                deployer.setDefaultsDescriptor(muleDefaults.toExternalForm());
+                webAppProvider.setDefaultsDescriptor(muleDefaults.toExternalForm());
             }
-            deployer.setConnector(this);
-            deployer.setWebAppDir(webAppDir);
-            deployer.setExtract(true);
-            deployer.setParentLoaderPriority(false);
-            deployer.setServerClasses(webappsConfiguration.getServerClasses());
-            deployer.setSystemClasses(webappsConfiguration.getSystemClasses());
 
-            Connector jettyConnector = createJettyConnector();
-            jettyConnector.setHost(webappsConfiguration.getHost());
-            jettyConnector.setPort(webappsConfiguration.getPort());
-            deployer.setContexts(httpServer);
+            webAppProvider.setMonitoredDirName(webAppDir);
+            webAppProvider.setExtractWars(true);
+            webAppProvider.setParentLoaderPriority(false);
+
             String[] confClasses = new String[]
             {
                 // configures webapp's classloader as a child of a Mule app classloader
                 WebInfConfiguration.class.getName(),
-                WebXmlConfiguration.class.getName(),
-                // just to get jetty going, we don't need java ee bindings. inherits annotation processing
-                DummyJndiConfiguration.class.getName()
+                WebXmlConfiguration.class.getName()
             };
-            deployer.setConfigurationClasses(confClasses);
+            webAppProvider.setConfigurationClasses(confClasses);
+            webAppProvider.setDeploymentManager(deploymentManager);
 
+            httpServer.addBean(deploymentManager);
             httpServer.addConnector(jettyConnector);
-            httpServer.addBean(deployer);
         }
 
         initialiseFromConfigFile();
@@ -198,37 +258,7 @@ public class JettyHttpConnector extends AbstractConnector
 
     protected void addHandler(Handler handler)
     {
-
-        final Connector c = httpServer.getConnectors()[0];
-        if (handler instanceof WebAppContext)
-        {
-            final WebAppContext webapp = (WebAppContext) handler;
-            final File workDir = new File(muleContext.getConfiguration().getWorkingDirectory(),
-                                          "_exploded_wars" + webapp.getContextPath());
-            workDir.mkdirs();
-            webapp.setTempDirectory(workDir);
-            webapp.setAttribute(MULE_CONTEXT_ATTRIBUTE, muleContext);
-
-            if (logger.isInfoEnabled())
-            {
-                final String msg = String.format("Will deploy a web app at %s:/%s%s%s",
-                                                 "http", c.getHost(),
-                                                 c.getPort() == 80 ? StringUtils.EMPTY : ":" + c.getPort(),
-                                                 webapp.getContextPath());
-
-                logger.info(StringMessageUtils.getBoilerPlate(msg, '*', 70));
-            }
-        }
-
-        ContextHandlerCollection contextHandlers = (ContextHandlerCollection) httpServer.getHandler();
-
-        if (contextHandlers == null)
-        {
-            contextHandlers = new ContextHandlerCollection();
-        }
-        contextHandlers.addHandler(handler);
-
-        httpServer.setHandler(contextHandlers);
+        contexts.addHandler(handler);
     }
 
     @SuppressWarnings("unchecked")
@@ -279,11 +309,6 @@ public class JettyHttpConnector extends AbstractConnector
     {
         try
         {
-            if (deployer != null)
-            {
-                deployer.start();
-            }
-
             httpServer.start();
 
             for (ConnectorHolder<?, ?> contextHolder : holders.values())
@@ -303,11 +328,6 @@ public class JettyHttpConnector extends AbstractConnector
         try
         {
             httpServer.stop();
-
-            if (deployer != null)
-            {
-                deployer.stop();
-            }
 
             for (ConnectorHolder<?, ?> connectorRef : holders.values())
             {
@@ -515,26 +535,24 @@ public class JettyHttpConnector extends AbstractConnector
             path = ROOT;
         }
 
-        ContextHandlerCollection handlerCollection = new ContextHandlerCollection();
-
         if (resourceBase != null)
         {
             ResourceHandler resourceHandler = new ResourceHandler();
-            ContextHandler resourceContextHandler = new ContextHandler(handlerCollection, path);
+            ContextHandler resourceContextHandler = new ContextHandler(contexts, path);
             resourceHandler.setResourceBase(resourceBase);
             resourceContextHandler.setHandler(resourceHandler);
         }
 
-        ServletContextHandler servletContext = new ServletContextHandler(handlerCollection, ROOT, ServletContextHandler.NO_SECURITY);
+        ServletContextHandler servletContext = new ServletContextHandler(contexts, ROOT, ServletContextHandler.NO_SECURITY);
         servletContext.addEventListener(new MuleServletContextListener(muleContext, getName()));
+        servletContext.setConnectorNames(new String[] {connector.getName()});
 
         ServletHolder holder = new ServletHolder();
         holder.setServlet(servlet);
         servletContext.addServlet(holder, "/*");
         servletContext.addServlet(JarResourceServlet.class, JarResourceServlet.DEFAULT_PATH_SPEC);
-        handlerCollection.addHandler(servletContext);
+        addHandler(servletContext);
 
-        addHandler(handlerCollection);
         return servlet;
     }
 
@@ -627,14 +645,4 @@ public class JettyHttpConnector extends AbstractConnector
         return true;
     }
 
-    /**
-     * A helper class to let jetty startup, we don't bind java ee objects like java:comp/UserTransaction.
-     */
-    public static class DummyJndiConfiguration extends AbstractConfiguration
-    {
-        public DummyJndiConfiguration() throws ClassNotFoundException
-        {
-
-        }
-    }
 }
