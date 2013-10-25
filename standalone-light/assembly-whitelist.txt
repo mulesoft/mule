@@ -258,6 +258,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/jersey-server-1.6.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jetty-annotations-8.1.13.v20130916.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jetty-continuation-8.1.13.v20130916.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/jetty-deploy-8.1.13.v20130916.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jetty-http-8.1.13.v20130916.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jetty-io-8.1.13.v20130916.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jetty-jndi-8.1.13.v20130916.jar
