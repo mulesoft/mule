@@ -75,6 +75,8 @@ public class JettyHttpConnector extends AbstractConnector
 
     private boolean useContinuations = false;
 
+    private int acceptors = 1;
+
     private String resourceBase;
 
     private WebappsConfiguration webappsConfiguration;
@@ -338,7 +340,12 @@ public class JettyHttpConnector extends AbstractConnector
 
     protected org.mortbay.jetty.AbstractConnector createJettyConnector()
     {
-        return new SelectChannelConnector();
+        final SelectChannelConnector cnn = new SelectChannelConnector();
+
+        // get and set number of acceptor threads into the underlying connector
+        cnn.setAcceptors(getAcceptors());
+
+        return cnn;
     }
 
     public void unregisterListener(MessageReceiver receiver) throws MuleException
@@ -403,6 +410,26 @@ public class JettyHttpConnector extends AbstractConnector
     public void setUseContinuations(boolean useContinuations)
     {
         this.useContinuations = useContinuations;
+    }
+
+    /**
+     * Get the number of "acceptor" threads Jetty should use
+     *
+     * @return the number of threads
+     */
+    public int getAcceptors()
+    {
+        return acceptors;
+    }
+
+    /**
+     * Set the number of "acceptor" threads Jetty should use
+     *
+     * @param acceptors the number of threads
+     */
+    public void setAcceptors(final int acceptors)
+    {
+        this.acceptors = acceptors;
     }
 
     ConnectorHolder<? extends MuleReceiverServlet, ? extends JettyHttpMessageReceiver> registerJettyEndpoint(MessageReceiver receiver, InboundEndpoint endpoint) throws MuleException
