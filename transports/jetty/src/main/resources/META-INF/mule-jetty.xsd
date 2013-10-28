@@ -107,7 +107,9 @@
             <xsd:annotation>
                 <xsd:documentation>
                 A comma delimited list of classes which cannot be seen by webapp context classloaders but can be overridden by the webapp.
-                Defaults to: org.mortbay.jetty.plus.jaas., org.mortbay.jetty., org.slf4j.
+                Defaults to all classes in org.eclipse.jetty., except: org.eclipse.jetty.continuation., org.eclipse.jetty.jndi., org.eclipse.jetty.plus.jaas.,
+                org.eclipse.jetty.websocket.WebSocket, org.eclipse.jetty.websocket.WebSocketFactory, org.eclipse.jetty.websocket.WebSocketServlet,
+                org.eclipse.jetty.servlet.DefaultServlet., org.eclipse.jetty.servlet.listener.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -115,7 +117,9 @@
             <xsd:annotation>
                 <xsd:documentation>
                 A comma delimited list of classes which cannot be overridden by webapp classloaders.
-                Defaults to: java., javax.servlet., javax.xml., org.mortbay., org.xml.,org.w3c., org.apache.commons.logging., org.apache.log4j.
+                Defaults to: java., javax., org.xml., org.w3c., org.apache.commons.logging., org.eclipse.jetty.continuation., org.eclipse.jetty.jndi.,
+                org.eclipse.jetty.plus.jaas., org.eclipse.jetty.websocket.WebSocket, org.eclipse.jetty.websocket.WebSocketFactory,
+                org.eclipse.jetty.websocket.WebSocketServlet, org.eclipse.jetty.servlet.DefaultServlet.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
