@@ -47,7 +47,12 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
 
         this.setFrequency(frequency);
 
-        sftpRRUtil = new SftpReceiverRequesterUtil(endpoint);
+        sftpRRUtil = createSftpReceiverRequesterUtil(endpoint);
+    }
+
+    protected SftpReceiverRequesterUtil createSftpReceiverRequesterUtil(InboundEndpoint endpoint)
+    {
+        return new SftpReceiverRequesterUtil(endpoint);
     }
 
     public SftpMessageReceiver(SftpConnector connector, FlowConstruct flow, InboundEndpoint endpoint) throws CreateException
