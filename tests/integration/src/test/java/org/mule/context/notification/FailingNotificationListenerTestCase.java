@@ -53,7 +53,6 @@ public class FailingNotificationListenerTestCase extends FunctionalTestCase
     public static class ExceptionFailingListener implements ExceptionNotificationListener
     {
 
-        @Override
         public void onNotification(ServerNotification notification)
         {
             synchronized (lock)
