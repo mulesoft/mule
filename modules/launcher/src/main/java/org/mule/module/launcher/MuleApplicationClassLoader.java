@@ -140,12 +140,6 @@ public class MuleApplicationClassLoader extends FineGrainedControlClassLoader
     }
 
     @Override
-    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
-    {
-        return super.loadClass(name, resolve);
-    }
-
-    @Override
     public URL getResource(String name)
     {
         return super.getResource(name);
