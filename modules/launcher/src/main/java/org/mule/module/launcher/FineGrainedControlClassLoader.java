@@ -71,7 +71,7 @@ public class FineGrainedControlClassLoader extends GoodCitizenClassLoader
     }
 
     @Override
-    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
+    protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
     {
         Class<?> result = findLoadedClass(name);
 
