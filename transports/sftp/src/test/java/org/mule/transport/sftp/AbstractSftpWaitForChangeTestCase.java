@@ -21,7 +21,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
-import org.junit.Before;
 import org.junit.Test;
 
 public abstract class AbstractSftpWaitForChangeTestCase extends AbstractSftpFunctionalTestCase
@@ -42,12 +41,14 @@ public abstract class AbstractSftpWaitForChangeTestCase extends AbstractSftpFunc
         sftpClient.storeFile(FILE2_NAME, new ByteArrayInputStream(TEST_MESSAGE.getBytes()));
     }
 
-    @Before
-    public void initStaticFields() throws Exception
+    @Override
+    public void setUp() throws IOException
     {
         pollingLatch = new CountDownLatch(1);
         pollingInvoked = false;
         availableFiles = null;
+
+        super.setUp();
     }
 
     @Test
