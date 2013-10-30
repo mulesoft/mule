@@ -158,7 +158,12 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
     private void processMuleSession(MuleEvent event, HttpMethod httpMethod)
     {
-        httpMethod.setRequestHeader(new Header(HttpConstants.HEADER_MULE_SESSION, event.getMessage().<String>getOutboundProperty(MuleProperties.MULE_SESSION_PROPERTY)));
+        String muleSession = event.getMessage().getOutboundProperty(MuleProperties.MULE_SESSION_PROPERTY);
+
+        if (muleSession != null)
+        {
+            httpMethod.setRequestHeader(new Header(HttpConstants.HEADER_MULE_SESSION, muleSession));
+        }
     }
 
     protected void processCookies(MuleEvent event)
