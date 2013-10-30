@@ -6,6 +6,8 @@
  */
 package org.mule.module.launcher;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -15,11 +17,8 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 @SmallTest
-public class FineGrainedControlClassLoaderTest extends AbstractMuleTestCase
+public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase
 {
     @Test
     public void isBlockedFQClassName() throws Exception
