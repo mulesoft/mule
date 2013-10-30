@@ -9,7 +9,6 @@ package org.mule.module.launcher;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.FlakinessDetectorTestRunner;
 import org.mule.tck.size.SmallTest;
 
 import java.net.URL;
@@ -17,10 +16,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 @SmallTest
-@RunWith(FlakinessDetectorTestRunner.class)
 public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase
 {
     @Test
