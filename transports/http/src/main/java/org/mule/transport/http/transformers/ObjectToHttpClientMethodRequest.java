@@ -42,7 +42,6 @@ import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 import javax.activation.URLDataSource;
 
-import org.apache.commons.httpclient.ContentLengthInputStream;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
@@ -485,7 +484,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
                         fileName = fileName.substring(x + 1);
                     }
                 }
-                parts[i] = new FilePart(dh.getName(), new ByteArrayPartSource(fileName,
+                parts[i] = new FilePart(fileName, new ByteArrayPartSource(fileName,
                     IOUtils.toByteArray(dh.getInputStream())), dh.getContentType(), null);
             }
         }
