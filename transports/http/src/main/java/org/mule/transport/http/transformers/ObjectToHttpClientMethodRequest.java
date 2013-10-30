@@ -480,7 +480,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
                         fileName = fileName.substring(x + 1);
                     }
                 }
-                parts[i] = new FilePart(dh.getName(), new ByteArrayPartSource(fileName,
+                parts[i] = new FilePart(fileName, new ByteArrayPartSource(fileName,
                     IOUtils.toByteArray(dh.getInputStream())), dh.getContentType(), null);
             }
         }
