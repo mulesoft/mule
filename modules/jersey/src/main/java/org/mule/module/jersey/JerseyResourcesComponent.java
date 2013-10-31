@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.module.jersey;
 
 import org.mule.api.MuleEvent;
@@ -109,8 +110,8 @@ public class JerseyResourcesComponent extends AbstractComponent
     {
         MuleMessage message = event.getMessage();
 
-        String path = (String) message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
-        String contextPath = (String) message.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
+        String path = message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+        String contextPath = message.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
         String query = null;
         int queryIdx = path.indexOf('?');
         if (queryIdx != -1)
@@ -224,13 +225,14 @@ public class JerseyResourcesComponent extends AbstractComponent
         setComponents(javaComponents);
     }
 
-    public void setExceptionMapper(ExceptionMapper<?> exceptionMapper)
+    public void setExceptionMappers(List<ExceptionMapper<?>> exceptionMappers)
     {
-        exceptionMappers.add(exceptionMapper);
+        this.exceptionMappers.addAll(exceptionMappers);
     }
 
-    public void setContextResolver(ContextResolver<?> contextResolver)
+    public void setContextResolvers(List<ContextResolver<?>> contextResolvers)
     {
-       contextResolvers.add(contextResolver);
+        this.contextResolvers.addAll(contextResolvers);
     }
+
 }
