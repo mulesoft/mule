@@ -14,6 +14,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.NameableObject;
+import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
@@ -531,7 +532,12 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
     public MuleEvent restoreAuthorizationEvent(String eventId)
         throws ObjectStoreException, ObjectDoesNotExistException
     {
-        return (MuleEvent) this.accessTokenObjectStore.retrieve(this.buildAuthorizationEventKey(eventId));
+        MuleEvent event = (MuleEvent) this.accessTokenObjectStore.retrieve(this.buildAuthorizationEventKey(eventId));
+        if (event instanceof ThreadSafeAccess) {
+            ((ThreadSafeAccess) event).resetAccessControl();
+        }
+        
+        return event;
     }
 
     private String buildAuthorizationEventKey(String eventId)
