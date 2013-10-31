@@ -638,6 +638,8 @@
 /mule-standalone-${productVersion}/lib/opt/spring-security-config-3.1.0.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-security-core-3.1.0.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-security-web-3.1.0.RELEASE.jar
+/mule-standalone-${productVersion}/lib/opt/spring-security-ldap-3.1.0.RELEASE.jar
+/mule-standalone-${productVersion}/lib/opt/spring-ldap-core-1.3.1.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-tx-3.2.1.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-web-3.2.1.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/stax-api-1.0-2.jar
