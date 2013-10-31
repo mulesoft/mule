@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -10,53 +7,48 @@
 
 package org.mule.module.jersey;
 
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
+import static org.junit.Assert.assertEquals;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.api.client.LocalMuleClient;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class MultipleContextResolverTestCase extends AbstractServiceAndFlowTestCase
+public class MultipleContextResolverTestCase extends FunctionalTestCase
 {
-    public MultipleContextResolverTestCase(ConfigVariant variant, String configResources)
+
+    @Rule
+    public DynamicPort port = new DynamicPort("port");
+
+    @Override
+    protected String getConfigResources()
     {
-        super(variant, configResources);
+        return "multiple-context-resolver-config.xml";
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "multiple-context-resolver-conf-flow.xml"},
-        });
-    }      
-    
-
-
     @Test
-    public void testMultipleContextResolver() throws Exception
+    public void supportsMultipleContextResolver() throws Exception
     {
-        MuleClient client = muleContext.getClient();
+        LocalMuleClient client = muleContext.getClient();
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
-        MuleMessage result = client.send("http://localhost:63081/helloworld/sayHelloWorldWithJson", "", props);
-        assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
+
+        MuleMessage result = client.send("http://localhost:" + port.getNumber() + "/helloworld/sayHelloWithJson/World", TEST_MESSAGE, props);
+
+        assertEquals((Integer) HttpConstants.SC_OK, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
         assertEquals(getHelloWorldMessage(), result.getPayloadAsString());
     }
 
-
-    private String getHelloWorldMessage () {
-        return "{\"message\":\"Hello World \",\"number\":0}";
+    private String getHelloWorldMessage()
+    {
+        return "{\"message\":\"Hello World\",\"number\":0}";
     }
-
 }
