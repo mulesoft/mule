@@ -533,10 +533,11 @@ public abstract class BaseOAuth2Manager<C extends OAuth2Adapter> extends Default
         throws ObjectStoreException, ObjectDoesNotExistException
     {
         MuleEvent event = (MuleEvent) this.accessTokenObjectStore.retrieve(this.buildAuthorizationEventKey(eventId));
-        if (event instanceof ThreadSafeAccess) {
+        if (event instanceof ThreadSafeAccess)
+        {
             ((ThreadSafeAccess) event).resetAccessControl();
         }
-        
+
         return event;
     }
 
