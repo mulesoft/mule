@@ -49,6 +49,6 @@ public class MultipleContextResolverTestCase extends FunctionalTestCase
 
     private String getHelloWorldMessage()
     {
-        return "{\"message\":\"Hello World\",\"number\":0}";
+        return "{\"message\":\"Hello World\",\"number\":\"0\"}";
     }
 }
