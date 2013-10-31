@@ -4,7 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.module.jersey;
+
+import org.mule.module.jersey.exception.BeanBadRequestException;
+import org.mule.module.jersey.exception.HelloWorldException;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -16,12 +20,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import org.mule.module.jersey.exception.BeanBadRequestException;
-import org.mule.module.jersey.exception.HelloWorldException;
-
 @Path("/helloworld")
 public class HelloWorldResource
 {
+
     @POST
     @Produces("text/plain")
     public String sayHelloWorld()
@@ -69,7 +71,7 @@ public class HelloWorldResource
     {
         return "Hello " + name;
     }
-    
+
     @GET
     @Produces("text/plain")
     @Path("/throwException")
@@ -79,20 +81,11 @@ public class HelloWorldResource
     }
 
     @GET
-    @Produces("application/json")
-    @Path("/sayHelloWorldWithJson")
-    public HelloWorld sayHelloWorldWithJson()
-    {
-        HelloWorld hello = new HelloWorld();
-        hello.setMessage("Hello World ");
-        return hello;
-    }
-
-    @GET
     @Produces("text/plain")
     @Path("/throwBadRequestException")
-    public HelloWorld throwHelloBeanException() throws BeanBadRequestException {
-        throw  new BeanBadRequestException("beans are rotten");
+    public HelloBean throwHelloBeanException() throws BeanBadRequestException
+    {
+        throw new BeanBadRequestException("beans are rotten");
     }
 
 }
