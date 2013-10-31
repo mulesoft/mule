@@ -1,12 +1,13 @@
 /*
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 
 package org.mule.security.oauth;
+
+import static org.mockito.Mockito.mock;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.store.ObjectStore;
@@ -19,11 +20,8 @@ import java.io.Serializable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.Assert;
-
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 public class FetchAccessTokenTestCase extends AbstractMuleContextTestCase implements Runnable
 {
@@ -43,7 +41,7 @@ public class FetchAccessTokenTestCase extends AbstractMuleContextTestCase implem
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        this.adapter = Mockito.mock(OAuth2Adapter.class);
+        this.adapter = mock(OAuth2Adapter.class);
         this.objectStore = new InMemoryObjectStore<Serializable>();
 
         this.event = getTestEvent("");
@@ -51,7 +49,7 @@ public class FetchAccessTokenTestCase extends AbstractMuleContextTestCase implem
         this.latch = new CountDownLatch(1);
         this.exception = null;
 
-        this.manager = new TestOAuth2Manager(Mockito.mock(KeyedPoolableObjectFactory.class), adapter);
+        this.manager = new TestOAuth2Manager(mock(KeyedPoolableObjectFactory.class), adapter);
         this.manager.setAccessTokenObjectStore(this.objectStore);
 
         this.processor = new OAuth2FetchAccessTokenMessageProcessor(manager, accessToken);
@@ -71,12 +69,19 @@ public class FetchAccessTokenTestCase extends AbstractMuleContextTestCase implem
     {
         this.objectStore.store("whatever-authorization-event", event);
 
-        new Thread(this).start();
+        Thread t = new Thread(this);
+        t.start();
 
-        Assert.assertTrue("Timeout", latch.await(1, TimeUnit.SECONDS));
-        if (this.exception != null)
+        if (latch.await(1, TimeUnit.SECONDS))
         {
-            throw this.exception;
+            if (this.exception != null)
+            {
+                throw this.exception;
+            }
+        }
+        else
+        {
+            t.interrupt();
         }
     }
 
