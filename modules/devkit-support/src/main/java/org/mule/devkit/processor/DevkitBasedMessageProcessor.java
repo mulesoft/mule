@@ -19,6 +19,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.transformer.Transformer;
 import org.mule.common.security.oauth.exception.NotAuthorizedException;
@@ -33,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class DevkitBasedMessageProcessor extends ExpressionEvaluatorSupport
-    implements FlowConstructAware, MuleContextAware, Startable, Disposable, Stoppable, Initialisable
+    implements FlowConstructAware, MuleContextAware, Startable, Disposable, Stoppable, Initialisable, MessageProcessor
 {
 
     private String operationName;
