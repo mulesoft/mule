@@ -7,6 +7,7 @@
 
 package org.mule.security.oauth;
 
+import static junit.framework.Assert.fail;
 import static org.mockito.Mockito.mock;
 
 import org.mule.api.MuleEvent;
@@ -82,6 +83,7 @@ public class FetchAccessTokenTestCase extends AbstractMuleContextTestCase implem
         else
         {
             t.interrupt();
+            fail("timeout");
         }
     }
 
