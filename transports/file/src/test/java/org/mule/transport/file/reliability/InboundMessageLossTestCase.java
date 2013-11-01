@@ -17,7 +17,6 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.transport.file.AbstractFileMoveDeleteTestCase;
-import org.mule.transport.file.FileTestUtils;
 
 import java.io.File;
 import java.util.concurrent.CountDownLatch;
@@ -203,8 +202,6 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
     public void testRollbackExceptionStrategyConsumesMessage() throws Exception
     {
         final CountDownLatch exceptionStrategyLatch = new CountDownLatch(4);
-        tmpDir = createFolder(".mule/rollbackOnException");
-        final File file = createDataFile(tmpDir, "test1.txt");
         muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>() {
             @Override
             public void onNotification(ExceptionNotification notification)
@@ -212,6 +209,8 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
                 exceptionStrategyLatch.countDown();
             }
         });
+        tmpDir = createFolder(".mule/rollbackOnException");
+        final File file = createDataFile(tmpDir, "test1.txt");
         if (!exceptionStrategyLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS))
         {
             fail("message should be redelivered");
