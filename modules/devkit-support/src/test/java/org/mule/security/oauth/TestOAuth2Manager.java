@@ -70,6 +70,11 @@ public class TestOAuth2Manager extends BaseOAuth2Manager<OAuth2Adapter>
         return exceptions;
     }
     
+    @Override
+    public KeyedPoolableObjectFactory<String, OAuth2Adapter> getAccessTokenPoolFactory()
+    {
+        return this.objectFactory;
+    }
     
 
 }
