@@ -316,7 +316,7 @@ public class ServerContextTestCase extends AbstractELTestCase
     @Test
     public void dateTimeAddMonths()
     {
-        Assert.assertEquals((Calendar.getInstance(Locale.US).get(Calendar.MONTH) + 2) % 12,
+        Assert.assertEquals(((Calendar.getInstance(Locale.US).get(Calendar.MONTH) + 1) % 12) + 1,
             evaluate("(int) server.dateTime.plusMonths(1).month"));
     }
 
