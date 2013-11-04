@@ -10,6 +10,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.el.ExpressionLanguage;
+import org.mule.api.el.ExpressionLanguageExtension;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.expression.InvalidExpressionException;
@@ -24,6 +25,7 @@ import org.mule.util.IOUtils;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -51,6 +53,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     protected ParserContext parserContext;
     protected MuleContext muleContext;
     protected MVELExpressionExecutor expressionExecutor;
+    protected Collection<ExpressionLanguageExtension> expressionLanguageExtensions;
 
     protected MVELExpressionLanguageContext staticContext;
 
@@ -73,6 +76,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     {
         parserContext = createParserContext();
         expressionExecutor = new MVELExpressionExecutor(parserContext);
+        expressionLanguageExtensions = muleContext.getRegistry().lookupObjectsForLifecycle(ExpressionLanguageExtension.class);
 
         loadGlobalFunctions();
         createStaticContext();
@@ -328,7 +332,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
     protected VariableResolverFactory createGlobalVariableResolverFactory(MVELExpressionLanguageContext context)
     {
-        return new GlobalVariableResolverFactory(this, context, parserContext, muleContext);
+        return new GlobalVariableResolverFactory(this, context, parserContext, muleContext, expressionLanguageExtensions);
     }
 
     protected VariableResolverFactory createEventVariableResolverFactory(MuleEvent event)
