@@ -9,6 +9,7 @@ package org.mule.el.mvel;
 import org.mule.api.MuleContext;
 import org.mule.api.el.ExpressionLanguageExtension;
 
+import java.util.Collection;
 import java.util.Map.Entry;
 
 import org.mvel2.ParserContext;
@@ -23,12 +24,12 @@ class GlobalVariableResolverFactory extends MVELExpressionLanguageContext
     public GlobalVariableResolverFactory(MVELExpressionLanguage el,
                                          MVELExpressionLanguageContext parent,
                                          ParserContext parserContext,
-                                         MuleContext muleContext)
+                                         MuleContext muleContext,
+                                         Collection<ExpressionLanguageExtension> expressionLanguageExtensions)
     {
         super(parserContext, muleContext);
         this.parent = parent;
-        for (ExpressionLanguageExtension extension : muleContext.getRegistry().lookupObjectsForLifecycle(
-            ExpressionLanguageExtension.class))
+        for (ExpressionLanguageExtension extension : expressionLanguageExtensions)
         {
             extension.configureContext(parent);
         }
