@@ -7,6 +7,7 @@
 package org.mule.transport.jms;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -16,12 +17,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.transaction.Transaction;
-import org.mule.retry.async.AsynchronousRetryTemplate;
-import org.mule.retry.policies.RetryForeverPolicyTemplate;
+import org.mule.module.bti.transaction.TransactionManagerWrapper;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transaction.TransactionCoordination;
+import org.mule.transport.jms.xa.BitronixConnectionFactoryWrapper;
+import org.mule.transport.jms.xa.ConnectionFactoryWrapper;
 
 import java.lang.reflect.UndeclaredThrowableException;
 
@@ -29,9 +31,12 @@ import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Session;
+import javax.jms.XAConnectionFactory;
+import javax.transaction.TransactionManager;
 
+import org.hamcrest.core.Is;
+import org.hamcrest.core.IsInstanceOf;
 import org.junit.Test;
-import org.mockito.Answers;
 import org.mockito.Matchers;
 
 public class JmsConnectorTestCase extends AbstractMuleContextTestCase
@@ -168,6 +173,58 @@ public class JmsConnectorTestCase extends AbstractMuleContextTestCase
         spy.doConnect();
         spy.doStop();
         verify(connection, times(1)).stop();
+    }
+
+    @Test
+    public void doNotChangeConnectionFactoryWhenNotUsingXAConnectionFactory() throws Exception
+    {
+        muleContext.setTransactionManager(mock(TransactionManager.class));
+        ConnectionFactory mockConnectionFactory = mock(ConnectionFactory.class);
+        JmsConnector connector = createConnectionFactoryWhenGettingConnection(mockConnectionFactory);
+        assertThat(connector.getConnectionFactory(), Is.is(mockConnectionFactory));
+    }
+
+    @Test
+    public void doNotChangeConnectionFactoryWhenNotUsingTransactionManager() throws Exception
+    {
+        ConnectionFactory mockConnectionFactory = mock(TestXAConnectionFactory.class);
+        JmsConnector connector = createConnectionFactoryWhenGettingConnection(mockConnectionFactory);
+        assertThat(connector.getConnectionFactory(), Is.is(mockConnectionFactory));
+    }
+
+    @Test
+    public void createConnectionFactoryWrapperWhenUsingTransactionManager() throws Exception
+    {
+        muleContext.setTransactionManager(mock(TransactionManager.class));
+        JmsConnector connector = createConnectionFactoryWhenGettingConnection(mock(TestXAConnectionFactory.class));
+        assertThat(connector.getConnectionFactory(), IsInstanceOf.instanceOf(ConnectionFactoryWrapper.class));
+    }
+
+    @Test
+    public void createBitronixConnectionFactoryWrapperWhenUsingBtm() throws Exception
+    {
+        muleContext.setTransactionManager(mock(TransactionManagerWrapper.class));
+        JmsConnector connector = createConnectionFactoryWhenGettingConnection(mock(TestXAConnectionFactory.class));
+        assertThat(connector.getConnectionFactory(), IsInstanceOf.instanceOf(BitronixConnectionFactoryWrapper.class));
+    }
+
+    private JmsConnector createConnectionFactoryWhenGettingConnection(ConnectionFactory mockConnectionFactory) throws JMSException, MuleException
+    {
+        final Connection connection = mock(Connection.class);
+
+        JmsSupport jmsSupport = mock(JmsSupport.class);
+        when(jmsSupport.createConnection(Matchers.<ConnectionFactory>any())).thenReturn(connection);
+
+        JmsConnector connector = new JmsConnector(muleContext);
+        connector.setJmsSupport(jmsSupport);
+
+        connector.setConnectionFactory(mockConnectionFactory);
+        connector.createConnection();
+        return connector;
+    }
+
+    private interface TestXAConnectionFactory extends ConnectionFactory, XAConnectionFactory
+    {
     }
 
 }

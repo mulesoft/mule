@@ -12,6 +12,7 @@ import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 
+import bitronix.tm.resource.jms.PoolingConnectionFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -24,9 +25,9 @@ public class BitronixConnectionFactoryWrapper
 
     protected static final transient Log logger = LogFactory.getLog(BitronixConnectionFactoryWrapper.class);
 
-    protected final ConnectionFactory factory;
+    protected final PoolingConnectionFactory factory;
 
-    public BitronixConnectionFactoryWrapper(ConnectionFactory factory)
+    public BitronixConnectionFactoryWrapper(PoolingConnectionFactory factory)
     {
         this.factory = factory;
     }
@@ -49,4 +50,8 @@ public class BitronixConnectionFactoryWrapper
         return proxy;
     }
 
+    public void close()
+    {
+        factory.close();
+    }
 }

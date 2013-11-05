@@ -62,7 +62,7 @@ public class JmsOutboundMessagesCounter implements TransactionScenarios.Outbound
         initialize();
         while (true)
         {
-            Message message = consumer.receive(100);
+            Message message = consumer.receive(1000);
             if (message != null)
             {
                 numberOfMessagesArrived++;

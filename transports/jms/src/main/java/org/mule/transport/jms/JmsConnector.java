@@ -27,7 +27,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ClusterNodeNotification;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.NotificationException;
-import org.mule.module.btm.transaction.TransactionManagerWrapper;
+import org.mule.module.bti.transaction.TransactionManagerWrapper;
 import org.mule.routing.MessageFilter;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
@@ -363,6 +363,11 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             connection = null;
         }
 
+        if (connectionFactory != null && connectionFactory instanceof BitronixConnectionFactoryWrapper)
+        {
+            ((BitronixConnectionFactoryWrapper)connectionFactory).close();
+        }
+
         if (jndiNameResolver != null)
         {
             jndiNameResolver.dispose();
@@ -464,7 +469,6 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
                     poolingConnectionFactory.setMaxIdleTime(1);
                     poolingConnectionFactory.setCacheProducersConsumers(false);
                     poolingConnectionFactory.setAllowLocalTransactions(true);
-                    poolingConnectionFactory.setIgnoreRecoveryFailures(true);
                     poolingConnectionFactory.setUniqueName(muleContext.getConfiguration().getId() + "-" + getName());
                     poolingConnectionFactory.init();
                     wrappedConnectionFactory = new BitronixConnectionFactoryWrapper(poolingConnectionFactory);

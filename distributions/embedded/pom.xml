@@ -160,7 +160,7 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.mule.modules</groupId>
-                                    <artifactId>mule-module-btm</artifactId>
+                                    <artifactId>mule-module-bti</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>

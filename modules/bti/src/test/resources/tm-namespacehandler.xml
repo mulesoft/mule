@@ -3,8 +3,8 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:bti="http://www.mulesoft.org/schema/mule/bti"
       xsi:schemaLocation="
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/bti http://www.mulesoft.org/schema/mule/bti/current/mule-bti.xsd">
+      http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/bti http://www.mulesoft.org/schema/mule/bti/current/mule-bti.xsd">
 
     <bti:transaction-manager/>
 

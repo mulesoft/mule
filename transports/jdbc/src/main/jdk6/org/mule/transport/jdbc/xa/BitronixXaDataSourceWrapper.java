@@ -71,4 +71,8 @@ public class BitronixXaDataSourceWrapper implements DataSource
         return null;
     }
 
+    public void close()
+    {
+        xaDataSource.close();
+    }
 }

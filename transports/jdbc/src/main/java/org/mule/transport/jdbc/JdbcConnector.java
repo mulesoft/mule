@@ -26,7 +26,7 @@ import org.mule.common.TestResult;
 import org.mule.common.Testable;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.module.btm.transaction.TransactionManagerWrapper;
+import org.mule.module.bti.transaction.TransactionManagerWrapper;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectException;
@@ -133,7 +133,6 @@ public class JdbcConnector extends AbstractConnector implements Testable
                 poolingDataSource.setClassName(BitronixJdbcXaDataSourceProvider.class.getCanonicalName());
                 poolingDataSource.setMaxPoolSize(100);
                 poolingDataSource.setAcquireIncrement(1);
-                poolingDataSource.setIgnoreRecoveryFailures(true);
                 poolingDataSource.setAllowLocalTransactions(true);
                 poolingDataSource.setAutomaticEnlistingEnabled(false);
                 poolingDataSource.setUniqueName(muleContext.getConfiguration().getId() + "-" + getName());
@@ -388,7 +387,10 @@ public class JdbcConnector extends AbstractConnector implements Testable
     @Override
     protected void doDispose()
     {
-        // template method
+        if (dataSource instanceof BitronixXaDataSourceWrapper)
+        {
+            ((BitronixXaDataSourceWrapper)dataSource).close();
+        }
     }
 
     @Override

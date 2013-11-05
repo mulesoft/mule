@@ -17,7 +17,7 @@ import javax.jms.XAConnectionFactory;
  * ConnectionFactory since BTM does not support it yet.
  *
  * This class workaround this issue by setting a ConnectionFactory in xaConnectionFactoryProvided and then
- * when BTM instanciate BitronixJmsXaConnectionFactoryProvider through reflection it uses that ConnectionFactory
+ * when BTM instantiates BitronixJmsXaConnectionFactoryProvider through reflection it uses that ConnectionFactory
  * as delegate for the operations.
  */
 public class BitronixJmsXaConnectionFactoryProvider implements ConnectionFactory, XAConnectionFactory
