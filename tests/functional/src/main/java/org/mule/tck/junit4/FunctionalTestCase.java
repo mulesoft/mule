@@ -49,13 +49,50 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
         setStartContext(true);
     }
 
+    /**
+     * @return
+     * @deprecated use getConfigFile instead.
+     */
+    @Deprecated
+    protected abstract String getConfigResources();
+
+
     @Override
     protected ConfigurationBuilder getBuilder() throws Exception
     {
-        return new SpringXmlConfigurationBuilder(getConfigResources());
+        String configResources = getConfigResources();
+        if (configResources != null)
+        {
+            return new SpringXmlConfigurationBuilder(configResources);
+        }
+        configResources = getConfigFile();
+        if (configResources != null)
+        {
+            if (configResources.contains(","))
+            {
+                throw new RuntimeException("Do not use this method when the config is composed of several files. Use getConfigFiles method instead.");
+            }
+            return new SpringXmlConfigurationBuilder(configResources);
+        }
+        String[] multipleConfigResources = getConfigFiles();
+        return new SpringXmlConfigurationBuilder(multipleConfigResources);
     }
 
-    protected abstract String getConfigResources();
+    /**
+     * @return a single file that defines a mule application configuration
+     */
+    protected String getConfigFile()
+    {
+        return null;
+    }
+
+    /**
+     * @return a several files that define a mule application configuration
+     */
+    protected String[] getConfigFiles()
+    {
+        return null;
+    }
 
     /**
      * Returns an instance of the service's component object. Note that depending on
