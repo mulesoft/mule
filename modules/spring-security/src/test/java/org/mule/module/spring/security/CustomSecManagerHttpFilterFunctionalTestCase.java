@@ -1,20 +1,21 @@
-package org.mule.module.spring.security;
-
 /*
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+package org.mule.module.spring.security;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 
 import java.util.Arrays;
@@ -25,6 +26,9 @@ import static org.junit.Assert.assertTrue;
 
 public class CustomSecManagerHttpFilterFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
     @Parameterized.Parameters
     public static Collection<Object[]> parameters()
     {
@@ -41,7 +45,7 @@ public class CustomSecManagerHttpFilterFunctionalTestCase extends AbstractServic
 
     protected String getUrl()
     {
-        return "http://localhost:4567/authenticate";
+        return "http://localhost:" + dynamicPort.getValue() + "/authenticate";
     }
 
     @Test
