@@ -27,8 +27,9 @@ public class NotificationUtils
 
     public static void addMessageProcessorPathElements(List<MessageProcessor> processors, MessageProcessorPathElement parentElement)
     {
-
-
+        if(processors == null){
+            return;
+        }
         for (MessageProcessor mp : processors)
         {
             if (!(mp instanceof InternalMessageProcessor))
