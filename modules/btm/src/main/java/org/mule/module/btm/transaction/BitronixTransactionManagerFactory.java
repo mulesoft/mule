@@ -35,10 +35,6 @@ public class BitronixTransactionManagerFactory implements TransactionManagerFact
     private DefaultXaSessionResourceProducer defaultXaSessionResourceProducer;
     private boolean transactionManagerUsedByThisApp;
 
-    public BitronixTransactionManagerFactory()
-    {
-    }
-
     public TransactionManager create(MuleConfiguration config) throws Exception
     {
         synchronized (BitronixTransactionManagerFactory.class)
@@ -96,9 +92,9 @@ public class BitronixTransactionManagerFactory implements TransactionManagerFact
                 if (numberOfAppsUsingTm == 0)
                 {
                     TransactionManagerServices.getTransactionManager().shutdown();
+                    transactionManager = null;
                 }
             }
-            transactionManager = null;
         }
     }
 

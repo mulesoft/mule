@@ -8,30 +8,29 @@ package org.mule.module.btm.xa;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.transaction.xa.XAResource;
 
-import bitronix.tm.BitronixXid;
-import bitronix.tm.internal.XAResourceHolderState;
+import bitronix.tm.resource.common.AbstractXAResourceHolder;
 import bitronix.tm.resource.common.ResourceBean;
-import bitronix.tm.resource.common.StateChangeListener;
 import bitronix.tm.resource.common.XAResourceHolder;
-import bitronix.tm.utils.Uid;
 
 /**
  * Bitronix infrastructure classes for mule core queues XA resources.
+ *
+ * No recovery needed for VM since it's always going to be managed as the last resource in the 2PC protocol.
  */
-public class DefaultXaSessionResourceHolder implements XAResourceHolder
+public class DefaultXaSessionResourceHolder extends AbstractXAResourceHolder
 {
 
     private final XAResource xaResource;
-    private final DefaultXaSessionResourceProducer defaultXaSessionResourceProducer;
+    private final ResourceBean resourceBean;
+    private int state;
 
-    public DefaultXaSessionResourceHolder(XAResource xaResource, DefaultXaSessionResourceProducer defaultXaSessionResourceProducer)
+    public DefaultXaSessionResourceHolder(XAResource xaResource, ResourceBean resourceBean)
     {
         this.xaResource = xaResource;
-        this.defaultXaSessionResourceProducer = defaultXaSessionResourceProducer;
+        this.resourceBean = resourceBean;
     }
 
     @Override
@@ -41,52 +40,21 @@ public class DefaultXaSessionResourceHolder implements XAResourceHolder
     }
 
     @Override
-    public Map<Uid, XAResourceHolderState> getXAResourceHolderStatesForGtrid(Uid gtrid)
-    {
-        return null;
-    }
-
-    @Override
-    public void putXAResourceHolderState(BitronixXid xid, XAResourceHolderState xaResourceHolderState)
-    {
-    }
-
-    @Override
-    public void removeXAResourceHolderState(BitronixXid xid)
-    {
-    }
-
-    @Override
-    public boolean hasStateForXAResource(XAResourceHolder xaResourceHolder)
-    {
-        return false;
-    }
-
-    @Override
     public ResourceBean getResourceBean()
     {
-        return defaultXaSessionResourceProducer;
+        return resourceBean;
     }
 
     @Override
     public int getState()
     {
-        return 0;
+        return state;
     }
 
     @Override
     public void setState(int state)
     {
-    }
-
-    @Override
-    public void addStateChangeEventListener(StateChangeListener listener)
-    {
-    }
-
-    @Override
-    public void removeStateChangeEventListener(StateChangeListener listener)
-    {
+        this.state = state;
     }
 
     @Override
@@ -111,4 +79,5 @@ public class DefaultXaSessionResourceHolder implements XAResourceHolder
     {
         return null;
     }
+
 }

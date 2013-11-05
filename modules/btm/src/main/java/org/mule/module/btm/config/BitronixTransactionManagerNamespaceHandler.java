@@ -12,7 +12,7 @@ import org.mule.module.btm.transaction.BitronixTransactionManagerFactory;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
- * Registers Bean Definition Parsers for the "jbossts" namespace.
+ * Registers Bean Definition Parsers for the "btm" namespace.
  */
 public class BitronixTransactionManagerNamespaceHandler extends NamespaceHandlerSupport
 {

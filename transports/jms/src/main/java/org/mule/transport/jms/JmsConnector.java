@@ -464,7 +464,6 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
                     poolingConnectionFactory.setMaxIdleTime(1);
                     poolingConnectionFactory.setCacheProducersConsumers(false);
                     poolingConnectionFactory.setAllowLocalTransactions(true);
-                    poolingConnectionFactory.setIgnoreRecoveryFailures(true);
                     poolingConnectionFactory.setUniqueName(muleContext.getConfiguration().getId() + "-" + getName());
                     poolingConnectionFactory.init();
                     wrappedConnectionFactory = new BitronixConnectionFactoryWrapper(poolingConnectionFactory);

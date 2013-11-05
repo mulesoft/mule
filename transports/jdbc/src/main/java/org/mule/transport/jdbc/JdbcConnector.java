@@ -133,7 +133,6 @@ public class JdbcConnector extends AbstractConnector implements Testable
                 poolingDataSource.setClassName(BitronixJdbcXaDataSourceProvider.class.getCanonicalName());
                 poolingDataSource.setMaxPoolSize(100);
                 poolingDataSource.setAcquireIncrement(1);
-                poolingDataSource.setIgnoreRecoveryFailures(true);
                 poolingDataSource.setAllowLocalTransactions(true);
                 poolingDataSource.setAutomaticEnlistingEnabled(false);
                 poolingDataSource.setUniqueName(muleContext.getConfiguration().getId() + "-" + getName());

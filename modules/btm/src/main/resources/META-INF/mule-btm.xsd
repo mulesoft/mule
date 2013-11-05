@@ -39,11 +39,7 @@
 
     <xsd:complexType name="transactionManagerType">
         <xsd:complexContent>
-            <xsd:extension base="mule:abstractTransactionManagerType">
-                <xsd:sequence>
-                    <xsd:group ref="mule:propertiesGroup"/>
-                </xsd:sequence>
-            </xsd:extension>
+            <xsd:extension base="mule:abstractTransactionManagerType"/>
         </xsd:complexContent>
     </xsd:complexType>
 

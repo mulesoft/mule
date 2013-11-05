@@ -148,12 +148,6 @@ public class EndpointToEndpointXaTransactionTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
-    {
-        return null;
-    }
-
-    @Override
     protected String[] getConfigFiles()
     {
         return configFiles;

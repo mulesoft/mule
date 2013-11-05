@@ -17,10 +17,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.naming.NamingException;
 import javax.naming.Reference;
+import javax.naming.StringRefAddr;
 import javax.transaction.xa.XAResource;
 
 import bitronix.tm.internal.XAResourceHolderState;
 import bitronix.tm.recovery.RecoveryException;
+import bitronix.tm.resource.ResourceObjectFactory;
 import bitronix.tm.resource.common.ResourceBean;
 import bitronix.tm.resource.common.XAResourceHolder;
 import bitronix.tm.resource.common.XAResourceProducer;
@@ -29,14 +31,16 @@ import bitronix.tm.utils.Scheduler;
 
 /**
  * Bitronix infrastructure classes for mule core queues XA resources.
+ *
+ * No recovery needed for VM since it's always going to be managed as the last resource in the 2PC protocol.
  */
 public class DefaultXaSessionResourceProducer extends ResourceBean implements XAResourceProducer
 {
 
     private final String uniqueName;
     private final AbstractXAResourceManager xaResourceManager;
-    private List<XAResource> xaResources = new ArrayList<XAResource>();
-    private ReadWriteLock xaResourcesLock = new ReentrantReadWriteLock();
+    private final List<XAResource> xaResources = new ArrayList<XAResource>();
+    private final ReadWriteLock xaResourcesLock = new ReentrantReadWriteLock();
 
     public DefaultXaSessionResourceProducer(String uniqueName, AbstractXAResourceManager xaResourceManager)
     {
@@ -108,7 +112,11 @@ public class DefaultXaSessionResourceProducer extends ResourceBean implements XA
     @Override
     public Reference getReference() throws NamingException
     {
-        return null;
+        return new Reference(
+                DefaultXaSessionResourceProducer.class.getName(),
+                new StringRefAddr("uniqueName", getUniqueName()),
+                ResourceObjectFactory.class.getName(),
+                null);
     }
 
     public void addDefaultXASession(XAResource session)

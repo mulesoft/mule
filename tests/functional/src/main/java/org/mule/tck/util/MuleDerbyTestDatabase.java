@@ -13,36 +13,54 @@ import java.util.List;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
-import org.junit.AfterClass;
 
 /**
- *
+ * Helper class for creating a derby database.
  */
 public class MuleDerbyTestDatabase
 {
 
+    public static final String DERBY_PROPERTIES_FILE = "derby.properties";
     private final String databaseNameProperty;
-    String connectionString;
+    private String connectionString;
 
+    /**
+     * @param databaseNameProperty name of the property with the database name in derby.properties file.
+     *                             To add a new database change derby.properties file.
+     */
     public MuleDerbyTestDatabase(String databaseNameProperty)
     {
         this.databaseNameProperty = databaseNameProperty;
     }
 
+    /**
+     * Creates an empty database with a table named TEST.
+     *
+     * @throws Exception
+     */
     public void startDatabase() throws Exception
     {
-        String dbName = MuleDerbyTestUtils.loadDatabaseName("derby.properties", databaseNameProperty);
+        String dbName = MuleDerbyTestUtils.loadDatabaseName(DERBY_PROPERTIES_FILE, databaseNameProperty);
         MuleDerbyTestUtils.defaultDerbyCleanAndInit("derby.properties", databaseNameProperty);
         connectionString = "jdbc:derby:" + dbName;
         emptyTestTable();
     }
 
-    @AfterClass
+    /**
+     * Stops the created database.
+     *
+     * @throws SQLException
+     */
     public void stopDatabase() throws SQLException
     {
         MuleDerbyTestUtils.stopDatabase();
     }
 
+    /**
+     * Remove all the rows from TEST table.
+     *
+     * @throws SQLException
+     */
     public void emptyTestTable() throws Exception
     {
         try
@@ -55,6 +73,9 @@ public class MuleDerbyTestDatabase
         }
     }
 
+    /**
+     * Inserts a record in the TEST table.
+     */
     public void insertIntoTest(String data, int type)
     {
         try
@@ -67,19 +88,30 @@ public class MuleDerbyTestDatabase
         }
     }
 
+    /**
+     * @return a new Connection to access the database.
+     * @throws Exception
+     */
     public Connection getConnection() throws Exception
     {
         Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
         return DriverManager.getConnection(connectionString);
     }
 
+    /**
+     * Executes a query against the database.
+     *
+     * @param sql SQL query
+     * @return
+     * @throws Exception
+     */
     public List execSqlQuery(String sql) throws Exception
     {
         Connection con = null;
         try
         {
             con = getConnection();
-            return (List)new QueryRunner().query(con, sql, new ArrayListHandler());
+            return (List) new QueryRunner().query(con, sql, new ArrayListHandler());
         }
         finally
         {
@@ -90,6 +122,14 @@ public class MuleDerbyTestDatabase
         }
     }
 
+    /**
+     * Executes an SQL statement against the database.
+     * For queries use execSqlQuery.
+     *
+     * @param sql SQL query
+     * @return
+     * @throws Exception
+     */
     public int execSqlUpdate(String sql) throws Exception
     {
         Connection con = null;
