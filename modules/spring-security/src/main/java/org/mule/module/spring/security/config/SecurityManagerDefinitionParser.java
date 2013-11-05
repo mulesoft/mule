@@ -54,7 +54,9 @@ public class SecurityManagerDefinitionParser implements BeanDefinitionParser
                 return orphanDefinitionParser.parse(element, parserContext);
             }
         }
-
-        return null;
+        else
+        {
+            return namedDefinitionParser.parse(element, parserContext);
+        }
     }
 }
