@@ -99,12 +99,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <!-- This dependency is needed for MIME types but should be removed. See MULE-7088 -->
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-email</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
         </dependency>
