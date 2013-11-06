@@ -19,8 +19,6 @@ import org.junit.Test;
 public class HttpOutboundAttachmentFunctionalTestCase extends FunctionalTestCase
 {
 
-    private static final String TEST_ENDPOINT = "vm://in";
-
     @Rule
     public DynamicPort httpPort = new DynamicPort("port");
 
@@ -31,10 +29,22 @@ public class HttpOutboundAttachmentFunctionalTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void sendsAttachmentCorrectlyInHttpOutboundEndpoint() throws Exception
+    public void sendsStringAttachmentCorrectly() throws Exception
+    {
+        sendMessageAndAssertResponse("vm://inString");
+    }
+
+    @Test
+    public void sendsByteArrayAttachmentCorrectly() throws Exception
+    {
+        sendMessageAndAssertResponse("vm://inByteArray");
+    }
+
+
+    private void sendMessageAndAssertResponse(String endpoint) throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage answer = client.send(TEST_ENDPOINT, TEST_MESSAGE, null);
+        MuleMessage answer = client.send(endpoint, TEST_MESSAGE, null);
         assertEquals(TEST_MESSAGE, answer.getPayloadAsString());
     }
 }
