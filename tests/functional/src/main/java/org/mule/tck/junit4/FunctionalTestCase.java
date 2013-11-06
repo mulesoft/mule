@@ -54,7 +54,10 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
      * @deprecated use getConfigFile instead.
      */
     @Deprecated
-    protected abstract String getConfigResources();
+    protected String getConfigResources()
+    {
+        return null;
+    }
 
 
     @Override
