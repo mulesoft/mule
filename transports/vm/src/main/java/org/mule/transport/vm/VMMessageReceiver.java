@@ -166,7 +166,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     protected List<MuleMessage> getFirstMessages() throws Exception
     {
         // The queue from which to pull events
-        QueueSession qs = connector.getQueueSession();
+        QueueSession qs = connector.getTransactionalResource(endpoint);
         Queue queue = qs.getQueue(endpoint.getEndpointURI().getAddress());
 
         // The list of retrieved messages that will be returned
@@ -200,7 +200,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     protected MuleEvent getFirstMessage() throws Exception
     {
         // The queue from which to pull events
-        QueueSession qs = connector.getQueueSession();
+        QueueSession qs = connector.getTransactionalResource(endpoint);
         Queue queue = qs.getQueue(endpoint.getEndpointURI().getAddress());
         // try to get the first event off the queue
         return (MuleEvent) queue.poll(connector.getQueueTimeout());
