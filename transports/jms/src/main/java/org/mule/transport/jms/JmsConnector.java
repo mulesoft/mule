@@ -514,7 +514,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             // apply connection factory properties
             BeanUtils.populateWithoutFail(connectionFactory, connectionFactoryProperties, true);
         }
-        if (isStarted())
+        if (isStarted() || startOnConnect)
         {
             connection.start();
         }
