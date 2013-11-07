@@ -389,7 +389,7 @@ public class JdbcConnector extends AbstractConnector implements Testable
     {
         if (dataSource instanceof BitronixXaDataSourceWrapper)
         {
-            ((BitronixXaDataSourceWrapper)dataSource).close();
+            ((BitronixXaDataSourceWrapper) dataSource).close();
         }
     }
 

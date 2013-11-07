@@ -8,6 +8,7 @@ package org.mule.module.bti.transaction;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.api.MuleContext;
@@ -27,7 +28,6 @@ import bitronix.tm.internal.BitronixSystemException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.mockito.internal.stubbing.defaultanswers.Answers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -36,9 +36,9 @@ import org.mockito.stubbing.Answer;
 public class BitronixTransactionManagerFactoryTestCase extends AbstractMuleTestCase
 {
 
-    private final MuleContext mockMuleContext = Mockito.mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
-    private final MuleConfiguration mockMuleConfiguration = Mockito.mock(MuleConfiguration.class);
-    private final TransactionalQueueManager mockTransactionalQueueManager = Mockito.mock(TransactionalQueueManager.class);
+    private final MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
+    private final MuleConfiguration mockMuleConfiguration = mock(MuleConfiguration.class);
+    private final TransactionalQueueManager mockTransactionalQueueManager = mock(TransactionalQueueManager.class);
     private final List<BitronixTransactionManagerFactory> createdFactories = new ArrayList<BitronixTransactionManagerFactory>();
 
     @Before

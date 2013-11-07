@@ -41,10 +41,8 @@ import org.mule.transport.jms.redelivery.RedeliveryHandlerFactory;
 import org.mule.transport.jms.xa.BitronixConnectionFactoryWrapper;
 import org.mule.transport.jms.xa.BitronixJmsXaConnectionFactoryProvider;
 import org.mule.transport.jms.xa.ConnectionFactoryWrapper;
-import org.mule.transport.jms.xa.ConnectionInvocationHandler;
 import org.mule.util.BeanUtils;
 
-import java.lang.reflect.Proxy;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -367,7 +365,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
         if (connectionFactory != null && connectionFactory instanceof BitronixConnectionFactoryWrapper)
         {
-            ((BitronixConnectionFactoryWrapper)connectionFactory).close();
+            ((BitronixConnectionFactoryWrapper) connectionFactory).close();
         }
 
         if (jndiNameResolver != null)

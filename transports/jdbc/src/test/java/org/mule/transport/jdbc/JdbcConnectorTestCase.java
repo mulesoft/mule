@@ -7,9 +7,11 @@
 package org.mule.transport.jdbc;
 
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
@@ -30,9 +32,7 @@ import javax.sql.XADataSource;
 
 import org.apache.derby.jdbc.EmbeddedDataSource;
 import org.enhydra.jdbc.standard.StandardDataSource;
-import org.hamcrest.core.IsInstanceOf;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 public class JdbcConnectorTestCase extends AbstractConnectorTestCase
 {
@@ -128,7 +128,7 @@ public class JdbcConnectorTestCase extends AbstractConnectorTestCase
     @Test
     public void dataSourceIsNotWrappedWhenNotUsingXA() throws InitialisationException
     {
-        DataSource mockDataSource = Mockito.mock(DataSource.class);
+        DataSource mockDataSource = mock(DataSource.class);
         DataSource dataSource = getDataSourceAfterInitialization(mockDataSource);
         assertThat(dataSource, is(mockDataSource));
     }
@@ -136,18 +136,18 @@ public class JdbcConnectorTestCase extends AbstractConnectorTestCase
     @Test
     public void dataSourceIsWrappedWhenUsingXA() throws InitialisationException
     {
-        DataSource mockDataSource = Mockito.mock(TestXADataSource.class);
+        DataSource mockDataSource = mock(TestXADataSource.class);
         DataSource dataSource = getDataSourceAfterInitialization(mockDataSource);
-        assertThat(dataSource, IsInstanceOf.instanceOf(DataSourceWrapper.class));
+        assertThat(dataSource, instanceOf(DataSourceWrapper.class));
     }
 
     @Test
     public void dataSourceIsWrappedWithBtmWrapperWhenUsingXA() throws Exception
     {
-        muleContext.setTransactionManager(Mockito.mock(TransactionManagerWrapper.class));
-        DataSource mockDataSource = Mockito.mock(TestXADataSource.class);
+        muleContext.setTransactionManager(mock(TransactionManagerWrapper.class));
+        DataSource mockDataSource = mock(TestXADataSource.class);
         DataSource dataSource = getDataSourceAfterInitialization(mockDataSource);
-        assertThat(dataSource, IsInstanceOf.instanceOf(BitronixXaDataSourceWrapper.class));
+        assertThat(dataSource, instanceOf(BitronixXaDataSourceWrapper.class));
     }
 
     private DataSource getDataSourceAfterInitialization(DataSource mockDataSource) throws InitialisationException
