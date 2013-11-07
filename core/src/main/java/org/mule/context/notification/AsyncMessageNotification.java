@@ -8,7 +8,7 @@ package org.mule.context.notification;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
-import org.mule.api.construct.Pipeline;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.processor.MessageProcessor;
@@ -33,22 +33,22 @@ public class AsyncMessageNotification extends ServerNotification implements Bloc
     protected MessageProcessor messageProcessor;
     protected MessagingException exception;
 
-    public AsyncMessageNotification(Pipeline pipeline,
+    public AsyncMessageNotification(FlowConstruct flowConstruct,
                                     MuleEvent event,
                                     MessageProcessor messageProcessor,
                                     int action)
     {
-        super(event, action, pipeline.getName());
+        super(event, action, flowConstruct.getName());
         this.messageProcessor = messageProcessor;
     }
 
-    public AsyncMessageNotification(Pipeline pipeline,
+    public AsyncMessageNotification(FlowConstruct flowConstruct,
                                     MuleEvent event,
                                     MessageProcessor messageProcessor,
                                     int action,
                                     MessagingException exception)
     {
-        this(pipeline, event, messageProcessor, action);
+        this(flowConstruct, event, messageProcessor, action);
         this.exception = exception;
     }
 

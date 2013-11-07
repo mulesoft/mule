@@ -18,7 +18,7 @@ import java.util.List;
  * A pipeline has an ordered list of {@link MessageProcessor}'s that are invoked in order to processor new
  * messages received from it's {@link MessageSource}
  */
-public interface Pipeline extends FlowConstruct, MessageProcessorContainer, ProcessingDescriptor
+public interface Pipeline extends FlowConstruct, MessageProcessorContainer, ProcessingDescriptor, MessageProcessorPathResolver
 {
 
     public void setMessageSource(MessageSource messageSource);
@@ -32,7 +32,5 @@ public interface Pipeline extends FlowConstruct, MessageProcessorContainer, Proc
     public void setProcessingStrategy(ProcessingStrategy processingStrategy);
 
     public ProcessingStrategy getProcessingStrategy();
-
-    public String getProcessorPath(MessageProcessor processor);
 
 }
