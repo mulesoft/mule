@@ -551,7 +551,12 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     protected void doConnect() throws Exception
     {
         connection = createConnection();
-        if (isStarted())
+        if ((connectionFactoryProperties != null) && !connectionFactoryProperties.isEmpty())
+        {
+            // apply connection factory properties
+            BeanUtils.populateWithoutFail(connectionFactory, connectionFactoryProperties, true);
+        }
+        if (isStarted() || startOnConnect)
         {
             connection.start();
         }
