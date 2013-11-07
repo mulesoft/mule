@@ -11,9 +11,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.context.MuleContextAware;
 
-import org.junit.Ignore;
-
-@Ignore
 public class QueueOutboundMessagesCounter implements TransactionScenarios.OutboundMessagesCounter, MuleContextAware
 {
 

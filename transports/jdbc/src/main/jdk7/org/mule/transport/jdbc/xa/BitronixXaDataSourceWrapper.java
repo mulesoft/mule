@@ -77,4 +77,9 @@ public class BitronixXaDataSourceWrapper implements DataSource
         throw new SQLFeatureNotSupportedException("btm does not support this feature yet");
     }
 
+    public void close()
+    {
+        xaDataSource.close();
+    }
+
 }

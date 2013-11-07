@@ -10,9 +10,6 @@ import java.lang.reflect.Method;
 
 import bitronix.tm.resource.jms.MessageConsumerWrapper;
 
-/**
- * Wr
- */
 public class BitronixMessageConsumerInvocationHandler implements TargetInvocationHandler
 {
 
@@ -32,7 +29,7 @@ public class BitronixMessageConsumerInvocationHandler implements TargetInvocatio
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
     {
-        //TODO remove once BTM-132 gets fixed.
+        //TODO remove once BTM-132 gets fixed. BTM is to properly closing the message consumer and that generates a leak.
         if (method.getName().equals("close"))
         {
             messageConsumerWrapper.getMessageConsumer().close();

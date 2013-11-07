@@ -148,7 +148,7 @@ public class EndpointToEndpointXaTransactionTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String[] getMultipleConfigResources()
+    protected String[] getConfigFiles()
     {
         return configFiles;
     }
@@ -191,19 +191,11 @@ public class EndpointToEndpointXaTransactionTestCase extends FunctionalTestCase
 
     protected void doSetUpBeforeMuleContextCreation() throws Exception
     {
-        unregisterAllPreviousResources();
         TransactionManagerServices.getConfiguration().setJournal(null);
         if (testSetUp != null)
         {
             testSetUp.initialize();
         }
-    }
-
-    private void unregisterAllPreviousResources() throws NoSuchFieldException, IllegalAccessException
-    {
-        Field resourcesField = ResourceRegistrar.class.getDeclaredField("resources");
-        resourcesField.setAccessible(true);
-        ((ConcurrentHashMap)resourcesField.get(null)).clear();
     }
 
     @Override

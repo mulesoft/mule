@@ -12,9 +12,6 @@ import org.mule.api.processor.MessageProcessor;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Ignore;
-
-@Ignore
 public class FailureGeneratorMessageProcessor implements MessageProcessor
 {
 
@@ -41,7 +38,7 @@ public class FailureGeneratorMessageProcessor implements MessageProcessor
             if (Math.random() < failureRange)
             {
                 numberOfFailures.incrementAndGet();
-                throw new RuntimeException();
+                throw new RuntimeException("Random exception thrown on purpose.");
             }
         }
         return event;

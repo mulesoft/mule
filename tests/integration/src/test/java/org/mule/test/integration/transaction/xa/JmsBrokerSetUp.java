@@ -7,9 +7,7 @@
 package org.mule.test.integration.transaction.xa;
 
 import org.apache.activemq.broker.BrokerService;
-import org.junit.Ignore;
 
-@Ignore
 public class JmsBrokerSetUp implements TransactionalTestSetUp
 {
 

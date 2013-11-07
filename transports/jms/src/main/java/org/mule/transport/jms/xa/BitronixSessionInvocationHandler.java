@@ -16,7 +16,6 @@ import java.lang.reflect.Proxy;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
-import javax.jms.Session;
 import javax.transaction.xa.XAResource;
 
 import bitronix.tm.resource.jms.DualSessionWrapper;
@@ -49,7 +48,7 @@ public class BitronixSessionInvocationHandler implements TargetInvocationHandler
             }
             if (method.getDeclaringClass().equals(XaTransaction.MuleXaObject.class))
             {
-                return method.invoke(this,args);
+                return method.invoke(this, args);
             }
             //TODO: BTM-132. Consumers are not getting closed never
             if (method.getName().equals("createConsumer"))
@@ -64,7 +63,6 @@ public class BitronixSessionInvocationHandler implements TargetInvocationHandler
         }
         catch (Exception e)
         {
-            System.out.println("e");
             throw new RuntimeException(e);
         }
     }
@@ -93,7 +91,7 @@ public class BitronixSessionInvocationHandler implements TargetInvocationHandler
     {
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
         XAResource xaResource = sessionWrapper.getXAResource();
-        ////TODO remove this logic once BTM-133
+        //TODO remove this logic once BTM-133. If getSession() is not called prior to getXAResource then getXAResource returns null.
         if (xaResource == null)
         {
 
@@ -106,14 +104,14 @@ public class BitronixSessionInvocationHandler implements TargetInvocationHandler
                 throw new TransactionException(e);
             }
         }
-        return ((XaTransaction)tx).enlistResource(sessionWrapper.getXAResource());
+        return ((XaTransaction) tx).enlistResource(sessionWrapper.getXAResource());
     }
 
     @Override
     public boolean delist() throws Exception
     {
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
-        return ((XaTransaction)tx).delistResource(sessionWrapper.getXAResource(),XAResource.TMSUCCESS);
+        return ((XaTransaction) tx).delistResource(sessionWrapper.getXAResource(), XAResource.TMSUCCESS);
     }
 
     @Override

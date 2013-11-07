@@ -13,18 +13,16 @@ import javax.jms.MessageConsumer;
 import javax.jms.Session;
 
 import org.apache.activemq.spring.ActiveMQConnectionFactory;
-import org.junit.Ignore;
 import org.springframework.jms.support.JmsUtils;
 
-@Ignore
 public class JmsOutboundMessagesCounter implements TransactionScenarios.OutboundMessagesCounter
-    {
+{
 
-        private MessageConsumer consumer;
-        private boolean initialized;
-        private int numberOfMessagesArrived;
-        private String brokerUrl;
-        private Connection connection;
+    private MessageConsumer consumer;
+    private boolean initialized;
+    private int numberOfMessagesArrived;
+    private String brokerUrl;
+    private Connection connection;
 
 
     public static JmsOutboundMessagesCounter createVerifierForBroker(int port)
@@ -64,7 +62,7 @@ public class JmsOutboundMessagesCounter implements TransactionScenarios.Outbound
         initialize();
         while (true)
         {
-            Message message = consumer.receive(100);
+            Message message = consumer.receive(1000);
             if (message != null)
             {
                 numberOfMessagesArrived++;

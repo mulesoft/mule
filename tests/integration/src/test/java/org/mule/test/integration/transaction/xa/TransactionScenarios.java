@@ -12,15 +12,13 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 
 import org.hamcrest.core.Is;
-import org.junit.Ignore;
 
-@Ignore
 public class TransactionScenarios
 {
 
     private final InboundMessagesGenerator inboundMessagesGenerator;
     private final OutboundMessagesCounter outboundMessagesVerifier;
-    private int verificationTimeout;
+    private int verificationTimeout = 1000;
 
     public TransactionScenarios(InboundMessagesGenerator inboundMessagesGenerator, OutboundMessagesCounter outboundMessagesVerifier)
     {
@@ -74,7 +72,6 @@ public class TransactionScenarios
         try
         {
             final Integer numberOfMessagesCreated = inboundMessagesGenerator.generateInboundMessages();
-            verificationTimeout = 10000;
             if (noMessageExpected)
             {
                 Thread.sleep(verificationTimeout);
@@ -82,7 +79,7 @@ public class TransactionScenarios
             }
             else
             {
-                new PollingProber(10000,100).check(new Probe()
+                new PollingProber(10000, 100).check(new Probe()
                 {
                     @Override
                     public boolean isSatisfied()
@@ -100,7 +97,14 @@ public class TransactionScenarios
                     @Override
                     public String describeFailure()
                     {
-                        return "Not all the messages arrived";
+                        try
+                        {
+                            return String.format("Not all the messages arrived. Only %d of %s arrived", outboundMessagesVerifier.numberOfMessagesThatArrived(), numberOfMessagesCreated);
+                        }
+                        catch (Exception e)
+                        {
+                            return String.format("Not all messages arrived.");
+                        }
                     }
                 });
             }
@@ -120,7 +124,9 @@ public class TransactionScenarios
 
     public interface InboundMessagesGenerator
     {
+
         int NUMBER_OF_MESSAGES = 6;
+
         /**
          * Send messages to transactional inbound endpoint
          */
@@ -130,11 +136,12 @@ public class TransactionScenarios
 
     public interface OutboundMessagesCounter
     {
-        int NUMBER_OF_MESSAGES = InboundMessagesGenerator.NUMBER_OF_MESSAGES;
+
         /**
-         *  Returns he number of messages received in the outbound endpoint
+         * Returns he number of messages received in the outbound endpoint
          */
         int numberOfMessagesThatArrived() throws Exception;
+
         void close();
     }
 

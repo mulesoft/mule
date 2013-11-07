@@ -13,21 +13,25 @@ import javax.jms.XAConnection;
 import javax.jms.XAConnectionFactory;
 
 /**
+ * This class it's used to be able to create a bitronix jms connection pool from an already created
+ * ConnectionFactory since BTM does not support it yet.
  *
+ * This class workaround this issue by setting a ConnectionFactory in xaConnectionFactoryProvided and then
+ * when BTM instantiates BitronixJmsXaConnectionFactoryProvider through reflection it uses that ConnectionFactory
+ * as delegate for the operations.
  */
-public class BitronixJmsXaConnectionFactoryProvider implements ConnectionFactory,XAConnectionFactory
+public class BitronixJmsXaConnectionFactoryProvider implements ConnectionFactory, XAConnectionFactory
 {
 
     private final XAConnectionFactory xaConnectionFactory;
     private final ConnectionFactory connectionFactory;
-    public static ConnectionFactory xaConnectionFactoryThreadLocal;
+    public static ConnectionFactory xaConnectionFactoryProvided;
 
     public BitronixJmsXaConnectionFactoryProvider()
     {
-        this.connectionFactory = xaConnectionFactoryThreadLocal;
-        this.xaConnectionFactory = (XAConnectionFactory)xaConnectionFactoryThreadLocal;
-        xaConnectionFactoryThreadLocal = null;
-
+        this.connectionFactory = xaConnectionFactoryProvided;
+        this.xaConnectionFactory = (XAConnectionFactory) xaConnectionFactoryProvided;
+        xaConnectionFactoryProvided = null;
     }
 
     @Override
@@ -37,9 +41,9 @@ public class BitronixJmsXaConnectionFactoryProvider implements ConnectionFactory
     }
 
     @Override
-    public Connection createConnection(String s, String s2) throws JMSException
+    public Connection createConnection(String username, String password) throws JMSException
     {
-        return connectionFactory.createConnection(s,s2);
+        return connectionFactory.createConnection(username, password);
     }
 
     @Override
@@ -49,8 +53,8 @@ public class BitronixJmsXaConnectionFactoryProvider implements ConnectionFactory
     }
 
     @Override
-    public XAConnection createXAConnection(String s, String s2) throws JMSException
+    public XAConnection createXAConnection(String username, String password) throws JMSException
     {
-        return xaConnectionFactory.createXAConnection(s,s2);
+        return xaConnectionFactory.createXAConnection(username, password);
     }
 }

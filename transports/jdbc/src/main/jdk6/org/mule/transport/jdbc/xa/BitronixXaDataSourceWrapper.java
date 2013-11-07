@@ -22,7 +22,7 @@ import bitronix.tm.resource.jdbc.PoolingDataSource;
 public class BitronixXaDataSourceWrapper implements DataSource
 {
 
-    private PoolingDataSource xaDataSource;
+    private final PoolingDataSource xaDataSource;
 
     public BitronixXaDataSourceWrapper(PoolingDataSource xaDataSource)
     {
@@ -71,4 +71,8 @@ public class BitronixXaDataSourceWrapper implements DataSource
         return null;
     }
 
+    public void close()
+    {
+        xaDataSource.close();
+    }
 }

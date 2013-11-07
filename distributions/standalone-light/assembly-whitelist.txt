@@ -97,7 +97,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-annotations-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-atom-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-bpm-${productVersion}.jar
-/mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-btm-${productVersion}.jar
+/mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-bti-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-builders-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-client-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-cxf-${productVersion}.jar

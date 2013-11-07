@@ -49,6 +49,17 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
         setStartContext(true);
     }
 
+    /**
+     * @return
+     * @deprecated use getConfigFile instead.
+     */
+    @Deprecated
+    protected String getConfigResources()
+    {
+        return null;
+    }
+
+
     @Override
     protected ConfigurationBuilder getBuilder() throws Exception
     {
@@ -57,25 +68,34 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
         {
             return new SpringXmlConfigurationBuilder(configResources);
         }
-        String[] multipleConfigResources = getMultipleConfigResources();
-        if (multipleConfigResources != null)
+        configResources = getConfigFile();
+        if (configResources != null)
         {
-            return new SpringXmlConfigurationBuilder(multipleConfigResources);
+            if (configResources.contains(","))
+            {
+                throw new RuntimeException("Do not use this method when the config is composed of several files. Use getConfigFiles method instead.");
+            }
+            return new SpringXmlConfigurationBuilder(configResources);
         }
-        throw new Exception("You must redefine getConfigResources or getMultipleConfigResources and return a not null configuration file");
+        String[] multipleConfigResources = getConfigFiles();
+        return new SpringXmlConfigurationBuilder(multipleConfigResources);
     }
 
-    protected String getConfigResources()
+    /**
+     * @return a single file that defines a mule application configuration
+     */
+    protected String getConfigFile()
     {
         return null;
     }
 
-    protected String[] getMultipleConfigResources()
+    /**
+     * @return a several files that define a mule application configuration
+     */
+    protected String[] getConfigFiles()
     {
         return null;
     }
-
-
 
     /**
      * Returns an instance of the service's component object. Note that depending on

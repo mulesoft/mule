@@ -10,11 +10,10 @@ import org.mule.tck.util.MuleDerbyTestDatabase;
 
 import org.junit.Ignore;
 
-@Ignore
 public class JdbcDatabaseSetUp implements TransactionalTestSetUp
 {
 
-    private MuleDerbyTestDatabase muleDerbyTestDatabase;
+    private final MuleDerbyTestDatabase muleDerbyTestDatabase;
 
     private JdbcDatabaseSetUp(String databaseNameProperty)
     {
