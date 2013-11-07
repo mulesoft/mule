@@ -15,8 +15,9 @@ import org.mule.common.config.XmlConfigurationCallback;
 import org.mule.common.config.XmlConfigurationMuleArtifactFactory;
 import org.mule.config.ConfigResource;
 import org.mule.context.DefaultMuleContextFactory;
+import org.mule.util.IOUtils;
 
-import java.io.StringBufferInputStream;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -36,27 +37,25 @@ import org.dom4j.io.DOMReader;
 public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurationMuleArtifactFactory
 {
 
-	private Map<MuleArtifact, SpringXmlConfigurationBuilder> builders = new HashMap<MuleArtifact, SpringXmlConfigurationBuilder>();
-	private Map<MuleArtifact, MuleContext> contexts = new HashMap<MuleArtifact, MuleContext>();
+    private Map<MuleArtifact, SpringXmlConfigurationBuilder> builders = new HashMap<MuleArtifact, SpringXmlConfigurationBuilder>();
+    private Map<MuleArtifact, MuleContext> contexts = new HashMap<MuleArtifact, MuleContext>();
 
     @Override
     public MuleArtifact getArtifact(org.w3c.dom.Element element, XmlConfigurationCallback callback)
-        throws MuleArtifactFactoryException
+            throws MuleArtifactFactoryException
     {
         return doGetArtifact(element, callback, false);
     }
 
     @Override
     public MuleArtifact getArtifactForMessageProcessor(org.w3c.dom.Element element, XmlConfigurationCallback callback)
-        throws MuleArtifactFactoryException
+            throws MuleArtifactFactoryException
     {
         return doGetArtifact(element, callback, true);
     }
 
-    private MuleArtifact doGetArtifact(org.w3c.dom.Element element, final XmlConfigurationCallback callback, boolean embedInFlow)
-                    throws MuleArtifactFactoryException
+    private String getArtifactMuleConfig(String flowName, org.w3c.dom.Element element, final XmlConfigurationCallback callback, boolean embedInFlow) throws MuleArtifactFactoryException
     {
-    	ConfigResource config;
         Document document = DocumentHelper.createDocument();
 
         // the rootElement is the root of the document
@@ -81,7 +80,6 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         // the parentElement is the parent of the element we are adding
         Element parentElement = rootElement;
         addSchemaLocation(rootElement, element, callback);
-        String flowName = "flow-" + Integer.toString(element.hashCode());
         if (embedInFlow)
         {
             // Need to put the message processor in a valid flow. Our default flow is:
@@ -99,28 +97,28 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
                 if (attributeName != null && attributeName.endsWith("-ref"))
                 {
                     org.w3c.dom.Element dependentElement = callback.getGlobalElement(element.getAttributes()
-                        .item(i)
-                        .getNodeValue());
+                                                                                             .item(i)
+                                                                                             .getNodeValue());
                     if (dependentElement != null)
                     {
-                    	// if the element is a spring bean, wrap the element in a top-level spring beans element
-                    	if ("http://www.springframework.org/schema/beans".equals(dependentElement.getNamespaceURI()))
-                    	{
-                    		String namespaceUri = dependentElement.getNamespaceURI();
-                    		Namespace namespace = new Namespace(dependentElement.getPrefix(), namespaceUri);
-                    		Element beans = rootElement.element(new QName("beans", namespace));
-                    		if (beans == null)
-                    		{
-                    			beans = rootElement.addElement("beans", namespaceUri);
-                    		}
-                    		beans.add(convert(dependentElement));
-                    	}
-                    	else
-                    	{
-	                        rootElement.add(convert(dependentElement));
-	                        addSchemaLocation(rootElement, dependentElement, callback);
-                    	}
-                    	addChildSchemaLocations(rootElement, dependentElement, callback);
+                        // if the element is a spring bean, wrap the element in a top-level spring beans element
+                        if ("http://www.springframework.org/schema/beans".equals(dependentElement.getNamespaceURI()))
+                        {
+                            String namespaceUri = dependentElement.getNamespaceURI();
+                            Namespace namespace = new Namespace(dependentElement.getPrefix(), namespaceUri);
+                            Element beans = rootElement.element(new QName("beans", namespace));
+                            if (beans == null)
+                            {
+                                beans = rootElement.addElement("beans", namespaceUri);
+                            }
+                            beans.add(convert(dependentElement));
+                        }
+                        else
+                        {
+                            rootElement.add(convert(dependentElement));
+                            addSchemaLocation(rootElement, dependentElement, callback);
+                        }
+                        addChildSchemaLocations(rootElement, dependentElement, callback);
                     }
                     // if missing a dependent element, try anyway because it might not be needed.
                 }
@@ -132,25 +130,40 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
                 parentElement.addElement("logger", "http://www.mulesoft.org/schema/mule/core");
             }
 
-            config = new ConfigResource("", new StringBufferInputStream(document.asXML()));
+            return document.asXML();
         }
-        catch (Exception e)
+        catch (Throwable t)
         {
-        	throw new MuleArtifactFactoryException("Error parsing XML", e);
+            throw new MuleArtifactFactoryException("Error generating XML", t);
         }
+
+    }
+
+    private MuleArtifact doGetArtifact(org.w3c.dom.Element element, final XmlConfigurationCallback callback, boolean embedInFlow)
+            throws MuleArtifactFactoryException
+    {
+        String flowName = "flow-" + Integer.toString(element.hashCode());
+        InputStream xmlConfig = IOUtils.toInputStream(getArtifactMuleConfig(flowName, element, callback, embedInFlow));
+
         MuleContext muleContext = null;
         SpringXmlConfigurationBuilder builder = null;
         Map<String, String> environmentProperties = callback.getEnvironmentProperties();
         Properties systemProperties = System.getProperties();
         Map<Object,Object> originalSystemProperties = new HashMap<Object, Object>(systemProperties);
+
         try
         {
+            ConfigResource config = new ConfigResource("embedded-datasense", xmlConfig);
+            // This configuration overrides the default-mule-config one to replace beans that are not required
+            ConfigResource defaultConfigOverride = new ConfigResource(getClass().getClassLoader().getResource("default-mule-config-artifact-factory-override.xml").toURI().toURL());
+
             if(environmentProperties != null)
             {
                 systemProperties.putAll(environmentProperties);
             }
             MuleContextFactory factory = new DefaultMuleContextFactory();
-            builder = new SpringXmlConfigurationBuilder(new ConfigResource[]{config});
+
+            builder = new SpringXmlConfigurationBuilder(new ConfigResource[] {config, defaultConfigOverride});
             muleContext = factory.createMuleContext(builder);
             muleContext.start();
 
@@ -183,13 +196,16 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
             contexts.put(artifact, muleContext);
             return artifact;
         }
-        catch (Exception e)
+        catch (Throwable t)
         {
-        	dispose(builder, muleContext);
-        	throw new MuleArtifactFactoryException("Error initializing", e);
-        } finally {
+            dispose(builder, muleContext);
+            throw new MuleArtifactFactoryException("Error initializing", t);
+        }
+        finally
+        {
             systemProperties.clear();
             systemProperties.putAll(originalSystemProperties);
+            IOUtils.closeQuietly(xmlConfig);
         }
     }
 
@@ -202,17 +218,17 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         schemaLocation.append(element.getNamespaceURI() + " "
                               + callback.getSchemaLocation(element.getNamespaceURI()));
         rootElement.addAttribute(
-            org.dom4j.QName.get("schemaLocation", "xsi", "http://www.w3.org/2001/XMLSchema-instance"),
-            schemaLocation.toString());
+                org.dom4j.QName.get("schemaLocation", "xsi", "http://www.w3.org/2001/XMLSchema-instance"),
+                schemaLocation.toString());
     }
 
     protected void addChildSchemaLocations(Element rootElement,
-            org.w3c.dom.Element element,
-            XmlConfigurationCallback callback)
+                                           org.w3c.dom.Element element,
+                                           XmlConfigurationCallback callback)
     {
         //TODO: implement
-//    	NodeList nl = element.getChildNodes();
-//    	for ()
+        //    	NodeList nl = element.getChildNodes();
+        //    	for ()
     }
 
     /**
@@ -236,46 +252,52 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         return doc2.getRootElement();
     }
 
-	@Override
-	public void returnArtifact(MuleArtifact artifact)
-	{
-		SpringXmlConfigurationBuilder builder = builders.remove(artifact);
-		MuleContext context = contexts.remove(artifact);
-		dispose(builder, context);
-	}
+    @Override
+    public void returnArtifact(MuleArtifact artifact)
+    {
+        SpringXmlConfigurationBuilder builder = builders.remove(artifact);
+        MuleContext context = contexts.remove(artifact);
+        dispose(builder, context);
+    }
 
-	private void dispose(SpringXmlConfigurationBuilder builder, MuleContext context)
-	{
-    	if (context != null)
-    	{
-    		context.dispose();
-    	}
-    	deleteLoggingThreads();
-	}
+    private void dispose(SpringXmlConfigurationBuilder builder, MuleContext context)
+    {
+        try
+        {
+            if (context != null)
+            {
+                context.dispose();
+            }
+        }
+        finally
+        {
+            deleteLoggingThreads();
+        }
+    }
 
-	private void deleteLoggingThreads()
-	{
-		String[] threadsToDelete = {"Mule.log.clogging.ref.handler", "Mule.log.slf4j.ref.handler"};
+    private void deleteLoggingThreads()
+    {
+        String[] threadsToDelete = {"Mule.log.clogging.ref.handler", "Mule.log.slf4j.ref.handler"};
 
-		Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
-		Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
-		for(String threadToDelete : threadsToDelete)
-		{
-			for (Thread t : threadArray)
-			{
-				if (threadToDelete.equals(t.getName()))
-				{
-					try
-					{
-						t.interrupt();
-					}
-					catch (SecurityException e)
-					{
-						// ignore
-					}
-				}
-			}
-		}
-	}
+        Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+        Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
+        for(String threadToDelete : threadsToDelete)
+        {
+            for (Thread t : threadArray)
+            {
+                if (threadToDelete.equals(t.getName()))
+                {
+                    try
+                    {
+                        t.interrupt();
+                    }
+                    catch (SecurityException e)
+                    {
+                        // ignore
+                    }
+                }
+            }
+        }
+    }
 
 }
