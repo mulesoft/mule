@@ -46,7 +46,6 @@ public class SpringXmlConfigurationMuleArtifactFactoryTest
         factoryTest.getArtifactForMessageProcessor(element, callback);
 
         Assert.assertThat("System properties where modified", properties, CoreMatchers.is(System.getProperties()));
-
     }
 
 

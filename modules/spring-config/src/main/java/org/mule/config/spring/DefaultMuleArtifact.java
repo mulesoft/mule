@@ -11,6 +11,7 @@ import org.mule.common.MuleArtifact;
 
 public class DefaultMuleArtifact implements MuleArtifact
 {
+
     private Object object;
 
     public DefaultMuleArtifact(Object object)
@@ -20,9 +21,9 @@ public class DefaultMuleArtifact implements MuleArtifact
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends Capability> T getCapability(Class<T> arg0)
+    public <T extends Capability> T getCapability(Class<T> clazz)
     {
-        if (hasCapability(arg0))
+        if (hasCapability(clazz))
         {
             return (T) object;
         }
@@ -33,9 +34,8 @@ public class DefaultMuleArtifact implements MuleArtifact
     }
 
     @Override
-    public <T extends Capability> boolean hasCapability(Class<T> arg0)
+    public <T extends Capability> boolean hasCapability(Class<T> clazz)
     {
-        return arg0.isAssignableFrom(object.getClass());
+        return clazz.isAssignableFrom(object.getClass());
     }
-
 }
