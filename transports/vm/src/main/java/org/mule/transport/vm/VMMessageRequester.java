@@ -44,7 +44,7 @@ public class VMMessageRequester extends AbstractMessageRequester
     {
         try
         {
-            QueueSession queueSession = connector.getQueueSession();
+            QueueSession queueSession = connector.getTransactionalResource(endpoint);
             Queue queue = queueSession.getQueue(endpoint.getEndpointURI().getAddress());
 
             if (queue == null)

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/btm"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
+            xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            targetNamespace="http://www.mulesoft.org/schema/mule/btm"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.5/mule.xsd"/>
+
+    <xsd:annotation>
+        <xsd:documentation>This module enables Mule to use the Bitronix transaction manager to
+            configure [XA transactions|Transaction Management#XA Transactions]. Developers can configure one Transaction
+            Manger per Mule instance.
+        </xsd:documentation>
+        <xsd:appinfo>
+            <schemadoc:short-name>bitronixts</schemadoc:short-name>
+            <schemadoc:page-title>Bitronix Transaction Manager</schemadoc:page-title>
+        </xsd:appinfo>
+    </xsd:annotation>
+
+    <xsd:element name="transaction-manager" type="transactionManagerType"
+                 substitutionGroup="mule:abstract-transaction-manager">
+        <xsd:annotation>
+            <xsd:documentation>
+                To configure an instance of the bitronix transaction manager within Mule, add this element to your Mule XML
+                config file.
+
+                You can then declare XA transactions on endpoints supporting XA transactions, and all those transactions
+                will be managed by the bitronix transaction manager.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="transactionManagerType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractTransactionManagerType">
+                <xsd:sequence>
+                    <xsd:group ref="mule:propertiesGroup"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
+</xsd:schema>

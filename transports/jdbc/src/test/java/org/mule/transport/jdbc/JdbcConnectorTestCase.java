@@ -1,23 +1,34 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- * The software in this package is published under the terms of the CPAL v1.0
- * license, a copy of which has been included with this distribution in the
- * LICENSE.txt file.
- */
+* Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+* The software in this package is published under the terms of the CPAL v1.0
+* license, a copy of which has been included with this distribution in the
+* LICENSE.txt file.
+*/
 package org.mule.transport.jdbc;
 
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import org.mule.api.MuleException;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.Connector;
 import org.mule.common.TestResult;
 import org.mule.common.Testable;
+import org.mule.module.bti.transaction.TransactionManagerWrapper;
 import org.mule.tck.util.MuleDerbyTestUtils;
 import org.mule.transport.AbstractConnectorTestCase;
+import org.mule.transport.jdbc.xa.BitronixXaDataSourceWrapper;
+import org.mule.transport.jdbc.xa.DataSourceWrapper;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.sql.DataSource;
+import javax.sql.XADataSource;
 
 import org.apache.derby.jdbc.EmbeddedDataSource;
 import org.enhydra.jdbc.standard.StandardDataSource;
@@ -112,6 +123,44 @@ public class JdbcConnectorTestCase extends AbstractConnectorTestCase
         System.out.println(((Testable) getConnector()).test().getMessage());
         assertFalse(getConnector().isStarted());
         assertFalse(getConnector().isConnected());
+    }
+
+    @Test
+    public void dataSourceIsNotWrappedWhenNotUsingXA() throws InitialisationException
+    {
+        DataSource mockDataSource = mock(DataSource.class);
+        DataSource dataSource = getDataSourceAfterInitialization(mockDataSource);
+        assertThat(dataSource, is(mockDataSource));
+    }
+
+    @Test
+    public void dataSourceIsWrappedWhenUsingXA() throws InitialisationException
+    {
+        DataSource mockDataSource = mock(TestXADataSource.class);
+        DataSource dataSource = getDataSourceAfterInitialization(mockDataSource);
+        assertThat(dataSource, instanceOf(DataSourceWrapper.class));
+    }
+
+    @Test
+    public void dataSourceIsWrappedWithBtmWrapperWhenUsingXA() throws Exception
+    {
+        muleContext.setTransactionManager(mock(TransactionManagerWrapper.class));
+        DataSource mockDataSource = mock(TestXADataSource.class);
+        DataSource dataSource = getDataSourceAfterInitialization(mockDataSource);
+        assertThat(dataSource, instanceOf(BitronixXaDataSourceWrapper.class));
+    }
+
+    private DataSource getDataSourceAfterInitialization(DataSource mockDataSource) throws InitialisationException
+    {
+        JdbcConnector connector = new JdbcConnector(muleContext);
+        connector.setDataSource(mockDataSource);
+        connector.initialise();
+        return connector.getDataSource();
+    }
+
+    private interface TestXADataSource extends XADataSource, DataSource
+    {
+
     }
 
 }

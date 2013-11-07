@@ -139,6 +139,12 @@
             <artifactId>bcprov-jdk16</artifactId>
             <version>${bouncycastleVersion}</version>
         </dependency>
+        <dependency>
+            <groupId>commons-dbutils</groupId>
+            <artifactId>commons-dbutils</artifactId>
+            <version>${commonsDbUtilsVersion}</version>
+        </dependency>
+
 
         <!-- Unit tests -->
         <dependency>

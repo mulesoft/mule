@@ -221,6 +221,7 @@
                 <include>org.mule.modules:mule-module-annotations</include>
                 <include>org.mule.modules:mule-module-atom</include>
                 <include>org.mule.modules:mule-module-bpm</include>
+                <include>org.mule.modules:mule-module-bti</include>
                 <include>org.mule.modules:mule-module-builders</include>
                 <include>org.mule.modules:mule-module-client</include>
                 <include>org.mule.modules:mule-module-cxf</include>
@@ -290,6 +291,7 @@
                 <exclude>org.mule.modules:mule-module-atom</exclude>
                 <exclude>org.mule.modules:mule-module-boot</exclude>
                 <exclude>org.mule.modules:mule-module-bpm</exclude>
+                <exclude>org.mule.modules:mule-module-bti</exclude>
                 <exclude>org.mule.modules:mule-module-builders</exclude>
                 <exclude>org.mule.modules:mule-module-client</exclude>
                 <exclude>org.mule.modules:mule-module-cxf</exclude>
