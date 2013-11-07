@@ -37,6 +37,7 @@ import org.dom4j.io.DOMReader;
 public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurationMuleArtifactFactory
 {
 
+    public static final String BEANS_ELEMENT = "beans";
     private Map<MuleArtifact, SpringXmlConfigurationBuilder> builders = new HashMap<MuleArtifact, SpringXmlConfigurationBuilder>();
     private Map<MuleArtifact, MuleContext> contexts = new HashMap<MuleArtifact, MuleContext>();
 
@@ -106,10 +107,10 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
                         {
                             String namespaceUri = dependentElement.getNamespaceURI();
                             Namespace namespace = new Namespace(dependentElement.getPrefix(), namespaceUri);
-                            Element beans = rootElement.element(new QName("beans", namespace));
+                            Element beans = rootElement.element(new QName(BEANS_ELEMENT, namespace));
                             if (beans == null)
                             {
-                                beans = rootElement.addElement("beans", namespaceUri);
+                                beans = rootElement.addElement(BEANS_ELEMENT, namespaceUri);
                             }
                             beans.add(convert(dependentElement));
                         }
@@ -118,7 +119,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
                             rootElement.add(convert(dependentElement));
                             addSchemaLocation(rootElement, dependentElement, callback);
                         }
-                        addChildSchemaLocations(rootElement, dependentElement, callback);
+                        // TODO: If required in the future addChileSchemaLocations here
                     }
                     // if missing a dependent element, try anyway because it might not be needed.
                 }
@@ -153,9 +154,9 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
 
         try
         {
-            ConfigResource config = new ConfigResource("embedded-datasense", xmlConfig);
+            ConfigResource config = new ConfigResource("embedded-datasense.xml", xmlConfig);
             // This configuration overrides the default-mule-config one to replace beans that are not required
-            ConfigResource defaultConfigOverride = new ConfigResource(getClass().getClassLoader().getResource("default-mule-config-artifact-factory-override.xml").toURI().toURL());
+            ConfigResource defaultConfigOverride = new ConfigResource(getClass().getClassLoader().getResource("default-mule-config-override.xml").toURI().toURL());
 
             if(environmentProperties != null)
             {
@@ -220,15 +221,6 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         rootElement.addAttribute(
                 org.dom4j.QName.get("schemaLocation", "xsi", "http://www.w3.org/2001/XMLSchema-instance"),
                 schemaLocation.toString());
-    }
-
-    protected void addChildSchemaLocations(Element rootElement,
-                                           org.w3c.dom.Element element,
-                                           XmlConfigurationCallback callback)
-    {
-        //TODO: implement
-        //    	NodeList nl = element.getChildNodes();
-        //    	for ()
     }
 
     /**
