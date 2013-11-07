@@ -11,6 +11,9 @@ import javax.jms.JMSException;
 import javax.jms.QueueConnection;
 import javax.jms.QueueConnectionFactory;
 
+import org.mockito.Mockito;
+import org.mockito.internal.stubbing.defaultanswers.Answers;
+
 public class TestConnectionFactory implements QueueConnectionFactory
 {
     private String providerProperty = "NOT_SET";
@@ -19,7 +22,7 @@ public class TestConnectionFactory implements QueueConnectionFactory
 
     public Connection createConnection() throws JMSException
     {
-        return null;
+        return Mockito.mock(Connection.class, Answers.RETURNS_DEEP_STUBS.get());
     }
 
     public Connection createConnection(String string, String string1) throws JMSException
@@ -55,12 +58,12 @@ public class TestConnectionFactory implements QueueConnectionFactory
 
     public QueueConnection createQueueConnection() throws JMSException
     {
-        return null;
+        return Mockito.mock(QueueConnection.class, Answers.RETURNS_DEEP_STUBS.get());
     }
 
     public QueueConnection createQueueConnection(String string, String string1) throws JMSException
     {
-        return null;
+        return createQueueConnection();
     }
     
     public Object getCustomProperty()
