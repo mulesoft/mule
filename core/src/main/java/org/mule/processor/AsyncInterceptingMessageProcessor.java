@@ -221,7 +221,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         if (event.getFlowConstruct() instanceof MessageProcessorPathResolver)
         {
             muleContext.getNotificationManager().fireNotification(
-                new AsyncMessageNotification((Pipeline) event.getFlowConstruct(), event,
+                new AsyncMessageNotification(event.getFlowConstruct(), event,
                     next, AsyncMessageNotification.PROCESS_ASYNC_COMPLETE, exception));
         }
     }
