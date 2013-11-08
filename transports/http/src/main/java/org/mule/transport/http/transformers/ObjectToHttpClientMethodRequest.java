@@ -118,7 +118,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             }
             else if (HttpConstants.METHOD_PATCH.equalsIgnoreCase(method))
             {
-                httpMethod = createPatchMethod(msg);
+                httpMethod = createPatchMethod(msg, outputEncoding);
             }
             else
             {
@@ -299,10 +299,15 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
         return new TraceMethod(uri.toString());
     }
 
-    protected HttpMethod createPatchMethod(MuleMessage message) throws Exception
+    protected HttpMethod createPatchMethod(MuleMessage message, String outputEncoding) throws Exception
     {
         URI uri = getURI(message);
-        return new PatchMethod(uri.toString());
+        PatchMethod patchMethod = new PatchMethod(uri.toString());
+
+        Object payload = message.getPayload();
+        setupEntityMethod(payload, outputEncoding, message, patchMethod);
+        checkForContentType(message, patchMethod);
+        return patchMethod;
     }
 
     protected URI getURI(MuleMessage message) throws URISyntaxException, TransformerException

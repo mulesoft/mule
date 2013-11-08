@@ -14,21 +14,24 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.httpclient.HttpParser;
 
 public abstract class MockHttpServer extends Object implements Runnable
 {
 
+    private static final long MOCK_HTTP_SERVER_TIMEOUT = 10000;
+
     public static final String HTTP_STATUS_LINE_OK = "HTTP/1.1 200 OK\n";
 
-    private int listenPort;
-    private CountDownLatch startupLatch;
+    private final int listenPort;
+    private final CountDownLatch startupLatch = new CountDownLatch(1);
+    private final CountDownLatch shutdownLatch = new CountDownLatch(1);
 
-    public MockHttpServer(int listenPort, CountDownLatch startupLatch)
+    public MockHttpServer(int listenPort)
     {
         this.listenPort = listenPort;
-        this.startupLatch = startupLatch;
     }
 
     protected abstract void processRequests(InputStream in, OutputStream out) throws Exception;
@@ -51,6 +54,8 @@ public abstract class MockHttpServer extends Object implements Runnable
             out.close();
             clientSocket.close();
             serverSocket.close();
+
+            shutdownLatch.countDown();
         }
         catch (Exception e)
         {
@@ -73,6 +78,16 @@ public abstract class MockHttpServer extends Object implements Runnable
         {
             throw new RuntimeException(e);
         }
+    }
+
+    public boolean waitUntilServerStarted() throws Exception
+    {
+        return startupLatch.await(MOCK_HTTP_SERVER_TIMEOUT, TimeUnit.MILLISECONDS);
+    }
+
+    public boolean waitUntilServerStopped() throws Exception
+    {
+        return shutdownLatch.await(MOCK_HTTP_SERVER_TIMEOUT, TimeUnit.MILLISECONDS);
     }
 }
 
