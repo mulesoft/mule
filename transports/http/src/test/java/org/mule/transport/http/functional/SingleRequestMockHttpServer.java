@@ -6,34 +6,39 @@
  */
 package org.mule.transport.http.functional;
 
-import java.io.BufferedReader;
+import org.mule.transport.http.HttpRequest;
+import org.mule.transport.http.RequestLine;
+
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.util.concurrent.CountDownLatch;
+
+import org.apache.commons.httpclient.HttpParser;
 
 public abstract class SingleRequestMockHttpServer extends MockHttpServer
 {
 
-    private final CountDownLatch testCompleteLatch;
+    private final String encoding;
 
-    public SingleRequestMockHttpServer(int listenPort, CountDownLatch startupLatch, CountDownLatch testCompleteLatch)
+    public SingleRequestMockHttpServer(int listenPort, String encoding)
     {
-        super(listenPort, startupLatch);
-        this.testCompleteLatch = testCompleteLatch;
+        super(listenPort);
+        this.encoding = encoding;
     }
 
-    protected abstract void readHttpRequest(BufferedReader reader) throws Exception;
+    protected abstract void processSingleRequest(HttpRequest httpRequest) throws Exception;
 
     @Override
     protected void processRequests(InputStream in, OutputStream out) throws Exception
     {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        readHttpRequest(reader);
+        String line = HttpParser.readLine(in, encoding);
+        RequestLine requestLine = RequestLine.parseLine(line);
+        HttpRequest request = new HttpRequest(requestLine, HttpParser.parseHeaders(in, encoding), in, encoding);
+
+        processSingleRequest(request);
+
         out.write(HTTP_STATUS_LINE_OK.getBytes());
         out.write('\n');
         out.flush();
-        testCompleteLatch.countDown();
     }
 
 }
