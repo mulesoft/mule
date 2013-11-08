@@ -7,18 +7,16 @@
 package org.mule.transport.http.components;
 
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
+import org.mule.transport.http.HttpRequest;
 import org.mule.transport.http.functional.AbstractMockHttpServerTestCase;
 import org.mule.transport.http.functional.MockHttpServer;
 import org.mule.transport.http.functional.SingleRequestMockHttpServer;
 
-import java.io.BufferedReader;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.StringTokenizer;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -67,16 +65,13 @@ public class RestServiceComponentDeleteTestCase extends AbstractMockHttpServerTe
     {
         public SimpleHttpServer(int listenPort, CountDownLatch startupLatch, CountDownLatch testCompleteLatch)
         {
-            super(listenPort, startupLatch, testCompleteLatch);
+            super(listenPort, startupLatch, testCompleteLatch, muleContext.getConfiguration().getDefaultEncoding());
         }
 
         @Override
-        protected void readHttpRequest(BufferedReader reader) throws Exception
+        protected void processSingleRequest(HttpRequest httpRequest) throws Exception
         {
-            String requestLine = reader.readLine();
-            String httpMethod = new StringTokenizer(requestLine).nextToken();
-
-            deleteRequestFound = httpMethod.equals(HttpConstants.METHOD_DELETE);
+            deleteRequestFound = httpRequest.getRequestLine().getMethod().equals(HttpConstants.METHOD_DELETE);
         }
     }
 }
