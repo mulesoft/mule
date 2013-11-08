@@ -25,11 +25,13 @@ public abstract class MockHttpServer extends Object implements Runnable
 
     private int listenPort;
     private CountDownLatch startupLatch;
+    private CountDownLatch testCompleteLatch;
 
-    public MockHttpServer(int listenPort, CountDownLatch startupLatch)
+    public MockHttpServer(int listenPort, CountDownLatch startupLatch, CountDownLatch testCompleteLatch)
     {
         this.listenPort = listenPort;
         this.startupLatch = startupLatch;
+        this.testCompleteLatch = testCompleteLatch;
     }
 
     protected abstract void processRequests(InputStream in, OutputStream out) throws Exception;
@@ -52,6 +54,8 @@ public abstract class MockHttpServer extends Object implements Runnable
             out.close();
             clientSocket.close();
             serverSocket.close();
+
+            testCompleteLatch.countDown();
         }
         catch (Exception e)
         {
