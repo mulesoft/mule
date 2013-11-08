@@ -21,7 +21,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.httpclient.Header;
 import org.junit.Rule;
@@ -61,9 +60,9 @@ public class HttpOutboundKeepAliveTestCase extends AbstractMockHttpServerTestCas
     }
 
     @Override
-    protected MockHttpServer getHttpServer(CountDownLatch serverStartLatch)
+    protected MockHttpServer getHttpServer()
     {
-        return new KeepAliveHTTPServer(httpPort.getNumber(), serverStartLatch);
+        return new KeepAliveHTTPServer(httpPort.getNumber());
     }
 
     @Test
@@ -142,9 +141,9 @@ public class HttpOutboundKeepAliveTestCase extends AbstractMockHttpServerTestCas
 
         private static final int MAX_REQUESTS = 2;
 
-        public KeepAliveHTTPServer(int port, CountDownLatch serverStartLatch)
+        public KeepAliveHTTPServer(int port)
         {
-            super(port, serverStartLatch);
+            super(port);
         }
 
         @Override
