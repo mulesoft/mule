@@ -61,9 +61,9 @@ public class HttpOutboundKeepAliveTestCase extends AbstractMockHttpServerTestCas
     }
 
     @Override
-    protected MockHttpServer getHttpServer(CountDownLatch serverStartLatch)
+    protected MockHttpServer getHttpServer(CountDownLatch serverStartLatch, CountDownLatch testCompleteLatch)
     {
-        return new KeepAliveHTTPServer(httpPort.getNumber(), serverStartLatch);
+        return new KeepAliveHTTPServer(httpPort.getNumber(), serverStartLatch, testCompleteLatch);
     }
 
     @Test
@@ -142,9 +142,9 @@ public class HttpOutboundKeepAliveTestCase extends AbstractMockHttpServerTestCas
 
         private static final int MAX_REQUESTS = 2;
 
-        public KeepAliveHTTPServer(int port, CountDownLatch serverStartLatch)
+        public KeepAliveHTTPServer(int port, CountDownLatch serverStartLatch, CountDownLatch testCompleteLatch)
         {
-            super(port, serverStartLatch);
+            super(port, serverStartLatch, testCompleteLatch);
         }
 
         @Override
