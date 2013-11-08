@@ -14,7 +14,6 @@ import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.PipelineMessageNotification;
 import org.mule.util.concurrent.Latch;
 
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -23,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 public class FlowExecutionListener
 {
 
-    private CountDownLatch flowExecutedLatch = new Latch();
+    private final Latch flowExecutedLatch = new Latch();
     private String flowName;
     private int timeout = 10000;
 
@@ -59,7 +58,7 @@ public class FlowExecutionListener
                     }
                     if (notification.getAction() == PipelineMessageNotification.PROCESS_COMPLETE)
                     {
-                        flowExecutedLatch.countDown();
+                        flowExecutedLatch.release();
                     }
                 }
             });
@@ -83,15 +82,6 @@ public class FlowExecutionListener
         {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * @param numberOfExecutionsRequired number of times that the listener must be notified before releasing the latch.
-     */
-    public FlowExecutionListener setNumberOfExecutionsRequired(int numberOfExecutionsRequired)
-    {
-        this.flowExecutedLatch = new CountDownLatch(numberOfExecutionsRequired);
-        return this;
     }
 
     public FlowExecutionListener setTimeoutInMillis(int timeout)
