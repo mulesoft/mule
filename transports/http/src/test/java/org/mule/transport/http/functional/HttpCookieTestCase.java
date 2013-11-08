@@ -9,10 +9,12 @@ package org.mule.transport.http.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.http.HttpConstants;
+import org.mule.transport.http.HttpRequest;
 
-import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -22,13 +24,13 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.httpclient.Header;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
 {
-    private static final String COOKIE_HEADER = "Cookie:";
 
     private CountDownLatch latch = new CountDownLatch(1);
     private boolean cookieFound = false;
@@ -51,9 +53,9 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
     }
 
     @Override
-    protected MockHttpServer getHttpServer(CountDownLatch serverStartLatch)
+    protected MockHttpServer getHttpServer()
     {
-        return new SimpleHttpServer(dynamicPort.getNumber(), serverStartLatch, latch);
+        return new SimpleHttpServer(dynamicPort.getNumber());
     }
 
     @Test
@@ -69,8 +71,8 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
         assertTrue(cookieFound);
 
         assertEquals(2, cookieHeaders.size());
-        assertThereIsCookieWithThisContent("Cookie: $Version=0; customCookie=yes", cookieHeaders);
-        assertThereIsCookieWithThisContent("Cookie: $Version=0; expressionCookie=MYCOOKIE", cookieHeaders);
+        assertThereIsCookieWithThisContent("$Version=0; customCookie=yes", cookieHeaders);
+        assertThereIsCookieWithThisContent("$Version=0; expressionCookie=MYCOOKIE", cookieHeaders);
     }
 
     private void assertThereIsCookieWithThisContent(String content, List<String> listOfRawCookies)
@@ -88,33 +90,25 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
 
     private class SimpleHttpServer extends SingleRequestMockHttpServer
     {
-        public SimpleHttpServer(int listenPort, CountDownLatch startupLatch, CountDownLatch testCompleteLatch)
+
+        public SimpleHttpServer(int listenPort)
         {
-            super(listenPort, startupLatch, testCompleteLatch);
+            super(listenPort, muleContext.getConfiguration().getDefaultEncoding());
         }
 
         @Override
-        protected void readHttpRequest(BufferedReader reader) throws Exception
+        protected void processSingleRequest(HttpRequest httpRequest) throws Exception
         {
-            String line = reader.readLine();
-            while (line != null)
+            for (Header header : httpRequest.getHeaders())
             {
-                // Check that we receive a 'Cookie:' header as it would be
-                // send by a regular http client
-                if (line.indexOf(COOKIE_HEADER) > -1)
+                if (header.getName().equals(HttpConstants.HEADER_COOKIE))
                 {
                     cookieFound = true;
-                    cookieHeaders.add(line);
-                }
-
-                line = reader.readLine();
-                // only read the header, i.e. if we encounter an empty line
-                // stop reading (we're only interested in the headers anyway)
-                if (line.trim().length() == 0)
-                {
-                    line = null;
+                    cookieHeaders.add(header.getValue());
                 }
             }
+
+            latch.countDown();
         }
     }
 }

@@ -9,9 +9,9 @@ package org.mule.transport.http.components;
 import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
+
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.StringTokenizer;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -21,6 +21,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
+import org.mule.transport.http.HttpRequest;
 import org.mule.transport.http.functional.AbstractMockHttpServerTestCase;
 import org.mule.transport.http.functional.MockHttpServer;
 import org.mule.transport.http.functional.SingleRequestMockHttpServer;
@@ -48,9 +49,9 @@ public class RestServiceComponentDeleteTestCase extends AbstractMockHttpServerTe
     }
 
     @Override
-    protected MockHttpServer getHttpServer(CountDownLatch serverStartLatch)
+    protected MockHttpServer getHttpServer()
     {
-        return new SimpleHttpServer(dynamicPort.getNumber(), serverStartLatch, serverRequestCompleteLatch);
+        return new SimpleHttpServer(dynamicPort.getNumber());
     }
 
     @Test
@@ -65,18 +66,16 @@ public class RestServiceComponentDeleteTestCase extends AbstractMockHttpServerTe
 
     private class SimpleHttpServer extends SingleRequestMockHttpServer
     {
-        public SimpleHttpServer(int listenPort, CountDownLatch startupLatch, CountDownLatch testCompleteLatch)
+        public SimpleHttpServer(int listenPort)
         {
-            super(listenPort, startupLatch, testCompleteLatch);
+            super(listenPort, muleContext.getConfiguration().getDefaultEncoding());
         }
 
         @Override
-        protected void readHttpRequest(BufferedReader reader) throws Exception
+        protected void processSingleRequest(HttpRequest httpRequest) throws Exception
         {
-            String requestLine = reader.readLine();
-            String httpMethod = new StringTokenizer(requestLine).nextToken();
-
-            deleteRequestFound = httpMethod.equals(HttpConstants.METHOD_DELETE);
+            deleteRequestFound = httpRequest.getRequestLine().getMethod().equals(HttpConstants.METHOD_DELETE);
+            serverRequestCompleteLatch.countDown();
         }
     }
 }
