@@ -108,6 +108,11 @@
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
         </dependency>
+        <dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib-nodep</artifactId>
+			<version>2.2</version>
+		</dependency>
         <!-- UUID generator, only called directly by mule-core -->
         <dependency>
             <groupId>org.safehaus.jug</groupId>

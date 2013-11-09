@@ -25,7 +25,20 @@
             <return-data>foo</return-data>
         </static-component>
     </flow>
-
+    
+    <sub-flow name="fruits">
+    	<set-payload value="#[['Apple', 'Banana', 'Coconut']]" />
+    </sub-flow>
+    
+    <sub-flow name="fruitsIterator">
+    	<flow-ref name="fruits" />
+    	<set-payload value="#[payload.iterator()]" />
+    </sub-flow>
+    
+    <sub-flow name="fruitsIterable">
+    	<flow-ref name="fruitsIterator" />
+    	<component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$IterableFactory" />
+    </sub-flow>
 
     <flow name="pollWithoutWatermark">
         <poll frequency="1000">
@@ -167,6 +180,118 @@
 
     </flow>
 
-
+	<flow name="minSelectorWithList" processingStrategy="synchronous">
+		<poll frequency="1000">
+            <watermark variable="minSelectorWithList" default-expression="#[string:noKey]" selector="MIN" selector-expression="#[payload.charAt(0)]"/>
+    		<flow-ref name="fruits" />
+        </poll>
+        
+        <flow-ref name="consume" />
+	</flow>
+	
+	<flow name="maxSelectorWithList" processingStrategy="synchronous">
+		<poll frequency="1000">
+            <watermark variable="maxSelectorWithList" default-expression="#[string:noKey]" selector="MAX" selector-expression="#[payload.charAt(0)]"/>
+    		<flow-ref name="fruits" />
+        </poll>
+        
+        <flow-ref name="consume" />
+	</flow>
+	
+	<flow name="firstSelectorWithList" processingStrategy="synchronous">
+		<poll frequency="1000">
+            <watermark variable="firstSelectorWithList" default-expression="#[string:noKey]" selector="FIRST" />
+    		<flow-ref name="fruits" />
+        </poll>
+        
+        <flow-ref name="consume" />
+	</flow>
+	
+	<flow name="lastSelectorWithList" processingStrategy="synchronous">
+		<poll frequency="1000">
+            <watermark variable="lastSelectorWithList" default-expression="#[string:noKey]" selector="LAST" />
+    		<flow-ref name="fruits" />
+        </poll>
+        
+        <flow-ref name="consume" />
+	</flow>
+	
+	<flow name="minSelectorWithIterator" processingStrategy="synchronous">
+		<poll frequency="1000">
+            <watermark variable="minSelectorWithIterator" default-expression="#[string:noKey]" selector="MIN" selector-expression="#[payload.charAt(0)]"/>
+    		<flow-ref name="fruitsIterator" />
+        </poll>
+        
+        <flow-ref name="consume" />
+	</flow>
+	
+	<flow name="maxSelectorWithIterator" processingStrategy="synchronous">
+		<poll frequency="1000">
+            <watermark variable="maxSelectorWithIterator" default-expression="#[string:noKey]" selector="MAX" selector-expression="#[payload.charAt(0)]"/>
+    		<flow-ref name="fruitsIterator" />
+        </poll>
+        
+        <flow-ref name="consume" />
+	</flow>
+	
+	<flow name="firstSelectorWithIterator" processingStrategy="synchronous">
+		<poll frequency="1000">
+            <watermark variable="firstSelectorWithIterator" default-expression="#[string:noKey]" selector="FIRST" />
+    		<flow-ref name="fruitsIterator" />
+        </poll>
+        
+        <flow-ref name="consume" />
+	</flow>
+	
+	<flow name="lastSelectorWithIterator" processingStrategy="synchronous">
+		<poll frequency="1000">
+            <watermark variable="lastSelectorWithIterator" default-expression="#[string:noKey]" selector="LAST" />
+    		<flow-ref name="fruitsIterator" />
+        </poll>
+        
+        <flow-ref name="consume" />
+	</flow>
+	
+	<flow name="minSelectorWithIterable" processingStrategy="synchronous">
+		<poll frequency="1000">
+            <watermark variable="minSelectorWithIterable" default-expression="#[string:noKey]" selector="MIN" selector-expression="#[payload.charAt(0)]"/>
+    		<flow-ref name="fruitsIterable" />
+        </poll>
+        
+        <flow-ref name="consume" />
+	</flow>
+	
+	<flow name="maxSelectorWithIterable" processingStrategy="synchronous">
+		<poll frequency="1000">
+            <watermark variable="maxSelectorWithIterable" default-expression="#[string:noKey]" selector="MAX" selector-expression="#[payload.charAt(0)]"/>
+    		<flow-ref name="fruitsIterable" />
+        </poll>
+        
+        <flow-ref name="consume" />
+	</flow>
+	
+	<flow name="firstSelectorWithIterable" processingStrategy="synchronous">
+		<poll frequency="1000">
+            <watermark variable="firstSelectorWithIterable" default-expression="#[string:noKey]" selector="FIRST" />
+    		<flow-ref name="fruitsIterable" />
+        </poll>
+        
+        <flow-ref name="consume" />
+	</flow>
+	
+	<flow name="lastSelectorWithIterable" processingStrategy="synchronous">
+		<poll frequency="1000">
+            <watermark variable="lastSelectorWithIterable" default-expression="#[string:noKey]" selector="LAST" />
+    		<flow-ref name="fruitsIterable" />
+        </poll>
+        
+        <flow-ref name="consume" />
+	</flow>
+	
+	<sub-flow name="consume">
+		<foreach>
+			<logger message="selecting from #[payload]" />
+		</foreach>
+	</sub-flow>
 
 </mule>

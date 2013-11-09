@@ -4,36 +4,44 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.config.spring.factories;
 
 import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.registry.MuleRegistry;
 import org.mule.api.store.ObjectStore;
-import org.mule.api.store.ObjectStoreManager;
+import org.mule.transport.polling.watermark.UpdateExpressionWatermark;
 import org.mule.transport.polling.watermark.Watermark;
+import org.mule.transport.polling.watermark.selector.SelectorWatermark;
+import org.mule.transport.polling.watermark.selector.WatermarkSelectorBroker;
 import org.mule.util.store.MuleObjectStoreManager;
 
-import org.springframework.beans.factory.config.AbstractFactoryBean;
-
-import javax.xml.namespace.QName;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WatermarkFactoryBean extends AbstractFactoryBean<Watermark> implements MuleContextAware, AnnotatedObject
+import javax.xml.namespace.QName;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.config.AbstractFactoryBean;
+
+public class WatermarkFactoryBean extends AbstractFactoryBean<Watermark>
+    implements MuleContextAware, AnnotatedObject
 {
 
     public static final String MULE_WATERMARK_PARTITION = "mule.watermark";
+    private static final String DEFAULT_SELECTOR_EXPRESSION = "#[payload]";
+
     private String variable;
     private String defaultExpression;
     private String updateExpression;
-    private ObjectStore objectStore;
+    private WatermarkSelectorBroker selector;
+    private String selectorExpression;
+    private ObjectStore<Serializable> objectStore;
 
     private Map<QName, Object> annotations = new HashMap<QName, Object>();
-
-    private MuleRegistry registry;
+    private MuleContext muleContext;
 
     @Override
     public Class<?> getObjectType()
@@ -44,37 +52,74 @@ public class WatermarkFactoryBean extends AbstractFactoryBean<Watermark> impleme
     @Override
     protected Watermark createInstance() throws Exception
     {
-        ObjectStore<?> os = objectStore;
-        if (os == null)
+        if (this.selector != null)
         {
-            MuleObjectStoreManager mgr = (MuleObjectStoreManager) registry.get(MuleProperties.OBJECT_STORE_MANAGER);
-            os = mgr.getUserObjectStore(MULE_WATERMARK_PARTITION, true);
+            if (!StringUtils.isEmpty(this.updateExpression))
+            {
+                throw new IllegalArgumentException(
+                    "You specified a watermark with both an update expression and a selector and/or a selector.\n"
+                                    + "Those cannot co-exist. You have to either specify an updateExpression or selector options");
+            }
+            String selectorExpression = StringUtils.isEmpty(this.selectorExpression)
+                                                                                    ? DEFAULT_SELECTOR_EXPRESSION
+                                                                                    : this.selectorExpression;
+
+            return new SelectorWatermark(this.acquireObjectStore(), this.variable, this.defaultExpression,
+                this.selector.newSelector(selectorExpression), selectorExpression);
+        }
+        else
+        {
+            return new UpdateExpressionWatermark(this.acquireObjectStore(), this.variable,
+                this.defaultExpression, updateExpression);
         }
 
-        return new Watermark(os, variable, defaultExpression, updateExpression);
     }
 
-    public void setObjectStore(ObjectStore objectStore)
+    private ObjectStore<Serializable> acquireObjectStore()
+    {
+        ObjectStore<Serializable> os = this.objectStore;
+        if (os == null)
+        {
+            MuleObjectStoreManager mgr = (MuleObjectStoreManager) this.muleContext.getObjectStoreManager();
+            os = mgr.getUserObjectStore(MULE_WATERMARK_PARTITION, true);
+        }
+        return os;
+    }
+
+    public void setObjectStore(ObjectStore<Serializable> objectStore)
     {
         this.objectStore = objectStore;
     }
 
-    public void setVariable(String variable) {
+    public void setVariable(String variable)
+    {
         this.variable = variable;
     }
 
-    public void setDefaultExpression(String defaultExpression) {
+    public void setDefaultExpression(String defaultExpression)
+    {
         this.defaultExpression = defaultExpression;
     }
 
-    public void setUpdateExpression(String updateExpression) {
+    public void setUpdateExpression(String updateExpression)
+    {
         this.updateExpression = updateExpression;
+    }
+
+    public void setSelector(WatermarkSelectorBroker selector)
+    {
+        this.selector = selector;
+    }
+
+    public void setSelectorExpression(String selectorExpression)
+    {
+        this.selectorExpression = selectorExpression;
     }
 
     @Override
     public void setMuleContext(MuleContext context)
     {
-        this.registry = context.getRegistry();
+        this.muleContext = context;
     }
 
     @Override
