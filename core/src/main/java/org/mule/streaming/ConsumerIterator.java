@@ -63,12 +63,14 @@ public class ConsumerIterator<T> implements Iterator<T>, Closeable, ProvidesTota
      * 
      * @throws UnsupportedOperationException
      */
+    @Override
     public void remove()
     {
         throw new UnsupportedOperationException();
     }
 
-    public int totalAvailable()
+    @Override
+    public int size()
     {
         return this.consumer.totalAvailable();
     }

@@ -9,13 +9,18 @@ package org.mule.transport.polling.watermark.selector;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.config.ConfigurationException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.streaming.ProvidesTotalHint;
 import org.mule.transport.polling.watermark.Watermark;
 import org.mule.transport.polling.watermark.WatermarkPollingInterceptor;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of
@@ -26,6 +31,8 @@ import java.util.Iterator;
  */
 public class SelectorWatermarkPollingInterceptor extends WatermarkPollingInterceptor
 {
+
+    private static final Logger logger = LoggerFactory.getLogger(SelectorWatermarkPollingInterceptor.class);
 
     private final WatermarkSelector selector;
     private final String selectorExpression;
@@ -58,8 +65,8 @@ public class SelectorWatermarkPollingInterceptor extends WatermarkPollingInterce
      * received by the {@link WatermarkSelector}
      * </p>
      */
-    @SuppressWarnings("unchecked")
     @Override
+    @SuppressWarnings("unchecked")
     public MuleEvent prepareRouting(MuleEvent sourceEvent, MuleEvent event) throws ConfigurationException
     {
         event = super.prepareRouting(sourceEvent, event);
@@ -67,63 +74,81 @@ public class SelectorWatermarkPollingInterceptor extends WatermarkPollingInterce
         final WatermarkSelector selector = new WatermarkSelectorWrapper(this.selector,
             this.selectorExpression, event);
 
-        if (payload instanceof Iterable)
+        if (payload instanceof Collection)
         {
             // consume early since the user could consume this collection in
             // unpredictable ways. He could even not consume it completely at all
-            for (Object object : (Iterable<?>) payload)
+            Collection<Object> copy = new ArrayList<Object>(((Collection<Object>) payload));
+            for (Object object : copy)
             {
                 selector.acceptValue(object);
             }
         }
         if (payload instanceof Iterator)
         {
-            event.getMessage().setPayload(new SelectorIteratorProxy<Object>((Iterator<Object>) payload, selector));
+            event.getMessage().setPayload(this.proxy((Iterator<Object>) payload, selector));
+        }
+        else if (payload instanceof Iterable)
+        {
+            event.getMessage().setPayload(this.proxy((Iterable<Object>) payload, selector));
         }
         else
         {
-            throw new ConfigurationException(CoreMessages.createStaticMessage(String.format(
-                    "Poll executing with payload of class %s but selector can only handle Iterator and Iterable objects when watermark is to be updated via selectors",
-                    payload.getClass().getCanonicalName())));
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(String.format(
+                    "Poll executing with payload of class %s but selector can only handle Iterator and Iterable. Watermark will not be updated",
+                    payload.getClass().getCanonicalName()));
+            }
         }
 
         return event;
     }
 
-    private static class SelectorIteratorProxy<T> implements Iterator<T>, ProvidesTotalHint {
-        private final Iterator<T> delegate;
-        private final WatermarkSelector selector;
+    @SuppressWarnings("unchecked")
+    private Iterator<Object> proxy(final Iterator<Object> iterator, final WatermarkSelector selector)
+    {
+        return (Iterator<Object>) Proxy.newProxyInstance(iterator.getClass().getClassLoader(),
+            new Class[]{Iterator.class}, new InvocationHandler()
+            {
 
-        private SelectorIteratorProxy(Iterator<T> delegate, WatermarkSelector selector)
-        {
-            this.delegate = delegate;
-            this.selector = selector;
-        }
+                @Override
+                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+                {
+                    if (method.getName().equals("next") && (args == null || args.length == 0))
+                    {
+                        Object value = iterator.next();
+                        selector.acceptValue(value);
 
-        @Override
-        public boolean hasNext()
-        {
-            return delegate.hasNext();
-        }
+                        return value;
+                    }
+                    else
+                    {
+                        return method.invoke(iterator, args);
+                    }
+                }
+            });
+    }
 
-        @Override
-        public T next()
-        {
-            T next = delegate.next();
-            selector.acceptValue(next);
-            return next;
-        }
+    @SuppressWarnings("unchecked")
+    private Iterable<Object> proxy(final Iterable<Object> iterable, final WatermarkSelector selector)
+    {
+        return (Iterable<Object>) Proxy.newProxyInstance(iterable.getClass().getClassLoader(),
+            new Class[]{Iterable.class}, new InvocationHandler()
+            {
 
-        @Override
-        public void remove()
-        {
-            delegate.remove();
-        }
-
-        @Override
-        public int totalAvailable()
-        {
-            return (delegate instanceof ProvidesTotalHint) ? ((ProvidesTotalHint) delegate).totalAvailable() : -1;
-        }
+                @Override
+                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+                {
+                    if (method.getName().equals("iterator") && (args == null || args.length == 0))
+                    {
+                        return proxy(iterable.iterator(), selector);
+                    }
+                    else
+                    {
+                        return method.invoke(iterable, args);
+                    }
+                }
+            });
     }
 }
