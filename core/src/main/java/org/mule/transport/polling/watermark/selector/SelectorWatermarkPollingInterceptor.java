@@ -67,22 +67,29 @@ public class SelectorWatermarkPollingInterceptor extends WatermarkPollingInterce
         final WatermarkSelector selector = new WatermarkSelectorWrapper(this.selector,
             this.selectorExpression, event);
 
-        if (payload instanceof Iterable)
+        if (payload instanceof Collection)
         {
             // consume early since the user could consume this collection in
             // unpredictable ways. He could even not consume it completely at all
-            for (Object object : (Iterable<?>) payload)
+            for (Object object : (Collection<?>) payload)
             {
                 selector.acceptValue(object);
             }
         }
-        if (payload instanceof Iterator)
+        else if (payload instanceof Iterator)
         {
-            event.getMessage().setPayload(new SelectorIteratorProxy<Object>((Iterator<Object>) payload, selector));
+            event.getMessage().setPayload(
+                new SelectorIteratorProxy<Object>((Iterator<Object>) payload, selector));
+        }
+        else if (payload instanceof Iterable)
+        {
+            event.getMessage().setPayload(
+                new SelectorIteratorProxy<Object>(((Iterable<Object>) payload).iterator(), selector));
         }
         else
         {
-            throw new ConfigurationException(CoreMessages.createStaticMessage(String.format(
+            throw new ConfigurationException(
+                CoreMessages.createStaticMessage(String.format(
                     "Poll executing with payload of class %s but selector can only handle Iterator and Iterable objects when watermark is to be updated via selectors",
                     payload.getClass().getCanonicalName())));
         }
@@ -90,7 +97,8 @@ public class SelectorWatermarkPollingInterceptor extends WatermarkPollingInterce
         return event;
     }
 
-    private static class SelectorIteratorProxy<T> implements Iterator<T>, ProvidesTotalHint {
+    private static class SelectorIteratorProxy<T> implements Iterator<T>, ProvidesTotalHint
+    {
         private final Iterator<T> delegate;
         private final WatermarkSelector selector;
 
@@ -121,9 +129,9 @@ public class SelectorWatermarkPollingInterceptor extends WatermarkPollingInterce
         }
 
         @Override
-        public int totalAvailable()
+        public int size()
         {
-            return (delegate instanceof ProvidesTotalHint) ? ((ProvidesTotalHint) delegate).totalAvailable() : -1;
+            return (delegate instanceof ProvidesTotalHint) ? ((ProvidesTotalHint) delegate).size() : -1;
         }
     }
 }

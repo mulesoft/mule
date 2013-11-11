@@ -37,7 +37,7 @@ public class PagingDelegateProducer<T> implements Producer<T>
      * Returns the total amount of available results informed by delegate
      */
     @Override
-    public int totalAvailable()
+    public int size()
     {
         return this.delegate.getTotalResults();
     }

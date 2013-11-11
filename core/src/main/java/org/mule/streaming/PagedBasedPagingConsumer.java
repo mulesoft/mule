@@ -97,9 +97,9 @@ public class PagedBasedPagingConsumer<T> implements Consumer<T>
      * {@inheritDoc}
      */
     @Override
-    public int totalAvailable()
+    public int size()
     {
-        return this.producer.totalAvailable();
+        return this.producer.size();
     }
 
     /**

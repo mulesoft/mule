@@ -88,7 +88,7 @@ public class ListableObjectStoreProducer<T extends Serializable> implements Prod
     }
 
     @Override
-    public int totalAvailable()
+    public int size()
     {
         return this.size;
     }

@@ -75,7 +75,7 @@ public class ElementBasedPagingConsumerTestCase extends AbstractPagingConsumerTe
     @Test
     public void totalAvailable()
     {
-        Assert.assertEquals(this.consumer.totalAvailable(), totalCount);
+        Assert.assertEquals(this.consumer.size(), totalCount);
     }
 
     @Test
@@ -114,7 +114,7 @@ public class ElementBasedPagingConsumerTestCase extends AbstractPagingConsumerTe
             return ret;
         }
 
-        public int totalAvailable()
+        public int size()
         {
             return totalCount;
         };

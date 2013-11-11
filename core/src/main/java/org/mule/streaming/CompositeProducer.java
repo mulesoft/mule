@@ -90,14 +90,14 @@ public class CompositeProducer<T> implements Producer<T>
      * does not have a value available (returns -1) then it is not factored in
      */
     @Override
-    public int totalAvailable()
+    public int size()
     {
         if (this.totalAvailable == null)
         {
             int total = 0;
             for (Producer<T> producer : this.producers)
             {
-                int available = producer.totalAvailable();
+                int available = producer.size();
                 if (available > 0)
                 {
                     total += available;
