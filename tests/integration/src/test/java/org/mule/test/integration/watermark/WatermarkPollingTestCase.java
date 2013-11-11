@@ -9,10 +9,8 @@ package org.mule.test.integration.watermark;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.schedule.SchedulerFactoryPostProcessor;
@@ -30,7 +28,6 @@ import org.mule.util.store.ObjectStorePartition;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Before;
@@ -479,30 +476,6 @@ public class WatermarkPollingTestCase extends FunctionalTestCase
         this.assertVariableInOS("lastSelectorWithIterator", "Coconut", "The last value wasn't 'Coconut'");
     }
 
-    @Test
-    public void minSelectorWithIterable() throws Exception
-    {
-        this.assertVariableInOS("minSelectorWithIterable", new Character('A'), "The min value wasn't 'A'");
-    }
-
-    @Test
-    public void maxSelectorWithIterable() throws Exception
-    {
-        this.assertVariableInOS("maxSelectorWithIterable", new Character('C'), "The max value wasn't 'C'");
-    }
-
-    @Test
-    public void firstSelectorWithIterable() throws Exception
-    {
-        this.assertVariableInOS("firstSelectorWithIterable", "Apple", "The first value wasn't 'Apple'");
-    }
-
-    @Test
-    public void lastSelectorWithIterable() throws Exception
-    {
-        this.assertVariableInOS("lastSelectorWithIterable", "Coconut", "The last value wasn't 'Coconut'");
-    }
-
     private void assertVariableInOS(final String variableName,
                                     final Serializable expected,
                                     final String failureDescription) throws Exception
@@ -552,30 +525,6 @@ public class WatermarkPollingTestCase extends FunctionalTestCase
                 foo.add(s);
             }
 
-        }
-    }
-
-    public static class IterableFactory implements Callable
-    {
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public Object onCall(MuleEventContext eventContext) throws Exception
-        {
-            final Iterator<Object> iterator = (Iterator<Object>) eventContext.getMessage().getPayload();
-            return new Iterable<Object>()
-            {
-
-                @Override
-                public Iterator<Object> iterator()
-                {
-                    return iterator;
-                }
-            };
-        }
-
-        public void process(final Iterator<Object> iterator)
-        {
         }
     }
 

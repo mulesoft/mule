@@ -14,7 +14,6 @@ import org.mule.streaming.ProvidesTotalHint;
 import org.mule.transport.polling.watermark.Watermark;
 import org.mule.transport.polling.watermark.WatermarkPollingInterceptor;
 
-import java.util.Collection;
 import java.util.Iterator;
 
 /**
@@ -44,18 +43,18 @@ public class SelectorWatermarkPollingInterceptor extends WatermarkPollingInterce
      * {@inheritDoc}
      * </p>
      * <p>
-     * If the payload is a {@link Collection}, then that collection is copied and
-     * iterated passing all values evaluated through the selector. This is so because
-     * not only different kinds of collections can be traversed in unpredictable
-     * ways, but also collections are often copied before being iterated in which
-     * case we have no interception point.
+     * If the payload is a {@link Iterable}, then it is iterated passing all values
+     * evaluated through the selector. This is so because not only different kinds of
+     * collections can be traversed in unpredictable ways, but also collections are
+     * often copied before being iterated in which case we have no interception
+     * point.
      * </p>
      * <p>
-     * If thepayload is an {@link Iterator} or an {@link Iterable}, then dynamic
-     * proxies are generated so that we can intercept all values an evaluate them
-     * through the selector. <b>Notice that if the {@link Iterable} or
-     * {@link Iterator} are not fully consumed, the unretrieved values will not be
-     * received by the {@link WatermarkSelector}
+     * If the payload is an {@link Iterator}, then a static proxy is generated so
+     * that we can intercept all values an evaluate them through the selector.
+     * <b>Notice that if the {@link Iterable} or {@link Iterator} are not fully
+     * consumed, the unretrieved values will not be received by the
+     * {@link WatermarkSelector}
      * </p>
      */
     @SuppressWarnings("unchecked")
@@ -67,11 +66,11 @@ public class SelectorWatermarkPollingInterceptor extends WatermarkPollingInterce
         final WatermarkSelector selector = new WatermarkSelectorWrapper(this.selector,
             this.selectorExpression, event);
 
-        if (payload instanceof Collection)
+        if (payload instanceof Iterable)
         {
             // consume early since the user could consume this collection in
             // unpredictable ways. He could even not consume it completely at all
-            for (Object object : (Collection<?>) payload)
+            for (Object object : (Iterable<?>) payload)
             {
                 selector.acceptValue(object);
             }
@@ -80,11 +79,6 @@ public class SelectorWatermarkPollingInterceptor extends WatermarkPollingInterce
         {
             event.getMessage().setPayload(
                 new SelectorIteratorProxy<Object>((Iterator<Object>) payload, selector));
-        }
-        else if (payload instanceof Iterable)
-        {
-            event.getMessage().setPayload(
-                new SelectorIteratorProxy<Object>(((Iterable<Object>) payload).iterator(), selector));
         }
         else
         {
