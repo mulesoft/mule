@@ -20,7 +20,7 @@ import java.util.Iterator;
  * will consider that it has not next items. remove() operation is not allowed on
  * this instance
  */
-public class ConsumerIterator<T> implements Iterator<T>, Closeable
+public class ConsumerIterator<T> implements Iterator<T>, Closeable, ProvidesTotalHint
 {
 
     private Consumer<T> consumer;
@@ -68,12 +68,7 @@ public class ConsumerIterator<T> implements Iterator<T>, Closeable
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * returns the total amount of items available for consumption. In some
-     * scenarios, it might not be possible/convenient to actually retrieve this value
-     * or it might not be available at this point. -1 is returned in such a case.
-     */
-    public int size()
+    public int totalAvailable()
     {
         return this.consumer.totalAvailable();
     }

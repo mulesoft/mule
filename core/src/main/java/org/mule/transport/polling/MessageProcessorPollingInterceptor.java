@@ -56,6 +56,6 @@ public abstract class MessageProcessorPollingInterceptor
      */
     public void postProcessRouting(MuleEvent event) throws MuleException
     {
-        // Mo-op
+        // No-op
     }
 }

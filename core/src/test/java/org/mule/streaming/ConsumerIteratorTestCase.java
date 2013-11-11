@@ -99,7 +99,7 @@ public class ConsumerIteratorTestCase
     @Test
     public void size() throws Exception {
         ConsumerIterator<String> it = this.newIterator();
-        Assert.assertEquals(it.size(), TOP);
+        Assert.assertEquals(it.totalAvailable(), TOP);
     }
 
     private ConsumerIterator<String> newIterator()
