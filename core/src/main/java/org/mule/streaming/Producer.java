@@ -15,7 +15,7 @@ import java.util.List;
  * pattern. Implementing this interface does not guarantee thread safeness. Check
  * each particular implementation for information about that
  */
-public interface Producer<T> extends Closeable, ProvidesTotalHint
+public interface Producer<T> extends Closeable
 {
 
     /**
@@ -24,5 +24,12 @@ public interface Producer<T> extends Closeable, ProvidesTotalHint
      * @return a list of items. Might be null or empty depending on implementation
      */
     public List<T> produce();
+    
+    /**
+     * returns the total amount of items available for storage/processing. In some
+     * scenarios, it might not be possible/convenient to actually retrieve this value
+     * or it might not be available at this point. -1 is returned in such a case.
+     */
+    public int totalAvailable();
 
 }
