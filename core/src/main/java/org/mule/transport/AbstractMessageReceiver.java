@@ -33,11 +33,11 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.context.notification.EndpointMessageNotification;
-import org.mule.execution.TransactionalErrorHandlingExecutionTemplate;
-import org.mule.lifecycle.PrimaryNodeLifecycleNotificationListener;
 import org.mule.execution.MessageProcessContext;
 import org.mule.execution.MessageProcessTemplate;
 import org.mule.execution.MessageProcessingManager;
+import org.mule.execution.TransactionalErrorHandlingExecutionTemplate;
+import org.mule.lifecycle.PrimaryNodeLifecycleNotificationListener;
 import org.mule.session.DefaultMuleSession;
 import org.mule.session.LegacySessionHandler;
 import org.mule.transaction.TransactionCoordination;
@@ -195,7 +195,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
 
     @Override
     public final MuleEvent routeMessage(MuleMessage message, Transaction trans, OutputStream outputStream)
-        throws MuleException
+            throws MuleException
     {
         return routeMessage(message, new DefaultMuleSession(), trans, outputStream);
     }
@@ -496,7 +496,14 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     {
         int shutdownTimeout = connector.getMuleContext().getConfiguration().getShutdownTimeout();
 
-        return new TrackingWorkManager(getConnectorWorkManager(), shutdownTimeout);
+        return new TrackingWorkManager(new WorkManagerHolder()
+        {
+            @Override
+            public WorkManager getWorkManager()
+            {
+                return getConnectorWorkManager();
+            }
+        }, shutdownTimeout);
     }
 
     public MuleEvent routeEvent(MuleEvent muleEvent) throws MuleException
