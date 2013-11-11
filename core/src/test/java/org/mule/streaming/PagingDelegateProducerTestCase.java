@@ -51,7 +51,7 @@ public class PagingDelegateProducerTestCase
     {
         final int total = 10;
         Mockito.when(this.delegate.getTotalResults()).thenReturn(total);
-        Assert.assertEquals(this.producer.totalAvailable(), total);
+        Assert.assertEquals(this.producer.size(), total);
     }
 
     @Test

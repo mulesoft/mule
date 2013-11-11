@@ -88,7 +88,7 @@ public class QueueProducer implements Producer<Serializable>
     }
 
     @Override
-    public int totalAvailable()
+    public int size()
     {
         return this.size;
     }
