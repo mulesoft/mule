@@ -9,20 +9,13 @@ package org.mule.transport.polling.watermark.selector;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.config.ConfigurationException;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.streaming.ProvidesTotalHint;
 import org.mule.transport.polling.watermark.Watermark;
 import org.mule.transport.polling.watermark.WatermarkPollingInterceptor;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.MethodInterceptor;
-import net.sf.cglib.proxy.MethodProxy;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of
@@ -33,8 +26,6 @@ import org.slf4j.LoggerFactory;
  */
 public class SelectorWatermarkPollingInterceptor extends WatermarkPollingInterceptor
 {
-
-    private static final Logger logger = LoggerFactory.getLogger(SelectorWatermarkPollingInterceptor.class);
 
     private final WatermarkSelector selector;
     private final String selectorExpression;
@@ -67,8 +58,8 @@ public class SelectorWatermarkPollingInterceptor extends WatermarkPollingInterce
      * received by the {@link WatermarkSelector}
      * </p>
      */
-    @Override
     @SuppressWarnings("unchecked")
+    @Override
     public MuleEvent prepareRouting(MuleEvent sourceEvent, MuleEvent event) throws ConfigurationException
     {
         event = super.prepareRouting(sourceEvent, event);
@@ -76,80 +67,63 @@ public class SelectorWatermarkPollingInterceptor extends WatermarkPollingInterce
         final WatermarkSelector selector = new WatermarkSelectorWrapper(this.selector,
             this.selectorExpression, event);
 
-        if (payload instanceof Collection)
+        if (payload instanceof Iterable)
         {
             // consume early since the user could consume this collection in
             // unpredictable ways. He could even not consume it completely at all
-            Collection<Object> copy = new ArrayList<Object>(((Collection<Object>) payload));
-            for (Object object : copy)
+            for (Object object : (Iterable<?>) payload)
             {
                 selector.acceptValue(object);
             }
         }
         if (payload instanceof Iterator)
         {
-            event.getMessage().setPayload(this.proxy((Iterator<Object>) payload, selector));
-        }
-        else if (payload instanceof Iterable)
-        {
-            event.getMessage().setPayload(this.proxy((Iterable<Object>) payload, selector));
+            event.getMessage().setPayload(new SelectorIteratorProxy<Object>((Iterator<Object>) payload, selector));
         }
         else
         {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug(String.format(
-                    "Poll executing with payload of class %s but selector can only handle Iterator and Iterable. Watermark will not be updated",
-                    payload.getClass().getCanonicalName()));
-            }
+            throw new ConfigurationException(CoreMessages.createStaticMessage(String.format(
+                    "Poll executing with payload of class %s but selector can only handle Iterator and Iterable objects when watermark is to be updated via selectors",
+                    payload.getClass().getCanonicalName())));
         }
 
         return event;
     }
 
-    @SuppressWarnings("unchecked")
-    private Iterator<Object> proxy(final Iterator<Object> iterator, final WatermarkSelector selector)
-    {
-        return (Iterator<Object>) Enhancer.create(Iterator.class, new MethodInterceptor()
+    private static class SelectorIteratorProxy<T> implements Iterator<T>, ProvidesTotalHint {
+        private final Iterator<T> delegate;
+        private final WatermarkSelector selector;
+
+        private SelectorIteratorProxy(Iterator<T> delegate, WatermarkSelector selector)
         {
-            @Override
-            public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy)
-                throws Throwable
-            {
-                if (method.getName().equals("next") && args.length == 0)
-                {
-                    Object value = iterator.next();
-                    selector.acceptValue(value);
+            this.delegate = delegate;
+            this.selector = selector;
+        }
 
-                    return value;
-                }
-                else
-                {
-                    return method.invoke(iterator, args);
-                }
-            }
-        });
-    }
-
-    @SuppressWarnings("unchecked")
-    private Iterable<Object> proxy(final Iterable<Object> iterable, final WatermarkSelector selector)
-    {
-        return (Iterable<Object>) Enhancer.create(Iterable.class, new MethodInterceptor()
+        @Override
+        public boolean hasNext()
         {
-            @Override
-            public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy)
-                throws Throwable
-            {
-                if (method.getName().equals("iterator") && args.length == 0)
-                {
-                    return proxy(iterable.iterator(), selector);
-                }
-                else
-                {
-                    return method.invoke(iterable, args);
-                }
-            }
-        });
-    }
+            return delegate.hasNext();
+        }
 
+        @Override
+        public T next()
+        {
+            T next = delegate.next();
+            selector.acceptValue(next);
+            return next;
+        }
+
+        @Override
+        public void remove()
+        {
+            delegate.remove();
+        }
+
+        @Override
+        public int totalAvailable()
+        {
+            return (delegate instanceof ProvidesTotalHint) ? ((ProvidesTotalHint) delegate).totalAvailable() : -1;
+        }
+    }
 }

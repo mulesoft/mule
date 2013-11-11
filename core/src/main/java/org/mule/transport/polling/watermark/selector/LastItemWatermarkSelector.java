@@ -8,7 +8,7 @@
 package org.mule.transport.polling.watermark.selector;
 
 /**
- * Implementation of {@link WatermarkSelector} that selectes the last value of the
+ * Implementation of {@link WatermarkSelector} that selects the last value of the
  * set. Thread-safeness is not guaranteed. If your use case is concurrent, then you
  * need to synchronize access yourself.
  * 
@@ -22,9 +22,6 @@ public class LastItemWatermarkSelector extends WatermarkSelector
         super(selectorExpression);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void acceptValue(Object value)
     {

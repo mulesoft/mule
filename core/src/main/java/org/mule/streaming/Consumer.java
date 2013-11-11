@@ -16,14 +16,14 @@ import java.util.NoSuchElementException;
  * interface does not guarantee thread safeness. Check each particular implementation
  * for information about that
  */
-public interface Consumer<T> extends Closeable
+public interface Consumer<T> extends Closeable, ProvidesTotalHint
 {
 
     /**
      * Retrieves the next available item.
      * 
      * @return an object of type T if available
-     * @throws {@link org.mule.api.streaming.ClosedConsumerException.ClosedConsumerException}
+     * @throws {@link org.mule.streaming.ClosedConsumerException}
      *         if the consumer is already closed
      */
     public T consume() throws NoSuchElementException;
@@ -31,7 +31,7 @@ public interface Consumer<T> extends Closeable
     /**
      * Returns <code>true</code> if no more items are available or if the consumer
      * was closed. When this method returns <code>true</code>, implementors of this
-     * class are require to invoke the {@link org.mule.api.Closeable.close()} method
+     * class are require to invoke the {@link org.mule.api.Closeable#close()} method
      * before returning in order to release resources as quickly as possible. Users
      * of this component who no longer need this require before it is fully consumed
      * are also required to close it.
@@ -41,11 +41,6 @@ public interface Consumer<T> extends Closeable
      */
     public boolean isConsumed();
 
-    /**
-     * returns the total amount of items available for consumption. In some
-     * scenarios, it might not be possible/convenient to actually retrieve this value
-     * or it might not be available at this point. -1 is returned in such a case.
-     */
-    public int totalAvailable();
+
 
 }
