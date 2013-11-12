@@ -133,8 +133,8 @@
             <version>3.1</version>
         </dependency>
         <dependency>
-            <groupId>org.mvel</groupId>
-            <artifactId>mvel2</artifactId>
+            <groupId>org.mule.mvel</groupId>
+            <artifactId>mule-mvel2</artifactId>
         </dependency>
         <dependency>
             <groupId>jgrapht</groupId>

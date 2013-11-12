@@ -13,7 +13,7 @@ import org.mule.el.context.ServerContext;
 import org.mule.el.function.DateTimeExpressionLanguageFuntion;
 import org.mule.el.function.RegexExpressionLanguageFuntion;
 
-import org.mvel2.ParserContext;
+import org.mule.mvel2.ParserContext;
 
 class StaticVariableResolverFactory extends MVELExpressionLanguageContext
 {

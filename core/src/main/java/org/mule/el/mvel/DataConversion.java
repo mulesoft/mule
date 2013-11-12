@@ -6,7 +6,7 @@
  */
 package org.mule.el.mvel;
 
-public class DataConversion extends org.mvel2.DataConversion
+public class DataConversion extends org.mule.mvel2.DataConversion
 {
 
     @SuppressWarnings("unchecked")

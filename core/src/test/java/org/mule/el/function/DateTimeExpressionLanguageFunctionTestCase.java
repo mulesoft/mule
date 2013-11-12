@@ -24,7 +24,7 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.mvel2.ParserContext;
+import org.mule.mvel2.ParserContext;
 
 @SmallTest
 public class DateTimeExpressionLanguageFunctionTestCase extends AbstractMuleTestCase

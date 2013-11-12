@@ -10,7 +10,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.construct.FlowConstruct;
 
-import org.mvel2.ParserContext;
+import org.mule.mvel2.ParserContext;
 
 public class EventVariableResolverFactory extends MessageVariableResolverFactory
 {

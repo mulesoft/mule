@@ -7,8 +7,8 @@
 package org.mule.module.xml.el;
 
 import org.dom4j.Node;
-import org.mvel2.ConversionHandler;
-import org.mvel2.conversion.StringCH;
+import org.mule.mvel2.ConversionHandler;
+import org.mule.mvel2.conversion.StringCH;
 
 class XMLToStringConversionHandler implements ConversionHandler
 {
