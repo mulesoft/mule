@@ -8,8 +8,8 @@ package org.mule.el.mvel;
 
 import org.mule.api.el.VariableAssignmentCallback;
 
-import org.mvel2.integration.VariableResolverFactory;
-import org.mvel2.integration.impl.SimpleSTValueResolver;
+import org.mule.mvel2.integration.VariableResolverFactory;
+import org.mule.mvel2.integration.impl.SimpleSTValueResolver;
 
 class MuleVariableResolver<T> extends SimpleSTValueResolver
 {

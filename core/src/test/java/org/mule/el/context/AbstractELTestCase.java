@@ -25,8 +25,8 @@ import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.mvel2.ImmutableElementException;
-import org.mvel2.PropertyAccessException;
+import org.mule.mvel2.ImmutableElementException;
+import org.mule.mvel2.PropertyAccessException;
 
 @RunWith(Parameterized.class)
 public abstract class AbstractELTestCase extends AbstractMuleContextTestCase

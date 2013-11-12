@@ -9,9 +9,9 @@ package org.mule.el.mvel;
 import org.mule.api.el.ExpressionLanguageContext;
 import org.mule.api.el.ExpressionLanguageFunction;
 
-import org.mvel2.ParserContext;
-import org.mvel2.ast.Function;
-import org.mvel2.integration.VariableResolverFactory;
+import org.mule.mvel2.ParserContext;
+import org.mule.mvel2.ast.Function;
+import org.mule.mvel2.integration.VariableResolverFactory;
 
 @SuppressWarnings("serial")
 class MVELFunctionAdaptor extends Function

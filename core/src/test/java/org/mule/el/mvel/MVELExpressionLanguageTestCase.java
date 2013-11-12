@@ -61,8 +61,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.Mockito;
-import org.mvel2.ParserContext;
-import org.mvel2.ast.Function;
+import org.mule.mvel2.ParserContext;
+import org.mule.mvel2.ast.Function;
 
 @RunWith(Parameterized.class)
 public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
@@ -513,7 +513,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         @Override
         public Object call(Object ctx,
                            Object thisValue,
-                           org.mvel2.integration.VariableResolverFactory factory,
+                           org.mule.mvel2.integration.VariableResolverFactory factory,
                            Object[] parms)
         {
             return "Hello World!";

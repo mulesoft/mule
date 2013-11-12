@@ -13,7 +13,7 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.el.context.MessageContext;
 import org.mule.el.context.MessagePropertyMapContext;
 
-import org.mvel2.ParserContext;
+import org.mule.mvel2.ParserContext;
 
 class MessageVariableResolverFactory extends MVELExpressionLanguageContext
 {

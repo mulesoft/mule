@@ -12,9 +12,9 @@ import org.mule.api.expression.InvalidExpressionException;
 import java.io.Serializable;
 
 import org.apache.commons.collections.map.LRUMap;
-import org.mvel2.MVEL;
-import org.mvel2.ParserContext;
-import org.mvel2.optimizers.OptimizerFactory;
+import org.mule.mvel2.MVEL;
+import org.mule.mvel2.ParserContext;
+import org.mule.mvel2.optimizers.OptimizerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
