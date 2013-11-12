@@ -12,7 +12,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.construct.MessageProcessorPathResolver;
-import org.mule.api.construct.Pipeline;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.api.exception.MessagingExceptionHandler;
@@ -154,7 +153,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
 
     protected void fireAsyncScheduledNotification(MuleEvent event)
     {
-        if (event.getFlowConstruct() instanceof Pipeline)
+        if (event.getFlowConstruct() instanceof MessageProcessorPathResolver)
         {
             muleContext.getNotificationManager().fireNotification(
                     new AsyncMessageNotification(event.getFlowConstruct(), event, next,
