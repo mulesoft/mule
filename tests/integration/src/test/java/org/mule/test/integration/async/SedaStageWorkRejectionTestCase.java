@@ -28,7 +28,7 @@ public class SedaStageWorkRejectionTestCase extends FunctionalTestCase
 {
 
     @Override
-    protected String getConfigFile()
+    protected String getConfigResources()
     {
         return "org/mule/test/integration/async/seda-stage-work-rejection-config-flow.xml";
     }
