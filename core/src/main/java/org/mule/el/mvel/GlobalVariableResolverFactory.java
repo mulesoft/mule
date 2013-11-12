@@ -12,8 +12,8 @@ import org.mule.api.el.ExpressionLanguageExtension;
 import java.util.Collection;
 import java.util.Map.Entry;
 
-import org.mvel2.ParserContext;
-import org.mvel2.ast.Function;
+import org.mule.mvel2.ParserContext;
+import org.mule.mvel2.ast.Function;
 
 public class GlobalVariableResolverFactory extends MVELExpressionLanguageContext
 {

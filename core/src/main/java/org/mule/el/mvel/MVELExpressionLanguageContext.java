@@ -17,13 +17,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.mvel2.ImmutableElementException;
-import org.mvel2.ParserContext;
-import org.mvel2.UnresolveablePropertyException;
-import org.mvel2.integration.VariableResolver;
-import org.mvel2.integration.VariableResolverFactory;
-import org.mvel2.integration.impl.BaseVariableResolverFactory;
-import org.mvel2.integration.impl.SimpleVariableResolverFactory;
+import org.mule.mvel2.ImmutableElementException;
+import org.mule.mvel2.ParserContext;
+import org.mule.mvel2.UnresolveablePropertyException;
+import org.mule.mvel2.integration.VariableResolver;
+import org.mule.mvel2.integration.VariableResolverFactory;
+import org.mule.mvel2.integration.impl.BaseVariableResolverFactory;
+import org.mule.mvel2.integration.impl.SimpleVariableResolverFactory;
 
 public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     implements ExpressionLanguageContext

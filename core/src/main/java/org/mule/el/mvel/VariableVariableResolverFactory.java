@@ -10,9 +10,9 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 
-import org.mvel2.ParserContext;
-import org.mvel2.UnresolveablePropertyException;
-import org.mvel2.integration.VariableResolver;
+import org.mule.mvel2.ParserContext;
+import org.mule.mvel2.UnresolveablePropertyException;
+import org.mule.mvel2.integration.VariableResolver;
 
 public class VariableVariableResolverFactory extends MVELExpressionLanguageContext
 {

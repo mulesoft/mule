@@ -1242,6 +1242,12 @@
             </dependency>
 
             <dependency>
+                <groupId>org.mule.mvel</groupId>
+                <artifactId>mule-mvel2</artifactId>
+                <version>${mvelVersion}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.aspectj</groupId>
                 <artifactId>aspectjrt</artifactId>
                 <version>${aspectjVersion}</version>

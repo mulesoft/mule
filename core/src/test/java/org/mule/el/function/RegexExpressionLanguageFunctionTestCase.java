@@ -27,8 +27,8 @@ import java.util.regex.Pattern;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.mvel2.CompileException;
-import org.mvel2.ParserContext;
+import org.mule.mvel2.CompileException;
+import org.mule.mvel2.ParserContext;
 
 @SmallTest
 public class RegexExpressionLanguageFunctionTestCase extends AbstractMuleTestCase
