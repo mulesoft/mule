@@ -12,15 +12,23 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 public class AsyncExceptionHandlingTestCase extends AbstractServiceAndFlowTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
