@@ -14,9 +14,9 @@
     http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
     http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
     
-    <endpoint name="search.inbound.endpoint"  address="http://localhost:8888/searchin" 
+    <endpoint name="search.inbound.endpoint"  address="http://localhost:${port1}/searchin"
         exchange-pattern="request-response"/>
-    <endpoint name="search.outbound.endpoint" address="http://localhost:8899/searchout" 
+    <endpoint name="search.outbound.endpoint" address="http://localhost:${port2}/searchout"
         exchange-pattern="request-response"/>
     
 
