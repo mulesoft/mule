@@ -20,7 +20,7 @@ import org.mule.api.client.MuleClient;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreException;
-import org.mule.routing.UntilSuccessful;
+import org.mule.routing.AsynchronousUntilSuccessfulProcessingStrategy;
 import org.mule.session.DefaultMuleSession;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
@@ -81,7 +81,7 @@ public class PersistentStore6007TestCase extends FunctionalTestCase
             {
                 MuleMessage msg = new DefaultMuleMessage(str, context);
                 MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, null, new DefaultMuleSession());
-                events.put(UntilSuccessful.buildQueueKey(event), event);
+                events.put(AsynchronousUntilSuccessfulProcessingStrategy.buildQueueKey(event), event);
             }
         }
 
