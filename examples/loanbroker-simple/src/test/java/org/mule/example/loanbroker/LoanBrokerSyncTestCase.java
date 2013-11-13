@@ -21,8 +21,10 @@ import org.mule.transport.http.HttpConstants;
 import java.util.Map;
 
 import org.apache.commons.collections.map.SingletonMap;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore("MULE-7122")
 public class LoanBrokerSyncTestCase extends FunctionalTestCase
 {
     @Override
