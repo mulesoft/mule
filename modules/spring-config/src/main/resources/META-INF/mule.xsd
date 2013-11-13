@@ -5104,8 +5104,6 @@
     <!-- this is a general threading type used by various elements here -->
     <xsd:complexType name="threadingProfileType">
         <xsd:complexContent>
-            <!-- this is a hack that allows us to use this general threading profile as a component threading profile
-                 without retyping everything -->
             <xsd:extension base="asynchronousThreadingProfileType">
                 <xsd:attribute name="doThreading" type="substitutableBoolean" default="true">
                     <xsd:annotation>
