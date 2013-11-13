@@ -63,7 +63,7 @@ public class OAuthContinuationTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void continuation() throws Exception
+    public void verifyLifecycleOnlyExecutedOnce() throws Exception
     {
         final MuleEvent event = getTestEvent("authCode");
 
