@@ -5106,6 +5106,22 @@
         <xsd:complexContent>
             <!-- this is a hack that allows us to use this general threading profile as a component threading profile
                  without retyping everything -->
+            <xsd:extension base="asynchronousThreadingProfileType">
+                <xsd:attribute name="doThreading" type="substitutableBoolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether threading should be used (default is true).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="asynchronousThreadingProfileType">
+        <xsd:complexContent>
+            <!-- this is a hack that allows us to use this general threading profile as a component threading profile
+                 without retyping everything -->
             <xsd:extension base="abstractServiceThreadingProfileType">
                 <xsd:attribute name="maxThreadsActive" type="substitutableInt">
                     <xsd:annotation>
@@ -5118,13 +5134,6 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             The maximum number of idle or inactive threads that can be in the pool before they are destroyed.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="doThreading" type="substitutableBoolean" default="true">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Whether threading should be used (default is true).
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -6214,8 +6223,18 @@
         </xsd:annotation>
         <xsd:complexType>
             <xsd:complexContent>
-                <xsd:extension base="processorWithExactlyOneTargetType">
-                    <xsd:attribute name="objectStore-ref" type="xsd:string" use="required">
+                <xsd:extension base="abstractRoutingMessageProcessorType">
+                    <xsd:sequence>
+                        <xsd:element name="threading-profile" type="asynchronousThreadingProfileType" minOccurs="0">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    Threading profile used to process the message processors inside the until-successful.
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="1"/>
+                    </xsd:sequence>
+                    <xsd:attribute name="objectStore-ref" type="xsd:string" use="optional">
                         <xsd:annotation>
                             <xsd:documentation>
                                 Reference to the org.mule.api.store.ListableObjectStore that will be used to store events pending (re)processing.
@@ -6256,6 +6275,13 @@
                         <xsd:annotation>
                             <xsd:documentation>
                                 The endpoint or message processor to which undeliverable messages are sent after all retries have been attempted.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="synchronous" type="substitutableBoolean" use="optional" default="false">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Defines if the route inside until-successful should be executed asynchronously or synchronously within the caller thread.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
