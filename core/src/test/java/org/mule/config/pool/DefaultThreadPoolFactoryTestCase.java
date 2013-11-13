@@ -14,8 +14,10 @@ import static org.junit.Assert.assertThat;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
@@ -44,5 +46,16 @@ public class DefaultThreadPoolFactoryTestCase extends AbstractMuleContextTestCas
         assertThat(scheduledPool.getMaximumPoolSize(), is(threadingProfile.getMaxThreadsActive()));
         assertThat(scheduledPool.getCorePoolSize(), is(threadingProfile.getMaxThreadsIdle()));
         assertThat(scheduledPool.getKeepAliveTime(TimeUnit.MILLISECONDS),is(threadingProfile.getThreadTTL()));
+    }
+
+    @Test
+    public void scheduledThreadPollRejectHandler() throws Exception
+    {
+        ThreadingProfile threadingProfile = muleContext.getDefaultThreadingProfile();
+        ThreadPoolExecutor.DiscardOldestPolicy expectedRejectedExecutionHandler = new ThreadPoolExecutor.DiscardOldestPolicy();
+        threadingProfile.setRejectedExecutionHandler(expectedRejectedExecutionHandler);
+        ScheduledExecutorService executorService = threadingProfile.createScheduledPool("sapo pepe");
+        ScheduledThreadPoolExecutor scheduledPool = (ScheduledThreadPoolExecutor) executorService;
+        assertThat(scheduledPool.getRejectedExecutionHandler(), is((RejectedExecutionHandler) expectedRejectedExecutionHandler));
     }
 }
