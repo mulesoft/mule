@@ -10,15 +10,22 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.Map;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 
 public class AsyncExceptionHandlingTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
+    @Rule
+    public DynamicPort port2 = new DynamicPort("port2");
 
     @Override
     protected String getConfigResources()
