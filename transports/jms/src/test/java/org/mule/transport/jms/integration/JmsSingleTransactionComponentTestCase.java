@@ -14,7 +14,8 @@ import org.junit.Test;
  */
 public class JmsSingleTransactionComponentTestCase extends AbstractJmsFunctionalTestCase
 {
-    protected String getConfigResources()
+    @Override
+    protected String getConfigFile()
     {
         return "integration/jms-single-tx-component.xml";
     }

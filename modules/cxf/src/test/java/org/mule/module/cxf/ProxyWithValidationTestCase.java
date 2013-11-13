@@ -7,6 +7,7 @@
 package org.mule.module.cxf;
 
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -16,7 +17,6 @@ import org.junit.Test;
 
 public class ProxyWithValidationTestCase extends FunctionalTestCase
 {
-
     public static final String SAMPLE_REQUEST = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
                                                 + "<soap:Body> " +
                                                 "<echo xmlns=\"http://www.muleumo.org\">" +
@@ -29,7 +29,7 @@ public class ProxyWithValidationTestCase extends FunctionalTestCase
     public final DynamicPort httpPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "proxy-with-validation-config.xml";
     }

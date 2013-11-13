@@ -6,21 +6,18 @@
  */
 package org.mule.transport.vm.functional.transactions;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.util.Map;
-
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class TransactionWithRecipientListTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "vm/transaction-with-recipient-list-config.xml";
     }
@@ -30,8 +27,7 @@ public class TransactionWithRecipientListTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        MuleMessage response = client.send("vm://input", "test", (Map) null);
-
+        MuleMessage response = client.send("vm://input", "test", null);
         assertEquals("test Received", response.getPayloadAsString());
     }
 }

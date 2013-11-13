@@ -21,7 +21,7 @@ import org.junit.Test;
 public class SessionPropertiesTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "vm/session-properties.xml";
     }

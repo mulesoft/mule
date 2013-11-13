@@ -11,9 +11,8 @@ import org.mule.transport.tcp.protocols.SafeProtocol;
 
 public class MuleMessageSafeProtocolReadTestCase extends AbstractMuleMessageProtocolReadTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "mule-message-safe-protocol-read-config.xml";
     }
@@ -23,5 +22,4 @@ public class MuleMessageSafeProtocolReadTestCase extends AbstractMuleMessageProt
     {
         return new SafeProtocol();
     }
-
 }

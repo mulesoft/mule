@@ -29,9 +29,8 @@ import org.junit.Test;
 
 public class CoreNamespaceRoutersFlowTestCase extends FunctionalTestCase
 {
-    
     @Override
-    public String getConfigResources()
+    public String getConfigFile()
     {
         return "core-namespace-routers-flow.xml";
     }
@@ -91,7 +90,7 @@ public class CoreNamespaceRoutersFlowTestCase extends FunctionalTestCase
     protected MessageProcessor lookupMessageProcessorFromFlow(String serviceName) throws Exception
     {
         Flow service = lookupFlow(serviceName);
-        List<MessageProcessor> routers = 
+        List<MessageProcessor> routers =
             service.getMessageProcessors();
         assertEquals(1, routers.size());
         return routers.get(0);

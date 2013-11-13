@@ -19,7 +19,7 @@ import org.junit.Test;
 public class InboundRouterSyncAsyncClientTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/routing/inbound/inbound-router-sync-async-client-test.xml";
     }

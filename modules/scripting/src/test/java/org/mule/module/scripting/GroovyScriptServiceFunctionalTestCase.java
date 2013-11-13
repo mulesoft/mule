@@ -58,7 +58,7 @@ public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "groovy-component-config-service.xml";
     }

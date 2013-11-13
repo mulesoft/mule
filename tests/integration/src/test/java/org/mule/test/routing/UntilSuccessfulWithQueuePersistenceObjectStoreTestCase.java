@@ -8,6 +8,7 @@ package org.mule.test.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
@@ -23,14 +24,13 @@ import org.junit.Test;
 
 public class UntilSuccessfulWithQueuePersistenceObjectStoreTestCase extends FunctionalTestCase
 {
-
     public UntilSuccessfulWithQueuePersistenceObjectStoreTestCase()
     {
         setStartContext(false);
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "until-successful-with-queue-persistence-object-store-config.xml";
     }

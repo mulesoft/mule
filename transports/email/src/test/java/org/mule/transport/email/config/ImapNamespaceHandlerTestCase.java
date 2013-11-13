@@ -6,6 +6,12 @@
  */
 package org.mule.transport.email.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleException;
 import org.mule.transport.email.ImapConnector;
 import org.mule.transport.email.ImapsConnector;
@@ -14,17 +20,10 @@ import javax.mail.Flags;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 public class ImapNamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerTestCase
 {
-    
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "imap-namespace-config.xml";
     }

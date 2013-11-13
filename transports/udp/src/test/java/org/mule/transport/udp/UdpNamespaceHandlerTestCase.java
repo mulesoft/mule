@@ -6,19 +6,18 @@
  */
 package org.mule.transport.udp;
 
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
 public class UdpNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "udp-namespace-config.xml";
     }
@@ -38,5 +37,4 @@ public class UdpNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
     }
-
 }

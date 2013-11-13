@@ -230,8 +230,8 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     /**
      * This creates a {@link org.mule.config.spring.SpringXmlConfigurationBuilder} as expected but also figures out
-     * which 'connector' configuration file to load with the event flow configuration (obtained from the overriding \
-     * class which implements {@link #getConfigResources()}).
+     * which 'connector' configuration file to load with the event flow configuration (obtained from the overriding
+     * class which implements {@link #getConfigFile()}).
      *
      * @return The config builder used to create the Mule instance for this test
      * @throws Exception
@@ -241,17 +241,20 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     {
         if (multipleProviders)
         {
-            final String configResource = getConfigResources();
+            final String configFile = getConfigFile();
             // multiple configs arent' supported by this mechanism, validate and fail if needed
-            if (StringUtils.splitAndTrim(configResource, ",; ").length > 1)
+            if (StringUtils.splitAndTrim(configFile, ",; ").length > 1)
             {
                 throw new IllegalArgumentException("Parameterized tests don't support multiple " +
-                                                   "config files as input: " + configResource);
+                                                   "config files as input: " + configFile);
             }
-            String resources = configResource.substring(configResource.lastIndexOf("/") + 1);
-            resources = String.format("integration/%s/connector-%s,%s", getJmsConfig().getName(),
-                                      resources, getConfigResources());
-            SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(resources);
+            
+            String resources = configFile.substring(configFile.lastIndexOf("/") + 1);
+            resources = String.format("integration/%s/connector-%s",
+                getJmsConfig().getName(), resources);
+            
+            String[] configFiles = new String[] { resources, configFile };
+            SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(configFiles);
             return builder;
         }
         else

@@ -6,6 +6,9 @@
  */
 package org.mule.test.config;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.EncryptionStrategy;
 import org.mule.api.security.SecurityManager;
 import org.mule.security.PasswordBasedEncryptionStrategy;
@@ -18,14 +21,10 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class SecurityNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "security-namespace-config.xml";
     }
@@ -53,5 +52,4 @@ public class SecurityNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(name, securityManager.getEncryptionStrategy(name));
         assertTrue(securityManager.getEncryptionStrategy(name).getClass().equals(clazz));
     }
-
 }

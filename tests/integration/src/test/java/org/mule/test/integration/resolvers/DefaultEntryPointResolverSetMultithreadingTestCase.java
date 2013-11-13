@@ -26,7 +26,7 @@ import org.junit.Test;
 public class DefaultEntryPointResolverSetMultithreadingTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/resolvers/default-entry-point-resolver-multithreading-test-config.xml";
     }

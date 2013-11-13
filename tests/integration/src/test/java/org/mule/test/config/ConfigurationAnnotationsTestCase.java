@@ -7,6 +7,11 @@
 package org.mule.test.config;
 
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.AnnotatedObject;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -21,19 +26,13 @@ import javax.xml.namespace.QName;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 /**
  * Test that configuration-based annotations are propagated to the appropriate runtime objects
  */
 public class ConfigurationAnnotationsTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/config/spring/annotations.xml";
     }

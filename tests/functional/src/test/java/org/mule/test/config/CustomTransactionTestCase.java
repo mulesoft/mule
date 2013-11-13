@@ -6,6 +6,10 @@
  */
 package org.mule.test.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transaction.TransactionConfig;
@@ -14,15 +18,10 @@ import org.mule.tck.testmodels.mule.TestTransactionFactory;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class CustomTransactionTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/config/custom-transaction-config.xml";
     }

@@ -28,7 +28,7 @@ import org.junit.Test;
 public class LoanBrokerSyncTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "mule-config.xml";
     }

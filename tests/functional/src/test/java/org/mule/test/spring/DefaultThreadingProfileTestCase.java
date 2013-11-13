@@ -6,19 +6,18 @@
  */
 package org.mule.test.spring;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.config.ThreadingProfile;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class DefaultThreadingProfileTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "";
     }
@@ -34,5 +33,4 @@ public class DefaultThreadingProfileTestCase extends FunctionalTestCase
         assertEquals(ThreadingProfile.DEFAULT_THREAD_WAIT_TIMEOUT, muleContext.getDefaultThreadingProfile().getThreadWaitTimeout());
         assertEquals(ThreadingProfile.DEFAULT_DO_THREADING, muleContext.getDefaultThreadingProfile().isDoThreading());
     }
-
 }

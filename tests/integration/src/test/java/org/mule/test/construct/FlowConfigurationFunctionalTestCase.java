@@ -45,14 +45,13 @@ import org.junit.Test;
 
 public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 {
-
     public FlowConfigurationFunctionalTestCase()
     {
         setDisposeContextPerClass(true);
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/construct/flow.xml";
     }

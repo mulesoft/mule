@@ -38,7 +38,7 @@ public class SecureHttpPollingFunctionalTestCase extends AbstractServiceAndFlowT
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "secure-http-polling-server-service.xml,secure-http-polling-client-service.xml"},
             {ConfigVariant.FLOW, "secure-http-polling-server-flow.xml,secure-http-polling-client-flow.xml"}
-            });
+        });
     }
 
     @Test

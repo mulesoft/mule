@@ -6,10 +6,13 @@
  */
 package org.mule.test.config;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.MessageSource;
 import org.mule.construct.Flow;
 import org.mule.processor.AbstractRedeliveryPolicy;
@@ -18,12 +21,8 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.store.SimpleMemoryObjectStore;
 
 import java.io.Serializable;
-import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 /**
  * Tests for all object stores that can be configured on an {@link org.mule.routing.IdempotentMessageFilter}.
@@ -37,7 +36,7 @@ public class RedeliveryPolicyNamespaceHandlerTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/config/redelivery-policy-config.xml";
     }

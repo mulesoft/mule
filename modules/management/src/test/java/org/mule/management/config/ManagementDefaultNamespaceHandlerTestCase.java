@@ -6,6 +6,9 @@
  */
 package org.mule.management.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.agent.Agent;
 import org.mule.module.management.agent.JmxAgent;
 import org.mule.module.management.agent.JmxServerNotificationAgent;
@@ -16,14 +19,10 @@ import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class ManagementDefaultNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "management-default-namespace-config.xml";
     }

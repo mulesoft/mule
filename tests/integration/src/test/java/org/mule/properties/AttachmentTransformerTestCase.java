@@ -6,12 +6,6 @@
  */
 package org.mule.properties;
 
-import javax.activation.DataHandler;
-import java.util.Arrays;
-import java.util.HashMap;
-
-import org.junit.Ignore;
-import org.junit.Test;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
@@ -19,11 +13,16 @@ import org.mule.construct.Flow;
 import org.mule.tck.functional.FlowAssert;
 import org.mule.tck.junit4.FunctionalTestCase;
 
+import java.util.HashMap;
+
+import javax.activation.DataHandler;
+
+import org.junit.Test;
+
 public class AttachmentTransformerTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/properties/attachment-transformer-test-case.xml";
     }

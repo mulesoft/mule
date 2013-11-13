@@ -39,7 +39,7 @@ public class SslFunctionalTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort3 = new DynamicPort("port3");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "ssl-functional-test.xml";
     }

@@ -19,12 +19,10 @@ import org.junit.Test;
 
 public class DynamicAllTestCase extends DynamicRouterTestCase
 {
-
     private static final String DYNAMIC_ALL = "dynamicAll";
 
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/routing/dynamic-all-config.xml";
     }

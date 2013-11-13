@@ -6,6 +6,11 @@
  */
 package org.mule.transport.jdbc.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transaction.MuleTransactionConfig;
@@ -19,16 +24,10 @@ import org.mule.transport.jdbc.test.TestDataSource;
 import org.apache.commons.dbutils.QueryRunner;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "jdbc-namespace-config.xml";
     }

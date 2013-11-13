@@ -8,6 +8,7 @@
 package org.mule.transport.http;
 
 import static junit.framework.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -18,12 +19,11 @@ import org.junit.Test;
 
 public class NullSessionHandlerTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort httpPort = new DynamicPort("httpPort");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "null-session-handler-config.xml";
     }

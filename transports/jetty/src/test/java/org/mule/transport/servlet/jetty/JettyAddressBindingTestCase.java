@@ -22,7 +22,7 @@ public class JettyAddressBindingTestCase extends TcpSocketToAddressBindingTestCa
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "jetty-address-binding-test.xml";
     }

@@ -6,6 +6,10 @@
  */
 package org.mule.transport.soap.axis;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleException;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -13,13 +17,8 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 public class AxisConnectorLifecycleTestCase extends FunctionalTestCase
 {
-
     private static String SERVICE_NAME = "mycomponent";
     private static String PROTOCOL_SERVICE_NAME = AxisConnector.AXIS_SERVICE_PROPERTY + "connector.axis.0";
 
@@ -33,7 +32,7 @@ public class AxisConnectorLifecycleTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort3 = new DynamicPort("port3");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "axis-http-mule-config.xml";
     }

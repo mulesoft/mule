@@ -12,9 +12,8 @@ import org.junit.Test;
 
 public class NestExampleTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "nest-example.xml";
     }
@@ -24,5 +23,4 @@ public class NestExampleTestCase extends FunctionalTestCase
     {
         // empty
     }
-
 }

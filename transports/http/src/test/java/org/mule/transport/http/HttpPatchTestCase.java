@@ -25,7 +25,7 @@ public class HttpPatchTestCase extends FunctionalTestCase
     public DynamicPort port = new DynamicPort("port");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "mule-http-patch.xml";
     }

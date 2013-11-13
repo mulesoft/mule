@@ -25,7 +25,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 public class CustomSecurityFilterTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/security/custom-security-filter-test.xml";
     }

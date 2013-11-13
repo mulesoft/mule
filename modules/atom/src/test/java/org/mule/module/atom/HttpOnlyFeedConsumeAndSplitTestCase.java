@@ -6,24 +6,23 @@
  */
 package org.mule.module.atom;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 public class HttpOnlyFeedConsumeAndSplitTestCase extends FunctionalTestCase
 {
-
     private static final long SLEEP_TIME = 10000;
 
     private final CounterCallback counter = new CounterCallback();
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "http-only-consume-and-split.xml";
     }

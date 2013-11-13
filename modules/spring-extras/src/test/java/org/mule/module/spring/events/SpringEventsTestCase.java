@@ -51,7 +51,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "mule-events-app-context.xml";
     }

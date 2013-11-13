@@ -13,9 +13,8 @@ import org.junit.Test;
 
 public class OrphanSimpleTestCase extends AbstractNamespaceTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/config/spring/parsers/orphan-simple-test.xml";
     }
@@ -28,5 +27,4 @@ public class OrphanSimpleTestCase extends AbstractNamespaceTestCase
         ChildBean child2 = (ChildBean) assertContentExists(orphan2.getChild(), ChildBean.class);
         assertBeanPopulated(child2, "child2");
     }
-
 }

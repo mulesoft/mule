@@ -18,7 +18,7 @@ import org.junit.Test;
 public class ReplyToChainIntegration4TestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/routing/replyto/replyto-chain-integration-test-4.xml";
     }

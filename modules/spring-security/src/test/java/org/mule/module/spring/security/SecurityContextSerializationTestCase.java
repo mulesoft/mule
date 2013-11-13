@@ -28,7 +28,7 @@ public class SecurityContextSerializationTestCase extends FunctionalTestCase
     public DynamicPort httpPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "security-context-serialization-test-case.xml";
     }
@@ -64,12 +64,12 @@ public class SecurityContextSerializationTestCase extends FunctionalTestCase
             int status = client.executeMethod(get);
             if (status == HttpConstants.SC_UNAUTHORIZED && handshake == true)
             {
-                // doAuthentication = true means that if the request returns 401, 
+                // doAuthentication = true means that if the request returns 401,
                 // the HttpClient will resend the request with credentials
                 status = client.executeMethod(get);
                 if (status == HttpConstants.SC_UNAUTHORIZED && handshake == true)
                 {
-                    // doAuthentication = true means that if the request returns 401, 
+                    // doAuthentication = true means that if the request returns 401,
                     // the HttpClient will resend the request with credentials
                     status = client.executeMethod(get);
                 }

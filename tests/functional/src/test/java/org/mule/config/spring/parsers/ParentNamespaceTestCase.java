@@ -13,9 +13,8 @@ import org.junit.Test;
 
 public class ParentNamespaceTestCase extends AbstractNamespaceTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/config/spring/parsers/parsers-test-namespace-config.xml";
     }
@@ -26,5 +25,4 @@ public class ParentNamespaceTestCase extends AbstractNamespaceTestCase
         OrphanBean orphan3 = (OrphanBean) assertBeanExists("orphan3", OrphanBean.class);
         assertContentExists(orphan3.getChild(), ChildBean.class);
     }
-
 }

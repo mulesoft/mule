@@ -7,6 +7,7 @@
 package org.mule.test.integration.routing.nested;
 
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
@@ -14,11 +15,10 @@ import org.junit.Test;
 
 public class ComponentBindingReturningNullTestCase extends FunctionalTestCase
 {
-
     private static boolean nullResultAccepted;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/routing/nested/component-binding-returning-null-config.xml";
     }
@@ -41,7 +41,7 @@ public class ComponentBindingReturningNullTestCase extends FunctionalTestCase
 
     public static class HelloImpl implements HelloInterface
     {
-
+        @Override
         public String sayHello(String s)
         {
             return null;
@@ -50,7 +50,6 @@ public class ComponentBindingReturningNullTestCase extends FunctionalTestCase
 
     public static class Component
     {
-
         private HelloInterface helloInterface;
 
         public String invoke(String s)

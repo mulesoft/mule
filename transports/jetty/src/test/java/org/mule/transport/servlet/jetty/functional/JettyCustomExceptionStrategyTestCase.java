@@ -23,7 +23,8 @@ public class JettyCustomExceptionStrategyTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
-    protected String getConfigResources()
+    @Override
+    protected String getConfigFile()
     {
         return "jetty-custom-exception-strategy.xml";
     }

@@ -6,6 +6,10 @@
  */
 package org.mule.transport.email.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleException;
 import org.mule.transport.email.Pop3Connector;
 import org.mule.transport.email.Pop3sConnector;
@@ -14,15 +18,10 @@ import javax.mail.Flags;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class Pop3NamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerTestCase
 {
-    
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "pop3-namespace-config.xml";
     }

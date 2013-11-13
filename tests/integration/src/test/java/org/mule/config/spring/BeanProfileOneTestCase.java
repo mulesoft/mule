@@ -11,9 +11,9 @@ import org.junit.Test;
 public class BeanProfileOneTestCase extends AbstractBeanProfileTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
-        return getConfigResources("one");
+        return getConfigFile("one");
     }
 
     @Test

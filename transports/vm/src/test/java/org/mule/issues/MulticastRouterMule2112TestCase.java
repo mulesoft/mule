@@ -22,7 +22,7 @@ import org.junit.Test;
 public class MulticastRouterMule2112TestCase  extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "issues/multicast-router-mule-2112-test.xml";
     }

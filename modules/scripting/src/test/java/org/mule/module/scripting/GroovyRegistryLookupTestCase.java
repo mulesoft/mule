@@ -18,7 +18,7 @@ import org.junit.Test;
 public class GroovyRegistryLookupTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "groovy-registry-lookup-config.xml";
     }

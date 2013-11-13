@@ -6,18 +6,18 @@
  */
 package org.mule.transport.ssl;
 
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
 public class TlsNamespaceHandlerTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "tls-namespace-config.xml";
     }

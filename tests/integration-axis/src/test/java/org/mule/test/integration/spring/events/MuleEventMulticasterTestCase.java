@@ -29,7 +29,7 @@ public class MuleEventMulticasterTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/spring/events/mule-events-example-app-context.xml";
     }

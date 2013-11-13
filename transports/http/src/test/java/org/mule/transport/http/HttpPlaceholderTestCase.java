@@ -10,14 +10,13 @@ import org.junit.Test;
 
 public class HttpPlaceholderTestCase extends AbstractNamespaceHandlerTestCase
 {
-
     public HttpPlaceholderTestCase()
     {
         super("http");
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "http-placeholder-test.xml";
     }
@@ -29,5 +28,4 @@ public class HttpPlaceholderTestCase extends AbstractNamespaceHandlerTestCase
                 (HttpConnector) muleContext.getRegistry().lookupConnector("httpConnector");
         testBasicProperties(connector);
     }
-
 }

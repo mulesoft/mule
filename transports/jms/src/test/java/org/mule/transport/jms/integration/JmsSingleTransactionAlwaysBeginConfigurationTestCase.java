@@ -33,7 +33,8 @@ public class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends Abstra
         return props;
     }
 
-    protected String getConfigResources()
+    @Override
+    protected String getConfigFile()
     {
         return "integration/jms-single-tx-ALWAYS_BEGIN.xml";
     }

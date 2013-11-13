@@ -28,7 +28,7 @@ public class GZipTransformerFunctionalTestCase extends FunctionalTestCase
     private static final String TEST_DATA = "the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog";
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/transformers/gzip-transformer-functional-test.xml";
     }

@@ -7,12 +7,13 @@
 package org.mule.module.scripting.builders;
 
 import static org.junit.Assert.fail;
+
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.MuleProperties;
 import org.mule.tck.AbstractScriptConfigBuilderTestCase;
-import org.mule.util.store.QueueStoreAdapter;
 import org.mule.util.store.QueuePersistenceObjectStore;
+import org.mule.util.store.QueueStoreAdapter;
 import org.mule.util.store.SimpleMemoryObjectStore;
 
 import java.io.Serializable;
@@ -21,7 +22,7 @@ import java.util.Properties;
 public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConfigBuilderTestCase
 {
     @Override
-    public String getConfigResources()
+    public String getConfigFile()
     {
         return "mule-config.groovy";
     }
@@ -31,7 +32,7 @@ public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConf
     {
         try
         {
-            return new ScriptConfigurationBuilder("groovy", getConfigResources());
+            return new ScriptConfigurationBuilder("groovy", getConfigFile());
         }
         catch (MuleException e)
         {

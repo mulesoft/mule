@@ -6,6 +6,12 @@
  */
 package org.mule.transformers.simple;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
@@ -19,17 +25,10 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
 public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "message-properties-transformer-config.xml";
     }

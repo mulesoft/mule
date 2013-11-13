@@ -6,22 +6,21 @@
  */
 package org.mule.config.spring.parsers;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.config.spring.parsers.beans.OrphanBean;
 
 import java.util.Collection;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 /**
  * References to collections in attributes are currently not handled correctly
  */
 public class ReferenceCollectionTestCase extends AbstractNamespaceTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/config/spring/parsers/reference-collection-test.xml";
     }
@@ -29,7 +28,7 @@ public class ReferenceCollectionTestCase extends AbstractNamespaceTestCase
     protected void testOffspringRef(int index, int size)
     {
         OrphanBean orphan = (OrphanBean) assertBeanExists("orphan" + index, OrphanBean.class);
-        Collection offspring = (Collection) assertContentExists(orphan.getOffspring(), Collection.class);
+        Collection<?> offspring = (Collection<?>) assertContentExists(orphan.getOffspring(), Collection.class);
         assertEquals(size, offspring.size());
     }
 

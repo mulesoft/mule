@@ -24,7 +24,7 @@ import org.junit.Test;
 public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "jmx-statistics-test.xml";
     }

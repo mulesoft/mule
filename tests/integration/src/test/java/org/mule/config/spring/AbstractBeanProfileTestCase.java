@@ -16,7 +16,7 @@ import org.mule.tck.junit4.FunctionalTestCase;
 public abstract class AbstractBeanProfileTestCase extends FunctionalTestCase
 {
 
-    protected String getConfigResources(String profile)
+    protected String getConfigFile(String profile)
     {
         System.setProperty("spring.profiles.active", profile);
         return "org/mule/test/integration/spring/bean-profiles-config.xml";

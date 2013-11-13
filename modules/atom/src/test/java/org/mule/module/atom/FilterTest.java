@@ -6,6 +6,8 @@
  */
 package org.mule.module.atom;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -17,13 +19,10 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class FilterTest extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "filter-conf.xml";
     }

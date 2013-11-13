@@ -6,6 +6,8 @@
  */
 package org.mule.management;
 
+import static org.junit.Assert.fail;
+
 import org.mule.module.management.agent.FixedHostRmiClientSocketFactory;
 import org.mule.tck.junit4.FunctionalTestCase;
 
@@ -14,13 +16,10 @@ import java.net.Socket;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
-
 public class JmxAgentDefaultConfigurationWithRMITestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "default-with-rmi-management-config.xml";
     }

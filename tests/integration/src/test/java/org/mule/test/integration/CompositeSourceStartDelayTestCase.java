@@ -26,7 +26,6 @@ import org.junit.Test;
 
 public class CompositeSourceStartDelayTestCase extends FunctionalTestCase
 {
-
     public static volatile boolean awakeMessageSource;
 
     public CompositeSourceStartDelayTestCase()
@@ -35,7 +34,7 @@ public class CompositeSourceStartDelayTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "composite-source-start-delay-config.xml";
     }
@@ -45,7 +44,7 @@ public class CompositeSourceStartDelayTestCase extends FunctionalTestCase
     {
         Thread thread = new Thread(new Runnable()
         {
-
+            @Override
             public void run()
             {
                 try
@@ -74,13 +73,14 @@ public class CompositeSourceStartDelayTestCase extends FunctionalTestCase
         Prober prober = new PollingProber(30000, 50);
         prober.check(new Probe()
         {
-
+            @Override
             public boolean isSatisfied()
             {
                 DefaultInboundEndpoint endpoint = (DefaultInboundEndpoint) muleContext.getRegistry().lookupObject(endpointName);
                 return endpoint.getConnector().isStarted();
             }
 
+            @Override
             public String describeFailure()
             {
                 return "Endpoint was not started";
@@ -90,7 +90,7 @@ public class CompositeSourceStartDelayTestCase extends FunctionalTestCase
 
     public static class AwakeSourceMessageProcessor implements MessageProcessor
     {
-
+        @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             awakeMessageSource = true;
@@ -101,13 +101,13 @@ public class CompositeSourceStartDelayTestCase extends FunctionalTestCase
 
     public static class StuckTransformer extends AbstractTransformer implements Startable
     {
-
         @Override
         protected Object doTransform(Object src, String enc) throws TransformerException
         {
             return null;
         }
 
+        @Override
         public void start() throws MuleException
         {
             while (!awakeMessageSource)

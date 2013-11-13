@@ -40,7 +40,7 @@ public class ValidatorTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/construct/validator-config.xml";
     }

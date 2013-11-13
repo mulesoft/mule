@@ -14,7 +14,6 @@ import org.junit.Test;
 
 public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
@@ -33,7 +32,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/transformer/response/response-transformer-scenarios.xml";
     }

@@ -15,7 +15,7 @@ public class JmsSingleTransactionNoneTestCase extends AbstractJmsFunctionalTestC
 {
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/jms-single-tx-NONE.xml";
     }

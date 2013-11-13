@@ -25,7 +25,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
     private DefaultJmsTopicResolver resolver;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "jms-topic-resolver.xml";
     }

@@ -20,7 +20,6 @@ import org.junit.Test;
 
 public class DynamicRoundRobinTestCase extends DynamicRouterTestCase
 {
-
     private static final String DYNAMIC_ROUND_ROBIN = "dynamicRoundRobin";
     private static final String DYNAMIC_ROUND_ROBIN_CUSTOM_ID = "dynamicRoundRobinWithCustomId";
     private static final String MULTIPLE_ROUND_ROBIN = "multipleDynamicRoundRobin";
@@ -33,7 +32,7 @@ public class DynamicRoundRobinTestCase extends DynamicRouterTestCase
     private static final int ID_3 = 3;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/routing/dynamic-round-robin-config.xml";
     }

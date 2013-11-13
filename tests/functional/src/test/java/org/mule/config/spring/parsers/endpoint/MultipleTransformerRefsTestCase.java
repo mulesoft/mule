@@ -6,6 +6,10 @@
  */
 package org.mule.config.spring.parsers.endpoint;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transformer.Transformer;
@@ -14,19 +18,14 @@ import java.util.List;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 /**
  * This really tests the handling of multiple references in
  * {@link org.mule.config.spring.parsers.assembly.DefaultBeanAssembler}
  */
 public class MultipleTransformerRefsTestCase  extends AbstractEndpointTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/config/spring/parsers/endpoint/multiple-transformer-refs-test.xml";
     }

@@ -6,18 +6,18 @@
  */
 package org.mule.test.construct;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import org.junit.Test;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
+import org.junit.Test;
+
 public class FlowOutboundInMiddleOfFlowTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/construct/flow-outbound-in-middle-of-flow.xml";
     }
@@ -32,14 +32,12 @@ public class FlowOutboundInMiddleOfFlowTestCase extends FunctionalTestCase
         MuleMessage msg = client.request("vm://test.out.1", 1000);
         assertEquals("messagehello", msg.getPayloadAsString());
         
-        MuleMessage msg2 = client.request("vm://test.out.2", 5000);        
+        MuleMessage msg2 = client.request("vm://test.out.2", 5000);
         assertEquals("messagebye", msg2.getPayloadAsString());
         
-        MuleMessage msg3 = client.request("vm://test.out.3", 5000);        
+        MuleMessage msg3 = client.request("vm://test.out.3", 5000);
         assertEquals("egassem", msg3.getPayloadAsString());
     }
-
-    
 }
 
 

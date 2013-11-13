@@ -37,7 +37,7 @@ public class JmsConcurrentConsumerExecutionTestCase extends FunctionalTestCase
     private static final Latch messageFailureReceived = new Latch();
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/transaction/jms-concurrent-in-transaction.xml";
     }

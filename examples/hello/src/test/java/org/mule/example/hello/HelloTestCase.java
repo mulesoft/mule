@@ -18,7 +18,7 @@ import org.junit.Test;
 public class HelloTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "mule-config.xml";
     }

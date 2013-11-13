@@ -40,7 +40,7 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
     private static boolean outboundComponentReached;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "vm/vm-exception-strategy-config-request-response.xml";
     }

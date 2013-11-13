@@ -6,6 +6,10 @@
  */
 package org.mule.module.atom.event;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -30,18 +34,13 @@ import org.apache.abdera.protocol.client.ClientResponse;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class AtomEventTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
     
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "atom-builder-conf.xml";
     }

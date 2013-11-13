@@ -16,13 +16,12 @@ import org.junit.Test;
 
 public class QuartzStatefulScheduledDispatchTestCase extends AbstractQuartzStatefulTestCase
 {
-
     public static final String VM_TEST_INPUT = "vm://testInput";
     private static final List<String> messages = new LinkedList<String>();
     private static final CountDownLatch latch = new CountDownLatch(1);
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "quartz-stateful-scheduled-dispatch-config.xml";
     }

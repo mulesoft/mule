@@ -51,7 +51,7 @@ public class HttpEncodingNonAsciiFunctionalTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "http-encoding-non-ascii-test.xml";
     }

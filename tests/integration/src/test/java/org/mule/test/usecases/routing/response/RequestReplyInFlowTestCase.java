@@ -22,7 +22,7 @@ import org.junit.Test;
 public class RequestReplyInFlowTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/usecases/routing/response/request-reply-flow.xml";
     }

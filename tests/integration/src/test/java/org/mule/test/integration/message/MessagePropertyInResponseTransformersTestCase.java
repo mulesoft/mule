@@ -21,7 +21,7 @@ import org.junit.Test;
 public class MessagePropertyInResponseTransformersTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/messaging/message-property-in-response-transformers.xml";
     }

@@ -24,7 +24,7 @@ public class MulticastConnectorFunctionalTestCase extends FunctionalTestCase
     public static final String MESSAGE = "hello";
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "multicast-functional-test.xml";
     }

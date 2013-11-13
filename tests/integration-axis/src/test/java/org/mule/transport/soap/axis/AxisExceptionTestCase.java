@@ -29,7 +29,7 @@ public class AxisExceptionTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "axis-using-cxf-config.xml";
     }

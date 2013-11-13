@@ -26,7 +26,7 @@ import org.junit.Test;
 public class AxisServiceUsingCxfEndpointTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "axis-using-cxf-config.xml";
     }

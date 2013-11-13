@@ -7,6 +7,8 @@
 package org.mule.test.integration.transport;
 
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -14,7 +16,6 @@ import org.mule.api.transport.Connector;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transformer.simple.ByteArrayInputStreamTransformersTestCase;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.DefaultReplyToHandler;
 
@@ -24,7 +25,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import static org.junit.Assert.assertEquals;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -34,7 +34,7 @@ public class ReplyToSerializationTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/transport/reply-to-serialization.xml";
     }

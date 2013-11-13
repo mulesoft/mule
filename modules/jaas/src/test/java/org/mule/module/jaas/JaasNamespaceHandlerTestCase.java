@@ -6,6 +6,10 @@
  */
 package org.mule.module.jaas;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.EncryptionStrategy;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.security.SecurityProvider;
@@ -14,14 +18,10 @@ import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class JaasNamespaceHandlerTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "jaas-namespace-config.xml";
     }

@@ -6,19 +6,19 @@
  */
 package org.mule.example.loanbroker.esn;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.service.Service;
 import org.mule.example.loanbroker.tests.AbstractLoanBrokerTestCase;
 import org.mule.model.seda.SedaModel;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class VMLoanBrokerSynchronousFunctionalTestCase extends AbstractLoanBrokerTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "loan-broker-sync-config.xml, loan-broker-vm-endpoints-config.xml";
     }

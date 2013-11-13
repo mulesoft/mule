@@ -9,9 +9,8 @@ package org.mule.transport.sftp;
 
 public class SftpWaitForSizeChangeTestCase extends AbstractSftpWaitForChangeTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "mule-sftp-wait-for-size-change-config.xml";
     }

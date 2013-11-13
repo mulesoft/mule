@@ -6,6 +6,10 @@
  */
 package org.mule.example.loanbroker.bpm;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.example.loanbroker.messages.Customer;
@@ -14,13 +18,8 @@ import org.mule.example.loanbroker.messages.LoanQuote;
 import org.mule.example.loanbroker.tests.AbstractAsynchronousLoanBrokerTestCase;
 import org.mule.transport.NullPayload;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class JBpmFunctionalTestCase extends AbstractAsynchronousLoanBrokerTestCase
 {
-
     public JBpmFunctionalTestCase()
     {
         super();
@@ -28,7 +27,7 @@ public class JBpmFunctionalTestCase extends AbstractAsynchronousLoanBrokerTestCa
     }
     
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "mule-config.xml";
     }

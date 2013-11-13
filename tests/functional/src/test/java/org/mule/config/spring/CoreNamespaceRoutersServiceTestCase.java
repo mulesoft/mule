@@ -6,6 +6,10 @@
  */
 package org.mule.config.spring;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -26,15 +30,10 @@ import java.util.List;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class CoreNamespaceRoutersServiceTestCase extends FunctionalTestCase
 {
-    
     @Override
-    public String getConfigResources()
+    public String getConfigFile()
     {
         return "core-namespace-routers-service.xml";
     }
@@ -95,7 +94,7 @@ public class CoreNamespaceRoutersServiceTestCase extends FunctionalTestCase
     protected MessageProcessor lookupOutboundRouterFromService(String serviceName) throws Exception
     {
         Service service = lookupService(serviceName);
-        OutboundRouterCollection routerCollection = 
+        OutboundRouterCollection routerCollection =
             (OutboundRouterCollection) service.getOutboundMessageProcessor();
         return routerCollection.getRoutes().get(0);
     }
@@ -103,7 +102,7 @@ public class CoreNamespaceRoutersServiceTestCase extends FunctionalTestCase
     protected MessageProcessor lookupInboundRouterFromService(String serviceName) throws Exception
     {
         Service service = lookupService(serviceName);
-        List<MessageProcessor> routers = 
+        List<MessageProcessor> routers =
             ((ServiceCompositeMessageSource) service.getMessageSource()).getMessageProcessors();
         assertEquals(1, routers.size());
         return routers.get(0);

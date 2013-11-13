@@ -13,7 +13,8 @@ import org.junit.Test;
  */
 public class JmsTopicTestCase extends AbstractJmsFunctionalTestCase
 {
-    protected String getConfigResources()
+    @Override
+    protected String getConfigFile()
     {
         return "integration/jms-topic.xml";
     }

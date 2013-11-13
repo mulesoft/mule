@@ -6,6 +6,10 @@
  */
 package org.mule.test.integration.client;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
@@ -16,13 +20,8 @@ import org.mule.tck.testmodels.services.Person;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class MuleClientAxisTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
@@ -33,7 +32,7 @@ public class MuleClientAxisTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort3 = new DynamicPort("port3");
     
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/client/axis-client-test-mule-config.xml";
     }

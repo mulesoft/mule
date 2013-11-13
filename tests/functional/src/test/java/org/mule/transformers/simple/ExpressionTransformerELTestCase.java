@@ -31,9 +31,8 @@ import org.junit.Test;
 
 public class ExpressionTransformerELTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/transformers/expression-transformers-el-test.xml";
     }

@@ -37,7 +37,7 @@ public class ImapMessageRequesterTestCase extends FunctionalTestCase
 
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "imap-message-requester.xml";
     }

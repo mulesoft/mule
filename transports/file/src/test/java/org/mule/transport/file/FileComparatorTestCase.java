@@ -30,7 +30,7 @@ public class FileComparatorTestCase extends FunctionalTestCase
     public static final String COMPONENT_NAME = "FolderTO";
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "file-functional-config.xml";
     }

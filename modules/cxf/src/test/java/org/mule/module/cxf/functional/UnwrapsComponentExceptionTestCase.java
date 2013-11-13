@@ -6,6 +6,8 @@
  */
 package org.mule.module.cxf.functional;
 
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
@@ -20,11 +22,8 @@ import javax.jws.WebService;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
-
 public class UnwrapsComponentExceptionTestCase extends FunctionalTestCase
 {
-
     public static final String ERROR_MESSAGE = "Changos!!!";
 
     private static final String requestPayload =
@@ -41,7 +40,7 @@ public class UnwrapsComponentExceptionTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "unwraps-component-exception-config.xml";
     }

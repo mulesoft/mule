@@ -33,7 +33,7 @@ public class WebServiceWrapperWithAxisTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "mule-ws-wrapper-config.xml";
     }

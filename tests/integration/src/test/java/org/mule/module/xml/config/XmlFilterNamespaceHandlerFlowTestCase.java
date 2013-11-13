@@ -28,7 +28,7 @@ import org.junit.Test;
 public class XmlFilterNamespaceHandlerFlowTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/module/xml/xml-filter-functional-test-flow.xml";
     }

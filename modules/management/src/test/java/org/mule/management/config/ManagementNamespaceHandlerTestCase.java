@@ -6,6 +6,11 @@
  */
 package org.mule.management.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.agent.EndpointNotificationLoggerAgent;
 import org.mule.agent.Log4jNotificationLoggerAgent;
 import org.mule.api.agent.Agent;
@@ -22,14 +27,8 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     private static final int CHAINSAW_PORT = 8080;
     
     public ManagementNamespaceHandlerTestCase()
@@ -40,7 +39,7 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "management-namespace-config.xml";
     }

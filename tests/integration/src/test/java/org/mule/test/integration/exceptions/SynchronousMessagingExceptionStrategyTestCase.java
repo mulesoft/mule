@@ -8,9 +8,7 @@ package org.mule.test.integration.exceptions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
-import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 
 import java.util.concurrent.TimeUnit;
@@ -19,9 +17,8 @@ import org.junit.Test;
 
 public class SynchronousMessagingExceptionStrategyTestCase extends AbstractExceptionStrategyTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/exceptions/synch-messaging-exception-strategy.xml";
     }

@@ -19,11 +19,12 @@ public class JmsSingleTransactionSingleServiceJoinIfPossibleConfigurationTestCas
 {
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/transactions/local/jms-single-tx-single-service-join-if-possible.xml";
     }
 
+    @Override
     @Test
     public void testAlwaysJoin() throws Exception
     {

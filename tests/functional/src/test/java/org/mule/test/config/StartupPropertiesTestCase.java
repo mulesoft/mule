@@ -6,14 +6,14 @@
  */
 package org.mule.test.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Properties;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class StartupPropertiesTestCase extends FunctionalTestCase
 {
@@ -23,7 +23,7 @@ public class StartupPropertiesTestCase extends FunctionalTestCase
     private String STARTUP_PROPERTY_2_VALUE = "startupProperty2Value";
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/config/startup-properties-test.xml";
     }

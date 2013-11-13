@@ -20,9 +20,8 @@ import org.junit.Test;
 
 public class PatternFlowStateTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/components/pattern-flows-initial-state.xml";
     }

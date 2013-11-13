@@ -10,7 +10,6 @@ import org.mule.example.loanbroker.tests.AbstractLoanBrokerTestCase;
 
 public class CxfLoanBrokerSynchronousFunctionalTestCase extends AbstractLoanBrokerTestCase
 {
-    
     @Override
     public void testSingleLoanRequest() throws Exception
     {
@@ -18,8 +17,8 @@ public class CxfLoanBrokerSynchronousFunctionalTestCase extends AbstractLoanBrok
     }
 
     @Override
-    protected String getConfigResources()
+    protected String[] getConfigFiles()
     {
-        return "loan-broker-sync-config.xml, loan-broker-cxf-endpoints-config.xml";
+        return new String[] { "loan-broker-sync-config.xml", "loan-broker-cxf-endpoints-config.xml" };
     }
 }

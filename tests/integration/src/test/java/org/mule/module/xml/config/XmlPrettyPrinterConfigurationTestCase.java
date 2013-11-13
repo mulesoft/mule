@@ -6,26 +6,25 @@
  */
 package org.mule.module.xml.config;
 
-import org.mule.module.xml.transformer.XmlPrettyPrinter;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.module.xml.transformer.XmlPrettyPrinter;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
 public class XmlPrettyPrinterConfigurationTestCase extends FunctionalTestCase
 {
-
     public XmlPrettyPrinterConfigurationTestCase()
     {
         setStartContext(false);
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/module/xml/xml-prettyprinter-config.xml";
     }

@@ -30,7 +30,7 @@ public class HolderTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "holder-conf.xml";
     }

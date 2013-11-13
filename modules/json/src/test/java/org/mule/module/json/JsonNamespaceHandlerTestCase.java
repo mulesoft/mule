@@ -6,6 +6,10 @@
  */
 package org.mule.module.json;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.module.json.filters.IsJsonFilter;
 import org.mule.module.json.transformers.FruitCollection;
 import org.mule.module.json.transformers.JsonBeanRoundTripTestCase;
@@ -21,15 +25,10 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class JsonNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "json-namespace-config.xml";
     }

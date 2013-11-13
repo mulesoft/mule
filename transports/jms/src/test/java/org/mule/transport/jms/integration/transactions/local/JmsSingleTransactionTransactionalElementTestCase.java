@@ -11,20 +11,21 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import javax.jms.JMSException;
-
-import org.junit.Before;
-import org.junit.Test;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.DispatchException;
 import org.mule.construct.Flow;
 import org.mule.transport.jms.integration.AbstractJmsFunctionalTestCase;
 
+import javax.jms.JMSException;
+
+import org.junit.Before;
+import org.junit.Test;
+
 public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJmsFunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/transactions/local/jms-single-tx-transactional.xml";
     }

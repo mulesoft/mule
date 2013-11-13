@@ -28,7 +28,7 @@ public class FlowNestingTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/construct/flow-nesting-config.xml";
     }
@@ -46,7 +46,7 @@ public class FlowNestingTestCase extends FunctionalTestCase
         client.dispatch("vm://inFilter", request);
         MuleMessage result = client.request("vm://outFilter", 5000);
         assertNotNull(result);
-    }        
+    }
     
     @Test
     public void testNestingFiltersRejected() throws MuleException
@@ -75,7 +75,7 @@ public class FlowNestingTestCase extends FunctionalTestCase
         client.dispatch("vm://inChoice", request);
         MuleMessage result = client.request("vm://outChoice", 5000);
         assertNotNull(result);
-        assertEquals("ABC", result.getPayloadAsString());                
+        assertEquals("ABC", result.getPayloadAsString());
     }
     
     @Test
@@ -90,8 +90,8 @@ public class FlowNestingTestCase extends FunctionalTestCase
         client.dispatch("vm://inChoice", request);
         MuleMessage result = client.request("vm://outChoice", 5000);
         assertNotNull(result);
-        assertEquals("AB", result.getPayloadAsString());                
-    }  
+        assertEquals("AB", result.getPayloadAsString());
+    }
 }
 
 

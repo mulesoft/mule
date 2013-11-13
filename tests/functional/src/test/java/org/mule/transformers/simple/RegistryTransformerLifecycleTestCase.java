@@ -6,6 +6,9 @@
  */
 package org.mule.transformers.simple;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
@@ -20,9 +23,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 /**
  * Highlights the issue: MULE-4599 where dispose cannot be called on a transformer
  * since it is a prototype in Spring, so spring does not manage the object.
@@ -30,7 +30,7 @@ import static org.junit.Assert.assertNotNull;
 public class RegistryTransformerLifecycleTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "simple-transformer-config.xml";
     }

@@ -12,7 +12,6 @@ import org.junit.Test;
 
 public class DynamicFirstSuccessfulTestCase extends DynamicRouterTestCase
 {
-
     private static final String DYNAMIC_FIRST_SUCCESSFUL = "dynamicFirstSuccessful";
     private static final String DYNAMIC_FIRST_SUCCESSFUL_WITH_EXPRESSION = "dynamicFirstSuccessfulWithExpression";
     private static final String LETTER_F = "f";
@@ -20,7 +19,7 @@ public class DynamicFirstSuccessfulTestCase extends DynamicRouterTestCase
     private static final String RANDOM_TEXT_2 = "fofo";
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/routing/dynamic-first-successful-config.xml";
     }

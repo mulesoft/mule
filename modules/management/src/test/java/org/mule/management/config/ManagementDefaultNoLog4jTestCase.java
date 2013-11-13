@@ -6,19 +6,18 @@
  */
 package org.mule.management.config;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.mule.api.agent.Agent;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 public class ManagementDefaultNoLog4jTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "management-default-no-log4j-config.xml";
     }
@@ -32,5 +31,4 @@ public class ManagementDefaultNoLog4jTestCase extends FunctionalTestCase
         agent = muleContext.getRegistry().lookupAgent("jmx-log4j");
         assertNull(agent);
     }
-
 }

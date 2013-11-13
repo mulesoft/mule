@@ -8,10 +8,9 @@ package org.mule.example.loanbroker.esn;
 
 public class CxfLoanBrokerSynchronousFlowFunctionalTestCase extends CxfLoanBrokerSynchronousFunctionalTestCase
 {
-    
     @Override
-    protected String getConfigResources()
+    protected String[] getConfigFiles()
     {
-        return "loan-broker-sync-flow-config.xml, loan-broker-cxf-endpoints-config.xml";
+        return new String[] { "loan-broker-sync-flow-config.xml", "loan-broker-cxf-endpoints-config.xml" };
     }
 }

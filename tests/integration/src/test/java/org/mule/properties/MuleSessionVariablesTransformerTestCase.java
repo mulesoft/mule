@@ -6,7 +6,6 @@
  */
 package org.mule.properties;
 
-import org.junit.Test;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
@@ -14,11 +13,12 @@ import org.mule.construct.Flow;
 import org.mule.tck.functional.FlowAssert;
 import org.mule.tck.junit4.FunctionalTestCase;
 
+import org.junit.Test;
+
 public class MuleSessionVariablesTransformerTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/properties/mule-session-variables-transformer-test-case.xml";
     }
@@ -79,5 +79,4 @@ public class MuleSessionVariablesTransformerTestCase extends FunctionalTestCase
         flow.process(event);
         FlowAssert.verify(flowName);
     }
-
 }

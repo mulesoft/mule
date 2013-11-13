@@ -6,7 +6,8 @@
  */
 package org.mule.test.integration.routing.outbound;
 
-import org.junit.Test;
+import static org.junit.Assert.fail;
+
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.construct.Flow;
 import org.mule.context.notification.ExceptionNotification;
@@ -15,12 +16,12 @@ import org.mule.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.fail;
+import org.junit.Test;
 
 public class UntilSuccessfulRetryExhaustedTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/routing/outbound/until-successful-retry-exhausted.xml";
     }
@@ -33,7 +34,7 @@ public class UntilSuccessfulRetryExhaustedTestCase extends FunctionalTestCase
             @Override
             public void onNotification(ExceptionNotification notification)
             {
-                exceptionStrategyCalledLatch.release();   
+                exceptionStrategyCalledLatch.release();
             }
         });
         Flow flow = (Flow) getFlowConstruct("retryExhausted");

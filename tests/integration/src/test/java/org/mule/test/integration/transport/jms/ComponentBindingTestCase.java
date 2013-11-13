@@ -19,7 +19,7 @@ import org.junit.Test;
 public class ComponentBindingTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/providers/jms/nestedrouter-test.xml";
     }

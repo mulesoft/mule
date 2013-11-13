@@ -6,6 +6,10 @@
  */
 package org.mule.transport.jms.reliability;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
@@ -13,14 +17,10 @@ import javax.jms.Session;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-
 public class JmsAcknowledgementTestCase extends AbstractJmsReliabilityTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "reliability/activemq-config.xml";
     }

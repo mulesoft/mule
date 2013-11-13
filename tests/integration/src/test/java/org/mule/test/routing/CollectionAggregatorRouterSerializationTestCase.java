@@ -31,7 +31,8 @@ public class CollectionAggregatorRouterSerializationTestCase extends FunctionalT
 {
     static
     {
-        DefaultObjectStoreFactoryBean.setDelegate(new MuleDefaultObjectStoreFactory(){
+        DefaultObjectStoreFactoryBean.setDelegate(new MuleDefaultObjectStoreFactory()
+        {
             @Override
             public ObjectStore<Serializable> createDefaultInMemoryObjectStore()
             {
@@ -41,7 +42,7 @@ public class CollectionAggregatorRouterSerializationTestCase extends FunctionalT
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "collection-aggregator-router-serialization.xml";
     }

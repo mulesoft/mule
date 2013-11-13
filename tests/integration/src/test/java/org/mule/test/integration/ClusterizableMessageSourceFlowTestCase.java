@@ -7,8 +7,8 @@
 package org.mule.test.integration;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
@@ -22,14 +22,13 @@ import org.junit.Test;
 
 public class ClusterizableMessageSourceFlowTestCase extends FunctionalTestCase
 {
-
     public ClusterizableMessageSourceFlowTestCase()
     {
         setStartContext(false);
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "clusterizable-message-source-flow-config.xml";
     }

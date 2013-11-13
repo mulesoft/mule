@@ -6,22 +6,21 @@
  */
 package org.mule.module.rss;
 
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.functional.CounterCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.tck.functional.CounterCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
 public class HttpOnlyFeedConsumeAndSplitTestCase extends FunctionalTestCase
 {
-
     private final CounterCallback counter = new CounterCallback();
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "http-only-consume-and-split.xml";
     }
@@ -36,7 +35,6 @@ public class HttpOnlyFeedConsumeAndSplitTestCase extends FunctionalTestCase
     @Test
     public void testConsume() throws Exception
     {
-
         Thread.sleep(4000);
         int count = counter.getCallbackCount();
         assertTrue(count > 0);

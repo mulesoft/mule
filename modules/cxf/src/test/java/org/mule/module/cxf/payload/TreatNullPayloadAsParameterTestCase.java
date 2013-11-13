@@ -14,10 +14,8 @@ package org.mule.module.cxf.payload;
 public class TreatNullPayloadAsParameterTestCase extends
     TreatNullPayloadAsParameterByDefaultTestCase
 {
-
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "messagedispatcher/null-payload-add-as-parameter.xml";
     }

@@ -32,7 +32,7 @@ public class MuleMessageProtocolChunkingTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "mule-message-protocol-mule-config.xml";
     }

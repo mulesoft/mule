@@ -7,12 +7,6 @@
 package org.mule.module.cxf.payload;
 
 
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-
-import org.junit.Rule;
-import org.junit.Test;
-
 import static org.mule.module.cxf.payload.PayloadTestConstants.emptyOjbectArrayPayload;
 import static org.mule.module.cxf.payload.PayloadTestConstants.greetMeOutEndpointName;
 import static org.mule.module.cxf.payload.PayloadTestConstants.nullPayload;
@@ -23,18 +17,23 @@ import static org.mule.module.cxf.payload.PayloadTestConstants.strArrayPayloadRe
 import static org.mule.module.cxf.payload.PayloadTestConstants.strPayload;
 import static org.mule.module.cxf.payload.PayloadTestConstants.strPayloadResult;
 
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+
+import org.junit.Rule;
+import org.junit.Test;
+
 /**
  * This tests the payloadToArguments attribute on the cxf outbound endpoints for the
  * default case (when it is not supplied).
  */
 public class TreatNullPayloadAsParameterByDefaultTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "messagedispatcher/null-payload-add-as-parameter-by-default.xml";
     }
@@ -63,5 +62,4 @@ public class TreatNullPayloadAsParameterByDefaultTestCase extends FunctionalTest
             callAndExpect.callEndpointAndExecuteAsserts();
         }
     }
-
 }

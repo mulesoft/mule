@@ -25,7 +25,7 @@ import org.junit.Test;
 public class SessionPropertyChainingRouterTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/messaging/session-property-chaining-router.xml";
     }

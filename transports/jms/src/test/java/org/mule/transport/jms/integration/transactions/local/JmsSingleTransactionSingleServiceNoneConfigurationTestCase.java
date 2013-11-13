@@ -17,13 +17,13 @@ import org.junit.Test;
 public class JmsSingleTransactionSingleServiceNoneConfigurationTestCase extends
     AbstractJmsSingleTransactionSingleServiceTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/transactions/local/jms-single-tx-single-service-none.xml";
     }
 
+    @Override
     @Test
     public void testAlwaysJoin() throws Exception
     {

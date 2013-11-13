@@ -9,6 +9,7 @@ package org.mule.transport.file;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.transport.file.FileTestUtils.createDataFile;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -23,7 +24,6 @@ import org.junit.Test;
 
 public class FileAgeAndPollingFrequencyInteractionTestCase extends FunctionalTestCase
 {
-
     private static File dataFile;
     private static boolean updateFileAge = true;
 
@@ -33,7 +33,7 @@ public class FileAgeAndPollingFrequencyInteractionTestCase extends FunctionalTes
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "file-age-polling-config.xml";
     }

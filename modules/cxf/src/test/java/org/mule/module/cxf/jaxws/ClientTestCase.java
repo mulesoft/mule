@@ -30,7 +30,7 @@ public class ClientTestCase extends FunctionalTestCase
     private Prober prober = new PollingProber(5000, 100);
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "jaxws-client-conf.xml";
     }

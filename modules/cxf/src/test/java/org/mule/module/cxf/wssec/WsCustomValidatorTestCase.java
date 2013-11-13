@@ -30,7 +30,7 @@ public class WsCustomValidatorTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/module/cxf/wssec/ws-custom-validator-config.xml";
     }

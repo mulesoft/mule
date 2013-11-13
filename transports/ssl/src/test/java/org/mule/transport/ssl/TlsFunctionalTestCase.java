@@ -8,7 +8,8 @@ package org.mule.transport.ssl;
 
 public class TlsFunctionalTestCase extends SslFunctionalTestCase
 {
-    protected String getConfigResources()
+    @Override
+    protected String getConfigFile()
     {
         return "tls-functional-test.xml";
     }

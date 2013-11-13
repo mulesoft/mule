@@ -29,7 +29,7 @@ public class HttpVmSessionPropertiesTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/properties/session-properties-http-vm-config.xml";
     }

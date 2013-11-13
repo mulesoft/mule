@@ -7,6 +7,7 @@
 package org.mule.test.integration.config;
 
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleContext;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.endpoint.EndpointURI;
@@ -23,7 +24,7 @@ public class EndpointUriBuilderOverrideTestCase extends FunctionalTestCase
     private static boolean invokedOverriddenUriBuilder;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/config/endpoint-uri-builder-service-override-config.xml";
     }

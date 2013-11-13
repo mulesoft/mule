@@ -26,7 +26,7 @@ public class ExceptionHandlingMule2167TestCase extends FunctionalTestCase
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "exception-handling-mule-2167-test.xml";
     }

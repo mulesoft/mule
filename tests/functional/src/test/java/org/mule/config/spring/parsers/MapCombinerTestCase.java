@@ -12,9 +12,8 @@ import org.junit.Test;
 
 public class MapCombinerTestCase extends AbstractNamespaceTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/config/spring/parsers/map-combiner-test.xml";
     }
@@ -48,5 +47,4 @@ public class MapCombinerTestCase extends AbstractNamespaceTestCase
             assertMapEntryExists(bean.getMap(), Integer.toString(i+1), i+1);
         }
     }
-
 }

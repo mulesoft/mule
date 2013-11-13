@@ -20,9 +20,8 @@ import org.junit.Test;
 
 public class TransformerStoppingEventFlowTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/transformers/transformer-stopped-processing.xml";
     }

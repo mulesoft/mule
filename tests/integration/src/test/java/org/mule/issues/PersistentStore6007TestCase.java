@@ -45,7 +45,7 @@ public class PersistentStore6007TestCase extends FunctionalTestCase
     private Latch latch;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/issues/persistent-store-6007.xml";
     }

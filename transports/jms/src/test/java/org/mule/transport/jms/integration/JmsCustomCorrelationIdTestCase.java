@@ -20,7 +20,7 @@ import org.junit.Test;
 public class JmsCustomCorrelationIdTestCase extends AbstractJmsFunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/jms-custom-correlation.xml";
     }

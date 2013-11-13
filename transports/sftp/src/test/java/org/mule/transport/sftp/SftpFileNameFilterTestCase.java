@@ -8,6 +8,7 @@ package org.mule.transport.sftp;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 
@@ -18,9 +19,8 @@ import org.junit.Test;
 
 public class SftpFileNameFilterTestCase extends AbstractSftpFunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "sftp-filename-filter-config.xml";
     }

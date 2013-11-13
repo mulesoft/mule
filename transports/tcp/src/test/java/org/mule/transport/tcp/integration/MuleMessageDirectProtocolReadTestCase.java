@@ -11,9 +11,8 @@ import org.mule.transport.tcp.protocols.DirectProtocol;
 
 public class MuleMessageDirectProtocolReadTestCase extends AbstractMuleMessageProtocolReadTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "mule-message-direct-protocol-read-config.xml";
     }

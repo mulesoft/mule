@@ -31,7 +31,7 @@ public class AxisSoapHeadersTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "axis-soapheader-test.xml";
     }

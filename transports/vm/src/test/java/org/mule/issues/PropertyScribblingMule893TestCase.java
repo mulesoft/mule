@@ -22,7 +22,7 @@ import org.junit.Test;
 public class PropertyScribblingMule893TestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "issues/property-scribbling-mule-893-test.xml";
     }

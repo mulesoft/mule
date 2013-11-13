@@ -12,11 +12,13 @@ import org.junit.Test;
 
 public class DefaultThreadingProfileMule2083TestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String[] getConfigFiles()
     {
-        return "default-threading-profile-1-mule-2083.xml, default-threading-profile-2-mule-2083.xml";
+        return new String[] {
+            "default-threading-profile-1-mule-2083.xml",
+            "default-threading-profile-2-mule-2083.xml"
+        };
     }
 
     @Test
@@ -24,5 +26,4 @@ public class DefaultThreadingProfileMule2083TestCase extends FunctionalTestCase
     {
         // no-op
     }
-
 }

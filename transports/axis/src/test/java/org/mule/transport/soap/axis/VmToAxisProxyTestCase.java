@@ -22,7 +22,7 @@ public class VmToAxisProxyTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "vm-to-axis-proxy-mule-config.xml";
     }

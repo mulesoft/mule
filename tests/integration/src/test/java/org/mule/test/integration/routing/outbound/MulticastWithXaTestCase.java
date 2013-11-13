@@ -21,7 +21,7 @@ import org.junit.Test;
 public class MulticastWithXaTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/routing/outbound/multicasting-router-xa-config.xml";
     }

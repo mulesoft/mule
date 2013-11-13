@@ -6,19 +6,18 @@
  */
 package org.mule.transport.multicast;
 
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
 public class MulticastNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "multicast-namespace-config.xml";
     }
@@ -39,5 +38,4 @@ public class MulticastNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
     }
-
 }

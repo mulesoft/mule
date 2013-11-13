@@ -6,6 +6,10 @@
  */
 package org.mule.transport.vm.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transaction.TransactionConfig;
@@ -17,20 +21,14 @@ import org.mule.transport.vm.VMConnector;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 
 /**
  * Tests the Spring XML namespace for the VM transport.
  */
 public class VmNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "vm/vm-namespace-config.xml";
     }

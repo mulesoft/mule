@@ -6,19 +6,18 @@
  */
 package org.mule.config.spring.parsers;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.config.spring.parsers.beans.OrphanBean;
 
 import java.util.Collection;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class BindingCollectionTestCase extends AbstractNamespaceTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/config/spring/parsers/nested-collection-test.xml";
     }
@@ -27,8 +26,7 @@ public class BindingCollectionTestCase extends AbstractNamespaceTestCase
     public void testAll()
     {
         OrphanBean orphan = (OrphanBean) assertBeanExists("orphan1", OrphanBean.class);
-        Collection kids = (Collection) assertContentExists(orphan.getKids(), Collection.class);
+        Collection<?> kids = (Collection<?>) assertContentExists(orphan.getKids(), Collection.class);
         assertEquals(5, kids.size());
     }
-
 }

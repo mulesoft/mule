@@ -27,7 +27,7 @@ public class HttpContentLengthPropagationTestCase extends FunctionalTestCase
     private static final String NAME_STYLESHEET = "stylesheet.xsl";
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "http-content-length-propagation-conf.xml";
     }

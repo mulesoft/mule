@@ -21,7 +21,7 @@ import org.junit.Test;
 public class RedeliveryPolicyTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "redelivery-policy-test.xml";
     }

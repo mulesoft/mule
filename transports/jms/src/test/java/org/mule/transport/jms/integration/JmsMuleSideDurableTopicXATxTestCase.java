@@ -20,11 +20,10 @@ import org.junit.Test;
  */
 public class JmsMuleSideDurableTopicXATxTestCase extends AbstractJmsFunctionalTestCase
 {
-
     public static final String CONNECTOR1_NAME = "jmsConnectorC1";
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/jms-muleside-durable-topic-xa-tx.xml";
     }

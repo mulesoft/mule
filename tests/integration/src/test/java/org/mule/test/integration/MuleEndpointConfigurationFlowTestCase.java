@@ -38,7 +38,7 @@ import org.junit.Test;
 public class MuleEndpointConfigurationFlowTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/test-endpoints-config-flow.xml";
     }

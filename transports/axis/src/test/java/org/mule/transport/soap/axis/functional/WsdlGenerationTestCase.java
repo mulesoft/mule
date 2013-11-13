@@ -45,7 +45,7 @@ public class WsdlGenerationTestCase extends FunctionalTestCase
     private Map<String, Object> properties;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "axis-wsdl-test.xml";
     }

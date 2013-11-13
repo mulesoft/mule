@@ -33,7 +33,7 @@ public class LargeProxyTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "largeproxytest-config.xml";
     }

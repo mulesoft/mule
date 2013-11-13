@@ -8,9 +8,8 @@ package org.mule.module.rss;
 
 public class FeedConsumeAndSplitExplicitTestCase extends FeedConsumeAndSplitTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "rss-consume-and-explicit-split.xml";
     }

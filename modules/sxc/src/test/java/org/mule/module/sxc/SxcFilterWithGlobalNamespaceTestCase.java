@@ -9,7 +9,7 @@ package org.mule.module.sxc;
 public class SxcFilterWithGlobalNamespaceTestCase extends SxcFilterTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "xpath-filter-with-global-namespace-conf.xml";
     }

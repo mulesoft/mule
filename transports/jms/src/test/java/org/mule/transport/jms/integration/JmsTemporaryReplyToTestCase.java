@@ -23,7 +23,7 @@ import org.junit.Test;
 public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/jms-temporary-replyTo.xml";
     }

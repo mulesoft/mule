@@ -13,7 +13,6 @@ import org.junit.Rule;
 
 public class AxisConnectorVMFunctionalTestCase extends AbstractSoapResourceEndpointFunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
@@ -30,9 +29,8 @@ public class AxisConnectorVMFunctionalTestCase extends AbstractSoapResourceEndpo
     }
 
     @Override
-    public String getConfigResources()
+    public String getConfigFile()
     {
         return "axis-" + getTransportProtocol() + "-mule-config.xml";
     }
-
 }

@@ -25,7 +25,7 @@ public class ValidShutdownTimeoutOneWayTestCase extends AbstractShutdownTimeoutR
     public SystemProperty contextShutdownTimeout = new SystemProperty("contextShutdownTimeout", "5000");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "shutdown-timeout-one-way-config.xml";
     }

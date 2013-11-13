@@ -26,7 +26,7 @@ import org.junit.Test;
 public class CxfClientPassivateTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/transport/cxf/cxf-memoryleak-config.xml";
     }

@@ -6,18 +6,17 @@
  */
 package org.mule.config.spring.parsers;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.config.spring.parsers.beans.ThirdPartyContainer;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-
 public class ThirdPartyTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/config/spring/parsers/third-party-test.xml";
     }
@@ -29,5 +28,4 @@ public class ThirdPartyTestCase extends FunctionalTestCase
         assertNotNull(container);
         assertNotNull(container.getThing());
     }
-
 }

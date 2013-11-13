@@ -18,16 +18,17 @@ import org.junit.Test;
 public class AuthenticationNamespaceHandlerFlowTestCase extends AuthenticationNamespaceHandlerServiceTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "authentication-config-flow.xml";
     }
  
+    @Override
     @Test
     public void testEndpointConfiguration()
     {
         Flow flow = muleContext.getRegistry().lookupObject("echo");
-        assertNotNull(flow);       
+        assertNotNull(flow);
 
         ImmutableEndpoint endpoint = (ImmutableEndpoint) flow.getMessageSource();
         assertNotNull(endpoint.getSecurityFilter());

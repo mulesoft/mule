@@ -31,7 +31,7 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
     private static final long LATCH_AWAIT_TIMEOUT = 3000;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/jms-exception-strategy.xml";
     }

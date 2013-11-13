@@ -6,20 +6,19 @@
  */
 package org.mule.test.integration.management;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleException;
 import org.mule.module.management.agent.DefaultJmxSupportAgent;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class ManagementSimpleStartupTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/management/management-simple-startup-test.xml";
     }
@@ -35,5 +34,4 @@ public class ManagementSimpleStartupTestCase extends FunctionalTestCase
         assertNotNull(agent.getPort());
         assertEquals("1100", agent.getPort());
     }
-
 }

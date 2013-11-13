@@ -40,7 +40,7 @@ public class ImapCustomSeenHandlingTestCase extends AbstractEmailFunctionalTestC
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "imap-custom-seen-flag.xml";
     }
@@ -48,11 +48,13 @@ public class ImapCustomSeenHandlingTestCase extends AbstractEmailFunctionalTestC
     @Parameters
     public static Collection<Object[]> parameters()
     {
+        // the (second) config resources parameter must be null - we override
+        // getConfigFile() which provides the actual config that's used
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "imap-functional-test-service.xml"},
-            {ConfigVariant.FLOW, "imap-functional-test-service.xml"}
+            {ConfigVariant.SERVICE, null},
+            {ConfigVariant.FLOW, null}
         });
-    }      
+    }
 
     @Test
     public void testMessagesMatchingFilterGetCustomFlagSet() throws Exception

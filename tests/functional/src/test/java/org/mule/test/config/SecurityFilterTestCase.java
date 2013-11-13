@@ -6,6 +6,9 @@
  */
 package org.mule.test.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -25,17 +28,13 @@ import java.util.List;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 /**
  * Test configuration of security filters
  */
 public class SecurityFilterTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/config/security-filter-config.xml";
     }
@@ -75,7 +74,7 @@ public class SecurityFilterTestCase extends FunctionalTestCase
             }
         }
         assertEquals(1, count);
-        assertEquals(MuleEncryptionEndpointSecurityFilter.class, securityMp.getFilter().getClass());        
+        assertEquals(MuleEncryptionEndpointSecurityFilter.class, securityMp.getFilter().getClass());
     }
 
     /**

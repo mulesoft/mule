@@ -14,14 +14,13 @@ import org.junit.Rule;
 
 public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
 {
-
     private EmbeddedJettyServer httpServer;
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    public String getConfigResources()
+    public String getConfigFile()
     {
         return "axis-test-servlet-mule-config.xml";
     }

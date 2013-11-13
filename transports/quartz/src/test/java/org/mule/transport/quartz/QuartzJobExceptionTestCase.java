@@ -7,6 +7,7 @@
 package org.mule.transport.quartz;
 
 import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -15,9 +16,8 @@ import org.junit.Test;
 
 public class QuartzJobExceptionTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "quartz-job-exception-config.xml";
     }
@@ -28,7 +28,6 @@ public class QuartzJobExceptionTestCase extends FunctionalTestCase
         LocalMuleClient client = muleContext.getClient();
 
         MuleMessage response = client.request("vm://error", RECEIVE_TIMEOUT);
-
         assertNotNull("Flow exception strategy was not invoked", response);
     }
 }

@@ -11,9 +11,8 @@ import org.mule.transport.tcp.protocols.LengthProtocol;
 
 public class MuleMessageLengthProtocolReadTestCase extends AbstractMuleMessageProtocolReadTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "mule-message-length-protocol-read-config.xml";
     }
@@ -23,5 +22,4 @@ public class MuleMessageLengthProtocolReadTestCase extends AbstractMuleMessagePr
     {
         return new LengthProtocol();
     }
-
 }

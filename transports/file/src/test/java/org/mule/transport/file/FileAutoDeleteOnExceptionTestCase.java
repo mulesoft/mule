@@ -7,6 +7,7 @@
 package org.mule.transport.file;
 
 import static org.junit.Assert.assertFalse;
+
 import org.mule.api.construct.FlowConstruct;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
@@ -22,7 +23,6 @@ import org.junit.Test;
 
 public class FileAutoDeleteOnExceptionTestCase extends FunctionalTestCase
 {
-
     public static final String TEST_FOLDER1 = ".mule/testData1";
     public static final String TEST_FOLDER2 = ".mule/testData2";
 
@@ -34,7 +34,7 @@ public class FileAutoDeleteOnExceptionTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "file-auto-delete-on-exception-config.xml";
     }

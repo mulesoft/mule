@@ -8,6 +8,7 @@ package org.mule.test.integration.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.service.Service;
@@ -24,12 +25,11 @@ import org.junit.Test;
 
 public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
 {
-
     protected static final int WAIT_TIME_MILLIS = 500;
     protected static final int NUM_MESSAGES = 500;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/service/service-inflight-messages.xml";
     }

@@ -8,6 +8,7 @@ package org.mule.transport.file;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.tck.junit4.FunctionalTestCase;
 
@@ -21,7 +22,6 @@ import org.junit.Test;
 
 public class WorkDirectoryPropertiesTestCase extends FunctionalTestCase
 {
-
     private File dataFolder;
 
     public WorkDirectoryPropertiesTestCase()
@@ -30,7 +30,7 @@ public class WorkDirectoryPropertiesTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "work-directory-properties-config.xml";
     }

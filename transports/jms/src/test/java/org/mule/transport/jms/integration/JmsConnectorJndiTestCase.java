@@ -36,7 +36,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
 {
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/jms-jndi-config.xml";
     }

@@ -6,20 +6,19 @@
  */
 package org.mule.transport.servlet;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class ServletNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "servlet-namespace-config.xml";
     }
@@ -36,5 +35,4 @@ public class ServletNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("foo/bar", b.buildInboundEndpoint().getEndpointURI().getAddress());
         assertTrue(connector.isUseCachedHttpServletRequest());
     }
-
 }

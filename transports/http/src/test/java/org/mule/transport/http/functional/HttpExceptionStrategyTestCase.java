@@ -6,25 +6,24 @@
  */
 package org.mule.transport.http.functional;
 
-import org.hamcrest.core.Is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertThat;
+
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.exception.AbstractMessagingExceptionStrategy;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.NullPayload;
 
+import org.hamcrest.core.Is;
 import org.hamcrest.core.IsInstanceOf;
 import org.hamcrest.core.IsNot;
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
 
 public class HttpExceptionStrategyTestCase extends FunctionalTestCase
 {
@@ -34,7 +33,7 @@ public class HttpExceptionStrategyTestCase extends FunctionalTestCase
     public DynamicPort port1 = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "http-exception-strategy-config.xml";
     }
@@ -62,6 +61,7 @@ public class HttpExceptionStrategyTestCase extends FunctionalTestCase
 
     public static class CustomExceptionStrategy extends AbstractMessagingExceptionStrategy
     {
+        @Override
         public MuleEvent handleException(Exception ex, MuleEvent event)
         {
             event.getMessage().setOutboundProperty("http.status","403");

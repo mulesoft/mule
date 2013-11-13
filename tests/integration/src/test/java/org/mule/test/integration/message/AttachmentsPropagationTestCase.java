@@ -26,7 +26,7 @@ public class AttachmentsPropagationTestCase extends FunctionalTestCase implement
     private static final String ATTACHMENT_CONTENT = "<content>";
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/message/attachment-propagation.xml";
     }

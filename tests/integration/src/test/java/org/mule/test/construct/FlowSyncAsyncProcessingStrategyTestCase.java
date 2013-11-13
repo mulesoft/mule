@@ -6,22 +6,22 @@
  */
 package org.mule.test.construct;
 
+import org.mule.api.client.MuleClient;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.util.FileUtils;
+
 import java.io.File;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.util.FileUtils;
 
 public class FlowSyncAsyncProcessingStrategyTestCase extends FunctionalTestCase
 {
-
     public static final String SLEEP_TIME = "sleepTime";
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/construct/flow-sync-async-processing-strategy-config.xml";
 

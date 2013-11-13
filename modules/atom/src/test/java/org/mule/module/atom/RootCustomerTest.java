@@ -10,9 +10,8 @@ import org.junit.Test;
 
 public class RootCustomerTest extends AbstractCustomerTest
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "customer-conf.xml";
     }

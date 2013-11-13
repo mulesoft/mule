@@ -24,7 +24,7 @@ public class InOptionalOutOutOptionalInTestCase extends FunctionalTestCase
     public static final long TIMEOUT = 3000;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out_Out-Optional-In.xml";
     }

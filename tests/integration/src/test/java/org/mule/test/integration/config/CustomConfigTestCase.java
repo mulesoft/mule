@@ -6,6 +6,10 @@
  */
 package org.mule.test.integration.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.transformer.Transformer;
@@ -16,15 +20,10 @@ import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class CustomConfigTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/config/custom-config.xml";
     }

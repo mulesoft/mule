@@ -8,6 +8,7 @@ package org.mule.modules.schedulers.cron;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleException;
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.schedule.Schedulers;
@@ -28,7 +29,6 @@ import org.junit.Test;
  */
 public class CronsSchedulerTest extends FunctionalTestCase
 {
-
     private static List<String> foo = new ArrayList<String>();
     private static List<String> bar = new ArrayList<String>();
 
@@ -39,11 +39,10 @@ public class CronsSchedulerTest extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "cron-scheduler-config.xml";
     }
-
 
     @Test
     public void test() throws Exception
@@ -125,7 +124,6 @@ public class CronsSchedulerTest extends FunctionalTestCase
 
     public static class FooComponent
     {
-
         public boolean process(String s)
         {
             synchronized (foo)
@@ -143,7 +141,6 @@ public class CronsSchedulerTest extends FunctionalTestCase
 
     public static class BarComponent
     {
-
         public boolean process(String s)
         {
             synchronized (bar)

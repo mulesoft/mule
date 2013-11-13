@@ -6,9 +6,11 @@
  */
 package org.mule.transport.file;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
@@ -20,7 +22,6 @@ import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
-import org.mule.tck.probe.Prober;
 import org.mule.util.FileUtils;
 import org.mule.util.concurrent.Latch;
 
@@ -28,10 +29,9 @@ import java.io.File;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
 {
@@ -45,7 +45,7 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
     private PollingProber pollingProber = new PollingProber(5000, 200);
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "file-exception-strategy-config.xml";
     }
@@ -227,6 +227,7 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
         });
     }
 
+    @Override
     @Before
     public void doSetUp()
     {

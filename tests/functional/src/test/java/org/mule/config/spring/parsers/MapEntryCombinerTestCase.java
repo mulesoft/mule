@@ -17,9 +17,8 @@ import org.junit.Test;
  */
 public class MapEntryCombinerTestCase extends AbstractNamespaceTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/config/spring/parsers/map-entry-combiner-test.xml";
     }

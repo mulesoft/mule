@@ -8,6 +8,7 @@ package org.mule.test.integration.schedule;
 
 
 import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleException;
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.schedule.Schedulers;
@@ -28,20 +29,20 @@ import org.junit.Test;
  */
 public class PollScheduleTestCase extends FunctionalTestCase
 {
-
     private static List<String> foo = new ArrayList<String>();
     private static List<String> bar = new ArrayList<String>();
 
     Prober workingPollProber = new PollingProber(5000, 1000l);
 
     @BeforeClass
-    public static void setProperties(){
+    public static void setProperties()
+    {
         System.setProperty("frequency.days", "4");
         System.setProperty("frequency.millis", "2000");
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/schedule/polling-schedule-config.xml";
     }

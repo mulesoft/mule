@@ -6,20 +6,19 @@
  */
 package org.mule.transformers.simple;
 
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.api.transformer.Transformer;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.mule.api.transformer.Transformer;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.testmodels.fruit.Orange;
+
+import org.junit.Test;
+
 public class TransformerArraysTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "transformer-arrays-config.xml";
     }

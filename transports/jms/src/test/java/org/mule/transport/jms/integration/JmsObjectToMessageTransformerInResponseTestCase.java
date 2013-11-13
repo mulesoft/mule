@@ -20,7 +20,7 @@ public class JmsObjectToMessageTransformerInResponseTestCase extends AbstractJms
     public static final int TIMEOUT = 3000;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/jms-object-to-message-transformer-test-case.xml";
     }

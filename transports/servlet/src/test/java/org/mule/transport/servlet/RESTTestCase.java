@@ -20,7 +20,7 @@ import org.junit.Test;
 public class RESTTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "rest-functional-test.xml";
     }

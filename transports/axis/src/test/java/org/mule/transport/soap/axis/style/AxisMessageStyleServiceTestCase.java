@@ -37,7 +37,7 @@ public class AxisMessageStyleServiceTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    public String getConfigResources()
+    public String getConfigFile()
     {
         return "style/axis-mule-message-config.xml";
     }

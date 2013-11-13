@@ -8,6 +8,7 @@ package org.mule.config.spring;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.config.MuleProperties;
 import org.mule.api.processor.ProcessingStrategy;
 import org.mule.api.store.ListableObjectStore;
@@ -26,9 +27,8 @@ import org.junit.Test;
 
 public class QueueStoreConfigurationTestCase extends FunctionalTestCase
 {
-    
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/spring/queue-store-configs.xml";
     }
@@ -120,14 +120,14 @@ public class QueueStoreConfigurationTestCase extends FunctionalTestCase
 
     private void assertObjectStoreIsDefaultMemoryObjectStore(ListableObjectStore<Serializable> objectStore)
     {
-        Object defaultMemoryObjectStore = 
+        Object defaultMemoryObjectStore =
             muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME);
         assertEquals(defaultMemoryObjectStore, objectStore);
     }
     
     private void assertObjectStoreIsDefaultPersistentObjectStore(ListableObjectStore<Serializable> objectStore)
     {
-        Object defaultPersistentObjectStore = 
+        Object defaultPersistentObjectStore =
             muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME);
         assertEquals(defaultPersistentObjectStore, objectStore);
     }

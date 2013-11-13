@@ -6,6 +6,10 @@
  */
 package org.mule.module.spring.security;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.http.HttpConstants;
 
@@ -16,15 +20,11 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.hamcrest.core.Is;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-
 public class AuthorizationFilterTestCase extends FunctionalTestCase
 {
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "http-filter-test.xml";
     }
@@ -97,12 +97,12 @@ public class AuthorizationFilterTestCase extends FunctionalTestCase
             int status = client.executeMethod(get);
             if (status == HttpConstants.SC_UNAUTHORIZED && handshake == true)
             {
-                // doAuthentication = true means that if the request returns 401, 
+                // doAuthentication = true means that if the request returns 401,
                 // the HttpClient will resend the request with credentials
                 status = client.executeMethod(get);
                 if (status == HttpConstants.SC_UNAUTHORIZED && handshake == true)
                 {
-                    // doAuthentication = true means that if the request returns 401, 
+                    // doAuthentication = true means that if the request returns 401,
                     // the HttpClient will resend the request with credentials
                     status = client.executeMethod(get);
                 }

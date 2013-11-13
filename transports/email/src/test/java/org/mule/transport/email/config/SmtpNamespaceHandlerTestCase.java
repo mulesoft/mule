@@ -6,6 +6,10 @@
  */
 package org.mule.transport.email.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleException;
 import org.mule.transport.email.SmtpConnector;
 import org.mule.transport.email.SmtpsConnector;
@@ -14,15 +18,10 @@ import java.util.Properties;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class SmtpNamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerTestCase
 {
-    
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "smtp-namespace-config.xml";
     }

@@ -7,6 +7,7 @@
 package org.mule.module.xml.functional;
 
 import static org.junit.Assert.assertNotNull;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.Transformer;
@@ -21,12 +22,11 @@ import org.junit.Test;
 
 public class XsltWithParamsTransformerTestCase extends FunctionalTestCase
 {
-
     @Rule
     public SystemProperty useXalan = new ForceXalanTransformerFactory();
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/module/xml/xml-namespace-test.xml";
     }

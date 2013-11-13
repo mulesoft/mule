@@ -15,18 +15,17 @@ import org.junit.Test;
 
 public class PropertyPlaceholderDefaultTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/spring/property-placeholder-default-test.xml";
     }
 
-    protected String getProperty(String name)
+    protected String getProperty(String propertyName)
     {
         MapHolder holder = (MapHolder) muleContext.getRegistry().lookupObject("props");
-        String value = (String) holder.getMap().get(name);
-        assertNotNull(name, value);
+        String value = (String) holder.getMap().get(propertyName);
+        assertNotNull(propertyName, value);
         return value;
     }
 

@@ -9,7 +9,7 @@ package org.mule.transport.vm.functional.transactions;
 public class XARollbackTestCase extends RollbackTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/config/xa-rollback-config.xml";
     }

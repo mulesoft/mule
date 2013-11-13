@@ -28,7 +28,7 @@ public class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
     protected static final Log logger = LogFactory.getLog(JmsXAAlwaysBeginTestCase.class);
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/jms-xa-tx-ALWAYS_BEGIN.xml";
     }

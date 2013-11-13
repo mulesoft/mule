@@ -18,7 +18,7 @@ import org.junit.Test;
 public class TcpToFileTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/usecases/sync/tcp-to-file.xml";
     }

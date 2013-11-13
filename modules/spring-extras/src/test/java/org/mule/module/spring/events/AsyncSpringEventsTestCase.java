@@ -8,9 +8,8 @@ package org.mule.module.spring.events;
 
 public class AsyncSpringEventsTestCase extends SpringEventsTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "async-mule-events-app-context.xml";
     }

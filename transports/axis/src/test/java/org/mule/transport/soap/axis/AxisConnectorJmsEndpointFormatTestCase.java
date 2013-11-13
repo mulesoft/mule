@@ -23,7 +23,7 @@ import org.junit.Test;
 public class AxisConnectorJmsEndpointFormatTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "axis-jms-endpoint-format-config.xml";
     }

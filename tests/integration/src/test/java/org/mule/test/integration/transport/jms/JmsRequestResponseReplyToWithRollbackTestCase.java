@@ -7,6 +7,7 @@
 package org.mule.test.integration.transport.jms;
 
 import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -15,9 +16,8 @@ import org.junit.Test;
 
 public class JmsRequestResponseReplyToWithRollbackTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/transport/jms/jms-request-response-reply-to-with-rollback-config.xml";
     }

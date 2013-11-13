@@ -6,6 +6,9 @@
  */
 package org.mule.transport.jms.integration;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleMessage;
@@ -22,9 +25,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 /** <code>JmsTransformersTestCase</code> Tests the JMS transformer implementations. */
 public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunctionalTestCase
 {
@@ -33,7 +33,7 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
     private Session session = null;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/jms-transformers.xml";
     }
