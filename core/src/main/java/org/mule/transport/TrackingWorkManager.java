@@ -28,15 +28,15 @@ public class TrackingWorkManager implements WorkManager
     public static final int DEFAULT_SLEEP_MILLIS = 50;
     public static final String MULE_WAIT_MILLIS = "mule.transport.dispose.wait";
 
-    private final WorkManager delegate;
+    private final WorkManagerHolder delegateHolder;
     private final int shutdownTimeout;
     private final int waitMillis;
     private WorkTracker workTracker;
     private WorkListenerWrapperFactory workListenerWrapperFactory;
 
-    public TrackingWorkManager(WorkManager delegate, int shutdownTimeout)
+    public TrackingWorkManager(WorkManagerHolder workManagerHolder, int shutdownTimeout)
     {
-        this.delegate = delegate;
+        this.delegateHolder = workManagerHolder;
         this.workTracker = new ConcurrentWorkTracker();
         this.shutdownTimeout = shutdownTimeout;
         this.workListenerWrapperFactory = new TrackerWorkListenerWrapperFactory();
@@ -46,7 +46,7 @@ public class TrackingWorkManager implements WorkManager
     @Override
     public boolean isStarted()
     {
-        return delegate.isStarted();
+        return delegateHolder.getWorkManager().isStarted();
     }
 
     @Override
@@ -84,7 +84,7 @@ public class TrackingWorkManager implements WorkManager
         {
             workTracker.addWork(runnable);
 
-            delegate.execute(new TrackeableRunnable(runnable));
+            delegateHolder.getWorkManager().execute(new TrackeableRunnable(runnable));
         }
         catch (RuntimeException e)
         {
@@ -106,7 +106,7 @@ public class TrackingWorkManager implements WorkManager
 
         try
         {
-            delegate.doWork(work);
+            delegateHolder.getWorkManager().doWork(work);
         }
         finally
         {
@@ -121,7 +121,7 @@ public class TrackingWorkManager implements WorkManager
 
         try
         {
-            delegate.doWork(work, startTimeout, execContext, workListener);
+            delegateHolder.getWorkManager().doWork(work, startTimeout, execContext, workListener);
         }
         finally
         {
@@ -138,7 +138,7 @@ public class TrackingWorkManager implements WorkManager
 
             Work wrappedWork = new TrackeableWork(work);
 
-            return delegate.startWork(wrappedWork);
+            return delegateHolder.getWorkManager().startWork(wrappedWork);
         }
         catch (WorkException e)
         {
@@ -160,7 +160,7 @@ public class TrackingWorkManager implements WorkManager
             workTracker.addWork(work);
 
             TrackeableWork trackeableWork = new TrackeableWork(work);
-            return delegate.startWork(trackeableWork, startTimeout, execContext, workListenerWrapperFactory.create(work, workListener));
+            return delegateHolder.getWorkManager().startWork(trackeableWork, startTimeout, execContext, workListenerWrapperFactory.create(work, workListener));
         }
         catch (WorkException e)
         {
@@ -183,7 +183,7 @@ public class TrackingWorkManager implements WorkManager
 
             Work wrappedWork = new TrackeableWork(work);
 
-            delegate.scheduleWork(wrappedWork);
+            delegateHolder.getWorkManager().scheduleWork(wrappedWork);
         }
         catch (WorkException e)
         {
@@ -206,7 +206,7 @@ public class TrackingWorkManager implements WorkManager
         {
             TrackeableWork trackeableWork = new TrackeableWork(work);
 
-            delegate.scheduleWork(trackeableWork, startTimeout, execContext, workListenerWrapperFactory.create(work, workListener));
+            delegateHolder.getWorkManager().scheduleWork(trackeableWork, startTimeout, execContext, workListenerWrapperFactory.create(work, workListener));
         }
         catch (WorkException e)
         {

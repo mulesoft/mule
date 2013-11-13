@@ -17,6 +17,7 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.api.context.WorkManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -48,13 +49,15 @@ public class TrackingWorkManagerTestCase extends AbstractMuleTestCase
 
     private final WorkManager delegateWorkManager = mock(WorkManager.class);
     private final WorkTracker workTracker = mock(WorkTracker.class);
+    private final WorkManagerHolder workManagerHolder = mock(WorkManagerHolder.class);
     private TrackingWorkManager trackingWorkManager;
 
     @Before
     public void setUp() throws Exception
     {
-        trackingWorkManager = new TrackingWorkManager(delegateWorkManager, 5000);
+        trackingWorkManager = new TrackingWorkManager(workManagerHolder, 5000);
         trackingWorkManager.setWorkTracker(workTracker);
+        when(workManagerHolder.getWorkManager()).thenReturn(delegateWorkManager);
     }
 
     @Test

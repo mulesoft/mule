@@ -189,7 +189,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
 
     @Override
     public final MuleEvent routeMessage(MuleMessage message, Transaction trans, OutputStream outputStream)
-        throws MuleException
+            throws MuleException
     {
         return routeMessage(message, new DefaultMuleSession(), trans, outputStream);
     }
@@ -524,6 +524,13 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     {
         int shutdownTimeout = connector.getMuleContext().getConfiguration().getShutdownTimeout();
 
-        return new TrackingWorkManager(getConnectorWorkManager(), shutdownTimeout);
+        return new TrackingWorkManager(new WorkManagerHolder()
+        {
+            @Override
+            public WorkManager getWorkManager()
+            {
+                return getConnectorWorkManager();
+            }
+        }, shutdownTimeout);
     }
 }
