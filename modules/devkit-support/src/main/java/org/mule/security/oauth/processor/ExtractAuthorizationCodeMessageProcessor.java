@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.security.oauth.processor;
 
 import org.mule.api.MessagingException;
@@ -12,6 +13,7 @@ import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.security.oauth.OAuthProperties;
+import org.mule.security.oauth.exception.AuthorizationCodeNotFoundException;
 
 import java.net.URLDecoder;
 import java.util.regex.Matcher;
@@ -51,8 +53,7 @@ public class ExtractAuthorizationCodeMessageProcessor implements MessageProcesso
         }
         else
         {
-            throw new Exception(String.format("OAuth authorization code could not be extracted from: %s",
-                response));
+            throw new AuthorizationCodeNotFoundException(this.pattern, response);
         }
     }
 
