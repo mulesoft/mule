@@ -25,7 +25,7 @@ public class MuleEventMulticasterTestCase extends FunctionalTestCase
     private final AtomicInteger eventCount = new AtomicInteger(0);
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/spring/events/mule-events-example-app-context.xml";
     }

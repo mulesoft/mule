@@ -16,7 +16,6 @@ import org.junit.Test;
 
 public class ErrorHandlerTestCase extends FunctionalTestCase
 {
-
     @Override
     protected Properties getStartUpProperties()
     {
@@ -26,7 +25,7 @@ public class ErrorHandlerTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "mule-config.xml";
     }

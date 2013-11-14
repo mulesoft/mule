@@ -38,7 +38,7 @@ import org.quartz.impl.StdScheduler;
 public class QuartzNamespaceHandlerFlowTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "quartz-namespace-config-flow.xml";
     }

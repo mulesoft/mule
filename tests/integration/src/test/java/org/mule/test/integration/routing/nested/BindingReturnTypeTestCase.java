@@ -23,7 +23,7 @@ public class BindingReturnTypeTestCase extends FunctionalTestCase
     private static final int MAGIC_NUMBER = 0xC0DE;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/routing/nested/binding-returns-message.xml";
     }

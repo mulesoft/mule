@@ -7,6 +7,7 @@
 package org.mule.test.integration.el;
 
 import static org.junit.Assert.assertSame;
+
 import org.mule.api.MuleContext;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.el.ExpressionLanguage;
@@ -18,9 +19,8 @@ import org.junit.Test;
 
 public class ExpressionLanguageExtensionTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/el/expression-language-extension-config.xml";
     }

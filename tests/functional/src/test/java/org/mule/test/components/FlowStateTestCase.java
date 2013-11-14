@@ -6,7 +6,10 @@
  */
 package org.mule.test.components;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.mule.api.transport.MessageReceiver;
 import org.mule.construct.AbstractFlowConstruct;
@@ -17,9 +20,8 @@ import org.junit.Test;
 
 public class FlowStateTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/components/flow-initial-state.xml";
     }

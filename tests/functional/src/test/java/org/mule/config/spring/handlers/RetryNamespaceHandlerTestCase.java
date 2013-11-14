@@ -6,6 +6,10 @@
  */
 package org.mule.config.spring.handlers;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.retry.RetryNotifier;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.transport.Connector;
@@ -18,15 +22,10 @@ import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class RetryNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/config/spring/handlers/retry-namespace-config.xml";
     }

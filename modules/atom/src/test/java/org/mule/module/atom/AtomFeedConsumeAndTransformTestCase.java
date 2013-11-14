@@ -6,6 +6,10 @@
  */
 package org.mule.module.atom;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -20,17 +24,13 @@ import java.util.concurrent.TimeUnit;
 import org.apache.abdera.model.Feed;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class AtomFeedConsumeAndTransformTestCase extends FunctionalTestCase
 {
     private Latch receiveLatch = new Latch();
     private MuleMessage message = null;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "atom-consume-transform-feed.xml";
     }

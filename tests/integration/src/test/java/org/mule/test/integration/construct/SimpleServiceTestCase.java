@@ -45,7 +45,7 @@ public class SimpleServiceTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/construct/simple-service-config.xml";
     }

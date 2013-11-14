@@ -23,10 +23,8 @@ import org.junit.Test;
  */
 public class JmsJndiReconnectionTestCase extends FunctionalTestCase
 {
-
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "jms-jndi-reconnection-config.xml";
     }

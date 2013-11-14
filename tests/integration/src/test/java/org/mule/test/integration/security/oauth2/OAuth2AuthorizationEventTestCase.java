@@ -70,7 +70,7 @@ public class OAuth2AuthorizationEventTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/security/oauth/oauth2-authorization-event-test.xml";
     }

@@ -6,6 +6,9 @@
  */
 package org.mule.transport.email.transformers;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transformer.TransformerException;
@@ -22,14 +25,10 @@ import javax.mail.internet.MimeMessage;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 public class Rfc822ByteArrayTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "rfc822-byte-array-test.xml";
     }
@@ -56,7 +55,7 @@ public class Rfc822ByteArrayTestCase extends FunctionalTestCase
     protected MimeMessage byteArrayToMimeMessage(byte[] bytes) throws MuleException
     {
         Rfc822ByteArraytoMimeMessage transformer = new Rfc822ByteArraytoMimeMessage();
-        ImmutableEndpoint endpoint = 
+        ImmutableEndpoint endpoint =
             muleContext.getEndpointFactory().getOutboundEndpoint(SmtpConnector.SMTP);
         transformer.setEndpoint(endpoint);
         Object result = transformer.transform(bytes);

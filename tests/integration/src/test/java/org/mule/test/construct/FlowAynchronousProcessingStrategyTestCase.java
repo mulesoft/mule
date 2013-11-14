@@ -6,10 +6,6 @@
  */
 package org.mule.test.construct;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.transaction.TransactionCoordination;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -17,11 +13,14 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.transaction.TransactionCoordination;
+
 public class FlowAynchronousProcessingStrategyTestCase extends FlowDefaultProcessingStrategyTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/construct/flow-asynchronous-processing-strategy-config.xml";
     }
@@ -106,18 +105,21 @@ public class FlowAynchronousProcessingStrategyTestCase extends FlowDefaultProces
         }
     }
 
+    @Override
     protected void assertAllProcessingInClientThread(MuleMessage result)
     {
         assertSync(result);
         assertEquals(Thread.currentThread().getName(), result.getInboundProperty("receiver-thread"));
     }
 
+    @Override
     protected void assertAllProcessingInRecieverThread(MuleMessage result)
     {
         assertSync(result);
         assertTrue(((String) result.getInboundProperty("receiver-thread")).startsWith("vm.receiver"));
     }
 
+    @Override
     protected void assertSync(MuleMessage result)
     {
         assertNotNull(result);
@@ -130,6 +132,7 @@ public class FlowAynchronousProcessingStrategyTestCase extends FlowDefaultProces
         assertEquals(flowThread, dispatcherThread);
     }
 
+    @Override
     protected void assertAllProcessingAsync(MuleMessage result)
     {
         assertNotNull(result);

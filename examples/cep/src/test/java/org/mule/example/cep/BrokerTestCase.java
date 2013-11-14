@@ -13,18 +13,18 @@ import org.junit.Test;
 public class BrokerTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "mule-config.xml";
     }
 
     @Test
     public void testBroker() throws Exception
-    {       
+    {
         Thread.sleep(20000); //don't set this too high without adjusting the test timeout first
         
 //        MuleClient client = new MuleClient();
-//        
+//
 //        client.send("vm://stock.tick", new StockTick("SAP", 110, 0), null);
 //        Thread.sleep(1000);
 //        client.send("vm://stock.tick", new StockTick("SAP", 115, 2000), null);

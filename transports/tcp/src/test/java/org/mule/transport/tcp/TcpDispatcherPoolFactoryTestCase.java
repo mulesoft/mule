@@ -6,6 +6,9 @@
  */
 package org.mule.transport.tcp;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.transport.Connector;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.ConfigurableKeyedObjectPool;
@@ -15,14 +18,10 @@ import org.mule.transport.DefaultConfigurableKeyedObjectPoolFactory;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 public class TcpDispatcherPoolFactoryTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "tcp-dispatcher-pool-factory-config.xml";
     }
@@ -34,7 +33,7 @@ public class TcpDispatcherPoolFactoryTestCase extends FunctionalTestCase
 
     public static class StubDispatcherPoolFactory implements ConfigurableKeyedObjectPoolFactory
     {
-
+        @Override
         public ConfigurableKeyedObjectPool createObjectPool()
         {
             return new StubConfigurableKeyedObjectPool();

@@ -16,11 +16,10 @@ import org.junit.Test;
 
 public class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 {
-
     private String clientId;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/jms-durable-topic.xml";
     }

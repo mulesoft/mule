@@ -8,6 +8,7 @@ package org.mule.test.el;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.el.ExpressionLanguage;
@@ -23,12 +24,11 @@ import org.junit.Test;
 
 public class ExpressionLanguageConfigTestCase extends FunctionalTestCase
 {
-
     ExpressionLanguage el;
     ExpressionManager em;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/el/expression-language-config.xml";
     }

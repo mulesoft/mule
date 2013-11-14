@@ -17,9 +17,8 @@ import org.junit.Test;
 
 public class SftpNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "sftp-namespace-config.xml";
     }

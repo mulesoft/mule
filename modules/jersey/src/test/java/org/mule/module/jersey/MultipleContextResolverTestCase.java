@@ -8,6 +8,7 @@
 package org.mule.module.jersey;
 
 import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -23,12 +24,11 @@ import org.junit.Test;
 
 public class MultipleContextResolverTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort port = new DynamicPort("port");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "multiple-context-resolver-config.xml";
     }

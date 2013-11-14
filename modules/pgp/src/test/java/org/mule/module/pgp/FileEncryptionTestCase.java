@@ -20,9 +20,7 @@ import org.junit.Test;
 
 public class FileEncryptionTestCase extends FunctionalTestCase
 {
-
     public static final String TEST_FOLDER = ".mule/testData";
-
 
     private Prober prober = new PollingProber(30000, 100);
 
@@ -32,7 +30,7 @@ public class FileEncryptionTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "file-encryption-config.xml";
     }

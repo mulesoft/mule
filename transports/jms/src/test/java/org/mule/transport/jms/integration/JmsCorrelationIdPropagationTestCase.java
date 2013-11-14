@@ -29,7 +29,7 @@ public class JmsCorrelationIdPropagationTestCase extends AbstractJmsFunctionalTe
     private final static int RECEIVE_TIMEOUT = 2 * AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/jms-correlation-id-propagation.xml";
     }

@@ -18,12 +18,11 @@ import org.junit.Test;
 
 public class GeneratedClientTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "proxy-conf-service.xml";
     }

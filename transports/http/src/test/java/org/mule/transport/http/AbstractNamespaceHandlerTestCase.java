@@ -6,14 +6,13 @@
  */
 package org.mule.transport.http;
 
-import org.mule.tck.junit4.FunctionalTestCase;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.mule.tck.junit4.FunctionalTestCase;
+
 public abstract class AbstractNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     private String prefix;
 
     protected AbstractNamespaceHandlerTestCase(String prefix)
@@ -22,7 +21,7 @@ public abstract class AbstractNamespaceHandlerTestCase extends FunctionalTestCas
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return prefix + "-namespace-config.xml";
     }

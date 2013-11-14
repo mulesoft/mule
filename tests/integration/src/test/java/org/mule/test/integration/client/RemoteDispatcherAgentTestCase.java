@@ -6,20 +6,20 @@
  */
 package org.mule.test.integration.client;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.module.client.remoting.RemoteDispatcherAgent;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transformer.wire.SerializedMuleMessageWireFormat;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class RemoteDispatcherAgentTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/client/mule-remote-dispatcher-agent.xml";
     }

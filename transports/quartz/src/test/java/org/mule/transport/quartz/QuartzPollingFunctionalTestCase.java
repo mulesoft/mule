@@ -23,7 +23,7 @@ import org.junit.Test;
 public class QuartzPollingFunctionalTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "quartz-polling-functional-test.xml";
     }

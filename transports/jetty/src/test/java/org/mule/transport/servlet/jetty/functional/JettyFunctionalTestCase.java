@@ -34,7 +34,7 @@ public class JettyFunctionalTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "jetty-functional-test.xml";
     }

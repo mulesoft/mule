@@ -8,12 +8,13 @@ package org.mule.test.integration.client;
 
 public class MuleClientRemotingHttpTestCase extends AbstractClientRemotingTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String[] getConfigFiles()
     {
-        return "org/mule/test/integration/client/client-remote-dispatcher-common-config.xml, " +
-                "org/mule/test/integration/client/test-client-mule-config-remote-http.xml";
+        return new String[] {
+            "org/mule/test/integration/client/client-remote-dispatcher-common-config.xml",
+            "org/mule/test/integration/client/test-client-mule-config-remote-http.xml"
+        };
     }
 
     @Override

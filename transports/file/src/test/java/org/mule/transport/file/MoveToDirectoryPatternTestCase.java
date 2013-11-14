@@ -23,7 +23,6 @@ import org.junit.Test;
 
 public class MoveToDirectoryPatternTestCase extends FunctionalTestCase
 {
-
     private static final String TEST_FILENAME = "test.txt";
 
     @Override
@@ -55,7 +54,7 @@ public class MoveToDirectoryPatternTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "move-to-directory-config.xml";
     }

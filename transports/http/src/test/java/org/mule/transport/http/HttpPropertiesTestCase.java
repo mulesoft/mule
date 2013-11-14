@@ -27,7 +27,7 @@ public class HttpPropertiesTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "http-properties-conf.xml";
     }
@@ -40,7 +40,6 @@ public class HttpPropertiesTestCase extends FunctionalTestCase
         String result =  httpGet.getResponseBodyAsString();
         assertEquals("Retrieving client with id = 1", result);
     }
-
 
     @Test
     public void testPropertiesPostMethod() throws Exception

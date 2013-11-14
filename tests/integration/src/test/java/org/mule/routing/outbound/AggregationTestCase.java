@@ -40,7 +40,7 @@ import org.junit.Test;
 public class AggregationTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/routing/outbound/aggregation-config.xml";
     }

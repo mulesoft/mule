@@ -7,6 +7,7 @@
 package org.mule.transport.servlet.jetty.functional;
 
 import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -22,7 +23,6 @@ import org.junit.Test;
 
 public class JettyEndpointsAndWebappTestCase extends AbstractWebappsTestCase
 {
-
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
 
@@ -33,7 +33,7 @@ public class JettyEndpointsAndWebappTestCase extends AbstractWebappsTestCase
     public DynamicPort port3 = new DynamicPort("port3");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "jetty-endpoints-and-webapp-test.xml";
     }

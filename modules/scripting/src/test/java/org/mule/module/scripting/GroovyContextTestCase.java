@@ -18,9 +18,8 @@ import org.junit.Test;
 
 public class GroovyContextTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "groovy-context-config.xml";
     }

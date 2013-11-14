@@ -14,9 +14,8 @@ import org.mule.transport.jms.integration.AbstractJmsSingleTransactionSingleServ
 public class JmsSingleTransactionSingleServiceBeginOrJoinConfigurationTestCase extends
     AbstractJmsSingleTransactionSingleServiceTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/transactions/local/jms-single-tx-single-service-begin-or-join.xml";
     }

@@ -9,9 +9,8 @@ package org.mule.transport.sftp;
 
 public class SftpWaitForAgeChangeTestCase extends AbstractSftpWaitForChangeTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "mule-sftp-wait-for-age-change-config.xml";
     }

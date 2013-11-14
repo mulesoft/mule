@@ -8,9 +8,8 @@ package org.mule.transport.soap.axis;
 
 public class AxisConnectorJmsTopicsFunctionalTestCase extends AxisConnectorJmsFunctionalTestCase
 {
-
     @Override
-    public String getConfigResources()
+    public String getConfigFile()
     {
         return "axis-jms-topics-mule-config.xml";
     }

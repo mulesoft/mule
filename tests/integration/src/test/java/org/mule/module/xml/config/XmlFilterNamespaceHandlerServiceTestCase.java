@@ -6,6 +6,10 @@
  */
 package org.mule.module.xml.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.routing.MatchableMessageProcessor;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
@@ -20,14 +24,10 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class XmlFilterNamespaceHandlerServiceTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/module/xml/xml-filter-functional-test-service.xml";
     }

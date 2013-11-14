@@ -24,9 +24,8 @@ import org.junit.Test;
 
 public class ImplicitTransformationTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/transformers/implicit-transformation-config.xml";
     }

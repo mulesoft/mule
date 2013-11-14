@@ -9,9 +9,11 @@ package org.mule.test.integration.models;
 public class OptimisedSedaPipelineTestCase extends AbstractPipelineTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String[] getConfigFiles()
     {
-        return "org/mule/test/integration/models/optimised-seda-pipeline-test-config.xml," +
-                "org/mule/test/integration/models/pipeline-test-config.xml";
+        return new String[] {
+            "org/mule/test/integration/models/optimised-seda-pipeline-test-config.xml",
+            "org/mule/test/integration/models/pipeline-test-config.xml"
+        };
     }
 }

@@ -46,7 +46,7 @@ public class JsonSchemaValidationFilterTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort = new DynamicPort("port");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "json-filter-config.xml";
     }

@@ -13,14 +13,13 @@ import org.junit.Test;
 
 public class TypedPlaceholderMule1887TestCase extends AbstractNamespaceHandlerTestCase
 {
-
     public TypedPlaceholderMule1887TestCase()
     {
         super("http");
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "typed-placeholder-mule-1887-test.xml";
     }
@@ -32,5 +31,4 @@ public class TypedPlaceholderMule1887TestCase extends AbstractNamespaceHandlerTe
                 (HttpConnector) muleContext.getRegistry().lookupConnector("httpConnector");
         testBasicProperties(connector);
     }
-
 }

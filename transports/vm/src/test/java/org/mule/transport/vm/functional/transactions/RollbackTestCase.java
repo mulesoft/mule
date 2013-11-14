@@ -25,7 +25,7 @@ public class RollbackTestCase extends FunctionalTestCase
     static AtomicInteger totalAccepted;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/config/rollback-config.xml";
     }

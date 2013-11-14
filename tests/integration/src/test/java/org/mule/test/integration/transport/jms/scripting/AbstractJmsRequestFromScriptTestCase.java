@@ -19,7 +19,7 @@ import org.junit.Test;
  * Defines a scenario when we request a jms message from inside a groovy script
  * which is executed as part of a service whose endpoints are jms ones.
  * Subclasses must provide the service configuration through the implementation
- * of {@link org.mule.tck.junit4.FunctionalTestCase#getConfigResources()}.
+ * of {@link org.mule.tck.junit4.FunctionalTestCase#getConfigFile()}.
  */
 public abstract class AbstractJmsRequestFromScriptTestCase extends FunctionalTestCase
 {

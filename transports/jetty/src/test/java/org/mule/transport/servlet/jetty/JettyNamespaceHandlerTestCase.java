@@ -6,13 +6,13 @@
  */
 package org.mule.transport.servlet.jetty;
 
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
 
 public class JettyNamespaceHandlerTestCase extends FunctionalTestCase
 {
@@ -23,7 +23,7 @@ public class JettyNamespaceHandlerTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "jetty-namespace-config.xml";
     }

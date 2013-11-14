@@ -6,6 +6,10 @@
  */
 package org.mule.transport.jms.integration;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import javax.jms.DeliveryMode;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -20,17 +24,12 @@ import javax.jms.TopicSession;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 {
-
     public static final String CONNECTOR1_NAME = "jmsConnectorC1";
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/jms-muleside-durable-topic.xml";
     }

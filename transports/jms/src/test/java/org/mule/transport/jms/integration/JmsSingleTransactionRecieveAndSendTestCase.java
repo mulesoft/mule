@@ -6,20 +6,19 @@
  */
 package org.mule.transport.jms.integration;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class JmsSingleTransactionRecieveAndSendTestCase extends AbstractJmsFunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/jms-single-tx-receive-send-in-one-tx.xml";
     }
@@ -33,5 +32,4 @@ public class JmsSingleTransactionRecieveAndSendTestCase extends AbstractJmsFunct
         assertTrue(TextMessage.class.isAssignableFrom(message.getClass()));
         assertEquals(((TextMessage) message).getText(), AbstractJmsFunctionalTestCase.DEFAULT_OUTPUT_MESSAGE);
     }
-
 }

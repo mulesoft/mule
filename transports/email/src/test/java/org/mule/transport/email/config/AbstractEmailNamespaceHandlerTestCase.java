@@ -6,27 +6,26 @@
  */
 package org.mule.transport.email.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.tck.junit4.FunctionalTestCase;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public abstract class AbstractEmailNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
-    protected void testInboundEndpoint(String name, String protocolName) throws MuleException
+    protected void testInboundEndpoint(String endpointName, String protocolName) throws MuleException
     {
         ImmutableEndpoint endpoint =
-            muleContext.getEndpointFactory().getInboundEndpoint(name);
+            muleContext.getEndpointFactory().getInboundEndpoint(endpointName);
         testEndpoint(endpoint, protocolName);
     }
 
-    protected void testOutboundEndpoint(String name, String protocolName) throws MuleException
+    protected void testOutboundEndpoint(String endpointName, String protocolName) throws MuleException
     {
         ImmutableEndpoint endpoint =
-            muleContext.getEndpointFactory().getOutboundEndpoint(name);
+            muleContext.getEndpointFactory().getOutboundEndpoint(endpointName);
         testEndpoint(endpoint, protocolName);
     }
 

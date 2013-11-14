@@ -6,6 +6,10 @@
  */
 package org.mule.issues;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transformer.Transformer;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -16,15 +20,10 @@ import org.mule.transport.AbstractConnector;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 public class ServiceOverridesMule1770TestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "issues/service-overrides-mule-1770-test.xml";
     }

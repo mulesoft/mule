@@ -7,6 +7,7 @@
 package org.mule.transport.http.functional;
 
 import static org.junit.Assert.assertEquals;
+
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -23,7 +24,6 @@ import org.junit.Test;
  */
 public class HttpRootLevelRequestsTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort httpPort1 = new DynamicPort("port1");
 
@@ -41,7 +41,7 @@ public class HttpRootLevelRequestsTestCase extends FunctionalTestCase
 
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "http-root-level-requests.xml";
     }

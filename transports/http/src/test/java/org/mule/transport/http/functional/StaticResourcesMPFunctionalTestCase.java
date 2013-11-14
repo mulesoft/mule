@@ -7,6 +7,7 @@
 package org.mule.transport.http.functional;
 
 import static org.junit.Assert.assertEquals;
+
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
@@ -41,7 +42,7 @@ public class StaticResourcesMPFunctionalTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "http-static-resource-test.xml";
     }

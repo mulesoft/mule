@@ -47,7 +47,7 @@ public class VMAttachmentsTestCase extends AbstractServiceAndFlowTestCase
     {
         DefaultMuleMessage msg = new DefaultMuleMessage("Mmm... attachments!", muleContext);
         FileDataSource ds = new FileDataSource(new File("transports/vm/src/test/resources/"
-                                                        + getConfigResources()).getAbsoluteFile());
+                                                        + getConfigFile()).getAbsoluteFile());
         msg.addOutboundAttachment("test-attachment", new DataHandler(ds));
 
         MuleClient client = muleContext.getClient();

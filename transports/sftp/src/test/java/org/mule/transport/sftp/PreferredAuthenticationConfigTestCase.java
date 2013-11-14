@@ -7,15 +7,15 @@
 package org.mule.transport.sftp;
 
 import static org.junit.Assert.assertEquals;
+
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
 public class PreferredAuthenticationConfigTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "preferred-authentication-config.xml";
     }

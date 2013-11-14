@@ -8,9 +8,8 @@ package org.mule.transport.soap.axis.style;
 
 public class AxisMessageStyleServiceWithoutNamespaceTestCase extends AxisMessageStyleServiceTestCase
 {
-
     @Override
-    public String getConfigResources()
+    public String getConfigFile()
     {
         return "style/axis-mule-message-config-without-namespace.xml";
     }
@@ -20,5 +19,4 @@ public class AxisMessageStyleServiceWithoutNamespaceTestCase extends AxisMessage
     {
         return "http://localhost:" + dynamicPort.getNumber() + "/ServiceEntryPoint";
     }
-
 }

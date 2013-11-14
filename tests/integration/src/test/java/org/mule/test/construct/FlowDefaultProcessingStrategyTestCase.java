@@ -35,9 +35,8 @@ import org.junit.Test;
 
 public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/construct/flow-default-processing-strategy-config.xml";
     }
@@ -259,6 +258,7 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
             super(connector, flowConstruct, endpoint);
         }
 
+        @Override
         public MuleMessage onCall(MuleMessage message) throws MuleException
         {
             try

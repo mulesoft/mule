@@ -25,7 +25,7 @@ public class PropertiesWithAllTestCase extends FunctionalTestCase
     public DynamicPort port1 = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/issues/all-properties.xml";
     }

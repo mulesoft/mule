@@ -6,6 +6,10 @@
  */
 package org.mule.transport.tcp;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
+
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -14,13 +18,8 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotSame;
-
 public class TcpSocketKeyTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
@@ -28,7 +27,7 @@ public class TcpSocketKeyTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "tcp-socket-key-test.xml";
     }

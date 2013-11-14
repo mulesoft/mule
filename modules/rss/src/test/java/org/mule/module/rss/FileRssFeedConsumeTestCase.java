@@ -6,6 +6,8 @@
  */
 package org.mule.module.rss;
 
+import static org.mule.module.rss.SampleFeed.ENTRIES_IN_RSS_FEED;
+
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
@@ -17,13 +19,10 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import static org.mule.module.rss.SampleFeed.ENTRIES_IN_RSS_FEED;
-
 public class FileRssFeedConsumeTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "file-rss-consume.xml";
     }
@@ -37,11 +36,13 @@ public class FileRssFeedConsumeTestCase extends FunctionalTestCase
         Prober prober = new PollingProber(10000, 100);
         prober.check(new Probe()
         {
+            @Override
             public boolean isSatisfied()
             {
                 return component.getCount() == SampleFeed.ENTRIES_IN_RSS_FEED;
             }
 
+            @Override
             public String describeFailure()
             {
                 return String.format("Did not receive %d feed entries (only got %d)",
@@ -58,5 +59,4 @@ public class FileRssFeedConsumeTestCase extends FunctionalTestCase
         fos.write(feed.getBytes());
         fos.close();
     }
-
 }

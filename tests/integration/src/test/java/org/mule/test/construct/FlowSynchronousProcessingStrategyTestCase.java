@@ -6,16 +6,15 @@
  */
 package org.mule.test.construct;
 
+import static org.junit.Assert.assertNull;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 
-import static org.junit.Assert.assertNull;
-
 public class FlowSynchronousProcessingStrategyTestCase extends FlowDefaultProcessingStrategyTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/construct/flow-synchronous-processing-strategy-config.xml";
     }

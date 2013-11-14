@@ -23,7 +23,7 @@ import org.junit.Test;
 public class InboundTransformingCatchAllTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/usecases/routing/inbound-transforming-catchall-service.xml";
     }

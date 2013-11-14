@@ -28,7 +28,7 @@ public class SimpleXmlTransformerFunctionalTestCase extends FunctionalTestCase
 
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/module/xml/simple-xml-transformer-functional-test-flow.xml";
     }

@@ -115,7 +115,7 @@ public class SxcFilterTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "xpath-filter-conf.xml";
     }

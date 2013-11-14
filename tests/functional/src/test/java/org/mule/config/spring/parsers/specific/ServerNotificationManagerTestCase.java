@@ -31,9 +31,8 @@ import org.junit.Test;
 
 public class ServerNotificationManagerTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/config/spring/parsers/specific/server-notification-manager-test.xml";
     }

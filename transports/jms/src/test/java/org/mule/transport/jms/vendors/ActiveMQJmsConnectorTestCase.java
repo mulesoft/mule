@@ -6,6 +6,12 @@
  */
 package org.mule.transport.jms.vendors;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.jms.DefaultJmsTopicResolver;
 import org.mule.transport.jms.JmsConnector;
@@ -19,17 +25,10 @@ import javax.jms.Session;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/activemq-config.xml";
     }

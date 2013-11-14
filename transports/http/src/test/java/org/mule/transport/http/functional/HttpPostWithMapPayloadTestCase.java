@@ -7,6 +7,7 @@
 package org.mule.transport.http.functional;
 
 import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -20,12 +21,11 @@ import org.junit.Test;
 
 public class HttpPostWithMapPayloadTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "http-post-with-map-config.xml";
     }

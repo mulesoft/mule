@@ -20,9 +20,8 @@ import org.junit.Test;
 
 public class JmsReplyToPropertyTestCase extends AbstractJmsFunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/jms-replyto-property.xml";
     }

@@ -8,9 +8,8 @@ package org.mule.transport.soap.axis;
 
 public abstract class AbstractSoapResourceEndpointFunctionalTestCase extends AbstractSoapFunctionalTestCase
 {
-    
     @Override
-    public String getConfigResources()
+    public String getConfigFile()
     {
         return "axis-" + getTransportProtocol() + "-mule-config.xml";
     }

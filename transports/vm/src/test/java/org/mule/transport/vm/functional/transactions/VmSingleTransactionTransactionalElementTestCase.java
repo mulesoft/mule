@@ -11,10 +11,6 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import org.hamcrest.core.Is;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -23,10 +19,15 @@ import org.mule.api.transport.DispatchException;
 import org.mule.construct.Flow;
 import org.mule.tck.junit4.FunctionalTestCase;
 
+import org.hamcrest.core.Is;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+
 public class VmSingleTransactionTransactionalElementTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "vm/vm-single-tx-transactional.xml";
     }

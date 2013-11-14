@@ -6,6 +6,10 @@
  */
 package org.mule.test.integration.routing.outbound;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
@@ -23,10 +27,6 @@ import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class ChoiceRouterTestCase extends FunctionalTestCase
 {
     private static final String WITH_DEFAULT_ROUTE_CHANNEL = "vm://with-default-route.in";
@@ -38,7 +38,7 @@ public class ChoiceRouterTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/routing/outbound/choice-router-test.xml";
     }

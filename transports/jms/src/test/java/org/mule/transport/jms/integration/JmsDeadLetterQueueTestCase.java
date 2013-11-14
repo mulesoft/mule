@@ -6,6 +6,12 @@
  */
 package org.mule.transport.jms.integration;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.api.config.MuleProperties;
 import org.mule.message.ExceptionMessage;
 import org.mule.util.SerializationUtils;
@@ -20,12 +26,6 @@ import javax.jms.TextMessage;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 /**
  * Tests a transactional exception strategy.
  */
@@ -33,7 +33,8 @@ public class JmsDeadLetterQueueTestCase extends AbstractJmsFunctionalTestCase
 {
     public static final String DEADLETTER_QUEUE_NAME = "dlq";
 
-    protected String getConfigResources()
+    @Override
+    protected String getConfigFile()
     {
         return "integration/jms-dead-letter-queue.xml";
     }
@@ -65,12 +66,14 @@ public class JmsDeadLetterQueueTestCase extends AbstractJmsFunctionalTestCase
     class ScenarioDeadLetter extends ScenarioCommit
     {
         // @Override
+        @Override
         public String getOutputDestinationName()
         {
             return DEADLETTER_QUEUE_NAME;
         }
 
         // @Override
+        @Override
         public Message receive(Session session, MessageConsumer consumer) throws JMSException
         {
             // Verify message got sent to dead letter queue.
@@ -133,6 +136,7 @@ public class JmsDeadLetterQueueTestCase extends AbstractJmsFunctionalTestCase
     class ScenarioDeadLetterRollback extends ScenarioDeadLetter
     {
         // @Override
+        @Override
         protected void applyTransaction(Session session) throws JMSException
         {
             session.rollback();
@@ -144,6 +148,7 @@ public class JmsDeadLetterQueueTestCase extends AbstractJmsFunctionalTestCase
     class ScenarioDeadLetterNotReceive extends ScenarioDeadLetter
     {
         // @Override
+        @Override
         public Message receive(Session session, MessageConsumer consumer) throws JMSException
         {
             Message message = consumer.receive(getSmallTimeout());

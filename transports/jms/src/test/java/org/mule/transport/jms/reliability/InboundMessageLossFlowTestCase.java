@@ -6,9 +6,9 @@
  */
 package org.mule.transport.jms.reliability;
 
-import java.util.concurrent.TimeUnit;
-
 import static org.junit.Assert.assertFalse;
+
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -22,11 +22,15 @@ import static org.junit.Assert.assertFalse;
 public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String[] getConfigFiles()
     {
-        return "reliability/activemq-config.xml, reliability/inbound-message-loss-flow.xml";
+        return new String[] {
+            "reliability/activemq-config.xml",
+            "reliability/inbound-message-loss-flow.xml"
+        };
     }
 
+    @Override
     public void testTransformerException() throws Exception
     {
         putMessageOnQueue("transformerException");
@@ -39,6 +43,7 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
             messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
     }
 
+    @Override
     public void testRouterException() throws Exception
     {
         putMessageOnQueue("routerException");

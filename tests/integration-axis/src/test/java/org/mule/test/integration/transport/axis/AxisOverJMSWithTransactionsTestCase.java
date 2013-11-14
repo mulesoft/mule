@@ -12,7 +12,7 @@ package org.mule.test.integration.transport.axis;
 public class AxisOverJMSWithTransactionsTestCase extends AbstractAxisOverJMSWithTransactionsTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/providers/axis/axis-over-jms-config.xml";
     }

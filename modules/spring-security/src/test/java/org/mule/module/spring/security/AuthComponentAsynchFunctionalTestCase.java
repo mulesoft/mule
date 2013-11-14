@@ -28,7 +28,7 @@ import org.springframework.security.core.context.SecurityContextImpl;
 public class AuthComponentAsynchFunctionalTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "auth-component-asynch-test.xml";
     }

@@ -20,7 +20,7 @@ import org.junit.Test;
 public class AsyncReplyNoTimeoutTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/routing/multi-async-repy-no-timeout.xml";
     }

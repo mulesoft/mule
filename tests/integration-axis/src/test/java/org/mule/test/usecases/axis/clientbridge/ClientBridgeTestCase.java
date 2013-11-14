@@ -24,7 +24,7 @@ public class ClientBridgeTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/usecases/axis/clientbridge/client-mule-config.xml";
     }

@@ -13,14 +13,13 @@ import org.springframework.beans.factory.BeanCreationException;
 
 public class BadTransformationContentTypeTestCase extends FunctionalTestCase
 {
-
     public BadTransformationContentTypeTestCase()
     {
         setStartContext(false);
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "bad-content-type-setting-transformer-configs.xml";
     }

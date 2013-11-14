@@ -22,7 +22,7 @@ public class JettyAddressLegacyBindingTestCase extends TcpSocketToAddressLegacyB
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "jetty-address-binding-test.xml";
     }

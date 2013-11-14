@@ -67,9 +67,8 @@ public class GroovyScriptFlowFunctionalTestCase extends GroovyScriptServiceFunct
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "groovy-component-config-flow.xml";
     }
-
 }

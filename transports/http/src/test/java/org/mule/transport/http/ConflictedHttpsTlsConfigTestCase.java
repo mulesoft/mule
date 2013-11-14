@@ -28,7 +28,7 @@ public class ConflictedHttpsTlsConfigTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "conflicted-https-config-" + configNumber +".xml";
     }

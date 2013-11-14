@@ -32,7 +32,7 @@ public class ReplyToTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/usecases/replyto.xml";
     }

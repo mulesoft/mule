@@ -15,7 +15,6 @@ import org.junit.Test;
 
 public class TransformerWeightingFunctionalTestCase extends FunctionalTestCase
 {
-
     private static final String XML_REQUEST = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                                               "<catalog>\n" +
                                               "    <cd>\n" +
@@ -29,7 +28,7 @@ public class TransformerWeightingFunctionalTestCase extends FunctionalTestCase
                                               "</catalog>";
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/transformers/transformer-weighting-functional-config.xml";
     }
@@ -40,7 +39,6 @@ public class TransformerWeightingFunctionalTestCase extends FunctionalTestCase
         LocalMuleClient client = muleContext.getClient();
 
         MuleMessage response = client.send("vm://testInput", XML_REQUEST, null);
-
         XMLAssert.assertXMLEqual(XML_REQUEST, response.getPayloadAsString());
     }
 }

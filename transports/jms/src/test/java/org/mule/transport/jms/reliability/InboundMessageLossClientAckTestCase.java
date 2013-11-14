@@ -8,19 +8,22 @@ package org.mule.transport.jms.reliability;
 
 
 /**
- * Verify that no inbound messages are lost when exceptions occur.  
- * The message must either make it all the way to the SEDA queue (in the case of 
+ * Verify that no inbound messages are lost when exceptions occur.
+ * The message must either make it all the way to the SEDA queue (in the case of
  * an asynchronous inbound endpoint), or be restored/rolled back at the source.
  * 
- * In the case of JMS, this will cause the failed message to be redelivered if 
+ * In the case of JMS, this will cause the failed message to be redelivered if
  * JMSRedelivery is configured.
  */
 public class InboundMessageLossClientAckTestCase extends InboundMessageLossTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String[] getConfigFiles()
     {
-        return "reliability/activemq-clientack-config.xml, reliability/inbound-message-loss.xml";
+        return new String[] {
+            "reliability/activemq-clientack-config.xml",
+            "reliability/inbound-message-loss.xml"
+        };
     }
 }
 

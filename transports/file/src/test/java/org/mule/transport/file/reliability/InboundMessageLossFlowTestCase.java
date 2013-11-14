@@ -8,18 +8,17 @@ package org.mule.transport.file.reliability;
 
 import static org.mule.transport.file.FileTestUtils.createDataFile;
 import static org.mule.transport.file.FileTestUtils.createFolder;
+
 import org.mule.api.MuleEventContext;
 import org.mule.construct.Flow;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.probe.Probe;
+import org.mule.util.concurrent.Latch;
 
 import java.io.File;
 
 import org.junit.Test;
-
-import org.mule.transport.file.FileTestUtils;
-import org.mule.util.concurrent.Latch;
 
 
 public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
@@ -30,11 +29,12 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "reliability/inbound-message-loss-flow.xml";
     }
 
+    @Override
     @Test
     public void testTransformerException() throws Exception
     {
@@ -60,6 +60,7 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
         });
     }
 
+    @Override
     @Test
     public void testRouterException() throws Exception
     {

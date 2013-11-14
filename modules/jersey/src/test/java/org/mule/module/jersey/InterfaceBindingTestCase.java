@@ -8,6 +8,7 @@ package org.mule.module.jersey;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -21,12 +22,11 @@ import org.junit.Test;
 
 public class InterfaceBindingTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort port = new DynamicPort("port");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "interface-binding-config.xml";
     }
@@ -35,7 +35,7 @@ public class InterfaceBindingTestCase extends FunctionalTestCase
     public void bindsComponentInterface() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        Map headers = new HashMap();
+        Map<String, Object> headers = new HashMap<String, Object>();
         headers.put("http.method", "GET");
         MuleMessage result = client.send("http://localhost:" + port.getNumber() + "/sayHello", "", headers);
 

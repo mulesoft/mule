@@ -8,10 +8,10 @@ package org.mule.test.integration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.schedule.Schedulers;
 import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.transport.polling.MessageProcessorPollingMessageReceiver;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,12 +21,11 @@ import org.junit.Test;
 
 public class PollingTestCase extends FunctionalTestCase
 {
-
     private static List<String> foo = new ArrayList<String>();
     private static List<String> bar = new ArrayList<String>();
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/polling-config.xml";
     }

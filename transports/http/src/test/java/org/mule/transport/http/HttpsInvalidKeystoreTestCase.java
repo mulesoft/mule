@@ -6,6 +6,9 @@
  */
 package org.mule.transport.http;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
@@ -14,9 +17,6 @@ import org.mule.transport.ConnectException;
 
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class HttpsInvalidKeystoreTestCase extends FunctionalTestCase implements ExceptionCallback
 {
@@ -32,7 +32,7 @@ public class HttpsInvalidKeystoreTestCase extends FunctionalTestCase implements 
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "https-invalid-keystore-config.xml";
     }

@@ -25,9 +25,12 @@ import org.junit.Test;
 public class InboundMessageLossTransactionsTestCase extends InboundMessageLossTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String[] getConfigFiles()
     {
-        return "reliability/activemq-config.xml, reliability/inbound-message-loss-transactions.xml";
+        return new String[] {
+            "reliability/activemq-config.xml",
+            "reliability/inbound-message-loss-transactions.xml"
+        };
     }
 
 

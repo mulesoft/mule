@@ -27,7 +27,7 @@ public class FilterOnGlobalFileEndpointTestCase extends FunctionalTestCase
     private File pollDirectory;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "global-file-ep-with-filter.xml";
     }

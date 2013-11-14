@@ -6,6 +6,9 @@
  */
 package org.mule.module.spring.security;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.security.SecurityManager;
 import org.mule.api.security.SecurityProvider;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -14,14 +17,10 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class SpringSecurityNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "spring-security-namespace-config.xml";
     }

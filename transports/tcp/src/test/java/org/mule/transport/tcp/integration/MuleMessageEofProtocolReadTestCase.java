@@ -11,9 +11,8 @@ import org.mule.transport.tcp.protocols.EOFProtocol;
 
 public class MuleMessageEofProtocolReadTestCase extends AbstractMuleMessageProtocolReadTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "mule-message-eof-protocol-read-config.xml";
     }

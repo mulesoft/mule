@@ -6,24 +6,19 @@
  */
 package org.mule.transport.http;
 
-import org.junit.Test;
-import org.mule.api.MuleContext;
-import org.mule.api.transport.Connector;
-import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import java.util.HashSet;
-import java.util.Set;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+
+import org.mule.api.transport.Connector;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
 
 public class HttpsTlsTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "https-tls-config.xml";
     }

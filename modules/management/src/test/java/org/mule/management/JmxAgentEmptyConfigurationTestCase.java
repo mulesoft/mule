@@ -16,9 +16,8 @@ import org.junit.Test;
 
 public class JmxAgentEmptyConfigurationTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "empty-management-config.xml";
     }

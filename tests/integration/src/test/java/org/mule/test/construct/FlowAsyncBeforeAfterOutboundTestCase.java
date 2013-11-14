@@ -22,7 +22,7 @@ import org.junit.Test;
 public class FlowAsyncBeforeAfterOutboundTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/construct/flow-async-before-after-outbound.xml";
     }

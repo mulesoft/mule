@@ -60,7 +60,7 @@ public class ServiceUsingAxisEndpointTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "using-axis-conf.xml";
     }

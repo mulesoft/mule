@@ -6,6 +6,11 @@
  */
 package org.mule.module.xml.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.routing.filter.Filter;
@@ -27,21 +32,15 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class XmlNamespaceTestCase extends FunctionalTestCase
 {
-
     public XmlNamespaceTestCase()
     {
         setDisposeContextPerClass(true);
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "xml-namespace-config.xml";
     }
@@ -131,7 +130,7 @@ public class XmlNamespaceTestCase extends FunctionalTestCase
     
     private static class MockResourceResolver implements LSResourceResolver
     {
-        public LSInput resolveResource(String type, String namespaceURI, String publicId, 
+        public LSInput resolveResource(String type, String namespaceURI, String publicId,
             String systemId, String baseURI)
         {
             return null;

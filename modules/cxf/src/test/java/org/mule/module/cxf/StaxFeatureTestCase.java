@@ -6,6 +6,8 @@
  */
 package org.mule.module.cxf;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -13,16 +15,13 @@ import org.apache.cxf.Bus;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-
 public class StaxFeatureTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "stax-feature-conf.xml";
     }
@@ -42,6 +41,5 @@ public class StaxFeatureTestCase extends FunctionalTestCase
 //        MuleMessage result = client.send("cxf:http://localhost:63081/services/Echo?method=echo", "Hello!", null);
 //        assertEquals("Hello!", result.getPayload());
     }
-
 }
 

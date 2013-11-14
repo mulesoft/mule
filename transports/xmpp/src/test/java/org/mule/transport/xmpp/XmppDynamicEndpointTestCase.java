@@ -34,9 +34,12 @@ public class XmppDynamicEndpointTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String[] getConfigFiles()
     {
-        return AbstractXmppTestCase.COMMON_CONFIG + ", xmpp-dynamic-endpoint-config.xml";
+        return new String[] {
+            AbstractXmppTestCase.COMMON_CONFIG,
+            "xmpp-dynamic-endpoint-config.xml"
+        };
     }
 
     @Test

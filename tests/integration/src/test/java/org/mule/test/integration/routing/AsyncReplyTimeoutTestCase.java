@@ -27,7 +27,7 @@ public class AsyncReplyTimeoutTestCase extends FunctionalTestCase
     private CountDownLatch latch;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/routing/multi-async-repy-timeout.xml";
     }

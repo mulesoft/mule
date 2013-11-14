@@ -6,22 +6,21 @@
  */
 package org.mule.module.atom;
 
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.functional.CounterCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.tck.functional.CounterCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
 public class FeedConsumeAndSplitExplicitTestCase extends FunctionalTestCase
 {
-
     private final CounterCallback counter = new CounterCallback();
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "atom-consume-and-explicit-split.xml";
     }
@@ -34,7 +33,8 @@ public class FeedConsumeAndSplitExplicitTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testConsume() throws Exception {
+    public void testConsume() throws Exception
+    {
         // add more time for build server
         Thread.sleep(5000);
         int count = counter.getCallbackCount();
@@ -42,6 +42,5 @@ public class FeedConsumeAndSplitExplicitTestCase extends FunctionalTestCase
         Thread.sleep(5000);
         //We should only receive entries once
         assertEquals(count, counter.getCallbackCount());
-
     }
 }

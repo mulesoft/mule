@@ -24,9 +24,8 @@ import org.junit.Test;
 public class XQueryFunctionalTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
-        //Our Mule configuration file
         return "org/mule/test/integration/xml/xquery-functional-test.xml";
     }
 

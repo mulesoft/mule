@@ -30,7 +30,7 @@ public class WsSecurityConfigMelExpressionTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/module/cxf/wssec/ws-security-config-mel-expression-config.xml";
     }
@@ -45,7 +45,6 @@ public class WsSecurityConfigMelExpressionTestCase extends FunctionalTestCase
 
         assertNotNull(received);
         assertEquals("Hello PasswordText", received.getPayloadAsString());
-
     }
 
     @Test

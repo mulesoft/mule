@@ -26,9 +26,8 @@ import org.junit.Test;
  */
 public class ExceptionPropagationMule5737TestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/exceptions/exception-propagation-mule-5737-config.xml";
     }

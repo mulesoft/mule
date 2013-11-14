@@ -8,6 +8,7 @@ package org.mule.test.transformers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.transformer.DiscoverableTransformer;
@@ -44,7 +45,6 @@ public class GraphTransformerResolutionTestCase extends FunctionalTestCase
 
     public static class C
     {
-
         private final String value;
 
         public C(String value)
@@ -54,7 +54,7 @@ public class GraphTransformerResolutionTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/transformers/graph-transformer-resolution-config.xml";
     }
@@ -70,7 +70,6 @@ public class GraphTransformerResolutionTestCase extends FunctionalTestCase
 
     public static class AtoBConverter extends AbstractTransformer implements DiscoverableTransformer
     {
-
         public AtoBConverter()
         {
             registerSourceType(new SimpleDataType<Object>(A.class));

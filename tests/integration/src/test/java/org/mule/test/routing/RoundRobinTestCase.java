@@ -27,7 +27,7 @@ public class RoundRobinTestCase extends FunctionalTestCase
     private MuleClient client;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "round-robin-test.xml";
     }

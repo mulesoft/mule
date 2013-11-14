@@ -20,7 +20,7 @@ import org.junit.Test;
 public class ExceptionStrategyReturnMessageTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/exceptions/exception-strategy-return-message.xml";
     }

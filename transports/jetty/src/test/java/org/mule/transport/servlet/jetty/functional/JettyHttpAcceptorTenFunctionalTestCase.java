@@ -14,9 +14,8 @@ import org.junit.Test;
  */
 public class JettyHttpAcceptorTenFunctionalTestCase extends AbstractJettyAcceptorFunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "jetty-http-acceptors-ten-functional-test.xml";
     }

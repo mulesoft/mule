@@ -37,7 +37,7 @@ public class ExpressionSplitterXPathWithFiltersTestCase extends FunctionalTestCa
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/routing/outbound/expression-splitter-xpath-with-filters-test.xml";
     }

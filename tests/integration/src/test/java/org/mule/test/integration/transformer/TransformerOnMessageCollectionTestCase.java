@@ -8,6 +8,7 @@ package org.mule.test.integration.transformer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.client.LocalMuleClient;
@@ -20,9 +21,8 @@ import org.junit.Test;
 
 public class TransformerOnMessageCollectionTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/transformers/transformer-on-message-collection-config.xml";
     }

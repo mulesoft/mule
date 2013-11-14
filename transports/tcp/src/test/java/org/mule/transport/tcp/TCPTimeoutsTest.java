@@ -7,6 +7,7 @@
 package org.mule.transport.tcp;
 
 import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.client.DefaultLocalMuleClient;
@@ -19,12 +20,11 @@ import org.junit.Test;
 
 public class TCPTimeoutsTest extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort tcpPort = new DynamicPort("tcpPort");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "tcp-response-timeout-config.xml";
     }

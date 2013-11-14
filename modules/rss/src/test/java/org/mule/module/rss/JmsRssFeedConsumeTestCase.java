@@ -6,18 +6,17 @@
  */
 package org.mule.module.rss;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class JmsRssFeedConsumeTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "jms-rss-consume.xml";
     }

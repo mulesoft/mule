@@ -18,7 +18,8 @@ import org.junit.Test;
  */
 public class JmsQueueMessageTypesTestCase extends AbstractJmsFunctionalTestCase
 {
-    protected String getConfigResources()
+    @Override
+    protected String getConfigFile()
     {
         return "integration/jms-queue-message-types.xml";
     }

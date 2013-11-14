@@ -14,7 +14,7 @@ public class JettyContinuationsTwoEndpointsSinglePortTestCase extends JettyTwoEn
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "jetty-continuations-two-endpoints-single-port.xml";
     }

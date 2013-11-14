@@ -6,6 +6,11 @@
  */
 package org.mule.transport.tcp;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.ResponseOutputStream;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.tcp.protocols.AbstractByteProtocol;
@@ -18,16 +23,10 @@ import java.net.Socket;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "tcp-namespace-config.xml";
     }

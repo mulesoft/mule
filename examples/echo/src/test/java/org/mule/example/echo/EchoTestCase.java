@@ -25,7 +25,7 @@ public class EchoTestCase extends FunctionalTestCase
     private static String MESSAGE = "message";
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "adding-logging-to-a-flow.xml";
     }

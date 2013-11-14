@@ -7,6 +7,7 @@
 package org.mule.module.cxf;
 
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -16,18 +17,18 @@ import org.junit.Test;
 
 public class CxfConfigurationWsdlTestCase extends org.mule.tck.junit4.FunctionalTestCase
 {
-
     @Rule
     public DynamicPort httpPort = new DynamicPort("httpPort");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "cxf-configuration-wsdl-config.xml";
     }
 
     @Test
-    public void test() throws Exception {
+    public void test() throws Exception
+    {
         MuleClient client = muleContext.getClient();
 
         MuleMessage result = client.request(String.format("http://localhost:%s?wsdl", httpPort.getNumber()), RECEIVE_TIMEOUT);

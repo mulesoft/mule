@@ -6,20 +6,19 @@
  */
 package org.mule.test.spring;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class MuleRootTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/spring/mule-root-test.xml";
     }
@@ -34,5 +33,4 @@ public class MuleRootTestCase extends FunctionalTestCase
         assertNotNull("No address", address);
         assertEquals("value", address);
     }
-
 }

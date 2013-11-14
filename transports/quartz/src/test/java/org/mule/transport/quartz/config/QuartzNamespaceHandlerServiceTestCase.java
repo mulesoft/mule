@@ -37,9 +37,8 @@ import org.quartz.impl.StdScheduler;
  */
 public class QuartzNamespaceHandlerServiceTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "quartz-namespace-config-service.xml";
     }

@@ -7,6 +7,7 @@
 package org.mule.modules.schedulers.cron;
 
 import static junit.framework.Assert.assertEquals;
+
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.schedule.Schedulers;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -23,7 +24,7 @@ public class StoppedCronSchedulerTestCase  extends FunctionalTestCase
     private static List<String> foo = new ArrayList<String>();
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "cron-scheduler-stopped-config.xml";
     }

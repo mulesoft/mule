@@ -31,7 +31,7 @@ public class ValidShutdownTimeoutRequestResponseTestCase extends AbstractShutdow
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "shutdown-timeout-request-response-config.xml";
     }

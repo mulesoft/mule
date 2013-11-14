@@ -39,7 +39,7 @@ public class SpringEventsJmsAsyncExampleTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/spring/events/async/mule-events-example-async-app-context.xml";
     }

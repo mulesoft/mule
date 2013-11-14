@@ -20,7 +20,7 @@ public class JmsXATransactionComponentTestCase extends AbstractJmsFunctionalTest
     public static final String CONNECTOR1_NAME = "jmsConnector";
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/jms-xa-tx-component.xml";
     }

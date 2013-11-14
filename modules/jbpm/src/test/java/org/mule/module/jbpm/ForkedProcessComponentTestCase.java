@@ -6,6 +6,10 @@
  */
 package org.mule.module.jbpm;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.bpm.BPMS;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -13,27 +17,22 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.jbpm.api.ProcessInstance;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class ForkedProcessComponentTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "jbpm-component-functional-test-service.xml";
     }
 
     @Test
-    public void testForkedProcess() throws Exception 
+    public void testForkedProcess() throws Exception
     {
         BPMS bpms = muleContext.getRegistry().lookupObject(BPMS.class);
         assertNotNull(bpms);
 
         // Create a new process.
-        MuleMessage response = muleContext.getClient().send("vm://fork", "data", null);                      
+        MuleMessage response = muleContext.getClient().send("vm://fork", "data", null);
         ProcessInstance process = (ProcessInstance) response.getPayload();
         
         // The process should be waiting for asynchronous responses from both services
@@ -53,7 +52,7 @@ public class ForkedProcessComponentTestCase extends FunctionalTestCase
                     
         // The process should have ended.
         process = (ProcessInstance) bpms.lookupProcess(process.getId());
-        assertTrue("Process should have ended, but is in state " + bpms.getState(process), 
+        assertTrue("Process should have ended, but is in state " + bpms.getState(process),
                 bpms.hasEnded(process));
     }
 

@@ -41,11 +41,10 @@ import org.junit.Test;
 
 public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
 {
-
     private Session session = null;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/jms-transformers.xml";
     }

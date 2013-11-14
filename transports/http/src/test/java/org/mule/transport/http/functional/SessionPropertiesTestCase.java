@@ -41,7 +41,7 @@ public class SessionPropertiesTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort6 = new DynamicPort("port6");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "session-properties.xml";
     }

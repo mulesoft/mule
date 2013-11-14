@@ -6,6 +6,8 @@
  */
 package org.mule.test.issues;
 
+import static org.junit.Assert.assertNotSame;
+
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.transformer.Transformer;
@@ -15,12 +17,10 @@ import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotSame;
-
 public class Mule5038TestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/issues/mule-5038-config.xml";
     }

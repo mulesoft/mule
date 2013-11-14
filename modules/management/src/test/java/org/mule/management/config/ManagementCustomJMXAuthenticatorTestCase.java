@@ -6,6 +6,9 @@
  */
 package org.mule.management.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.agent.Agent;
 import org.mule.module.management.agent.ConfigurableJMXAuthenticator;
 import org.mule.module.management.agent.JmxAgent;
@@ -17,14 +20,10 @@ import javax.security.auth.Subject;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class ManagementCustomJMXAuthenticatorTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "management-custom-jmx-authenticator-config.xml";
     }
@@ -41,15 +40,15 @@ public class ManagementCustomJMXAuthenticatorTestCase extends FunctionalTestCase
 
     public static class CustomJMXAuthenticator implements ConfigurableJMXAuthenticator
     {
-
+        @Override
         public void configure(Map credentials)
         {
         }
 
+        @Override
         public Subject authenticate(Object credentials)
         {
             return null;
         }
     }
-
 }

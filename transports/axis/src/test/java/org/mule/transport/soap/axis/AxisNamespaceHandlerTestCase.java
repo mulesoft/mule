@@ -6,6 +6,11 @@
  */
 package org.mule.transport.soap.axis;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.module.cxf.SoapConstants;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -19,16 +24,10 @@ import org.apache.axis.constants.Style;
 import org.apache.axis.constants.Use;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "axis-namespace-config.xml";
     }

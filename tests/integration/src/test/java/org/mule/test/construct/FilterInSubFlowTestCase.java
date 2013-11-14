@@ -17,9 +17,8 @@ import org.junit.Test;
 
 public class FilterInSubFlowTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/construct/sub-flow-with-filter-config.xml";
     }

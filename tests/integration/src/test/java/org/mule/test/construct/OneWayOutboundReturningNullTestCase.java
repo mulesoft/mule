@@ -12,11 +12,13 @@ import org.mule.api.MuleMessage;
 
 public class OneWayOutboundReturningNullTestCase extends OneWayOutboundTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String[] getConfigFiles()
     {
-        return "org/mule/test/construct/activate-flow-ending-with-one-way-endpoint-returns-null-flag-config.xml,org/mule/test/construct/one-way-outbound-config.xml";
+        return new String[] {
+            "org/mule/test/construct/activate-flow-ending-with-one-way-endpoint-returns-null-flag-config.xml",
+            "org/mule/test/construct/one-way-outbound-config.xml"
+        };
     }
 
     @Override

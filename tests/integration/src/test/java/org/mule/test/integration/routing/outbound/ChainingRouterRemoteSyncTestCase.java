@@ -22,7 +22,7 @@ import org.junit.Test;
 public class ChainingRouterRemoteSyncTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/routing/outbound/chaining-router-remote-sync.xml";
     }

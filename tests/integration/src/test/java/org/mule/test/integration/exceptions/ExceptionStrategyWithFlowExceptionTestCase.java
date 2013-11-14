@@ -23,7 +23,7 @@ import org.junit.Test;
 public class ExceptionStrategyWithFlowExceptionTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/exceptions/exception-strategy-with-flow-exception.xml";
     }
@@ -41,6 +41,7 @@ public class ExceptionStrategyWithFlowExceptionTestCase extends FunctionalTestCa
 
     public static class ExceptionThrower implements MessageProcessor
     {
+        @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             throw new MessagingException(event,null);

@@ -6,6 +6,9 @@
  */
 package org.mule.module.cxf;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.module.cxf.builder.WebServiceMessageProcessorBuilder;
@@ -18,14 +21,10 @@ import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.LoggingFeature;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class FeaturesTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "features-test.xml";
     }
@@ -45,7 +44,7 @@ public class FeaturesTestCase extends FunctionalTestCase
         List<AbstractFeature> features = builder.getFeatures();
         assertNotNull(features);
         boolean found = false;
-        for (AbstractFeature f : features) 
+        for (AbstractFeature f : features)
         {
             if (f instanceof LoggingFeature)
             {

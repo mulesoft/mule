@@ -19,11 +19,10 @@ import org.junit.Test;
 
 public class TransformersInvokedFromResponseTestCase extends FunctionalTestCase
 {
-
     private static int counter1 = 0;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "transformers-invoked-from-response-config.xml";
     }
@@ -45,7 +44,6 @@ public class TransformersInvokedFromResponseTestCase extends FunctionalTestCase
 
     public static class InvocationCounterTransformer1 extends AbstractTransformer
     {
-
         @Override
         protected Object doTransform(Object src, String enc) throws TransformerException
         {

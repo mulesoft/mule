@@ -6,19 +6,18 @@
  */
 package org.mule.config.spring.parsers.endpoint;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class ComplexEndpointTestCase extends AbstractEndpointTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/config/spring/parsers/endpoint/complex-endpoint-test.xml";
     }
@@ -32,5 +31,4 @@ public class ComplexEndpointTestCase extends AbstractEndpointTestCase
         assertNotNull(endpoint.getProperty("string"));
         assertEquals(endpoint.getProperty("string"), "hello world");
     }
-
 }

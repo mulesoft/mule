@@ -6,23 +6,23 @@
  */
 package org.mule.test.integration.exceptions;
 
-import org.hamcrest.core.Is;
-import org.hamcrest.core.IsNull;
-import org.junit.Test;
+import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
-import static org.junit.Assert.assertThat;
+import org.hamcrest.core.Is;
+import org.hamcrest.core.IsNull;
+import org.junit.Test;
 
 public class ExceptionStrategyFlowRefTestCase extends FunctionalTestCase
 {
-
     public static final String MESSAGE = "some message";
     public static final int TIMEOUT = 5000;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/exceptions/exception-strategy-flow-ref.xml";
     }

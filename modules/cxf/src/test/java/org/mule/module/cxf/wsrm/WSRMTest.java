@@ -6,6 +6,8 @@
  */
 package org.mule.module.cxf.wsrm;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -16,11 +18,8 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class WSRMTest extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
@@ -28,7 +27,7 @@ public class WSRMTest extends FunctionalTestCase
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/module/cxf/wsrm/wsrm-conf.xml";
     }

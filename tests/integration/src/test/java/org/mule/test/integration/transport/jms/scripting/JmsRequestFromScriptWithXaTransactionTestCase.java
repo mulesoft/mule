@@ -12,9 +12,8 @@ package org.mule.test.integration.transport.jms.scripting;
  */
 public class JmsRequestFromScriptWithXaTransactionTestCase extends AbstractJmsRequestFromScriptTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/transport/jms/scripting/jms-request-from-script-with-xa-transaction-config.xml";
     }

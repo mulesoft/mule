@@ -6,6 +6,8 @@
  */
 package org.mule.test.integration.construct;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
@@ -15,8 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class SimpleServiceTestCase extends FunctionalTestCase
 {
@@ -28,7 +28,7 @@ public class SimpleServiceTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/construct/simple-service-config.xml";
     }

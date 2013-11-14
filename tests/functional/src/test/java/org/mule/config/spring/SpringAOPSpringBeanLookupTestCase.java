@@ -20,9 +20,8 @@ import org.junit.Test;
  */
 public class SpringAOPSpringBeanLookupTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/config/spring/spring-aop-springbeanlookup-config.xml";
     }

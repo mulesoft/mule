@@ -24,7 +24,7 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
     protected TestJMSMessageListener listener;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/service/service-inflight-messages-jms.xml";
     }
@@ -36,6 +36,7 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
         listener = createTestJMSConsumer();
     }
 
+    @Override
     protected void stopService(Service service) throws Exception
     {
         service.stop();
@@ -43,6 +44,7 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
         Thread.sleep(WAIT_TIME_MILLIS);
     }
 
+    @Override
     protected void startService(Service service) throws Exception
     {
         service.start();
@@ -66,11 +68,13 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
         return consumer;
     }
 
+    @Override
     protected int getOutSize() throws Exception
     {
         return (int) (500 - listener.countdownLatch.getCount());
     }
 
+    @Override
     protected void recreateAndStartMuleContext() throws Exception, MuleException
     {
         muleContext = createMuleContext();

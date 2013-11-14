@@ -43,7 +43,7 @@ public abstract class AbstractTcpSocketToAddressBindingTestCase extends Function
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "tcp-socket-to-address-binding-test.xml";
     }

@@ -25,7 +25,7 @@ import org.junit.Test;
 public class ChainingRouterPropertyPropagationTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/routing/outbound/chaining-router-properties-propagation-config.xml";
     }

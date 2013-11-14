@@ -6,21 +6,20 @@
  */
 package org.mule.config.spring;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleRuntimeException;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 import org.springframework.beans.FatalBeanException;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 public class BeanCreationExceptionPropagationTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/config/spring/bean-creation-exception-propagation-config.xml";
     }

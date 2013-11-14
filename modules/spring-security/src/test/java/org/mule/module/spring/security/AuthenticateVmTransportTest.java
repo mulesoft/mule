@@ -22,7 +22,7 @@ import org.junit.Test;
 public class AuthenticateVmTransportTest extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "auth-vm-transport-config.xml";
     }

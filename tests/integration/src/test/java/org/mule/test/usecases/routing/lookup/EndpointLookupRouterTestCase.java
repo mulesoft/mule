@@ -24,9 +24,12 @@ import org.junit.Test;
 public class EndpointLookupRouterTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String[] getConfigFiles()
     {
-        return "org/mule/test/usecases/routing/lookup/router-config.xml, org/mule/test/usecases/routing/lookup/services.xml";
+        return new String[] {
+            "org/mule/test/usecases/routing/lookup/router-config.xml",
+            "org/mule/test/usecases/routing/lookup/services.xml"
+        };
     }
 
     @Test

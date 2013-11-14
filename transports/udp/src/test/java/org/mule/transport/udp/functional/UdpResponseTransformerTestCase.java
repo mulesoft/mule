@@ -6,6 +6,8 @@
  */
 package org.mule.transport.udp.functional;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.udp.util.UdpClient;
@@ -13,16 +15,13 @@ import org.mule.transport.udp.util.UdpClient;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class UdpResponseTransformerTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "udp-response-transformer-config.xml";
     }

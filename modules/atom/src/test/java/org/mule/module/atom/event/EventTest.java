@@ -6,6 +6,9 @@
  */
 package org.mule.module.atom.event;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -23,9 +26,6 @@ import org.apache.abdera.protocol.client.ClientResponse;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class EventTest extends FunctionalTestCase
 {
     private Repository repository;
@@ -34,7 +34,7 @@ public class EventTest extends FunctionalTestCase
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "eventqueue-conf.xml";
     }

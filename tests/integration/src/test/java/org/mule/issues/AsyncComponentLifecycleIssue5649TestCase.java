@@ -18,6 +18,7 @@ import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.Test;
 
 public class AsyncComponentLifecycleIssue5649TestCase extends FunctionalTestCase implements FunctionalTestComponent.LifecycleCallback
@@ -39,7 +40,7 @@ public class AsyncComponentLifecycleIssue5649TestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/issues/async-component-lifecycle-5649.xml";
     }

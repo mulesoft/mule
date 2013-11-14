@@ -17,7 +17,7 @@ import org.junit.Test;
 public class JmsRemoteSyncMule2868TestCase extends AbstractJmsFunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/jms-remote-sync-mule2868.xml";
     }

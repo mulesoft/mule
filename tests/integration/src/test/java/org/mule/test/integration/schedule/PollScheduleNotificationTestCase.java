@@ -24,12 +24,11 @@ import org.junit.Test;
 
 public class PollScheduleNotificationTestCase extends FunctionalTestCase
 {
-
     public static final QName NAME = new QName("http://www.mulesoft.org/schema/mule/documentation", "name");
     Prober prober = new PollingProber(5000, 100l);
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/schedule/poll-notifications-config.xml";
     }

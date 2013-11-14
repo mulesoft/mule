@@ -9,6 +9,7 @@ package org.mule.test.integration.routing.replyto;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
@@ -23,7 +24,6 @@ import org.junit.Test;
 
 public class ReplyToWithSubflowTestCase extends FunctionalTestCase
 {
-
     private static final String FLOW_PAYLOAD = "FLOW_PAYLOAD";
     private static final String SUB_FLOW_PAYLOAD = "SUB_FLOW_PAYLOAD";
 
@@ -32,7 +32,7 @@ public class ReplyToWithSubflowTestCase extends FunctionalTestCase
     private static final int DUPLICATE_RESPONSE_TIMEOUT = 500;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/routing/replyto/replyto-with-subflow-test.xml";
     }

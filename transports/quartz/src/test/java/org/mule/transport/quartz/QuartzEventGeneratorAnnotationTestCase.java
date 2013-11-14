@@ -20,7 +20,7 @@ import org.junit.Test;
 public class QuartzEventGeneratorAnnotationTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "quartz-event-generator-with-annotation.xml";
     }

@@ -13,9 +13,8 @@ import org.junit.Test;
  */
 public class JmsDurableTopicSingleTxTestCase extends JmsDurableTopicTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/jms-durable-topic-single-tx.xml";
     }

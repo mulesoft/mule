@@ -18,9 +18,8 @@ import org.junit.Test;
 
 public class FileAtomFeedConsumeTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "file-atom-consume.xml";
     }
@@ -51,5 +50,4 @@ public class FileAtomFeedConsumeTestCase extends FunctionalTestCase
             }
         });
     }
-
 }

@@ -9,7 +9,7 @@ package org.mule.module.jersey;
 public class DynamicInterfaceBindingTestCase extends InterfaceBindingTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "dynamic-interface-binding-config.xml";
     }

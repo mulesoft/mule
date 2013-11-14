@@ -26,7 +26,7 @@ public class ExpiredShutdownTimeoutRequestResponseTestCase extends AbstractShutd
     public SystemProperty contextShutdownTimeout = new SystemProperty("contextShutdownTimeout", "100");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "shutdown-timeout-request-response-config.xml";
     }

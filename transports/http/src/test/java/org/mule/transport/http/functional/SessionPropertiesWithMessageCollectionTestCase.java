@@ -6,6 +6,9 @@
  */
 package org.mule.transport.http.functional;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -15,8 +18,6 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.ArrayList;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -24,12 +25,11 @@ import org.junit.Test;
 
 public class SessionPropertiesWithMessageCollectionTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "session-properties-with-message-collection.xml";
     }

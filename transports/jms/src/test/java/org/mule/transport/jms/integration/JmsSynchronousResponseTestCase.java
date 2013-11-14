@@ -18,14 +18,13 @@ import org.mule.util.StringUtils;
 
 import org.junit.Test;
 
-
 /**
  * see EE-1688/MULE-3059
  */
 public class JmsSynchronousResponseTestCase extends AbstractJmsFunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/jms-synchronous-response.xml";
     }

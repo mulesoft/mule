@@ -6,6 +6,9 @@
  */
 package org.mule.transport.soap.axis;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
@@ -15,9 +18,6 @@ import org.mule.config.ExceptionHelper;
 import org.mule.tck.MuleTestUtils;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpointFunctionalTestCase
 {
@@ -31,7 +31,7 @@ public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpoint
     }
 
     @Override
-    public String getConfigResources()
+    public String getConfigFile()
     {
         return "axis-" + getTransportProtocol() + "-mule-config.xml";
     }

@@ -6,6 +6,9 @@
  */
 package org.mule.test.spring;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.MessageExchangePattern;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.MessageReceiver;
@@ -22,14 +25,10 @@ import java.util.List;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/spring/service-overrides.xml";
     }
@@ -39,7 +38,7 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
     {
         TestConnector connector = lookupDummyConnector();
         
-        // create an xa-transacted endpoint (this triggers the cration of an 
+        // create an xa-transacted endpoint (this triggers the cration of an
         // xaTransactedMessageReceiver in the service descriptor impl
         InboundEndpoint endpoint = getTestInboundEndpoint("foo");
         endpoint.getTransactionConfig().setAction(MuleTransactionConfig.ACTION_ALWAYS_BEGIN);
@@ -48,9 +47,9 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
         TransportServiceDescriptor serviceDescriptor = connector.getServiceDescriptor();
 
         // see if we get the overridden message receiver
-        MessageReceiver receiver = serviceDescriptor.createMessageReceiver(connector, 
+        MessageReceiver receiver = serviceDescriptor.createMessageReceiver(connector,
             getTestService(), endpoint);
-        assertEquals(TestMessageReceiver.class, receiver.getClass());        
+        assertEquals(TestMessageReceiver.class, receiver.getClass());
     }
 
     private TestConnector lookupDummyConnector()

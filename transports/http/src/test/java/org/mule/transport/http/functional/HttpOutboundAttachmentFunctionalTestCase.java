@@ -8,6 +8,7 @@ package org.mule.transport.http.functional;
 
 
 import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -18,12 +19,11 @@ import org.junit.Test;
 
 public class HttpOutboundAttachmentFunctionalTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort httpPort = new DynamicPort("port");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "http-outbound-attachments-config.xml";
     }

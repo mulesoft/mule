@@ -6,6 +6,10 @@
  */
 package org.mule.transport.jms.vendors;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.jms.DefaultJmsTopicResolver;
 import org.mule.transport.jms.JmsConnector;
@@ -14,15 +18,10 @@ import org.mule.transport.jms.mulemq.MuleMQJmsConnector;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class MuleMQJmsConnectorTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "mulemq-config.xml";
     }

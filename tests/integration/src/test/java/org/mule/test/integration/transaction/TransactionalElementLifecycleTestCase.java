@@ -7,7 +7,7 @@
 package org.mule.test.integration.transaction;
 
 import static org.junit.Assert.fail;
-import org.junit.Test;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.functional.EventCallback;
@@ -17,10 +17,12 @@ import org.mule.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Test;
+
 public class TransactionalElementLifecycleTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/transaction/transactional-lifecycle-config.xml";
     }

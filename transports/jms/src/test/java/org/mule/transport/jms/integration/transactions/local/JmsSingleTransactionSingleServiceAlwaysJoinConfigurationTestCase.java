@@ -16,13 +16,13 @@ import org.junit.Test;
 public class JmsSingleTransactionSingleServiceAlwaysJoinConfigurationTestCase extends
     AbstractJmsSingleTransactionSingleServiceTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/transactions/local/jms-single-tx-single-service-always-join.xml";
     }
 
+    @Override
     @Test
     public void testNone() throws Exception
     {
@@ -36,6 +36,7 @@ public class JmsSingleTransactionSingleServiceAlwaysJoinConfigurationTestCase ex
         runTransactionFail("testNone");
     }
 
+    @Override
     @Test
     public void testAlwaysBegin() throws Exception
     {
@@ -49,6 +50,7 @@ public class JmsSingleTransactionSingleServiceAlwaysJoinConfigurationTestCase ex
         runTransactionFail("testAlwaysBegin");
     }
 
+    @Override
     @Test
     public void testBeginOrJoin() throws Exception
     {
@@ -62,6 +64,7 @@ public class JmsSingleTransactionSingleServiceAlwaysJoinConfigurationTestCase ex
         runTransactionFail("testBeginOrJoin");
     }
 
+    @Override
     @Test
     public void testAlwaysJoin() throws Exception
     {
@@ -75,6 +78,7 @@ public class JmsSingleTransactionSingleServiceAlwaysJoinConfigurationTestCase ex
         runTransactionFail("testAlwaysJoin");
     }
 
+    @Override
     @Test
     public void testJoinIfPossible() throws Exception
     {

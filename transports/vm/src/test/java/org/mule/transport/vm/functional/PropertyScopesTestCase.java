@@ -25,9 +25,8 @@ import org.junit.Test;
  */
 public class PropertyScopesTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "vm/property-scopes.xml";
     }

@@ -287,7 +287,7 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/properties/invocation-properties-config.xml";
     }

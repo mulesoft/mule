@@ -39,7 +39,7 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase
     private static boolean outboundComponentReached;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "vm/vm-exception-strategy-config-one-way.xml";
     }

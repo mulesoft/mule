@@ -10,7 +10,6 @@ import org.mule.tck.AbstractConfigBuilderTestCase;
 
 public class SpringNamespaceConfigBuilderTestCase extends AbstractConfigBuilderTestCase
 {
-
     public SpringNamespaceConfigBuilderTestCase()
     {
         super(false);
@@ -18,9 +17,11 @@ public class SpringNamespaceConfigBuilderTestCase extends AbstractConfigBuilderT
     }
 
     @Override
-    public String getConfigResources()
+    public String[] getConfigFiles()
     {
-        return "org/mule/test/spring/config1/test-xml-mule2-config.xml," +
-                "org/mule/test/spring/config1/test-xml-mule2-config-split.xml";
+        return new String[] {
+            "org/mule/test/spring/config1/test-xml-mule2-config.xml",
+            "org/mule/test/spring/config1/test-xml-mule2-config-split.xml"
+        };
     }
 }

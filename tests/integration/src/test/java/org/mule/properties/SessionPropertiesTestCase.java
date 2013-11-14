@@ -230,9 +230,8 @@ public class SessionPropertiesTestCase extends org.mule.tck.junit4.FunctionalTes
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/properties/session-properties-config.xml";
     }
-
 }

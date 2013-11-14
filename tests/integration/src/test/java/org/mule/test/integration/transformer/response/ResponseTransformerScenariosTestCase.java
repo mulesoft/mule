@@ -9,6 +9,7 @@ package org.mule.test.integration.transformer.response;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
@@ -50,7 +51,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/transformer/response/response-transformer-scenarios.xml";
     }

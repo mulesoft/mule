@@ -13,9 +13,8 @@ import org.junit.Test;
 
 public class NamedDynamicTestCase extends AbstractNamespaceTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/config/spring/parsers/named-dynamic-test.xml";
     }
@@ -28,5 +27,4 @@ public class NamedDynamicTestCase extends AbstractNamespaceTestCase
         ChildBean child1 = (ChildBean) assertContentExists(orphan1.getChild(), ChildBean.class);
         assertBeanPopulated(child1, "child1");
     }
-
 }

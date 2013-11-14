@@ -6,6 +6,12 @@
  */
 package org.mule.test.components;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.LifecycleException;
@@ -16,22 +22,15 @@ import org.mule.transport.AbstractConnector;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 public class ServiceStateTestCase extends FunctionalTestCase
 {
-
     public ServiceStateTestCase()
     {
         setStartContext(true);
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/components/component-initial-state.xml";
     }

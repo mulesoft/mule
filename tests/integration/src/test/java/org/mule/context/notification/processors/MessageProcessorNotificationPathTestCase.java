@@ -25,9 +25,8 @@ import org.junit.Test;
  */
 public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/notifications/message-processor-notification-test-flow.xml";
     }

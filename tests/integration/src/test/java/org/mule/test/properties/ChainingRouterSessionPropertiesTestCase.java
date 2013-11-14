@@ -20,7 +20,7 @@ public class ChainingRouterSessionPropertiesTestCase extends FunctionalTestCase
     public static final String EXPECTED_MESSAGE = "First property value is sessionProp1Val other property value is sessionProp2Val.";
 
     @Override
-	protected String getConfigResources()
+	protected String getConfigFile()
     {
 		return "org/mule/test/properties/chaining-router-session-properties.xml";
 	}
@@ -42,5 +42,4 @@ public class ChainingRouterSessionPropertiesTestCase extends FunctionalTestCase
 		msg = client.send("vm://Service2Request", msg);
 		assertEquals(EXPECTED_MESSAGE, msg.getPayload());
 	}
-
 }

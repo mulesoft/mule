@@ -10,16 +10,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Test;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 
+import org.junit.Test;
+
 public class ServiceDescriptorFlowTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/components/service-factory-functional-test-flow.xml";
     }
@@ -38,7 +38,7 @@ public class ServiceDescriptorFlowTestCase extends FunctionalTestCase
     @Test
     public void testGenericObjectFactoryWithProperties() throws Exception
     {
-        FlowConstruct c = muleContext.getRegistry().lookupFlowConstruct("orange2");        
+        FlowConstruct c = muleContext.getRegistry().lookupFlowConstruct("orange2");
 
         // Create an orange
         Object flow = getComponent(c);
@@ -56,7 +56,7 @@ public class ServiceDescriptorFlowTestCase extends FunctionalTestCase
     @Test
     public void testSingletonObjectFactory() throws Exception
     {
-        FlowConstruct c = muleContext.getRegistry().lookupFlowConstruct("orange3"); 
+        FlowConstruct c = muleContext.getRegistry().lookupFlowConstruct("orange3");
         
         Object flow =  getComponent(c);
         assertTrue("Flow should be an Orange", flow instanceof Orange);
@@ -67,7 +67,7 @@ public class ServiceDescriptorFlowTestCase extends FunctionalTestCase
     @Test
     public void testSpringSingleton() throws Exception
     {
-        FlowConstruct c = muleContext.getRegistry().lookupFlowConstruct("orange4"); 
+        FlowConstruct c = muleContext.getRegistry().lookupFlowConstruct("orange4");
         
         Object flow =  getComponent(c);
         assertTrue("Flow should be an Orange", flow instanceof Orange);

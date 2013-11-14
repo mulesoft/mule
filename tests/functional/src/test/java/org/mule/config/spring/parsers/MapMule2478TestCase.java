@@ -6,6 +6,10 @@
  */
 package org.mule.config.spring.parsers;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.config.spring.parsers.beans.ChildBean;
 import org.mule.config.spring.parsers.beans.OrphanBean;
 
@@ -14,15 +18,10 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class MapMule2478TestCase extends AbstractNamespaceTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/config/spring/parsers/map-mule-2478-test.xml";
     }
@@ -41,14 +40,14 @@ public class MapMule2478TestCase extends AbstractNamespaceTestCase
     public void testMappedChild()
     {
         OrphanBean orphan = (OrphanBean) assertBeanExists("orphan", OrphanBean.class);
-        Map map = orphan.getMap();
+        Map<?, ?> map = orphan.getMap();
         assertNotNull(map);
         assertTrue(map.containsKey("string"));
         assertEquals("string2", map.get("string"));
         assertTrue(map.containsKey("name"));
         assertEquals("child2", map.get("name"));
         assertTrue(map.containsKey("list"));
-        assertEquals("list2", ((List) map.get("list")).get(0));
+        assertEquals("list2", ((List<?>) map.get("list")).get(0));
     }
 
 // TODO ComplexComponentDefinitionParser is not longer used, is there any way to rewrite/reuse the "factory" element for testing?

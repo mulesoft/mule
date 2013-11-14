@@ -11,11 +11,9 @@ package org.mule.transport.servlet.jetty.functional;
  */
 public class JettyContinuationsFunctionalTestCase extends JettyFunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "jetty-continuations-functional-test.xml";
     }
-
 }

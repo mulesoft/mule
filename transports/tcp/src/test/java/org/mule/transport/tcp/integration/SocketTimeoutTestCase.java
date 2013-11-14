@@ -22,11 +22,11 @@ import org.junit.Test;
 
 public class SocketTimeoutTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    protected String getConfigResources()
+    @Override
+    protected String getConfigFile()
     {
         return "tcp-outbound-timeout-config.xml";
     }

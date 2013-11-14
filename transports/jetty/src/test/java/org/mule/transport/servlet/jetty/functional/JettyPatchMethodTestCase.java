@@ -34,7 +34,7 @@ public class JettyPatchMethodTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "jetty-patch-method.xml";
     }

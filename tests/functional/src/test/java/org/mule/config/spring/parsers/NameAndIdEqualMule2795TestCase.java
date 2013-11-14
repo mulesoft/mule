@@ -6,18 +6,17 @@
  */
 package org.mule.config.spring.parsers;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 public class NameAndIdEqualMule2795TestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/config/spring/parsers/name-id-equal-mule-2795-test.xml";
     }
@@ -31,5 +30,4 @@ public class NameAndIdEqualMule2795TestCase extends FunctionalTestCase
         assertNotNull(muleContext.getRegistry().lookupObject("id2"));
         assertNull(muleContext.getRegistry().lookupObject(".:no-name-2"));
     }
-
 }

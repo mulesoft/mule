@@ -26,11 +26,11 @@ import java.util.Map;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.junit.Rule;
-import org.junit.Test;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.junit.Rule;
+import org.junit.Test;
 
 public class AxisServletWithSecurityTestCase extends FunctionalTestCase
 {
@@ -42,7 +42,7 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "axis-servlet-security-config.xml";
     }

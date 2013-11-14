@@ -22,7 +22,7 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
     private static final int TIMEOUT = 5000;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/endpoints/endpoint-message-processors.xml";
     }

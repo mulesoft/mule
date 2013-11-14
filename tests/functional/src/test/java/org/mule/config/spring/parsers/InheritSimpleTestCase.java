@@ -13,9 +13,8 @@ import org.junit.Test;
 
 public class InheritSimpleTestCase extends AbstractNamespaceTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/config/spring/parsers/inherit-simple-test.xml";
     }
@@ -28,5 +27,4 @@ public class InheritSimpleTestCase extends AbstractNamespaceTestCase
         ChildBean child1 = (ChildBean) assertContentExists(orphan1.getChild(), ChildBean.class);
         assertBeanPopulated(child1, "child1");
     }
-
 }

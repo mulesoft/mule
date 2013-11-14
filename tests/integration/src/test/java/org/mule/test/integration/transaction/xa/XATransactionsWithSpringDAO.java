@@ -6,6 +6,11 @@
  */
 package org.mule.test.integration.transaction.xa;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -25,19 +30,13 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 public class XATransactionsWithSpringDAO extends FunctionalTestCase
 {
-    
     private static final int RECEIVE_TIMEOUT = 10000;
     private static String connectionString;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/transaction/xatransactions-with-spring-dao-config.xml";
     }
@@ -140,7 +139,7 @@ public class XATransactionsWithSpringDAO extends FunctionalTestCase
 
         client.sendNoReceive("jms://my.queue", book, null);
         result = client.request("vm://output", 5000);
-        // need to test that the Spring transaction has really been rolled back... 
+        // need to test that the Spring transaction has really been rolled back...
         // from log file, it is
         assertNull(result);
     }

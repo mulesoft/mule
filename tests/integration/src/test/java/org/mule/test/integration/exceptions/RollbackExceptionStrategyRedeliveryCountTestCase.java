@@ -25,9 +25,8 @@ import org.junit.Test;
 
 public class RollbackExceptionStrategyRedeliveryCountTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/exceptions/rollback-exception-strategy-redelivery-count.xml";
     }
@@ -37,7 +36,8 @@ public class RollbackExceptionStrategyRedeliveryCountTestCase extends Functional
     {
         final CountDownLatch latch = new CountDownLatch(4);
         LocalMuleClient client = muleContext.getClient();
-        muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>() {
+        muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>()
+        {
             @Override
             public void onNotification(ExceptionNotification notification)
             {

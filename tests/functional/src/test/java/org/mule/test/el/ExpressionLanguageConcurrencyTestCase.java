@@ -18,9 +18,8 @@ import org.junit.Test;
 
 public class ExpressionLanguageConcurrencyTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/el/expression-language-concurrency-config.xml";
     }

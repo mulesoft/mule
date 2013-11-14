@@ -29,7 +29,7 @@ public class XmppNamespaceHandlerTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "xmpp-namespace-config.xml";
     }

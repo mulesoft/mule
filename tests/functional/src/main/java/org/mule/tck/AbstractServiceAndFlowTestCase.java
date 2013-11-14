@@ -7,6 +7,7 @@
 package org.mule.tck;
 
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.util.StringUtils;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -53,9 +54,23 @@ public abstract class AbstractServiceAndFlowTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
+        if (configResources.contains(","))
+        {
+            return null;
+        }
         return configResources;
+    }
+    
+    @Override
+    protected String[] getConfigFiles()
+    {
+        if (configResources.contains(","))
+        {
+            return StringUtils.splitAndTrim(configResources, ",");
+        }
+        return null;
     }
 
     @Override

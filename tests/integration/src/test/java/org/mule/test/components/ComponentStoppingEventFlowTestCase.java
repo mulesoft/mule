@@ -19,7 +19,7 @@ import org.junit.Test;
 public class ComponentStoppingEventFlowTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/components/component-stopped-processing.xml";
     }

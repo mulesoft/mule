@@ -13,12 +13,11 @@ import org.junit.Test;
 
 public class WebappsDefaultsTestCase extends AbstractWebappsTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "jetty-webapps-with-defaults.xml";
     }

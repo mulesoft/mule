@@ -9,6 +9,7 @@ package org.mule.transport.file.reliability;
 import static org.junit.Assert.fail;
 import static org.mule.transport.file.FileTestUtils.createDataFile;
 import static org.mule.transport.file.FileTestUtils.createFolder;
+
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.exception.DefaultSystemExceptionStrategy;
@@ -40,11 +41,10 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
     public InboundMessageLossTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
-
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "reliability/inbound-message-loss.xml";
     }

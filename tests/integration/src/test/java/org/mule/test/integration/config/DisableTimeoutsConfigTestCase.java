@@ -32,7 +32,7 @@ public class DisableTimeoutsConfigTestCase extends FunctionalTestCase
     public SystemProperty disableTimeouts = new SystemProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "timeout.disable", "true");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/config/disable-timeouts-config.xml";
     }

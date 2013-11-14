@@ -6,6 +6,8 @@
  */
 package org.mule.config.spring.flow;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleContext;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
@@ -22,13 +24,10 @@ import java.util.List;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/config/spring/flow/flow-processing-strategies.xml";
     }

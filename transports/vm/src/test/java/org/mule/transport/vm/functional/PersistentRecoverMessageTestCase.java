@@ -24,14 +24,13 @@ import org.junit.Test;
 
 public class PersistentRecoverMessageTestCase extends FunctionalTestCase
 {
-
     public PersistentRecoverMessageTestCase()
     {
         setStartContext(false);
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "vm/persistent-vmqueue-test.xml";
     }

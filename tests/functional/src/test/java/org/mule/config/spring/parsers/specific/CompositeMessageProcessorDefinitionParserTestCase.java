@@ -7,6 +7,7 @@
 package org.mule.config.spring.parsers.specific;
 
 import static org.junit.Assert.assertEquals;
+
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
@@ -17,9 +18,8 @@ import org.junit.Test;
 
 public class CompositeMessageProcessorDefinitionParserTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/config/spring/parsers/specific/composite-message-processor.xml";
     }

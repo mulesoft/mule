@@ -12,9 +12,8 @@ import org.mule.api.MuleMessage;
 
 public class OneWayOutboundReturningEventTestCase extends OneWayOutboundTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/construct/one-way-outbound-config.xml";
     }
@@ -30,5 +29,4 @@ public class OneWayOutboundReturningEventTestCase extends OneWayOutboundTestCase
     {
         assertEquals("TEST processed", response.getPayload());
     }
-
 }

@@ -20,7 +20,7 @@ public class InOutOutOnlyAsyncRouterTestCase extends FunctionalTestCase
     public static final long TIMEOUT = 3000;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/messaging/meps/pattern_In-Out_Out-Only-Async-Router.xml";
     }

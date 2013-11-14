@@ -13,12 +13,11 @@ import org.junit.Test;
 
 public class SslWebappsTestCase extends AbstractWebappsTestCase
 {
-
     @Rule
     public DynamicPort httpPort = new DynamicPort("port");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "jetty-ssl-webapps.xml";
     }

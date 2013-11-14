@@ -54,7 +54,7 @@ public class WatermarkPollingTestCase extends FunctionalTestCase
     private static final List<String> foo = new ArrayList<String>();
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/watermark/watermark-polling-config.xml";
     }

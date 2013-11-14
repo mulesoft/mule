@@ -7,6 +7,7 @@
 package org.mule.management;
 
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.context.notification.MessageProcessorNotification;
@@ -16,9 +17,8 @@ import org.junit.Test;
 
 public class MessageProcessorNotificationTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "message-processor-notification-config.xml";
     }

@@ -9,6 +9,7 @@ package org.mule.test.integration.schedule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleException;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.Predicate;
@@ -23,12 +24,10 @@ import org.junit.Test;
  */
 public class RunningScheduleTestCase extends FunctionalTestCase
 {
-
-
     public static final String SCHEDULER_NAME = "testScheduler";
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/schedule/scheduler-config.xml";
     }

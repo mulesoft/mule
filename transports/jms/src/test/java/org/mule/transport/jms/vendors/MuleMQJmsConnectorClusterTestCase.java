@@ -6,6 +6,9 @@
  */
 package org.mule.transport.jms.vendors;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.jms.DefaultJmsTopicResolver;
 import org.mule.transport.jms.JmsConnector;
@@ -14,14 +17,10 @@ import org.mule.transport.jms.mulemq.MuleMQJmsConnector;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class MuleMQJmsConnectorClusterTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "mulemq-cluster-config.xml";
     }
@@ -38,6 +37,6 @@ public class MuleMQJmsConnectorClusterTestCase extends FunctionalTestCase
         JmsTopicResolver resolver = c.getTopicResolver();
         assertNotNull("Topic resolver must not be null.", resolver);
         assertTrue("Wrong topic resolver configured on the connector.",
-                   resolver instanceof DefaultJmsTopicResolver);   
+                   resolver instanceof DefaultJmsTopicResolver);
     }
 }

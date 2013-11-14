@@ -19,7 +19,7 @@ import org.junit.Test;
 public class FirstSuccessfulTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "first-successful-test.xml";
     }

@@ -6,16 +6,15 @@
  */
 package org.mule.config.spring.parsers.specific;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.construct.Flow;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class MethodInvokerDefinitionParserTestCase extends FunctionalTestCase
 {
-
     @Test
     public void testPojoFlow() throws Exception
     {
@@ -30,9 +29,8 @@ public class MethodInvokerDefinitionParserTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "pojo-invoke-test.xml";
     }
-
 }

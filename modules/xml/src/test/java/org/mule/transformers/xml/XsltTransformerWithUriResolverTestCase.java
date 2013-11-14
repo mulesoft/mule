@@ -8,6 +8,7 @@ package org.mule.transformers.xml;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.transformer.Transformer;
 import org.mule.module.xml.transformer.XsltTransformer;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -18,9 +19,8 @@ import org.junit.Test;
 
 public class XsltTransformerWithUriResolverTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "xslt-transformer-wth-uri-resolver-config.xml";
     }

@@ -6,6 +6,9 @@
  */
 package org.mule.example.bookstore;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Collection;
@@ -13,14 +16,10 @@ import java.util.Collection;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class BookstoreTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "bookstore-config.xml";
     }
@@ -55,13 +54,13 @@ public class BookstoreTestCase extends FunctionalTestCase
         JaxWsProxyFactoryBean pf2 = new JaxWsProxyFactoryBean();
         pf2.setServiceClass(OrderService.class);
         pf2.setAddress(OrderService.URL);
-        OrderService orderService = (OrderService) pf2.create();     
+        OrderService orderService = (OrderService) pf2.create();
         assertNotNull(orderService);
 
         // Place an order for book #3 from the catalog
-        Book book = catalog.getBook(3); 
+        Book book = catalog.getBook(3);
         assertNotNull(book);
-        Order order = orderService.orderBook(book, 2, "Somewhere", "me@my-mail.com"); 
+        Order order = orderService.orderBook(book, 2, "Somewhere", "me@my-mail.com");
         assertNotNull(order);
         assertEquals(3, order.getBook().getId());
         assertEquals(2, order.getQuantity());
@@ -74,7 +73,7 @@ public class BookstoreTestCase extends FunctionalTestCase
 //        HttpServletRequest request = new Request();
 //        request.setAttribute("title", "blah");
 //        request.setAttribute("author", "blah");
-//        
+//
 //        MuleClient client = new MuleClient(muleContext);
 //        client.send("servlet://catalog", request, null);
 //    }
