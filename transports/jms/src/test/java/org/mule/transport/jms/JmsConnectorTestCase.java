@@ -19,10 +19,10 @@ import static org.mockito.Mockito.when;
 
 import org.mule.api.MuleException;
 import org.mule.api.transaction.Transaction;
+import org.mule.module.bti.jms.BitronixConnectionFactoryWrapper;
 import org.mule.module.bti.transaction.TransactionManagerWrapper;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.transport.jms.xa.BitronixConnectionFactoryWrapper;
 import org.mule.transport.jms.xa.ConnectionFactoryWrapper;
 
 import java.lang.reflect.UndeclaredThrowableException;
@@ -218,6 +218,7 @@ public class JmsConnectorTestCase extends AbstractMuleContextTestCase
         JmsConnector connector = new JmsConnector(muleContext);
         connector.setJmsSupport(jmsSupport);
 
+        connector.setName("testConnector");
         connector.setConnectionFactory(mockConnectionFactory);
         connector.createConnection();
         return connector;

@@ -11,6 +11,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.XaTransaction;
+import org.mule.util.proxy.TargetInvocationHandler;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;

@@ -4,12 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transport.jms.xa;
+package org.mule.module.bti.jms;
 
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.XaTransaction;
+import org.mule.util.proxy.TargetInvocationHandler;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transport.jdbc.xa;
+package org.mule.module.bti.jdbc;
 
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
@@ -31,6 +31,7 @@ import java.sql.Statement;
 import java.sql.Struct;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Executor;
 
 import javax.transaction.xa.XAResource;
 
@@ -102,12 +103,6 @@ public class BitronixConnectionWrapper implements Connection, XaTransaction.Mule
         }
 
         Transaction transaction = TransactionCoordination.getInstance().getTransaction();
-        validateTransactionType(transaction);
-        return ((XaTransaction) transaction).enlistResource(getXaResource());
-    }
-
-    private void validateTransactionType(Transaction transaction) throws IllegalTransactionStateException
-    {
         if (transaction == null)
         {
             throw new IllegalTransactionStateException(CoreMessages.noMuleTransactionAvailable());
@@ -116,6 +111,8 @@ public class BitronixConnectionWrapper implements Connection, XaTransaction.Mule
         {
             throw new IllegalTransactionStateException(CoreMessages.notMuleXaTransaction(transaction));
         }
+
+        return ((XaTransaction) transaction).enlistResource(getXaResource());
     }
 
     private XAResource getXaResource()
@@ -127,7 +124,15 @@ public class BitronixConnectionWrapper implements Connection, XaTransaction.Mule
     public boolean delist() throws Exception
     {
         Transaction transaction = TransactionCoordination.getInstance().getTransaction();
-        validateTransactionType(transaction);
+        if (transaction == null)
+        {
+            throw new IllegalTransactionStateException(CoreMessages.noMuleTransactionAvailable());
+        }
+        if (!(transaction instanceof XaTransaction))
+        {
+            throw new IllegalTransactionStateException(CoreMessages.notMuleXaTransaction(transaction));
+        }
+
         return ((XaTransaction) transaction).delistResource(getXaResource(), XAResource.TMSUCCESS);
     }
 
@@ -415,6 +420,36 @@ public class BitronixConnectionWrapper implements Connection, XaTransaction.Mule
     public <T> T unwrap(Class<T> iface) throws SQLException
     {
         return connection.unwrap(iface);
+    }
+
+    @Override
+    public void setSchema(String schema) throws SQLException
+    {
+        connection.setSchema(schema);
+    }
+
+    @Override
+    public String getSchema() throws SQLException
+    {
+        return connection.getSchema();
+    }
+
+    @Override
+    public void abort(Executor executor) throws SQLException
+    {
+        connection.abort(executor);
+    }
+
+    @Override
+    public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException
+    {
+        connection.setNetworkTimeout(executor, milliseconds);
+    }
+
+    @Override
+    public int getNetworkTimeout() throws SQLException
+    {
+        return connection.getNetworkTimeout();
     }
 
 }

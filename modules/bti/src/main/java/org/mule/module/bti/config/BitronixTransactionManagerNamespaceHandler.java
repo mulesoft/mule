@@ -20,6 +20,8 @@ public class BitronixTransactionManagerNamespaceHandler extends NamespaceHandler
     public void init()
     {
         registerBeanDefinitionParser("transaction-manager", new MuleOrphanDefinitionParser(BitronixTransactionManagerFactory.class, true));
+        registerBeanDefinitionParser("xa-data-source-pool", new MuleOrphanDefinitionParser(DataSourcePoolFactoryBean.class, true));
+        registerBeanDefinitionParser("xa-connection-factory-pool", new MuleOrphanDefinitionParser(ConnectionFactoryPoolFactoryBean.class, true));
     }
 
 }

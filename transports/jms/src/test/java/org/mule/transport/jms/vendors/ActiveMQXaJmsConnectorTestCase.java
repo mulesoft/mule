@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.xa.ConnectionFactoryWrapper;
-import org.mule.transport.jms.xa.TargetInvocationHandler;
+import org.mule.util.proxy.TargetInvocationHandler;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;

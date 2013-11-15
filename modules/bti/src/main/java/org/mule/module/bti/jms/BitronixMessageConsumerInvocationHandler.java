@@ -4,7 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transport.jms.xa;
+package org.mule.module.bti.jms;
+
+import org.mule.util.proxy.TargetInvocationHandler;
 
 import java.lang.reflect.Method;
 

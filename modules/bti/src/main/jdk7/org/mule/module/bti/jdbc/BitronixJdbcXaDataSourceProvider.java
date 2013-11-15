@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transport.jdbc.xa;
+package org.mule.module.bti.jdbc;
 
 import java.io.PrintWriter;
 import java.sql.SQLException;

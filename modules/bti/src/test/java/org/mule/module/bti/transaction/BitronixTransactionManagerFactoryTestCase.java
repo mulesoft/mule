@@ -28,7 +28,7 @@ import bitronix.tm.internal.BitronixSystemException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.internal.stubbing.defaultanswers.Answers;
+import org.mockito.Answers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 

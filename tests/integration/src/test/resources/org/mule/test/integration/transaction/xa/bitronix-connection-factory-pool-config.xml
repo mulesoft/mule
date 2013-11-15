@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:bti="http://www.mulesoft.org/schema/mule/bti"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/bti http://www.mulesoft.org/schema/mule/bti/current/mule-bti.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+
+    <bti:transaction-manager/>
+
+    <spring:bean name="xaConnectionFactory" class="org.apache.activemq.ActiveMQXAConnectionFactory">
+        <spring:property name="brokerURL" value="tcp://localhost:${port}"/>
+    </spring:bean>
+
+    <jms:activemq-xa-connector connectionFactory-ref="xaConnectionFactory" name="jmsConnectorDefaultPool"
+                               maxRedelivery="-1" specification="1.1" numberOfConsumers="1"/>
+
+
+    <bti:xa-connection-factory-pool name="bitronixConnectionFactory" minPoolSize="5" maxPoolSize="15" maxIdleTime="40"
+                                    connectionFactory-ref="xaConnectionFactory"/>
+
+    <jms:activemq-xa-connector name="jmsConnectorCustomPool" connectionFactory-ref="bitronixConnectionFactory"
+                               maxRedelivery="-1" specification="1.1" numberOfConsumers="1"/>
+
+
+</mule>

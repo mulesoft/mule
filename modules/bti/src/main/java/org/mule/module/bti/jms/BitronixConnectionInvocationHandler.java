@@ -4,19 +4,22 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transport.jms.xa;
+package org.mule.module.bti.jms;
 
 import org.mule.api.transaction.Transaction;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.XaTransaction;
+import org.mule.util.proxy.TargetInvocationHandler;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 import javax.jms.Connection;
+import javax.jms.JMSException;
 import javax.jms.Session;
 
 import bitronix.tm.resource.jms.DualSessionWrapper;
+import bitronix.tm.resource.jms.JmsConnectionHandle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -66,6 +69,18 @@ public class BitronixConnectionInvocationHandler implements TargetInvocationHand
     @Override
     public Object getTargetObject()
     {
+        if (connection instanceof JmsConnectionHandle)
+        {
+            JmsConnectionHandle jmsConnectionHandle = (JmsConnectionHandle) connection;
+            try
+            {
+                return jmsConnectionHandle.getXAConnection();
+            }
+            catch (JMSException e)
+            {
+                // The connection is already closed, no reference to XAConnection available.
+            }
+        }
         return connection;
     }
 }

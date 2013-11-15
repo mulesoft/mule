@@ -27,6 +27,8 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ClusterNodeNotification;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.NotificationException;
+import org.mule.module.bti.jms.BitronixConnectionFactoryPoolBuilder;
+import org.mule.module.bti.jms.BitronixConnectionFactoryWrapper;
 import org.mule.module.bti.transaction.TransactionManagerWrapper;
 import org.mule.routing.MessageFilter;
 import org.mule.transaction.TransactionCoordination;
@@ -38,8 +40,6 @@ import org.mule.transport.jms.jndi.JndiNameResolver;
 import org.mule.transport.jms.jndi.SimpleJndiNameResolver;
 import org.mule.transport.jms.redelivery.AutoDiscoveryRedeliveryHandlerFactory;
 import org.mule.transport.jms.redelivery.RedeliveryHandlerFactory;
-import org.mule.transport.jms.xa.BitronixConnectionFactoryWrapper;
-import org.mule.transport.jms.xa.BitronixJmsXaConnectionFactoryProvider;
 import org.mule.transport.jms.xa.ConnectionFactoryWrapper;
 import org.mule.util.BeanUtils;
 
@@ -59,8 +59,6 @@ import javax.jms.TemporaryTopic;
 import javax.jms.XAConnectionFactory;
 import javax.naming.CommunicationException;
 import javax.naming.NamingException;
-
-import bitronix.tm.resource.jms.PoolingConnectionFactory;
 
 /**
  * <code>JmsConnector</code> is a JMS 1.0.2b compliant connector that can be used
@@ -450,7 +448,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     private ConnectionFactory createConnectionFactoryWrapper(ConnectionFactory connectionFactory) throws InitialisationException
     {
         ConnectionFactory wrappedConnectionFactory = connectionFactory;
-        if (connectionFactory instanceof PoolingConnectionFactory || connectionFactory instanceof ConnectionFactoryWrapper)
+        if (connectionFactory instanceof BitronixConnectionFactoryWrapper || connectionFactory instanceof ConnectionFactoryWrapper)
         {
             return connectionFactory;
         }
@@ -458,21 +456,10 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         {
             if (connectionFactory instanceof XAConnectionFactory && muleContext.getTransactionManager() instanceof TransactionManagerWrapper)
             {
-                synchronized (BitronixJmsXaConnectionFactoryProvider.class)
-                {
-                    //TODO change once BTM-131 get's fixed
-                    BitronixJmsXaConnectionFactoryProvider.xaConnectionFactoryProvided = connectionFactory;
-                    PoolingConnectionFactory poolingConnectionFactory = new PoolingConnectionFactory();
-                    poolingConnectionFactory.setClassName(BitronixJmsXaConnectionFactoryProvider.class.getCanonicalName());
-                    poolingConnectionFactory.setAutomaticEnlistingEnabled(false);
-                    poolingConnectionFactory.setMaxPoolSize(100);
-                    poolingConnectionFactory.setMaxIdleTime(1);
-                    poolingConnectionFactory.setCacheProducersConsumers(false);
-                    poolingConnectionFactory.setAllowLocalTransactions(true);
-                    poolingConnectionFactory.setUniqueName(muleContext.getConfiguration().getId() + "-" + getName());
-                    poolingConnectionFactory.init();
-                    wrappedConnectionFactory = new BitronixConnectionFactoryWrapper(poolingConnectionFactory);
-                }
+                BitronixConnectionFactoryPoolBuilder builder = new BitronixConnectionFactoryPoolBuilder();
+                builder.setConnectionFactory((XAConnectionFactory) connectionFactory);
+                builder.setName(getName());
+                wrappedConnectionFactory = builder.build(muleContext);
             }
             else
             {

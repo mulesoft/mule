@@ -4,7 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transport.jms.xa;
+package org.mule.module.bti.jms;
+
+import org.mule.api.MuleContext;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.config.i18n.MessageFactory;
+import org.mule.module.bti.transaction.TransactionManagerWrapper;
 
 import java.lang.reflect.Proxy;
 
@@ -19,17 +25,19 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Wrapper for JMS ConnectionFactory that will return a proxy for JMS Connections to make them work inside xa transactions.
  */
-public class BitronixConnectionFactoryWrapper
-        implements ConnectionFactory
+public class BitronixConnectionFactoryWrapper implements ConnectionFactory, Initialisable
 {
 
     protected static final transient Log logger = LogFactory.getLog(BitronixConnectionFactoryWrapper.class);
 
-    protected final PoolingConnectionFactory factory;
+    private final PoolingConnectionFactory factory;
+    private final MuleContext muleContext;
 
-    public BitronixConnectionFactoryWrapper(PoolingConnectionFactory factory)
+
+    public BitronixConnectionFactoryWrapper(PoolingConnectionFactory factory, MuleContext muleContext)
     {
         this.factory = factory;
+        this.muleContext = muleContext;
     }
 
     public Connection createConnection() throws JMSException
@@ -53,5 +61,20 @@ public class BitronixConnectionFactoryWrapper
     public void close()
     {
         factory.close();
+    }
+
+    public PoolingConnectionFactory getWrappedConnectionFactory()
+    {
+        return factory;
+    }
+
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        if (!(muleContext.getTransactionManager() instanceof TransactionManagerWrapper))
+        {
+            throw new InitialisationException(MessageFactory.createStaticMessage("Cannot use a Bitronix connection factory pool without " +
+                                                                                 "using Bitronix transaction manager"), this);
+        }
     }
 }

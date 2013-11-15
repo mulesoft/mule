@@ -26,14 +26,14 @@ import org.mule.common.TestResult;
 import org.mule.common.Testable;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.module.bti.jdbc.BitronixXaDataSourceBuilder;
+import org.mule.module.bti.jdbc.BitronixXaDataSourceWrapper;
 import org.mule.module.bti.transaction.TransactionManagerWrapper;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectException;
 import org.mule.transport.jdbc.sqlstrategy.DefaultSqlStatementStrategyFactory;
 import org.mule.transport.jdbc.sqlstrategy.SqlStatementStrategyFactory;
-import org.mule.transport.jdbc.xa.BitronixJdbcXaDataSourceProvider;
-import org.mule.transport.jdbc.xa.BitronixXaDataSourceWrapper;
 import org.mule.transport.jdbc.xa.DataSourceWrapper;
 import org.mule.util.StringUtils;
 import org.mule.util.TemplateParser;
@@ -49,7 +49,6 @@ import java.util.regex.Pattern;
 import javax.sql.DataSource;
 import javax.sql.XADataSource;
 
-import bitronix.tm.resource.jdbc.PoolingDataSource;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 
@@ -123,21 +122,23 @@ public class JdbcConnector extends AbstractConnector implements Testable
 
     private void decorateDataSourceIfRequired()
     {
+        if (dataSource instanceof BitronixXaDataSourceWrapper)
+        {
+            // Nothing to do. There is an explicit Bitronix data source pool.
+            return;
+        }
         if (dataSource instanceof XADataSource)
         {
             if (muleContext.getTransactionManager() instanceof TransactionManagerWrapper)
             {
-                //TODO change once BTM-131 gets fixed
-                BitronixJdbcXaDataSourceProvider.xaDatasourceHolder = (XADataSource) dataSource;
-                PoolingDataSource poolingDataSource = new PoolingDataSource();
-                poolingDataSource.setClassName(BitronixJdbcXaDataSourceProvider.class.getCanonicalName());
-                poolingDataSource.setMaxPoolSize(100);
-                poolingDataSource.setAcquireIncrement(1);
-                poolingDataSource.setAllowLocalTransactions(true);
-                poolingDataSource.setAutomaticEnlistingEnabled(false);
-                poolingDataSource.setUniqueName(muleContext.getConfiguration().getId() + "-" + getName());
-                poolingDataSource.init();
-                this.dataSource = new BitronixXaDataSourceWrapper(poolingDataSource);
+                logger.info(String.format("No pool defined for XADataSource in connector %s. A default pool will be created. " +
+                                          "To customize define a btm:xa-data-source-pool element in your config and assign it to " +
+                                          "the connector.", getName()));
+
+                BitronixXaDataSourceBuilder builder = new BitronixXaDataSourceBuilder();
+                builder.setName(getName());
+                builder.setDataSource((XADataSource) dataSource);
+                this.dataSource = builder.build(muleContext);
             }
             else
             {

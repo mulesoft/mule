@@ -9,6 +9,7 @@ package org.mule.transport.jms.xa;
 import org.mule.api.transaction.Transaction;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.XaTransaction;
+import org.mule.util.proxy.TargetInvocationHandler;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
