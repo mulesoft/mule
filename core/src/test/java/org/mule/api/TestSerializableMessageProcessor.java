@@ -5,15 +5,20 @@
  * LICENSE.txt file.
  */
 
-package org.mule.exception;
+package org.mule.api;
 
 import java.io.Serializable;
 
-public class TestSerializableConnectable extends TestConnectable implements Serializable
+public class TestSerializableMessageProcessor extends TestNotSerializableMessageProcessor implements Serializable
 {
-    private static final long serialVersionUID = -5012248219580312476L;
+    private static final long serialVersionUID = -6309566893615114065L;
 
     private String value;
+
+    public TestSerializableMessageProcessor()
+    {
+        super();
+    }
 
     public String getValue()
     {

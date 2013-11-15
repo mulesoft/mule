@@ -5,16 +5,16 @@
  * LICENSE.txt file.
  */
 
-package org.mule.exception;
+package org.mule.api;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 
-public class TestMessageProcessor implements MessageProcessor
+public class TestNotSerializableMessageProcessor implements MessageProcessor
 {
 
-    public TestMessageProcessor()
+    public TestNotSerializableMessageProcessor()
     {
         super();
     }
