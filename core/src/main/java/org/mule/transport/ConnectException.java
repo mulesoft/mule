@@ -10,6 +10,11 @@ import org.mule.api.MuleException;
 import org.mule.api.transport.Connectable;
 import org.mule.config.i18n.Message;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
 /** 
  * When this exception is thrown it will trigger a retry (reconnection) policy to go into effect if one is configured.
  */
@@ -45,5 +50,30 @@ public class ConnectException extends MuleException
     public Connectable getFailed()
     {
         return failed;
+    }
+    
+    private void writeObject(ObjectOutputStream out) throws Exception
+    {
+        out.defaultWriteObject();
+        if (this.failed instanceof Serializable)
+        {
+            out.writeBoolean(true);
+            out.writeObject(this.failed);
+        }
+        else
+        {
+            out.writeBoolean(false);
+        }
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+    {
+        in.defaultReadObject();
+
+        boolean failedWasSerialized = in.readBoolean();
+        if (failedWasSerialized)
+        {
+            this.failed = (Connectable) in.readObject();
+        }
     }
 }
