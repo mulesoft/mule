@@ -43,7 +43,7 @@ public class MessagingException extends MuleException
 
     private boolean causeRollback;
     private boolean handled;
-    private MessageProcessor failingMessageProcessor;
+    private transient MessageProcessor failingMessageProcessor;
 
     /**
      * @deprecated use MessagingException(Message, MuleEvent)

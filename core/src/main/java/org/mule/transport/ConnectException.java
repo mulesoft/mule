@@ -19,7 +19,7 @@ public class ConnectException extends MuleException
     private static final long serialVersionUID = -7802483584780922653L;
 
     /** Resource which has disconnected */
-    private Connectable failed;
+    private transient Connectable failed;
     
     public ConnectException(Message message, Connectable failed)
     {

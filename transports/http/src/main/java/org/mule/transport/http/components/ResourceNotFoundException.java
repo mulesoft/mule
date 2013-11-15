@@ -8,7 +8,6 @@ package org.mule.transport.http.components;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
 import org.mule.config.i18n.Message;
 
 /**
