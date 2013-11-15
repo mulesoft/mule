@@ -9,8 +9,8 @@ package org.mule.el.datetime;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
+import org.mule.api.store.ObjectStore;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -27,8 +27,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-@SmallTest
-public class DateTimeTestCase extends AbstractMuleTestCase
+public class DateTimeTestCase extends AbstractMuleContextTestCase
 {
 
     private Calendar currentCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
@@ -250,5 +249,23 @@ public class DateTimeTestCase extends AbstractMuleTestCase
         assertEquals(1, new DateTime(xmlCal).getMonth());
         assertEquals(1, new DateTime(xmlCal).getDayOfMonth());
     }
+    
+    @Test
+    public void serialization() throws Exception
+    {
+        final String key = "key";
+        ObjectStore<DateTime> os = muleContext.getObjectStoreManager().getObjectStore("DateTimeTestCase",
+            true);
+        try
+        {
+            os.store(key, now);
+            DateTime recovered = os.retrieve(key);
+            assertEquals(now, recovered);
+        }
+        finally
+        {
+            os.clear();
+        }
+    }                    
 
 }
