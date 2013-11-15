@@ -5,14 +5,14 @@
  * LICENSE.txt file.
  */
 
-package org.mule.exception;
+package org.mule.transport;
 
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.transport.Connectable;
 
-public class TestConnectable implements Connectable
+public class TestNotSerializableConnectable implements Connectable
 {
 
     @Override
