@@ -10,6 +10,9 @@ import org.mule.api.el.datetime.Date;
 import org.mule.api.el.datetime.Time;
 import org.mule.el.context.ServerContext;
 
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -23,8 +26,10 @@ import javax.xml.datatype.XMLGregorianCalendar;
  * Models a DateTime and simplifies the parsing/formatting and very basic manipulation of dates via Mule
  * expression language.
  */
-public class DateTime extends AbstractInstant implements Date, Time
+public class DateTime extends AbstractInstant implements Date, Time, Serializable
 {
+
+    private static final long serialVersionUID = -5006713884149136787L;
 
     public DateTime(Calendar calendar, Locale locale)
     {
@@ -33,7 +38,7 @@ public class DateTime extends AbstractInstant implements Date, Time
 
     public DateTime()
     {
-        this(Calendar.getInstance(ServerContext.getLocale()), (ServerContext.getLocale()));
+        super();
     }
 
     public DateTime(Calendar calendar)
@@ -407,5 +412,20 @@ public class DateTime extends AbstractInstant implements Date, Time
         }
 
     }
+    
+    private void writeObject(ObjectOutputStream out) throws Exception
+    {
+        out.defaultWriteObject();
+        out.writeObject(this.calendar);
+        out.writeObject(this.locale);
+    }
+
+    private void readObject(ObjectInputStream in) throws Exception
+    {
+        in.defaultReadObject();
+        this.calendar = (Calendar) in.readObject();
+        this.locale = (Locale) in.readObject();
+    }
+
 
 }
