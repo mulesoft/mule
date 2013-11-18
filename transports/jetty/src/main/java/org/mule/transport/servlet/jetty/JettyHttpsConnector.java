@@ -297,6 +297,8 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
         if (tls.getTrustStore() != null) cnn.setTruststore(tls.getTrustStore());
         if (tls.getTrustStoreType() != null) cnn.setTruststoreType(tls.getTrustStoreType());
         if (tls.getTrustManagerAlgorithm() != null) cnn.setSslTrustManagerFactoryAlgorithm(tls.getTrustManagerAlgorithm());
+        cnn.setNeedClientAuth(tls.isRequireClientAuthentication());
+
         return cnn;
     }
 }
