@@ -12,8 +12,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.TlsDirectKeyStore;
 import org.mule.api.security.TlsDirectTrustStore;
 import org.mule.api.security.TlsIndirectKeyStore;
-import org.mule.api.security.TlsProtocolHandler;
-import org.mule.api.security.provider.SecurityProviderFactory;
 import org.mule.api.security.tls.TlsConfiguration;
 import org.mule.util.SystemUtils;
 
@@ -33,7 +31,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
  * One server is created for each connector declared, many Jetty endpoints can share the same connector.
  */
 
-public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirectKeyStore, TlsIndirectKeyStore, TlsDirectTrustStore, TlsProtocolHandler
+public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirectKeyStore, TlsIndirectKeyStore, TlsDirectTrustStore
 {
 
     public static final String JETTY_SSL = "jetty-ssl";
@@ -118,21 +116,6 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
     public String getKeyStoreType()
     {
         return tls.getKeyStoreType();
-    }
-
-    public String getProtocolHandler()
-    {
-        return tls.getProtocolHandler();
-    }
-
-    public Provider getProvider()
-    {
-        return tls.getProvider();
-    }
-
-    public SecurityProviderFactory getSecurityProviderFactory()
-    {
-        return tls.getSecurityProviderFactory();
     }
 
     public String getSslType()
@@ -225,24 +208,9 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
         tls.setKeyStoreType(keystoreType);
     }
 
-    public void setProtocolHandler(String protocolHandler)
-    {
-        tls.setProtocolHandler(protocolHandler);
-    }
-
-    public void setProvider(Provider provider)
-    {
-        tls.setProvider(provider);
-    }
-
     public void setRequireClientAuthentication(boolean requireClientAuthentication)
     {
         tls.setRequireClientAuthentication(requireClientAuthentication);
-    }
-
-    public void setSecurityProviderFactory(SecurityProviderFactory spFactory)
-    {
-        tls.setSecurityProviderFactory(spFactory);
     }
 
     public void setSslType(String sslType)
@@ -295,11 +263,8 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
     private SslContextFactory createSslContextFactory()
     {
         SslContextFactory sslContextFactory = new SslContextFactory();
+        sslContextFactory.setProtocol(getSslType());
 
-        if (SystemUtils.isIbmJDK())
-        {
-            sslContextFactory.setProtocol("SSL_TLS");
-        }
         if (tls.getKeyStore() != null)
         {
             sslContextFactory.setKeyStorePath(tls.getKeyStore());
@@ -315,10 +280,6 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
         if (tls.getKeyManagerAlgorithm() != null)
         {
             sslContextFactory.setSslKeyManagerFactoryAlgorithm(tls.getKeyManagerAlgorithm());
-        }
-        if (tls.getProvider() != null)
-        {
-            sslContextFactory.setProvider(tls.getProvider().getName());
         }
         if (tls.getTrustStorePassword() != null)
         {

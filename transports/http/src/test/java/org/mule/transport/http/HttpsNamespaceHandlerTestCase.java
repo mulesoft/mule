@@ -42,8 +42,6 @@ public class HttpsNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestC
         assertEquals("mulepassword", connector.getTrustStorePassword());
         assertTrue(connector.isExplicitTrustStoreOnly());
         assertTrue(connector.isRequireClientAuthentication());
-
-        assertEquals("foo", connector.getProtocolHandler());
     }
 
     @Test

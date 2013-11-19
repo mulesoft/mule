@@ -7816,17 +7816,18 @@
         </xsd:union>
     </xsd:simpleType>
 
-    <!-- corresponds to TlsProtocolHandler, named as tls-protocol-handler -->
+    <!-- corresponds to TlsProtocolHandler, named as tls-protocol-handler.
+         DEPRECATED since 3.5 - This property will be ignored -->
     <xsd:complexType name="tlsProtocolHandler">
         <xsd:annotation>
             <xsd:documentation>
-                Configures the global Java protocol handler. WARNING - Untested.
+                Configures the global Java protocol handler. DEPRECATED since 3.5 - This is no longer necessary and will be ignored
             </xsd:documentation>
         </xsd:annotation>
         <xsd:attribute name="property" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    Sets the java.protocol.handler.pkgs system property.
+                    Sets the java.protocol.handler.pkgs system property. DEPRECATED since 3.5 - This is no longer necessary and will be ignored
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
