@@ -456,6 +456,10 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         {
             if (connectionFactory instanceof XAConnectionFactory && muleContext.getTransactionManager() instanceof TransactionManagerWrapper)
             {
+                logger.info(String.format("No pool defined for XAConnectionFactory in connector %s. A default pool will be created. " +
+                                          "To customize define a bti:xa-connection-factory-pool element in your config and assign it to " +
+                                          "the connector.", getName()));
+
                 BitronixConnectionFactoryPoolBuilder builder = new BitronixConnectionFactoryPoolBuilder();
                 builder.setConnectionFactory((XAConnectionFactory) connectionFactory);
                 builder.setName(getName());

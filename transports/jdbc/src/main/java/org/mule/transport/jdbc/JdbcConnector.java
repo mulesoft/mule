@@ -132,7 +132,7 @@ public class JdbcConnector extends AbstractConnector implements Testable
             if (muleContext.getTransactionManager() instanceof TransactionManagerWrapper)
             {
                 logger.info(String.format("No pool defined for XADataSource in connector %s. A default pool will be created. " +
-                                          "To customize define a btm:xa-data-source-pool element in your config and assign it to " +
+                                          "To customize define a bti:xa-data-source-pool element in your config and assign it to " +
                                           "the connector.", getName()));
 
                 BitronixXaDataSourceBuilder builder = new BitronixXaDataSourceBuilder();

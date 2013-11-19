@@ -18,7 +18,7 @@ import bitronix.tm.resource.jms.PoolingConnectionFactory;
 public class BitronixConnectionFactoryPoolBuilder
 {
 
-    private int minPoolSize = 2;
+    private int minPoolSize = 4;
     private int maxPoolSize = 32;
     private int maxIdleTime = 60;
     private String name;
@@ -28,7 +28,7 @@ public class BitronixConnectionFactoryPoolBuilder
     {
         Preconditions.checkState(name != null, "name is required");
         Preconditions.checkState(connectionFactory != null, "connectionFactory is required");
-        Preconditions.checkState(minPoolSize > 0, "minPoolSize must be greater than 0");
+        Preconditions.checkState(minPoolSize >= 0, "minPoolSize must be greater or equal than 0");
         Preconditions.checkState(maxPoolSize > 0, "maxPoolSize must be greater than 0");
         Preconditions.checkState(maxIdleTime > 0, "maxIdleTime must be greater than 0");
 

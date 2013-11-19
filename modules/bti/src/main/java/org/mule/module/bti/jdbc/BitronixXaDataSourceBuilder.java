@@ -17,7 +17,7 @@ import bitronix.tm.resource.jdbc.PoolingDataSource;
 public class BitronixXaDataSourceBuilder
 {
 
-    private int minPoolSize = 2;
+    private int minPoolSize = 4;
     private int maxPoolSize = 16;
     private int maxIdleTime = 60;
     private String name;
@@ -27,7 +27,7 @@ public class BitronixXaDataSourceBuilder
     {
         Preconditions.checkState(name != null, "name is required");
         Preconditions.checkState(dataSource != null, "dataSource is required");
-        Preconditions.checkState(minPoolSize > 0, "minPoolSize must be greater than 0");
+        Preconditions.checkState(minPoolSize >= 0, "minPoolSize must be greater or equal than 0");
         Preconditions.checkState(maxPoolSize > 0, "maxPoolSize must be greater than 0");
         Preconditions.checkState(maxIdleTime > 0, "maxIdleTime must be greater than 0");
 

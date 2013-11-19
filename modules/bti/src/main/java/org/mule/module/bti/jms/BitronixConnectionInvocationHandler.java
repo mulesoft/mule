@@ -79,6 +79,10 @@ public class BitronixConnectionInvocationHandler implements TargetInvocationHand
             catch (JMSException e)
             {
                 // The connection is already closed, no reference to XAConnection available.
+                if (BitronixConnectionInvocationHandler.logger.isDebugEnabled())
+                {
+                    BitronixConnectionInvocationHandler.logger.debug("Failed to get XA connection", e);
+                }
             }
         }
         return connection;
