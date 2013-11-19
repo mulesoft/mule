@@ -7,7 +7,7 @@
 package org.mule.transport.jms.integration.activemq;
 
 import org.mule.transport.jms.test.TestReconnectionConnectionFactoryWrapper;
-import org.mule.transport.jms.xa.TargetInvocationHandler;
+import org.mule.util.proxy.TargetInvocationHandler;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;

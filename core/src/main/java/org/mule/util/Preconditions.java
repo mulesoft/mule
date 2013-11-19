@@ -29,4 +29,16 @@ public class Preconditions
             throw new IllegalArgumentException(message);
         }
     }
+
+    /**
+     * @param condition Condition that must be satisfied
+     * @param message   The Message of the exception in case the condition is invalid
+     */
+    public static void checkState(boolean condition, String message)
+    {
+        if (!condition)
+        {
+            throw new IllegalStateException(message);
+        }
+    }
 }

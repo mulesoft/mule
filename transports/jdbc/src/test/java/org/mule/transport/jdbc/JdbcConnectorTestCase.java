@@ -18,10 +18,10 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.Connector;
 import org.mule.common.TestResult;
 import org.mule.common.Testable;
+import org.mule.module.bti.jdbc.BitronixXaDataSourceWrapper;
 import org.mule.module.bti.transaction.TransactionManagerWrapper;
 import org.mule.tck.util.MuleDerbyTestUtils;
 import org.mule.transport.AbstractConnectorTestCase;
-import org.mule.transport.jdbc.xa.BitronixXaDataSourceWrapper;
 import org.mule.transport.jdbc.xa.DataSourceWrapper;
 
 import java.util.HashMap;
@@ -33,6 +33,7 @@ import javax.sql.XADataSource;
 import org.apache.derby.jdbc.EmbeddedDataSource;
 import org.enhydra.jdbc.standard.StandardDataSource;
 import org.junit.Test;
+import org.mockito.Answers;
 
 public class JdbcConnectorTestCase extends AbstractConnectorTestCase
 {
@@ -145,7 +146,7 @@ public class JdbcConnectorTestCase extends AbstractConnectorTestCase
     public void dataSourceIsWrappedWithBtmWrapperWhenUsingXA() throws Exception
     {
         muleContext.setTransactionManager(mock(TransactionManagerWrapper.class));
-        DataSource mockDataSource = mock(TestXADataSource.class);
+        DataSource mockDataSource = mock(TestXADataSource.class, Answers.RETURNS_DEEP_STUBS.get());
         DataSource dataSource = getDataSourceAfterInitialization(mockDataSource);
         assertThat(dataSource, instanceOf(BitronixXaDataSourceWrapper.class));
     }
@@ -154,6 +155,7 @@ public class JdbcConnectorTestCase extends AbstractConnectorTestCase
     {
         JdbcConnector connector = new JdbcConnector(muleContext);
         connector.setDataSource(mockDataSource);
+        connector.setName("testConnector");
         connector.initialise();
         return connector.getDataSource();
     }

@@ -9,7 +9,7 @@ package org.mule.transport.jms.activemq;
 import org.mule.api.MuleContext;
 import org.mule.transport.ConnectException;
 import org.mule.transport.jms.JmsConnector;
-import org.mule.transport.jms.xa.TargetInvocationHandler;
+import org.mule.util.proxy.TargetInvocationHandler;
 import org.mule.util.ClassUtils;
 
 import java.lang.reflect.InvocationTargetException;

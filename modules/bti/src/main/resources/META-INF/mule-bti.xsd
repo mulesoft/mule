@@ -43,5 +43,87 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="xa-data-source-pool" type="xaDataSourcePoolType" substitutionGroup="mule:abstract-extension">
+        <xsd:annotation>
+            <xsd:documentation>
+                This element allows to configure a Bitronix data source pool. You must reference a data source though the dataSource-ref
+                attribute, and then use this element as data source in the JDBC connector.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="xa-connection-factory-pool" type="xaConnectionFactoryPoolType" substitutionGroup="mule:abstract-extension">
+        <xsd:annotation>
+            <xsd:documentation>
+                This element allows to configure a Bitronix connection factory pool. You must reference a connection factory though the
+                connectionFactory-ref attribute, and then use this element as data source in the JMS connector.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+
+
+    <xsd:complexType name="abstractXaPoolType" abstract="true">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                <xsd:attribute name="name" type="mule:substitutableName" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the pool so that the connector can reference it.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="minPoolSize" type="mule:substitutableInt" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Defines the minimal amount of connections that can be in the pool.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="maxPoolSize" type="mule:substitutableInt" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Defines the maximum amount of connections that can be in the pool.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="maxIdleTime" type="mule:substitutableInt" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Defines the amount of seconds an idle connection can stay in the pool before getting closed.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="xaDataSourcePoolType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractXaPoolType">
+                <xsd:attribute name="dataSource-ref" type="mule:substitutableName" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Reference to the JDBC data source object. An XADataSource object must be provided."
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="xaConnectionFactoryPoolType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractXaPoolType">
+                <xsd:attribute name="connectionFactory-ref" type="mule:substitutableName" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Reference to the connection factory. An XAConnectionFactory must be provided.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
 </xsd:schema>
