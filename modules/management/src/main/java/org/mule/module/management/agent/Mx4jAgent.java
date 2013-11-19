@@ -137,16 +137,7 @@ public class Mx4jAgent extends AbstractAgent
 
         if (socketFactoryProperties != null && !socketFactoryProperties.isEmpty())
         {
-            SSLAdaptorServerSocketFactoryMBean factory;
-            if (SystemUtils.isIbmJDK())
-            {
-                factory = new IBMSslAdapterServerSocketFactory();
-            }
-            else
-            {
-                // BEA are using Sun's JSSE, so no extra checks necessary
-                factory = new SSLAdaptorServerSocketFactory();
-            }
+            SSLAdaptorServerSocketFactoryMBean factory = new SSLAdaptorServerSocketFactory();
             BeanUtils.populateWithoutFail(factory, socketFactoryProperties, true);
             adaptor.setSocketFactory(factory);
         }

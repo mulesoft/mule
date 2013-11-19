@@ -6,7 +6,6 @@
  */
 package org.mule.api.security;
 
-import org.mule.api.security.provider.AutoDiscoverySecurityProviderFactory;
 import org.mule.api.security.tls.TlsConfiguration;
 
 import javax.net.ssl.TrustManagerFactory;
@@ -39,14 +38,12 @@ public interface TlsDirectTrustStore extends TlsIndirectTrustStore
     void setTrustStoreType(String trustStoreType);
 
     /**
-     * @return The algorithm used by the trust store.  The default comes from 
-     * {@link AutoDiscoverySecurityProviderFactory}
+     * @return The algorithm used by the trust store.
      */
     String getTrustManagerAlgorithm();
 
     /**
-     * @param trustManagerAlgorithm The algorithm used by the trust store.  The default comes from 
-     * {@link AutoDiscoverySecurityProviderFactory}
+     * @param trustManagerAlgorithm The algorithm used by the trust store.
      */
     void setTrustManagerAlgorithm(String trustManagerAlgorithm);
 

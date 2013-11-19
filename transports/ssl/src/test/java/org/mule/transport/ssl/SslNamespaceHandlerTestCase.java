@@ -45,7 +45,5 @@ public class SslNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("mulepassword", connector.getTrustStorePassword());
         assertTrue(connector.isExplicitTrustStoreOnly());
         assertTrue(connector.isRequireClientAuthentication());
-
-        assertEquals("foo", connector.getProtocolHandler());
     }
 }

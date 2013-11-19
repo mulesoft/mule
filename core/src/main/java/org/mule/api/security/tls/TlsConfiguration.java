@@ -10,10 +10,6 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.security.TlsDirectKeyStore;
 import org.mule.api.security.TlsDirectTrustStore;
 import org.mule.api.security.TlsIndirectKeyStore;
-import org.mule.api.security.TlsProtocolHandler;
-import org.mule.api.security.provider.AutoDiscoverySecurityProviderFactory;
-import org.mule.api.security.provider.SecurityProviderFactory;
-import org.mule.api.security.provider.SecurityProviderInfo;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
@@ -27,8 +23,6 @@ import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.Provider;
-import java.security.Security;
 import java.util.Enumeration;
 
 import javax.net.ssl.KeyManager;
@@ -110,21 +104,17 @@ import org.apache.commons.logging.LogFactory;
  * socket factory can be retrieved from {@link #getKeyManagerFactory()}.  It just works.</p>
  */
 public final class TlsConfiguration
-        implements TlsDirectTrustStore, TlsDirectKeyStore, TlsIndirectKeyStore, TlsProtocolHandler
+        implements TlsDirectTrustStore, TlsDirectKeyStore, TlsIndirectKeyStore
 {
     public static final String DEFAULT_KEYSTORE = ".keystore";
     public static final String DEFAULT_KEYSTORE_TYPE = KeyStore.getDefaultType();
+    public static final String DEFAULT_KEYMANAGER_ALGORITHM = KeyManagerFactory.getDefaultAlgorithm();
+    public static final String DEFAULT_SSL_TYPE = "TLSv1";
     public static final String JSSE_NAMESPACE = "javax.net";
 
     private Log logger = LogFactory.getLog(getClass());
 
-    private SecurityProviderFactory spFactory = new AutoDiscoverySecurityProviderFactory();
-    private SecurityProviderInfo spInfo = spFactory.getSecurityProviderInfo();
-    private Provider provider = spFactory.getProvider();
-    private String sslType = spInfo.getDefaultSslType();
-
-    // global
-    private String protocolHandler = spInfo.getProtocolHandler();
+    private String sslType = DEFAULT_SSL_TYPE;
 
     // this is the key store that is generated in-memory and available to connectors explicitly.
     // it is local to the socket.
@@ -133,7 +123,7 @@ public final class TlsConfiguration
     private String keyPassword = null;
     private String keyStorePassword = null;
     private String keystoreType = DEFAULT_KEYSTORE_TYPE;
-    private String keyManagerAlgorithm = spInfo.getKeyManagerAlgorithm();
+    private String keyManagerAlgorithm = DEFAULT_KEYMANAGER_ALGORITHM;
     private KeyManagerFactory keyManagerFactory = null;
 
     // this is the key store defined in system properties that is used implicitly.
@@ -150,7 +140,7 @@ public final class TlsConfiguration
     private String trustStoreName = null;
     private String trustStorePassword = null;
     private String trustStoreType = DEFAULT_KEYSTORE_TYPE;
-    private String trustManagerAlgorithm = spInfo.getKeyManagerAlgorithm();
+    private String trustManagerAlgorithm = DEFAULT_KEYMANAGER_ALGORITHM;
     private TrustManagerFactory trustManagerFactory = null;
     private boolean explicitTrustStoreOnly = false;
     private boolean requireClientAuthentication = false;
@@ -182,8 +172,6 @@ public final class TlsConfiguration
         }
         validate(anon);
 
-        Security.addProvider(provider);
-        System.setProperty("java.protocol.handler.pkgs", protocolHandler);
 
         if (!anon)
         {
@@ -199,7 +187,6 @@ public final class TlsConfiguration
 
     private void validate(boolean anon) throws CreateException
     {
-        assertNotNull(getProvider(), "The security provider cannot be null");
         if (!anon)
         {
             assertNotNull(getKeyStore(), "The KeyStore location cannot be null");
@@ -379,38 +366,6 @@ public final class TlsConfiguration
         this.sslType = sslType;
     }
 
-    public Provider getProvider()
-    {
-        return provider;
-    }
-
-    public void setProvider(Provider provider)
-    {
-        this.provider = provider;
-    }
-
-    @Override
-    public String getProtocolHandler()
-    {
-        return protocolHandler;
-    }
-
-    @Override
-    public void setProtocolHandler(String protocolHandler)
-    {
-        this.protocolHandler = protocolHandler;
-    }
-
-    public SecurityProviderFactory getSecurityProviderFactory()
-    {
-        return spFactory;
-    }
-
-    public void setSecurityProviderFactory(SecurityProviderFactory spFactory)
-    {
-        this.spFactory = spFactory;
-    }
-
     // access to the explicit key store variables
 
     @Override
@@ -588,7 +543,7 @@ public final class TlsConfiguration
     @Override
     public void setTrustManagerAlgorithm(String trustManagerAlgorithm)
     {
-        this.trustManagerAlgorithm = defaultForNull(trustManagerAlgorithm, spInfo.getKeyManagerAlgorithm());
+        this.trustManagerAlgorithm = defaultForNull(trustManagerAlgorithm, DEFAULT_KEYMANAGER_ALGORITHM);
     }
 
     @Override
