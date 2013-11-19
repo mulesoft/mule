@@ -15,7 +15,7 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.NullPayload;
 
-import java.net.SocketException;
+import java.io.IOException;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,7 +46,7 @@ public class JettyHttpsClientAuthenticationTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://notAuthenticatedClientEndpoint", TEST_MESSAGE, null);
         assertEquals(NullPayload.getInstance(), response.getPayload());
-        assertTrue(response.getExceptionPayload().getException().getCause() instanceof SocketException);
+        assertTrue(response.getExceptionPayload().getException().getCause() instanceof IOException);
     }
 
 }
