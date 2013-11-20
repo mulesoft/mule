@@ -7,7 +7,10 @@
 package org.mule.module.bti.jdbc;
 
 import org.mule.api.MuleContext;
-import org.mule.module.bti.jdbc.BitronixConnectionWrapper;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.config.i18n.MessageFactory;
+import org.mule.module.bti.transaction.TransactionManagerWrapper;
 
 import java.io.PrintWriter;
 import java.sql.Connection;
