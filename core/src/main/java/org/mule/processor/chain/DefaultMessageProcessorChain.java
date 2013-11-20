@@ -20,6 +20,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.RequestReplyReplierMessageProcessor;
+import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.construct.Flow;
 import org.mule.execution.MessageProcessorExecutionTemplate;
@@ -79,11 +80,13 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
         else
         {
             FlowConstruct flowConstruct = event.getFlowConstruct();
+            boolean flowConstructIsNotAService = !(flowConstruct instanceof Service);
             MuleEvent copy = null;
+            
             for (int i = 0; i < processors.size(); i++)
             {
                 MessageProcessor processor = processors.get(i);
-                if (flowConstruct instanceof Flow && processorMayReturnNull(processor))
+                if (flowConstructIsNotAService && processorMayReturnNull(processor))
                 {
                     copy = OptimizedRequestContext.criticalSetEvent(event);
                 }
@@ -92,7 +95,7 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
 
                 if (VoidMuleEvent.getInstance().equals(event))
                 {
-                    if (flowConstruct instanceof Pipeline)
+                    if (flowConstructIsNotAService)
                     {
                         event = copy;
                     }
