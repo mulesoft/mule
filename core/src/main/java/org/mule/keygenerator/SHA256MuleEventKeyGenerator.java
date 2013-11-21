@@ -6,45 +6,46 @@
  */
 package org.mule.keygenerator;
 
-import org.mule.api.MuleEventKeyGenerator;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleEventKeyGenerator;
+import org.mule.util.StringUtils;
 
 import java.io.NotSerializableException;
 import java.io.Serializable;
 import java.security.MessageDigest;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Implements {@link org.mule.api.MuleEventKeyGenerator} applying an MD5 digest to the event's
+ * Implements {@link org.mule.api.MuleEventKeyGenerator} applying SHA-256 digest to the event's
  * message payload.
- *
- * @deprecated Use {@code SHA256MuleEventKeyGenerator} instead.
  */
-@Deprecated
-public class MD5MuleEventKeyGenerator implements MuleEventKeyGenerator
+public class SHA256MuleEventKeyGenerator implements MuleEventKeyGenerator
 {
 
-    protected Log logger = LogFactory.getLog(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(SHA256MuleEventKeyGenerator.class);
 
     public Serializable generateKey(MuleEvent event) throws NotSerializableException
     {
         try
         {
             byte[] bytesOfMessage = event.getMessageAsBytes();
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            String key = new String(md.digest(bytesOfMessage));
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            String key = StringUtils.toHexString(md.digest(bytesOfMessage));
 
             if (logger.isDebugEnabled())
             {
-                logger.debug("Generated key for event: " + event + " key: " + key);
+                logger.debug(String.format("Generated key for event: %s key: %s", event, key));
             }
 
             return key;
         }
         catch (Exception e)
         {
+            // TODO: The exception may not necessarily be caused by a serialization problem, but we still throw
+            // NotSerializableException to keep backwards compatibility. The interface needs to be changed.
+
             NotSerializableException notSerializableException = new NotSerializableException(e.getMessage());
             notSerializableException.initCause(e);
 
