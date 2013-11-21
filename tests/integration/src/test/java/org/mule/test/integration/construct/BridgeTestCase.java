@@ -6,6 +6,7 @@
  */
 package org.mule.test.integration.construct;
 
+import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 
 import org.mule.api.MuleEventContext;
@@ -15,7 +16,6 @@ import org.mule.api.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.transport.NullPayload;
 import org.mule.util.concurrent.Latch;
 
 import java.util.Collections;
@@ -28,6 +28,8 @@ import org.junit.Test;
 
 public class BridgeTestCase extends FunctionalTestCase
 {
+    private static final int TIMEOUT = 5000;
+    
     private MuleClient muleClient;
 
     public BridgeTestCase()
@@ -57,8 +59,12 @@ public class BridgeTestCase extends FunctionalTestCase
     @Test
     public void testAsynchronous() throws Exception
     {
-        final MuleMessage result = muleClient.send("vm://asynchronous-bridge.in", "foobar", null);
-        assertEquals(NullPayload.getInstance(), result.getPayload());
+        final String payload = "foobar";
+        final MuleMessage result = muleClient.send("vm://asynchronous-bridge.in", payload, null);
+        assertNull(result);
+        
+        MuleMessage received = muleClient.request("vm://log-service.in", TIMEOUT);
+        assertEquals(payload, received.getPayload());
     }
 
     @Test
