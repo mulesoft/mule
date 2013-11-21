@@ -70,7 +70,7 @@ public class InOptionalOutOutOnlyJMSTestCase extends AbstractServiceAndFlowTestC
         assertNotNull(result);
         assertEquals(NullPayload.getInstance(), result.getPayload());
 
-        Map<String, String> props = new HashMap<String, String>();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("foo", "bar");
         result = client.send("inboundEndpoint", "some data", props, 20000);
 

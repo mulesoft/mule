@@ -129,7 +129,7 @@ public class HttpProxyTestCase extends AbstractServiceAndFlowTestCase
                              final String expectedResult,
                              final Map<String, String> extraHeaders) throws Exception
     {
-        final Map<String, String> headers = new HashMap<String, String>(Collections.singletonMap(
+        final Map<String, Object> headers = new HashMap<String, Object>(Collections.singletonMap(
             "X-Custom-Header", "w00t"));
         headers.putAll(extraHeaders);
 
