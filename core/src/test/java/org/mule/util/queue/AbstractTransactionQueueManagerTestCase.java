@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.util.queue;
 
 import static org.junit.Assert.assertEquals;
@@ -11,6 +12,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.concurrent.Latch;
 import org.mule.util.store.QueueStoreAdapter;
@@ -31,6 +33,8 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
      * logger used by this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
+
+    protected QueueTestComponent disposeTest = new QueueTestComponent();
 
     protected abstract TransactionalQueueManager createQueueManager() throws Exception;
 
@@ -162,12 +166,13 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
 
     }
-    
+
     @Test
-    public void testClearWithoutTransaction() throws Exception {
+    public void testClearWithoutTransaction() throws Exception
+    {
         final TransactionalQueueManager mgr = createQueueManager();
         mgr.start();
-        
+
         QueueSession s = mgr.getQueueSession();
         Queue q = s.getQueue("queue1");
         assertEquals("Queue size", 0, q.size());
@@ -175,40 +180,41 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         assertEquals("Queue size", 1, q.size());
         q.clear();
         assertEquals("Queue size", 0, q.size());
-        
+
         mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
     }
-    
+
     @Test
-    public void testClearInTransaction() throws Exception {
+    public void testClearInTransaction() throws Exception
+    {
         final TransactionalQueueManager mgr = createQueueManager();
         mgr.start();
-        
+
         QueueSession s = mgr.getQueueSession();
-        
-        //insert item in transaction
+
+        // insert item in transaction
         s.begin();
         Queue q = s.getQueue("queue1");
         assertEquals("Queue size", 0, q.size());
         q.put("String1");
         s.commit();
-        
+
         assertEquals("Queue size", 1, q.size());
-        
-        //clear queue but rollback
+
+        // clear queue but rollback
         s.begin();
         assertEquals("Queue size", 1, q.size());
         q.clear();
         s.rollback();
         assertEquals("Queue size", 1, q.size());
-        
-        //do clear in transaction
+
+        // do clear in transaction
         s.begin();
         assertEquals("Queue size", 1, q.size());
         q.clear();
         s.commit();
         assertEquals("Queue size", 0, q.size());
-        
+
         mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
     }
 
@@ -333,7 +339,8 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
     {
         final TransactionalQueueManager mgr = createQueueManager();
         mgr.start();
-        mgr.setDefaultQueueConfiguration(new QueueConfiguration(2, new QueueStoreAdapter<Serializable>(new SimpleMemoryObjectStore())));
+        mgr.setDefaultQueueConfiguration(new QueueConfiguration(2, new QueueStoreAdapter<Serializable>(
+            new SimpleMemoryObjectStore())));
 
         final Latch latch = new Latch();
 
@@ -721,7 +728,8 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
     {
 
         final TransactionalQueueManager mgr = createQueueManager();
-        mgr.setDefaultQueueConfiguration(new QueueConfiguration(1, new QueueStoreAdapter<Serializable>(new SimpleMemoryObjectStore())));
+        mgr.setDefaultQueueConfiguration(new QueueConfiguration(1, new QueueStoreAdapter<Serializable>(
+            new SimpleMemoryObjectStore())));
         try
         {
             mgr.start();
@@ -871,6 +879,24 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
             assertEquals(0, q.size());
         }
 
+    }
+
+    @Test
+    public void testDisposeQueueWithoutTransaction() throws Exception
+    {
+        this.disposeTest.testDisposal(this.createQueueManager(), false);
+    }
+
+    @Test
+    public void testDisposeQueueInTransaction() throws Exception
+    {
+        this.disposeTest.testDisposal(this.createQueueManager(), true);
+    }
+
+    @Test
+    public void testDisposeQueueByNameInTransaction() throws Exception
+    {
+        this.disposeTest.testDisposal(this.createQueueManager(), true);
     }
 
 }

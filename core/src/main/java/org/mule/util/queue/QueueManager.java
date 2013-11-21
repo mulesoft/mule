@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.util.queue;
 
 import org.mule.api.lifecycle.Startable;
@@ -15,9 +16,28 @@ import org.mule.api.lifecycle.Stoppable;
  */
 public interface QueueManager extends Startable, Stoppable
 {
+    /**
+     * Returns a new instance of {@link QueueSession} bounded to this
+     * {@link QueueManager}
+     * 
+     * @return
+     */
     QueueSession getQueueSession();
 
+    /**
+     * Sets the default {@link QueueConfiguration} for any created {@link Queue} for
+     * which a custom configuration hasn't been specified
+     * 
+     * @param config an instance of {@link QueueConfiguration}
+     */
     void setDefaultQueueConfiguration(QueueConfiguration config);
 
+    /**
+     * Specifies a {@link QueueConfiguration} for the queue which name matches
+     * queueName
+     * 
+     * @param queueName the name of a {@link Queue}
+     * @param config an instance of {@link QueueConfiguration}
+     */
     void setQueueConfiguration(String queueName, QueueConfiguration config);
 }

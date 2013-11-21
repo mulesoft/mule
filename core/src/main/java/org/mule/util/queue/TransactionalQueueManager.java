@@ -7,7 +7,10 @@
 package org.mule.util.queue;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
@@ -36,19 +39,26 @@ import javax.transaction.xa.XAResource;
 public class TransactionalQueueManager extends AbstractXAResourceManager
     implements QueueManager, MuleContextAware
 {
-    private Map<String, QueueInfo> queues = new HashMap<String, QueueInfo>();
+    private final Map<String, QueueInfo> queues = new HashMap<String, QueueInfo>();
 
     private QueueConfiguration defaultQueueConfiguration;
     private MuleContext muleContext;
-    private Set<QueueStore> queueObjectStores = new HashSet<QueueStore>();
-    private Set<ListableObjectStore> listableObjectStores = new HashSet<ListableObjectStore>();
+    private final Set<QueueStore> queueObjectStores = new HashSet<QueueStore>();
+    private final Set<ListableObjectStore> listableObjectStores = new HashSet<ListableObjectStore>();
 
+    /**
+     * {@inheritDoc}
+     * @return an instance of {@link TransactionalQueueSession}
+     */
     @Override
     public synchronized QueueSession getQueueSession()
     {
         return new TransactionalQueueSession(this, this);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void setDefaultQueueConfiguration(QueueConfiguration config)
     {
@@ -56,27 +66,64 @@ public class TransactionalQueueManager extends AbstractXAResourceManager
         addStore(config.objectStore);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void setQueueConfiguration(String queueName, QueueConfiguration config)
     {
         getQueue(queueName, config).setConfig(config);
         addStore(config.objectStore);
     }
+    
+    protected void disposeQueue(Queue queue) throws MuleException, InterruptedException
+    {
+        if (queue == null)
+        {
+            throw new IllegalArgumentException("Queue to be disposed cannot be null");
+        }
+        
+        final String queueName = queue.getName();
+        
+        synchronized (this.queues)
+        {
+            if (!this.queues.containsKey(queueName))
+            {
+                throw new IllegalArgumentException(String.format("There's no queue for name %s", queueName));
+            }
+            
+            this.queues.remove(queueName);
+        }
+        
+        queue.clear();
+        
+        if (queue instanceof Stoppable) {
+            ((Stoppable) queue).stop();
+        }
+        
+        if (queue instanceof Disposable) {
+            ((Disposable) queue).dispose();
+        }
+    }
 
-    protected synchronized QueueInfo getQueue(String name)
+    protected QueueInfo getQueue(String name)
     {
         return getQueue(name, defaultQueueConfiguration);
     }
 
-    protected synchronized QueueInfo getQueue(String name, QueueConfiguration config)
+    protected QueueInfo getQueue(String name, QueueConfiguration config)
     {
-        QueueInfo q = queues.get(name);
-        if (q == null)
+        synchronized (this.queues)
         {
-            q = new QueueInfo(name, muleContext, config);
-            queues.put(name, q);
+            QueueInfo q = queues.get(name);
+            if (q == null)
+            {
+                q = new QueueInfo(name, muleContext, config);
+                queues.put(name, q);
+            }
+            
+            return q;
         }
-        return q;
     }
 
     public synchronized QueueInfo getQueueInfo(String name)

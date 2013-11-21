@@ -6,6 +6,7 @@
  */
 package org.mule.util.queue;
 
+import org.mule.api.MuleException;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.util.store.DeserializationPostInitialisable;
 import org.mule.util.xa.AbstractXAResourceManager;
@@ -202,6 +203,12 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
             {
                 throw new RuntimeException(e);
             }
+        }
+        
+        @Override
+        public void dispose() throws MuleException, InterruptedException
+        {
+            queueManager.disposeQueue(this);
         }
 
         @Override

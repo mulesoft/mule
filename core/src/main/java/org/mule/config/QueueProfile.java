@@ -87,13 +87,19 @@ public class QueueProfile
     public QueueConfiguration configureQueue(MuleContext context, String component, QueueManager queueManager)
         throws InitialisationException
     {
+        QueueConfiguration qc = toQueueConfiguration(context);
+        queueManager.setQueueConfiguration(component, qc);
+
+        return qc;
+    }
+
+    public QueueConfiguration toQueueConfiguration(MuleContext context)
+    {
         if (objectStore instanceof MuleContextAware)
         {
             ((MuleContextAware) objectStore).setMuleContext(context);
         }
-        QueueConfiguration qc = new QueueConfiguration(context, maxOutstandingMessages, objectStore);
-        queueManager.setQueueConfiguration(component, qc);
-        return qc;
+        return new QueueConfiguration(context, maxOutstandingMessages, objectStore);
     }
 
     public ListableObjectStore<Serializable> getObjectStore()
