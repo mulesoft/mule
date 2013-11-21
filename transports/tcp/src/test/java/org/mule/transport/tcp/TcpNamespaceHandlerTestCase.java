@@ -44,6 +44,7 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         // this is what we want - i was worried that the client was used as default if the server
         // wasn't set, but that's not the case
         assertEquals(-1, c.getServerSoTimeout());
+        assertEquals(-1, c.getConnectionTimeout());
         assertEquals(3000, c.getClientSoTimeout());
         assertEquals(3000, c.getSocketMaxWait());
         assertTrue(c.isKeepAlive());
@@ -61,6 +62,7 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(c);
         assertEquals(4000, c.getServerSoTimeout());
         assertEquals(3000, c.getClientSoTimeout());
+        assertEquals(2000, c.getConnectionTimeout());
         assertEquals(-1, c.getSocketMaxWait());
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
