@@ -6,6 +6,8 @@
  */
 package org.mule.transport.tcp;
 
+import org.mule.api.transport.Connector;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -13,10 +15,20 @@ import java.net.Socket;
 public class TcpSocketFactory extends AbstractTcpSocketFactory
 {
 
+    private final int connectionTimeout;
+
+    public TcpSocketFactory(int connectionTimeout)
+    {
+        this.connectionTimeout = connectionTimeout;
+    }
+
     protected Socket createSocket(TcpSocketKey key) throws IOException
     {
         Socket socket = new Socket();
-        socket.connect(new InetSocketAddress(key.getInetAddress(), key.getPort()), key.getEndpoint().getResponseTimeout());
+
+        int timeout = connectionTimeout != Connector.INT_VALUE_NOT_SET ? connectionTimeout : key.getEndpoint().getResponseTimeout();
+
+        socket.connect(new InetSocketAddress(key.getInetAddress(), key.getPort()), timeout);
         return socket;
     }
 

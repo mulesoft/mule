@@ -57,6 +57,7 @@ public class TcpConnector extends AbstractConnector
 
     private int clientSoTimeout = DEFAULT_SOCKET_TIMEOUT;
     private int serverSoTimeout = DEFAULT_SOCKET_TIMEOUT;
+    private int connectionTimeout = DEFAULT_SOCKET_TIMEOUT;
     private int socketMaxWait = DEFAULT_WAIT_TIMEOUT;
     private int sendBufferSize = DEFAULT_BUFFER_SIZE;
     private int receiveBufferSize = DEFAULT_BUFFER_SIZE;
@@ -92,7 +93,6 @@ public class TcpConnector extends AbstractConnector
     public TcpConnector(MuleContext context)
     {
         super(context);
-        setSocketFactory(new TcpSocketFactory());
         setServerSocketFactory(new TcpServerSocketFactory());
         setTcpProtocol(new SafeProtocol());
     }
@@ -147,6 +147,9 @@ public class TcpConnector extends AbstractConnector
     @Override
     protected void doInitialise() throws InitialisationException
     {
+        TcpSocketFactory tcpSocketFactory = new TcpSocketFactory(getConnectionTimeout());
+        setSocketFactory(tcpSocketFactory);
+
         socketsPool.setFactory(getSocketFactory());
         socketsPool.setTestOnBorrow(true);
         socketsPool.setTestOnReturn(true);
@@ -313,6 +316,16 @@ public class TcpConnector extends AbstractConnector
     public void setClientSoTimeout(int timeout)
     {
         this.clientSoTimeout = valueOrDefault(timeout, 0, DEFAULT_SOCKET_TIMEOUT);
+    }
+
+    public int getConnectionTimeout()
+    {
+        return this.connectionTimeout;
+    }
+
+    public void setConnectionTimeout(int timeout)
+    {
+        this.connectionTimeout= valueOrDefault(timeout, 0, DEFAULT_SOCKET_TIMEOUT);
     }
 
     public int getServerSoTimeout()
