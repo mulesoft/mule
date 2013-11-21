@@ -6,8 +6,9 @@
  */
 package org.mule.keygenerator;
 
-import org.mule.api.MuleEventKeyGenerator;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleEventKeyGenerator;
+import org.mule.util.StringUtils;
 
 import java.io.NotSerializableException;
 import java.io.Serializable;
@@ -17,13 +18,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Implements {@link org.mule.api.MuleEventKeyGenerator} applying an MD5 digest to the event's
+ * Implements {@link org.mule.api.MuleEventKeyGenerator} applying SHA-256 digest to the event's
  * message payload.
- *
- * @deprecated Use {@code SHA256MuleEventKeyGenerator} instead.
  */
-@Deprecated
-public class MD5MuleEventKeyGenerator implements MuleEventKeyGenerator
+public class SHA256MuleEventKeyGenerator implements MuleEventKeyGenerator
 {
 
     protected Log logger = LogFactory.getLog(getClass());
@@ -33,8 +31,8 @@ public class MD5MuleEventKeyGenerator implements MuleEventKeyGenerator
         try
         {
             byte[] bytesOfMessage = event.getMessageAsBytes();
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            String key = new String(md.digest(bytesOfMessage));
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            String key = StringUtils.toHexString(md.digest(bytesOfMessage));
 
             if (logger.isDebugEnabled())
             {
