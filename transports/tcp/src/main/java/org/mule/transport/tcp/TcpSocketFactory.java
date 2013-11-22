@@ -15,18 +15,11 @@ import java.net.Socket;
 public class TcpSocketFactory extends AbstractTcpSocketFactory
 {
 
-    private final int connectionTimeout;
-
-    public TcpSocketFactory(int connectionTimeout)
-    {
-        this.connectionTimeout = connectionTimeout;
-    }
-
     protected Socket createSocket(TcpSocketKey key) throws IOException
     {
         Socket socket = new Socket();
 
-        int timeout = connectionTimeout != Connector.INT_VALUE_NOT_SET ? connectionTimeout : key.getEndpoint().getResponseTimeout();
+        int timeout = getConnectionTimeout() != Connector.INT_VALUE_NOT_SET ? getConnectionTimeout() : key.getEndpoint().getResponseTimeout();
 
         socket.connect(new InetSocketAddress(key.getInetAddress(), key.getPort()), timeout);
         return socket;

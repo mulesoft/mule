@@ -93,6 +93,7 @@ public class TcpConnector extends AbstractConnector
     public TcpConnector(MuleContext context)
     {
         super(context);
+        setSocketFactory(new TcpSocketFactory());
         setServerSocketFactory(new TcpServerSocketFactory());
         setTcpProtocol(new SafeProtocol());
     }
@@ -147,8 +148,7 @@ public class TcpConnector extends AbstractConnector
     @Override
     protected void doInitialise() throws InitialisationException
     {
-        TcpSocketFactory tcpSocketFactory = new TcpSocketFactory(getConnectionTimeout());
-        setSocketFactory(tcpSocketFactory);
+        socketFactory.setConnectionTimeout(getConnectionTimeout());
 
         socketsPool.setFactory(getSocketFactory());
         socketsPool.setTestOnBorrow(true);
