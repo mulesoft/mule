@@ -6,12 +6,11 @@
  */
 package org.mule.transport.tcp;
 
+import static org.junit.Assert.assertEquals;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractConnectorTestCase;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class TcpConnectorTestCase extends AbstractConnectorTestCase
 {
@@ -47,9 +46,13 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
         assertEquals(TcpConnector.DEFAULT_SOCKET_TIMEOUT, c.getServerSoTimeout());
         c.setClientSoTimeout(-1);
         assertEquals(TcpConnector.DEFAULT_SOCKET_TIMEOUT, c.getClientSoTimeout());
+        c.setConnectionTimeout(-1);
+        assertEquals(TcpConnector.DEFAULT_SOCKET_TIMEOUT, c.getConnectionTimeout());
         c.setClientSoTimeout(1000);
         c.setServerSoTimeout(1000);
+        c.setConnectionTimeout(1000);
         assertEquals(1000, c.getServerSoTimeout());
         assertEquals(1000, c.getClientSoTimeout());
+        assertEquals(1000, c.getConnectionTimeout());
     }
 }
