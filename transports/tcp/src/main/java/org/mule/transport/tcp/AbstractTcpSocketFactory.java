@@ -6,6 +6,7 @@
  */
 package org.mule.transport.tcp;
 
+import org.mule.api.transport.Connector;
 import org.mule.util.MapUtils;
 
 import java.io.IOException;
@@ -26,6 +27,8 @@ public abstract class AbstractTcpSocketFactory implements KeyedPoolableObjectFac
      * logger used by this class
      */
     private static final Log logger = LogFactory.getLog(TcpSocketFactory.class);
+
+    private int connectionTimeout = Connector.INT_VALUE_NOT_SET;
 
     public Object makeObject(Object key) throws Exception
     {
@@ -84,6 +87,16 @@ public abstract class AbstractTcpSocketFactory implements KeyedPoolableObjectFac
                 logger.debug("Failed to close socket after dispatch: " + e.getMessage());
             }
         }
+    }
+
+    public int getConnectionTimeout()
+    {
+        return connectionTimeout;
+    }
+
+    public void setConnectionTimeout(int connectionTimeout)
+    {
+        this.connectionTimeout = connectionTimeout;
     }
 
 }
