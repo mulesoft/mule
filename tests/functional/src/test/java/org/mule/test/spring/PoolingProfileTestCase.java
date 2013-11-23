@@ -9,7 +9,6 @@ package org.mule.test.spring;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.api.service.Service;
 import org.mule.component.PooledJavaComponent;
 import org.mule.config.PoolingProfile;
 import org.mule.construct.Flow;
@@ -38,9 +37,8 @@ public class PoolingProfileTestCase  extends AbstractServiceAndFlowTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "pooling-profile-test-service.xml"},
-            {ConfigVariant.FLOW, "pooling-profile-test-flow.xml"}
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "pooling-profile-test-flow.xml"}
         });
     }
 
@@ -102,20 +100,11 @@ public class PoolingProfileTestCase  extends AbstractServiceAndFlowTestCase
     {
         Object o = muleContext.getRegistry().lookupObject(serviceFlow);
         assertNotNull(serviceFlow, o);
-        
-        PooledJavaComponent pjc;
-        
-        if(variant.equals(ConfigVariant.SERVICE))
-        {
-            assertTrue(((Service)o).getComponent() instanceof PooledJavaComponent);
-            pjc = (PooledJavaComponent) ((Service)o).getComponent();
-        }
-        else
-        {            
-            assertTrue(((Flow)o).getMessageProcessors().get(0) instanceof PooledJavaComponent);
-            pjc = (PooledJavaComponent) ((Flow)o).getMessageProcessors().get(0);
-        }
-        
+
+
+        assertTrue(((Flow) o).getMessageProcessors().get(0) instanceof PooledJavaComponent);
+        PooledJavaComponent pjc = (PooledJavaComponent) ((Flow) o).getMessageProcessors().get(0);
+
         PoolingProfile profile = pjc.getPoolingProfile();
         assertNotNull(profile);
         assertEquals("exhausted:", exhausted, profile.getExhaustedAction());

@@ -6,12 +6,13 @@
  */
 package org.mule.test.config;
 
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 public class MultipleNamedConnectorsTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -24,9 +25,8 @@ public class MultipleNamedConnectorsTestCase extends AbstractServiceAndFlowTestC
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "multiple-named-connectors-test-service.xml"},
-            {ConfigVariant.FLOW, "multiple-named-connectors-test-flow.xml"}
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "multiple-named-connectors-test-flow.xml"}
         });
     }
 

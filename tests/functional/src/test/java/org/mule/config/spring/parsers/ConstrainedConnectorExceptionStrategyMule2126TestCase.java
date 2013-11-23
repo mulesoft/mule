@@ -24,7 +24,7 @@ public class ConstrainedConnectorExceptionStrategyMule2126TestCase extends Abstr
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/config/spring/parsers/constrained-connector-exception-strategy-mule-2126-test.xml"}           
+            {ConfigVariant.FLOW, "org/mule/config/spring/parsers/constrained-connector-exception-strategy-mule-2126-test.xml"}
         });
     }      
     

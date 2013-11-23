@@ -24,7 +24,7 @@ public class MissingParserTestCase extends AbstractBadConfigTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/config/spring/parsers/missing-parser-test.xml"},
+            {ConfigVariant.FLOW, "org/mule/config/spring/parsers/missing-parser-test.xml"},
         });
     }     
     

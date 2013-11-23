@@ -31,9 +31,8 @@ public class InheritedPropertiesMule2458TestCase extends AbstractServiceAndFlowT
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/spring/inherited-properties-mule-2458-test-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/spring/inherited-properties-mule-2458-test-flow.xml"}
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "org/mule/test/spring/inherited-properties-mule-2458-test-flow.xml"}
         });
     }      
     

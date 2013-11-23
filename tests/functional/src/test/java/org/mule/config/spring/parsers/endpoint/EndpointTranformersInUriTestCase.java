@@ -39,9 +39,8 @@ public class EndpointTranformersInUriTestCase extends AbstractServiceAndFlowTest
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/config/spring/parsers/endpoint/endpoint-uri-transformers-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/config/spring/parsers/endpoint/endpoint-uri-transformers-flow.xml"}
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "org/mule/config/spring/parsers/endpoint/endpoint-uri-transformers-flow.xml"}
         });
     }      
     

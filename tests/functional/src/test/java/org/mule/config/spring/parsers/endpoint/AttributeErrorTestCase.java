@@ -25,9 +25,8 @@ public class AttributeErrorTestCase extends AbstractBadConfigTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/config/spring/parsers/endpoint/attribute-error-test-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/config/spring/parsers/endpoint/attribute-error-test-flow.xml"}
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "org/mule/config/spring/parsers/endpoint/attribute-error-test-flow.xml"}
         });
     }      
     

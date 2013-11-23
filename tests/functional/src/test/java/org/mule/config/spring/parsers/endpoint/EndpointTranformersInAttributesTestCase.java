@@ -43,9 +43,8 @@ public class EndpointTranformersInAttributesTestCase extends AbstractServiceAndF
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/config/spring/parsers/endpoint/endpoint-attribute-transformers-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/config/spring/parsers/endpoint/endpoint-attribute-transformers-flow.xml"}
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "org/mule/config/spring/parsers/endpoint/endpoint-attribute-transformers-flow.xml"}
         });
     }      
     

@@ -30,9 +30,8 @@ public class EndpointContentTypeTestCase  extends AbstractServiceAndFlowTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "content-type-setting-endpoint-configs-service.xml"},
-            {ConfigVariant.FLOW, "content-type-setting-endpoint-configs-flow.xml"}
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "content-type-setting-endpoint-configs-flow.xml"}
         });
     }      
     

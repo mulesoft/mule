@@ -24,7 +24,7 @@ public class MuleElementRequiredTestCase extends AbstractBadConfigTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "mule-element-required-test.xml"},            
+            {ConfigVariant.FLOW, "mule-element-required-test.xml"},
         });
     }      
     

@@ -37,9 +37,8 @@ public class EndpointMessageProcessorsTestCase extends AbstractServiceAndFlowTes
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/config/spring/parsers/endpoint/endpoint-message-processors-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/config/spring/parsers/endpoint/endpoint-message-processors-flow.xml"}
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "org/mule/config/spring/parsers/endpoint/endpoint-message-processors-flow.xml"}
         });
     }      
 

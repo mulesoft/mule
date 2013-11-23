@@ -39,9 +39,8 @@ public class MuleTestNamespaceTestCase extends AbstractServiceAndFlowTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "test-namespace-config-service.xml"},
-            {ConfigVariant.FLOW, "test-namespace-config-flow.xml"}
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "test-namespace-config-flow.xml"}
         });
     }
 
