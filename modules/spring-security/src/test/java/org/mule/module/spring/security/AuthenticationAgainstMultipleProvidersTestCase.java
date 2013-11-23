@@ -44,8 +44,8 @@ public class AuthenticationAgainstMultipleProvidersTestCase extends AbstractServ
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "mule-multiple-providers-config-service.xml"},
-            {ConfigVariant.FLOW, "mule-multiple-providers-config-flow.xml"}});
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "mule-multiple-providers-config-flow.xml"}});
     }
 
     @Test

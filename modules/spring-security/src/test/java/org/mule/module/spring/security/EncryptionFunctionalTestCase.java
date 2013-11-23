@@ -38,9 +38,8 @@ public class EncryptionFunctionalTestCase extends AbstractServiceAndFlowTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "encryption-test-service.xml"},
-            {ConfigVariant.FLOW, "encryption-test-flow.xml"}
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "encryption-test-flow.xml"}
         });
     }      
 

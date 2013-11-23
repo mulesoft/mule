@@ -36,9 +36,8 @@ public class PlainTextFunctionalTestCase extends AbstractServiceAndFlowTestCase
     {
         // Note that this file contains global attributes, which the configuration-building
         // process will ignore (MULE-5375)
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "encryption-test-service.xml"},
-            {ConfigVariant.FLOW, "encryption-test-flow.xml"}
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "encryption-test-flow.xml"}
         });
     }
 
