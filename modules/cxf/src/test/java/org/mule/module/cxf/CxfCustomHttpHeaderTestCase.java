@@ -50,7 +50,6 @@ public class CxfCustomHttpHeaderTestCase extends AbstractServiceAndFlowTestCase 
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "headers-conf-service.xml"},
             {ConfigVariant.FLOW, "headers-conf-flow.xml"}
         });
     }

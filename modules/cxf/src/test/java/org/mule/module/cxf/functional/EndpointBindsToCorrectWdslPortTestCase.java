@@ -44,7 +44,6 @@ public class EndpointBindsToCorrectWdslPortTestCase extends AbstractServiceAndFl
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/module/cxf/functional/endpoint-binds-to-correct-wdsl-port-service.xml"},
             {ConfigVariant.FLOW, "org/mule/module/cxf/functional/endpoint-binds-to-correct-wdsl-port-flow.xml"}
         });
     }      

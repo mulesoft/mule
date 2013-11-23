@@ -35,7 +35,6 @@ public class ClientSimpleFrontendTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "aegis-conf-service.xml"},
             {ConfigVariant.FLOW, "aegis-conf-flow.xml"}
         });
     }

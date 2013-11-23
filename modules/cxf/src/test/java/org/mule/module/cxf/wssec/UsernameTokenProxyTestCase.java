@@ -40,7 +40,6 @@ public class UsernameTokenProxyTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/module/cxf/wssec/cxf-secure-proxy-service.xml, org/mule/module/cxf/wssec/username-token-conf.xml"},
             {ConfigVariant.FLOW, "org/mule/module/cxf/wssec/cxf-secure-proxy-flow.xml, org/mule/module/cxf/wssec/username-token-conf.xml"}
         });
     }

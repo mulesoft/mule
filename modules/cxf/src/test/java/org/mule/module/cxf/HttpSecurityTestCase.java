@@ -55,7 +55,6 @@ public class HttpSecurityTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "http-security-conf-service.xml"},
             {ConfigVariant.FLOW, "http-security-conf-flow.xml"}
         });
     }

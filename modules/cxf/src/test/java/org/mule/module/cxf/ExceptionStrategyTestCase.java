@@ -75,7 +75,6 @@ public class ExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-                {ConfigVariant.SERVICE, "exception-strategy-service-conf.xml"},
                 {ConfigVariant.FLOW, "exception-strategy-flow-conf.xml"}
         });
     }

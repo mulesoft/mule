@@ -43,7 +43,6 @@ public class JettySslTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-                {ConfigVariant.SERVICE, "jetty-ssl-conf-service.xml"},
                 {ConfigVariant.FLOW, "jetty-ssl-conf-flow.xml"}
         });
     }

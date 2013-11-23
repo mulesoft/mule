@@ -6,6 +6,7 @@
  */
 package org.mule.module.cxf;
 
+import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -17,8 +18,6 @@ import java.util.Collection;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
-
-import static org.junit.Assert.assertTrue;
 
 public class ProxySoapVersionTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -64,7 +63,6 @@ public class ProxySoapVersionTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-                {AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE, "proxy-soap-version-conf-service.xml"},
                 {AbstractServiceAndFlowTestCase.ConfigVariant.FLOW, "proxy-soap-version-conf-flow.xml"}
         });
     }

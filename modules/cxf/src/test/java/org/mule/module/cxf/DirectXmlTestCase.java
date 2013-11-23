@@ -46,7 +46,6 @@ public class DirectXmlTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "direct/direct-xml-conf-service.xml"},
             {ConfigVariant.FLOW, "direct/direct-xml-conf-flow.xml"}
         });
     }

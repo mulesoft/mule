@@ -43,7 +43,6 @@ public class ServletTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "servlet-conf-service.xml"},
             {ConfigVariant.FLOW, "servlet-conf-flow.xml"}
         });
     }

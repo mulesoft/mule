@@ -40,7 +40,6 @@ public class WebServiceWrapperWithCxfTestCase extends AbstractServiceAndFlowTest
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "mule-ws-wrapper-config-service.xml"},
             {ConfigVariant.FLOW, "mule-ws-wrapper-config-flow.xml"}
         });
     }

@@ -36,7 +36,6 @@ public class ConfigurationTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "configuration-conf-service.xml"},
             {ConfigVariant.FLOW, "configuration-conf-flow.xml"}
         });
     }      

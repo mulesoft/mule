@@ -71,7 +71,6 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-                {ConfigVariant.SERVICE, "catch-exception-strategy-service-conf.xml"},
                 {ConfigVariant.FLOW, "catch-exception-strategy-flow-conf.xml"}
         });
     }
