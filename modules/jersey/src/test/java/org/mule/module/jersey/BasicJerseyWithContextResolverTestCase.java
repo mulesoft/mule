@@ -22,7 +22,6 @@ public class BasicJerseyWithContextResolverTestCase extends BasicJerseyTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "basic-context-resolver-conf-service.xml"},
             {ConfigVariant.FLOW, "basic-context-resolver-conf-flow.xml"}
         });
     }

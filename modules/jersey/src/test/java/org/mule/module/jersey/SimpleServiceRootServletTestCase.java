@@ -24,7 +24,7 @@ public class SimpleServiceRootServletTestCase extends AbstractServletTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "simple-service-servlet-conf.xml"}
+            {ConfigVariant.FLOW, "simple-service-servlet-conf.xml"}
         });
     }
 

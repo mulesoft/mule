@@ -34,7 +34,7 @@ public class BasicJerseyTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "basic-conf.xml"},
+            {ConfigVariant.FLOW, "basic-conf.xml"},
         });
     }
 
@@ -92,7 +92,7 @@ public class BasicJerseyTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testThrowException() throws Exception
     {
-        callThrowException(500, "Failed to invoke JerseyResourcesComponent{helloWorldResource.component}. Component that caused exception is: JerseyResourcesComponent{helloWorldResource.component}. Message payload is of type: String");
+        callThrowException(500, "Failed to invoke JerseyResourcesComponent");
     }
 
     protected void callThrowException(Integer expectedErrorCode, String expectedData) throws Exception

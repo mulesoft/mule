@@ -23,7 +23,6 @@ public class BasicJerseyWithExceptionMapperTestCase extends BasicJerseyTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "basic-exception-mapper-conf-service.xml"},
             {ConfigVariant.FLOW, "basic-exception-mapper-conf-flow.xml"}
         });
     }      

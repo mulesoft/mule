@@ -37,7 +37,6 @@ public class MultipleResourcesTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "multiple-resources-conf-service.xml"},
             {ConfigVariant.FLOW, "multiple-resources-conf-flow.xml"}
         });
     }

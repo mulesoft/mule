@@ -24,7 +24,6 @@ public class RootServletTestCase extends AbstractServletTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "servlet-conf-service.xml"},
             {ConfigVariant.FLOW, "servlet-conf-flow.xml"}
         });
     }

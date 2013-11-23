@@ -23,7 +23,6 @@ public class NonRootServletTestCase extends AbstractServletTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "non-root-servlet-conf-service.xml"},
             {ConfigVariant.FLOW, "non-root-servlet-conf-flow.xml"}
         });
     }
