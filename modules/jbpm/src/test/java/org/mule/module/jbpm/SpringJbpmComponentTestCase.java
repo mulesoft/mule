@@ -10,6 +10,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.module.bpm.BPMS;
+import org.mule.module.bpm.Process;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -18,11 +23,6 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.module.bpm.BPMS;
-import org.mule.module.bpm.Process;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 /**
  * Tests jBPM component with a simple process. The ProcessEngine is built by Spring
@@ -39,8 +39,8 @@ public class SpringJbpmComponentTestCase extends AbstractServiceAndFlowTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "spring-jbpm-component-service.xml"},
-            {ConfigVariant.FLOW, "spring-jbpm-component-flow.xml"}});
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "spring-jbpm-component-flow.xml"}});
     }
 
     @Test

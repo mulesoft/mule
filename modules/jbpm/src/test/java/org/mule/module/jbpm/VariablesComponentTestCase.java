@@ -38,9 +38,8 @@ public class VariablesComponentTestCase extends AbstractServiceAndFlowTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "jbpm-component-functional-test-service.xml"},
-            {ConfigVariant.FLOW, "jbpm-component-functional-test-flow.xml"}
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "jbpm-component-functional-test-flow.xml"}
         });
     }      
     
