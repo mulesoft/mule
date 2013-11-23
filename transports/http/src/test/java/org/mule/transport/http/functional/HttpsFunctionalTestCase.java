@@ -38,7 +38,6 @@ public class HttpsFunctionalTestCase extends HttpFunctionalTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "https-functional-test-service.xml"},
             {ConfigVariant.FLOW, "https-functional-test-flow.xml"}
         });
     }

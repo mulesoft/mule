@@ -51,7 +51,6 @@ public class HttpResponseTimeoutTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "http-response-timeout-config-service.xml"},
             {ConfigVariant.FLOW, "http-response-timeout-config-flow.xml"}
         });
     }

@@ -89,10 +89,6 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
     @Test
     public void testFlowRefException() throws Exception
     {
-        if (variant.equals(ConfigVariant.SERVICE))
-        {
-            return;
-        }
         final Latch exceptionThrownLatch = new Latch();
         tmpDir = createFolder(".mule/flowRefException");
         final File file = createDataFile(tmpDir, "test1.txt");

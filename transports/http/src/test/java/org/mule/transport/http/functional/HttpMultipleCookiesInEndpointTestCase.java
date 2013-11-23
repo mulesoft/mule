@@ -35,7 +35,6 @@ public class HttpMultipleCookiesInEndpointTestCase extends AbstractServiceAndFlo
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "http-multiple-cookies-on-endpoint-test-service.xml"},
             {ConfigVariant.FLOW, "http-multiple-cookies-on-endpoint-test-flow.xml"}
         });
     }

@@ -41,7 +41,6 @@ public class RestServiceComponentDeleteTestCase extends AbstractMockHttpServerTe
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "rest-service-component-delete-test-service.xml"},
             {ConfigVariant.FLOW, "rest-service-component-delete-test-flow.xml"}});
     }
 

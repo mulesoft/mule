@@ -49,7 +49,6 @@ public class HttpContinueFunctionalTestCase extends AbstractServiceAndFlowTestCa
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "http-functional-test-service.xml"},
             {ConfigVariant.FLOW, "http-functional-test-flow.xml"}
         });
     }

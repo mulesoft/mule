@@ -45,7 +45,6 @@ public class HttpTransformersMule1822TestCase extends AbstractServiceAndFlowTest
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "http-transformers-mule-1822-test-service.xml"},
             {ConfigVariant.FLOW, "http-transformers-mule-1822-test-flow.xml"}
         });
     }

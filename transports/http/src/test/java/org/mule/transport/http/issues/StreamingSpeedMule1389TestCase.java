@@ -32,7 +32,7 @@ public class StreamingSpeedMule1389TestCase extends AbstractStreamingCapacityTes
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "streaming-speed-mule-1389-service.xml"},
+        return Arrays.asList(new Object[][]{
             {ConfigVariant.FLOW, "streaming-speed-mule-1389-flow.xml"}});
     }
 

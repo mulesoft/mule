@@ -42,7 +42,6 @@ public class HttpPollingWithTransformersFunctionalTestCase extends AbstractServi
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "mule-http-polling-with-transformers-config-service.xml"},
             {ConfigVariant.FLOW, "mule-http-polling-with-transformers-config-flow.xml"}});
     }
 

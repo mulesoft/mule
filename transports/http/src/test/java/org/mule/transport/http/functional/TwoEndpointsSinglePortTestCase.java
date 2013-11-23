@@ -35,7 +35,6 @@ public class TwoEndpointsSinglePortTestCase extends AbstractServiceAndFlowTestCa
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "two-endpoints-single-port-service.xml"},
             {ConfigVariant.FLOW, "two-endpoints-single-port-flow.xml"}
         });
     }

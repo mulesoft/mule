@@ -6,6 +6,7 @@
  */
 package org.mule.transport.http.functional;
 
+import static org.junit.Assert.assertEquals;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -27,8 +28,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-
 public class HttpMethodTestCase extends AbstractServiceAndFlowTestCase
 {
     @ClassRule
@@ -47,7 +46,6 @@ public class HttpMethodTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "http-method-test-service.xml"},
             {ConfigVariant.FLOW, "http-method-test-flow.xml"}
         });
     }

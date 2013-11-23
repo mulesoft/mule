@@ -8,6 +8,11 @@ package org.mule.transport.file;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.mule.api.MuleEventContext;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.EventCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -18,11 +23,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleEventContext;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.util.FileUtils;
 
 public class WorkDirectoryTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -38,7 +38,6 @@ public class WorkDirectoryTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "work-directory-config-service.xml"},
             {ConfigVariant.FLOW, "work-directory-config-flow.xml"}
         });
     }

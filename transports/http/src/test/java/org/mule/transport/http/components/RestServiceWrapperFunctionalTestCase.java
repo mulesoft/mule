@@ -46,7 +46,6 @@ public class RestServiceWrapperFunctionalTestCase extends AbstractServiceAndFlow
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "http-rest-service-wrapper-functional-test-service.xml"},
             {ConfigVariant.FLOW, "http-rest-service-wrapper-functional-test-flow.xml"}
         });
     }

@@ -36,7 +36,6 @@ public class FtpStreamingTestCase extends AbstractFtpServerTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "ftp-streaming-test-service.xml"},
             {ConfigVariant.FLOW, "ftp-streaming-test-flow.xml"}
         });
     }      

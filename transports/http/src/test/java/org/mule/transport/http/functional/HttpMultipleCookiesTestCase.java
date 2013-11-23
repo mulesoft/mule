@@ -68,7 +68,6 @@ public class HttpMultipleCookiesTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "http-multiple-cookies-test-flow.xml"},
             {ConfigVariant.FLOW, "http-multiple-cookies-test-service.xml"}
         });
     }      

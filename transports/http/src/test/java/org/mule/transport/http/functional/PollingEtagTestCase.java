@@ -53,7 +53,6 @@ public class PollingEtagTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "polling-etag-test-service.xml"},
             {ConfigVariant.FLOW, "polling-etag-test-flow.xml"}
         });
     }      

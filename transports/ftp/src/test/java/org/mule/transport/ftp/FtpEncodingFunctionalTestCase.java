@@ -38,7 +38,6 @@ public class FtpEncodingFunctionalTestCase extends AbstractFtpServerTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "ftp-encoding-functional-config-service.xml"},
             {ConfigVariant.FLOW, "ftp-encoding-functional-config-flow.xml"}
         });
     }

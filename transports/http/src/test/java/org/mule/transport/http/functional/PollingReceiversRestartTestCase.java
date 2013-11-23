@@ -38,7 +38,6 @@ public class PollingReceiversRestartTestCase extends AbstractServiceAndFlowTestC
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "polling-receivers-restart-test-service.xml"},
             {ConfigVariant.FLOW, "polling-receivers-restart-test-flow.xml"}
         });
     }

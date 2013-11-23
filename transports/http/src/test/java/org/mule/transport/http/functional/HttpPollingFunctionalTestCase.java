@@ -37,7 +37,7 @@ public class HttpPollingFunctionalTestCase extends AbstractServiceAndFlowTestCas
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "mule-http-polling-config-service.xml"},
+        return Arrays.asList(new Object[][]{
             {ConfigVariant.FLOW, "mule-http-polling-config-flow.xml"}});
     }
 

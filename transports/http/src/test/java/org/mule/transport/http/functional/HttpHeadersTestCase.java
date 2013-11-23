@@ -39,7 +39,6 @@ public class HttpHeadersTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "http-headers-config-service.xml"},
             {ConfigVariant.FLOW, "http-headers-config-flow.xml"}
         });
     }

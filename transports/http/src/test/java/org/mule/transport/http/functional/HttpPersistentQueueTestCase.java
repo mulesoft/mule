@@ -51,7 +51,6 @@ public class HttpPersistentQueueTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "http-persistent-queue-service.xml"},
             {ConfigVariant.FLOW, "http-persistent-queue-flow.xml"}
         });
     }      

@@ -46,7 +46,6 @@ public abstract class AbstractFileFunctionalTestCase extends AbstractServiceAndF
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "file-functional-test-service.xml"},
             {ConfigVariant.FLOW, "file-functional-test-flow.xml"}
         });
     }      

@@ -39,7 +39,6 @@ public class HttpFunctionalWithQueryTestCase extends AbstractServiceAndFlowTestC
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "http-functional-test-with-query-service.xml"},
             {ConfigVariant.FLOW, "http-functional-test-with-query-flow.xml"}
         });
     }

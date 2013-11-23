@@ -40,7 +40,6 @@ public class FileNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "file-namespace-config-service.xml"},
             {ConfigVariant.FLOW, "file-namespace-config-flow.xml"}});
     }
 

@@ -39,7 +39,6 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "http-encoding-test-service.xml"},
             {ConfigVariant.FLOW, "http-encoding-test-flow.xml"}
         });
     }      

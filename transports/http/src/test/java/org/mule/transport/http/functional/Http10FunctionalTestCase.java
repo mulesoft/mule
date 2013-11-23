@@ -38,7 +38,6 @@ public class Http10FunctionalTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "http-10-config-service.xml"},
             {ConfigVariant.FLOW, "http-10-config-flow.xml"}
         });
     }

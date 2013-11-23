@@ -35,7 +35,6 @@ public class FileEncodingFunctionalTestCase extends AbstractFileFunctionalTestCa
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "file-encoding-test-service.xml"},
             {ConfigVariant.FLOW, "file-encoding-test-flow.xml"}
         });
     }

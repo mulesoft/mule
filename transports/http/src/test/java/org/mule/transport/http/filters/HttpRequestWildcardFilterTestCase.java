@@ -46,7 +46,6 @@ public class HttpRequestWildcardFilterTestCase extends AbstractServiceAndFlowTes
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "http-wildcard-filter-test-flow.xml"},
             {ConfigVariant.FLOW, "http-wildcard-filter-test-service.xml"}
         });
     }

@@ -69,7 +69,6 @@ public class HttpKeepAliveFunctionalTestCase extends AbstractServiceAndFlowTestC
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-                {ConfigVariant.SERVICE, "http-keep-alive-config-service.xml"},
                 {ConfigVariant.FLOW, "http-keep-alive-config-flow.xml"}
         });
     }

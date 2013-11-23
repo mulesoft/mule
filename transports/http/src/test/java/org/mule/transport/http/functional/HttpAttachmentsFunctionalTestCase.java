@@ -45,7 +45,6 @@ public class HttpAttachmentsFunctionalTestCase extends AbstractServiceAndFlowTes
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "http-attachments-functional-test-service.xml"},
             {ConfigVariant.FLOW, "http-attachments-functional-test-flow.xml"}
         });
     }      

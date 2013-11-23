@@ -52,7 +52,6 @@ public class HttpMessageReceiverMule4456TestCase extends AbstractServiceAndFlowT
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "http-receiver-mule4456-config-service.xml"},
             {ConfigVariant.FLOW, "http-receiver-mule4456-config-flow.xml"}
         });
     }

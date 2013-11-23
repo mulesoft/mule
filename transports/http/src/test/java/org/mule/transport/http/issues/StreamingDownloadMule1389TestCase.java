@@ -32,7 +32,6 @@ public class StreamingDownloadMule1389TestCase extends AbstractStreamingDownload
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "streaming-download-mule-1389-service.xml"},
             {ConfigVariant.FLOW, "streaming-download-mule-1389-flow.xml"}
         });
     }
