@@ -31,8 +31,8 @@ public class JaasAutenticationWithJaasConfigFileTestCase extends AbstractJaasFun
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "mule-conf-for-jaas-conf-file-service.xml"},
-            {ConfigVariant.FLOW, "mule-conf-for-jaas-conf-file-flow.xml"}});
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "mule-conf-for-jaas-conf-file-flow.xml"}});
     }
 
     @Test
