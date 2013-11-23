@@ -35,8 +35,7 @@ public class BpmNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "bpm-namespace-config-service.xml"},
-            {ConfigVariant.FLOW, "bpm-namespace-config-flow.xml"}});
+        return Arrays.asList(new Object[][] {{ConfigVariant.FLOW, "bpm-namespace-config-flow.xml"}});
     }
 
     @Test
