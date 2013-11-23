@@ -11,16 +11,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.ConfigurationException;
-import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.construct.Flow;
 import org.mule.module.ognl.filters.OGNLFilter;
 import org.mule.routing.MessageFilter;
-import org.mule.routing.outbound.FilteringOutboundRouter;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -50,8 +47,8 @@ public class OGNLFilterTestCase extends AbstractServiceAndFlowTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "ognl-functional-test-service.xml"},
-            {ConfigVariant.FLOW, "ognl-functional-test-flow.xml"}});
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "ognl-functional-test-flow.xml"}});
     }
 
     @Override
@@ -89,19 +86,8 @@ public class OGNLFilterTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testNamespaceHandler()
     {
-        String expression;
-
-        if (variant.equals(ConfigVariant.SERVICE))
-        {
-            expression = ((OGNLFilter) ((FilteringOutboundRouter) ((OutboundRouterCollection) muleContext.getRegistry()
-                .lookupService(SERVICE_NAME)
-                .getOutboundMessageProcessor()).getRoutes().get(0)).getFilter()).getExpression();
-        }
-        else
-        {
-            expression = ((OGNLFilter) ((MessageFilter) ((Flow) muleContext.getRegistry()
+        String expression = ((OGNLFilter) ((MessageFilter) ((Flow) muleContext.getRegistry()
                 .lookupFlowConstruct(SERVICE_NAME)).getMessageProcessors().get(0)).getFilter()).getExpression();
-        }
 
         assertEquals(expression, OGNL_EXSPRESSION);
     }
