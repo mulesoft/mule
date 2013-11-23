@@ -34,7 +34,6 @@ public class GroovyScriptFilterFunctionalTestCase extends AbstractServiceAndFlow
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "groovy-filter-config-service.xml"},
             {ConfigVariant.FLOW, "groovy-filter-config-flow.xml"}
         });
     }

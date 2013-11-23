@@ -31,7 +31,6 @@ public class GroovyBindingFunctionalTestCase extends AbstractServiceAndFlowTestC
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "groovy-binding-config-service.xml"},
             {ConfigVariant.FLOW, "groovy-binding-config-flow.xml"}
         });
     }

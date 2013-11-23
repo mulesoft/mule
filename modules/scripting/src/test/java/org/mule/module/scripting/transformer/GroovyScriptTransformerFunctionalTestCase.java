@@ -31,8 +31,8 @@ public class GroovyScriptTransformerFunctionalTestCase extends AbstractServiceAn
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "groovy-transformer-config-service.xml"},
-            {ConfigVariant.FLOW, "groovy-transformer-config-flow.xml"}});
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "groovy-transformer-config-flow.xml"}});
     }
 
     @Test

@@ -35,7 +35,6 @@ public class GroovyRefreshableBeanTestCase extends AbstractRefreshableBeanTestCa
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "groovy-refreshable-config-service.xml"},
             {ConfigVariant.FLOW, "groovy-refreshable-config-flow.xml"}
         });
     }      

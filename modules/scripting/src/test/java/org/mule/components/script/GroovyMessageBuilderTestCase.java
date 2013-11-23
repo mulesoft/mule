@@ -30,7 +30,6 @@ public class GroovyMessageBuilderTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "groovy-messagebuilder-config-service.xml"},
             {ConfigVariant.FLOW, "groovy-messagebuilder-config-flow.xml"}
         });
     }
