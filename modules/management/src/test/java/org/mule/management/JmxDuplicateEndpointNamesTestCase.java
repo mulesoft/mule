@@ -39,7 +39,6 @@ public class JmxDuplicateEndpointNamesTestCase extends AbstractServiceAndFlowTes
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "duplicate-endpoint-addesses-service.xml"},
             {ConfigVariant.FLOW, "duplicate-endpoint-addesses-flow.xml"}
         });
     }      

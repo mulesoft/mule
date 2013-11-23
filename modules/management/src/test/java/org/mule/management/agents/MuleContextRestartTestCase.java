@@ -7,6 +7,8 @@
 package org.mule.management.agents;
 
 import static org.junit.Assert.assertEquals;
+import org.mule.module.management.mbean.MBeanServerFactory;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -18,8 +20,6 @@ import javax.management.ObjectName;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.module.management.mbean.MBeanServerFactory;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 public class MuleContextRestartTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -32,9 +32,8 @@ public class MuleContextRestartTestCase extends AbstractServiceAndFlowTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "mule-context-restart-config-service.xml"},
-            {ConfigVariant.FLOW, "mule-context-restart-config-flow.xml"}});
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "mule-context-restart-config-flow.xml"}});
     }
 
     @Test
