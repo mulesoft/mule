@@ -35,7 +35,6 @@ public class SmtpAttachmentsFunctionalTestCase extends AbstractEmailFunctionalTe
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "smtp-functional-test-all-attachments-service.xml"},
             {ConfigVariant.FLOW, "smtp-functional-test-all-attachments-service.xml"}
         });
     }      

@@ -6,13 +6,15 @@
  */
 package org.mule.transport.email.functional;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 import java.util.Collection;
+
 import javax.mail.internet.MimeMessage;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import static org.junit.Assert.assertEquals;
 
 public class SmtpFunctionalTestCase extends AbstractEmailFunctionalTestCase
 {
@@ -26,7 +28,6 @@ public class SmtpFunctionalTestCase extends AbstractEmailFunctionalTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "smtp-functional-test-service.xml"},
             {ConfigVariant.FLOW, "smtp-functional-test-flow.xml"}
         });
     }      

@@ -26,7 +26,6 @@ public class Pop3MimeWithConnectorMule2042TestCase extends AbstractEmailFunction
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "pop3-mime-with-connector-mule-2042-test-service.xml"},
             {ConfigVariant.FLOW, "pop3-mime-with-connector-mule-2042-test-flow.xml"}
         });
     }      

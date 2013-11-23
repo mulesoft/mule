@@ -35,7 +35,6 @@ public class SmtpAttachmentsFunctionalOutboundAttachmentsOnlyTestCase extends Ab
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "smtp-functional-test-outbound-attachments-only-service.xml"},
             {ConfigVariant.FLOW, "smtp-functional-test-outbound-attachments-only-flow.xml"}
         });
     }      

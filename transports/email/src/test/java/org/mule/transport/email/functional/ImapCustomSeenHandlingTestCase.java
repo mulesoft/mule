@@ -51,7 +51,6 @@ public class ImapCustomSeenHandlingTestCase extends AbstractEmailFunctionalTestC
         // the (second) config resources parameter must be null - we override
         // getConfigFile() which provides the actual config that's used
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, null},
             {ConfigVariant.FLOW, null}
         });
     }

@@ -24,7 +24,6 @@ public class SmtpMimeFunctionalTestCase extends AbstractEmailFunctionalTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "smtp-mime-functional-test-service.xml"},
             {ConfigVariant.FLOW, "smtp-mime-functional-test-flow.xml"}
         });
     }      

@@ -26,7 +26,6 @@ public class SmtpNonAsciiFunctionalTestCase extends AbstractEmailFunctionalTestC
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "smtp-functional-test-service.xml"},
             {ConfigVariant.FLOW, "smtp-functional-test-flow.xml"}
         });
     }      

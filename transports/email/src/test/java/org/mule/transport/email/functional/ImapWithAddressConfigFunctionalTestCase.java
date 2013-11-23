@@ -24,7 +24,6 @@ public class ImapWithAddressConfigFunctionalTestCase extends AbstractEmailFuncti
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "imap-with-address-functional-test-service.xml"},
             {ConfigVariant.FLOW, "imap-with-address-functional-test-flow.xml"}
         });
     }      

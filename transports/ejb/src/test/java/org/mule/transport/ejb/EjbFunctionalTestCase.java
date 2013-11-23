@@ -40,7 +40,6 @@ public class EjbFunctionalTestCase extends AbstractFunctionalTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "ejb-functional-test-service.xml"},
             {ConfigVariant.FLOW, "ejb-functional-test-flow.xml"}
         });
     }

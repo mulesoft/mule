@@ -69,7 +69,6 @@ public class EmailRoundTripTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "email-round-trip-test-service.xml"},
             {ConfigVariant.FLOW, "email-round-trip-test-flow.xml"}
         });
     }

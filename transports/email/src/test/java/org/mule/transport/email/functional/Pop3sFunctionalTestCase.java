@@ -25,7 +25,6 @@ public class Pop3sFunctionalTestCase extends AbstractEmailFunctionalTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "pop3s-functional-test-service.xml"},
             {ConfigVariant.FLOW, "pop3s-functional-test-flow.xml"}
         });
     }      

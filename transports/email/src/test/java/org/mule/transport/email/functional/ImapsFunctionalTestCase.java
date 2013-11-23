@@ -25,7 +25,6 @@ public class ImapsFunctionalTestCase extends AbstractEmailFunctionalTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "imaps-functional-test-service.xml"},
             {ConfigVariant.FLOW, "imaps-functional-test-flow.xml"}
         });
     }      

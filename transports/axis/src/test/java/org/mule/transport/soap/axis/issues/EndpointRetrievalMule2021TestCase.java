@@ -41,7 +41,6 @@ public class EndpointRetrievalMule2021TestCase extends AbstractServiceAndFlowTes
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "endpoint-retrieval-mule-2021-test-service.xml"},
             {ConfigVariant.FLOW, "endpoint-retrieval-mule-2021-test-flow.xml"}
         });
     }      

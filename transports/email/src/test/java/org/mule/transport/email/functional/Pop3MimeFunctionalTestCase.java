@@ -24,7 +24,6 @@ public class Pop3MimeFunctionalTestCase extends AbstractEmailFunctionalTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "pop3-mime-functional-test-service.xml"},
             {ConfigVariant.FLOW, "pop3-mime-functional-test-flow.xml"}
         });
     }      
