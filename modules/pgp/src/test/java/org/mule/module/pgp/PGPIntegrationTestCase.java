@@ -30,7 +30,6 @@ public class PGPIntegrationTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "pgp-integration-mule-config-service.xml"},
             {ConfigVariant.FLOW, "pgp-integration-mule-config-flow.xml"}});
     }
 

@@ -34,7 +34,6 @@ public class PGPExpiredIntegrationTestCase extends AbstractServiceAndFlowTestCas
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "pgp-expired-integration-mule-config-service.xml"},
             {ConfigVariant.FLOW, "pgp-expired-integration-mule-config-flow.xml"}
         });
     }

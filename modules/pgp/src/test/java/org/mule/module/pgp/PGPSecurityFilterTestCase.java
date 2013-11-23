@@ -6,6 +6,8 @@
  */
 package org.mule.module.pgp;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -24,20 +26,15 @@ import java.util.Map;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class PGPSecurityFilterTestCase extends AbstractServiceAndFlowTestCase
 {
     protected static final String TARGET = "/encrypted.txt";
-    protected static final String DIRECTORY = "output";
     protected static final String MESSAGE_EXCEPTION = "Crypto Failure";
 
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "test-pgp-encrypt-config-service.xml"},
             {ConfigVariant.FLOW, "test-pgp-encrypt-config-flow.xml"}});
     }
 
