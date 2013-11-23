@@ -28,7 +28,6 @@ public class MessagePropertyScopesTestCase extends AbstractServiceAndFlowTestCas
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/messaging/message-property-scopes-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/messaging/message-property-scopes-config-flow.xml"}
         });
     }

@@ -27,7 +27,6 @@ public class ForwardingMessageSplitterTestCase extends AbstractServiceAndFlowTes
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/usecases/routing/forwarding-message-splitter-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/usecases/routing/forwarding-message-splitter-flow.xml"}
         });
     }

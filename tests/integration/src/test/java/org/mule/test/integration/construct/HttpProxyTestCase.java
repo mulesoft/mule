@@ -40,9 +40,8 @@ public class HttpProxyTestCase extends AbstractServiceAndFlowTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
-            "org/mule/test/integration/construct/http-proxy-config.xml"}
-
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "org/mule/test/integration/construct/http-proxy-config.xml"}
         });
     }
 

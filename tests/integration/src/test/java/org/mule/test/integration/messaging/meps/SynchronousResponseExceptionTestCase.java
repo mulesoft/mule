@@ -30,8 +30,6 @@ public class SynchronousResponseExceptionTestCase extends AbstractServiceAndFlow
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/messaging/meps/synchronous-response-exception-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/messaging/meps/synchronous-response-exception-flow.xml"}});
     }

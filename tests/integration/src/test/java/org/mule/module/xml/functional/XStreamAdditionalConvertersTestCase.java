@@ -34,7 +34,6 @@ public class XStreamAdditionalConvertersTestCase extends AbstractServiceAndFlowT
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/module/xml/xstream-additional-converters-service.xml"},
             {ConfigVariant.FLOW, "org/mule/module/xml/xstream-additional-converters-flow.xml"}});
     }
 

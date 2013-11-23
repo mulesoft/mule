@@ -50,8 +50,6 @@ public class InOptionalOutOutOnlyJMSTestCase extends AbstractServiceAndFlowTestC
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out_Out-Only_JMS-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out_Out-Only_JMS-flow.xml"}});
     }

@@ -26,9 +26,8 @@ public class ManySendsMule1758TestCase extends AbstractServiceAndFlowTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/issues/many-sends-mule-1758-test-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/issues/many-sends-mule-1758-test-flow.xml"}
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "org/mule/issues/many-sends-mule-1758-test-flow.xml"}
         });
     }
 

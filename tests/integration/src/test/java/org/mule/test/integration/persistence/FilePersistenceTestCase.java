@@ -27,8 +27,6 @@ public class FilePersistenceTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-            "org/mule/test/integration/persistence/file-persistence-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/persistence/file-persistence-config-flow.xml"}});
     }
 
@@ -55,10 +53,6 @@ public class FilePersistenceTestCase extends AbstractServiceAndFlowTestCase
         assertNotNull(files);
         assertEquals(1, files.length);
 
-        if (variant.equals(ConfigVariant.SERVICE))
-        {
-            muleContext.getRegistry().lookupService("TestComponent").start();
-        }
         // give the service some time to initialise
         Thread.sleep(2000);
         files = store.listFiles();

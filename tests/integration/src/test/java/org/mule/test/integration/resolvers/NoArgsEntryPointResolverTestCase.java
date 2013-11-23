@@ -18,7 +18,6 @@ public class NoArgsEntryPointResolverTestCase extends AbstractEntryPointResolver
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/resolvers/no-args-entry-point-resolver-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/resolvers/no-args-entry-point-resolver-test-flow.xml"}
         });
     }      

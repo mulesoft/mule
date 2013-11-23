@@ -39,7 +39,6 @@ public class HttpTransformTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/usecases/sync/http-transform-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/usecases/sync/http-transform-flow.xml"}
         });
     }

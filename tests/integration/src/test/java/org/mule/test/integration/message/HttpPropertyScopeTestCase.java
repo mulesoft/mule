@@ -13,6 +13,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class HttpPropertyScopeTestCase extends AbstractPropertyScopeTestCase
 {
+
     public HttpPropertyScopeTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -21,8 +22,7 @@ public class HttpPropertyScopeTestCase extends AbstractPropertyScopeTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
-            "org/mule/test/message/http-property-scope.xml"}
+        return Arrays.asList(new Object[][] {{ConfigVariant.FLOW, "org/mule/test/message/http-property-scope.xml"}
         });
     }
 }

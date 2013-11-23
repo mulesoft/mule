@@ -43,7 +43,6 @@ public class JmsRequestResponseReplyToTestCase extends AbstractServiceAndFlowTes
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-                {ConfigVariant.SERVICE, "org/mule/test/integration/transport/jms/jms-request-response-reply-to-config-service.xml"},
                 {ConfigVariant.FLOW, "org/mule/test/integration/transport/jms/jms-request-response-reply-to-config-flow.xml"}});
     }
 

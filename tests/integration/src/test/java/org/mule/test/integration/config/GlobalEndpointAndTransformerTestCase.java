@@ -29,7 +29,6 @@ public class GlobalEndpointAndTransformerTestCase extends AbstractServiceAndFlow
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/config/globalendpointandtransformer-mule-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/config/globalendpointandtransformer-mule-config-flow.xml"}
         });
     }

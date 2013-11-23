@@ -27,7 +27,6 @@ public class WireTapTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/routing/wire-tap-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/routing/wire-tap-flow.xml"}});
     }
 

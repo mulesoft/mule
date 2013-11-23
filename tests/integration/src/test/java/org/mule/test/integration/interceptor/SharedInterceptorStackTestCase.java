@@ -28,7 +28,6 @@ public class SharedInterceptorStackTestCase extends AbstractServiceAndFlowTestCa
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "shared-interceptor-stack-service.xml"},
             {ConfigVariant.FLOW, "shared-interceptor-stack-flow.xml"}
         });
     }

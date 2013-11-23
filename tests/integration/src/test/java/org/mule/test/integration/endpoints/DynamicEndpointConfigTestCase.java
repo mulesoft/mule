@@ -6,6 +6,9 @@
  */
 package org.mule.test.integration.endpoints;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DataType;
@@ -17,17 +20,12 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 public class DynamicEndpointConfigTestCase extends AbstractServiceAndFlowTestCase
 {
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/endpoints/dynamic-endpoint-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/endpoints/dynamic-endpoint-config-flow.xml"}
         });
     }

@@ -40,9 +40,8 @@ public class HttpReturnsJaxbObject5531TestCase extends AbstractServiceAndFlowTes
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
-            "org/mule/issues/http-returns-jaxb-object-mule-5531-test.xml"}
-
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "org/mule/issues/http-returns-jaxb-object-mule-5531-test.xml"}
         });
     }
 

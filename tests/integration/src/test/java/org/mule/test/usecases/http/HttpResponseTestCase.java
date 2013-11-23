@@ -32,7 +32,6 @@ public class HttpResponseTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/usecases/http/http-response-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/usecases/http/http-response-flow.xml"}
         });
     }

@@ -78,7 +78,7 @@ public class ExceptionStrategyCommonScenariosTestCase extends AbstractServiceAnd
     @Parameterized.Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/exception-strategy-common-scenarios-service.xml"},
+        return Arrays.asList(new Object[][]{
                 {AbstractServiceAndFlowTestCase.ConfigVariant.FLOW, "org/mule/test/integration/exceptions/exception-strategy-common-scenarios-flow.xml"}});
     }
 
@@ -189,11 +189,6 @@ public class ExceptionStrategyCommonScenariosTestCase extends AbstractServiceAnd
     @Test
     public void testRollbackTransactionAndSendAnEmail() throws Exception
     {
-        if (variant.equals(ConfigVariant.SERVICE))
-        {
-            //((Lifecycle)getFlowConstruct("RollbackTransactionAndSendEmail")).stop(); is not working as expected
-            return;
-        }
         FixedPortGreenMailSupport greenMailSupport = new FixedPortGreenMailSupport(dynamicPort2.getNumber());
 
         List<Integer> ports = new ArrayList<Integer>(6);

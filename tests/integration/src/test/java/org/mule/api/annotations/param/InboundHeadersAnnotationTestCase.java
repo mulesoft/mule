@@ -47,7 +47,6 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/annotations/inbound-headers-annotation-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/annotations/inbound-headers-annotation-flow.xml"}
         });
     }

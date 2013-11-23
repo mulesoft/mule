@@ -32,8 +32,6 @@ public class ExpressionSplitterSyncTestCase extends AbstractServiceAndFlowTestCa
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/routing/outbound/expression-splitter-sync-test-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/routing/outbound/expression-splitter-sync-test-flow.xml"}});
     }

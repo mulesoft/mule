@@ -31,7 +31,6 @@ public class NoArgsCallWrapperFunctionalTestCase extends AbstractServiceAndFlowT
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "no-args-call-wrapper-config-service.xml"},
             {ConfigVariant.FLOW, "no-args-call-wrapper-config-flow.xml"}});
     }
 

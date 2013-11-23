@@ -6,6 +6,8 @@
  */
 package org.mule.module.xml.functional;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -17,9 +19,6 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.w3c.dom.Node;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class W3CDocumentXPathNodeEvaluatorTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -36,7 +35,6 @@ public class W3CDocumentXPathNodeEvaluatorTestCase extends AbstractServiceAndFlo
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/module/xml/w3c-dom-xpath-node-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/module/xml/w3c-dom-xpath-node-config-flow.xml"}
         });
     }

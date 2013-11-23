@@ -28,7 +28,6 @@ public class W3CDomPropertyExtractorStaticTestCase extends AbstractXmlPropertyEx
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/module/xml/property-extractor-static-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/module/xml/property-extractor-static-test-flow.xml"}});
     }
 

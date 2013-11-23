@@ -33,7 +33,6 @@ public class ComponentBindingTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE, "org/mule/test/integration/routing/nested/interface-binding-test.xml"},
             {AbstractServiceAndFlowTestCase.ConfigVariant.FLOW, "org/mule/test/integration/routing/nested/interface-binding-test-flow.xml"}
         });
     }

@@ -33,7 +33,6 @@ public class AsyncExceptionHandlingTestCase extends AbstractServiceAndFlowTestCa
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/async-exception-handling-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/async-exception-handling-flow.xml"}
         });
     }

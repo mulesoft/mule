@@ -36,7 +36,6 @@ public class XPathNodeExpressionEvaluatorTestCase extends AbstractServiceAndFlow
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/module/xml/xpath-node-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/module/xml/xpath-node-config-flow.xml"}
         });
     }

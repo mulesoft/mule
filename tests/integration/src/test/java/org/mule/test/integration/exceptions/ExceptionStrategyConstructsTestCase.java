@@ -33,8 +33,6 @@ public class ExceptionStrategyConstructsTestCase extends AbstractServiceAndFlowT
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/exceptions/exception-strategy-constructs-config-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/exceptions/exception-strategy-constructs-config-flow.xml"}});
     }

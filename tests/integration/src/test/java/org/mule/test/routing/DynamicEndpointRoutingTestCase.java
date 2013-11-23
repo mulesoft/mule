@@ -26,7 +26,6 @@ public class DynamicEndpointRoutingTestCase extends AbstractServiceAndFlowTestCa
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "dynamic-endpoint-routing-test-service.xml"},
             {ConfigVariant.FLOW, "dynamic-endpoint-routing-test-flow.xml"}});
     }
 

@@ -29,8 +29,6 @@ public class ExpressionRecipientListAsyncTestCase extends AbstractServiceAndFlow
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/routing/outbound/expression-recipient-list-async-test-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/routing/outbound/expression-recipient-list-async-test-flow.xml"},
             {ConfigVariant.FLOW_EL,

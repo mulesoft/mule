@@ -35,8 +35,6 @@ public class CxfEnvelopePayloadWithWsdlTestCase extends AbstractServiceAndFlowTe
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/transport/cxf/scratchcard-service-config-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/transport/cxf/scratchcard-service-config-flow.xml"}});
     }

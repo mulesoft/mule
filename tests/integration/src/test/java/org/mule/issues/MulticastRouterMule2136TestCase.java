@@ -39,7 +39,6 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/issues/multicast-router-mule-2136-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/issues/multicast-router-mule-2136-test-flow.xml"}
         });
     }

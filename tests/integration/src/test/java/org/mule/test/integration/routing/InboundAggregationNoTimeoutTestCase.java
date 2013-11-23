@@ -31,7 +31,6 @@ public class InboundAggregationNoTimeoutTestCase extends AbstractServiceAndFlowT
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/routing/multi-inbound-aggregator-no-timeout-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/routing/multi-inbound-aggregator-no-timeout-flow.xml"}
         });
     }

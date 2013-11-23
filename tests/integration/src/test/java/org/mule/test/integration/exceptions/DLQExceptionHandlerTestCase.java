@@ -28,7 +28,6 @@ public class DLQExceptionHandlerTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/exception-dlq-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/exception-dlq-flow.xml"}});
     }
 

@@ -34,7 +34,6 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/module/xml/xml-transformer-functional-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/module/xml/xml-transformer-functional-test-flow.xml"}
         });
     }

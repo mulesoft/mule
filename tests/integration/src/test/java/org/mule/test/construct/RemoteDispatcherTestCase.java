@@ -6,6 +6,9 @@
  */
 package org.mule.test.construct;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
@@ -20,10 +23,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 /**
  * Test remote dispatcher using serialization wire format
  */
@@ -36,7 +35,7 @@ public class RemoteDispatcherTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/construct/remote-dispatcher.xml"}
+            {ConfigVariant.FLOW, "org/mule/test/construct/remote-dispatcher.xml"}
 
         });
     }

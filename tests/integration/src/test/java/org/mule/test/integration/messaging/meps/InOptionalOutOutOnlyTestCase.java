@@ -6,6 +6,8 @@
  */
 package org.mule.test.integration.messaging.meps;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -19,9 +21,6 @@ import java.util.Map;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 //START SNIPPET: full-class
 public class InOptionalOutOutOnlyTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -31,8 +30,6 @@ public class InOptionalOutOutOnlyTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out_Out-Only-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out_Out-Only-flow.xml"}});
     }

@@ -26,7 +26,6 @@ public class OutboundHttpEndpointAuthenticationTestCase extends AbstractServiceA
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/security/outbound-http-endpoint-authentication-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/security/outbound-http-endpoint-authentication-test-flow.xml"}
         });
     }

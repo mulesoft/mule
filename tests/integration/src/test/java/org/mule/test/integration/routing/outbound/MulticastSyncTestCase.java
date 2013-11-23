@@ -29,8 +29,6 @@ public class MulticastSyncTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/routing/outbound/multicaster-sync-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/routing/outbound/multicaster-sync-test-flow.xml"}});
     }
 

@@ -35,8 +35,9 @@ public class Mule4412TestCase extends AbstractServiceAndFlowTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "mule-4412-service.xml"},
-            {ConfigVariant.FLOW, "mule-4412-flow.xml"}});
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "mule-4412-flow.xml"}}
+        );
     }
 
     public Mule4412TestCase(ConfigVariant variant, String configResources)

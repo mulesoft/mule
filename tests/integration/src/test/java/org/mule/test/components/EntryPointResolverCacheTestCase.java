@@ -31,7 +31,6 @@ public class EntryPointResolverCacheTestCase extends AbstractServiceAndFlowTestC
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/components/entry-point-resolver-cache-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/components/entry-point-resolver-cache-flow.xml"}});
     }
 

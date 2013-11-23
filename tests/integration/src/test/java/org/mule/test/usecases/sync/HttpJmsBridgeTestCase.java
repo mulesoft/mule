@@ -33,7 +33,6 @@ public class HttpJmsBridgeTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/usecases/sync/http-jms-bridge-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/usecases/sync/http-jms-bridge-flow.xml"}
         });
     }

@@ -51,7 +51,7 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
     @Parameterized.Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/catch-exception-strategy-use-case-service.xml"},
+        return Arrays.asList(new Object[][] {
                 {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/catch-exception-strategy-use-case-flow.xml"}});
     }
 

@@ -6,6 +6,8 @@
  */
 package org.mule.test.routing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.mule.api.FutureMessageResult;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
@@ -17,9 +19,6 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 // MULE-5162
 // FIXME: refactor since it's a copy of DynamicEndpointRoutingTestCase with a jms outbound endpoint
 public class DynamicJmsEndpointRoutingTestCase extends AbstractServiceAndFlowTestCase
@@ -27,9 +26,8 @@ public class DynamicJmsEndpointRoutingTestCase extends AbstractServiceAndFlowTes
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "dynamic-endpoint-routing-test-service.xml"},
-            {ConfigVariant.FLOW, "dynamic-endpoint-routing-test-flow.xml"}});
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "dynamic-endpoint-routing-test-flow.xml"}});
     }
 
     public DynamicJmsEndpointRoutingTestCase(ConfigVariant variant, String configResources)

@@ -30,7 +30,6 @@ public class InOnlyOutOnlyTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/messaging/meps/pattern_In-Only_Out-Only-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/messaging/meps/pattern_In-Only_Out-Only-flow.xml"}
         });
     }

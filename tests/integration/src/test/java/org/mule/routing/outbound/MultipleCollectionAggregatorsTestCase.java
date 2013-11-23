@@ -6,6 +6,7 @@
  */
 package org.mule.routing.outbound;
 
+import static org.junit.Assert.assertTrue;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -14,15 +15,12 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertTrue;
-
 public class MultipleCollectionAggregatorsTestCase extends AbstractServiceAndFlowTestCase
 {
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "multiple-collection-aggregators-config-service.xml"},
             {ConfigVariant.FLOW, "multiple-collection-aggregators-config-flow.xml"}
         });
     }

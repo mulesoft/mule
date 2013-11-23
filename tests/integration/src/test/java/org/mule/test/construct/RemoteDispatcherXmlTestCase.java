@@ -16,6 +16,7 @@ import org.junit.runners.Parameterized.Parameters;
  */
 public class RemoteDispatcherXmlTestCase extends RemoteDispatcherTestCase
 {
+
     public RemoteDispatcherXmlTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -25,9 +26,8 @@ public class RemoteDispatcherXmlTestCase extends RemoteDispatcherTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
-            "org/mule/test/construct/remote-dispatcher-xml.xml"}
-
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "org/mule/test/construct/remote-dispatcher-xml.xml"}
         });
     }
 }

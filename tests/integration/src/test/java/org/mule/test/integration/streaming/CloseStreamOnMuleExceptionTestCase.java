@@ -46,10 +46,7 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-            "org/mule/test/integration/streaming/close-stream-on-mule-exception-test-service.xml"},
-            {ConfigVariant.FLOW,
-            "org/mule/test/integration/streaming/close-stream-on-mule-exception-test-flow.xml"}});
+            {ConfigVariant.FLOW, "org/mule/test/integration/streaming/close-stream-on-mule-exception-test-flow.xml"}});
     }
 
     public CloseStreamOnMuleExceptionTestCase(ConfigVariant variant, String configResources)

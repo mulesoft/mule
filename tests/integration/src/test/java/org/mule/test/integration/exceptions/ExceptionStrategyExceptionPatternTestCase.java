@@ -49,7 +49,7 @@ public class ExceptionStrategyExceptionPatternTestCase extends AbstractServiceAn
     @Parameterized.Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/exception-strategy-exception-pattern-service.xml"},
+        return Arrays.asList(new Object[][]{
                 {AbstractServiceAndFlowTestCase.ConfigVariant.FLOW, "org/mule/test/integration/exceptions/exception-strategy-exception-pattern-flow.xml"}});
     }
     

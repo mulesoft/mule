@@ -30,7 +30,6 @@ public class OutboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlo
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/annotations/outbound-attachments-annotation-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/annotations/outbound-attachments-annotation-flow.xml"}});
     }
 

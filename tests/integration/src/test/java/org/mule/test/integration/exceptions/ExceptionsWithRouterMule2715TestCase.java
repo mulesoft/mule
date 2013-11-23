@@ -30,7 +30,6 @@ public class ExceptionsWithRouterMule2715TestCase extends AbstractServiceAndFlow
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/exceptions-with-router-mule-2715-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/exceptions-with-router-mule-2715-flow.xml"}
         });
     }

@@ -29,7 +29,6 @@ public class MulticasterMixedSyncAsyncTestCase extends AbstractServiceAndFlowTes
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/routing/outbound/multicaster-mixed-sync-async-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/routing/outbound/multicaster-mixed-sync-async-test-flow.xml"}
         });
     }

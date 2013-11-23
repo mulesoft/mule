@@ -34,7 +34,6 @@ public class TriggerNoArgsServiceMethodTestCase extends AbstractServiceAndFlowTe
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/cookbook/quartz/trigger-no-args-method-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/cookbook/quartz/trigger-no-args-method-config-flow.xml"}});
     }
 

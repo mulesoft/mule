@@ -26,7 +26,6 @@ public class NamedInterceptorTestCase extends AbstractInterceptorTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/config/spring/named-interceptor-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/config/spring/named-interceptor-test-flow.xml"}});
     }
 

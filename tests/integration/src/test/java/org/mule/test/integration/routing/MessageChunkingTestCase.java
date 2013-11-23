@@ -33,7 +33,6 @@ public class MessageChunkingTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/routing/message-chunking-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/routing/message-chunking-flow.xml"}});
     }
 

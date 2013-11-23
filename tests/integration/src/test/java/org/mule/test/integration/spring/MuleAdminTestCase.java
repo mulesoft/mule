@@ -6,6 +6,7 @@
  */
 package org.mule.test.integration.spring;
 
+import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.module.client.RemoteDispatcher;
@@ -19,8 +20,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertNotNull;
-
 public class MuleAdminTestCase extends AbstractServiceAndFlowTestCase
 {
     @Rule
@@ -30,7 +29,6 @@ public class MuleAdminTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/spring/mule-admin-spring-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/spring/mule-admin-spring-flow.xml"}});
     }
 

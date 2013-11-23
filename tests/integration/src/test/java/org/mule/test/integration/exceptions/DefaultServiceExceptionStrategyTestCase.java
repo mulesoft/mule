@@ -40,8 +40,6 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractServiceAndF
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/exceptions/default-service-exception-strategy-config-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/exceptions/default-service-exception-strategy-config-flow.xml"}});
     }

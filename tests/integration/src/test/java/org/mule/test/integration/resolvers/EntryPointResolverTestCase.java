@@ -25,18 +25,7 @@ public class EntryPointResolverTestCase extends AbstractEntryPointResolverTestCa
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/resolvers/entry-point-resolver-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/resolvers/entry-point-resolver-test-flow.xml"}});
-    }
-
-    @Test
-    public void testArrayEntryPointResolverOnModel() throws Exception
-    {
-        if (variant.equals(ConfigVariant.SERVICE))
-        {
-            doTest("array", new String[]{"hello", "world"}, "array");
-        }
     }
 
     @Test
@@ -46,43 +35,15 @@ public class EntryPointResolverTestCase extends AbstractEntryPointResolverTestCa
     }
 
     @Test
-    public void testCallableEntryPointResolverOnModel() throws Exception
-    {
-        if (variant.equals(ConfigVariant.SERVICE))
-        {
-            doTest("callable", new Object(), "callable");
-        }
-    }
-
-    @Test
     public void testCallableEntryPointResolverOnComponent() throws Exception
     {
         doTest("callable2", new Object(), "callable");
     }
 
     @Test
-    public void testCustomEntryPointResolverOnModel() throws Exception
-    {
-        if (variant.equals(ConfigVariant.SERVICE))
-        {
-            doTest("custom", new Object(), "custom");
-        }
-    }
-
-    @Test
     public void testCustomEntryPointResolverOnComponent() throws Exception
     {
         doTest("custom2", new Object(), "custom");
-    }
-
-    @Test
-    public void testMethodEntryPointResolverOnModel() throws Exception
-    {
-        if (variant.equals(ConfigVariant.SERVICE))
-        {
-            doTest("method", new String(), "methodString");
-            doTest("method", new Integer(0), "methodInteger");
-        }
     }
 
     @Test
@@ -93,29 +54,9 @@ public class EntryPointResolverTestCase extends AbstractEntryPointResolverTestCa
     }
 
     @Test
-    public void testNoArgumentsEntryPointResolverOnModel() throws Exception
-    {
-        if (variant.equals(ConfigVariant.SERVICE))
-        {
-            doTest("no-arguments", new String(), "noArguments");
-        }
-    }
-
-    @Test
     public void testNoArgumentsEntryPointResolverOnComponent() throws Exception
     {
         doTest("no-arguments2", new String(), "noArguments");
-    }
-
-    @Test
-    public void testPropertyEntryPointResolverOnModel() throws Exception
-    {
-        if (variant.equals(ConfigVariant.SERVICE))
-        {
-            Map<String, Object> properties = new HashMap<String, Object>();
-            properties.put("propertyName", "property");
-            doTest("property", new Object(), "property", properties);
-        }
     }
 
     @Test
@@ -127,27 +68,9 @@ public class EntryPointResolverTestCase extends AbstractEntryPointResolverTestCa
     }
 
     @Test
-    public void testReflectionEntryPointResolverOnModel() throws Exception
-    {
-        if (variant.equals(ConfigVariant.SERVICE))
-        {
-            doTest("reflection", new Object[]{new Integer(0), new String("String")}, "reflection");
-        }
-    }
-
-    @Test
     public void testReflectionEntryPointResolverOnComponent() throws Exception
     {
         doTest("reflection2", new Object[]{new Integer(0), new String("String")}, "reflection");
-    }
-
-    @Test
-    public void testLegacyEntryPointResolversOnModel() throws Exception
-    {
-        if (variant.equals(ConfigVariant.SERVICE))
-        {
-            doTest("legacy", "hello world", "callable");
-        }
     }
 
     @Test

@@ -28,10 +28,9 @@ public class LifecycleTrackerComponentFunctionalTestCase extends AbstractService
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/components/component-lifecycle-config-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/components/component-lifecycle-config-flow.xml"}});
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "org/mule/test/integration/components/component-lifecycle-config-flow.xml"}}
+        );
     }
 
     public LifecycleTrackerComponentFunctionalTestCase(ConfigVariant variant, String configResources)

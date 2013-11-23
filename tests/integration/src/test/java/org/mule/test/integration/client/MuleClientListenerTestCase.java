@@ -6,8 +6,10 @@
  */
 package org.mule.test.integration.client;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.NoReceiverForEndpointException;
@@ -20,18 +22,12 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class MuleClientListenerTestCase extends AbstractServiceAndFlowTestCase
 {
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/client/mule-client-listener-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/client/mule-client-listener-config-flow.xml"}});
     }
 
@@ -58,11 +54,6 @@ public class MuleClientListenerTestCase extends AbstractServiceAndFlowTestCase
         }
 
         Object c = muleContext.getRegistry().lookupObject(component);
-
-        if (variant.equals(ConfigVariant.SERVICE))
-        {
-            ((Startable) c).start();
-        }
 
         MuleMessage message = client.send(endpoint, "Test Client Send message", null);
         assertNotNull(message);

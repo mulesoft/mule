@@ -30,7 +30,6 @@ public class GracefulShutdownTimeoutTestCase extends AbstractServiceAndFlowTestC
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/work/graceful-shutdown-timeout-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/work/graceful-shutdown-timeout-flow.xml"}});
     }
 

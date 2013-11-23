@@ -28,8 +28,6 @@ public class VmXaTransactionsPersistentQueueTestCase extends AbstractServiceAndF
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/transaction/vm-xa-transaction-persistent-queue-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/transaction/vm-xa-transaction-persistent-queue-flow.xml"}});
     }

@@ -30,7 +30,6 @@ public class MultiuserSecurityWithMultiuserProviderTestCase extends MultiuserSec
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "multiuser-security-test-service.xml, multiuser-security-provider.xml"},
             {ConfigVariant.FLOW, "multiuser-security-test-flow.xml, multiuser-security-provider.xml"}
         });
     }

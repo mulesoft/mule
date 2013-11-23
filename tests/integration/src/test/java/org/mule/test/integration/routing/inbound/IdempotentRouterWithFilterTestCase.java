@@ -29,7 +29,6 @@ public class IdempotentRouterWithFilterTestCase extends AbstractServiceAndFlowTe
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/routing/inbound/idempotent-router-with-filter-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/routing/inbound/idempotent-router-with-filter-flow.xml"}
         });
     }

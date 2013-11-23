@@ -33,7 +33,6 @@ public class InOutTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/messaging/meps/pattern_In-Out-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/messaging/meps/pattern_In-Out-flow.xml"}});
     }
 

@@ -28,7 +28,6 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/module/xml/xml-filter-functional-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/module/xml/xml-filter-functional-test-flow.xml"}});
     }
 

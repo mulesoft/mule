@@ -29,7 +29,6 @@ public class MuleTestNamespaceFunctionalTestCase extends AbstractServiceAndFlowT
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/tck/test-namespace-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/tck/test-namespace-config-flow.xml"}});
     }
 

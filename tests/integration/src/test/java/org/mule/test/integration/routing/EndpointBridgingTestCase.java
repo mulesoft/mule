@@ -25,7 +25,6 @@ public class EndpointBridgingTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/routing/bridge-mule-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/routing/bridge-mule-flow.xml"}});
     }
 

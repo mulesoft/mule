@@ -46,7 +46,6 @@ public class FileFunctionalTestCase extends AbstractServiceAndFlowTestCase imple
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/providers/file/file-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/providers/file/file-config-flow.xml"}});
     }
 

@@ -31,7 +31,6 @@ public class CorrelationResequencerTestCase extends AbstractServiceAndFlowTestCa
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "correlation-resequencer-test-service.xml"},
             {ConfigVariant.FLOW, "correlation-resequencer-test-flow.xml"}});
     }
 

@@ -25,8 +25,9 @@ public class JXPathTestCase extends AbstractServiceAndFlowTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "jxpath-config-service.xml"},
-            {ConfigVariant.FLOW, "jxpath-config-flow.xml"}});
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "jxpath-config-flow.xml"}}
+        );
     }
 
     public JXPathTestCase(ConfigVariant variant, String configResources)

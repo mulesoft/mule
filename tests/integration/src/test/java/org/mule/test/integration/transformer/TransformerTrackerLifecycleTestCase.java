@@ -23,7 +23,6 @@ public class TransformerTrackerLifecycleTestCase extends AbstractServiceAndFlowT
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/transformers/transformer-lifecycle-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/transformers/transformer-lifecycle-flow.xml"}});
     }
 

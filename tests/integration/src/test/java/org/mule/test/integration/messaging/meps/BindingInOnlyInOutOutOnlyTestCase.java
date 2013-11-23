@@ -6,6 +6,8 @@
  */
 package org.mule.test.integration.messaging.meps;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -16,9 +18,6 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 //START SNIPPET: full-class
 public class BindingInOnlyInOutOutOnlyTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -28,10 +27,7 @@ public class BindingInOnlyInOutOutOnlyTestCase extends AbstractServiceAndFlowTes
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/messaging/meps/pattern_binding-In-Only_In-Out_Out-Only-service.xml"},
-            {ConfigVariant.FLOW,
-                "org/mule/test/integration/messaging/meps/pattern_binding-In-Only_In-Out_Out-Only-flow.xml"}});
+            {ConfigVariant.FLOW, "org/mule/test/integration/messaging/meps/pattern_binding-In-Only_In-Out_Out-Only-flow.xml"}});
     }
 
     public BindingInOnlyInOutOutOnlyTestCase(ConfigVariant variant, String configResources)

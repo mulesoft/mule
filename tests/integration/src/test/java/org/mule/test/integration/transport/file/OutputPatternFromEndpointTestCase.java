@@ -38,8 +38,6 @@ implements EndpointMessageNotificationListener<EndpointMessageNotification>
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-            "org/mule/test/integration/providers/file/mule-file-output-pattern-from-endpoint-service.xml"},
             {ConfigVariant.FLOW,
             "org/mule/test/integration/providers/file/mule-file-output-pattern-from-endpoint-flow.xml"}});
     }

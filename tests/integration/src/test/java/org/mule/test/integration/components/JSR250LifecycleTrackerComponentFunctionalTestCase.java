@@ -25,8 +25,6 @@ public class JSR250LifecycleTrackerComponentFunctionalTestCase extends AbstractS
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/components/jsr250-component-lifecycle-config-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/components/jsr250-component-lifecycle-config-flow.xml"}});
     }

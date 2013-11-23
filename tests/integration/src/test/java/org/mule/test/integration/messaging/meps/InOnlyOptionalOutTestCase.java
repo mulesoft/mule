@@ -6,6 +6,9 @@
  */
 package org.mule.test.integration.messaging.meps;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -18,10 +21,6 @@ import java.util.Map;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 public class InOnlyOptionalOutTestCase extends AbstractServiceAndFlowTestCase
 {
     public static final long TIMEOUT = 3000;
@@ -29,11 +28,9 @@ public class InOnlyOptionalOutTestCase extends AbstractServiceAndFlowTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/messaging/meps/pattern_In-Only_Optional-Out-service.xml"},
-            {ConfigVariant.FLOW,
-                "org/mule/test/integration/messaging/meps/pattern_In-Only_Optional-Out-flow.xml"}});
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "org/mule/test/integration/messaging/meps/pattern_In-Only_Optional-Out-flow.xml"}}
+        );
     }
 
     public InOnlyOptionalOutTestCase(ConfigVariant variant, String configResources)

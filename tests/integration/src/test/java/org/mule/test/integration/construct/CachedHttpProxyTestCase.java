@@ -36,8 +36,8 @@ public class CachedHttpProxyTestCase extends HttpProxyTestCase
     @Parameterized.Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][] {{ConfigVariant.SERVICE,
-                "org/mule/test/integration/construct/cached-http-proxy-config.xml"}
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.FLOW, "org/mule/test/integration/construct/cached-http-proxy-config.xml"}
         });
     }
 

@@ -6,6 +6,7 @@
  */
 package org.mule.test.integration.transport.file;
 
+import static org.junit.Assert.fail;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.util.FileUtils;
 
@@ -16,16 +17,12 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.fail;
-
 public class FileRuntimeExceptionStrategyFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/providers/file/file-runtime-exception-strategy-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/providers/file/file-runtime-exception-strategy-flow.xml"}});
     }

@@ -9,12 +9,10 @@ package org.mule.test.integration.messaging.meps;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.service.Service;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -36,8 +34,6 @@ public class InOptionalOutOutOnlyAsyncRouterTestCase extends AbstractServiceAndF
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out_Out-Only-Async-Router-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out_Out-Only-Async-Router-flow.xml"}
 
@@ -58,23 +54,11 @@ public class InOptionalOutOutOnlyAsyncRouterTestCase extends AbstractServiceAndF
         assertNotNull(result);
         assertEquals("got it!", result.getPayloadAsString());
 
-        if (ConfigVariant.SERVICE.equals(variant))
-        {
-            Service async = muleContext.getRegistry().lookupService("In-Out_Out-Only-Async-Service");
-            Service external = muleContext.getRegistry().lookupService("ExternalApp");
-
-            assertEquals(2, async.getStatistics().getProcessedEvents());
-            assertEquals(1, external.getStatistics().getProcessedEvents());
-        }
-        else
-        {
-            FlowConstruct async = muleContext.getRegistry().lookupFlowConstruct(
+        FlowConstruct async = muleContext.getRegistry().lookupFlowConstruct(
                 "In-Out_Out-Only-Async-Service");
-            FlowConstruct external = muleContext.getRegistry().lookupFlowConstruct("ExternalApp");
+        FlowConstruct external = muleContext.getRegistry().lookupFlowConstruct("ExternalApp");
 
-            assertEquals(2, async.getStatistics().getProcessedEvents());
-            assertEquals(1, external.getStatistics().getProcessedEvents());
-        }
-
+        assertEquals(2, async.getStatistics().getProcessedEvents());
+        assertEquals(1, external.getStatistics().getProcessedEvents());
     }
 }

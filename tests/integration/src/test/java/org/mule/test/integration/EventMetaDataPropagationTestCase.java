@@ -45,7 +45,6 @@ public class EventMetaDataPropagationTestCase extends AbstractServiceAndFlowTest
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/event-metadata-propagation-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/event-metadata-propagation-config-flow.xml"}});
     }
 

@@ -26,7 +26,7 @@ public class ChainingRouterNullsHandlingTestCase extends AbstractServiceAndFlowT
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
+        return Arrays.asList(new Object[][]{{ConfigVariant.FLOW,
             "org/mule/test/integration/routing/outbound/chaining-router-null-handling-service.xml"}});
     }
 

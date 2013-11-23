@@ -31,7 +31,6 @@ public class ResponseTransformerOnMessageCollectionTestCase extends AbstractServ
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-                {ConfigVariant.SERVICE, "org/mule/test/integration/transformer/response/response-transformer-on-message-collection-service-config.xml"},
                 {ConfigVariant.FLOW, "org/mule/test/integration/transformer/response/response-transformer-on-message-collection-flow-config.xml"}
         });
     }

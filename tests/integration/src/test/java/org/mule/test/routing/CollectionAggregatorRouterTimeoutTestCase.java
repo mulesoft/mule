@@ -29,7 +29,6 @@ public class CollectionAggregatorRouterTimeoutTestCase extends AbstractServiceAn
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "collection-aggregator-router-timeout-test-service.xml"},
             {ConfigVariant.FLOW, "collection-aggregator-router-timeout-test-flow.xml"}});
     }
 

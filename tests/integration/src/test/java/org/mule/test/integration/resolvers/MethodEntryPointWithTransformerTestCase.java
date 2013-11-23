@@ -25,8 +25,6 @@ public class MethodEntryPointWithTransformerTestCase extends AbstractServiceAndF
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/resolvers/method-entrypoint-with-transformer-config-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/resolvers/method-entrypoint-with-transformer-config-flow.xml"}});
     }

@@ -30,7 +30,6 @@ public class ExceptionStrategyMessagePropertiesTestCase extends AbstractServiceA
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/exception-strategy-message-properties-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/exception-strategy-message-properties-flow.xml"}
         });
     }

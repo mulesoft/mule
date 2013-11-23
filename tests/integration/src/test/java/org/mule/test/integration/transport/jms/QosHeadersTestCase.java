@@ -6,6 +6,8 @@
  */
 package org.mule.test.integration.transport.jms;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -25,16 +27,12 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class QosHeadersTestCase extends AbstractServiceAndFlowTestCase
 {
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/providers/jms/qosheaders-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/providers/jms/qosheaders-test-flow.xml"}});
     }
 

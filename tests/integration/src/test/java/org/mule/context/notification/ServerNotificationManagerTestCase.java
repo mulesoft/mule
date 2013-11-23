@@ -7,7 +7,6 @@
 package org.mule.context.notification;
 
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.client.MuleClient;
 import org.mule.api.service.Service;
 
@@ -28,7 +27,7 @@ public class ServerNotificationManagerTestCase extends AbstractNotificationTestC
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/notifications/server-notification-manager-test.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/notifications/server-notification-manager-test.xml"},
         });
     }
 

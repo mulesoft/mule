@@ -32,7 +32,6 @@ public class RemoteExceptionTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/client/remote-exception-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/client/remote-exception-config-flow.xml"}
         });
     }

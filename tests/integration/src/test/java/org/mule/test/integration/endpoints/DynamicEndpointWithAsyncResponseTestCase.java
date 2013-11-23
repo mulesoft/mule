@@ -6,6 +6,8 @@
  */
 package org.mule.test.integration.endpoints;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.client.DefaultLocalMuleClient;
@@ -19,9 +21,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class DynamicEndpointWithAsyncResponseTestCase extends AbstractServiceAndFlowTestCase
 {
     @Rule
@@ -30,7 +29,7 @@ public class DynamicEndpointWithAsyncResponseTestCase extends AbstractServiceAnd
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
+        return Arrays.asList(new Object[][]{{ConfigVariant.FLOW,
             "org/mule/test/integration/endpoints/dynamic-endpoint-with-async-response-config.xml"}
 
         });

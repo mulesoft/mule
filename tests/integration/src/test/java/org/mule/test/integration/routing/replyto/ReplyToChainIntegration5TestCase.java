@@ -36,7 +36,6 @@ public class ReplyToChainIntegration5TestCase extends AbstractServiceAndFlowTest
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-                {ConfigVariant.SERVICE, "org/mule/test/integration/routing/replyto/replyto-chain-integration-test-5-service.xml"},
                 {ConfigVariant.FLOW, "org/mule/test/integration/routing/replyto/replyto-chain-integration-test-5-flow.xml"}
         });
     }

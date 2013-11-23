@@ -33,7 +33,6 @@ public class ResponseAggregatorTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/usecases/routing/response/response-router-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/usecases/routing/response/response-router-flow.xml"}});
     }
 

@@ -32,8 +32,6 @@ public class ExpressionSplitterMixedSyncAsyncTestCase extends AbstractServiceAnd
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/routing/outbound/expression-splitter-mixed-sync-async-test-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/routing/outbound/expression-splitter-mixed-sync-async-test-flow.xml"}});
     }

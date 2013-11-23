@@ -32,8 +32,6 @@ public class MulticastSyncWithTransformersTestCase extends AbstractServiceAndFlo
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/routing/outbound/multicaster-sync-with-transformers-test-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/routing/outbound/multicaster-sync-with-transformers-test-flow.xml"}});
     }
