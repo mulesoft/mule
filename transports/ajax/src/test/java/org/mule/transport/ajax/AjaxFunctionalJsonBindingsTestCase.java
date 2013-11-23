@@ -53,7 +53,6 @@ public class AjaxFunctionalJsonBindingsTestCase extends AbstractServiceAndFlowTe
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "ajax-embedded-functional-json-bindings-test-service.xml"},
             {ConfigVariant.FLOW, "ajax-embedded-functional-json-bindings-test-flow.xml"}
         });
     }

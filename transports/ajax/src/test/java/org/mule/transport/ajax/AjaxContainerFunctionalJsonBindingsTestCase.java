@@ -31,7 +31,6 @@ public class AjaxContainerFunctionalJsonBindingsTestCase extends AjaxFunctionalJ
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "ajax-container-functional-json-bindings-test-service.xml"},
             {ConfigVariant.FLOW, "ajax-container-functional-json-bindings-test-flow.xml"}});
     }
 

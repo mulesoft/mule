@@ -48,7 +48,6 @@ public class AjaxRPCFunctionalTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE, "ajax-rpc-test.xml"},
             {AbstractServiceAndFlowTestCase.ConfigVariant.FLOW, "ajax-rpc-test-flow.xml"}
         });
     }

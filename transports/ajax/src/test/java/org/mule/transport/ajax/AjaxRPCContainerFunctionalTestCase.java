@@ -9,14 +9,13 @@ package org.mule.transport.ajax;
 import org.mule.transport.ajax.container.MuleAjaxServlet;
 import org.mule.transport.servlet.MuleServletContextListener;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.runners.Parameterized;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
-
-import org.junit.runners.Parameterized;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 public class AjaxRPCContainerFunctionalTestCase extends AjaxRPCFunctionalTestCase
 {
@@ -31,7 +30,6 @@ public class AjaxRPCContainerFunctionalTestCase extends AjaxRPCFunctionalTestCas
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "ajax-container-rpc-test.xml"},
             {ConfigVariant.FLOW, "ajax-container-rpc-test-flow.xml"}
         });
     }

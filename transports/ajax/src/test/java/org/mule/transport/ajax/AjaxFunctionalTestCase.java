@@ -59,7 +59,6 @@ public class AjaxFunctionalTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "ajax-embedded-functional-test-service.xml"},
             {ConfigVariant.FLOW, "ajax-embedded-functional-test-flow.xml"}
         });
     }

@@ -31,7 +31,6 @@ public class AjaxContainerFunctionalTestCase extends AjaxFunctionalTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "ajax-container-functional-test-service.xml"},
             {ConfigVariant.FLOW, "ajax-container-functional-test-flow.xml"}
         });
     }      
