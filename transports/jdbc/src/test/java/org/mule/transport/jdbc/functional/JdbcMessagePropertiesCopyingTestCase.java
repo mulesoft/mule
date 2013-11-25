@@ -36,7 +36,6 @@ public class JdbcMessagePropertiesCopyingTestCase extends AbstractJdbcFunctional
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, AbstractJdbcFunctionalTestCase.getConfig() + ", jdbc-message-properties-copying-service.xml"},
             {ConfigVariant.FLOW, AbstractJdbcFunctionalTestCase.getConfig() + ", jdbc-message-properties-copying-flow.xml"}
         });
     }

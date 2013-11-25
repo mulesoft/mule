@@ -35,7 +35,6 @@ public class JdbcBridgeFunctionalTestCase extends AbstractJdbcFunctionalTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "jdbc-bridge-service.xml"},
             {ConfigVariant.FLOW, "jdbc-bridge-flow.xml"}
         });
     }          

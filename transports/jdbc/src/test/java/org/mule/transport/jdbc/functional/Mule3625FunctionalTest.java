@@ -36,7 +36,6 @@ public class Mule3625FunctionalTest extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "jdbc-mule-3625-service.xml"},
             {ConfigVariant.FLOW, "jdbc-mule-3625-flow.xml"}
         });
     }      

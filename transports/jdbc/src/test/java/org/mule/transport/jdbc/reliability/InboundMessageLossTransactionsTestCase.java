@@ -37,7 +37,7 @@ public class InboundMessageLossTransactionsTestCase extends InboundMessageLossTe
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "reliability/jdbc-connector.xml, reliability/inbound-message-loss-transactions.xml"},            
+            {ConfigVariant.FLOW, "reliability/jdbc-connector.xml, reliability/inbound-message-loss-transactions.xml"},
         });
     }      
     

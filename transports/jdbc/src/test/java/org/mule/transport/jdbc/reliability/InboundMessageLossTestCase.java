@@ -48,7 +48,7 @@ public class InboundMessageLossTestCase extends AbstractJdbcFunctionalTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "reliability/jdbc-connector.xml, reliability/inbound-message-loss.xml"}            
+            {ConfigVariant.FLOW, "reliability/jdbc-connector.xml, reliability/inbound-message-loss.xml"}
         });
     }          
 

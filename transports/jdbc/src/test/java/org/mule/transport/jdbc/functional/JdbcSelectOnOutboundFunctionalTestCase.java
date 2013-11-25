@@ -34,7 +34,6 @@ public class JdbcSelectOnOutboundFunctionalTestCase extends AbstractJdbcFunction
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, AbstractJdbcFunctionalTestCase.getConfig() + ",jdbc-select-outbound-service.xml"},
             {ConfigVariant.FLOW, AbstractJdbcFunctionalTestCase.getConfig() + ",jdbc-select-outbound-flow.xml"}
         });
     }
