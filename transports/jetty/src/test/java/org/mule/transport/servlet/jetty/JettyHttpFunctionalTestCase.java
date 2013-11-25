@@ -33,7 +33,6 @@ public class JettyHttpFunctionalTestCase extends HttpFunctionalTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "jetty-http-functional-test-service.xml"},
             {ConfigVariant.FLOW, "jetty-http-functional-test-flow.xml"}
         });
     }      

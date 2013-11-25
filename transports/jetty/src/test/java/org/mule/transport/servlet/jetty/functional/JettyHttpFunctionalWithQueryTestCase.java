@@ -37,7 +37,6 @@ public class JettyHttpFunctionalWithQueryTestCase extends AbstractServiceAndFlow
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "jetty-http-functional-test-with-query-service.xml"},
             {ConfigVariant.FLOW, "jetty-http-functional-test-with-query-flow.xml"}
         });
     }

@@ -39,7 +39,6 @@ public class JettyHttpStemTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "jetty-http-stem-test-service.xml"},
             {ConfigVariant.FLOW, "jetty-http-stem-test-flow.xml"}
         });
     }

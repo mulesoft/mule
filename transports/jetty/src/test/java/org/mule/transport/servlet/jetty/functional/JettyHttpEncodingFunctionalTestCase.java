@@ -36,7 +36,6 @@ public class JettyHttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "jetty-http-encoding-test-service.xml"},
             {ConfigVariant.FLOW, "jetty-http-encoding-test-flow.xml"}
         });
     }

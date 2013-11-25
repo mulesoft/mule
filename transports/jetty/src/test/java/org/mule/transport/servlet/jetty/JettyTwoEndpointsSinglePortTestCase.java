@@ -39,7 +39,6 @@ public class JettyTwoEndpointsSinglePortTestCase extends AbstractServiceAndFlowT
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "jetty-two-endpoints-single-port-service.xml"},
             {ConfigVariant.FLOW, "jetty-two-endpoints-single-port-flow.xml"}
         });
     }

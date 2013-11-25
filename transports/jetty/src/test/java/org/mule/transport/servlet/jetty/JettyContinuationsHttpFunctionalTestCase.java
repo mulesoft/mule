@@ -24,7 +24,7 @@ public class JettyContinuationsHttpFunctionalTestCase extends HttpFunctionalTest
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-           {ConfigVariant.SERVICE, "jetty-continuations-http-functional-test.xml"}            
+           {ConfigVariant.FLOW, "jetty-continuations-http-functional-test.xml"}
         });
     }      
 }
