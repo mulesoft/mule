@@ -50,7 +50,6 @@ public class SftpIdentityFileFunctionalTestCase extends AbstractSftpTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "mule-sftp-identity-file-config-service.xml"},
             {ConfigVariant.FLOW, "mule-sftp-identity-file-config-flow.xml"}
         });
     }

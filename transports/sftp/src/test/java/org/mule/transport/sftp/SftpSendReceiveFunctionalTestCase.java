@@ -47,7 +47,7 @@ public class SftpSendReceiveFunctionalTestCase extends AbstractSftpTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "mule-send-receive-test-config-service.xml"},
+        return Arrays.asList(new Object[][]{
             {ConfigVariant.FLOW, "mule-send-receive-test-config-flow.xml"}});
     }
 

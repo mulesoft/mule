@@ -30,7 +30,7 @@ public class MultipleConnectorsMule1765TestCase extends AbstractServiceAndFlowTe
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "multiple-connectors-test-service.xml"},
+        return Arrays.asList(new Object[][]{
             {ConfigVariant.FLOW, "multiple-connectors-test-flow.xml"}});
     }
 

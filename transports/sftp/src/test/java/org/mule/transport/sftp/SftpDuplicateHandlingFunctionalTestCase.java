@@ -48,7 +48,6 @@ public class SftpDuplicateHandlingFunctionalTestCase extends AbstractSftpTestCas
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "mule-sftp-duplicateHandling-test-config-service.xml"},
             {ConfigVariant.FLOW, "mule-sftp-duplicateHandling-test-config-flow.xml"}
         });
     }

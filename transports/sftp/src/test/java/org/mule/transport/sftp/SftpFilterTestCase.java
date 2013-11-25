@@ -38,7 +38,6 @@ public class SftpFilterTestCase extends AbstractSftpDataIntegrityTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "mule-sftp-filter-config-service.xml"},
             {ConfigVariant.FLOW, "mule-sftp-filter-config-flow.xml"}
         });
     }

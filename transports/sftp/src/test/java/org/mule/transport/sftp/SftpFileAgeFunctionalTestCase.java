@@ -46,7 +46,6 @@ public class SftpFileAgeFunctionalTestCase extends AbstractSftpTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-         {ConfigVariant.SERVICE, "mule-sftp-file-age-config-service.xml"},
         {ConfigVariant.FLOW, "mule-sftp-file-age-config-flow.xml"}});
     }
 

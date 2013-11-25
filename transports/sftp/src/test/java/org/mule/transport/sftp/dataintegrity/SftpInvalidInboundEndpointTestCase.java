@@ -9,6 +9,10 @@ package org.mule.transport.sftp.dataintegrity;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.registry.MuleRegistry;
+import org.mule.transport.sftp.SftpConnector;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -16,10 +20,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.registry.MuleRegistry;
-import org.mule.transport.sftp.SftpConnector;
 
 public class SftpInvalidInboundEndpointTestCase extends AbstractSftpDataIntegrityTestCase
 {
@@ -33,7 +33,7 @@ public class SftpInvalidInboundEndpointTestCase extends AbstractSftpDataIntegrit
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
+        return Arrays.asList(new Object[][]{{ConfigVariant.FLOW,
             "dataintegrity/sftp-invalid-inbound-endpoint-config.xml"}});
     }
 

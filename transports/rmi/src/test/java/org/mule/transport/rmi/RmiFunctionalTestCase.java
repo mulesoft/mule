@@ -25,7 +25,6 @@ public class RmiFunctionalTestCase extends AbstractFunctionalTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "rmi-functional-test-service.xml"},
             {ConfigVariant.FLOW, "rmi-functional-test-flow.xml"}
         });
     }      

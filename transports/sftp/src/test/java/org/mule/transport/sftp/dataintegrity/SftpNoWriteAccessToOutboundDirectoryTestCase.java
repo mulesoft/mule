@@ -37,7 +37,6 @@ public class SftpNoWriteAccessToOutboundDirectoryTestCase extends AbstractSftpDa
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "dataintegrity/sftp-dataintegrity-common-config-service.xml"},
             {ConfigVariant.FLOW, "dataintegrity/sftp-dataintegrity-common-config-flow.xml"}});
     }
 

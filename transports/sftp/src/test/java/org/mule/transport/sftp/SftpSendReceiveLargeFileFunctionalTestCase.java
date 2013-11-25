@@ -40,7 +40,6 @@ public class SftpSendReceiveLargeFileFunctionalTestCase extends AbstractSftpTest
     public static Collection<Object[]> parameters()
     {        
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "mule-send-receive-large-file-test-config-service.xml"},
             {ConfigVariant.FLOW, "mule-send-receive-large-file-test-config-flow.xml"}});
     }
 

@@ -36,7 +36,6 @@ public class SftpNotificationFunctionalTestCase extends AbstractSftpTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "mule-sftp-notification-test-config-service.xml"},
             {ConfigVariant.FLOW, "mule-sftp-notification-test-config-flow.xml"}
         });
     }

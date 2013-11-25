@@ -33,7 +33,6 @@ public class QuartzPersistentCustomJobFromMessageTestCase extends AbstractServic
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "quartz-persistent-custom-job-generator-service.xml"},
             {ConfigVariant.FLOW, "quartz-persistent-custom-job-generator-flow.xml"}});
     }
 

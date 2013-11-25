@@ -37,7 +37,6 @@ public class SftpEndpointTestCase extends AbstractSftpTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "mule-sftp-endpoint-config-service.xml"},
             {ConfigVariant.FLOW, "mule-sftp-endpoint-config-flow.xml"}
         });
     }

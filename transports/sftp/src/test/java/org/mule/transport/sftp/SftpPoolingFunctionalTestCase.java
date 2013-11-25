@@ -52,7 +52,6 @@ public class SftpPoolingFunctionalTestCase extends AbstractSftpTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "mule-pooling-test-config-service.xml"},
             {ConfigVariant.FLOW, "mule-pooling-test-config-flow.xml"}
         });
     }

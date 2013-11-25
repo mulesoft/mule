@@ -41,7 +41,6 @@ public class JmsResponseElementTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-                {ConfigVariant.SERVICE, "integration/jms-response-element-config-service.xml"},
                 {ConfigVariant.FLOW, "integration/jms-response-element-config-flow.xml"}
         });
     }

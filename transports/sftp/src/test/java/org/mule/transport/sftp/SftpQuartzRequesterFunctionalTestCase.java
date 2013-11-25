@@ -32,7 +32,6 @@ public class SftpQuartzRequesterFunctionalTestCase extends AbstractSftpTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "mule-sftp-quartzRequester-test-config-service.xml"},
             {ConfigVariant.FLOW, "mule-sftp-quartzRequester-test-config-flow.xml"}});
     }
 

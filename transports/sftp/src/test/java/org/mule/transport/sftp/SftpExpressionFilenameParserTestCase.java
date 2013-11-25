@@ -36,8 +36,7 @@ public class SftpExpressionFilenameParserTestCase extends AbstractSftpTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "mule-sftp-expressionFilenameParser-config.xml"},
-            {ConfigVariant.FLOW, "mule-sftp-expressionFilenameParser-config.xml"}
+            {ConfigVariant.FLOW, "mule-sftp-expressionFilenameParser-config-flow.xml"}
         });
     }
 

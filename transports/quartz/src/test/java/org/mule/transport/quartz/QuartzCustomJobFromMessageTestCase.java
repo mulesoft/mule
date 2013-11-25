@@ -8,6 +8,12 @@ package org.mule.transport.quartz;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.CountdownCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.transport.NullPayload;
+import org.mule.transport.quartz.jobs.ScheduledDispatchJobConfig;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,12 +22,6 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.functional.CountdownCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.transport.NullPayload;
-import org.mule.transport.quartz.jobs.ScheduledDispatchJobConfig;
 
 public class QuartzCustomJobFromMessageTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -35,7 +35,6 @@ public class QuartzCustomJobFromMessageTestCase extends AbstractServiceAndFlowTe
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "quartz-receive-dispatch-delegating-job-service.xml"},
             {ConfigVariant.FLOW, "quartz-receive-dispatch-delegating-job-flow.xml"}});
     }
 

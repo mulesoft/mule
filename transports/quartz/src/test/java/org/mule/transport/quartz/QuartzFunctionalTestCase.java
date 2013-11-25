@@ -8,15 +8,15 @@ package org.mule.transport.quartz;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.CountdownCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.functional.CountdownCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
 
 public class QuartzFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -30,7 +30,6 @@ public class QuartzFunctionalTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "quartz-functional-test-service.xml"},
             {ConfigVariant.FLOW, "quartz-functional-test-flow.xml"}
         });
     }

@@ -37,7 +37,6 @@ public class SftpNoOutboundDirectoryTestCase extends AbstractSftpDataIntegrityTe
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "dataintegrity/sftp-no-outbound-directory-config-service.xml"},
             {ConfigVariant.FLOW, "dataintegrity/sftp-no-outbound-directory-config-flow.xml"}});
     }
 

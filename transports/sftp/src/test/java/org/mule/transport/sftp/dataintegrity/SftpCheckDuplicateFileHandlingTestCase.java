@@ -74,7 +74,6 @@ public class SftpCheckDuplicateFileHandlingTestCase extends AbstractServiceAndFl
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "dataintegrity/sftp-dataintegrity-duplicate-handling-service.xml"},
             {ConfigVariant.FLOW, "dataintegrity/sftp-dataintegrity-duplicate-handling-flow.xml"}});
     }
 

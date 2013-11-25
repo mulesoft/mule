@@ -58,7 +58,6 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "mule-sftp-archive-test-config-service.xml"},
             {ConfigVariant.FLOW, "mule-sftp-archive-test-config-flow.xml"}});
     }
 

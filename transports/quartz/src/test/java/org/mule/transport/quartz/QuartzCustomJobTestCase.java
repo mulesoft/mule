@@ -7,6 +7,7 @@
 package org.mule.transport.quartz;
 
 import static org.junit.Assert.assertTrue;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -32,7 +32,6 @@ public class QuartzCustomJobTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "quartz-custom-job-service.xml"},
             {ConfigVariant.FLOW, "quartz-custom-job-flow.xml"}
         });
     }

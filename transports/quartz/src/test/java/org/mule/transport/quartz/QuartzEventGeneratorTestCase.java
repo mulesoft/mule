@@ -37,7 +37,7 @@ public class QuartzEventGeneratorTestCase extends AbstractServiceAndFlowTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "quartz-event-generator-service.xml"},
+        return Arrays.asList(new Object[][]{
             {ConfigVariant.FLOW, "quartz-event-generator-flow.xml"}});
     }
 

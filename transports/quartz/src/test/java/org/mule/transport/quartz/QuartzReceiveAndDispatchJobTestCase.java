@@ -31,7 +31,7 @@ public class QuartzReceiveAndDispatchJobTestCase extends AbstractServiceAndFlowT
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "quartz-receive-dispatch-service.xml"},
+        return Arrays.asList(new Object[][]{
             {ConfigVariant.FLOW, "quartz-receive-dispatch-flow.xml"}});
     }
 

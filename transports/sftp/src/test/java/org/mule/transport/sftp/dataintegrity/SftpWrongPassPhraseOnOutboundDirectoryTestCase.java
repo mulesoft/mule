@@ -40,7 +40,6 @@ public class SftpWrongPassPhraseOnOutboundDirectoryTestCase extends AbstractSftp
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "dataintegrity/sftp-wrong-passphrase-config-service.xml"},
             {ConfigVariant.FLOW, "dataintegrity/sftp-wrong-passphrase-config-flow.xml"}});
     }
 

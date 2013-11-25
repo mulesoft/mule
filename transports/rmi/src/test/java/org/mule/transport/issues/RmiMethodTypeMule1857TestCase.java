@@ -25,7 +25,6 @@ public class RmiMethodTypeMule1857TestCase extends AbstractFunctionalTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "rmi-method-type-1857-test-service.xml"},
             {ConfigVariant.FLOW, "rmi-method-type-1857-test-flow.xml"}
         });
     }      

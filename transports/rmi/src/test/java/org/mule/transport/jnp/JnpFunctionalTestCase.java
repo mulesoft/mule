@@ -25,7 +25,6 @@ public class JnpFunctionalTestCase extends AbstractFunctionalTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "jnp-functional-test-service.xml"},
             {ConfigVariant.FLOW, "jnp-functional-test-flow.xml"}
         });
     }      

@@ -35,7 +35,7 @@ public class SftpTempDirFunctionalTestCase extends AbstractSftpTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "mule-sftp-temp-dir-config-service.xml"},
+        return Arrays.asList(new Object[][]{
             {ConfigVariant.FLOW, "mule-sftp-temp-dir-config-flow.xml"}});
     }
 

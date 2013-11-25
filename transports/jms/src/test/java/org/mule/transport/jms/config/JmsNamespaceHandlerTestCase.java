@@ -57,7 +57,7 @@ public class JmsNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "jms-namespace-config-service.xml"},
+        return Arrays.asList(new Object[][]{
             {ConfigVariant.FLOW, "jms-namespace-config-flow.xml"}});
     }
 

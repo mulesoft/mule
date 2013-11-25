@@ -34,7 +34,6 @@ public class QuartzPersistentQueueEventGeneratorTestCase extends AbstractService
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "quartz-persistent-event-generator-service.xml"},
             {ConfigVariant.FLOW, "quartz-persistent-event-generator-flow.xml"}});
     }
 

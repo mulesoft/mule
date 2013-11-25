@@ -44,7 +44,7 @@ public class SslCertificatesTestCase extends AbstractServiceAndFlowTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "ssl-certificates-test-service.xml"},
+        return Arrays.asList(new Object[][]{
             {ConfigVariant.FLOW, "ssl-certificates-test-flow.xml"}});
     }
 

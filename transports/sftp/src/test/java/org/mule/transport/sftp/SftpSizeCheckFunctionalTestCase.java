@@ -32,7 +32,6 @@ public class SftpSizeCheckFunctionalTestCase extends AbstractSftpTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "mule-sftp-sizeCheck-test-config-service.xml"},
             {ConfigVariant.FLOW, "mule-sftp-sizeCheck-test-config-flow.xml"}
         });
     }

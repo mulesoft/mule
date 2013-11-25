@@ -6,8 +6,9 @@
  */
 package org.mule.transport.jms;
 
-import org.apache.activemq.command.ActiveMQMessage;
-import org.mule.api.ExceptionPayload;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -29,10 +30,6 @@ import java.util.Collection;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runners.Parameterized;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractJmsRedeliveryTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -56,7 +53,7 @@ public abstract class AbstractJmsRedeliveryTestCase extends AbstractServiceAndFl
     @Parameterized.Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][] {{ConfigVariant.SERVICE, "jms-redelivery-service.xml"},
+        return Arrays.asList(new Object[][] {
                 {ConfigVariant.FLOW, "jms-redelivery-flow.xml"}});
     }
 
