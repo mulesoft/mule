@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
+       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+       xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+
+    <bpm:jbpm name="jbpm" />
+    
+    <model>
+        <service name="SimpleProcess">
+            <inbound>
+                <vm:inbound-endpoint path="simple" exchange-pattern="request-response"/>
+            </inbound>
+            <bpm:process processName="simple" processDefinition="simple-process.jpdl.xml" />
+        </service>
+
+        <service name="MessageProcess">
+            <inbound>
+                <vm:inbound-endpoint path="message" exchange-pattern="request-response"/>
+            </inbound>
+            <bpm:process processName="message" processDefinition="message-process.jpdl.xml" />
+        </service>
+
+        <service name="MessageExceptionProcess">
+            <inbound>
+                <vm:inbound-endpoint path="exception" exchange-pattern="request-response"/>
+            </inbound>
+            <bpm:process processName="exception" processDefinition="message-exception-process.jpdl.xml" />
+        </service>
+
+        <service name="ForkedProcess">
+            <inbound>
+                <vm:inbound-endpoint path="fork" exchange-pattern="request-response"/>
+                <vm:inbound-endpoint path="fork-reply" exchange-pattern="one-way"/>
+            </inbound>
+            <bpm:process processName="fork" processDefinition="fork-process.jpdl.xml" />
+        </service>
+
+        <service name="VariablesProcess">
+            <inbound>
+                <vm:inbound-endpoint path="variables" exchange-pattern="request-response"/>
+            </inbound>
+            <bpm:process processName="variables" processDefinition="variables-process.jpdl.xml" />
+        </service>
+
+        <service name="ServiceA" initialState="paused">
+            <inbound>
+                <vm:inbound-endpoint path="queueA" exchange-pattern="one-way"/>
+            </inbound>
+            <test:component>
+                <test:return-data>Response A</test:return-data>
+            </test:component>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="fork-reply" exchange-pattern="one-way"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+        
+        <service name="ServiceB">
+            <inbound>
+                <vm:inbound-endpoint path="queueB" exchange-pattern="one-way"/>
+            </inbound>
+            <test:component>
+                <test:return-data>Response B</test:return-data>
+            </test:component>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="fork-reply" exchange-pattern="one-way"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+        
+        <service name="echoService">
+            <inbound>
+                <vm:inbound-endpoint path="echo" exchange-pattern="request-response"/>
+            </inbound>
+            <echo-component />
+        </service>
+        
+        <service name="exceptionService">
+            <inbound>
+                <vm:inbound-endpoint path="exceptionService" exchange-pattern="request-response"/>
+            </inbound>
+            <test:component throwException="true" />
+        </service>
+        
+        <service name="exceptionTransformer">
+            <inbound>
+                <vm:inbound-endpoint path="exceptionTransformer" exchange-pattern="request-response">
+                    <!-- Throw an exception -->
+                    <custom-transformer class="org.mule.tck.transformer.ValidateResponse" />
+                </vm:inbound-endpoint>
+            </inbound>
+            <echo-component />
+        </service>
+    </model>
+</mule>

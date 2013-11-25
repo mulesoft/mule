@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" 
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:file="http://www.mulesoft.org/schema/mule/file"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xmlns:xm="http://www.mulesoft.org/schema/mule/xml"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
+
+    <configuration defaultResponseTimeout="1001"/>
+
+    <vm:connector name="vmConnector1"/>
+    <vm:connector name="vmConnector2"/>
+    <custom-connector name="testConnector1" class="org.mule.tck.testmodels.mule.TestConnector"/>
+    <!-- need second connector as "create connector" no longer supported
+         and we want same uri to be used twice on inbound  -->
+    <custom-connector name="testConnector2" class="org.mule.tck.testmodels.mule.TestConnector"/>
+
+    <file:file-to-string-transformer name="ObjectToFileMessage"/>
+    <xm:object-to-xml-transformer name="ObjectToXml"/>
+    <xm:xml-to-object-transformer name="XmlToObject"/>
+
+    <endpoint name="server1" address="tcp://localhost:45431" exchange-pattern="one-way"/>
+    <endpoint name="server2" address="tcp://localhost:45432" exchange-pattern="one-way"/>
+    <endpoint name="server3" address="tcp://localhost:45433" exchange-pattern="one-way"/>
+    <endpoint name="testEndpoint" address="vm://another.queue" exchange-pattern="one-way"
+        connector-ref="vmConnector1" transformer-refs="ObjectToXml" />
+    <endpoint name="testEndpoint2" address="vm://yet.another.queue" exchange-pattern="one-way"
+        connector-ref="vmConnector1" transformer-refs="ObjectToXml" />
+
+    <model name="main">
+        
+        <!-- Test sendEndpoint and receive endpoint as URIs where the test connector will be
+            used from the above config and the stdio connector will be create dymanically
+        -->
+        <service name="TestComponent1">
+            <inbound>
+                <inbound-endpoint address="test://localhost/test.queue" exchange-pattern="one-way"
+                    connector-ref="testConnector1" />
+            </inbound>
+            <component class="org.mule.tck.testmodels.services.TestComponent"/>
+            <outbound>
+                <pass-through-router>
+                    <outbound-endpoint address="stdio://System.out" exchange-pattern="one-way"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="TestComponent2">
+            <inbound>
+                <inbound-endpoint address="test://localhost/test.queue" exchange-pattern="one-way"
+                    connector-ref="testConnector2" transformer-refs="XmlToObject" />
+            </inbound>
+            <component class="org.mule.tck.testmodels.services.TestComponent"/>
+        </service>
+
+        <!-- Test uri endpoints for send and receive and Uri endpoints on the outbound router -->
+        <service name="TestComponent3">
+            <inbound>
+                <inbound-endpoint ref="testEndpoint"/>
+            </inbound>
+            <component class="org.mule.tck.testmodels.services.TestComponent"/>
+            <outbound>
+                <filtering-router>
+                    <outbound-endpoint name="tcp1" address="tcp://localhost:60201" 
+                        exchange-pattern="one-way"/>
+                </filtering-router>
+                <multicasting-router>
+                    <outbound-endpoint address="udp://localhost:56731" exchange-pattern="one-way"/>
+                    <outbound-endpoint address="test://test.queue2" exchange-pattern="one-way"
+                        connector-ref="testConnector1"/>
+                </multicasting-router>
+            </outbound>
+        </service>
+
+        <!-- test Uri receiver endpoint specifying a provider with endpoint overriden and
+             test outbound router config combining endpoints -->
+        <service name="TestComponent4">
+            <inbound>
+                <!-- this didn't make sense? -->
+                <!-- inbound-endpoint address="vm://queue4" exchange-pattern="one-way" connector-ref="testConnector1" / -->
+                <inbound-endpoint address="vm://queue4" exchange-pattern="one-way"
+                    connector-ref="vmConnector2" transformer-refs="ObjectToXml"/>
+            </inbound>
+            <component class="org.mule.tck.testmodels.services.TestComponent"/>
+            <outbound>
+                <filtering-router>
+                    <outbound-endpoint address="udp://localhost:56731" exchange-pattern="one-way"/>
+                </filtering-router>
+            </outbound>
+        </service>
+
+        <service name="TestComponent5">
+            <inbound>
+                <inbound-endpoint address="vm://some.queue" exchange-pattern="one-way"
+                    connector-ref="vmConnector2" />
+            </inbound>
+            <component class="org.mule.tck.testmodels.services.TestComponent"/>
+            <outbound>
+                <filtering-router>
+                    <outbound-endpoint ref="server1" />
+                </filtering-router>
+            </outbound>
+        </service>
+
+        <service name="TestComponent6">
+            <component class="org.mule.tck.testmodels.services.TestComponent"/>
+            <outbound>
+                <filtering-router>
+                    <outbound-endpoint ref="server3" />
+                </filtering-router>
+            </outbound>
+        </service>
+    </model>
+</mule>
