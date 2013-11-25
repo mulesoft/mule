@@ -32,7 +32,6 @@ public class TcpSyncTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "tcp-sync-service.xml"},
             {ConfigVariant.FLOW, "tcp-sync-flow.xml"}
         });
     }

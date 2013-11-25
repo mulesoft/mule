@@ -61,7 +61,6 @@ public class ResponseTransformerMule2165TestCase extends AbstractServiceAndFlowT
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "issues/response-transformer-mule-2165-test-service.xml"},
             {ConfigVariant.FLOW, "issues/response-transformer-mule-2165-test-flow.xml"}});
     }
 

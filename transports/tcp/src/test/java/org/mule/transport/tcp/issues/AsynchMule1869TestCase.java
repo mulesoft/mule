@@ -41,7 +41,7 @@ public class AsynchMule1869TestCase extends AbstractServiceAndFlowTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "tcp-functional-test-service.xml"},
+        return Arrays.asList(new Object[][]{
             {ConfigVariant.FLOW, "tcp-functional-test-flow.xml"}});
     }
 

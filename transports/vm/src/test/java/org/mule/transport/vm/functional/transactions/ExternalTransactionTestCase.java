@@ -46,7 +46,6 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/config/external-transaction-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/config/external-transaction-config-flow.xml"}
         });
     }

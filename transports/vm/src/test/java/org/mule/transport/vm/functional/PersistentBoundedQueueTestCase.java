@@ -36,7 +36,6 @@ public class PersistentBoundedQueueTestCase extends AbstractServiceAndFlowTestCa
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "vm/persistent-bounded-vm-queue-test-service.xml"},
             {ConfigVariant.FLOW, "vm/persistent-bounded-vm-queue-test-flow.xml"}});
     }
 

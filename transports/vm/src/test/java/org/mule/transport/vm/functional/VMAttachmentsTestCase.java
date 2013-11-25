@@ -37,7 +37,6 @@ public class VMAttachmentsTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "vm/vm-attachments-test-service.xml"},
             {ConfigVariant.FLOW, "vm/vm-attachments-test-flow.xml"}
         });
     }

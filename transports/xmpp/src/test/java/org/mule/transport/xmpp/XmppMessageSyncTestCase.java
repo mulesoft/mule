@@ -34,7 +34,6 @@ public class XmppMessageSyncTestCase extends AbstractXmppTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-            {ConfigVariant.SERVICE, "xmpp-message-sync-config-service.xml"},
             {ConfigVariant.FLOW, "xmpp-message-sync-config-flow.xml"}
         });
     }

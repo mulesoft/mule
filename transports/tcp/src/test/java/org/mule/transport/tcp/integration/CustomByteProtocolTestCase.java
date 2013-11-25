@@ -41,7 +41,6 @@ public class CustomByteProtocolTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "custom-serialisation-mule-config-service.xml"},
             {ConfigVariant.FLOW, "custom-serialisation-mule-config-flow.xml"}
         });
     }

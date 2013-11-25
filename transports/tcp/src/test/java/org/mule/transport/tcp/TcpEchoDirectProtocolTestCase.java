@@ -38,7 +38,6 @@ public class TcpEchoDirectProtocolTestCase extends AbstractServiceAndFlowTestCas
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "tcp-echo-test-service.xml"},
             {ConfigVariant.FLOW, "tcp-echo-test-flow.xml"}
         });
     }

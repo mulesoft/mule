@@ -51,7 +51,6 @@ public class MultiStreamMule1692TestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "tcp-streaming-test-service.xml"},
             {ConfigVariant.FLOW, "tcp-streaming-test-flow.xml"}
         });
     }

@@ -31,7 +31,7 @@ public class MuleMessageLengthTestCase extends AbstractServiceAndFlowTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "tcp-mplength-test-service.xml"},
+        return Arrays.asList(new Object[][]{
             {ConfigVariant.FLOW, "tcp-mplength-test-flow.xml"}});
     }
 

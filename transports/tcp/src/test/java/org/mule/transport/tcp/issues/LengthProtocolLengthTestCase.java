@@ -39,7 +39,6 @@ public class LengthProtocolLengthTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "length-protocol-length-test-service.xml"},
             {ConfigVariant.FLOW, "length-protocol-length-test-flow.xml"}
         });
     }

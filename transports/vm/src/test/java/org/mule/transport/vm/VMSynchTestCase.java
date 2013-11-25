@@ -33,7 +33,6 @@ public class VMSynchTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "vm/vm-synch-test-service.xml"},
             {ConfigVariant.FLOW, "vm/vm-synch-test-flow.xml"}
         });
     }

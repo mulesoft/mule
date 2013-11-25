@@ -33,7 +33,6 @@ public class CustomFilterMule2437TestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "issues/custom-filter-mule-2437-test-service.xml"},
             {ConfigVariant.FLOW, "issues/custom-filter-mule-2437-test-flow.xml"}
         });
     }

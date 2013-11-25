@@ -51,7 +51,7 @@ public class KeepSendSocketOpenMule1491TestCase extends AbstractServiceAndFlowTe
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "tcp-keep-send-socket-open-service.xml"},
+        return Arrays.asList(new Object[][]{
             {ConfigVariant.FLOW, "tcp-keep-send-socket-open-flow.xml"}});
     }
 

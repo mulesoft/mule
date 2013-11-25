@@ -31,7 +31,6 @@ public class ReuseMule2069TestCase extends TcpFunctionalTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "reuse-mule-2069-service.xml"},
             {ConfigVariant.FLOW, "reuse-mule-2069-flow.xml"}
         });
     }

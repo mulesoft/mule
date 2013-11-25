@@ -9,14 +9,14 @@ package org.mule.transport.stdio;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 public class StdioNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -30,7 +30,6 @@ public class StdioNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCas
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "stdio-namespace-config-service.xml"},
             {ConfigVariant.FLOW, "stdio-namespace-config-flow.xml"}
         });
     }

@@ -45,7 +45,6 @@ public class MessageFilterTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/config/message-filter-config-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/config/message-filter-config-flow.xml"}});
     }
 

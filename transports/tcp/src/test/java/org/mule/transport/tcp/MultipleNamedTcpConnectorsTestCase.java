@@ -30,7 +30,6 @@ public class MultipleNamedTcpConnectorsTestCase extends AbstractServiceAndFlowTe
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "multiple-named-tcp-connectors-test-service.xml"},
             {ConfigVariant.FLOW, "multiple-named-tcp-connectors-test-flow.xml"}});
     }
 

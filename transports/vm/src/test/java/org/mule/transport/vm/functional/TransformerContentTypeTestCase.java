@@ -37,7 +37,6 @@ public class TransformerContentTypeTestCase extends AbstractServiceAndFlowTestCa
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/config/content-type-setting-transform-configs-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/config/content-type-setting-transform-configs-flow.xml"}
         });
     }

@@ -20,7 +20,6 @@ public class XmppChatAsyncTestCase extends XmppMessageAsyncTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-            {ConfigVariant.SERVICE, "xmpp-chat-async-config-service.xml"},
             {ConfigVariant.FLOW, "xmpp-chat-async-config-flow.xml"}
         });
     }

@@ -48,7 +48,7 @@ public class TcpRemoteSyncTestCase extends AbstractServiceAndFlowTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "tcp-remotesync-service.xml"},
+        return Arrays.asList(new Object[][]{
             {ConfigVariant.FLOW, "tcp-remotesync-flow.xml"}});
     }
 

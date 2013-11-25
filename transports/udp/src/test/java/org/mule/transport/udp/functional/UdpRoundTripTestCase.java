@@ -6,6 +6,7 @@
  */
 package org.mule.transport.udp.functional;
 
+import static org.junit.Assert.assertEquals;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -23,8 +24,6 @@ import java.util.Collection;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
 
 public class UdpRoundTripTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -44,7 +43,6 @@ public class UdpRoundTripTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "udp-roundtrip-test-config-service.xml"},
             {ConfigVariant.FLOW, "udp-roundtrip-test-config-flow.xml"}
         });
     }

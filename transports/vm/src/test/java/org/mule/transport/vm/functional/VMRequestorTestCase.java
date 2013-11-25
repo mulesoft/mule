@@ -34,7 +34,6 @@ public class VMRequestorTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "vm/vm-functional-test-service.xml"},
             {ConfigVariant.FLOW, "vm/vm-functional-test-flow.xml"}
         });
     }

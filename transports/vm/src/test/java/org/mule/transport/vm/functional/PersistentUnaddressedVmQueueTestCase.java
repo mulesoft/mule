@@ -32,7 +32,6 @@ public class PersistentUnaddressedVmQueueTestCase extends AbstractServiceAndFlow
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "vm/persistent-unaddressed-vm-queue-test-service.xml"},
             {ConfigVariant.FLOW, "vm/persistent-unaddressed-vm-queue-test-flow.xml"}});
     }
 

@@ -37,7 +37,6 @@ public class VMQueueTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "vm/vm-queue-test-service.xml"},
             {ConfigVariant.FLOW, "vm/vm-queue-test-flow.xml"}
         });
     }

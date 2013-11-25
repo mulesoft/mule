@@ -47,7 +47,6 @@ public class VmXATransactionTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "vm-xa-transaction-service.xml"},
             {ConfigVariant.FLOW, "vm-xa-transaction-flow.xml"}
         });
     }

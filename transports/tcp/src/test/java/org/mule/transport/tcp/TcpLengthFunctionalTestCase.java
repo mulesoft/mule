@@ -45,7 +45,6 @@ public class TcpLengthFunctionalTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "tcp-length-functional-test-service.xml"},
             {ConfigVariant.FLOW, "tcp-length-functional-test-flow.xml"}
         });
     }

@@ -6,6 +6,9 @@
  */
 package org.mule.transport.tcp;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 import org.mule.ResponseOutputStream;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transport.DispatchException;
@@ -22,10 +25,6 @@ import java.util.Collection;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 public class TcpSocketsPoolTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -45,7 +44,6 @@ public class TcpSocketsPoolTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-                {ConfigVariant.SERVICE, "tcp-sockets-pool-test-service.xml"},
                 {ConfigVariant.FLOW, "tcp-sockets-pool-test-flow.xml"}
         });
     }

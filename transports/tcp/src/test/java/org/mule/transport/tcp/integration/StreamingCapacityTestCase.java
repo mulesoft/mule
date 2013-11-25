@@ -36,7 +36,6 @@ public class StreamingCapacityTestCase extends AbstractStreamingCapacityTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "tcp-streaming-test-service.xml", 10 * ONE_GB},
             {ConfigVariant.FLOW, "tcp-streaming-test-flow.xml", 10 * ONE_GB}});
     }
 

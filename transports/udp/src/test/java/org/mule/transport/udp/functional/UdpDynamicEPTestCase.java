@@ -35,7 +35,6 @@ public class UdpDynamicEPTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "udp-roundtrip-dynamicep-test-config-service.xml"},
             {ConfigVariant.FLOW, "udp-roundtrip-dynamicep-test-config-flow.xml"}
         });
     }

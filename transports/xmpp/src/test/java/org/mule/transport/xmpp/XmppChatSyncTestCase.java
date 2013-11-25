@@ -19,7 +19,6 @@ public class XmppChatSyncTestCase extends XmppMessageSyncTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "xmpp-chat-sync-config-service.xml"},
             {ConfigVariant.FLOW, "xmpp-chat-sync-config-flow.xml"}
         });
     }

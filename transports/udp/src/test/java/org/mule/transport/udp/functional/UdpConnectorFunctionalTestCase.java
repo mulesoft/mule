@@ -38,7 +38,6 @@ public class UdpConnectorFunctionalTestCase extends AbstractServiceAndFlowTestCa
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "udp-functional-test-service.xml"},
             {ConfigVariant.FLOW, "udp-functional-test-flow.xml"}
         });
     }

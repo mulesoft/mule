@@ -36,7 +36,6 @@ public class TransformerChainMule2063TestCase extends AbstractServiceAndFlowTest
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "issues/transformer-chain-mule-2063-test-service.xml"},
             {ConfigVariant.FLOW, "issues/transformer-chain-mule-2063-test-flow.xml"}});
     }
 
