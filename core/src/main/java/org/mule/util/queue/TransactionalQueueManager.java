@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.util.queue;
 
 import org.mule.api.MuleContext;
@@ -27,6 +28,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.transaction.xa.XAResource;
 
@@ -45,9 +49,11 @@ public class TransactionalQueueManager extends AbstractXAResourceManager
     private MuleContext muleContext;
     private final Set<QueueStore> queueObjectStores = new HashSet<QueueStore>();
     private final Set<ListableObjectStore> listableObjectStores = new HashSet<ListableObjectStore>();
+    private final ReadWriteLock queuesLock = new ReentrantReadWriteLock();
 
     /**
      * {@inheritDoc}
+     * 
      * @return an instance of {@link TransactionalQueueSession}
      */
     @Override
@@ -75,33 +81,40 @@ public class TransactionalQueueManager extends AbstractXAResourceManager
         getQueue(queueName, config).setConfig(config);
         addStore(config.objectStore);
     }
-    
+
     protected void disposeQueue(Queue queue) throws MuleException, InterruptedException
     {
         if (queue == null)
         {
             throw new IllegalArgumentException("Queue to be disposed cannot be null");
         }
-        
+
         final String queueName = queue.getName();
-        
-        synchronized (this.queues)
+        Lock lock = this.queuesLock.writeLock();
+        lock.lock();
+        try
         {
             if (!this.queues.containsKey(queueName))
             {
                 throw new IllegalArgumentException(String.format("There's no queue for name %s", queueName));
             }
-            
+
             this.queues.remove(queueName);
         }
-        
+        finally
+        {
+            lock.unlock();
+        }
+
         queue.clear();
-        
-        if (queue instanceof Stoppable) {
+
+        if (queue instanceof Stoppable)
+        {
             ((Stoppable) queue).stop();
         }
-        
-        if (queue instanceof Disposable) {
+
+        if (queue instanceof Disposable)
+        {
             ((Disposable) queue).dispose();
         }
     }
@@ -113,7 +126,9 @@ public class TransactionalQueueManager extends AbstractXAResourceManager
 
     protected QueueInfo getQueue(String name, QueueConfiguration config)
     {
-        synchronized (this.queues)
+        Lock lock = this.queuesLock.writeLock();
+        lock.lock();
+        try
         {
             QueueInfo q = queues.get(name);
             if (q == null)
@@ -121,15 +136,28 @@ public class TransactionalQueueManager extends AbstractXAResourceManager
                 q = new QueueInfo(name, muleContext, config);
                 queues.put(name, q);
             }
-            
+
             return q;
+        }
+        finally
+        {
+            lock.unlock();
         }
     }
 
-    public synchronized QueueInfo getQueueInfo(String name)
+    public QueueInfo getQueueInfo(String name)
     {
-        QueueInfo q = queues.get(name);
-        return q == null ? q : new QueueInfo(q);
+        Lock lock = this.queuesLock.readLock();
+        lock.lock();
+        try
+        {
+            QueueInfo q = queues.get(name);
+            return q == null ? q : new QueueInfo(q);
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     @Override
@@ -154,9 +182,15 @@ public class TransactionalQueueManager extends AbstractXAResourceManager
     {
         // Clear queues on shutdown to avoid duplicate entries on warm restarts
         // (MULE-3678)
-        synchronized (this)
+        Lock lock = this.queuesLock.writeLock();
+        lock.lock();
+        try
         {
             queues.clear();
+        }
+        finally
+        {
+            lock.unlock();
         }
         return super.shutdown(mode, timeoutMSecs);
     }
