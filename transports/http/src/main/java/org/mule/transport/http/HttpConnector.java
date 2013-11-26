@@ -54,7 +54,6 @@ import org.apache.commons.httpclient.util.IdleConnectionTimeoutThread;
  * <li>proxyUsername - If the proxy requires authentication supply a username</li>
  * <li>proxyPassword - If the proxy requires authentication supply a password</li>
  * </ul>
- * 
  */
 
 public class HttpConnector extends TcpConnector
@@ -159,6 +158,7 @@ public class HttpConnector extends TcpConnector
 
     public static final String COOKIE_SPEC_NETSCAPE = "netscape";
     public static final String COOKIE_SPEC_RFC2109 = "rfc2109";
+    public static final int DEFAULT_CONNECTION_TIMEOUT = 2000;
 
     private String proxyHostname = null;
 
@@ -223,6 +223,16 @@ public class HttpConnector extends TcpConnector
             params.setTcpNoDelay(isSendTcpNoDelay());
             params.setMaxTotalConnections(dispatchers.getMaxTotal());
             params.setDefaultMaxConnectionsPerHost(dispatchers.getMaxTotal());
+
+            if (getConnectionTimeout() != INT_VALUE_NOT_SET)
+            {
+                params.setConnectionTimeout(getConnectionTimeout());
+            }
+            else
+            {
+                params.setConnectionTimeout(DEFAULT_CONNECTION_TIMEOUT);
+            }
+
             clientConnectionManager.setParams(params);
         }
     }

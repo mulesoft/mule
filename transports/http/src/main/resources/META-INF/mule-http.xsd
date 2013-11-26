@@ -381,6 +381,13 @@
                 returned. If set to false, a "Connection: close" header will be returned.</xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="connectionTimeout" type="mule:substitutableInt">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Number of milliseconds to wait until a connection to a remote server is successfully created. When no value is specified a default timeout of 2000ms is used
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
     <xsd:simpleType name="httpMethodTypes">
