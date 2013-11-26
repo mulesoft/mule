@@ -53,7 +53,7 @@ public class QueueInfo
         QueueInfoDelegateFactory factory = null;
         if (config != null)
         {
-            capacity = config.capacity;
+            capacity = config.getCapacity();
             factory = delegateFactories.get(config.objectStore.getClass());
         }
         if (delegate == null || (config != null && !hadConfig))

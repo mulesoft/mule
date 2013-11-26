@@ -4,10 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.util.queue;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
@@ -24,6 +28,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.transaction.xa.XAResource;
 
@@ -36,19 +43,28 @@ import javax.transaction.xa.XAResource;
 public class TransactionalQueueManager extends AbstractXAResourceManager
     implements QueueManager, MuleContextAware
 {
-    private Map<String, QueueInfo> queues = new HashMap<String, QueueInfo>();
+    private final Map<String, QueueInfo> queues = new HashMap<String, QueueInfo>();
 
     private QueueConfiguration defaultQueueConfiguration;
     private MuleContext muleContext;
-    private Set<QueueStore> queueObjectStores = new HashSet<QueueStore>();
-    private Set<ListableObjectStore> listableObjectStores = new HashSet<ListableObjectStore>();
+    private final Set<QueueStore> queueObjectStores = new HashSet<QueueStore>();
+    private final Set<ListableObjectStore> listableObjectStores = new HashSet<ListableObjectStore>();
+    private final ReadWriteLock queuesLock = new ReentrantReadWriteLock();
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @return an instance of {@link TransactionalQueueSession}
+     */
     @Override
     public synchronized QueueSession getQueueSession()
     {
         return new TransactionalQueueSession(this, this);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void setDefaultQueueConfiguration(QueueConfiguration config)
     {
@@ -56,6 +72,9 @@ public class TransactionalQueueManager extends AbstractXAResourceManager
         addStore(config.objectStore);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void setQueueConfiguration(String queueName, QueueConfiguration config)
     {
@@ -63,26 +82,82 @@ public class TransactionalQueueManager extends AbstractXAResourceManager
         addStore(config.objectStore);
     }
 
-    protected synchronized QueueInfo getQueue(String name)
+    protected void disposeQueue(Queue queue) throws MuleException, InterruptedException
+    {
+        if (queue == null)
+        {
+            throw new IllegalArgumentException("Queue to be disposed cannot be null");
+        }
+
+        final String queueName = queue.getName();
+        Lock lock = this.queuesLock.writeLock();
+        lock.lock();
+        try
+        {
+            if (!this.queues.containsKey(queueName))
+            {
+                throw new IllegalArgumentException(String.format("There's no queue for name %s", queueName));
+            }
+
+            this.queues.remove(queueName);
+        }
+        finally
+        {
+            lock.unlock();
+        }
+
+        queue.clear();
+
+        if (queue instanceof Stoppable)
+        {
+            ((Stoppable) queue).stop();
+        }
+
+        if (queue instanceof Disposable)
+        {
+            ((Disposable) queue).dispose();
+        }
+    }
+
+    protected QueueInfo getQueue(String name)
     {
         return getQueue(name, defaultQueueConfiguration);
     }
 
-    protected synchronized QueueInfo getQueue(String name, QueueConfiguration config)
+    protected QueueInfo getQueue(String name, QueueConfiguration config)
     {
-        QueueInfo q = queues.get(name);
-        if (q == null)
+        Lock lock = this.queuesLock.writeLock();
+        lock.lock();
+        try
         {
-            q = new QueueInfo(name, muleContext, config);
-            queues.put(name, q);
+            QueueInfo q = queues.get(name);
+            if (q == null)
+            {
+                q = new QueueInfo(name, muleContext, config);
+                queues.put(name, q);
+            }
+
+            return q;
         }
-        return q;
+        finally
+        {
+            lock.unlock();
+        }
     }
 
-    public synchronized QueueInfo getQueueInfo(String name)
+    public QueueInfo getQueueInfo(String name)
     {
-        QueueInfo q = queues.get(name);
-        return q == null ? q : new QueueInfo(q);
+        Lock lock = this.queuesLock.readLock();
+        lock.lock();
+        try
+        {
+            QueueInfo q = queues.get(name);
+            return q == null ? q : new QueueInfo(q);
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     @Override
@@ -107,9 +182,15 @@ public class TransactionalQueueManager extends AbstractXAResourceManager
     {
         // Clear queues on shutdown to avoid duplicate entries on warm restarts
         // (MULE-3678)
-        synchronized (this)
+        Lock lock = this.queuesLock.writeLock();
+        lock.lock();
+        try
         {
             queues.clear();
+        }
+        finally
+        {
+            lock.unlock();
         }
         return super.shutdown(mode, timeoutMSecs);
     }
