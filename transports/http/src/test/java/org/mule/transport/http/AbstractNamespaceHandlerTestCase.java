@@ -42,6 +42,7 @@ public abstract class AbstractNamespaceHandlerTestCase extends FunctionalTestCas
         assertEquals(5678, connector.getSendBufferSize());
         assertEquals(6789, connector.getSocketSoLinger());
         assertEquals(7890, connector.getServerSoTimeout());
+        assertEquals(4000, connector.getConnectionTimeout());
         assertEquals(true, connector.isEnableCookies());
         assertEquals(true, connector.isKeepAlive());
         assertEquals(true, connector.isKeepSendSocketOpen());

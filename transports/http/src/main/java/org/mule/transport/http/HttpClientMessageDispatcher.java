@@ -196,7 +196,6 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         // precedence and is not available before send/dispatch.
         // Given that dispatchers are borrowed from a thread pool mutating client
         // here is ok even though it is not ideal.
-        client.getHttpConnectionManager().getParams().setConnectionTimeout(endpoint.getResponseTimeout());
         client.getHttpConnectionManager().getParams().setSoTimeout(endpoint.getResponseTimeout());
 
         MuleMessage msg = event.getMessage();
