@@ -171,6 +171,7 @@ public class HttpConnector extends TcpConnector
     public static final String COOKIE_SPEC_NETSCAPE = "netscape";
     public static final String COOKIE_SPEC_RFC2109 = "rfc2109";
     public static final String ROOT_PATH = "/";
+    public static final int DEFAULT_CONNECTION_TIMEOUT = 2000;
 
     private String proxyHostname = null;
 
@@ -237,6 +238,16 @@ public class HttpConnector extends TcpConnector
             params.setTcpNoDelay(isSendTcpNoDelay());
             params.setMaxTotalConnections(dispatchers.getMaxTotal());
             params.setDefaultMaxConnectionsPerHost(dispatchers.getMaxTotal());
+
+            if (getConnectionTimeout() != INT_VALUE_NOT_SET)
+            {
+                params.setConnectionTimeout(getConnectionTimeout());
+            }
+            else
+            {
+                params.setConnectionTimeout(DEFAULT_CONNECTION_TIMEOUT);
+            }
+
             clientConnectionManager.setParams(params);
         }
         //connection manager must be created during initialization due that devkit requires the connection manager before start phase.
