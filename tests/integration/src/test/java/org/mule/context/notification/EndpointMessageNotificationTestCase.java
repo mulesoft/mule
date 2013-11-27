@@ -7,13 +7,7 @@
 package org.mule.context.notification;
 
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.client.MuleClient;
-
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.runners.Parameterized.Parameters;
 
 public class EndpointMessageNotificationTestCase extends AbstractNotificationTestCase
 {
@@ -22,17 +16,10 @@ public class EndpointMessageNotificationTestCase extends AbstractNotificationTes
     public static final String SERVICE_2_ID = "service-2";
     public static final String CLIENT_ID = "MuleClient";
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/integration/notifications/endpoint-message-notification-test-flow.xml"}
-        });
-    }
-
-    public EndpointMessageNotificationTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/notifications/endpoint-message-notification-test-flow.xml";
     }
 
     @Override

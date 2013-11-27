@@ -8,16 +8,12 @@ package org.mule.module.xml.functional;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class XPathNodeExpressionEvaluatorTestCase extends AbstractServiceAndFlowTestCase
+public class XPathNodeExpressionEvaluatorTestCase extends FunctionalTestCase
 {
     private static final String SAMPLE_REQUEST =
             "<root>" +
@@ -32,17 +28,10 @@ public class XPathNodeExpressionEvaluatorTestCase extends AbstractServiceAndFlow
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<name>African Coffee Table</name>";
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/module/xml/xpath-node-config-flow.xml"}
-        });
-    }
-
-    public XPathNodeExpressionEvaluatorTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/module/xml/xpath-node-config-flow.xml";
     }
 
     @Test

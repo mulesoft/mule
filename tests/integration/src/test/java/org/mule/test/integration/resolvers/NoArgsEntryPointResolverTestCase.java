@@ -6,25 +6,15 @@
  */
 package org.mule.test.integration.resolvers;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class NoArgsEntryPointResolverTestCase extends AbstractEntryPointResolverTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
+
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/integration/resolvers/no-args-entry-point-resolver-test-flow.xml"}
-        });
-    }      
-    
-    public NoArgsEntryPointResolverTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/resolvers/no-args-entry-point-resolver-test-flow.xml";
     }
 
     @Test

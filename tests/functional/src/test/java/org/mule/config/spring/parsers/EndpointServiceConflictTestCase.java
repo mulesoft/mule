@@ -6,26 +6,16 @@
  */
 package org.mule.config.spring.parsers;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class EndpointServiceConflictTestCase extends AbstractBadConfigTestCase
-{    
-    public EndpointServiceConflictTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources); 
-    }
+{
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "org/mule/config/spring/parsers/endpoint-service-conflict-test-flow.xml"}
-        });
-    }      
+        return "org/mule/config/spring/parsers/endpoint-service-conflict-test-flow.xml";
+    }
 
     @Test
     public void testBeanError() throws Exception

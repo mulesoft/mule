@@ -6,12 +6,6 @@
  */
 package org.mule.security;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.runners.Parameterized.Parameters;
-
-
 /**
  * Tests multi-user security against a security provider which holds authentications 
  * for multiple users concurrently.
@@ -20,19 +14,10 @@ import org.junit.runners.Parameterized.Parameters;
  */
 public class MultiuserSecurityWithMultiuserProviderTestCase extends MultiuserSecurityTestCase
 {
-        
-    public MultiuserSecurityWithMultiuserProviderTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "multiuser-security-test-flow.xml, multiuser-security-provider.xml"}
-        });
+        return "multiuser-security-test-flow.xml, multiuser-security-provider.xml";
     }
-    
-    
 }

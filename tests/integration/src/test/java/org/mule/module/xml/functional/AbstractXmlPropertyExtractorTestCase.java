@@ -8,33 +8,25 @@ package org.mule.module.xml.functional;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public abstract class AbstractXmlPropertyExtractorTestCase extends AbstractServiceAndFlowTestCase
+public abstract class AbstractXmlPropertyExtractorTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/module/xml/property-extractor-test.xml"}
 
-        });
+    public AbstractXmlPropertyExtractorTestCase(boolean matchSingle)
+    {
+        this.matchSingle = matchSingle;
     }
 
-    public AbstractXmlPropertyExtractorTestCase(ConfigVariant variant, String configResources, boolean matchSingle)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-        this.matchSingle = matchSingle;
+        return  "org/mule/module/xml/property-extractor-test.xml";
     }
 
     private boolean matchSingle = true;

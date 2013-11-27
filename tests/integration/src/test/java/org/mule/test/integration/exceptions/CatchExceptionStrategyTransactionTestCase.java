@@ -14,6 +14,7 @@ import org.mule.api.client.LocalMuleClient;
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
 import java.util.Arrays;
@@ -23,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-public class CatchExceptionStrategyTransactionTestCase extends AbstractServiceAndFlowTestCase
+public class CatchExceptionStrategyTransactionTestCase extends FunctionalTestCase
 {
 
     public static final int TIMEOUT = 5000;
@@ -31,16 +32,10 @@ public class CatchExceptionStrategyTransactionTestCase extends AbstractServiceAn
     public static final int SHORT_TIMEOUT = 500;
     private Latch messageConsumed = new Latch();
 
-    public CatchExceptionStrategyTransactionTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/catch-exception-strategy-transaction-flow.xml"}});
+        return "org/mule/test/integration/exceptions/catch-exception-strategy-transaction-flow.xml";
     }
 
     @Test

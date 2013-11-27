@@ -14,26 +14,17 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class MuleClientListenerTestCase extends AbstractServiceAndFlowTestCase
+public class MuleClientListenerTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/integration/client/mule-client-listener-config-flow.xml"}});
-    }
 
-    public MuleClientListenerTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/integration/client/mule-client-listener-config-flow.xml";
     }
 
     public void doTestRegisterListener(String component, String endpoint, boolean canSendWithoutReceiver)

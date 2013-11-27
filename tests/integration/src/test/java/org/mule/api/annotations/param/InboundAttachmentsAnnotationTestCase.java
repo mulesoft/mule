@@ -11,18 +11,15 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.expression.RequiredValueException;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.StringDataSource;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,25 +27,20 @@ import java.util.Map;
 import javax.activation.DataHandler;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlowTestCase
+public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
 {
     private MuleMessage muleMessage;
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    public InboundAttachmentsAnnotationTestCase()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/annotations/inbound-attachments-annotation-flow.xml"}
-
-        });
+        setDisposeContextPerClass(true);
     }
 
-    public InboundAttachmentsAnnotationTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-        setDisposeContextPerClass(true);
+        return "org/mule/test/annotations/inbound-attachments-annotation-flow.xml";
     }
 
     @Override

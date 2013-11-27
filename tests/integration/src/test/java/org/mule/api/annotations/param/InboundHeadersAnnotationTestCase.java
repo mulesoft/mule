@@ -11,19 +11,16 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.expression.RequiredValueException;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.util.ExceptionUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -31,24 +28,20 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTestCase
+public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
 {
     private Map<String, Object> props;
 
-    public InboundHeadersAnnotationTestCase(ConfigVariant variant, String configResources)
+    public InboundHeadersAnnotationTestCase()
     {
-        super(variant, configResources);
         setDisposeContextPerClass(true);
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/annotations/inbound-headers-annotation-flow.xml"}
-        });
+        return "org/mule/test/annotations/inbound-headers-annotation-flow.xml";
     }
 
     @Override

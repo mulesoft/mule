@@ -9,36 +9,27 @@ package org.mule.test.usecases.routing.response;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.routing.requestreply.AbstractAsyncRequestReplyRequester;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.SensingNullMessageProcessor;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.store.SimpleMemoryObjectStore;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class ResponseAggregatorTestCase extends AbstractServiceAndFlowTestCase
+public class ResponseAggregatorTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/usecases/routing/response/response-router-flow.xml"}});
-    }
 
-    public ResponseAggregatorTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/usecases/routing/response/response-router-flow.xml";
     }
 
     @Test

@@ -10,11 +10,7 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.api.client.MuleClient;
 import org.mule.api.service.Service;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Ignore;
-import org.junit.runners.Parameterized.Parameters;
 
 @Ignore
 public class ServerNotificationManagerTestCase extends AbstractNotificationTestCase
@@ -23,17 +19,10 @@ public class ServerNotificationManagerTestCase extends AbstractNotificationTestC
     public static final String MODEL = "the-model";
     public static final String SERVICE = "the-service";
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/integration/notifications/server-notification-manager-test.xml"},
-        });
-    }
-
-    public ServerNotificationManagerTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/notifications/server-notification-manager-test.xml";
     }
 
     @Override

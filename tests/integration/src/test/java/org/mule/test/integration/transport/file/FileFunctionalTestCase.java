@@ -6,13 +6,17 @@
  */
 package org.mule.test.integration.transport.file;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import org.mule.DefaultMuleContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.functional.FunctionalTestNotification;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transport.PollingController;
 import org.mule.transport.file.FileMessageReceiver;
@@ -23,18 +27,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-public class FileFunctionalTestCase extends AbstractServiceAndFlowTestCase implements FunctionalTestNotificationListener
+public class FileFunctionalTestCase extends FunctionalTestCase implements FunctionalTestNotificationListener
 {
     @ClassRule
     public static SystemProperty filePollOnlyOnPrimaryNode = new SystemProperty(FileMessageReceiver.MULE_TRANSPORT_FILE_SINGLEPOLLINSTANCE,"true");
@@ -42,16 +39,10 @@ public class FileFunctionalTestCase extends AbstractServiceAndFlowTestCase imple
     private Object receivedData = null;
     private boolean shouldPoll;
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/integration/providers/file/file-config-flow.xml"}});
-    }
-
-    public FileFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/providers/file/file-config-flow.xml";
     }
 
     @Override

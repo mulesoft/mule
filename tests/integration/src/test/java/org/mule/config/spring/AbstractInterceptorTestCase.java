@@ -6,24 +6,18 @@
  */
 package org.mule.config.spring;
 
-import org.mule.api.MuleException;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import org.mule.api.MuleException;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-public abstract class AbstractInterceptorTestCase extends AbstractServiceAndFlowTestCase
+public abstract class AbstractInterceptorTestCase extends FunctionalTestCase
 {
     public static final String MESSAGE = "boo";
 
-    public AbstractInterceptorTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     public void assertMessageIntercepted() throws MuleException, InterruptedException
     {
-        FunctionalTestAdvice advice = (FunctionalTestAdvice) muleContext.getRegistry().lookupObject("advice");
+        FunctionalTestAdvice advice = muleContext.getRegistry().lookupObject("advice");
         assertNotNull("Cannot find advice", advice);
         String message = advice.getMessage(RECEIVE_TIMEOUT);
         assertEquals("Bad message", MESSAGE, message);

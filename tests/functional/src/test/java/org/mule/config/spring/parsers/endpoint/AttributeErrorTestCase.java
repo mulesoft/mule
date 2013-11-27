@@ -8,28 +8,17 @@ package org.mule.config.spring.parsers.endpoint;
 
 import org.mule.config.spring.parsers.AbstractBadConfigTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class AttributeErrorTestCase extends AbstractBadConfigTestCase
 {
 
-    public AttributeErrorTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);     
+        return "org/mule/config/spring/parsers/endpoint/attribute-error-test-flow.xml";
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "org/mule/config/spring/parsers/endpoint/attribute-error-test-flow.xml"}
-        });
-    }      
-    
     @Test
     public void testError() throws Exception
     {

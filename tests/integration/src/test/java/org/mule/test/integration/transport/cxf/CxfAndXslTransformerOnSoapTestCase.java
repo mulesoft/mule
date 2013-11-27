@@ -14,6 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.cxf.support.OutputPayloadInterceptor;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy.ExceptionCallback;
 import org.mule.util.concurrent.Latch;
@@ -26,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-public class CxfAndXslTransformerOnSoapTestCase extends AbstractServiceAndFlowTestCase
+public class CxfAndXslTransformerOnSoapTestCase extends FunctionalTestCase
 {
     private static final String msg = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:emop=\"http://www.wcs.com/2010/07/14/emop\">"
                        + "  <soapenv:Header>\n"
@@ -42,16 +43,10 @@ public class CxfAndXslTransformerOnSoapTestCase extends AbstractServiceAndFlowTe
 
     private final AtomicInteger connectorExceptionCounter = new AtomicInteger();
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/integration/transport/cxf/scratchcard-service-v1-flow.xml"}});
-    }
-
-    public CxfAndXslTransformerOnSoapTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/transport/cxf/scratchcard-service-v1-flow.xml";
     }
 
     @Override

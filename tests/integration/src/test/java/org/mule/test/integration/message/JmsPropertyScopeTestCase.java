@@ -12,25 +12,15 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class JmsPropertyScopeTestCase extends AbstractPropertyScopeTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            { ConfigVariant.FLOW, "org/mule/test/message/jms-property-scope-flow.xml" }
-        });
-    }
 
-    public JmsPropertyScopeTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/message/jms-property-scope-flow.xml";
     }
 
     @Override

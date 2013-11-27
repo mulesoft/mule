@@ -8,39 +8,27 @@ package org.mule.test.integration.exceptions;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleEvent;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transaction.TransactionException;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transaction.TransactionCoordination;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * When exception strategies are used with transactions it should be possible to send
  * the exception message while rolling back the transaction. See MULE-4338
  */
-public class ExceptionStrategyTransactionTestCase extends AbstractServiceAndFlowTestCase
+public class ExceptionStrategyTransactionTestCase extends FunctionalTestCase
 {
     private static String failure;
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/exception-strategy-transaction-test-flow.xml"}
-        });
-    }
-
-    public ExceptionStrategyTransactionTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/exceptions/exception-strategy-transaction-test-flow.xml";
     }
 
     @Test

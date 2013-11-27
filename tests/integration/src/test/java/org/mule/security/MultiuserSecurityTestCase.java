@@ -8,23 +8,17 @@ package org.mule.security;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.EncryptionStrategy;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.transport.SessionHandler;
-import org.mule.session.MuleSessionHandler;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Tests multi-user security against a security provider which only authenticates
@@ -34,25 +28,19 @@ import org.junit.runners.Parameterized.Parameters;
  * see EE-979
  */
 @Ignore
-public class MultiuserSecurityTestCase extends AbstractServiceAndFlowTestCase
+public class MultiuserSecurityTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "multiuser-security-test-flow.xml, singleuser-security-provider.xml"}});
-    }
 
-    public MultiuserSecurityTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "multiuser-security-test-flow.xml, singleuser-security-provider.xml";
     }
 
     @Test
     public void testMultipleAuthentications() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        SessionHandler sessionHandler = new MuleSessionHandler();
         MuleMessage reply;
         Map<String, Object> props;
 

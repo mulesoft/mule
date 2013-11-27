@@ -21,30 +21,22 @@ import org.mule.module.xml.filters.JXPathFilter;
 import org.mule.routing.MessageFilter;
 import org.mule.routing.filters.logic.NotFilter;
 import org.mule.routing.outbound.FilteringOutboundRouter;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class XmlFilterNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
+public class XmlFilterNamespaceHandlerTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/module/xml/xml-filter-functional-test-flow.xml"}});
-    }
 
-    public XmlFilterNamespaceHandlerTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/module/xml/xml-filter-functional-test-flow.xml";
     }
 
     /**

@@ -14,9 +14,9 @@ public class JXPathExpressionWithNamespaceTestCase extends AbstractXmlPropertyEx
 
     public static final String MESSAGE = "<foo:endpoint xmlns:foo=\"http://foo.com\">{0}</foo:endpoint>";
 
-    public JXPathExpressionWithNamespaceTestCase(ConfigVariant variant, String configResources)
+    public JXPathExpressionWithNamespaceTestCase()
     {
-        super(variant, configResources, true);
+        super(true);
     }
 
     @Override

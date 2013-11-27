@@ -6,23 +6,12 @@
  */
 package org.mule.test.integration.message;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.runners.Parameterized.Parameters;
-
 public class HttpPropertyScopeTestCase extends AbstractPropertyScopeTestCase
 {
 
-    public HttpPropertyScopeTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {{ConfigVariant.FLOW, "org/mule/test/message/http-property-scope.xml"}
-        });
+        return "org/mule/test/message/http-property-scope.xml";
     }
 }

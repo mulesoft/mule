@@ -8,16 +8,11 @@ package org.mule.test.cookbook.quartz;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * The Quartz transport can be used to trigger an event to be received by the
@@ -28,18 +23,13 @@ import org.junit.runners.Parameterized.Parameters;
  * service method, and by not specifying a 'payload' element there is no data to try
  * and match to the service method, so Mule will match a method with no arguments.
  */
-public class TriggerNoArgsServiceMethodTestCase extends AbstractServiceAndFlowTestCase
+public class TriggerNoArgsServiceMethodTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/cookbook/quartz/trigger-no-args-method-config-flow.xml"}});
-    }
 
-    public TriggerNoArgsServiceMethodTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/cookbook/quartz/trigger-no-args-method-config-flow.xml";
     }
 
     @Test

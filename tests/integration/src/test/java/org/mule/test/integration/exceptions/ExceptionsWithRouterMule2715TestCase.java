@@ -8,35 +8,23 @@ package org.mule.test.integration.exceptions;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.message.ExceptionMessage;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class ExceptionsWithRouterMule2715TestCase extends AbstractServiceAndFlowTestCase
+public class ExceptionsWithRouterMule2715TestCase extends FunctionalTestCase
 {
     public static final String MESSAGE = "message";
     public static final long TIMEOUT = 5000L;
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/exceptions-with-router-mule-2715-flow.xml"}
-        });
-    }
-
-    public ExceptionsWithRouterMule2715TestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/exceptions/exceptions-with-router-mule-2715-flow.xml";
     }
 
     @Test

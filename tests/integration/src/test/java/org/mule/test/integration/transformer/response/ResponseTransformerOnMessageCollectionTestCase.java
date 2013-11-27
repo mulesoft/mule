@@ -11,28 +11,17 @@ import static org.junit.Assert.assertFalse;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.client.LocalMuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
-public class ResponseTransformerOnMessageCollectionTestCase extends AbstractServiceAndFlowTestCase
+public class ResponseTransformerOnMessageCollectionTestCase extends FunctionalTestCase
 {
 
-    public ResponseTransformerOnMessageCollectionTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "org/mule/test/integration/transformer/response/response-transformer-on-message-collection-flow-config.xml"}
-        });
+        return "org/mule/test/integration/transformer/response/response-transformer-on-message-collection-flow-config.xml";
     }
 
     @Test

@@ -12,7 +12,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
@@ -23,9 +22,9 @@ import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.exception.AbstractMessagingExceptionStrategy;
 import org.mule.message.ExceptionMessage;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.NullPayload;
 import org.mule.transport.email.FixedPortGreenMailSupport;
@@ -33,8 +32,6 @@ import org.mule.transport.email.functional.AbstractEmailFunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -44,9 +41,8 @@ import javax.mail.internet.MimeMessage;
 import org.hamcrest.core.IsNull;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
-public class ExceptionStrategyCommonScenariosTestCase extends AbstractServiceAndFlowTestCase
+public class ExceptionStrategyCommonScenariosTestCase extends FunctionalTestCase
 {
     public static final String MESSAGE_TO_SEND = "A message";
     public static final String MESSAGE_MODIFIED = "A message with some text added";
@@ -70,16 +66,10 @@ public class ExceptionStrategyCommonScenariosTestCase extends AbstractServiceAnd
     @Rule
     public DynamicPort dynamicPort6 = new DynamicPort("port6");
 
-    public ExceptionStrategyCommonScenariosTestCase(AbstractServiceAndFlowTestCase.ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-                {AbstractServiceAndFlowTestCase.ConfigVariant.FLOW, "org/mule/test/integration/exceptions/exception-strategy-common-scenarios-flow.xml"}});
+        return "org/mule/test/integration/exceptions/exception-strategy-common-scenarios-flow.xml";
     }
 
     @Test

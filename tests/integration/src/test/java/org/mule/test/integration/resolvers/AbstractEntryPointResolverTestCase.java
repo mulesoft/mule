@@ -7,19 +7,14 @@
 package org.mule.test.integration.resolvers;
 
 import static org.junit.Assert.assertEquals;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Map;
 
-public abstract class AbstractEntryPointResolverTestCase extends AbstractServiceAndFlowTestCase
+public abstract class AbstractEntryPointResolverTestCase extends FunctionalTestCase
 {
-    public AbstractEntryPointResolverTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     protected void doTest(String path, Object payload, String result) throws Exception
     {

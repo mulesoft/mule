@@ -9,34 +9,23 @@ package org.mule.test.integration.exceptions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class ExceptionStrategyMessagePropertiesTestCase extends AbstractServiceAndFlowTestCase
+public class ExceptionStrategyMessagePropertiesTestCase extends FunctionalTestCase
 {
     private final int numMessages = 100;
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/exception-strategy-message-properties-flow.xml"}
-        });
-    }
-
-    public ExceptionStrategyMessagePropertiesTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/exceptions/exception-strategy-message-properties-flow.xml";
     }
 
     @Test

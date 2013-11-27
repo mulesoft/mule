@@ -7,13 +7,7 @@
 package org.mule.context.notification;
 
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.client.MuleClient;
-
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test ComponentNotifications/Listeners by sending events to a component. A pre and
@@ -21,17 +15,11 @@ import org.junit.runners.Parameterized.Parameters;
  */
 public class ComponentMessageNotificationTestCase extends AbstractNotificationTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW,
-                "org/mule/test/integration/notifications/component-message-notification-test-flow.xml"}});
-    }
 
-    public ComponentMessageNotificationTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/integration/notifications/component-message-notification-test-flow.xml";
     }
 
     @Override

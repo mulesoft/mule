@@ -6,26 +6,18 @@
  */
 package org.mule.test.integration.resolvers;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class EntryPointResolverTestCase extends AbstractEntryPointResolverTestCase
 {
-    public EntryPointResolverTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/integration/resolvers/entry-point-resolver-test-flow.xml"}});
+        return "org/mule/test/integration/resolvers/entry-point-resolver-test-flow.xml";
     }
 
     @Test

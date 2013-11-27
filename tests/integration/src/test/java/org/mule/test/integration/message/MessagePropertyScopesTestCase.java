@@ -9,32 +9,21 @@ package org.mule.test.integration.message;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class MessagePropertyScopesTestCase extends AbstractServiceAndFlowTestCase
+public class MessagePropertyScopesTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/integration/messaging/message-property-scopes-config-flow.xml"}
-        });
-    }
 
-    public MessagePropertyScopesTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/integration/messaging/message-property-scopes-config-flow.xml";
     }
 
     @Test

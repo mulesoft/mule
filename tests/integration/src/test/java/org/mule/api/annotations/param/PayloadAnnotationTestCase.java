@@ -9,34 +9,29 @@ package org.mule.api.annotations.param;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transformer.TransformerException;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.IOUtils;
 
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class PayloadAnnotationTestCase extends AbstractServiceAndFlowTestCase
+public class PayloadAnnotationTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
+
+    public PayloadAnnotationTestCase()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/annotations/payload-annotation-flow.xml"}});
+        setDisposeContextPerClass(true);
     }
 
-    public PayloadAnnotationTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-        setDisposeContextPerClass(true);
+        return "org/mule/test/annotations/payload-annotation-flow.xml";
     }
 
     @Test

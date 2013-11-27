@@ -13,34 +13,22 @@ import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
-import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.construct.Flow;
-import org.mule.routing.outbound.OutboundPassThroughRouter;
-import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class EndpointMessageProcessorsTestCase extends AbstractServiceAndFlowTestCase
+public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
 {
-    public EndpointMessageProcessorsTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "org/mule/config/spring/parsers/endpoint/endpoint-message-processors-flow.xml"}
-        });
-    }      
+        return "org/mule/config/spring/parsers/endpoint/endpoint-message-processors-flow.xml";
+    }
 
     @Test
     public void testGlobalEndpoint1() throws MuleException
@@ -82,19 +70,8 @@ public class EndpointMessageProcessorsTestCase extends AbstractServiceAndFlowTes
     @Test
     public void testLocalEndpoints() throws MuleException
     {
-        ImmutableEndpoint endpoint;
-
-        if (variant.equals(ConfigVariant.FLOW))
-        {
-            Flow service = muleContext.getRegistry().lookupObject("localEndpoints");
-            endpoint = (ImmutableEndpoint) service.getMessageSource();
-        }
-        else
-        {
-            endpoint = ((ServiceCompositeMessageSource) muleContext.getRegistry()
-                .lookupService("localEndpoints")
-                .getMessageSource()).getEndpoint("ep3");
-        }
+        Flow service = muleContext.getRegistry().lookupObject("localEndpoints");
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) service.getMessageSource();
 
         List<MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
@@ -111,20 +88,8 @@ public class EndpointMessageProcessorsTestCase extends AbstractServiceAndFlowTes
         assertEquals("C", ((TestMessageProcessor) chain.getMessageProcessors().get(0)).getLabel());
         assertEquals("D", ((TestMessageProcessor) chain.getMessageProcessors().get(1)).getLabel());
 
-        MessageProcessor mp;
+        MessageProcessor mp = ((Flow) muleContext.getRegistry().lookupObject("localEndpoints")).getMessageProcessors().get(0);
 
-        if (variant.equals(ConfigVariant.FLOW))
-        {            
-            mp = ((Flow) muleContext.getRegistry().lookupObject("localEndpoints")).getMessageProcessors()
-                .get(0);
-        }
-        else
-        {
-            mp = ((OutboundPassThroughRouter) ((OutboundRouterCollection) muleContext.getRegistry()
-                .lookupService("localEndpoints")
-                .getOutboundMessageProcessor()).getRoutes().get(0)).getRoute("ep4");
-        }
-        
         endpoint = (ImmutableEndpoint) mp;
         processors = endpoint.getMessageProcessors();
         assertNotNull(processors);

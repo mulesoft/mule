@@ -19,6 +19,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import javax.jws.WebParam;
@@ -29,7 +30,7 @@ import java.util.Collection;
 
 import static org.junit.Assert.assertThat;
 
-public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
+public class CatchExceptionStrategyTestCase extends FunctionalTestCase
 {
     public static final int TIMEOUT = 5000;
     public static final String ERROR_PROCESSING_NEWS = "error processing news";
@@ -43,16 +44,10 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
     @Rule
     public DynamicPort dynamicPort3 = new DynamicPort("port3");
 
-    public CatchExceptionStrategyTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/catch-exception-strategy-use-case-flow.xml"}});
+        return "org/mule/test/integration/exceptions/catch-exception-strategy-use-case-flow.xml";
     }
 
     @Test

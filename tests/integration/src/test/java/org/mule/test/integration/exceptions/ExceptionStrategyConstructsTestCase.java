@@ -20,6 +20,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.message.ExceptionMessage;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,19 +28,13 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-public class ExceptionStrategyConstructsTestCase extends AbstractServiceAndFlowTestCase
+public class ExceptionStrategyConstructsTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW,
-                "org/mule/test/integration/exceptions/exception-strategy-constructs-config-flow.xml"}});
-    }
 
-    public ExceptionStrategyConstructsTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/integration/exceptions/exception-strategy-constructs-config-flow.xml";
     }
 
     @Test

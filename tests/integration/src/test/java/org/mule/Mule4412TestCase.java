@@ -10,39 +10,27 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transport.PropertyScope;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.test.filters.FilterCounter;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test for MULE-4412 : selective-consumer filter is applied twice. We test that the
  * filter is only applied once in the positive case, plus make sure it doesn't get
  * filtered at all when the message does not meet the filter criteria
  */
-public class Mule4412TestCase extends AbstractServiceAndFlowTestCase
+public class Mule4412TestCase extends FunctionalTestCase
 {
     private int RECEIVE_TIMEOUT_MS = 3000;
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "mule-4412-flow.xml"}}
-        );
-    }
-
-    public Mule4412TestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "mule-4412-flow.xml";
     }
 
     @Override

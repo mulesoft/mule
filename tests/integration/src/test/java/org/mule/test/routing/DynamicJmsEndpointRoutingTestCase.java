@@ -11,28 +11,19 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.api.FutureMessageResult;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 // MULE-5162
 // FIXME: refactor since it's a copy of DynamicEndpointRoutingTestCase with a jms outbound endpoint
-public class DynamicJmsEndpointRoutingTestCase extends AbstractServiceAndFlowTestCase
+public class DynamicJmsEndpointRoutingTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "dynamic-endpoint-routing-test-flow.xml"}});
-    }
 
-    public DynamicJmsEndpointRoutingTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "dynamic-endpoint-routing-test-flow.xml";
     }
 
     @Test

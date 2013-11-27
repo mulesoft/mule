@@ -12,9 +12,9 @@ import java.util.Properties;
 
 public class BeanPropertyExtractorMultipleEndpointsTestCase extends AbstractXmlPropertyExtractorTestCase
 {
-    public BeanPropertyExtractorMultipleEndpointsTestCase(ConfigVariant variant, String configResources)
+    public BeanPropertyExtractorMultipleEndpointsTestCase()
     {
-        super(variant, configResources, false);
+        super(false);
     }
 
     @Override

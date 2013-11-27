@@ -11,16 +11,12 @@ import static org.junit.Assert.assertTrue;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.w3c.dom.Node;
 
-public class W3CDocumentXPathNodeEvaluatorTestCase extends AbstractServiceAndFlowTestCase
+public class W3CDocumentXPathNodeEvaluatorTestCase extends FunctionalTestCase
 {
     private static final String XML_INPUT =
         "<root>" +
@@ -31,17 +27,10 @@ public class W3CDocumentXPathNodeEvaluatorTestCase extends AbstractServiceAndFlo
         "  </table>" +
         "</root>";
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/module/xml/w3c-dom-xpath-node-config-flow.xml"}
-        });
-    }
-
-    public W3CDocumentXPathNodeEvaluatorTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/module/xml/w3c-dom-xpath-node-config-flow.xml";
     }
 
     @Test

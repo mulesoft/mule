@@ -9,34 +9,25 @@ package org.mule.test.components;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.message.DefaultExceptionPayload;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test an entry-point resolver used for multiple classes
  */
-public class EntryPointResolverCacheTestCase extends AbstractServiceAndFlowTestCase
+public class EntryPointResolverCacheTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/components/entry-point-resolver-cache-flow.xml"}});
-    }
 
-    public EntryPointResolverCacheTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/components/entry-point-resolver-cache-flow.xml";
     }
 
     @Test

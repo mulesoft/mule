@@ -9,36 +9,26 @@ package org.mule.test.integration.client;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.module.client.MuleClient;
 import org.mule.module.client.RemoteDispatcher;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class RemoteExceptionTestCase extends AbstractServiceAndFlowTestCase
+public class RemoteExceptionTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/integration/client/remote-exception-config-flow.xml"}
-        });
-    }
 
-    public RemoteExceptionTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/integration/client/remote-exception-config-flow.xml";
     }
 
     @Test

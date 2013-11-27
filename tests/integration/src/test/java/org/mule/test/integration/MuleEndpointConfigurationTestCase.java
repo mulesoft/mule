@@ -11,7 +11,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -27,33 +26,25 @@ import org.mule.construct.Flow;
 import org.mule.endpoint.DefaultInboundEndpoint;
 import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.tcp.TcpConnector;
 import org.mule.transport.vm.VMConnector;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test the creation of various targets from the service descriptor
  */
-public class MuleEndpointConfigurationTestCase extends AbstractServiceAndFlowTestCase
+public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/integration/test-endpoints-config-flow.xml"}});
-    }
 
-    public MuleEndpointConfigurationTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/integration/test-endpoints-config-flow.xml";
     }
 
     @Test

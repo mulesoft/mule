@@ -7,28 +7,20 @@
 package org.mule.test.integration.transport.file;
 
 import static org.junit.Assert.fail;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.FileUtils;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class FileExceptionStrategyFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/integration/providers/file/file-exception-strategy-flow.xml"}});
-    }
 
-    public FileExceptionStrategyFunctionalTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/integration/providers/file/file-exception-strategy-flow.xml";
     }
 
     @Test

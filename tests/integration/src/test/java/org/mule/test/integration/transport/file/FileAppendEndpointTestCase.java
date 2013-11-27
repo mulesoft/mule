@@ -7,30 +7,20 @@
 package org.mule.test.integration.transport.file;
 
 import static org.junit.Assert.assertFalse;
-
 import org.mule.api.client.MuleClient;
 import org.mule.util.FileUtils;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class FileAppendEndpointTestCase extends FileAppendConnectorTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW,
-                "org/mule/test/integration/providers/file/mule-fileappend-endpoint-config-flow.xml"}});
-    }
 
-    public FileAppendEndpointTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/integration/providers/file/mule-fileappend-endpoint-config-flow.xml";
     }
 
     @Override
