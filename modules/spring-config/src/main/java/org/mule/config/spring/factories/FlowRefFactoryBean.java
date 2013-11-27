@@ -6,6 +6,9 @@
  */
 package org.mule.config.spring.factories;
 
+import org.mule.DefaultMuleEvent;
+import org.mule.OptimizedRequestContext;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -142,7 +145,16 @@ public class FlowRefFactoryBean
                 @Override
                 public MuleEvent process(MuleEvent event) throws MuleException
                 {
-                    return referencedFlow.process(event);
+                    MuleEvent newEvent = DefaultMuleEvent.copy(event);
+                    newEvent.clearFlowVariables();
+                    MuleEvent resultEvent = referencedFlow.process(newEvent);
+                    if (resultEvent != null && !resultEvent.equals(VoidMuleEvent.getInstance()))
+                    {
+                        resultEvent.clearFlowVariables();
+                        DefaultMuleEvent.copyVariables((DefaultMuleEvent) event, (DefaultMuleEvent) resultEvent);
+                        OptimizedRequestContext.criticalSetEvent(resultEvent);
+                    }
+                    return resultEvent;
                 }
             };
         }
