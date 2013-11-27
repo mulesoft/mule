@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.application;
+package org.mule.module.launcher.artifact;
 
 import org.mule.api.MuleContext;
 import org.mule.api.context.notification.MuleContextListener;
@@ -13,7 +13,7 @@ import org.mule.module.launcher.DeploymentListener;
 /**
 * Delegates {@link MuleContextListener} notifications to a {@link DeploymentListener}
 */
-class MuleContextDeploymentListener implements MuleContextListener
+public class MuleContextDeploymentListener implements MuleContextListener
 {
 
     private final String appName;

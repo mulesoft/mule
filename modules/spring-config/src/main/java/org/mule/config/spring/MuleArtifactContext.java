@@ -25,12 +25,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 
 /**
- * <code>MuleApplicationContext</code> is a simple extension application context
+ * <code>MuleArtifactContext</code> is a simple extension application context
  * that allows resources to be loaded from the Classpath of file system using the
  * MuleBeanDefinitionReader.
  *
  */
-public class MuleApplicationContext extends AbstractXmlApplicationContext
+public class MuleArtifactContext extends AbstractXmlApplicationContext
 {
     private MuleContext muleContext;
     private Resource[] springResources;
@@ -43,13 +43,13 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
      * @param configResources
      * @see org.mule.config.spring.SpringRegistry
      */
-    public MuleApplicationContext(MuleContext muleContext, ConfigResource[] configResources)
+    public MuleArtifactContext(MuleContext muleContext, ConfigResource[] configResources)
             throws BeansException
     {
         this(muleContext, convert(configResources));
     }
 
-    public MuleApplicationContext(MuleContext muleContext, Resource[] springResources) throws BeansException
+    public MuleArtifactContext(MuleContext muleContext, Resource[] springResources) throws BeansException
     {
         this.muleContext = muleContext;
         this.springResources = springResources;

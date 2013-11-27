@@ -6,26 +6,25 @@
  */
 package org.mule.module.launcher;
 
-import org.mule.module.launcher.application.Application;
+import org.mule.module.launcher.artifact.Artifact;
 
 import java.io.IOException;
 import java.net.URL;
 
-/**
- *
- */
-public interface MuleDeployer
+public interface MuleDeployer<T extends Artifact>
 {
 
-    void deploy(Application app);
+    void deploy(T artifact);
 
-    void undeploy(Application app);
+    void undeploy(T artifact);
 
     /**
      * Installs packaged Mule apps from $MULE_HOME/apps directory.
-     * @param packedMuleAppFileName filename of the packed Mule app (only name + ext)
+     *
+     * @param packedArtifactName filename of the packed Mule app (only name + ext)
      */
-    Application installFromAppDir(String packedMuleAppFileName) throws IOException;
+    T installFromDir(String packedArtifactName) throws IOException;
 
-    Application installFrom(URL url) throws IOException;
+
+    T installFrom(URL url) throws IOException;
 }

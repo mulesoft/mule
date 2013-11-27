@@ -95,6 +95,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     implements MuleDefinitionParser
 {
     public static final String ROOT_ELEMENT = "mule";
+    public static final String DOMAIN_ROOT_ELEMENT = "mule-domain";
     public static final String ATTRIBUTE_ID = "id";
     public static final String ATTRIBUTE_NAME = "name";
     public static final String ATTRIBUTE_CLASS = "class";
@@ -486,7 +487,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      */
     protected boolean isTopLevel(Element element)
     {
-        return element.getParentNode().getLocalName().equals(ROOT_ELEMENT);
+        return element.getParentNode().getLocalName().equals(ROOT_ELEMENT) || element.getParentNode().getLocalName().equals(DOMAIN_ROOT_ELEMENT);
     }
 
     public AbstractBeanDefinition muleParse(Element element, ParserContext context)
