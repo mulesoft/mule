@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
@@ -32,7 +31,6 @@ public class SmtpNonAsciiFunctionalTestCase extends AbstractEmailFunctionalTestC
     }      
     
     @Test
-    @Ignore("MULE-6926: flaky test")
     public void testSend() throws Exception
     {
         doSend();

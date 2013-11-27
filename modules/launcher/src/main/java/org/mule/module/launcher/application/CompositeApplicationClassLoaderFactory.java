@@ -7,6 +7,7 @@
 package org.mule.module.launcher.application;
 
 import org.mule.module.launcher.PluginClassLoaderManager;
+import org.mule.module.launcher.artifact.ArtifactClassLoader;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 
 import java.util.LinkedList;
@@ -14,7 +15,7 @@ import java.util.List;
 
 /**
  * Composes a {@link CompositeApplicationClassLoader} using a {@link ApplicationClassLoaderFactory}
- * to create the classloader for a Mule application and the plugin
+ * to getDomainClassLoader the classloader for a Mule application and the plugin
  * classloaders available in the {@link PluginClassLoaderManager}
  */
 public class CompositeApplicationClassLoaderFactory implements ApplicationClassLoaderFactory
@@ -30,16 +31,16 @@ public class CompositeApplicationClassLoaderFactory implements ApplicationClassL
     }
 
     @Override
-    public ClassLoader create(ApplicationDescriptor descriptor)
+    public ArtifactClassLoader create(ApplicationDescriptor descriptor)
     {
         List<ClassLoader> pluginClassLoaders = pluginClassLoaderManager.getPluginClassLoaders();
 
-        ClassLoader appClassLoader = applicationClassLoaderFactory.create(descriptor);
+        ArtifactClassLoader appClassLoader = applicationClassLoaderFactory.create(descriptor);
 
         if (!pluginClassLoaders.isEmpty())
         {
             List<ClassLoader> classLoaders = new LinkedList<ClassLoader>();
-            classLoaders.add(appClassLoader);
+            classLoaders.add(appClassLoader.getClassLoader());
             classLoaders.addAll(pluginClassLoaders);
 
             appClassLoader = new CompositeApplicationClassLoader(descriptor.getAppName(), classLoaders);

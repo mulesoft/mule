@@ -8,6 +8,7 @@ package org.mule.module.launcher.descriptor;
 
 import org.mule.module.launcher.plugin.PluginDescriptor;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -32,6 +33,8 @@ public class ApplicationDescriptor
     private String domain;
     private String packagesToScan;
     private String[] configResources = new String[] {DEFAULT_CONFIGURATION_RESOURCE};
+    private String[] absoluteResourcePaths;
+    private File[] configResourcesFile;
     private Map<String, String> appProperties = new HashMap<String, String>();
 
     private boolean redeploymentEnabled = true;
@@ -107,6 +110,26 @@ public class ApplicationDescriptor
         this.configResources = configResources;
     }
 
+    public String[] getAbsoluteResourcePaths()
+    {
+        return absoluteResourcePaths;
+    }
+
+    public void setAbsoluteResourcePaths(String[] absoluteResourcePaths)
+    {
+        this.absoluteResourcePaths = absoluteResourcePaths;
+    }
+
+    public void setConfigResourcesFile(File[] configResourcesFile)
+    {
+        this.configResourcesFile = configResourcesFile;
+    }
+
+    public File[] getConfigResourcesFile()
+    {
+        return configResourcesFile;
+    }
+
     public boolean isRedeploymentEnabled()
     {
         return redeploymentEnabled;
@@ -146,4 +169,5 @@ public class ApplicationDescriptor
     {
         this.packagesToScan = packages;
     }
+
 }

@@ -15,7 +15,6 @@ import org.mule.api.client.MuleClient;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.tck.junit4.FunctionalTestCase;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -34,7 +33,6 @@ public class EndpointLookupRouterTestCase extends FunctionalTestCase
     }
 
     @Test
-    @Ignore("MULE-6926: Flaky Test")
     public void testRouterSuccess() throws Exception
     {
         MuleClient client = muleContext.getClient();

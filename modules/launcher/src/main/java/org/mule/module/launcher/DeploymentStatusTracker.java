@@ -33,9 +33,9 @@ public class DeploymentStatusTracker extends AbstractDeploymentListener
         return Collections.unmodifiableMap(deploymentStates);
     }
 
-    public void onDeploymentStart(String appName)
+    public void onDeploymentStart(String artifactName)
     {
-        deploymentStates.put(appName, DeploymentState.DEPLOYING);
+        deploymentStates.put(artifactName, DeploymentState.DEPLOYING);
     }
 
     public void onDeploymentSuccess(String appName)
@@ -43,9 +43,9 @@ public class DeploymentStatusTracker extends AbstractDeploymentListener
         deploymentStates.put(appName, DeploymentState.DEPLOYED);
     }
 
-    public void onDeploymentFailure(String appName, Throwable failureCause)
+    public void onDeploymentFailure(String artifactName, Throwable failureCause)
     {
-        deploymentStates.put(appName, DeploymentState.FAILED);
+        deploymentStates.put(artifactName, DeploymentState.FAILED);
     }
 
 }

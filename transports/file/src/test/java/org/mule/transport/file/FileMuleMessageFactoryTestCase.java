@@ -19,7 +19,7 @@ public class FileMuleMessageFactoryTestCase extends AbstractFileMuleMessageFacto
     @Override
     protected MuleMessageFactory doCreateMuleMessageFactory()
     {
-        return new FileMuleMessageFactory(muleContext);
+        return new FileMuleMessageFactory();
     }
 
     @Override
@@ -33,7 +33,7 @@ public class FileMuleMessageFactoryTestCase extends AbstractFileMuleMessageFacto
     {
         MuleMessageFactory factory = createMuleMessageFactory();
 
-        MuleMessage message = factory.create(getValidTransportMessage(), encoding);
+        MuleMessage message = factory.create(getValidTransportMessage(), encoding, muleContext);
         assertNotNull(message);
         assertMessageProperties(message);
     }
@@ -44,7 +44,7 @@ public class FileMuleMessageFactoryTestCase extends AbstractFileMuleMessageFacto
         MuleMessageFactory factory = createMuleMessageFactory();
 
         ReceiverFileInputStream stream = new ReceiverFileInputStream(tempFile, false, null);
-        MuleMessage message = factory.create(stream, encoding);
+        MuleMessage message = factory.create(stream, encoding, muleContext);
         assertNotNull(message);
         assertMessageProperties(message);
     }

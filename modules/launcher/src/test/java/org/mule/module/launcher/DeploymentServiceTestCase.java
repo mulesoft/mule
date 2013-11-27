@@ -10,6 +10,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -26,6 +27,9 @@ import org.mule.config.StartupContext;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.MuleApplicationClassLoaderFactory;
 import org.mule.module.launcher.application.TestApplicationFactory;
+import org.mule.module.launcher.domain.Domain;
+import org.mule.module.launcher.domain.MuleDomainClassLoaderRepository;
+import org.mule.module.launcher.domain.TestDomainFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.PollingProber;
@@ -62,11 +66,13 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
     protected File muleHome;
     protected File appsDir;
+    protected File domainsDir;
     protected MuleDeploymentService deploymentService;
-    protected DeploymentListener deploymentListener;
+    protected DeploymentListener applicationDeploymentListener;
+    protected DeploymentListener domainDeploymentListener;
 
     @Rule
-    public SystemProperty changeChangeInterval = new SystemProperty(MuleDeploymentService.CHANGE_CHECK_INTERVAL_PROPERTY, "10");
+    public SystemProperty changeChangeInterval = new SystemProperty(DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY, "10");
 
     @Override
     protected void doSetUp() throws Exception
@@ -77,13 +83,17 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         muleHome = new File(tmpDir, getClass().getSimpleName() + System.currentTimeMillis());
         appsDir = new File(muleHome, "apps");
         appsDir.mkdirs();
+        domainsDir = new File(muleHome, "domains");
+        domainsDir.mkdirs();
         System.setProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, muleHome.getCanonicalPath());
 
         new File(muleHome, "lib/shared/default").mkdirs();
 
-        deploymentListener = mock(DeploymentListener.class);
+        applicationDeploymentListener = mock(DeploymentListener.class);
+        domainDeploymentListener = mock(DeploymentListener.class);
         deploymentService = new MuleDeploymentService(new MulePluginClassLoaderManager());
-        deploymentService.addDeploymentListener(deploymentListener);
+        deploymentService.addDeploymentListener(applicationDeploymentListener);
+        deploymentService.addDomainDeploymentListener(domainDeploymentListener);
     }
 
     @Override
@@ -104,54 +114,55 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void deploysZipOnStartup() throws Exception
+    public void deploysAppZipOnStartup() throws Exception
     {
         addPackedAppFromResource("/dummy-app.zip");
 
         deploymentService.start();
 
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
 
         assertAppsDir(NONE, new String[] {"dummy-app"}, true);
 
         // just assert no privileged entries were put in the registry
         final Application app = findApp("dummy-app", 1);
-        final MuleRegistry registry = app.getMuleContext().getRegistry();
+
+        final MuleRegistry registry = getMuleRegistry(app);
 
         // mule-app.properties from the zip archive must have loaded properly
         assertEquals("mule-app.properties should have been loaded.", "someValue", registry.get("myCustomProp"));
     }
 
     @Test
-    public void deploysZipAfterStartup() throws Exception
+    public void deploysAppZipAfterStartup() throws Exception
     {
         deploymentService.start();
 
         addPackedAppFromResource("/dummy-app.zip");
 
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
         assertAppsDir(NONE, new String[] {"dummy-app"}, true);
 
         // just assert no privileged entries were put in the registry
         final Application app = findApp("dummy-app", 1);
-        final MuleRegistry registry = app.getMuleContext().getRegistry();
+        final MuleRegistry registry = getMuleRegistry(app);
 
         // mule-app.properties from the zip archive must have loaded properly
         assertEquals("mule-app.properties should have been loaded.", "someValue", registry.get("myCustomProp"));
     }
 
     @Test
-    public void deploysBrokenZipOnStartup() throws Exception
+    public void deploysBrokenAppZipOnStartup() throws Exception
     {
         addPackedAppFromResource("/broken-app.zip", "brokenApp.zip");
 
         deploymentService.start();
 
-        assertDeploymentFailure(deploymentListener, "brokenApp");
+        assertDeploymentFailure(applicationDeploymentListener, "brokenApp");
 
         assertAppsDir(new String[] {"brokenApp.zip"}, NONE, true);
 
-        final Map<URL, Long> zombieMap = deploymentService.getZombieMap();
+        final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
         assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
         final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
         assertEquals("Wrong URL tagged as zombie.", "brokenApp.zip", new File(zombie.getKey().getFile()).getName());
@@ -159,17 +170,17 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void deploysBrokenZipAfterStartup() throws Exception
+    public void deploysBrokenAppZipAfterStartup() throws Exception
     {
         deploymentService.start();
 
         addPackedAppFromResource("/broken-app.zip", "brokenApp.zip");
 
-        assertDeploymentFailure(deploymentListener, "brokenApp");
+        assertDeploymentFailure(applicationDeploymentListener, "brokenApp");
 
         assertAppsDir(new String[] {"brokenApp.zip"}, NONE, true);
 
-        final Map<URL, Long> zombieMap = deploymentService.getZombieMap();
+        final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
         assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
         final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
         assertEquals("Wrong URL tagged as zombie.", "brokenApp.zip", new File(zombie.getKey().getFile()).getName());
@@ -177,45 +188,45 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void redeploysZipDeployedOnStartup() throws Exception
+    public void redeploysAppZipDeployedOnStartup() throws Exception
     {
         deploymentService.start();
 
         addPackedAppFromResource("/dummy-app.zip");
 
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
 
         assertAppsDir(NONE, new String[] {"dummy-app"}, true);
         assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
 
-        reset(deploymentListener);
+        reset(applicationDeploymentListener);
 
         addPackedAppFromResource("/dummy-app.zip");
 
-        assertUndeploymentSuccess(deploymentListener, "dummy-app");
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertUndeploymentSuccess(applicationDeploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
         assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
         assertAppsDir(NONE, new String[] {"dummy-app"}, true);
     }
 
     @Test
-    public void redeploysZipDeployedAfterStartup() throws Exception
+    public void redeploysAppZipDeployedAfterStartup() throws Exception
     {
         addPackedAppFromResource("/dummy-app.zip");
 
         deploymentService.start();
 
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
 
         assertAppsDir(NONE, new String[] {"dummy-app"}, true);
         assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
 
-        reset(deploymentListener);
+        reset(applicationDeploymentListener);
 
         addPackedAppFromResource("/dummy-app.zip");
 
-        assertUndeploymentSuccess(deploymentListener, "dummy-app");
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertUndeploymentSuccess(applicationDeploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
         assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
         assertAppsDir(NONE, new String[] {"dummy-app"}, true);
     }
@@ -227,7 +238,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
         assertAppsDir(NONE, new String[] {"dummy-app"}, true);
     }
 
@@ -239,14 +250,14 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
 
         addPackedAppFromResource("/empty-app.zip");
 
-        assertDeploymentSuccess(deploymentListener, "empty-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "empty-app");
 
         // Checks that dummy app was deployed just once
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
     }
 
     @Test
@@ -256,7 +267,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         addExplodedAppFromResource("/dummy-app.zip");
 
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
         assertAppsDir(NONE, new String[] {"dummy-app"}, true);
     }
 
@@ -267,11 +278,11 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentFailure(deploymentListener, "app with spaces");
+        assertDeploymentFailure(applicationDeploymentListener, "app with spaces");
 
         // Maintains app dir created
         assertAppsDir(NONE, new String[] {"app with spaces"}, true);
-        final Map<URL, Long> zombieMap = deploymentService.getZombieMap();
+        final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
         assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
         final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
         // Spaces are converted to %20 is returned by java file api :/
@@ -287,11 +298,11 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         addExplodedAppFromResource("/dummy-app.zip", "app with spaces");
 
-        assertDeploymentFailure(deploymentListener, "app with spaces");
+        assertDeploymentFailure(applicationDeploymentListener, "app with spaces");
 
         // Maintains app dir created
         assertAppsDir(NONE, new String[] {"app with spaces"}, true);
-        final Map<URL, Long> zombieMap = deploymentService.getZombieMap();
+        final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
         assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
         final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
         // Spaces are converted to %20 is returned by java file api :/
@@ -306,16 +317,16 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.start();
 
         addExplodedAppFromResource("/dummy-app.zip", "app with spaces");
-        assertDeploymentFailure(deploymentListener, "app with spaces", atLeast(1));
+        assertDeploymentFailure(applicationDeploymentListener, "app with spaces", atLeast(1));
 
         addExplodedAppFromResource("/dummy-app.zip");
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
 
         addExplodedAppFromResource("/empty-app.zip");
-        assertDeploymentSuccess(deploymentListener, "empty-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "empty-app");
 
         // After three update cycles should have only one deployment failure notification for the broken app
-        assertDeploymentFailure(deploymentListener, "app with spaces");
+        assertDeploymentFailure(applicationDeploymentListener, "app with spaces");
     }
 
     @Test
@@ -328,11 +339,11 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentFailure(deploymentListener, "incompleteApp");
+        assertDeploymentFailure(applicationDeploymentListener, "incompleteApp");
 
         // Maintains app dir created
         assertAppsDir(NONE, new String[] {"incompleteApp"}, true);
-        final Map<URL, Long> zombieMap = deploymentService.getZombieMap();
+        final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
         assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
         final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
         assertEquals("Wrong URL tagged as zombie.", "incompleteApp", new File(zombie.getKey().getFile()).getParentFile().getName());
@@ -346,11 +357,11 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         addExplodedAppFromResource("/incompleteApp.zip");
 
-        assertDeploymentFailure(deploymentListener, "incompleteApp");
+        assertDeploymentFailure(applicationDeploymentListener, "incompleteApp");
 
         // Maintains app dir created
         assertAppsDir(NONE, new String[] {"incompleteApp"}, true);
-        final Map<URL, Long> zombieMap = deploymentService.getZombieMap();
+        final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
         assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
         final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
         assertEquals("Wrong URL tagged as zombie.", "incompleteApp", new File(zombie.getKey().getFile()).getParentFile().getName());
@@ -364,15 +375,15 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
         assertAppsDir(NONE, new String[] {"dummy-app"}, true);
 
-        reset(deploymentListener);
+        reset(applicationDeploymentListener);
 
         File configFile = new File(appsDir + "/dummy-app", "mule-config.xml");
         configFile.setLastModified(configFile.lastModified() + 1000);
 
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
     }
 
     @Test
@@ -382,15 +393,15 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         addExplodedAppFromResource("/dummy-app.zip");
 
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
         assertAppsDir(NONE, new String[] {"dummy-app"}, true);
 
-        reset(deploymentListener);
+        reset(applicationDeploymentListener);
 
         File configFile = new File(appsDir + "/dummy-app", "mule-config.xml");
         configFile.setLastModified(configFile.lastModified() + 1000);
 
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
     }
 
     @Test
@@ -400,22 +411,22 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentFailure(deploymentListener, "incompleteApp");
+        assertDeploymentFailure(applicationDeploymentListener, "incompleteApp");
 
         // Maintains app dir created
         assertAppsDir(NONE, new String[] {"incompleteApp"}, true);
-        final Map<URL, Long> zombieMap = deploymentService.getZombieMap();
+        final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
         assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
         final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
         assertEquals("Wrong URL tagged as zombie.", "incompleteApp", new File(zombie.getKey().getFile()).getParentFile().getName());
         assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
 
-        reset(deploymentListener);
+        reset(applicationDeploymentListener);
 
         File configFile = new File(appsDir + "/incompleteApp", "mule-config.xml");
         configFile.setLastModified(configFile.lastModified() + 1000);
 
-        assertDeploymentFailure(deploymentListener, "incompleteApp");
+        assertDeploymentFailure(applicationDeploymentListener, "incompleteApp");
     }
 
     @Test
@@ -425,22 +436,22 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         addExplodedAppFromResource("/incompleteApp.zip");
 
-        assertDeploymentFailure(deploymentListener, "incompleteApp");
+        assertDeploymentFailure(applicationDeploymentListener, "incompleteApp");
 
         // Maintains app dir created
         assertAppsDir(NONE, new String[] {"incompleteApp"}, true);
-        final Map<URL, Long> zombieMap = deploymentService.getZombieMap();
+        final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
         assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
         final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
         assertEquals("Wrong URL tagged as zombie.", "incompleteApp", new File(zombie.getKey().getFile()).getParentFile().getName());
         assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
 
-        reset(deploymentListener);
+        reset(applicationDeploymentListener);
 
         File configFile = new File(appsDir + "/incompleteApp", "mule-config.xml");
         configFile.setLastModified(configFile.lastModified() + 1000);
 
-        assertDeploymentFailure(deploymentListener, "incompleteApp");
+        assertDeploymentFailure(applicationDeploymentListener, "incompleteApp");
     }
 
     @Test
@@ -450,17 +461,17 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
         assertAppsDir(NONE, new String[] {"dummy-app"}, true);
 
-        reset(deploymentListener);
+        reset(applicationDeploymentListener);
 
         File originalConfigFile = new File(appsDir + "/dummy-app", "mule-config.xml");
         URL url = getClass().getResource("/broken-config.xml");
         File newConfigFile = new File(url.toURI());
         FileUtils.copyFile(newConfigFile, originalConfigFile);
 
-        assertDeploymentFailure(deploymentListener, "dummy-app");
+        assertDeploymentFailure(applicationDeploymentListener, "dummy-app");
     }
 
     @Test
@@ -470,17 +481,17 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         addExplodedAppFromResource("/dummy-app.zip", "dummy-app");
 
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
         assertAppsDir(NONE, new String[] {"dummy-app"}, true);
 
-        reset(deploymentListener);
+        reset(applicationDeploymentListener);
 
         File originalConfigFile = new File(appsDir + "/dummy-app", "mule-config.xml");
         URL url = getClass().getResource("/broken-config.xml");
         File newConfigFile = new File(url.toURI());
         FileUtils.copyFile(newConfigFile, originalConfigFile);
 
-        assertDeploymentFailure(deploymentListener, "dummy-app");
+        assertDeploymentFailure(applicationDeploymentListener, "dummy-app");
     }
 
     @Test
@@ -490,18 +501,18 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentFailure(deploymentListener, "incompleteApp");
+        assertDeploymentFailure(applicationDeploymentListener, "incompleteApp");
 
-        reset(deploymentListener);
+        reset(applicationDeploymentListener);
 
         File originalConfigFile = new File(appsDir + "/incompleteApp", "mule-config.xml");
         URL url = getClass().getResource("/empty-config.xml");
         File newConfigFile = new File(url.toURI());
         FileUtils.copyFile(newConfigFile, originalConfigFile);
-        assertDeploymentSuccess(deploymentListener, "incompleteApp");
+        assertDeploymentSuccess(applicationDeploymentListener, "incompleteApp");
 
         addPackedAppFromResource("/dummy-app.zip");
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
 
         // Check that the failed application folder is still there
         assertAppFolderIsMaintained("incompleteApp");
@@ -515,24 +526,23 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         addExplodedAppFromResource("/incompleteApp.zip", "incompleteApp");
 
 
-        assertDeploymentFailure(deploymentListener, "incompleteApp");
+        assertDeploymentFailure(applicationDeploymentListener, "incompleteApp");
 
-        reset(deploymentListener);
+        reset(applicationDeploymentListener);
 
         File originalConfigFile = new File(appsDir + "/incompleteApp", "mule-config.xml");
         URL url = getClass().getResource("/empty-config.xml");
         File newConfigFile = new File(url.toURI());
         FileUtils.copyFile(newConfigFile, originalConfigFile);
 
-        assertDeploymentSuccess(deploymentListener, "incompleteApp");
+        assertDeploymentSuccess(applicationDeploymentListener, "incompleteApp");
 
         addPackedAppFromResource("/dummy-app.zip");
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
 
         // Check that the failed application folder is still there
         assertAppFolderIsMaintained("incompleteApp");
     }
-
 
     @Test
     public void redeploysZipAppOnConfigChanges() throws Exception
@@ -541,18 +551,18 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
 
         assertAppsDir(NONE, new String[] {"dummy-app"}, true);
         assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
 
-        reset(deploymentListener);
+        reset(applicationDeploymentListener);
 
         File configFile = new File(appsDir + "/dummy-app", "mule-config.xml");
         configFile.setLastModified(configFile.lastModified() + 1000);
 
-        assertUndeploymentSuccess(deploymentListener, "dummy-app");
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertUndeploymentSuccess(applicationDeploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
         assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
         assertAppsDir(NONE, new String[] {"dummy-app"}, true);
     }
@@ -573,51 +583,17 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         doBrokenAppArchiveTest();
     }
 
-    public void doBrokenAppArchiveTest() throws Exception
-    {
-        addPackedAppFromResource("/broken-app.zip");
-
-        deploymentService.start();
-
-        assertDeploymentFailure(deploymentListener, "broken-app");
-        reset(deploymentListener);
-
-        // let the file system's write-behind cache commit the delete operation?
-        Thread.sleep(1000);
-
-        // zip stays intact, no app dir created
-        assertAppsDir(new String[] {"broken-app.zip"}, NONE, true);
-        // don't assert dir contents, we want to check internal deployer state next
-        assertAppsDir(NONE, new String[] {"dummy-app"}, false);
-        assertEquals("No apps should have been registered with Mule.", 0, deploymentService.getApplications().size());
-        final Map<URL, Long> zombieMap = deploymentService.getZombieMap();
-        assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
-        final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
-        assertEquals("Wrong URL tagged as zombie.", "broken-app.zip", new File(zombie.getKey().getFile()).getName());
-        assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
-
-        // Checks that the invalid zip was not deployed again
-        try
-        {
-            assertDeploymentFailure(deploymentListener, "broken-app.zip");
-            fail("Install was invoked again for the broken application file");
-        }
-        catch (AssertionError expected)
-        {
-        }
-    }
-
     @Test
     public void deploysInvalidZipAppOnStartup() throws Exception
     {
         addPackedAppFromResource("/empty-app.zip", "app with spaces.zip");
 
         deploymentService.start();
-        assertDeploymentFailure(deploymentListener, "app with spaces");
+        assertDeploymentFailure(applicationDeploymentListener, "app with spaces");
 
         // zip stays intact, no app dir created
         assertAppsDir(new String[] {"app with spaces.zip"}, NONE, true);
-        final Map<URL, Long> zombieMap = deploymentService.getZombieMap();
+        final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
         assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
         final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
         // Spaces are converted to %20 is returned by java file api :/
@@ -633,11 +609,11 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         addPackedAppFromResource("/empty-app.zip", "app with spaces.zip");
 
-        assertDeploymentFailure(deploymentListener, "app with spaces");
+        assertDeploymentFailure(applicationDeploymentListener, "app with spaces");
 
         // zip stays intact, no app dir created
         assertAppsDir(new String[] {"app with spaces.zip"}, NONE, true);
-        final Map<URL, Long> zombieMap = deploymentService.getZombieMap();
+        final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
         assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
         final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
         // Spaces are converted to %20 is returned by java file api :/
@@ -653,14 +629,14 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(deploymentListener, "empty-app.zip");
-        reset(deploymentListener);
+        assertDeploymentSuccess(applicationDeploymentListener, "empty-app.zip");
+        reset(applicationDeploymentListener);
 
         assertAppsDir(NONE, new String[] {"empty-app.zip"}, true);
         assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
 
         // Checks that the empty-app.zip folder is not processed as a zip file
-        assertNoDeploymentInvoked(deploymentListener);
+        assertNoDeploymentInvoked(applicationDeploymentListener);
     }
 
     @Test
@@ -676,18 +652,18 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(deploymentListener, "1");
-        assertDeploymentSuccess(deploymentListener, "2");
-        assertDeploymentSuccess(deploymentListener, "3");
+        assertDeploymentSuccess(applicationDeploymentListener, "1");
+        assertDeploymentSuccess(applicationDeploymentListener, "2");
+        assertDeploymentSuccess(applicationDeploymentListener, "3");
         assertAppsDir(NONE, new String[] {"1", "2", "3"}, true);
 
         // When apps are passed as -app app1:app2:app3 the startup order matters
         List<Application> applications = deploymentService.getApplications();
         assertNotNull(applications);
         assertEquals(3, applications.size());
-        assertEquals("3", applications.get(0).getAppName());
-        assertEquals("1", applications.get(1).getAppName());
-        assertEquals("2", applications.get(2).getAppName());
+        assertEquals("3", applications.get(0).getArtifactName());
+        assertEquals("1", applications.get(1).getArtifactName());
+        assertEquals("2", applications.get(2).getArtifactName());
     }
 
     @Test
@@ -703,9 +679,9 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(deploymentListener, "1");
-        assertDeploymentSuccess(deploymentListener, "2");
-        assertDeploymentSuccess(deploymentListener, "3");
+        assertDeploymentSuccess(applicationDeploymentListener, "1");
+        assertDeploymentSuccess(applicationDeploymentListener, "2");
+        assertDeploymentSuccess(applicationDeploymentListener, "3");
 
         assertAppsDir(NONE, new String[] {"1", "2", "3"}, true);
 
@@ -713,9 +689,9 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         List<Application> applications = deploymentService.getApplications();
         assertNotNull(applications);
         assertEquals(3, applications.size());
-        assertEquals("3", applications.get(0).getAppName());
-        assertEquals("1", applications.get(1).getAppName());
-        assertEquals("2", applications.get(2).getAppName());
+        assertEquals("3", applications.get(0).getArtifactName());
+        assertEquals("1", applications.get(1).getArtifactName());
+        assertEquals("2", applications.get(2).getArtifactName());
     }
 
     @Test
@@ -729,7 +705,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
         assertAppsDir(NONE, new String[] {"dummy-app"}, true);
 
         List<Application> applications = deploymentService.getApplications();
@@ -747,10 +723,10 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         configFile.setLastModified(System.currentTimeMillis() + ONE_HOUR_IN_MILLISECONDS);
 
         deploymentService.start();
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
-        reset(deploymentListener);
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
+        reset(applicationDeploymentListener);
 
-        assertNoDeploymentInvoked(deploymentListener);
+        assertNoDeploymentInvoked(applicationDeploymentListener);
     }
 
     @Test
@@ -762,10 +738,10 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
-        assertMuleContextCreated(deploymentListener, "dummy-app");
-        assertMuleContextInitialized(deploymentListener, "dummy-app");
-        assertMuleContextConfigured(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
+        assertMuleContextCreated(applicationDeploymentListener, "dummy-app");
+        assertMuleContextInitialized(applicationDeploymentListener, "dummy-app");
+        assertMuleContextConfigured(applicationDeploymentListener, "dummy-app");
     }
 
     @Test
@@ -775,7 +751,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
         final Application app = findApp("dummy-app", 1);
         app.stop();
 
@@ -789,11 +765,11 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
 
-        assertTrue("Unable to remove anchor file", removeAnchorFile("dummy-app"));
+        assertTrue("Unable to remove anchor file", removeAppAnchorFile("dummy-app"));
 
-        assertUndeploymentSuccess(deploymentListener, "dummy-app");
+        assertUndeploymentSuccess(applicationDeploymentListener, "dummy-app");
     }
 
     @Test
@@ -801,17 +777,17 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         addPackedAppFromResource("/empty-app.zip");
 
-        TestApplicationFactory appFactory = new TestApplicationFactory(new MuleApplicationClassLoaderFactory());
+        TestApplicationFactory appFactory = new TestApplicationFactory(new MuleApplicationClassLoaderFactory(new MuleDomainClassLoaderRepository()));
         appFactory.setFailOnStopApplication(true);
 
         deploymentService.setAppFactory(appFactory);
         deploymentService.start();
 
-        assertDeploymentSuccess(deploymentListener, "empty-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "empty-app");
 
-        assertTrue("Unable to remove anchor file", removeAnchorFile("empty-app"));
+        assertTrue("Unable to remove anchor file", removeAppAnchorFile("empty-app"));
 
-        assertUndeploymentSuccess(deploymentListener, "empty-app");
+        assertUndeploymentSuccess(applicationDeploymentListener, "empty-app");
 
         assertAppFolderIsDeleted("empty-app");
     }
@@ -821,16 +797,16 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         addPackedAppFromResource("/empty-app.zip");
 
-        TestApplicationFactory appFactory = new TestApplicationFactory(new MuleApplicationClassLoaderFactory());
+        TestApplicationFactory appFactory = new TestApplicationFactory(new MuleApplicationClassLoaderFactory(new MuleDomainClassLoaderRepository()));
         appFactory.setFailOnDisposeApplication(true);
         deploymentService.setAppFactory(appFactory);
         deploymentService.start();
 
-        assertDeploymentSuccess(deploymentListener, "empty-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "empty-app");
 
-        assertTrue("Unable to remove anchor file", removeAnchorFile("empty-app"));
+        assertTrue("Unable to remove anchor file", removeAppAnchorFile("empty-app"));
 
-        assertUndeploymentSuccess(deploymentListener, "empty-app");
+        assertUndeploymentSuccess(applicationDeploymentListener, "empty-app");
 
         assertAppFolderIsDeleted("empty-app");
     }
@@ -842,16 +818,16 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentFailure(deploymentListener, "incompleteApp");
+        assertDeploymentFailure(applicationDeploymentListener, "incompleteApp");
 
         // Deploys another app to confirm that DeploymentService has execute the updater thread
         addPackedAppFromResource("/dummy-app.zip");
 
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
 
         // Check that the failed application folder is still there
         assertAppFolderIsMaintained("incompleteApp");
-        final Map.Entry<URL, Long> zombie = deploymentService.getZombieMap().entrySet().iterator().next();
+        final Map.Entry<URL, Long> zombie = deploymentService.getZombieApplications().entrySet().iterator().next();
         assertEquals("Wrong URL tagged as zombie.", "incompleteApp", new File(zombie.getKey().getFile()).getParentFile().getName());
     }
 
@@ -862,46 +838,18 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         addPackedAppFromResource("/incompleteApp.zip");
 
-        assertDeploymentFailure(deploymentListener, "incompleteApp");
+        assertDeploymentFailure(applicationDeploymentListener, "incompleteApp");
 
         // Deploys another app to confirm that DeploymentService has execute the updater thread
         addPackedAppFromResource("/dummy-app.zip");
 
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
 
         // Check that the failed application folder is still there
         assertAppFolderIsMaintained("incompleteApp");
-        final Map.Entry<URL, Long> zombie = deploymentService.getZombieMap().entrySet().iterator().next();
+        final Map.Entry<URL, Long> zombie = deploymentService.getZombieApplications().entrySet().iterator().next();
         assertEquals("Wrong URL tagged as zombie.", "incompleteApp", new File(zombie.getKey().getFile()).getParentFile().getName());
     }
-
-    //@Test
-    //public void redeploysOkAfterIncompleteZipAppOnStartupWhenConfigIsUpdated() throws Exception
-    //{
-    //    addPackedAppFromResource("/incompleteApp.zip");
-    //
-    //    deploymentService.start();
-    //
-    //    assertDeploymentFailure(deploymentListener, "incompleteApp");
-    //
-    //
-    //    File originalConfigFile = new File(appsDir + "/incompleteApp", "mule-config.xml");
-    //    URL url = getClass().getResource("/empty-config.xml");
-    //    File newConfigFile = new File(url.toURI());
-    //    FileUtils.copyFile(newConfigFile, originalConfigFile);
-    //
-    //
-    //
-    //    // Deploys another app to confirm that DeploymentService has execute the updater thread
-    //    addPackedAppFromResource("/dummy-app.zip");
-    //
-    //    assertDeploymentSuccess(deploymentListener, "dummy-app");
-    //
-    //    // Check that the failed application folder is still there
-    //    assertAppFolderIsMaintained("broken-xml-app");
-    //    final Map.Entry<URL, Long> zombie = deploymentService.getZombieMap().entrySet().iterator().next();
-    //    assertEquals("Wrong URL tagged as zombie.", "incompleteApp", new File(zombie.getKey().getFile()).getParentFile().getName());
-    //}
 
     @Test
     public void mantainsAppFolderOnExplodedAppDeploymentError() throws Exception
@@ -910,16 +858,16 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         addPackedAppFromResource("/incompleteApp.zip");
 
-        assertDeploymentFailure(deploymentListener, "incompleteApp");
+        assertDeploymentFailure(applicationDeploymentListener, "incompleteApp");
 
         // Deploys another app to confirm that DeploymentService has execute the updater thread
         addPackedAppFromResource("/dummy-app.zip");
 
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
 
         // Check that the failed application folder is still there
         assertAppFolderIsMaintained("incompleteApp");
-        final Map.Entry<URL, Long> zombie = deploymentService.getZombieMap().entrySet().iterator().next();
+        final Map.Entry<URL, Long> zombie = deploymentService.getZombieApplications().entrySet().iterator().next();
         assertEquals("Wrong URL tagged as zombie.", "incompleteApp", new File(zombie.getKey().getFile()).getParentFile().getName());
     }
 
@@ -930,18 +878,18 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentFailure(deploymentListener, "incompleteApp");
+        assertDeploymentFailure(applicationDeploymentListener, "incompleteApp");
 
         // Deploys another app to confirm that DeploymentService has execute the updater thread
         addPackedAppFromResource("/dummy-app.zip");
 
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
 
         // Deploys another app to confirm that DeploymentService has execute the updater thread
         addPackedAppFromResource("/empty-app.zip", "incompleteApp.zip");
-        assertDeploymentSuccess(deploymentListener, "incompleteApp");
+        assertDeploymentSuccess(applicationDeploymentListener, "incompleteApp");
 
-        assertEquals("Failed app still appears as zombie after a successful redeploy", 0, deploymentService.getZombieMap().size());
+        assertEquals("Failed app still appears as zombie after a successful redeploy", 0, deploymentService.getZombieApplications().size());
     }
 
     @Test
@@ -951,20 +899,19 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         addPackedAppFromResource("/incompleteApp.zip");
 
-        assertDeploymentFailure(deploymentListener, "incompleteApp");
+        assertDeploymentFailure(applicationDeploymentListener, "incompleteApp");
 
         // Deploys another app to confirm that DeploymentService has execute the updater thread
         addPackedAppFromResource("/dummy-app.zip");
 
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
 
         // Deploys another app to confirm that DeploymentService has execute the updater thread
         addPackedAppFromResource("/empty-app.zip", "incompleteApp.zip");
-        assertDeploymentSuccess(deploymentListener, "incompleteApp");
+        assertDeploymentSuccess(applicationDeploymentListener, "incompleteApp");
 
-        assertEquals("Failed app still appears as zombie after a successful redeploy", 0, deploymentService.getZombieMap().size());
+        assertEquals("Failed app still appears as zombie after a successful redeploy", 0, deploymentService.getZombieApplications().size());
     }
-
 
     @Test
     public void redeploysInvalidZipAppAfterSuccessfulDeploymentOnStartup() throws IOException
@@ -973,13 +920,13 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(deploymentListener, "empty-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "empty-app");
 
         addPackedAppFromResource("/incompleteApp.zip", "empty-app.zip");
 
-        assertDeploymentFailure(deploymentListener, "empty-app");
+        assertDeploymentFailure(applicationDeploymentListener, "empty-app");
 
-        final Map.Entry<URL, Long> zombie = deploymentService.getZombieMap().entrySet().iterator().next();
+        final Map.Entry<URL, Long> zombie = deploymentService.getZombieApplications().entrySet().iterator().next();
         assertEquals("Wrong URL tagged as zombie.", "empty-app", new File(zombie.getKey().getFile()).getParentFile().getName());
     }
 
@@ -989,12 +936,12 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.start();
 
         addPackedAppFromResource("/empty-app.zip");
-        assertDeploymentSuccess(deploymentListener, "empty-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "empty-app");
 
         addPackedAppFromResource("/incompleteApp.zip", "empty-app.zip");
-        assertDeploymentFailure(deploymentListener, "empty-app");
+        assertDeploymentFailure(applicationDeploymentListener, "empty-app");
 
-        final Map.Entry<URL, Long> zombie = deploymentService.getZombieMap().entrySet().iterator().next();
+        final Map.Entry<URL, Long> zombie = deploymentService.getZombieApplications().entrySet().iterator().next();
         assertEquals("Wrong URL tagged as zombie.", "empty-app", new File(zombie.getKey().getFile()).getParentFile().getName());
     }
 
@@ -1005,15 +952,15 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentFailure(deploymentListener, "incompleteApp");
+        assertDeploymentFailure(applicationDeploymentListener, "incompleteApp");
 
-        reset(deploymentListener);
+        reset(applicationDeploymentListener);
 
         addPackedAppFromResource("/incompleteApp.zip");
 
-        assertDeploymentFailure(deploymentListener, "incompleteApp");
+        assertDeploymentFailure(applicationDeploymentListener, "incompleteApp");
 
-        final Map.Entry<URL, Long> zombie = deploymentService.getZombieMap().entrySet().iterator().next();
+        final Map.Entry<URL, Long> zombie = deploymentService.getZombieApplications().entrySet().iterator().next();
         assertEquals("Wrong URL tagged as zombie.", "incompleteApp", new File(zombie.getKey().getFile()).getParentFile().getName());
     }
 
@@ -1023,14 +970,14 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.start();
 
         addPackedAppFromResource("/incompleteApp.zip");
-        assertDeploymentFailure(deploymentListener, "incompleteApp");
+        assertDeploymentFailure(applicationDeploymentListener, "incompleteApp");
 
-        reset(deploymentListener);
+        reset(applicationDeploymentListener);
 
         addPackedAppFromResource("/incompleteApp.zip");
-        assertDeploymentFailure(deploymentListener, "incompleteApp");
+        assertDeploymentFailure(applicationDeploymentListener, "incompleteApp");
 
-        final Map.Entry<URL, Long> zombie = deploymentService.getZombieMap().entrySet().iterator().next();
+        final Map.Entry<URL, Long> zombie = deploymentService.getZombieApplications().entrySet().iterator().next();
         assertEquals("Wrong URL tagged as zombie.", "incompleteApp", new File(zombie.getKey().getFile()).getParentFile().getName());
     }
 
@@ -1041,21 +988,612 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         addPackedAppFromResource("/incompleteApp.zip");
 
-        assertDeploymentFailure(deploymentListener, "incompleteApp");
+        assertDeploymentFailure(applicationDeploymentListener, "incompleteApp");
 
         // Deploys another app to confirm that DeploymentService has execute the updater thread
         addPackedAppFromResource("/dummy-app.zip");
 
-        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
 
         // Redeploys a fixed version for incompleteApp
         addExplodedAppFromResource("/empty-app.zip", "incompleteApp");
 
-        assertDeploymentSuccess(deploymentListener, "incompleteApp");
-        assertEquals("Failed app still appears as zombie after a successful redeploy", 0, deploymentService.getZombieMap().size());
+        assertDeploymentSuccess(applicationDeploymentListener, "incompleteApp");
+        assertEquals("Failed app still appears as zombie after a successful redeploy", 0, deploymentService.getZombieApplications().size());
     }
 
-    private void assertDeploymentSuccess(final DeploymentListener listener, final String appName)
+    @Test
+    public void deploysDomainZipOnStartup() throws Exception
+    {
+        addPackedDomainFromResource("/dummy-domain.zip");
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(domainDeploymentListener, "dummy-domain");
+
+        assertDomainDir(NONE, new String[] {"dummy-domain"}, true);
+
+        final Domain domain = findADomain("dummy-domain", 1);
+        assertNotNull(domain);
+        assertNull(domain.getMuleContext());
+    }
+
+    @Test
+    public void deploysDomainZipAfterStartup() throws Exception
+    {
+        deploymentService.start();
+
+        addPackedDomainFromResource("/dummy-domain.zip");
+
+        assertDeploymentSuccess(domainDeploymentListener, "dummy-domain");
+
+        assertDomainDir(NONE, new String[] {"dummy-domain"}, true);
+
+        final Domain domain = findADomain("dummy-domain", 1);
+        assertNotNull(domain);
+        assertNull(domain.getMuleContext());
+
+    }
+
+    @Test
+    public void deploysBrokenDomainZipOnStartup() throws Exception
+    {
+        addPackedDomainFromResource("/broken-domain.zip", "brokenDomain.zip");
+
+        deploymentService.start();
+
+        assertDeploymentFailure(domainDeploymentListener, "brokenDomain");
+
+        assertDomainDir(new String[] {"brokenDomain.zip"}, NONE, true);
+
+        final Map<URL, Long> zombieMap = deploymentService.getZombieDomains();
+        assertEquals("Wrong number of zombie domains registered.", 1, zombieMap.size());
+        final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
+        assertEquals("Wrong URL tagged as domain", "brokenDomain.zip", new File(zombie.getKey().getFile()).getName());
+        assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+    }
+
+    @Test
+    public void deploysBrokenDomainZipAfterStartup() throws Exception
+    {
+        deploymentService.start();
+
+        addPackedDomainFromResource("/broken-domain.zip", "brokenDomain.zip");
+
+        assertDeploymentFailure(domainDeploymentListener, "brokenDomain");
+
+        assertDomainDir(new String[] {"brokenDomain.zip"}, NONE, true);
+
+        final Map<URL, Long> zombieMap = deploymentService.getZombieDomains();
+        assertEquals("Wrong number of zombie domains registered.", 1, zombieMap.size());
+        final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
+        assertEquals("Wrong URL tagged as domain.", "brokenDomain.zip", new File(zombie.getKey().getFile()).getName());
+        assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+    }
+
+    @Test
+    public void redeploysDomainZipDeployedOnStartup() throws Exception
+    {
+        deploymentService.start();
+
+        addPackedDomainFromResource("/dummy-domain.zip");
+
+        assertDeploymentSuccess(domainDeploymentListener, "dummy-domain");
+
+        assertDomainDir(NONE, new String[] {"dummy-domain"}, true);
+        assertEquals("Domain has not been properly registered with Mule", 1, deploymentService.getDomains().size());
+
+        reset(domainDeploymentListener);
+
+        addPackedDomainFromResource("/dummy-domain.zip");
+
+        assertUndeploymentSuccess(domainDeploymentListener, "dummy-domain");
+        assertDeploymentSuccess(domainDeploymentListener, "dummy-domain");
+        assertEquals("Domain has not been properly registered with Mule", 1, deploymentService.getDomains().size());
+        assertDomainDir(NONE, new String[] {"dummy-domain"}, true);
+    }
+
+    @Test
+    public void redeploysDomainZipDeployedAfterStartup() throws Exception
+    {
+        addPackedDomainFromResource("/dummy-domain.zip");
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(domainDeploymentListener, "dummy-domain");
+
+        assertDomainDir(NONE, new String[] {"dummy-domain"}, true);
+        assertEquals("Domain has not been properly registered with Mule", 1, deploymentService.getDomains().size());
+
+        reset(domainDeploymentListener);
+
+        addPackedDomainFromResource("/dummy-domain.zip");
+
+        assertUndeploymentSuccess(domainDeploymentListener, "dummy-domain");
+        assertDeploymentSuccess(domainDeploymentListener, "dummy-domain");
+        assertEquals("Domain has not been properly registered with Mule", 1, deploymentService.getDomains().size());
+        assertDomainDir(NONE, new String[] {"dummy-domain"}, true);
+    }
+
+    @Test
+    public void deploysExplodedDomainOnStartup() throws Exception
+    {
+        addExplodedDomainFromResource("/dummy-domain.zip");
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(domainDeploymentListener, "dummy-domain");
+        assertDomainDir(NONE, new String[] {"dummy-domain"}, true);
+    }
+
+    @Test
+    public void deploysPackagedDomainOnStartupWhenExplodedDomainIsAlsoPresent() throws Exception
+    {
+        addExplodedDomainFromResource("/dummy-domain.zip");
+        addPackedDomainFromResource("/dummy-domain.zip");
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(domainDeploymentListener, "dummy-domain");
+
+        addExplodedDomainFromResource("/empty-domain.zip");
+
+        assertDeploymentSuccess(domainDeploymentListener, "empty-domain");
+
+        // Checks that dummy app was deployed just once
+        assertDeploymentSuccess(domainDeploymentListener, "dummy-domain");
+    }
+
+    @Test
+    public void deploysExplodedDomainAfterStartup() throws Exception
+    {
+        deploymentService.start();
+
+        addExplodedDomainFromResource("/dummy-domain.zip");
+
+        assertDeploymentSuccess(domainDeploymentListener, "dummy-domain");
+        assertDomainDir(NONE, new String[] {"dummy-domain"}, true);
+    }
+
+    @Test
+    public void deploysInvalidExplodedDomainOnStartup() throws Exception
+    {
+        addExplodedDomainFromResource("/dummy-domain.zip", "domain with spaces");
+
+        deploymentService.start();
+
+        assertDeploymentFailure(domainDeploymentListener, "domain with spaces");
+
+        // Maintains app dir created
+        assertDomainDir(NONE, new String[] {"domain with spaces"}, true);
+        final Map<URL, Long> zombieMap = deploymentService.getZombieDomains();
+        assertEquals("Wrong number of zombie domains registered.", 1, zombieMap.size());
+        final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
+        // Spaces are converted to %20 is returned by java file api :/
+        String domainName = URLDecoder.decode(new File(zombie.getKey().getFile()).getName(), "UTF-8");
+        assertEquals("Wrong URL tagged as zombie.", "domain with spaces", domainName);
+        assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+    }
+
+    @Test
+    public void deploysInvalidExplodedDomainAfterStartup() throws Exception
+    {
+        deploymentService.start();
+
+        addExplodedDomainFromResource("/dummy-domain.zip", "domain with spaces");
+
+        assertDeploymentFailure(domainDeploymentListener, "domain with spaces");
+
+        // Maintains app dir created
+        assertDomainDir(NONE, new String[] {"domain with spaces"}, true);
+        final Map<URL, Long> zombieMap = deploymentService.getZombieDomains();
+        assertEquals("Wrong number of zombie domains registered.", 1, zombieMap.size());
+        final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
+        // Spaces are converted to %20 is returned by java file api :/
+        String appName = URLDecoder.decode(new File(zombie.getKey().getFile()).getName(), "UTF-8");
+        assertEquals("Wrong URL tagged as zombie.", "domain with spaces", appName);
+        assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+    }
+
+    @Test
+    public void deploysInvalidExplodedDomainOnlyOnce() throws Exception
+    {
+        deploymentService.start();
+
+        addExplodedDomainFromResource("/dummy-domain.zip", "domain with spaces");
+        assertDeploymentFailure(domainDeploymentListener, "domain with spaces", atLeast(1));
+
+        addExplodedDomainFromResource("/dummy-domain.zip");
+        assertDeploymentSuccess(domainDeploymentListener, "dummy-domain");
+
+        addExplodedDomainFromResource("/empty-domain.zip");
+        assertDeploymentSuccess(domainDeploymentListener, "empty-domain");
+
+        // After three update cycles should have only one deployment failure notification for the broken app
+        assertDeploymentFailure(domainDeploymentListener, "domain with spaces");
+    }
+
+    @Test
+    public void deploysBrokenExplodedDomainOnStartup() throws Exception
+    {
+        final URL url = getClass().getResource("/incompleteDomain.zip");
+        assertNotNull("Test app file not found " + url, url);
+
+        addExplodedDomainFromResource("/incompleteDomain.zip");
+
+        deploymentService.start();
+
+        assertDeploymentFailure(domainDeploymentListener, "incompleteDomain");
+
+        // Maintains app dir created
+        assertDomainDir(NONE, new String[] {"incompleteDomain"}, true);
+        final Map<URL, Long> zombieMap = deploymentService.getZombieDomains();
+        assertEquals("Wrong number of zombie domains registered.", 1, zombieMap.size());
+        final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
+        assertEquals("Wrong URL tagged as zombie.", "incompleteDomain", new File(zombie.getKey().getFile()).getParentFile().getName());
+        assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+    }
+
+    @Test
+    public void deploysBrokenExplodedDomainAfterStartup() throws Exception
+    {
+        deploymentService.start();
+
+        addExplodedDomainFromResource("/incompleteDomain.zip");
+
+        assertDeploymentFailure(domainDeploymentListener, "incompleteDomain");
+
+        // Maintains app dir created
+        assertDomainDir(NONE, new String[] {"incompleteDomain"}, true);
+        final Map<URL, Long> zombieMap = deploymentService.getZombieDomains();
+        assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
+        final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
+        assertEquals("Wrong URL tagged as zombie.", "incompleteDomain", new File(zombie.getKey().getFile()).getParentFile().getName());
+        assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+    }
+
+    @Test
+    public void receivesDomainMuleContextDeploymentNotifications() throws Exception
+    {
+        // NOTE: need an integration test like this because DefaultMuleApplication
+        // class cannot be unit tested.
+        addPackedDomainFromResource("/http-shared-domain.zip");
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(domainDeploymentListener, "http-shared-domain");
+        assertMuleContextCreated(domainDeploymentListener, "http-shared-domain");
+        assertMuleContextInitialized(domainDeploymentListener, "http-shared-domain");
+        assertMuleContextConfigured(domainDeploymentListener, "http-shared-domain");
+    }
+
+    @Test
+    public void undeploysStoppedDomain() throws Exception
+    {
+        addPackedDomainFromResource("/dummy-domain.zip");
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(domainDeploymentListener, "dummy-domain");
+        final Domain domain = findADomain("dummy-domain", 1);
+        domain.stop();
+
+        deploymentService.undeploy(domain);
+    }
+
+    @Test
+    public void undeploysDomainRemovingAnchorFile() throws Exception
+    {
+        addPackedDomainFromResource("/dummy-domain.zip");
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(domainDeploymentListener, "dummy-domain");
+
+        assertTrue("Unable to remove anchor file", removeDomainAnchorFile("dummy-domain"));
+
+        assertUndeploymentSuccess(domainDeploymentListener, "dummy-domain");
+    }
+
+    @Test
+    public void undeploysDomainCompletelyEvenOnStoppingException() throws Exception
+    {
+        addPackedDomainFromResource("/empty-domain.zip");
+
+        TestDomainFactory testDomainFactory = new TestDomainFactory(new MuleDomainClassLoaderRepository());
+        testDomainFactory.setFailOnStopApplication();
+
+        deploymentService.setDomainFactory(testDomainFactory);
+        deploymentService.start();
+
+        assertDeploymentSuccess(domainDeploymentListener, "empty-domain");
+
+        assertTrue("Unable to remove anchor file", removeDomainAnchorFile("empty-domain"));
+
+        assertUndeploymentSuccess(domainDeploymentListener, "empty-domain");
+
+        assertAppFolderIsDeleted("empty-domain");
+    }
+
+    @Test
+    public void undeploysDomainCompletelyEvenOnDisposingException() throws Exception
+    {
+        addPackedDomainFromResource("/empty-domain.zip");
+
+        TestDomainFactory testDomainFactory = new TestDomainFactory(new MuleDomainClassLoaderRepository());
+        testDomainFactory.setFailOnDisposeApplication();
+        deploymentService.setDomainFactory(testDomainFactory);
+        deploymentService.start();
+
+        assertDeploymentSuccess(domainDeploymentListener, "empty-domain");
+
+        assertTrue("Unable to remove anchor file", removeDomainAnchorFile("empty-domain"));
+
+        assertUndeploymentSuccess(domainDeploymentListener, "empty-domain");
+
+        assertAppFolderIsDeleted("empty-domain");
+    }
+
+    @Test
+    public void deploysIncompleteZipDomainOnStartup() throws Exception
+    {
+        addPackedDomainFromResource("/incompleteDomain.zip");
+
+        deploymentService.start();
+
+        assertDeploymentFailure(domainDeploymentListener, "incompleteDomain");
+
+        // Deploys another app to confirm that DeploymentService has execute the updater thread
+        addPackedDomainFromResource("/dummy-domain.zip");
+
+        assertDeploymentSuccess(domainDeploymentListener, "dummy-domain");
+
+        // Check that the failed application folder is still there
+        assertDomainFolderIsMaintained("incompleteDomain");
+        final Map.Entry<URL, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
+        assertEquals("Wrong URL tagged as zombie.", "incompleteDomain", new File(zombie.getKey().getFile()).getParentFile().getName());
+    }
+
+    @Test
+    public void deploysIncompleteZipDomainAfterStartup() throws Exception
+    {
+        deploymentService.start();
+
+        addPackedDomainFromResource("/incompleteDomain.zip");
+
+        assertDeploymentFailure(domainDeploymentListener, "incompleteDomain");
+
+        // Deploys another app to confirm that DeploymentService has execute the updater thread
+        addPackedDomainFromResource("/dummy-domain.zip");
+
+        assertDeploymentSuccess(domainDeploymentListener, "dummy-domain");
+
+        // Check that the failed application folder is still there
+        assertDomainFolderIsMaintained("incompleteDomain");
+        final Map.Entry<URL, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
+        assertEquals("Wrong URL tagged as zombie.", "incompleteDomain", new File(zombie.getKey().getFile()).getParentFile().getName());
+    }
+
+    @Test
+    public void mantainsDomainFolderOnExplodedAppDeploymentError() throws Exception
+    {
+        deploymentService.start();
+
+        addPackedDomainFromResource("/incompleteDomain.zip");
+
+        assertDeploymentFailure(domainDeploymentListener, "incompleteDomain");
+
+        // Deploys another app to confirm that DeploymentService has execute the updater thread
+        addPackedDomainFromResource("/dummy-domain.zip");
+
+        assertDeploymentSuccess(domainDeploymentListener, "dummy-domain");
+
+        // Check that the failed application folder is still there
+        assertDomainFolderIsMaintained("incompleteDomain");
+        final Map.Entry<URL, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
+        assertEquals("Wrong URL tagged as zombie.", "incompleteDomain", new File(zombie.getKey().getFile()).getParentFile().getName());
+    }
+
+    @Test
+    public void redeploysZipDomainAfterDeploymentErrorOnStartup() throws Exception
+    {
+        addPackedDomainFromResource("/incompleteDomain.zip");
+
+        deploymentService.start();
+
+        assertDeploymentFailure(domainDeploymentListener, "incompleteDomain");
+
+        // Deploys another app to confirm that DeploymentService has execute the updater thread
+        addPackedDomainFromResource("/dummy-domain.zip");
+
+        assertDeploymentSuccess(domainDeploymentListener, "dummy-domain");
+
+        // Deploys another app to confirm that DeploymentService has execute the updater thread
+        addPackedDomainFromResource("/empty-domain.zip", "incompleteDomain.zip");
+        assertDeploymentSuccess(domainDeploymentListener, "incompleteDomain");
+
+        assertEquals("Failed domain still appears as zombie after a successful redeploy", 0, deploymentService.getZombieDomains().size());
+    }
+
+    @Test
+    public void redeploysZipDomainAfterDeploymentErrorAfterStartup() throws Exception
+    {
+        deploymentService.start();
+
+        addPackedDomainFromResource("/incompleteDomain.zip");
+
+        assertDeploymentFailure(domainDeploymentListener, "incompleteDomain");
+
+        // Deploys another app to confirm that DeploymentService has execute the updater thread
+        addPackedDomainFromResource("/dummy-domain.zip");
+
+        assertDeploymentSuccess(domainDeploymentListener, "dummy-domain");
+
+        // Deploys another app to confirm that DeploymentService has execute the updater thread
+        addPackedDomainFromResource("/empty-domain.zip", "incompleteDomain.zip");
+        assertDeploymentSuccess(domainDeploymentListener, "incompleteDomain");
+
+        assertEquals("Failed domain still appears as zombie after a successful redeploy", 0, deploymentService.getZombieDomains().size());
+    }
+
+    @Test
+    public void redeploysInvalidZipDomainAfterSuccessfulDeploymentOnStartup() throws IOException
+    {
+        addPackedDomainFromResource("/empty-domain.zip");
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(domainDeploymentListener, "empty-domain");
+
+        addPackedDomainFromResource("/incompleteDomain.zip", "empty-domain.zip");
+
+        assertDeploymentFailure(domainDeploymentListener, "empty-domain");
+
+        final Map.Entry<URL, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
+        assertEquals("Wrong URL tagged as zombie.", "empty-domain", new File(zombie.getKey().getFile()).getParentFile().getName());
+    }
+
+    @Test
+    public void redeploysInvalidZipDomainAfterSuccessfulDeploymentAfterStartup() throws IOException
+    {
+        deploymentService.start();
+
+        addPackedDomainFromResource("/empty-domain.zip");
+        assertDeploymentSuccess(domainDeploymentListener, "empty-domain");
+
+        addPackedDomainFromResource("/incompleteDomain.zip", "empty-domain.zip");
+        assertDeploymentFailure(domainDeploymentListener, "empty-domain");
+
+        final Map.Entry<URL, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
+        assertEquals("Wrong URL tagged as zombie.", "empty-domain", new File(zombie.getKey().getFile()).getParentFile().getName());
+    }
+
+    @Test
+    public void redeploysInvalidZipDomainAfterFailedDeploymentOnStartup() throws IOException
+    {
+        addPackedDomainFromResource("/incompleteDomain.zip");
+
+        deploymentService.start();
+
+        assertDeploymentFailure(domainDeploymentListener, "incompleteDomain");
+
+        reset(domainDeploymentListener);
+
+        addPackedDomainFromResource("/incompleteDomain.zip");
+
+        assertDeploymentFailure(domainDeploymentListener, "incompleteDomain");
+
+        final Map.Entry<URL, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
+        assertEquals("Wrong URL tagged as zombie.", "incompleteDomain", new File(zombie.getKey().getFile()).getParentFile().getName());
+    }
+
+    @Test
+    public void redeploysInvalidZipDomainAfterFailedDeploymentAfterStartup() throws IOException
+    {
+        deploymentService.start();
+
+        addPackedDomainFromResource("/incompleteDomain.zip");
+        assertDeploymentFailure(domainDeploymentListener, "incompleteDomain");
+
+        reset(domainDeploymentListener);
+
+        addPackedDomainFromResource("/incompleteDomain.zip");
+        assertDeploymentFailure(domainDeploymentListener, "incompleteDomain");
+
+        final Map.Entry<URL, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
+        assertEquals("Wrong URL tagged as zombie.", "incompleteDomain", new File(zombie.getKey().getFile()).getParentFile().getName());
+    }
+
+    @Test
+    public void redeploysExplodedDomainAfterDeploymentError() throws Exception
+    {
+        deploymentService.start();
+
+        addPackedDomainFromResource("/incompleteDomain.zip");
+
+        assertDeploymentFailure(domainDeploymentListener, "incompleteDomain");
+
+        // Deploys another app to confirm that DeploymentService has execute the updater thread
+        addPackedDomainFromResource("/dummy-domain.zip");
+
+        assertDeploymentSuccess(domainDeploymentListener, "dummy-domain");
+
+        // Redeploys a fixed version for incompleteDomain
+        addExplodedDomainFromResource("/empty-domain.zip", "incompleteDomain");
+
+        assertDeploymentSuccess(domainDeploymentListener, "incompleteDomain");
+        assertEquals("Failed domain still appears as zombie after a successful redeploy", 0, deploymentService.getZombieDomains().size());
+    }
+
+    public void doBrokenAppArchiveTest() throws Exception
+    {
+        addPackedAppFromResource("/broken-app.zip");
+
+        deploymentService.start();
+
+        assertDeploymentFailure(applicationDeploymentListener, "broken-app");
+        reset(applicationDeploymentListener);
+
+        // let the file system's write-behind cache commit the delete operation?
+        Thread.sleep(1000);
+
+        // zip stays intact, no app dir created
+        assertAppsDir(new String[] {"broken-app.zip"}, NONE, true);
+        // don't assert dir contents, we want to check internal deployer state next
+        assertAppsDir(NONE, new String[] {"dummy-app"}, false);
+        assertEquals("No apps should have been registered with Mule.", 0, deploymentService.getApplications().size());
+        final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
+        assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
+        final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
+        assertEquals("Wrong URL tagged as zombie.", "broken-app.zip", new File(zombie.getKey().getFile()).getName());
+        assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+
+        // Checks that the invalid zip was not deployed again
+        try
+        {
+            assertDeploymentFailure(applicationDeploymentListener, "broken-app.zip");
+            fail("Install was invoked again for the broken application file");
+        }
+        catch (AssertionError expected)
+        {
+        }
+    }
+
+    public void doBrokenDomainArchiveTest() throws Exception
+    {
+        addPackedDomainFromResource("/broken-domain.zip");
+
+        deploymentService.start();
+
+        assertDeploymentFailure(domainDeploymentListener, "broken-domain");
+        reset(domainDeploymentListener);
+
+        // let the file system's write-behind cache commit the delete operation?
+        Thread.sleep(1000);
+
+        // zip stays intact, no app dir created
+        assertDomainDir(new String[] {"broken-domain.zip"}, NONE, true);
+        // don't assert dir contents, we want to check internal deployer state next
+        assertDomainDir(NONE, new String[] {"dummy-domain"}, false);
+        assertEquals("No domains should have been registered with Mule.", 0, deploymentService.getDomains().size());
+        final Map<URL, Long> zombieMap = deploymentService.getZombieDomains();
+        assertEquals("Wrong number of zombie domains registered.", 1, zombieMap.size());
+        final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
+        assertEquals("Wrong URL tagged as zombie.", "broken-domain.zip", new File(zombie.getKey().getFile()).getName());
+        assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+
+        // Checks that the invalid zip was not deployed again
+        try
+        {
+            assertDeploymentFailure(domainDeploymentListener, "broken-domain.zip");
+            fail("Install was invoked again for the broken doamin file");
+        }
+        catch (AssertionError expected)
+        {
+        }
+    }
+
+    private void assertDeploymentSuccess(final DeploymentListener listener, final String artifactName)
     {
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
         prober.check(new Probe()
@@ -1064,7 +1602,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
             {
                 try
                 {
-                    verify(listener, times(1)).onDeploymentSuccess(appName);
+                    verify(listener, times(1)).onDeploymentSuccess(artifactName);
                     return true;
                 }
                 catch (AssertionError e)
@@ -1075,7 +1613,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
             public String describeFailure()
             {
-                return "Failed to deploy application: " + appName;
+                return "Failed to deploy application: " + artifactName;
             }
         });
     }
@@ -1175,17 +1713,31 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
             public String describeFailure()
             {
-                return "Failed to undeploy application: " + appName;
+                return "Failed to undeployArtifact application: " + appName;
             }
         });
     }
 
-    private void assertDeploymentFailure(final DeploymentListener listener, final String appName)
+    private MuleRegistry getMuleRegistry(Application app)
     {
-        assertDeploymentFailure(listener, appName, times(1));
+        final ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
+        try
+        {
+            Thread.currentThread().setContextClassLoader(app.getArtifactClassLoader().getClassLoader());
+            return app.getMuleContext().getRegistry();
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader(currentClassLoader);
+        }
     }
 
-    private void assertDeploymentFailure(final DeploymentListener listener, final String appName, final VerificationMode mode)
+    private void assertDeploymentFailure(final DeploymentListener listener, final String artifactName)
+    {
+        assertDeploymentFailure(listener, artifactName, times(1));
+    }
+
+    private void assertDeploymentFailure(final DeploymentListener listener, final String artifactName, final VerificationMode mode)
     {
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
         prober.check(new Probe()
@@ -1194,7 +1746,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
             {
                 try
                 {
-                    verify(listener, mode).onDeploymentFailure(eq(appName), any(Throwable.class));
+                    verify(listener, mode).onDeploymentFailure(eq(artifactName), any(Throwable.class));
                     return true;
                 }
                 catch (AssertionError e)
@@ -1205,7 +1757,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
             public String describeFailure()
             {
-                return "Application deployment was supposed to fail for: " + appName;
+                return "Application deployment was supposed to fail for: " + artifactName;
             }
         });
     }
@@ -1214,7 +1766,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         //TODO(pablo.kraan): look for a better way to test this
         boolean invoked;
-        Prober prober = new PollingProber(MuleDeploymentService.DEFAULT_CHANGES_CHECK_INTERVAL_MS * 2, 100);
+        Prober prober = new PollingProber(DeploymentDirectoryWatcher.DEFAULT_CHANGES_CHECK_INTERVAL_MS * 2, 100);
         try
         {
             prober.check(new Probe()
@@ -1262,18 +1814,42 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         return app;
     }
 
+    /**
+     * Find a deployed app, performing some basic assertions.
+     */
+    private Domain findADomain(final String domainName, int totalAppsExpected)
+    {
+        // list all apps to validate total count
+        final List<Domain> apps = deploymentService.getDomains();
+        assertNotNull(apps);
+        assertEquals(totalAppsExpected, apps.size());
+        final Domain domain = deploymentService.findDomain(domainName);
+        assertNotNull(domain);
+        return domain;
+    }
+
     private void assertAppsDir(String[] expectedZips, String[] expectedApps, boolean performValidation)
     {
-        final String[] actualZips = appsDir.list(MuleDeploymentService.ZIP_APPS_FILTER);
+        assertArtifactDir(appsDir, expectedZips, expectedApps, performValidation);
+    }
+
+    private void assertDomainDir(String[] expectedZips, String[] expectedDomains, boolean performValidation)
+    {
+        assertArtifactDir(domainsDir, expectedZips, expectedDomains, performValidation);
+    }
+
+    private void assertArtifactDir(File artifactDir, String[] expectedZips, String[] expectedArtifacts, boolean performValidation)
+    {
+        final String[] actualZips = artifactDir.list(MuleDeploymentService.ZIP_ARTIFACT_FILTER);
         if (performValidation)
         {
-            assertArrayEquals("Invalid Mule application archives set", expectedZips, actualZips);
+            assertArrayEquals("Invalid Mule artifact archives set", expectedZips, actualZips);
         }
-        final String[] actualApps = appsDir.list(DirectoryFileFilter.DIRECTORY);
+        final String[] actualArtifacts = artifactDir.list(DirectoryFileFilter.DIRECTORY);
         if (performValidation)
         {
-            assertTrue("Invalid Mule exploded applications set",
-                       CollectionUtils.isEqualCollection(Arrays.asList(expectedApps), Arrays.asList(actualApps)));
+            assertTrue("Invalid Mule exploded artifact set",
+                       CollectionUtils.isEqualCollection(Arrays.asList(expectedArtifacts), Arrays.asList(actualArtifacts)));
         }
     }
 
@@ -1287,16 +1863,46 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
     private void addPackedAppFromResource(String resource, String targetName) throws IOException
     {
+        addPackedArtifactFromResource(appsDir, resource, targetName);
+    }
+
+    /**
+     * Copies a given app archive to the apps folder for deployment.
+     */
+    private void addPackedDomainFromResource(String resource) throws IOException
+    {
+        addPackedDomainFromResource(resource, null);
+    }
+
+    private void addPackedDomainFromResource(String resource, String targetName) throws IOException
+    {
+        addPackedArtifactFromResource(domainsDir, resource, targetName);
+    }
+
+    private void addPackedArtifactFromResource(File targetDir, String resource, String targetName) throws IOException
+    {
         URL url = getClass().getResource(resource);
         assertNotNull("Test resource not found: " + url, url);
-
-        addAppArchive(url, targetName);
+        addArchive(targetDir, url, targetName);
     }
 
     /**
      * Copies a given app archive with a given target name to the apps folder for deployment
      */
     private void addAppArchive(URL url, String targetFile) throws IOException
+    {
+        addArchive(appsDir, url, targetFile);
+    }
+
+    /**
+     * Copies a given app archive with a given target name to the apps folder for deployment
+     */
+    private void addDomainArchive(URL url, String targetFile) throws IOException
+    {
+        addArchive(domainsDir, url, targetFile);
+    }
+
+    private void addArchive(File outputDir ,URL url, String targetFile) throws IOException
     {
         ReentrantLock lock = deploymentService.getLock();
 
@@ -1305,7 +1911,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         {
             // copy is not atomic, copy to a temp file and rename instead (rename is atomic)
             final String tempFileName = new File((targetFile == null ? url.getFile() : targetFile) + ".part").getName();
-            final File tempFile = new File(appsDir, tempFileName);
+            final File tempFile = new File(outputDir, tempFileName);
             FileUtils.copyURLToFile(url, tempFile);
             tempFile.renameTo(new File(StringUtils.removeEnd(tempFile.getAbsolutePath(), ".part")));
         }
@@ -1320,52 +1926,67 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         addExplodedAppFromResource(resource, null);
     }
 
+    private void addExplodedDomainFromResource(String resource) throws IOException, URISyntaxException
+    {
+        addExplodedDomainFromResource(resource, null);
+    }
+
+    private void addExplodedDomainFromResource(String resource, String domainName) throws IOException, URISyntaxException
+    {
+        addExplodedArtifactFromResource(resource, domainName, "mule-domain-config.xml", domainsDir);
+    }
+
     private void addExplodedAppFromResource(String resource, String appName) throws IOException, URISyntaxException
+    {
+        addExplodedArtifactFromResource(resource, appName, "mule-config.xml", appsDir);
+    }
+
+    private void addExplodedArtifactFromResource(String resource, String artifactName, String configFileName, File destinationDir) throws IOException, URISyntaxException
     {
         URL url = getClass().getResource(resource);
         assertNotNull("Test resource not found: " + url, url);
 
-        String appFolder = appName;
-        if (appFolder == null)
+        String artifactFolder = artifactName;
+        if (artifactFolder == null)
         {
             File file = new File(url.getFile());
             int index = file.getName().lastIndexOf(".");
 
             if (index > 0)
             {
-                appFolder = file.getName().substring(0, index);
+                artifactFolder = file.getName().substring(0, index);
             }
             else
             {
-                appFolder = file.getName();
+                artifactFolder = file.getName();
             }
         }
 
-        addExplodedApp(url, appFolder);
+        addExplodedArtifact(url, artifactFolder, configFileName, destinationDir);
     }
 
     /**
      * Copies a given app archive with a given target name to the apps folder for deployment
      */
-    private void addExplodedApp(URL url, String appName) throws IOException, URISyntaxException
+    private void addExplodedArtifact(URL url, String artifactName, String configFileName, File destinationDir) throws IOException, URISyntaxException
     {
         ReentrantLock lock = deploymentService.getLock();
 
         lock.lock();
         try
         {
-            File tempFolder = new File(muleHome, appName);
+            File tempFolder = new File(muleHome, artifactName);
             FileUtils.unzip(new File(url.toURI()), tempFolder);
 
             // Under some platforms, file.lastModified is managed at second level, not milliseconds.
             // Need to update the config file lastModified ere to ensure that is different from previous value
-            File configFile = new File(tempFolder, "mule-config.xml");
+            File configFile = new File(tempFolder, configFileName);
             if (configFile.exists())
             {
                 configFile.setLastModified(System.currentTimeMillis() + 1000);
             }
 
-            File appFolder = new File(appsDir, appName);
+            File appFolder = new File(destinationDir, artifactName);
 
             if (appFolder.exists())
             {
@@ -1383,14 +2004,33 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     /**
      * Removes a given application anchor file in order to start application undeployment
      *
-     * @param appName name of application to undeploy
+     * @param appName name of application to undeployArtifact
      * @return true if anchor file was deleted, false otherwise
      */
-    private boolean removeAnchorFile(String appName)
+    private boolean removeAppAnchorFile(String appName)
     {
-        String anchorFileName = appName + MuleDeploymentService.APP_ANCHOR_SUFFIX;
+        String anchorFileName = appName + MuleDeploymentService.ARTIFACT_ANCHOR_SUFFIX;
         File anchorFile = new File(appsDir, anchorFileName);
+        return anchorFile.delete();
+    }
 
+    /**
+     * Removes a given domain anchor file in order to start application undeployment
+     *
+     * @param domainName name of application to undeployArtifact
+     * @return true if anchor file was deleted, false otherwise
+     */
+    private boolean removeDomainAnchorFile(String domainName)
+    {
+        String anchorFileName = domainName + MuleDeploymentService.ARTIFACT_ANCHOR_SUFFIX;
+        File anchorFile = new File(domainsDir, anchorFileName);
+        return anchorFile.delete();
+    }
+
+    private boolean removeAnchorFile(String artifactName, File artifactDir)
+    {
+        String anchorFileName = artifactName + MuleDeploymentService.ARTIFACT_ANCHOR_SUFFIX;
+        File anchorFile = new File(artifactDir, anchorFileName);
         return anchorFile.delete();
     }
 
@@ -1403,8 +2043,18 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
     private void assertAppFolderIsMaintained(String appName)
     {
+        assetArtifactFolderIsMaintained(appName, appsDir);
+    }
+
+    private void assertDomainFolderIsMaintained(String domainName)
+    {
+        assetArtifactFolderIsMaintained(domainName, domainsDir);
+    }
+
+    private void assetArtifactFolderIsMaintained(String artifactName, File artifactDir)
+    {
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
-        File appFolder = new File(appsDir, appName);
+        File appFolder = new File(artifactDir, artifactName);
         prober.check(new FileExists(appFolder));
     }
 }

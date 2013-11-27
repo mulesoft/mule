@@ -96,13 +96,13 @@ public class CountingRedeliveryHandler extends AbstractRedeliveryHandler
 
             if (connectorRedelivery == JmsConnector.REDELIVERY_FAIL_ON_FIRST)
             {
-                MuleMessage msg = createMuleMessage(message);
+                MuleMessage msg = createMuleMessage(message, endpoint.getMuleContext());
                 throw new MessageRedeliveredException(id, redeliveryCount, connectorRedelivery, endpoint, flow, msg);
             }
         }
         else if (redeliveryCount > connectorRedelivery)
         {
-            MuleMessage msg = createMuleMessage(message);
+            MuleMessage msg = createMuleMessage(message, endpoint.getMuleContext());
             throw new MessageRedeliveredException(id, redeliveryCount, connectorRedelivery, endpoint, flow, msg);
         }
         else

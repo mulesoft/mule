@@ -6,7 +6,6 @@
  */
 package org.mule.test.integration.messaging.meps;
 
-import static org.junit.Assert.assertTrue;
 import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -17,9 +16,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertTrue;
 
 // START SNIPPET: full-class
 public class InOnlyTestCase extends AbstractServiceAndFlowTestCase
@@ -40,7 +40,6 @@ public class InOnlyTestCase extends AbstractServiceAndFlowTestCase
     }
 
     @Test
-    @Ignore("MULE-6926: Flaky Test")
     public void testExchange() throws Exception
     {
         MuleClient client = muleContext.getClient();

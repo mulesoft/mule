@@ -97,7 +97,8 @@ public class DescriptorParserTestCase extends AbstractMuleTestCase
     class TestDescriptorParserDefault implements DescriptorParser
     {
 
-        public ApplicationDescriptor parse(File descriptor) throws IOException
+        @Override
+        public ApplicationDescriptor parse(File descriptor, String applicationName) throws IOException
         {
             return null;
         }
@@ -115,7 +116,8 @@ public class DescriptorParserTestCase extends AbstractMuleTestCase
     class TestDescriptorParserPreferred implements DescriptorParser
     {
 
-        public ApplicationDescriptor parse(File descriptor) throws IOException
+        @Override
+        public ApplicationDescriptor parse(File descriptor, String applicationName) throws IOException
         {
             return null;
         }
@@ -131,7 +133,8 @@ public class DescriptorParserTestCase extends AbstractMuleTestCase
     class TestDescriptorParserNoAnnotation implements DescriptorParser
     {
 
-        public ApplicationDescriptor parse(File descriptor) throws IOException
+        @Override
+        public ApplicationDescriptor parse(File descriptor, String applicationName) throws IOException
         {
             return null;
         }

@@ -6,17 +6,11 @@
  */
 package org.mule.transport.rmi;
 
-import org.mule.api.MuleContext;
 import org.mule.api.transport.MessageTypeNotSupportedException;
 import org.mule.transport.AbstractMuleMessageFactory;
 
 public class RmiMuleMessageFactory extends AbstractMuleMessageFactory
 {
-
-    public RmiMuleMessageFactory(MuleContext context)
-    {
-        super(context);
-    }
 
     @Override
     protected Object extractPayload(Object transportMessage, String encoding) throws Exception

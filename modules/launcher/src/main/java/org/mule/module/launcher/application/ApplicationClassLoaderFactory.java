@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher.application;
 
+import org.mule.module.launcher.artifact.ArtifactClassLoader;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 
 /**
@@ -14,6 +15,6 @@ import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 public interface ApplicationClassLoaderFactory
 {
 
-    ClassLoader create(ApplicationDescriptor descriptor);
+    ArtifactClassLoader create(ApplicationDescriptor descriptor);
 
 }

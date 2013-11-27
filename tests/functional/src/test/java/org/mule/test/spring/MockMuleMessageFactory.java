@@ -6,14 +6,9 @@
  */
 package org.mule.test.spring;
 
-import org.mule.api.MuleContext;
 import org.mule.transport.DefaultMuleMessageFactory;
 
 public class MockMuleMessageFactory extends DefaultMuleMessageFactory
 {
-    public MockMuleMessageFactory(MuleContext context)
-    {
-        super(context);
-    }
 }
 

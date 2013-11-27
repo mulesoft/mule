@@ -7,7 +7,6 @@
 package org.mule.transport.soap.axis;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
 import org.mule.module.cxf.MuleSoapHeaders;
 import org.mule.transport.AbstractMuleMessageFactory;
 import org.mule.util.StringUtils;
@@ -24,11 +23,6 @@ import org.apache.commons.logging.LogFactory;
 public class AxisMuleMessageFactory extends AbstractMuleMessageFactory
 {
     private static Log log = LogFactory.getLog(AxisMuleMessageFactory.class);
-    
-    public AxisMuleMessageFactory(MuleContext context)
-    {
-        super(context);
-    }
 
     @Override
     protected Class<?>[] getSupportedTransportMessageTypes()

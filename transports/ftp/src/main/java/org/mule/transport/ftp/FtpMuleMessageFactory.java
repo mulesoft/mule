@@ -7,7 +7,6 @@
 package org.mule.transport.ftp;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
 import org.mule.transport.AbstractMuleMessageFactory;
 import org.mule.transport.file.FileConnector;
 
@@ -24,11 +23,6 @@ public class FtpMuleMessageFactory extends AbstractMuleMessageFactory
 
     private FTPClient ftpClient;
     private boolean streaming;
-
-    public FtpMuleMessageFactory(MuleContext context)
-    {
-        super(context);
-    }
 
     @Override
     protected Object extractPayload(Object transportMessage, String encoding) throws Exception

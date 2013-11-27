@@ -88,7 +88,7 @@ public class FtpMessageRequester extends AbstractMessageRequester
             fileToProcess = prepareFile(client, fileToProcess);
 
             FtpMuleMessageFactory messageFactory = createMuleMessageFactory(client);
-            MuleMessage message = messageFactory.create(fileToProcess, endpoint.getEncoding());
+            MuleMessage message = messageFactory.create(fileToProcess, endpoint.getEncoding(), endpoint.getMuleContext());
             postProcess(client, fileToProcess, message);
             return message;
         }
