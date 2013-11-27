@@ -12,10 +12,13 @@ import static org.mockito.Mockito.verify;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.registry.ServiceType;
+import org.mule.config.ClusterConfiguration;
 import org.mule.config.ExceptionHelper;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.transport.PollingController;
 import org.mule.util.SpiUtils;
 import org.mule.util.store.MuleObjectStoreManager;
 
@@ -24,7 +27,7 @@ import java.io.FileWriter;
 import java.net.URL;
 
 import junit.framework.Assert;
-
+import org.hamcrest.core.Is;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.VerificationModeFactory;
@@ -82,6 +85,65 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase
         MuleContext context = new DefaultMuleContextFactory().createMuleContext();
         Object osManager = context.getObjectStoreManager();
         Assert.assertTrue(osManager instanceof MuleObjectStoreManager);
+    }
+
+    @Test
+    public void defaultMuleClusterConfiguration() throws Exception
+    {
+        MuleContext context = new DefaultMuleContextFactory().createMuleContext();
+        context.start();
+        org.junit.Assert.assertThat(context.getClusterId(), Is.is(""));
+        org.junit.Assert.assertThat(context.getClusterNodeId(), Is.is(0));
+    }
+
+    @Test
+    public void overriddenClusterConfiguration() throws Exception
+    {
+        final int clusterNodeId = 22;
+        final String clusterId = "some-id";
+        MuleContext context = new DefaultMuleContextFactory().createMuleContext();
+        context.getRegistry().registerObject(MuleProperties.OBJECT_CLUSTER_CONFIGURATION, new ClusterConfiguration()
+        {
+            @Override
+            public String getClusterId()
+            {
+                return clusterId;
+            }
+
+            @Override
+            public int getClusterNodeId()
+            {
+
+                return clusterNodeId;
+            }
+        });
+        context.start();
+        assertThat(context.getClusterId(), is(clusterId));
+        assertThat(context.getClusterNodeId(), is(clusterNodeId));
+    }
+
+    @Test
+    public void defaultMulePollingController() throws Exception
+    {
+        MuleContext context = new DefaultMuleContextFactory().createMuleContext();
+        context.start();
+        assertThat(context.isPrimaryPollingInstance(), is(true));
+    }
+
+    @Test
+    public void overriddenMulePollingController() throws Exception
+    {
+        MuleContext context = new DefaultMuleContextFactory().createMuleContext();
+        context.getRegistry().registerObject(MuleProperties.OBJECT_POLLING_CONTROLLER, new PollingController()
+        {
+            @Override
+            public boolean isPrimaryPollingInstance()
+            {
+                return false;
+            }
+        });
+        context.start();
+        assertThat(context.isPrimaryPollingInstance(), is(false));
     }
 
 }

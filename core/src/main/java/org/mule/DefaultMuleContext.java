@@ -6,6 +6,8 @@
  */
 package org.mule;
 
+import static org.mule.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
@@ -38,7 +40,9 @@ import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.transaction.TransactionManagerFactory;
 import org.mule.client.DefaultLocalMuleClient;
+import org.mule.config.ClusterConfiguration;
 import org.mule.config.DefaultMuleConfiguration;
+import org.mule.config.NullClusterConfiguration;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
@@ -127,11 +131,9 @@ public class DefaultMuleContext implements MuleContext
     /** Global exception handler which handles "system" exceptions (i.e., when no message is involved). */
     protected SystemExceptionHandler exceptionListener;
 
-    private String clusterId = "";
-
-    private int clusterNodeId;
-
     private PollingController pollingController = new DefaultPollingController();
+
+    private ClusterConfiguration clusterConfiguration = new NullClusterConfiguration();
 
     private Map<QName, Set<Object>> configurationAnnotations;
 
@@ -248,7 +250,8 @@ public class DefaultMuleContext implements MuleContext
 
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTING));
         getLifecycleManager().fireLifecycle(Startable.PHASE_NAME);
-
+        overridePollingController();
+        overrideClusterConfiguration();
 
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTED));
 
@@ -732,22 +735,12 @@ public class DefaultMuleContext implements MuleContext
 
     public String getClusterId()
     {
-        return clusterId;
-    }
-
-    public void setClusterId(String clusterId)
-    {
-        this.clusterId = clusterId;
+        return clusterConfiguration.getClusterId();
     }
 
     public int getClusterNodeId()
     {
-        return clusterNodeId;
-    }
-
-    public void setClusterNodeId(int clusterNodeId)
-    {
-        this.clusterNodeId = clusterNodeId;
+        return clusterConfiguration.getClusterNodeId();
     }
 
     public void setPollingController(PollingController pollingController)
@@ -764,7 +757,7 @@ public class DefaultMuleContext implements MuleContext
     @Override
     public String getUniqueIdString()
     {
-        return clusterNodeId + "-" + UUID.getUUID();
+        return clusterConfiguration.getClusterNodeId() + "-" + UUID.getUUID();
     }
 
     @Override
@@ -845,5 +838,23 @@ public class DefaultMuleContext implements MuleContext
         }
 
         return this.processingTimeWatcher;
+    }
+
+    private void overrideClusterConfiguration()
+    {
+        ClusterConfiguration overriddenClusterConfiguration = getRegistry().get(MuleProperties.OBJECT_CLUSTER_CONFIGURATION);
+        if (overriddenClusterConfiguration != null)
+        {
+            this.clusterConfiguration = overriddenClusterConfiguration;
+        }
+    }
+
+    private void overridePollingController()
+    {
+        PollingController overriddenPollingController = getRegistry().get(OBJECT_POLLING_CONTROLLER);
+        if (overriddenPollingController != null)
+        {
+            this.pollingController = overriddenPollingController;
+        }
     }
 }
