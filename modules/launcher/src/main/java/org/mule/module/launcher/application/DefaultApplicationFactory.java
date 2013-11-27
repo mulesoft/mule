@@ -10,7 +10,10 @@ import org.mule.module.launcher.AppBloodhound;
 import org.mule.module.launcher.DefaultAppBloodhound;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
+import org.mule.module.launcher.domain.DomainFactory;
+import org.mule.module.reboot.MuleContainerBootstrapUtils;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -20,11 +23,13 @@ public class DefaultApplicationFactory implements ApplicationFactory
 {
 
     private final ApplicationClassLoaderFactory applicationClassLoaderFactory;
+    private final DomainFactory domainFactory;
     protected DeploymentListener deploymentListener;
 
-    public DefaultApplicationFactory(ApplicationClassLoaderFactory applicationClassLoaderFactory)
+    public DefaultApplicationFactory(ApplicationClassLoaderFactory applicationClassLoaderFactory, DomainFactory domainFactory)
     {
         this.applicationClassLoaderFactory = applicationClassLoaderFactory;
+        this.domainFactory = domainFactory;
     }
 
     public void setDeploymentListener(DeploymentListener deploymentListener)
@@ -32,7 +37,7 @@ public class DefaultApplicationFactory implements ApplicationFactory
         this.deploymentListener = deploymentListener;
     }
 
-    public Application createApp(String appName) throws IOException
+    public Application createArtifact(String appName) throws IOException
     {
         if (appName.contains(" "))
         {
@@ -45,15 +50,28 @@ public class DefaultApplicationFactory implements ApplicationFactory
         return createAppFrom(descriptor);
     }
 
+    @Override
+    public File getArtifactDir()
+    {
+        return MuleContainerBootstrapUtils.getMuleAppsDir();
+    }
+
     protected Application createAppFrom(ApplicationDescriptor descriptor) throws IOException
     {
-        final DefaultMuleApplication delegate = new DefaultMuleApplication(descriptor, applicationClassLoaderFactory);
+        DefaultMuleApplication delegate;
+        if (descriptor.getDomain() == null || "".equals(descriptor.getDomain().trim()))
+        {
+            delegate = new DefaultMuleApplication(descriptor, applicationClassLoaderFactory, domainFactory.createDefaultDomain());
+        }
+        else
+        {
+            delegate = new DefaultMuleApplication(descriptor, applicationClassLoaderFactory, domainFactory.createArtifact(descriptor.getDomain()));
+        }
 
         if (deploymentListener != null)
         {
             delegate.setDeploymentListener(deploymentListener);
         }
-
         return new ApplicationWrapper(delegate);
     }
 

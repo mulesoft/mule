@@ -135,7 +135,7 @@ public class DefaultMuleContext implements MuleContext
 
     private ClusterConfiguration clusterConfiguration = new NullClusterConfiguration();
 
-    private Map<QName, Set<Object>> configurationAnnotations;
+    private Map<QName, Set<Object>> configurationAnnotations = new HashMap<QName, Set<Object>>();
 
     private SingleResourceTransactionFactoryManager singleResourceTransactionFactoryManager = new SingleResourceTransactionFactoryManager();
 
@@ -145,6 +145,10 @@ public class DefaultMuleContext implements MuleContext
 
     private ProcessingTimeWatcher processingTimeWatcher;
 
+    /**
+     * @deprecated Use empty constructor instead and use setter for dependencies.
+     */
+    @Deprecated
     public DefaultMuleContext(MuleConfiguration config,
                               WorkManager workManager,
                               WorkListener workListener,
@@ -165,7 +169,10 @@ public class DefaultMuleContext implements MuleContext
         muleRegistryHelper = createRegistryHelper(registryBroker);
         localMuleClient = new DefaultLocalMuleClient(this);
         exceptionListener = new DefaultSystemExceptionStrategy(this);
-        configurationAnnotations = new HashMap<QName, Set<Object>>();
+    }
+
+    public DefaultMuleContext()
+    {
     }
 
     protected DefaultRegistryBroker createRegistryBroker()
@@ -237,10 +244,6 @@ public class DefaultMuleContext implements MuleContext
     {
         getLifecycleManager().checkPhase(Startable.PHASE_NAME);
 
-        if (getSecurityManager() == null)
-        {
-            throw new MuleRuntimeException(CoreMessages.objectIsNull("securityManager"));
-        }
         if (getQueueManager() == null)
         {
             throw new MuleRuntimeException(CoreMessages.objectIsNull("queueManager"));
@@ -468,7 +471,7 @@ public class DefaultMuleContext implements MuleContext
      */
     public SecurityManager getSecurityManager()
     {
-        SecurityManager securityManager = (SecurityManager) registryBroker.lookupObject(MuleProperties.OBJECT_SECURITY_MANAGER);
+        SecurityManager securityManager = registryBroker.lookupObject(MuleProperties.OBJECT_SECURITY_MANAGER);
         if (securityManager == null)
         {
             Collection temp = registryBroker.lookupObjects(SecurityManager.class);
@@ -476,6 +479,10 @@ public class DefaultMuleContext implements MuleContext
             {
                 securityManager = ((SecurityManager) temp.iterator().next());
             }
+        }
+        if (securityManager == null)
+        {
+            throw new MuleRuntimeException(CoreMessages.objectIsNull("securityManager"));
         }
         return securityManager;
     }
@@ -856,5 +863,50 @@ public class DefaultMuleContext implements MuleContext
         {
             this.pollingController = overriddenPollingController;
         }
+    }
+
+    public void setMuleConfiguration(MuleConfiguration muleConfiguration)
+    {
+        this.config = muleConfiguration;
+    }
+
+    public void setWorkManager(WorkManager workManager)
+    {
+        this.workManager = workManager;
+    }
+
+    public void setworkListener(WorkListener workListener)
+    {
+        this.workListener = workListener;
+    }
+
+    public void setNotificationManager(ServerNotificationManager notificationManager)
+    {
+        this.notificationManager = notificationManager;
+    }
+
+    public void setLifecycleManager(MuleContextLifecycleManager lifecyleManager)
+    {
+        this.lifecycleManager = lifecyleManager;
+    }
+
+    public void setExpressionManager(DefaultExpressionManager expressionManager)
+    {
+        this.expressionManager = expressionManager;
+    }
+
+    public void setRegistryBroker(DefaultRegistryBroker registryBroker)
+    {
+        this.registryBroker = registryBroker;
+    }
+
+    public void setMuleRegistry(MuleRegistryHelper muleRegistry)
+    {
+        this.muleRegistryHelper = muleRegistry;
+    }
+
+    public void setLocalMuleClient(DefaultLocalMuleClient localMuleContext)
+    {
+        this.localMuleClient = localMuleContext;
     }
 }

@@ -7,6 +7,7 @@
 package org.mule.module.launcher.application;
 
 import org.mule.module.launcher.PluginClassLoaderManager;
+import org.mule.module.launcher.artifact.ArtifactClassLoader;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 
 import java.util.LinkedList;
@@ -30,16 +31,16 @@ public class CompositeApplicationClassLoaderFactory implements ApplicationClassL
     }
 
     @Override
-    public ClassLoader create(ApplicationDescriptor descriptor)
+    public ArtifactClassLoader create(ApplicationDescriptor descriptor)
     {
         List<ClassLoader> pluginClassLoaders = pluginClassLoaderManager.getPluginClassLoaders();
 
-        ClassLoader appClassLoader = applicationClassLoaderFactory.create(descriptor);
+        ArtifactClassLoader appClassLoader = applicationClassLoaderFactory.create(descriptor);
 
         if (!pluginClassLoaders.isEmpty())
         {
             List<ClassLoader> classLoaders = new LinkedList<ClassLoader>();
-            classLoaders.add(appClassLoader);
+            classLoaders.add(appClassLoader.getClassLoader());
             classLoaders.addAll(pluginClassLoaders);
 
             appClassLoader = new CompositeApplicationClassLoader(descriptor.getAppName(), classLoaders);

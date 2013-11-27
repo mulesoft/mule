@@ -7,23 +7,11 @@
 package org.mule.module.launcher.application;
 
 import org.mule.api.MuleContext;
-import org.mule.module.launcher.DeploymentStartException;
-import org.mule.module.launcher.InstallException;
+import org.mule.module.launcher.artifact.Artifact;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 
-public interface Application
+public interface Application extends Artifact
 {
-    void install() throws InstallException;
-
-    void init();
-
-    void start() throws DeploymentStartException;
-
-    void stop();
-
-    void dispose();
-
-    void redeploy();
 
     MuleContext getMuleContext();
 
@@ -32,6 +20,11 @@ public interface Application
      */
     ClassLoader getDeploymentClassLoader();
 
+    /**
+     * @deprecated use {@code Artifact.getArtifactName} instead.
+     * @return
+     */
+    @Deprecated
     String getAppName();
 
     ApplicationDescriptor getDescriptor();

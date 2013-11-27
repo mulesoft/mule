@@ -6,6 +6,9 @@
  */
 package org.mule.module.launcher.application;
 
+import org.mule.module.launcher.domain.DefaultDomainFactory;
+import org.mule.module.launcher.domain.MuleDomainClassLoaderFactory;
+
 import java.io.IOException;
 
 /**
@@ -20,13 +23,13 @@ public class TestApplicationFactory extends DefaultApplicationFactory
 
     public TestApplicationFactory(ApplicationClassLoaderFactory applicationClassLoaderFactory)
     {
-        super(applicationClassLoaderFactory);
+        super(applicationClassLoaderFactory, new DefaultDomainFactory(new MuleDomainClassLoaderFactory()));
     }
 
     @Override
-    public Application createApp(String appName) throws IOException
+    public Application createArtifact(String appName) throws IOException
     {
-        Application app = super.createApp(appName);
+        Application app = super.createArtifact(appName);
 
         TestApplicationWrapper testApplicationWrapper = new TestApplicationWrapper(app);
         testApplicationWrapper.setFailOnDisposeApplication(failOnDisposeApplication);

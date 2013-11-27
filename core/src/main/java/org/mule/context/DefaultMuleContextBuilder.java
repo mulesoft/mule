@@ -11,6 +11,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.ThreadingProfile;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.AsyncMessageNotificationListener;
@@ -29,6 +30,7 @@ import org.mule.api.context.notification.SecurityNotificationListener;
 import org.mule.api.context.notification.ServiceNotificationListener;
 import org.mule.api.context.notification.TransactionNotificationListener;
 import org.mule.api.lifecycle.LifecycleManager;
+import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
@@ -48,7 +50,11 @@ import org.mule.context.notification.SecurityNotification;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.context.notification.ServiceNotification;
 import org.mule.context.notification.TransactionNotification;
+import org.mule.exception.DefaultSystemExceptionStrategy;
+import org.mule.expression.DefaultExpressionManager;
 import org.mule.lifecycle.MuleContextLifecycleManager;
+import org.mule.registry.DefaultRegistryBroker;
+import org.mule.registry.MuleRegistryHelper;
 import org.mule.util.ClassUtils;
 import org.mule.util.SplashScreen;
 import org.mule.work.DefaultWorkListener;
@@ -89,14 +95,30 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
     public MuleContext buildMuleContext()
     {
         logger.debug("Building new DefaultMuleContext instance with MuleContextBuilder: " + this);
-        MuleContextLifecycleManager manager = getLifecycleManager();
-        DefaultMuleContext muleContext = new DefaultMuleContext(getMuleConfiguration(),
-                                                         getWorkManager(),
-                                                         getWorkListener(),
-                                                         manager,
-                                                         getNotificationManager());
-        manager.setMuleContext(muleContext);
+        DefaultMuleContext muleContext = createDefaultMuleContext();
+        MuleContext muleContextToInject = createMuleContextToInject(muleContext);
+        muleContext.setMuleConfiguration(injectMuleContextIfRequired(getMuleConfiguration(), muleContextToInject));
+        muleContext.setWorkManager(getWorkManager());
+        muleContext.setworkListener(getWorkListener());
+        muleContext.setNotificationManager(injectMuleContextIfRequired(getNotificationManager(), muleContextToInject));
+        muleContext.setLifecycleManager(injectMuleContextIfRequired(getLifecycleManager(), muleContextToInject));
+        muleContext.setExpressionManager(injectMuleContextIfRequired(new DefaultExpressionManager(),muleContext));
+        DefaultRegistryBroker registryBroker = new DefaultRegistryBroker(muleContextToInject);
+        muleContext.setRegistryBroker(registryBroker);
+        muleContext.setMuleRegistry(new MuleRegistryHelper(registryBroker, muleContextToInject));
+        muleContext.setLocalMuleClient(new DefaultLocalMuleClient(muleContextToInject));
+        muleContext.setExceptionListener(new DefaultSystemExceptionStrategy(muleContextToInject));
         muleContext.setExecutionClassLoader(Thread.currentThread().getContextClassLoader());
+        return muleContext;
+    }
+
+    protected DefaultMuleContext createDefaultMuleContext()
+    {
+        return new DefaultMuleContext();
+    }
+
+    protected MuleContext createMuleContextToInject(final MuleContext muleContext)
+    {
         return muleContext;
     }
 
@@ -130,6 +152,15 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         {
             return createMuleConfiguration();
         }
+    }
+
+    public <T> T injectMuleContextIfRequired(T object, MuleContext muleContext)
+    {
+        if (object instanceof MuleContextAware)
+        {
+            ((MuleContextAware)object).setMuleContext(muleContext);
+        }
+        return object;
     }
 
     protected MuleContextLifecycleManager getLifecycleManager()
