@@ -9,12 +9,9 @@ package org.mule.transport.http.functional;
 import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
@@ -26,9 +23,8 @@ import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class HttpKeepAliveFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public class HttpKeepAliveFunctionalTestCase extends FunctionalTestCase
 {
 
     private static final String IN_CONNECTOR_NO_KEEP_ALIVE_EP_NO_KEEP_ALIVE = "inConnectorNoKeepAliveEpNoKeepAlive";
@@ -60,17 +56,10 @@ public class HttpKeepAliveFunctionalTestCase extends AbstractServiceAndFlowTestC
     @Rule
     public DynamicPort dynamicPort6 = new DynamicPort("port6");
 
-    public HttpKeepAliveFunctionalTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "http-keep-alive-config-flow.xml"}
-        });
+        return "http-keep-alive-config-flow.xml";
     }
 
     @Test

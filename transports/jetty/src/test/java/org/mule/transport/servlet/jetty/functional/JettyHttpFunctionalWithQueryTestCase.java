@@ -7,38 +7,27 @@
 package org.mule.transport.servlet.jetty.functional;
 
 import static org.junit.Assert.assertEquals;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transport.DispatchException;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class JettyHttpFunctionalWithQueryTestCase extends AbstractServiceAndFlowTestCase
+public class JettyHttpFunctionalWithQueryTestCase extends FunctionalTestCase
 {
     @Rule
     public DynamicPort port = new DynamicPort("port1");
 
-    public JettyHttpFunctionalWithQueryTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "jetty-http-functional-test-with-query-flow.xml"}
-        });
+        return "jetty-http-functional-test-with-query-flow.xml";
     }
 
     @Test

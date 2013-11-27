@@ -23,10 +23,6 @@ import org.junit.Test;
 
 public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
 {
-    public InboundMessageLossFlowTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Override
     protected String getConfigFile()

@@ -9,15 +9,12 @@ package org.mule.transport.http.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,9 +23,8 @@ import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.lang.time.StopWatch;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class HttpContinueFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public class HttpContinueFunctionalTestCase extends FunctionalTestCase
 {
     /**
      * HttpClient has default 3 seconds wait for Expect-Continue calls.
@@ -40,17 +36,10 @@ public class HttpContinueFunctionalTestCase extends AbstractServiceAndFlowTestCa
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public HttpContinueFunctionalTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "http-functional-test-flow.xml"}
-        });
+        return "http-functional-test-flow.xml";
     }
 
     @Test

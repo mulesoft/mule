@@ -8,30 +8,24 @@ package org.mule.transport.email.functional;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import javax.mail.internet.MimeMessage;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class SmtpFunctionalTestCase extends AbstractEmailFunctionalTestCase
 {
 
-    public SmtpFunctionalTestCase(ConfigVariant variant, String configResources)
+    public SmtpFunctionalTestCase()
     {
-        super(variant, STRING_MESSAGE, "smtp", configResources);
+        super(STRING_MESSAGE, "smtp");
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "smtp-functional-test-flow.xml"}
-        });
-    }      
-    
+        return "smtp-functional-test-flow.xml";
+    }
+
     @Test
     public void testSend() throws Exception
     {

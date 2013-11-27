@@ -9,6 +9,7 @@ package org.mule.transport.ftp;
 import static org.junit.Assert.assertFalse;
 
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.ftp.server.FTPTestClient;
 import org.mule.transport.ftp.server.MuleFtplet;
@@ -27,7 +28,7 @@ import org.junit.Rule;
  * Abstract FTP test class. Sets up the ftp server and starts/stops it during the
  * test lifecycle.
  */
-public abstract class AbstractFtpServerTestCase extends AbstractServiceAndFlowTestCase implements MuleFtplet.Callback
+public abstract class AbstractFtpServerTestCase extends FunctionalTestCase implements MuleFtplet.Callback
 {
     public static final String TEST_MESSAGE = "Test FTP message";
 
@@ -57,21 +58,20 @@ public abstract class AbstractFtpServerTestCase extends AbstractServiceAndFlowTe
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public AbstractFtpServerTestCase(ConfigVariant variant, String configResources, String ftpHost, int timeout)
+    public AbstractFtpServerTestCase(String ftpHost, int timeout)
     {
-        super(variant, configResources);
         this.ftpHost = ftpHost;
         this.timeout = timeout;
     }
 
-    public AbstractFtpServerTestCase(ConfigVariant variant, String configResources, int timeout)
+    public AbstractFtpServerTestCase(int timeout)
     {
-        this(variant, configResources, DEFAULT_FTP_HOST, timeout);
+        this(DEFAULT_FTP_HOST, timeout);
     }
 
-    public AbstractFtpServerTestCase(ConfigVariant variant, String configResources)
+    public AbstractFtpServerTestCase()
     {
-        this(variant, configResources, DEFAULT_TIMEOUT);
+        this(DEFAULT_TIMEOUT);
     }
     
     protected void startServer() throws Exception

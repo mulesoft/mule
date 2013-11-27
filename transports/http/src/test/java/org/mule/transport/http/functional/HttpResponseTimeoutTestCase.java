@@ -11,29 +11,25 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.DispatchException;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.ExceptionUtils;
 
 import java.net.SocketTimeoutException;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * See MULE-4491 "Http outbound endpoint does not use responseTimeout attribute"
  * See MULE-4743 "MuleClient.send() timeout is not respected with http transport"
  */
-public class HttpResponseTimeoutTestCase extends AbstractServiceAndFlowTestCase
+public class HttpResponseTimeoutTestCase extends FunctionalTestCase
 {
     protected static String PAYLOAD = "Eugene";
     protected static int DEFAULT_RESPONSE_TIMEOUT = 2000;
@@ -42,17 +38,10 @@ public class HttpResponseTimeoutTestCase extends AbstractServiceAndFlowTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public HttpResponseTimeoutTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "http-response-timeout-config-flow.xml"}
-        });
+        return "http-response-timeout-config-flow.xml";
     }
 
     protected String getPayload()

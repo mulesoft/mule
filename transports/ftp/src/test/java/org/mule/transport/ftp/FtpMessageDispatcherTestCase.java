@@ -6,36 +6,26 @@
  */
 package org.mule.transport.ftp;
 
+import static org.junit.Assert.assertTrue;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.client.MuleClient;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertTrue;
 
 public class FtpMessageDispatcherTestCase extends AbstractFtpServerTestCase
 {
+
     private CountDownLatch latch = new CountDownLatch(1);
 
-    public FtpMessageDispatcherTestCase(ConfigVariant variant, String configResources)
-    {  
-        super(variant, configResources);
-    }
-    
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][] {            
-            {ConfigVariant.FLOW, "ftp-message-requester-test.xml"}
-        });
-    }      
+        return "ftp-message-requester-test.xml";
+    }
     
     @Test
     public void dispatch() throws Exception

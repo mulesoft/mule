@@ -37,17 +37,10 @@ public class InboundMessageLossFlowTestCase extends AbstractFtpServerTestCase
      */
     protected Prober prober = new PollingProber(10000, 100);
 
-    public InboundMessageLossFlowTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "reliability/inbound-message-loss-flow.xml"}
-        });
+        return "reliability/inbound-message-loss-flow.xml";
     }
 
     @Override

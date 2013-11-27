@@ -15,6 +15,7 @@ import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.Arrays;
@@ -30,7 +31,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-public class HttpMessageReceiverMule4456TestCase extends AbstractServiceAndFlowTestCase
+public class HttpMessageReceiverMule4456TestCase extends FunctionalTestCase
 {
     private static final String MESSAGE = "test message";
 
@@ -43,17 +44,10 @@ public class HttpMessageReceiverMule4456TestCase extends AbstractServiceAndFlowT
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    public HttpMessageReceiverMule4456TestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "http-receiver-mule4456-config-flow.xml"}
-        });
+        return "http-receiver-mule4456-config-flow.xml";
     }
 
     @Override

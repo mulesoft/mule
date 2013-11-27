@@ -10,15 +10,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.concurrent.Latch;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -30,17 +27,12 @@ import org.cometd.MessageListener;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.mortbay.cometd.client.BayeuxClient;
 import org.mortbay.jetty.client.Address;
 import org.mortbay.jetty.client.HttpClient;
 
-public class AjaxFunctionalJsonBindingsTestCase extends AbstractServiceAndFlowTestCase
+public class AjaxFunctionalJsonBindingsTestCase extends FunctionalTestCase
 {
-    public AjaxFunctionalJsonBindingsTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     public static int SERVER_PORT = -1;
 
@@ -49,12 +41,10 @@ public class AjaxFunctionalJsonBindingsTestCase extends AbstractServiceAndFlowTe
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "ajax-embedded-functional-json-bindings-test-flow.xml"}
-        });
+        return "ajax-embedded-functional-json-bindings-test-flow.xml";
     }
 
     @Override

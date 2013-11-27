@@ -6,28 +6,23 @@
  */
 package org.mule.transport.email.functional;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class ImapFunctionalTestCase extends AbstractEmailFunctionalTestCase
 {
 
-    public ImapFunctionalTestCase(ConfigVariant variant, String configResources)
+    public ImapFunctionalTestCase()
     {
-        super(variant, STRING_MESSAGE, "imap", configResources);
+        super(STRING_MESSAGE, "imap");
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "imap-functional-test-flow.xml"}
-        });
-    }      
-    
+        return "imap-functional-test-flow.xml";
+    }
+
+
     @Test
     public void testRequest() throws Exception
     {

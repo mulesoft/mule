@@ -10,13 +10,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.config.i18n.LocaleMessageHandler;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.email.GreenMailUtilities;
 import org.mule.transport.email.ImapConnector;
@@ -43,7 +42,7 @@ import javax.mail.internet.MimeMultipart;
 
 import org.junit.Rule;
 
-public abstract class AbstractEmailFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
 {
     public static final long DELIVERY_DELAY_MS = 10000;
 
@@ -80,37 +79,31 @@ public abstract class AbstractEmailFunctionalTestCase extends AbstractServiceAnd
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
 
-    protected AbstractEmailFunctionalTestCase(ConfigVariant variant, boolean isMimeMessage, String protocol)
+    //protected AbstractEmailFunctionalTestCase(ConfigVariant variant, boolean isMimeMessage, String protocol, Locale locale, String charset)
+    //{
+    //    this(isMimeMessage, protocol, locale, charset);
+    //}
+
+    protected AbstractEmailFunctionalTestCase(boolean isMimeMessage, String protocol)
     {
-        this(variant, isMimeMessage, protocol, protocol + CONFIG_BASE, null, null);
+        this(isMimeMessage, protocol, null, null);
     }
 
-    protected AbstractEmailFunctionalTestCase(ConfigVariant variant, boolean isMimeMessage, String protocol, Locale locale, String charset)
+    protected AbstractEmailFunctionalTestCase(boolean isMimeMessage, String protocol, boolean addSmtp)
     {
-        this(variant, isMimeMessage, protocol, protocol + CONFIG_BASE, locale, charset);
-    }
-
-    protected AbstractEmailFunctionalTestCase(ConfigVariant variant, boolean isMimeMessage, String protocol, String configResources)
-    {
-        this(variant, isMimeMessage, protocol, configResources, null, null);
-    }
-
-    protected AbstractEmailFunctionalTestCase(ConfigVariant variant, boolean isMimeMessage, String protocol, String configResources, boolean addSmtp)
-    {
-        this(variant, isMimeMessage, protocol, configResources, null, null);
+        this(isMimeMessage, protocol, null, null);
         this.addSmtp = addSmtp;
     }
 
-    protected AbstractEmailFunctionalTestCase(ConfigVariant variant, boolean isMimeMessage, String protocol, String configResources, Locale locale, String charset)
+    protected AbstractEmailFunctionalTestCase(boolean isMimeMessage, String protocol, Locale locale, String charset)
     {
-        this(variant, isMimeMessage, protocol, configResources,
-                DEFAULT_EMAIL, DEFAULT_USER, (locale == null ? DEFAULT_MESSAGE : getMessage(locale)), DEFAULT_PASSWORD, charset);
+        this(isMimeMessage, protocol,
+             DEFAULT_EMAIL, DEFAULT_USER, (locale == null ? DEFAULT_MESSAGE : getMessage(locale)), DEFAULT_PASSWORD, charset);
     }
 
-    protected AbstractEmailFunctionalTestCase(ConfigVariant variant, boolean isMimeMessage, String protocol,
-        String configResources, String email, String user, String message, String password, String charset)
+    protected AbstractEmailFunctionalTestCase(boolean isMimeMessage, String protocol,
+                                              String email, String user, String message, String password, String charset)
     {
-        super(variant, configResources);
         this.isMimeMessage = isMimeMessage;
         this.protocol = protocol;
         this.email = email;

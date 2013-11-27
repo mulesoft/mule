@@ -6,29 +6,26 @@
  */
 package org.mule.transport.ajax;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.util.concurrent.Latch;
+
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.cometd.Client;
 import org.cometd.Message;
 import org.cometd.MessageListener;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 import org.mortbay.cometd.client.BayeuxClient;
 import org.mortbay.jetty.client.Address;
 import org.mortbay.jetty.client.HttpClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.concurrent.Latch;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-public class AjaxRPCFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public class AjaxRPCFunctionalTestCase extends FunctionalTestCase
 {
     public static final String TEST_JSON_MESSAGE = "{\"data\" : {\"value1\" : \"foo\", \"value2\" : \"bar\"}, \"replyTo\" : \"/response\"}";
 
@@ -39,17 +36,10 @@ public class AjaxRPCFunctionalTestCase extends AbstractServiceAndFlowTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public AjaxRPCFunctionalTestCase(AbstractServiceAndFlowTestCase.ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {AbstractServiceAndFlowTestCase.ConfigVariant.FLOW, "ajax-rpc-test-flow.xml"}
-        });
+        return "ajax-rpc-test-flow.xml";
     }
 
     @Override

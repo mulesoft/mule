@@ -27,18 +27,12 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class FtpStreamingTestCase extends AbstractFtpServerTestCase
 {
-    public FtpStreamingTestCase(ConfigVariant variant, String configResources)
+
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "ftp-streaming-test-flow.xml";
     }
-    
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "ftp-streaming-test-flow.xml"}
-        });
-    }      
 
     @Test
     public void testRequest() throws Exception

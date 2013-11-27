@@ -8,22 +8,17 @@ package org.mule.transport.http.issues;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.StringAppendTestTransformer;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class HttpTransformersMule1822TestCase extends AbstractServiceAndFlowTestCase
+public class HttpTransformersMule1822TestCase extends FunctionalTestCase
 {
     public static final String OUTBOUND_MESSAGE = "Test message";
 
@@ -36,17 +31,10 @@ public class HttpTransformersMule1822TestCase extends AbstractServiceAndFlowTest
     @Rule
     public DynamicPort dynamicPort3 = new DynamicPort("port3");
 
-    public HttpTransformersMule1822TestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "http-transformers-mule-1822-test-flow.xml"}
-        });
+        return "http-transformers-mule-1822-test-flow.xml";
     }
 
     private MuleMessage sendTo(String uri) throws MuleException

@@ -10,17 +10,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -32,29 +29,21 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class HttpPersistentQueueTestCase extends AbstractServiceAndFlowTestCase
+public class HttpPersistentQueueTestCase extends FunctionalTestCase
 {
     private CountDownLatch messageDidArrive = new CountDownLatch(1);
     private int port = -1;
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
-    
-    public HttpPersistentQueueTestCase(ConfigVariant variant, String configResources)
+
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "http-persistent-queue-flow.xml";
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "http-persistent-queue-flow.xml"}
-        });
-    }      
-    
     @Override
     protected void doSetUp() throws Exception
     {

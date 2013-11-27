@@ -7,20 +7,17 @@
 package org.mule.transport.http.functional;
 
 import static org.junit.Assert.assertTrue;
+import org.mule.tck.functional.CounterCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.functional.CounterCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.junit4.rule.DynamicPort;
 
-public class PollingReceiversRestartTestCase extends AbstractServiceAndFlowTestCase
+public class PollingReceiversRestartTestCase extends FunctionalTestCase
 {
 
     private static final int WAIT_TIME = 3000;
@@ -28,18 +25,15 @@ public class PollingReceiversRestartTestCase extends AbstractServiceAndFlowTestC
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public PollingReceiversRestartTestCase(ConfigVariant variant, String configResources)
+    public PollingReceiversRestartTestCase()
     {
-        super(variant, configResources);
         setStartContext(false);
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "polling-receivers-restart-test-flow.xml"}
-        });
+        return "polling-receivers-restart-test-flow.xml";
     }
 
     @Test

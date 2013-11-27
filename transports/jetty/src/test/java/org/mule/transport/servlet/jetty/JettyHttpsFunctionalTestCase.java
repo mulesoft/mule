@@ -29,17 +29,11 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class JettyHttpsFunctionalTestCase extends HttpFunctionalTestCase
 {
-    public JettyHttpsFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "jetty-https-functional-test-flow.xml"}
-        });
+        return "jetty-https-functional-test-flow.xml";
     }
 
     @Override

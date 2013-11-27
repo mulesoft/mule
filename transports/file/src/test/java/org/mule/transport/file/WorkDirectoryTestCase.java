@@ -9,37 +9,28 @@ package org.mule.transport.file;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.mule.api.MuleEventContext;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class WorkDirectoryTestCase extends AbstractServiceAndFlowTestCase
+public class WorkDirectoryTestCase extends FunctionalTestCase
 {
     
     private static final String TEST_FILENAME = "test.txt";
 
-    public WorkDirectoryTestCase(ConfigVariant variant, String configResources)
+
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-    
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "work-directory-config-flow.xml"}
-        });
+        return "work-directory-config-flow.xml";
     }
 
     @Override

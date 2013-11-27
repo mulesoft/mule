@@ -39,11 +39,6 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
     /** Polling mechanism to replace Thread.sleep() for testing a delayed result. */
     protected Prober prober = new PollingProber(10000, 100);
 
-    public InboundMessageLossTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Override
     protected String getConfigFile()
     {

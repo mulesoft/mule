@@ -6,6 +6,9 @@
  */
 package org.mule.transport.file;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import org.mule.transport.AbstractMuleMessageFactory;
 
 import java.io.BufferedReader;
@@ -14,17 +17,8 @@ import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 public abstract class AbstractFileMoveDeleteTestCase extends AbstractFileFunctionalTestCase
 {
-
-    public AbstractFileMoveDeleteTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     protected File configureConnector(File inFile, boolean stream, boolean move, boolean delete,
                                       Class<? extends AbstractMuleMessageFactory> messageFactoryClass) throws Exception

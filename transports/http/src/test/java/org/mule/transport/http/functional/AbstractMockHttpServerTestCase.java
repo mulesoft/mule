@@ -7,17 +7,12 @@
 package org.mule.transport.http.functional;
 
 import static org.junit.Assert.assertTrue;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-public abstract class AbstractMockHttpServerTestCase extends AbstractServiceAndFlowTestCase
+public abstract class AbstractMockHttpServerTestCase extends FunctionalTestCase
 {
 
     private MockHttpServer mockHttpServer;
-
-    public AbstractMockHttpServerTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Override
     protected void doSetUp() throws Exception

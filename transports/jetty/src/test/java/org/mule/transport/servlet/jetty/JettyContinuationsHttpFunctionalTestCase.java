@@ -8,23 +8,12 @@ package org.mule.transport.servlet.jetty;
 
 import org.mule.transport.http.functional.HttpFunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.runners.Parameterized.Parameters;
-
 public class JettyContinuationsHttpFunctionalTestCase extends HttpFunctionalTestCase
 {
-    public JettyContinuationsHttpFunctionalTestCase(ConfigVariant variant, String configResources)
+
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }    
-    
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-           {ConfigVariant.FLOW, "jetty-continuations-http-functional-test.xml"}
-        });
-    }      
+        return  "jetty-continuations-http-functional-test.xml";
+    }
 }
