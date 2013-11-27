@@ -11,26 +11,17 @@ import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
 import org.mule.util.SystemUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class JaasAuthenticationWithNtLoginModule extends AbstractJaasFunctionalTestCase
 {
-    public JaasAuthenticationWithNtLoginModule(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.FLOW, "mule-conf-with-NTLoginModule.xml"}
-
-        });
+        return "mule-conf-with-NTLoginModule.xml";
     }
 
     @Override

@@ -7,15 +7,13 @@
 package org.mule.module.cxf;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.servlet.MuleReceiverServlet;
 import org.mule.transport.servlet.jetty.util.EmbeddedJettyServer;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.dom4j.Document;
@@ -23,9 +21,8 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class WsdlCallTestCase extends AbstractServiceAndFlowTestCase
+public class WsdlCallTestCase extends FunctionalTestCase
 {
     @Rule
     public final DynamicPort jettyPort = new DynamicPort("jettyPort");
@@ -35,17 +32,10 @@ public class WsdlCallTestCase extends AbstractServiceAndFlowTestCase
 
     private EmbeddedJettyServer httpServer;
 
-    public WsdlCallTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-    
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "wsdl-conf-flow.xml"}
-        });
+        return "wsdl-conf-flow.xml";
     }
 
     @Override

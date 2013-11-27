@@ -10,38 +10,27 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 @Ignore("Broken on removing services")
-public class Http10TestCase extends AbstractServiceAndFlowTestCase
+public class Http10TestCase extends FunctionalTestCase
 {
     @ClassRule
     public static DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public Http10TestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-        setDisposeContextPerClass(true);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "http-10-conf-flow.xml"}
-        });
+        return "http-10-conf-flow.xml";
     }
 
     @Test

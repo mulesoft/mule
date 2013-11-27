@@ -7,25 +7,21 @@
 package org.mule.module.cxf;
 
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.servlet.MuleReceiverServlet;
 import org.mule.transport.servlet.jetty.util.EmbeddedJettyServer;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class ServletTestCase extends AbstractServiceAndFlowTestCase
+public class ServletTestCase extends FunctionalTestCase
 {
     public int HTTP_PORT = -1;
 
@@ -34,17 +30,10 @@ public class ServletTestCase extends AbstractServiceAndFlowTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public ServletTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "servlet-conf-flow.xml"}
-        });
+        return "servlet-conf-flow.xml";
     }
 
     @Override

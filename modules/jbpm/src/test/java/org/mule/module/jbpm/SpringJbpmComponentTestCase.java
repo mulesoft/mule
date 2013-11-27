@@ -14,33 +14,24 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.bpm.BPMS;
 import org.mule.module.bpm.Process;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Tests jBPM component with a simple process. The ProcessEngine is built by Spring
  * and injected into the Mule wrapper.
  */
-public class SpringJbpmComponentTestCase extends AbstractServiceAndFlowTestCase
+public class SpringJbpmComponentTestCase extends FunctionalTestCase
 {
 
-    public SpringJbpmComponentTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "spring-jbpm-component-flow.xml"}});
+        return "spring-jbpm-component-flow.xml";
     }
 
     @Test

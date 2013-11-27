@@ -8,17 +8,14 @@ package org.mule.module.cxf;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.xml.stax.StaxSource;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collection;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
@@ -28,26 +25,19 @@ import javax.xml.transform.sax.SAXSource;
 import org.apache.cxf.helpers.DOMUtils;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
-public class DirectXmlTestCase extends AbstractServiceAndFlowTestCase
+public class DirectXmlTestCase extends FunctionalTestCase
 {
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public DirectXmlTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "direct/direct-xml-conf-flow.xml"}
-        });
+        return "direct/direct-xml-conf-flow.xml";
     }
 
     @Test

@@ -8,37 +8,26 @@ package org.mule.module.spring.security;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.security.MuleCredentials;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class PlainTextFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public class PlainTextFunctionalTestCase extends FunctionalTestCase
 {
-    public PlainTextFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
         // Note that this file contains global attributes, which the configuration-building
         // process will ignore (MULE-5375)
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "encryption-test-flow.xml"}
-        });
+        return "encryption-test-flow.xml";
     }
 
     @Test

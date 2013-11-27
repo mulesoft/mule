@@ -6,13 +6,12 @@
  */
 package org.mule.module.cxf.jaxws;
 
+import static org.junit.Assert.assertEquals;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,28 +22,19 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
-import static org.junit.Assert.assertEquals;
-
-public class JettySslTestCase extends AbstractServiceAndFlowTestCase
+public class JettySslTestCase extends FunctionalTestCase
 {
     private static final Bus defaultBus = BusFactory.getDefaultBus();
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public JettySslTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "jetty-ssl-conf-flow.xml"}
-        });
+        return "jetty-ssl-conf-flow.xml";
     }
 
     @BeforeClass

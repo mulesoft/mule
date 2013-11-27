@@ -6,27 +6,16 @@
  */
 package org.mule.module.cxf;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Ignore;
-import org.junit.runners.Parameterized.Parameters;
 
 @Ignore("Broken on removing services")
 public class MtomProxyTestCase extends MtomTestCase
 {
 
-    public MtomProxyTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "mtom-proxy-conf.xml";
     }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{            
-            {ConfigVariant.FLOW, "mtom-proxy-conf.xml"}
-        });
-    }          
 }
 

@@ -6,27 +6,17 @@
  */
 package org.mule.module.cxf.wssec;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.runners.Parameterized.Parameters;
-
 public class CertificateTokenTestCase extends UsernameTokenTestCase
 {
 
-    public CertificateTokenTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String[] getConfigFiles()
     {
-        super(variant, configResources);
+        return new String[] {
+                "org/mule/module/cxf/wssec/cxf-secure-service-flow.xml",
+                "org/mule/module/cxf/wssec/certificate-token-conf.xml"
+        };
     }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/module/cxf/wssec/cxf-secure-service-flow.xml, org/mule/module/cxf/wssec/certificate-token-conf.xml"}
-        });
-    }      
-       
 }
 
 

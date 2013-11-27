@@ -19,11 +19,9 @@ import org.mule.module.management.mbean.MuleConfigurationService;
 import org.mule.module.management.mbean.MuleService;
 import org.mule.module.management.mbean.StatisticsService;
 import org.mule.module.management.support.JmxSupport;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -33,21 +31,21 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectInstance;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Verify that expected MBeans are registered based on the config.
  */
-public class MBeansRegistrationTestCase extends AbstractServiceAndFlowTestCase
+public class MBeansRegistrationTestCase extends FunctionalTestCase
 {
 
     private MBeanServer mBeanServer;
     private String domainName;
     private JmxSupport jmxSupport;
 
-    public MBeansRegistrationTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "mbeans-test-flow.xml";
     }
 
     @Override
@@ -58,13 +56,6 @@ public class MBeansRegistrationTestCase extends AbstractServiceAndFlowTestCase
         jmxSupport = jmxAgent.getJmxSupportFactory().getJmxSupport();
         domainName = jmxSupport.getDomainName(muleContext);
         mBeanServer = jmxAgent.getMBeanServer();
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "mbeans-test-flow.xml"}});
     }
 
     /**

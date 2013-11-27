@@ -8,12 +8,9 @@ package org.mule.management;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -23,26 +20,18 @@ import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class JmxDuplicateEndpointNamesTestCase extends AbstractServiceAndFlowTestCase
+public class JmxDuplicateEndpointNamesTestCase extends FunctionalTestCase
 {
 
     private List<ObjectInstance> endpointMBeans = new ArrayList<ObjectInstance>();
        
-    public JmxDuplicateEndpointNamesTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "duplicate-endpoint-addesses-flow.xml";
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "duplicate-endpoint-addesses-flow.xml"}
-        });
-    }      
-    
     @Test
     public void testDuplicateNames()
     {

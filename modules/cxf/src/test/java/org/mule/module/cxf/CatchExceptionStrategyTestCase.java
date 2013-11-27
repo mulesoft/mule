@@ -10,7 +10,6 @@ package org.mule.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -20,23 +19,20 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.exception.TemplateMessagingExceptionStrategy;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
 
 import org.apache.cxf.interceptor.Fault;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 
-public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
+public class CatchExceptionStrategyTestCase extends FunctionalTestCase
 {
     private static final String requestPayload =
         "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
@@ -62,19 +58,11 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public CatchExceptionStrategyTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "catch-exception-strategy-flow-conf.xml";
     }
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "catch-exception-strategy-flow-conf.xml"}
-        });
-    }
-
 
     @Test
     public void testFaultInCxfServiceWithCatchExceptionStrategy() throws Exception

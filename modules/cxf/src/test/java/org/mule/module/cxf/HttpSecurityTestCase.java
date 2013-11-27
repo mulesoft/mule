@@ -7,15 +7,11 @@
 package org.mule.module.cxf;
 
 import static org.junit.Assert.assertEquals;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
@@ -25,10 +21,9 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 
-public class HttpSecurityTestCase extends AbstractServiceAndFlowTestCase
+public class HttpSecurityTestCase extends FunctionalTestCase
 {
     private static String soapRequest =
         "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:unk=\"http://unknown.namespace/\">" +
@@ -46,17 +41,10 @@ public class HttpSecurityTestCase extends AbstractServiceAndFlowTestCase
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    public HttpSecurityTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "http-security-conf-flow.xml"}
-        });
+        return "http-security-conf-flow.xml";
     }
 
     /**

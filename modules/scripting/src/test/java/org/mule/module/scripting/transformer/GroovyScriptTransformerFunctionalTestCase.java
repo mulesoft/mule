@@ -8,31 +8,25 @@ package org.mule.module.scripting.transformer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class GroovyScriptTransformerFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCase
 {
-    public GroovyScriptTransformerFunctionalTestCase(ConfigVariant variant, String configResources)
+
+    public GroovyScriptTransformerFunctionalTestCase()
     {
-        super(variant, configResources);
         // Groovy really hammers the startup time since it needs to create the interpreter on every start
         setDisposeContextPerClass(false);
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "groovy-transformer-config-flow.xml"}});
+        return "groovy-transformer-config-flow.xml";
     }
 
     @Test

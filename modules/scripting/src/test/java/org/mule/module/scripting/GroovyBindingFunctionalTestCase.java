@@ -8,31 +8,20 @@ package org.mule.module.scripting;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 
-public class GroovyBindingFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public class GroovyBindingFunctionalTestCase extends FunctionalTestCase
 {
-    public GroovyBindingFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "groovy-binding-config-flow.xml"}
-        });
+        return "groovy-binding-config-flow.xml";
     }
 
     @Test

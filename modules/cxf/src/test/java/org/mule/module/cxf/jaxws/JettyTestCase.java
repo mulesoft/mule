@@ -7,16 +7,13 @@
 package org.mule.module.cxf.jaxws;
 
 import static org.junit.Assert.assertEquals;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Prober;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,26 +24,19 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class JettyTestCase extends AbstractServiceAndFlowTestCase
+public class JettyTestCase extends FunctionalTestCase
 {
     private static final Bus defaultBus = BusFactory.getDefaultBus();
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public JettyTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "jetty-conf-flow.xml"}
-        });
+        return "jetty-conf-flow.xml";
     }
 
     @BeforeClass

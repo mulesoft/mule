@@ -9,7 +9,6 @@ package org.mule.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -21,7 +20,7 @@ import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transport.NullPayload;
@@ -39,7 +38,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class ExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
+public class ExceptionStrategyTestCase extends FunctionalTestCase
 {
     private static final String requestPayload =
         "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
@@ -66,17 +65,11 @@ public class ExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public ExceptionStrategyTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "exception-strategy-flow-conf.xml"}
-        });
+        return "exception-strategy-flow-conf.xml";
     }
 
     @Test

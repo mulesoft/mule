@@ -10,7 +10,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
@@ -18,7 +17,7 @@ import org.mule.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.context.notification.EndpointMessageNotification;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.ArrayList;
@@ -32,7 +31,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-public class CxfCustomHttpHeaderTestCase extends AbstractServiceAndFlowTestCase implements EndpointMessageNotificationListener
+public class CxfCustomHttpHeaderTestCase extends FunctionalTestCase implements EndpointMessageNotificationListener
 {
     protected String endpointAddress = null;
     private List<MuleMessage> notificationMsgList = new ArrayList<MuleMessage>();
@@ -41,17 +40,10 @@ public class CxfCustomHttpHeaderTestCase extends AbstractServiceAndFlowTestCase 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public CxfCustomHttpHeaderTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "headers-conf-flow.xml"}
-        });
+        return "headers-conf-flow.xml";
     }
 
     @Override

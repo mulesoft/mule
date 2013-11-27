@@ -7,11 +7,8 @@
 package org.mule.module.spring.security;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
@@ -22,9 +19,8 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class AuthenticationAgainstMultipleProvidersTestCase extends AbstractServiceAndFlowTestCase
+public class AuthenticationAgainstMultipleProvidersTestCase extends FunctionalTestCase
 {
 
     @Rule
@@ -36,16 +32,10 @@ public class AuthenticationAgainstMultipleProvidersTestCase extends AbstractServ
     @Rule
     public DynamicPort httpPort3 = new DynamicPort("port3");
 
-    public AuthenticationAgainstMultipleProvidersTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "mule-multiple-providers-config-flow.xml"}});
+        return "mule-multiple-providers-config-flow.xml";
     }
 
     @Test

@@ -6,24 +6,13 @@
  */
 package org.mule.module.jersey;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.runners.Parameterized.Parameters;
-
 public class BasicJerseyWithContextResolverTestCase extends BasicJerseyTestCase
 {
-    public BasicJerseyWithContextResolverTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "basic-context-resolver-conf-flow.xml"}
-        });
+        return "basic-context-resolver-conf-flow.xml";
     }
 
     @Override

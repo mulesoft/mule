@@ -18,15 +18,11 @@ import org.mule.api.config.ConfigurationException;
 import org.mule.construct.Flow;
 import org.mule.module.ognl.filters.OGNLFilter;
 import org.mule.routing.MessageFilter;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class OGNLFilterTestCase extends AbstractServiceAndFlowTestCase
+public class OGNLFilterTestCase extends FunctionalTestCase
 {
     public static final String DEFAULT_INPUT_QUEUE = "vm://in";
     public static final String DEFUALT_OUTPUT_QUEUE = "vm://out";
@@ -39,16 +35,10 @@ public class OGNLFilterTestCase extends AbstractServiceAndFlowTestCase
 
     private OGNLFilter filter;
 
-    public OGNLFilterTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "ognl-functional-test-flow.xml"}});
+        return "ognl-functional-test-flow.xml";
     }
 
     @Override
