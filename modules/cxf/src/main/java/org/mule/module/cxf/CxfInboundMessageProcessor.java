@@ -284,10 +284,18 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
                 String eventRequestUri = event.getMessageSourceURI().toString();
                 if (eventRequestUri.startsWith(JmsConnector.JMS))
                 {
-                    String contentType = muleReqMsg.getInboundProperty(SoapJMSConstants.CONTENTTYPE_FIELD) != null ? (String) muleReqMsg.getInboundProperty(SoapJMSConstants.CONTENTTYPE_FIELD) : "text/xml";
-                    String requestUri = muleReqMsg.getInboundProperty(SoapJMSConstants.REQUESTURI_FIELD) != null ? (String) muleReqMsg.getInboundProperty(SoapJMSConstants.REQUESTURI_FIELD) : eventRequestUri;
-
+                    String contentType = muleReqMsg.getInboundProperty(SoapJMSConstants.CONTENTTYPE_FIELD);
+                    if (contentType == null)
+                    {
+                        contentType = "text/xml";
+                    }
                     protocolHeaders.put(SoapJMSConstants.CONTENTTYPE_FIELD, Collections.singletonList(contentType));
+
+                    String requestUri = muleReqMsg.getInboundProperty(SoapJMSConstants.REQUESTURI_FIELD);
+                    if (requestUri == null)
+                    {
+                        requestUri = eventRequestUri;
+                    }
                     protocolHeaders.put(SoapJMSConstants.REQUESTURI_FIELD, Collections.singletonList(requestUri));
                 }
 
