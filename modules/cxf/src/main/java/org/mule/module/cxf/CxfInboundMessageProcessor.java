@@ -25,7 +25,6 @@ import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
-import org.mule.transport.jms.JmsConnector;
 import org.mule.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
@@ -74,6 +73,9 @@ import org.w3c.dom.Node;
  */
 public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProcessor implements Lifecycle
 {
+
+    public static final String JMS_TRANSPORT = "jms";
+
     /**
      * logger used by this class
      */
@@ -282,7 +284,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
                 }
 
                 String eventRequestUri = event.getMessageSourceURI().toString();
-                if (eventRequestUri.startsWith(JmsConnector.JMS))
+                if (eventRequestUri.startsWith(JMS_TRANSPORT))
                 {
                     String contentType = muleReqMsg.getInboundProperty(SoapJMSConstants.CONTENTTYPE_FIELD);
                     if (contentType == null)

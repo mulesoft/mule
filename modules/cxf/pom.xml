@@ -707,12 +707,6 @@
             <type>test-jar</type>
         </dependency>
 
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-jms</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <!-- for integration tests -->
         <!-- Maven classpath gets messed up and WsdlCallTestCase doesn't pass unless this is here -->
         <dependency>
@@ -785,6 +779,12 @@
             <groupId>xalan</groupId>
             <artifactId>serializer</artifactId>
             <version>${xalanVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-jms</artifactId>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
