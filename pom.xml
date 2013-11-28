@@ -1553,7 +1553,7 @@
                 <version>RELEASE</version>
                 -->
                 <configuration>
-                    <argLine>-Xms64m -Xmx256m</argLine>
+                    <argLine>-Xms64m -Xmx512m</argLine>
                     <excludes>
                         <!-- Surefire should be able to detect that classes are abstract but it seems it isn't -->
                         <exclude>**/Abstract*.*</exclude>
