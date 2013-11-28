@@ -1,9 +1,13 @@
 /*
+ * $Id$
+ * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.transport.sftp;
 
 import static org.mule.transport.sftp.AuthenticationMethodValidator.validateAuthenticationMethods;
@@ -63,6 +67,7 @@ public class SftpConnector extends AbstractConnector
     public static final String PROPERTY_USE_TEMP_FILE_TIMESTAMP_SUFFIX = "useTempFileTimestampSuffix";
     public static final String PROPERTY_DUPLICATE_HANDLING_THROW_EXCEPTION = "throwException";
     public static final String PROPERTY_DUPLICATE_HANDLING_OVERWRITE = "overwrite";
+    public static final String PROPERTY_DUPLICATE_HANDLING_APPEND = "append";
     public static final String PROPERTY_DUPLICATE_HANDLING_ASS_SEQ_NO = "addSeqNo";
     public static final String PROPERTY_MAX_CONNECTION_POOL_SIZE = "maxConnectionPoolSize";
     public static final String PROPERTY_KEEP_FILE_ON_ERROR = "keepFileOnError";

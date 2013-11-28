@@ -1,9 +1,14 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+
 package org.mule.transport.sftp;
 
 import static junit.framework.Assert.assertEquals;
@@ -46,6 +51,7 @@ public class SftpMessageDispatcherTestCase extends AbstractMuleTestCase
     private SftpClient sftpClient = mock(SftpClient.class);
     private ArgumentCaptor<String> transferFilenameCaptor = ArgumentCaptor.forClass(String.class);
     private ArgumentCaptor<InputStream> inputStreamCaptor = ArgumentCaptor.forClass(InputStream.class);
+    private ArgumentCaptor<Integer> writeModeCaptor = ArgumentCaptor.forClass(Integer.class);
     private FilenameParser filenameParser = mock(FilenameParser.class);
 
     @Before
@@ -115,4 +121,30 @@ public class SftpMessageDispatcherTestCase extends AbstractMuleTestCase
         IOUtils.copy(inputStream, stringWriter, "UTF-8");
         assertEquals(payload, stringWriter.toString());
     }
+    
+    @Test
+    public void appendFile() throws Exception
+    {
+        when(sftpConnector.getDuplicateHandling()).thenReturn("append");
+        SftpMessageDispatcher sftpMessageDispatcher = new SftpMessageDispatcher(outboundEndpoint);
+        sftpMessageDispatcher.doDispatch(muleEvent);
+        verify(sftpClient).storeFile(transferFilenameCaptor.capture(), inputStreamCaptor.capture(), writeModeCaptor.capture().intValue());
+        InputStream inputStream = inputStreamCaptor.getValue();
+        StringWriter stringWriter = new StringWriter();
+        IOUtils.copy(inputStream, stringWriter, "UTF-8");
+        assertEquals(payload, stringWriter.toString());
+    }
+
+    @Test
+    public void overwriteFile() throws Exception
+    {
+        SftpMessageDispatcher sftpMessageDispatcher = new SftpMessageDispatcher(outboundEndpoint);
+        sftpMessageDispatcher.doDispatch(muleEvent);
+        verify(sftpClient).storeFile(transferFilenameCaptor.capture(), inputStreamCaptor.capture());
+        InputStream inputStream = inputStreamCaptor.getValue();
+        StringWriter stringWriter = new StringWriter();
+        IOUtils.copy(inputStream, stringWriter, "UTF-8");
+        assertEquals(payload, stringWriter.toString());        
+    }
+    
 }

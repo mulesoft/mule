@@ -1,9 +1,13 @@
 /*
+ * $Id$
+ * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.transport.sftp;
 
 import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_DELETE_ACTION;
@@ -46,6 +50,8 @@ public class SftpClient
     public static final String CHANNEL_SFTP = "sftp";
     public static final String STRICT_HOST_KEY_CHECKING = "StrictHostKeyChecking";
     public static final String PREFERRED_AUTHENTICATION_METHODS = "PreferredAuthentications";
+    public static final int APPEND_MODE = ChannelSftp.APPEND;
+    public static final int OVERWRITE_MODE = ChannelSftp.OVERWRITE;
 
     private Log logger = LogFactory.getLog(getClass());
 
@@ -376,21 +382,26 @@ public class SftpClient
 
     public void storeFile(String fileName, InputStream stream) throws IOException
     {
+        storeFile(fileName, stream, OVERWRITE_MODE);
+    }
+
+    public void storeFile(String fileName, InputStream stream, int writeMode) throws IOException
+    {
         try
         {
-
+            
             // Notify sftp put file action
             if (notifier != null)
             {
                 notifier.notify(SFTP_PUT_ACTION, currentDirectory + "/" + fileName);
             }
-
+            
             if (logger.isDebugEnabled())
             {
                 logger.debug("Sending to SFTP service: Stream = " + stream + " , filename = " + fileName);
             }
-
-            channelSftp.put(stream, fileName);
+            
+            channelSftp.put(stream, fileName, writeMode);
         }
         catch (SftpException e)
         {
@@ -398,12 +409,17 @@ public class SftpClient
             throw new IOException(e.getMessage());
         }
     }
-
+    
     public void storeFile(String fileNameLocal, String fileNameRemote) throws IOException
+    {
+        storeFile(fileNameLocal, fileNameRemote, OVERWRITE_MODE);
+    }
+
+    public void storeFile(String fileNameLocal, String fileNameRemote, int mode) throws IOException
     {
         try
         {
-            channelSftp.put(fileNameLocal, fileNameRemote);
+            channelSftp.put(fileNameLocal, fileNameRemote, mode);
         }
         catch (SftpException e)
         {
