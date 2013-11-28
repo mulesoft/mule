@@ -25,6 +25,7 @@ import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
+import org.mule.transport.jms.JmsConnector;
 import org.mule.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
@@ -35,6 +36,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +49,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
+import org.apache.cxf.binding.soap.jms.interceptor.SoapJMSConstants;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.interceptor.StaxInEndingInterceptor;
 import org.apache.cxf.message.ExchangeImpl;
@@ -277,6 +280,17 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
                     soapActions.add(soapAction);
                     protocolHeaders.put(SoapBindingConstants.SOAP_ACTION, soapActions);
                 }
+
+                String eventRequestUri = event.getMessageSourceURI().toString();
+                if (eventRequestUri.startsWith(JmsConnector.JMS))
+                {
+                    String contentType = muleReqMsg.getInboundProperty(SoapJMSConstants.CONTENTTYPE_FIELD) != null ? (String) muleReqMsg.getInboundProperty(SoapJMSConstants.CONTENTTYPE_FIELD) : "text/xml";
+                    String requestUri = muleReqMsg.getInboundProperty(SoapJMSConstants.REQUESTURI_FIELD) != null ? (String) muleReqMsg.getInboundProperty(SoapJMSConstants.REQUESTURI_FIELD) : eventRequestUri;
+
+                    protocolHeaders.put(SoapJMSConstants.CONTENTTYPE_FIELD, Collections.singletonList(contentType));
+                    protocolHeaders.put(SoapJMSConstants.REQUESTURI_FIELD, Collections.singletonList(requestUri));
+                }
+
                 m.put(Message.PROTOCOL_HEADERS, protocolHeaders);
             }
 
