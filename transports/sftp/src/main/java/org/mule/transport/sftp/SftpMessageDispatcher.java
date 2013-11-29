@@ -105,7 +105,7 @@ public class SftpMessageDispatcher extends AbstractMessageDispatcher
             // choose appropriate writing mode
             if (sftpUtil.getDuplicateHandling().equals(SftpConnector.PROPERTY_DUPLICATE_HANDLING_APPEND))
             {
-                client.storeFile(transferFilename, inputStream, SftpClient.APPEND_MODE);
+                client.storeFile(transferFilename, inputStream, SftpClient.WriteMode.APPEND);
             }
             else
             {

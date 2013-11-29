@@ -46,8 +46,6 @@ public class SftpClient
     public static final String CHANNEL_SFTP = "sftp";
     public static final String STRICT_HOST_KEY_CHECKING = "StrictHostKeyChecking";
     public static final String PREFERRED_AUTHENTICATION_METHODS = "PreferredAuthentications";
-    public static final int APPEND_MODE = ChannelSftp.APPEND;
-    public static final int OVERWRITE_MODE = ChannelSftp.OVERWRITE;
 
     private Log logger = LogFactory.getLog(getClass());
 
@@ -378,10 +376,10 @@ public class SftpClient
 
     public void storeFile(String fileName, InputStream stream) throws IOException
     {
-        storeFile(fileName, stream, OVERWRITE_MODE);
+        storeFile(fileName, stream, WriteMode.OVERWRITE);
     }
 
-    public void storeFile(String fileName, InputStream stream, int writeMode) throws IOException
+    public void storeFile(String fileName, InputStream stream, WriteMode mode) throws IOException
     {
         try
         {
@@ -397,7 +395,7 @@ public class SftpClient
                 logger.debug("Sending to SFTP service: Stream = " + stream + " , filename = " + fileName);
             }
 
-            channelSftp.put(stream, fileName, writeMode);
+            channelSftp.put(stream, fileName, mode.intValue());
         }
         catch (SftpException e)
         {
@@ -408,14 +406,14 @@ public class SftpClient
 
     public void storeFile(String fileNameLocal, String fileNameRemote) throws IOException
     {
-        storeFile(fileNameLocal, fileNameRemote, OVERWRITE_MODE);
+        storeFile(fileNameLocal, fileNameRemote, WriteMode.OVERWRITE);
     }
 
-    public void storeFile(String fileNameLocal, String fileNameRemote, int mode) throws IOException
+    public void storeFile(String fileNameLocal, String fileNameRemote, WriteMode mode) throws IOException
     {
         try
         {
-            channelSftp.put(fileNameLocal, fileNameRemote, mode);
+            channelSftp.put(fileNameLocal, fileNameRemote, mode.intValue());
         }
         catch (SftpException e)
         {
@@ -704,5 +702,25 @@ public class SftpClient
     public void setPreferredAuthenticationMethods(String preferredAuthenticationMethods)
     {
         this.preferredAuthenticationMethods = preferredAuthenticationMethods;
+    }
+
+    public enum WriteMode
+    {
+        APPEND
+        {
+            @Override
+            public int intValue() {
+                return ChannelSftp.APPEND;
+            }
+        },
+        OVERWRITE
+        {
+            @Override
+            public int intValue() {
+                return ChannelSftp.OVERWRITE;
+            }
+        };
+
+        public abstract int intValue();
     }
 }
