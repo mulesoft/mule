@@ -37,6 +37,7 @@ import org.mule.model.seda.SedaService;
 import org.mule.object.SingletonObjectFactory;
 import org.mule.routing.MessageFilter;
 import org.mule.session.DefaultMuleSession;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.mule.TestAgent;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;

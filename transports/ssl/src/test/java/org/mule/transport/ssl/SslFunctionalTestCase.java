@@ -18,7 +18,6 @@ import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.tck.testmodels.mule.TestSedaService;
 import org.mule.util.JdkVersionUtils;
 import org.mule.util.JdkVersionUtils.JdkVersion;
 
@@ -72,7 +71,7 @@ public class SslFunctionalTestCase extends FunctionalTestCase
         }
 
         Service c = muleContext.getRegistry().lookupService("testComponent2");
-        assertTrue("Service should be a TestSedaService", c instanceof TestSedaService);
+        //assertTrue("Service should be a TestSedaService", c instanceof TestSedaService);
         Object ftc = getComponent(c);
         assertNotNull("Functional Test Service not found in the model.", ftc);
         assertTrue("Service should be a FunctionalTestComponent", ftc instanceof FunctionalTestComponent);
