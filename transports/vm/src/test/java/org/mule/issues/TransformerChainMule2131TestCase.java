@@ -11,15 +11,9 @@ import org.junit.Test;
 public class TransformerChainMule2131TestCase extends TransformerChainMule2063TestCase
 {
 
-    public TransformerChainMule2131TestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Test
     public void testOutputTransformers() throws Exception
     {
         doTest("test3", TEST3_OUT);
     }
-
 }

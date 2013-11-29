@@ -10,35 +10,25 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class VMAttachmentsTestCase extends AbstractServiceAndFlowTestCase
+public class VMAttachmentsTestCase extends FunctionalTestCase
 {
-    public VMAttachmentsTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "vm/vm-attachments-test-flow.xml"}
-        });
+        return "vm/vm-attachments-test-flow.xml";
     }
 
     @Test

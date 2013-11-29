@@ -9,16 +9,11 @@ package org.mule.transport.sftp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.DispatchException;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.apache.commons.lang.NotImplementedException;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test the archive features.
@@ -30,10 +25,8 @@ public class SftpDuplicateHandlingFunctionalTestCase extends AbstractSftpTestCas
     // Size of the generated stream - 2 Mb
     final static int SEND_SIZE = 1024 * 1024 * 2;
 
-    public SftpDuplicateHandlingFunctionalTestCase(ConfigVariant variant, String configResources)
+    public SftpDuplicateHandlingFunctionalTestCase()
     {
-        super(variant, configResources);
-
         // Only start mule once for all tests below, save a lot of time..., if test3
         // starts failing, comment this out
         setDisposeContextPerClass(true);
@@ -44,12 +37,10 @@ public class SftpDuplicateHandlingFunctionalTestCase extends AbstractSftpTestCas
         logger.info("Timeout is now set to: " + System.getProperty(TEST_TIMEOUT_SYSTEM_PROPERTY, "-1"));
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "mule-sftp-duplicateHandling-test-config-flow.xml"}
-        });
+        return "mule-sftp-duplicateHandling-test-config-flow.xml";
     }
 
     @Override

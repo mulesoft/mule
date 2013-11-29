@@ -9,7 +9,6 @@ package org.mule.transport.ejb;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -19,29 +18,23 @@ import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.transport.AbstractFunctionalTestCase;
 import org.mule.transport.rmi.RmiConnector;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Properties;
-
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * test EJB object invocations
  */
 public class EjbFunctionalTestCase extends AbstractFunctionalTestCase
 {
-    public EjbFunctionalTestCase(ConfigVariant variant, String configResources)
+
+    public EjbFunctionalTestCase()
     {
-        super(variant, configResources);
         this.prefix = "ejb";
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "ejb-functional-test-flow.xml"}
-        });
+        return "ejb-functional-test-flow.xml";
     }
 
     @Override

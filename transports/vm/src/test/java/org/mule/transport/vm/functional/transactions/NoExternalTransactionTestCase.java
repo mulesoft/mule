@@ -10,42 +10,31 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
-
 import org.mule.api.client.MuleClient;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.transaction.TransactionConfig;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import javax.transaction.Transaction;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /** Test transaction behavior when "joinExternal" is set to disallow joining external transactions
  * There is one test per legal transactional behavior (e.g. ALWAYS_BEGIN).
  */
 public class NoExternalTransactionTestCase extends AbstractExternalTransactionTestCase
 {
+
     public static final long WAIT = 3000L;
 
     protected static final Log log = LogFactory.getLog(NoExternalTransactionTestCase.class);
 
-    public NoExternalTransactionTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/config/no-external-transaction-config-flow.xml"}
-        });
+        return "org/mule/test/config/no-external-transaction-config-flow.xml";
     }
 
     @Test

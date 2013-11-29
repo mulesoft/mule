@@ -9,38 +9,29 @@ package org.mule.transport.tcp.issues;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class LengthProtocolLengthTestCase extends AbstractServiceAndFlowTestCase
+public class LengthProtocolLengthTestCase extends FunctionalTestCase
 {
+
     @Rule
     public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    public LengthProtocolLengthTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "length-protocol-length-test-flow.xml"}
-        });
+        return "length-protocol-length-test-flow.xml";
     }
 
     @Test

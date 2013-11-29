@@ -9,7 +9,6 @@ package org.mule.transport.sftp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleEventContext;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transport.PropertyScope;
@@ -17,8 +16,6 @@ import org.mule.tck.functional.EventCallback;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +25,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * <code>SftpPoolingFunctionalTestCase</code> tests sending an receiving multiple
@@ -43,17 +39,10 @@ public class SftpPoolingFunctionalTestCase extends AbstractSftpTestCase
 
     private int nrOfFiles = 100;
 
-    public SftpPoolingFunctionalTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "mule-pooling-test-config-flow.xml"}
-        });
+        return "mule-pooling-test-config-flow.xml";
     }
 
     @Test

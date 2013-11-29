@@ -13,7 +13,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -22,8 +21,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.construct.Flow;
 import org.mule.routing.filters.logic.NotFilter;
-import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transaction.XaTransactionFactory;
@@ -35,30 +33,24 @@ import org.mule.transport.jms.test.TestConnectionFactory;
 import org.mule.transport.jms.test.TestRedeliveryHandler;
 import org.mule.transport.jms.test.TestRedeliveryHandlerFactory;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import javax.jms.Session;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Tests the "jms" namespace.
  */
-public class JmsNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
+public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
 {
-    public JmsNamespaceHandlerTestCase(ConfigVariant variant, String configResources)
+    public JmsNamespaceHandlerTestCase()
     {
-        super(variant, configResources);
         setStartContext(false);
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "jms-namespace-config-flow.xml"}});
+        return "jms-namespace-config-flow.xml";
     }
 
     @Test
@@ -179,20 +171,8 @@ public class JmsNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
         assertNotNull(filter3);
         assertTrue(filter3 instanceof JmsPropertyFilter);
 
-        InboundEndpoint inboundEndpoint;
-
-        if (variant.equals(ConfigVariant.FLOW))
-        {
-            inboundEndpoint = (InboundEndpoint) ((Flow) muleContext.getRegistry()
-                            .lookupObject("testService"))
-                            .getMessageSource();
-        }
-        else
-        {
-            inboundEndpoint = ((ServiceCompositeMessageSource) muleContext.getRegistry()
-                .lookupService("testService")
-                .getMessageSource()).getEndpoints().get(0);
-        }
+        InboundEndpoint inboundEndpoint = (InboundEndpoint) ((Flow) muleContext.getRegistry()
+                .lookupObject("testService")).getMessageSource();
 
         assertNotNull(inboundEndpoint);
         assertEquals(1, inboundEndpoint.getProperties().size());

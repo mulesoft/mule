@@ -8,35 +8,25 @@ package org.mule.issues;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class TransformerChainMule2063TestCase extends AbstractServiceAndFlowTestCase
+public class TransformerChainMule2063TestCase extends FunctionalTestCase
 {
+
     public static final String IN = "in";
     public static final String TEST1_OUT = IN + "123";
     public static final String TEST2_OUT = IN + "123";
     public static final String TEST3_OUT = IN + "123abc";
     public static final long WAIT_MS = 3000L;
 
-    public TransformerChainMule2063TestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "issues/transformer-chain-mule-2063-test-flow.xml"}});
+        return "issues/transformer-chain-mule-2063-test-flow.xml";
     }
 
     protected void doTest(String name, String result) throws Exception

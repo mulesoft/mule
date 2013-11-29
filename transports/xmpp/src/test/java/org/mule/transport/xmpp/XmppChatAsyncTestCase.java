@@ -8,25 +8,15 @@ package org.mule.transport.xmpp;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.jivesoftware.smack.packet.Message;
-import org.junit.runners.Parameterized.Parameters;
 
 public class XmppChatAsyncTestCase extends XmppMessageAsyncTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-            {ConfigVariant.FLOW, "xmpp-chat-async-config-flow.xml"}
-        });
-    }
 
-    public XmppChatAsyncTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "xmpp-chat-async-config-flow.xml";
     }
 
     @Override

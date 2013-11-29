@@ -8,36 +8,25 @@ package org.mule.transport.vm.functional;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transaction.TransactionCoordination;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class VmTransactionTestCase extends AbstractServiceAndFlowTestCase
+public class VmTransactionTestCase extends FunctionalTestCase
 {
+
     protected static volatile boolean serviceComponentAck = false;
     protected static final Log logger = LogFactory.getLog(VmTransactionTestCase.class);
 
-    public VmTransactionTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "vm/vm-transaction-flow.xml"}
-        });
+        return "vm/vm-transaction-flow.xml";
     }
 
     @Test

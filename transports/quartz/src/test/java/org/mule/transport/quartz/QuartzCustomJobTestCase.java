@@ -7,39 +7,29 @@
 package org.mule.transport.quartz;
 
 import static org.junit.Assert.assertTrue;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-public class QuartzCustomJobTestCase extends AbstractServiceAndFlowTestCase
+public class QuartzCustomJobTestCase extends FunctionalTestCase
 {
 
-    public QuartzCustomJobTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "quartz-custom-job-flow.xml"}
-        });
+        return "quartz-custom-job-flow.xml";
     }
 
     @Test
     public void testCustomJob() throws Exception
     {
-        CountDownLatch eventLatch = (CountDownLatch) muleContext.getRegistry().lookupObject("latch");
+        CountDownLatch eventLatch = muleContext.getRegistry().lookupObject("latch");
 
         // we wait up to 60 seconds here which is WAY too long for one tick but it seems that 
         // "sometimes" it takes a very long time for Quartz go kick in. Once it starts 

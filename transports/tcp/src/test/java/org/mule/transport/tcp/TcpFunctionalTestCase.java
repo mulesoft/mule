@@ -8,21 +8,17 @@ package org.mule.transport.tcp;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class TcpFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public class TcpFunctionalTestCase extends FunctionalTestCase
 {
+
     protected static String TEST_MESSAGE = "Test TCP Request";
 
     @Rule
@@ -31,17 +27,10 @@ public class TcpFunctionalTestCase extends AbstractServiceAndFlowTestCase
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    public TcpFunctionalTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "tcp-functional-test-flow.xml"}
-        });
+        return "tcp-functional-test-flow.xml";
     }
 
     @Test

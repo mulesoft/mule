@@ -13,12 +13,9 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.ResourceBundle;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test the archive features.
@@ -49,16 +46,10 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
     private String archive = null;
     private String archiveCanonicalPath = null;
 
-    public SftpArchiveFunctionalTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "mule-sftp-archive-test-config-flow.xml"}});
+        return "mule-sftp-archive-test-config-flow.xml";
     }
 
     @Override

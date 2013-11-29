@@ -8,14 +8,11 @@ package org.mule.transport.sftp;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleEventContext;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
@@ -24,7 +21,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * <code>SendReceiveFunctionalTestCase</code> tests sending an receiving multiple
@@ -39,16 +35,10 @@ public class SftpSendReceiveFunctionalTestCase extends AbstractSftpTestCase
 
     private int nrOfFiles = 8;
 
-    public SftpSendReceiveFunctionalTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "mule-send-receive-test-config-flow.xml"}});
+        return "mule-send-receive-test-config-flow.xml";
     }
 
     @Test

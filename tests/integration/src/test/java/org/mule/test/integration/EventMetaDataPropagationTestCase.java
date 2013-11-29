@@ -9,7 +9,6 @@ package org.mule.test.integration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
@@ -18,10 +17,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.Callable;
-import org.mule.api.service.Service;
 import org.mule.construct.Flow;
-import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transformer.AbstractMessageAwareTransformer;
@@ -29,8 +25,6 @@ import org.mule.transformer.AbstractMessageAwareTransformer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,7 +32,6 @@ import javax.activation.DataHandler;
 import javax.activation.DataSource;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class EventMetaDataPropagationTestCase extends FunctionalTestCase
 {

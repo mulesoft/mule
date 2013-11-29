@@ -7,21 +7,18 @@
 package org.mule.transport.udp.functional;
 
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class UdpConnectorFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public class UdpConnectorFunctionalTestCase extends FunctionalTestCase
 {
+
     public static final String MESSAGE = "hello";
     public static final int TOTAL_MESSAGE_COUNT = 1000;
     public static final int MAX_NUMBER_OF_BATCHES = 128;
@@ -29,17 +26,10 @@ public class UdpConnectorFunctionalTestCase extends AbstractServiceAndFlowTestCa
     public static final long MIN_PAUSE_PERIOD = 10;
     public static final long BETWEEN_BATCH_PAUSE = 5000;
 
-    public UdpConnectorFunctionalTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "udp-functional-test-flow.xml"}
-        });
+        return "udp-functional-test-flow.xml";
     }
 
     /**

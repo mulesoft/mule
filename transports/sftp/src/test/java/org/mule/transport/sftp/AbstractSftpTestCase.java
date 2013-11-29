@@ -11,7 +11,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_DISPATCHED;
 import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_SENT;
-
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
@@ -28,8 +27,8 @@ import org.mule.api.model.Model;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.context.notification.EndpointMessageNotification;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.sftp.util.SftpServer;
 import org.mule.transport.sftp.util.ValueHolder;
@@ -58,7 +57,7 @@ import org.junit.Rule;
 /**
  * @author Lennart Häggkvist, Magnus Larsson Date: Jun 8, 2009
  */
-public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCase
+public abstract class AbstractSftpTestCase extends FunctionalTestCase
 {
     private static final String HOST = "localhost";
     private static final String USER = "muletest1";
@@ -78,11 +77,6 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
 
     protected SftpServer sftpServer;
     protected SftpClient sftpClient;
-
-    public AbstractSftpTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     /**
      * Deletes all files in the directory, useful when testing to ensure that no

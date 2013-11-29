@@ -6,17 +6,13 @@
  */
 package org.mule.transport.tcp.issues;
 
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class MultiConnectorMULE3669TestCase extends AbstractServiceAndFlowTestCase
+public class MultiConnectorMULE3669TestCase extends FunctionalTestCase
 {
 
     @Rule
@@ -25,17 +21,10 @@ public class MultiConnectorMULE3669TestCase extends AbstractServiceAndFlowTestCa
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    public MultiConnectorMULE3669TestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "multiconnector-mule3669-test-flow.xml"}
-        });
+        return "multiconnector-mule3669-test-flow.xml";
     }
 
     @Test

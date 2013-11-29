@@ -15,26 +15,17 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.transport.sftp.SftpConnector;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class SftpInvalidInboundEndpointTestCase extends AbstractSftpDataIntegrityTestCase
 {
     private static final int NO_OF_INVALID_ATTEMPTS = 50;
 
-    public SftpInvalidInboundEndpointTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{{ConfigVariant.FLOW,
-            "dataintegrity/sftp-invalid-inbound-endpoint-config.xml"}});
+        return "dataintegrity/sftp-invalid-inbound-endpoint-config.xml";
     }
 
     @Test

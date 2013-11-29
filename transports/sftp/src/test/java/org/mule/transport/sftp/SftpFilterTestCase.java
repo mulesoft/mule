@@ -8,17 +8,13 @@ package org.mule.transport.sftp;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.client.MuleClient;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.transport.sftp.dataintegrity.AbstractSftpDataIntegrityTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Simple test to verify that the filter configuration works. Note that the transport
@@ -29,17 +25,10 @@ public class SftpFilterTestCase extends AbstractSftpDataIntegrityTestCase
     private static String INBOUND_ENDPOINT_NAME = "inboundEndpoint";
     private static String OUTBOUND_ENDPOINT_NAME = "outboundEndpoint";
 
-    public SftpFilterTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "mule-sftp-filter-config-flow.xml"}
-        });
+        return "mule-sftp-filter-config-flow.xml";
     }
 
     @Override

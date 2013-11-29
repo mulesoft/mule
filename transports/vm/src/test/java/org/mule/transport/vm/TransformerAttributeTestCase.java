@@ -8,33 +8,22 @@ package org.mule.transport.vm;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.StringAppendTestTransformer;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class TransformerAttributeTestCase extends AbstractServiceAndFlowTestCase
+public class TransformerAttributeTestCase extends FunctionalTestCase
 {
+
     public static final String OUTBOUND_MESSAGE = "Test message";
 
-    public TransformerAttributeTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "vm/transformer-attribute-test-flow.xml"}
-        });
+        return "vm/transformer-attribute-test-flow.xml";
     }
 
     @Test

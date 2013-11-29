@@ -9,7 +9,6 @@ package org.mule.module.pgp;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleEvent;
@@ -17,15 +16,10 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.ExceptionUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class PGPExpiredIntegrationTestCase extends FunctionalTestCase
 {

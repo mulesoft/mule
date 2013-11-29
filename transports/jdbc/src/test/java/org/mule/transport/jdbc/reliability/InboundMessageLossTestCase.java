@@ -38,19 +38,19 @@ public class InboundMessageLossTestCase extends AbstractJdbcFunctionalTestCase
         
     protected QueryRunner qr;
     
-    public InboundMessageLossTestCase(ConfigVariant variant, String configResources)
+    public InboundMessageLossTestCase()
     {
-        super(variant, configResources);
         setPopulateTestData(false);
     }
-    
-    @Parameters
-    public static Collection<Object[]> parameters()
+
+    @Override
+    protected String[] getConfigFiles()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "reliability/jdbc-connector.xml, reliability/inbound-message-loss.xml"}
-        });
-    }          
+        return new String[] {
+                "reliability/jdbc-connector.xml",
+                "reliability/inbound-message-loss.xml"
+        };
+    }
 
     @Override
     protected void doSetUp() throws Exception

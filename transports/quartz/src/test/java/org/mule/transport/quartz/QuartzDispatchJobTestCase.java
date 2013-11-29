@@ -8,33 +8,23 @@ package org.mule.transport.quartz;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.CountdownCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class QuartzDispatchJobTestCase extends AbstractServiceAndFlowTestCase
+public class QuartzDispatchJobTestCase extends FunctionalTestCase
 {
-    public QuartzDispatchJobTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "quartz-dispatch-flow.xml"}
-        });
+        return "quartz-dispatch-flow.xml";
     }
 
     @Test

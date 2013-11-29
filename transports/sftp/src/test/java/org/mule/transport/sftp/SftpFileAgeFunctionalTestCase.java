@@ -11,17 +11,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.After;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * <code>SftpFileAgeFunctionalTestCase</code> tests the fileAge functionality.
@@ -37,16 +34,10 @@ public class SftpFileAgeFunctionalTestCase extends AbstractSftpTestCase
     protected static final long TIMEOUT = 10000;
     private static final long READ_FILE_TIMEOUT = 2000;
 
-    public SftpFileAgeFunctionalTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-        {ConfigVariant.FLOW, "mule-sftp-file-age-config-flow.xml"}});
+        return "mule-sftp-file-age-config-flow.xml";
     }
 
     @Override

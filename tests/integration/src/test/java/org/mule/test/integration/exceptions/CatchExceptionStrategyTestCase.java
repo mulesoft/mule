@@ -6,29 +6,25 @@
  */
 package org.mule.test.integration.exceptions;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.hamcrest.core.Is;
-import org.hamcrest.core.IsNull;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
+import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
-import java.util.Arrays;
-import java.util.Collection;
 
-import static org.junit.Assert.assertThat;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.hamcrest.core.Is;
+import org.hamcrest.core.IsNull;
+import org.junit.Rule;
+import org.junit.Test;
 
 public class CatchExceptionStrategyTestCase extends FunctionalTestCase
 {

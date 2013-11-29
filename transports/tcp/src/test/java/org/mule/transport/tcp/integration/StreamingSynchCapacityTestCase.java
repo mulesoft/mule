@@ -9,11 +9,7 @@ package org.mule.transport.tcp.integration;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.SystemUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Rule;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Tests a model for which synchonous=true for environment (was "and connector", but
@@ -34,17 +30,15 @@ public class StreamingSynchCapacityTestCase extends AbstractStreamingCapacityTes
     @Rule
     public DynamicPort port2 = new DynamicPort("port2");
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "tcp-streaming2-test-flow.xml"}
-        });
+        return "tcp-streaming2-test-flow.xml";
     }
 
-    public StreamingSynchCapacityTestCase(ConfigVariant variant, String configResources)
+    public StreamingSynchCapacityTestCase()
     {
-        super(variant, configResources, 100 * ONE_MB);
+        super(100 * ONE_MB);
     }
 
     @Override

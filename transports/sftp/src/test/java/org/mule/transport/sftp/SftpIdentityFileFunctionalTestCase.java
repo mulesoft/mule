@@ -9,14 +9,11 @@ package org.mule.transport.sftp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleEventContext;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -26,7 +23,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * <code>LargeFileReceiveFunctionalTestCase</code> tests receiving a large file
@@ -41,17 +37,10 @@ public class SftpIdentityFileFunctionalTestCase extends AbstractSftpTestCase
     // Increase this to be a little larger than expected download time
     private static final String INBOUND_ENDPOINT_NAME = "inboundEndpoint";
 
-    public SftpIdentityFileFunctionalTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "mule-sftp-identity-file-config-flow.xml"}
-        });
+        return "mule-sftp-identity-file-config-flow.xml";
     }
 
     @Override

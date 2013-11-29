@@ -9,34 +9,25 @@ package org.mule.transport.vm.functional;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class PersistentBoundedQueueTestCase extends AbstractServiceAndFlowTestCase
+public class PersistentBoundedQueueTestCase extends FunctionalTestCase
 {
+
     // add some sizeable delay, as queue store ordering won't be guaranteed
     private static final int SLEEP = 100;
 
-    public PersistentBoundedQueueTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "vm/persistent-bounded-vm-queue-test-flow.xml"}});
+        return "vm/persistent-bounded-vm-queue-test-flow.xml";
     }
 
     @Test

@@ -28,11 +28,6 @@ public class SafeProtocolMule2227TestCase extends SafeProtocolTestCase
 
     // update - we now do have a maximum size
 
-    public SafeProtocolMule2227TestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Test
     public void testSafeToUnsafe() throws MuleException
     {

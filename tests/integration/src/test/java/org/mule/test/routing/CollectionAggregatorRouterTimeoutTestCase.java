@@ -8,21 +8,17 @@ package org.mule.test.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.RoutingNotificationListener;
 import org.mule.context.notification.RoutingNotification;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class CollectionAggregatorRouterTimeoutTestCase extends FunctionalTestCase
 {

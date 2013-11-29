@@ -7,17 +7,14 @@
 package org.mule.transport.sftp.dataintegrity;
 
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.client.MuleClient;
 import org.mule.transport.sftp.LatchDownExceptionListener;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Tests that files are not deleted if the temp directory can't be created
@@ -27,16 +24,10 @@ public class SftpCantCreateTempDirectoryTestCase extends AbstractSftpDataIntegri
     private static final int EXCEPTION_TIMEOUT = 3000;
     private static String INBOUND_ENDPOINT_NAME = "inboundEndpoint";
 
-    public SftpCantCreateTempDirectoryTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "dataintegrity/sftp-dataintegrity-common-with-tempdir-config-flow.xml"}});
+        return "dataintegrity/sftp-dataintegrity-common-with-tempdir-config-flow.xml";
     }
 
     @Override

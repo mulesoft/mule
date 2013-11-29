@@ -13,7 +13,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.execution.ExecutionCallback;
@@ -22,32 +21,22 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.util.ExceptionUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import javax.transaction.Transaction;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /** Test transaction behavior when "joinExternal" is set to allow joining external transactions
  * There is one test per legal transactional behavior (e.g. ALWAYS_BEGIN).
  */
 public class ExternalTransactionTestCase extends AbstractExternalTransactionTestCase
 {
+
     public static final long WAIT = 3000L;
 
-    public ExternalTransactionTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/config/external-transaction-config-flow.xml"}
-        });
+        return "org/mule/test/config/external-transaction-config-flow.xml";
     }
 
     @Test

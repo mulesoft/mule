@@ -10,34 +10,25 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.transport.NullPayload;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class JdbcMessagePropertiesCopyingTestCase extends AbstractJdbcFunctionalTestCase
 {
     private static final String PROPERTY_KEY = "custom-key";
     private static final String PROPERTY_VALUE = "custom-value";
 
-    public JdbcMessagePropertiesCopyingTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String[] getConfigFiles()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, AbstractJdbcFunctionalTestCase.getConfig() + ", jdbc-message-properties-copying-flow.xml"}
-        });
+        return new String[] {
+                AbstractJdbcFunctionalTestCase.getConfig(),
+                "jdbc-message-properties-copying-flow.xml"
+        };
     }
 
     @Test

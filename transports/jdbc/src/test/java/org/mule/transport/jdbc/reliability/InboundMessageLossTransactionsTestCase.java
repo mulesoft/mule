@@ -28,19 +28,16 @@ import org.junit.runners.Parameterized.Parameters;
  */
 public class InboundMessageLossTransactionsTestCase extends InboundMessageLossTestCase
 {
-    public InboundMessageLossTransactionsTestCase(ConfigVariant variant, String configResources)
+
+    @Override
+    protected String[] getConfigFiles()
     {
-        super(variant, configResources);     
+        return new String[] {
+                "reliability/jdbc-connector.xml",
+                "reliability/inbound-message-loss-transactions.xml"
+        };
     }
-  
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "reliability/jdbc-connector.xml, reliability/inbound-message-loss-transactions.xml"},
-        });
-    }      
-    
+
     @Override
     @Test
     public void testComponentException() throws Exception

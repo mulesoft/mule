@@ -8,39 +8,28 @@ package org.mule.transport.xmpp;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.client.MuleClient;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.util.concurrent.Latch;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.jivesoftware.smack.packet.Message;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class XmppMessageAsyncTestCase extends AbstractXmppTestCase
 {
-    protected static final long JABBER_SEND_THREAD_SLEEP_TIME = 1000;
+
     private static final String RECEIVE_SERVICE_NAME = "receiveFromJabber";
 
     private CountDownLatch latch = new CountDownLatch(1);
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][] {
-            {ConfigVariant.FLOW, "xmpp-message-async-config-flow.xml"}
-        });
-    }
-
-    public XmppMessageAsyncTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "xmpp-message-async-config-flow.xml";
     }
 
     @Override

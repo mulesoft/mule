@@ -10,11 +10,7 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.tcp.integration.AbstractStreamingCapacityTestCase;
 import org.mule.util.SystemUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Rule;
-import org.junit.runners.Parameterized.Parameters;
 
 public class StreamingSpeedMule1389TestCase extends AbstractStreamingCapacityTestCase
 {
@@ -24,16 +20,15 @@ public class StreamingSpeedMule1389TestCase extends AbstractStreamingCapacityTes
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    public StreamingSpeedMule1389TestCase(ConfigVariant variant, String configResources)
+    public StreamingSpeedMule1389TestCase()
     {
-        super(variant, configResources, 100 * ONE_MB);
+        super(100 * ONE_MB);
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "streaming-speed-mule-1389-flow.xml"}});
+        return "streaming-speed-mule-1389-flow.xml";
     }
 
     @Override

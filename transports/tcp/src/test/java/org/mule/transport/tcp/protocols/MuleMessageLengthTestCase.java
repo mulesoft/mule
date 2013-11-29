@@ -7,37 +7,26 @@
 package org.mule.transport.tcp.protocols;
 
 import static org.junit.Assert.assertEquals;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class MuleMessageLengthTestCase extends AbstractServiceAndFlowTestCase
+public class MuleMessageLengthTestCase extends FunctionalTestCase
 {
+
     protected static String TEST_MESSAGE = "Test TCP Request";
 
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
 
-
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "tcp-mplength-test-flow.xml"}});
-    }
-
-    public MuleMessageLengthTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "tcp-mplength-test-flow.xml";
     }
 
     @Test

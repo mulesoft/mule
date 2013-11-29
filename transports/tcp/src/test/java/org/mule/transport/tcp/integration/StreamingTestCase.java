@@ -9,17 +9,14 @@ package org.mule.transport.tcp.integration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleEventContext;
 import org.mule.api.client.MuleClient;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalStreamingTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -28,13 +25,13 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * This test is more about testing the streaming model than the TCP provider, really.
  */
-public class StreamingTestCase extends AbstractServiceAndFlowTestCase
+public class StreamingTestCase extends FunctionalTestCase
 {
+
     public static final int TIMEOUT = 300000;
     public static final String TEST_MESSAGE = "Test TCP Request";
     public static final String RESULT = "Received stream; length: 16; 'Test...uest'";
@@ -45,17 +42,10 @@ public class StreamingTestCase extends AbstractServiceAndFlowTestCase
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    public StreamingTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "tcp-streaming-test-flow.xml"}
-        });
+        return "tcp-streaming-test-flow.xml";
     }
 
     @Test

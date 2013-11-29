@@ -11,7 +11,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -20,20 +19,16 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.message.ExceptionMessage;
 import org.mule.routing.outbound.MulticastingRouter;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
 {

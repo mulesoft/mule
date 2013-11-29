@@ -8,37 +8,27 @@ package org.mule.transport.vm.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.transport.PropertyScope;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.activation.MimeType;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class TransformerContentTypeTestCase extends AbstractServiceAndFlowTestCase
+public class TransformerContentTypeTestCase extends FunctionalTestCase
 {
-    public TransformerContentTypeTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/config/content-type-setting-transform-configs-flow.xml"}
-        });
+        return "org/mule/test/config/content-type-setting-transform-configs-flow.xml";
     }
 
     @Test

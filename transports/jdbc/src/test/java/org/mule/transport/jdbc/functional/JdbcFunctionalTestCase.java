@@ -8,35 +8,31 @@ package org.mule.transport.jdbc.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayHandler;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
 {
-    public JdbcFunctionalTestCase(ConfigVariant variant, String configResources)
+    public JdbcFunctionalTestCase()
     {
-        super(variant, configResources);
         setPopulateTestData(false);
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String[] getConfigFiles()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, AbstractJdbcFunctionalTestCase.getConfig() + ",jdbc-functional-config-flow.xml"}
-        });
+        return new String[] {
+                AbstractJdbcFunctionalTestCase.getConfig(),
+                "jdbc-functional-config-flow.xml"
+        };
     }
 
     @Test

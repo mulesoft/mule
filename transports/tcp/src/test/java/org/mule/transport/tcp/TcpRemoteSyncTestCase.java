@@ -8,25 +8,21 @@ package org.mule.transport.tcp;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class TcpRemoteSyncTestCase extends AbstractServiceAndFlowTestCase
+public class TcpRemoteSyncTestCase extends FunctionalTestCase
 {
     public static final String message = "mule";
 
@@ -39,17 +35,10 @@ public class TcpRemoteSyncTestCase extends AbstractServiceAndFlowTestCase
     @Rule
     public DynamicPort dynamicPort3 = new DynamicPort("port3");
 
-
-    public TcpRemoteSyncTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "tcp-remotesync-flow.xml"}});
+        return "tcp-remotesync-flow.xml";
     }
 
     @Test

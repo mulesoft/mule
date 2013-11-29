@@ -6,26 +6,16 @@
  */
 package org.mule.transport.xmpp;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Message.Type;
-import org.junit.runners.Parameterized.Parameters;
 
 public class XmppChatSyncTestCase extends XmppMessageSyncTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "xmpp-chat-sync-config-flow.xml"}
-        });
-    }
 
-    public XmppChatSyncTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "xmpp-chat-sync-config-flow.xml";
     }
 
     @Override

@@ -18,20 +18,16 @@ import org.mule.api.exception.MessageRedeliveredException;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.message.ExceptionMessage;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.runners.Parameterized;
 
-public abstract class AbstractJmsRedeliveryTestCase extends AbstractServiceAndFlowTestCase
+public abstract class AbstractJmsRedeliveryTestCase extends FunctionalTestCase
 {
 
     protected static final String JMS_INPUT_QUEUE = "jms://in?connector=jmsConnectorLimitedRedelivery";
@@ -43,18 +39,16 @@ public abstract class AbstractJmsRedeliveryTestCase extends AbstractServiceAndFl
     protected Latch messageRedeliveryExceptionFired;
     protected CounterCallback callback;
 
-    public AbstractJmsRedeliveryTestCase(ConfigVariant variant, String configResources)
+    public AbstractJmsRedeliveryTestCase()
     {
-        super(variant, configResources);
         System.setProperty("maxRedelivery", String.valueOf(getMaxRedelivery()));
         System.setProperty("maxRedeliveryAttempts", String.valueOf(getMaxRedeliveryAttempts()));
     }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "jms-redelivery-flow.xml"}});
+        return "jms-redelivery-flow.xml";
     }
 
     @Before

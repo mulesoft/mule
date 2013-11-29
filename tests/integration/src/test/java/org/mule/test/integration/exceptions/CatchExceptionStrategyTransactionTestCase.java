@@ -6,23 +6,19 @@
  */
 package org.mule.test.integration.exceptions;
 
-import org.hamcrest.core.IsNull;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import org.hamcrest.core.IsNull;
+import org.junit.Test;
 
 public class CatchExceptionStrategyTransactionTestCase extends FunctionalTestCase
 {

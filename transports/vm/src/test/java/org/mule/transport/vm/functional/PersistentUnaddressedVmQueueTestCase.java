@@ -8,31 +8,21 @@ package org.mule.transport.vm.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class PersistentUnaddressedVmQueueTestCase extends AbstractServiceAndFlowTestCase
+public class PersistentUnaddressedVmQueueTestCase extends FunctionalTestCase
 {
+
     private static final int RECEIVE_TIMEOUT = 5000;
 
-    public PersistentUnaddressedVmQueueTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "vm/persistent-unaddressed-vm-queue-test-flow.xml"}});
+        return "vm/persistent-unaddressed-vm-queue-test-flow.xml";
     }
 
     @Test

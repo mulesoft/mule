@@ -6,33 +6,22 @@
  */
 package org.mule.transport.tcp.issues;
 
+import static org.junit.Assert.assertTrue;
 import org.mule.transport.tcp.TcpConnector;
 import org.mule.transport.tcp.TcpFunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * This is just to check that the Boolean (rather than boolean) doesn't cause any problems
  */
 public class ReuseMule2069TestCase extends TcpFunctionalTestCase
 {
-    public ReuseMule2069TestCase(ConfigVariant variant, String configResources)
+
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-    
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "reuse-mule-2069-flow.xml"}
-        });
+        return "reuse-mule-2069-flow.xml";
     }
 
     @Test
