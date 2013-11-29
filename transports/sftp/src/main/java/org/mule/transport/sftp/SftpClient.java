@@ -4,7 +4,6 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.sftp;
 
 import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_DELETE_ACTION;
