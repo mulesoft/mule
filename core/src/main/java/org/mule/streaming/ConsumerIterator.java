@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.streaming;
 
 import org.mule.api.Closeable;
@@ -24,6 +25,20 @@ public class ConsumerIterator<T> implements Iterator<T>, Closeable, ProvidesTota
 {
 
     private Consumer<T> consumer;
+
+    /**
+     * Creates a new ConsumerIterator for the given {@link Producer}. Use this
+     * factory method over the {@link #ConsumerIterator(Consumer)} constructor
+     * whenever you want to let the system choose what the best {@link Consumer} is
+     * for your case
+     * 
+     * @param producer a {@link Producer}
+     * @return a new {@link ConsumerIterator}
+     */
+    public static <T> ConsumerIterator<T> forProducer(Producer<T> producer)
+    {
+        return new ConsumerIterator<T>(new ElementBasedPagingConsumer<T>(producer));
+    }
 
     public ConsumerIterator(Consumer<T> consumer)
     {
