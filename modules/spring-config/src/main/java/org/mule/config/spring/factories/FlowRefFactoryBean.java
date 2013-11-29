@@ -145,7 +145,7 @@ public class FlowRefFactoryBean
                 @Override
                 public MuleEvent process(MuleEvent event) throws MuleException
                 {
-                    MuleEvent newEvent = DefaultMuleEvent.copy(event);
+                    MuleEvent newEvent = DefaultMuleEvent.copyPreservingSession(event);
                     newEvent.clearFlowVariables();
                     MuleEvent resultEvent = referencedFlow.process(newEvent);
                     if (resultEvent != null && !resultEvent.equals(VoidMuleEvent.getInstance()))
