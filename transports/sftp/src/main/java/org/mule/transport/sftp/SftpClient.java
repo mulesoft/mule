@@ -386,18 +386,18 @@ public class SftpClient
     {
         try
         {
-        
+
             // Notify sftp put file action
             if (notifier != null)
             {
                 notifier.notify(SFTP_PUT_ACTION, currentDirectory + "/" + fileName);
             }
-            
+
             if (logger.isDebugEnabled())
             {
                 logger.debug("Sending to SFTP service: Stream = " + stream + " , filename = " + fileName);
             }
-            
+
             channelSftp.put(stream, fileName, writeMode);
         }
         catch (SftpException e)
@@ -406,7 +406,7 @@ public class SftpClient
             throw new IOException(e.getMessage());
         }
     }
-    
+
     public void storeFile(String fileNameLocal, String fileNameRemote) throws IOException
     {
         storeFile(fileNameLocal, fileNameRemote, OVERWRITE_MODE);
