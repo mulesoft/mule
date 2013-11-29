@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.streaming;
 
 import org.mule.tck.size.SmallTest;
@@ -36,7 +37,7 @@ public class QueueProducerTestCase
 
     private Set<String> values;
     private Iterator<String> valuesIterator;
-    private QueueProducer producer;
+    private QueueProducer<Serializable> producer;
 
     @Before
     public void setUp() throws Exception
@@ -59,7 +60,7 @@ public class QueueProducerTestCase
 
         Mockito.when(this.queue.size()).thenReturn(this.values.size());
 
-        this.producer = new QueueProducer(this.queue);
+        this.producer = new QueueProducer<Serializable>(this.queue);
     }
 
     @Test
