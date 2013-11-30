@@ -9,7 +9,7 @@ package org.mule.config.builders;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationException;
 import org.mule.config.ConfigResource;
-import org.mule.config.spring.MuleApplicationContext;
+import org.mule.config.spring.MuleArtifactContext;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 
 import java.io.FileNotFoundException;
@@ -103,7 +103,7 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
             servletContextResources[i] = new ServletContextOrClassPathResource(context, configResources[i].getResourceName());
         }
 
-        return new MuleApplicationContext(muleContext, servletContextResources);
+        return new MuleArtifactContext(muleContext, servletContextResources);
     }
 
     /**
@@ -133,6 +133,16 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
             parentContext = (ApplicationContext) locator.useBeanFactory(parentContextKey).getFactory();
         }
 
+        return parentContext;
+    }
+
+    public void setParentContext(ApplicationContext parentContext)
+    {
+        this.parentContext = parentContext;
+    }
+
+    public ApplicationContext getParentContext()
+    {
         return parentContext;
     }
 

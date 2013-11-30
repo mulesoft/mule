@@ -10,9 +10,11 @@ import org.mule.api.context.WorkManager;
 
 public class PollingReceiverWorkerSchedule implements Runnable
 {
+
     protected final PollingReceiverWorker worker;
     protected final WorkManager workManager;
     protected final AbstractPollingMessageReceiver receiver;
+    private final ClassLoader classLoader;
 
     protected PollingReceiverWorkerSchedule(PollingReceiverWorker work)
     {
@@ -20,15 +22,26 @@ public class PollingReceiverWorkerSchedule implements Runnable
         worker = work;
         receiver = work.getReceiver();
         workManager = receiver.getWorkManager();
+        //use the class loader from the thread it created the work.
+        classLoader = Thread.currentThread().getContextClassLoader();
     }
 
     public void run()
     {
         try
         {
-            if (!worker.isRunning())
+            ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
+            try
             {
-                workManager.scheduleWork(worker);
+                Thread.currentThread().setContextClassLoader(classLoader);
+                if (!worker.isRunning())
+                {
+                    workManager.scheduleWork(worker);
+                }
+            }
+            finally
+            {
+                Thread.currentThread().setContextClassLoader(originalCl);
             }
         }
         catch (Exception e)

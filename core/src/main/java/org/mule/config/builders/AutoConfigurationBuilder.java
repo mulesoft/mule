@@ -7,8 +7,10 @@
 package org.mule.config.builders;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.config.DomainMuleContextAwareConfigurationBuilder;
 import org.mule.config.ConfigResource;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
@@ -25,8 +27,10 @@ import java.util.Properties;
  * auto-detecting the ConfigurationBuilder to use for each resource. This is resolved by either checking the
  * classpath for config modules e.g. spring-config or by using the file extention or a combination.
  */
-public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuilder
+public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuilder implements DomainMuleContextAwareConfigurationBuilder
 {
+    private MuleContext domainContext;
+
     public AutoConfigurationBuilder(String resource) throws ConfigurationException
     {
         super(resource);
@@ -86,6 +90,14 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
                 ConfigResource[] constructorArg = new ConfigResource[configs.size()];
                 System.arraycopy(configs.toArray(), 0, constructorArg, 0, configs.size());
                 ConfigurationBuilder cb = (ConfigurationBuilder) ClassUtils.instanciateClass(className, new Object[] {constructorArg});
+                if (domainContext != null && cb instanceof DomainMuleContextAwareConfigurationBuilder)
+                {
+                    ((DomainMuleContextAwareConfigurationBuilder) cb).setDomainContext(domainContext);
+                }
+                else if (domainContext != null)
+                {
+                    throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("ConfigurationBuilder %s does not support domain context", cb.getClass().getCanonicalName())));
+                }
                 cb.configure(muleContext);
             }
         }
@@ -97,5 +109,11 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
         {
             throw new ConfigurationException(e);
         }
+    }
+
+    @Override
+    public void setDomainContext(MuleContext domainContext)
+    {
+        this.domainContext  = domainContext;
     }
 }

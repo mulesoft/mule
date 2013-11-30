@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <flow name="serverFlow">
+        <vm:inbound-endpoint path="helloWorldService" exchange-pattern="request-response" connector-ref="sharedVmConnector"/>
+        <set-payload value="hello world"/>
+    </flow>
+
+    <flow name="serverFlowRequestReply">
+        <vm:inbound-endpoint path="helloWorldServiceRequestReply" connector-ref="sharedVmConnector"/>
+        <set-payload value="hello world"/>
+    </flow>
+
+    <flow name="serverFlowOneWay">
+        <vm:inbound-endpoint path="helloWorldServiceOneWay" connector-ref="sharedVmConnector"/>
+        <set-payload value="hello world"/>
+    </flow>
+
+</mule>

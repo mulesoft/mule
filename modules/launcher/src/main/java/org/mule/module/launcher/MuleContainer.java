@@ -14,7 +14,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.module.launcher.coreextension.DefaultMuleCoreExtensionManager;
 import org.mule.module.launcher.coreextension.MuleCoreExtensionManager;
-import org.mule.module.launcher.log4j.ApplicationAwareRepositorySelector;
+import org.mule.module.launcher.log4j.ArtifactAwareRepositorySelector;
 import org.mule.util.MuleUrlStreamHandlerFactory;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
@@ -67,7 +67,7 @@ public class MuleContainer
         if (System.getProperty("mule.simpleLog") == null)
         {
             // TODO save this guard ref for later
-            LogManager.setRepositorySelector(new ApplicationAwareRepositorySelector(), new Object());
+            LogManager.setRepositorySelector(new ArtifactAwareRepositorySelector(), new Object());
         }
         logger = LogFactory.getLog(MuleContainer.class);
     }
