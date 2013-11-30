@@ -24,7 +24,7 @@ public class MessagingExceptionComponentTestCase extends FunctionalTestCase
     @Override
     protected String getConfigFile()
     {
-        return "jbpm-component-functional-test-service.xml";
+        return "jbpm-component-config.xml";
     }
 
     @Test

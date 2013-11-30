@@ -5,43 +5,34 @@
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
       xsi:schemaLocation="
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-       http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
-       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+           http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+           http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+           http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
 
     <jms:activemq-connector name="jmsConnector"/>
 
     <jms:endpoint connector-ref="jmsConnector" name="testJmsEndpoint"
                   queue="testQueue" exchange-pattern="request-response"/>
 
-    <model>
-        <service name="test">
-            <inbound>
-                <inbound-endpoint ref="testJmsEndpoint">
-                    <response>
-                        <scripting:transformer>
-                            <scripting:script engine="groovy">
-                                return payload + " transformed"
-                            </scripting:script>
-                        </scripting:transformer>
-                        <custom-transformer class="org.mule.TransformersInvokedFromResponseTestCase$InvocationCounterTransformer1"/>
-                    </response>
-                </inbound-endpoint>
-            </inbound>
-            <echo-component/>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint address="vm://vmOutput"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="test">
+        <inbound-endpoint ref="testJmsEndpoint">
+            <response>
+                <scripting:transformer>
+                    <scripting:script engine="groovy">
+                        return payload + " transformed"
+                    </scripting:script>
+                </scripting:transformer>
+                <custom-transformer
+                        class="org.mule.TransformersInvokedFromResponseTestCase$InvocationCounterTransformer1"/>
+            </response>
+        </inbound-endpoint>
+        <echo-component/>
+        <outbound-endpoint address="vm://vmOutput"/>
+    </flow>
 
-        <service name="output">
-            <inbound>
-                <vm:inbound-endpoint path="vmOutput"/>
-            </inbound>
-            <echo-component/>
-        </service>
-    </model>
+    <flow name="output">
+        <vm:inbound-endpoint path="vmOutput"/>
+        <echo-component/>
+    </flow>
 </mule>
