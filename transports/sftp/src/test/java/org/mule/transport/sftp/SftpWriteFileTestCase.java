@@ -26,7 +26,7 @@ public class SftpWriteFileTestCase extends AbstractSftpFunctionalTestCase {
         MuleClient client = muleContext.getClient();
         client.send("vm://append", "hello", null);
         client.send("vm://append", " world", null);
-        MuleMessage message = client.request("file://testdir/append.txt", 3000);
+        MuleMessage message = client.request("file://testdir/append.txt", RECEIVE_TIMEOUT);
         assertEquals("hello world", message.getPayloadAsString());
     }
 
@@ -36,7 +36,7 @@ public class SftpWriteFileTestCase extends AbstractSftpFunctionalTestCase {
         MuleClient client = muleContext.getClient();
         client.send("vm://overwrite", "hello", null);
         client.send("vm://overwrite", "world", null);
-        MuleMessage message = client.request("file://testdir/overwrite.txt", 3000);
+        MuleMessage message = client.request("file://testdir/overwrite.txt", RECEIVE_TIMEOUT);
         assertEquals("world", message.getPayloadAsString());
     }
 
