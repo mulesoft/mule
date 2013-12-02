@@ -709,14 +709,16 @@ public class SftpClient
         APPEND
         {
             @Override
-            public int intValue() {
+            public int intValue() 
+            {
                 return ChannelSftp.APPEND;
             }
         },
         OVERWRITE
         {
             @Override
-            public int intValue() {
+            public int intValue() 
+            {
                 return ChannelSftp.OVERWRITE;
             }
         };
