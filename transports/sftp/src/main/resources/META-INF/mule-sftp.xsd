@@ -304,6 +304,7 @@
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="throwException"/>
             <xsd:enumeration value="overwrite"/>
+            <xsd:enumeration value="append"/>
             <xsd:enumeration value="addSeqNo"/>
         </xsd:restriction>
     </xsd:simpleType>

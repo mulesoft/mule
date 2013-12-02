@@ -63,6 +63,7 @@ public class SftpConnector extends AbstractConnector
     public static final String PROPERTY_USE_TEMP_FILE_TIMESTAMP_SUFFIX = "useTempFileTimestampSuffix";
     public static final String PROPERTY_DUPLICATE_HANDLING_THROW_EXCEPTION = "throwException";
     public static final String PROPERTY_DUPLICATE_HANDLING_OVERWRITE = "overwrite";
+    public static final String PROPERTY_DUPLICATE_HANDLING_APPEND = "append";
     public static final String PROPERTY_DUPLICATE_HANDLING_ASS_SEQ_NO = "addSeqNo";
     public static final String PROPERTY_MAX_CONNECTION_POOL_SIZE = "maxConnectionPoolSize";
     public static final String PROPERTY_KEEP_FILE_ON_ERROR = "keepFileOnError";
