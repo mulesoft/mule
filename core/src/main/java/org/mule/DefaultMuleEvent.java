@@ -958,6 +958,15 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         }
     }
 
+    /**
+     * This method does a complete deep copy of the event.
+     *
+     * This method should be used whenever the event is going to be executed
+     * in a different context and changes to that event must not effect the source event.
+     *
+     * @param event the event that must be copied
+     * @return the copied event
+     */
     public static MuleEvent copy(MuleEvent event)
     {
         MuleMessage messageCopy = (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy();
@@ -967,6 +976,32 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         return eventCopy;
     }
 
+    /**
+     * This method should be used whenever the event must be copied to
+     * by executed in a different context but changes in the session must be
+     * propagated.
+     *
+     * For instance, when flow A calls flow B using flow-ref.
+     *
+     * @param event the event that must be copied
+     * @return the copied event with the same MuleSession as the source event
+     */
+    public static MuleEvent copyPreservingSession(MuleEvent event)
+    {
+        MuleMessage messageCopy = (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy();
+        DefaultMuleEvent eventCopy = new DefaultMuleEvent(messageCopy, event, event.getSession());
+        copyVariables((DefaultMuleEvent) event, eventCopy);
+        return eventCopy;
+    }
+
+    /**
+     * Copies the variables from source event to destination event.
+     *
+     * Eliminates any previous flow variables from source event.
+     *
+     * @param source the event from which we should take the variables.
+     * @param destination the event to which we should copy the variables.
+     */
     public static void copyVariables(DefaultMuleEvent source, DefaultMuleEvent destination)
     {
         destination.flowVariables = new CaseInsensitiveHashMap(source.flowVariables);

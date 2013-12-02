@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.streaming;
 
 import org.mule.api.MuleException;
 import org.mule.util.queue.Queue;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * {@link org.mule.util.queue.Queue} A polling timeout value might be specified,
  * otherwise the default value of 5000 milliseconds will be assumed
  */
-public class QueueProducer implements Producer<Serializable>
+public class QueueProducer<T> implements Producer<T>
 {
 
     private static final Logger logger = LoggerFactory.getLogger(QueueProducer.class);
@@ -61,24 +61,25 @@ public class QueueProducer implements Producer<Serializable>
      * returned as well
      */
     @Override
-    public List<Serializable> produce()
+    @SuppressWarnings("unchecked")
+    public List<T> produce()
     {
         if (this.queue == null)
         {
             return Collections.emptyList();
         }
 
-        Serializable item = null;
+        T item = null;
         try
         {
-            item = this.queue.poll(this.timeout);
+            item = (T) this.queue.poll(this.timeout);
         }
         catch (InterruptedException e)
         {
             logger.warn("Thread interrupted while polling in producer. Will return an empty list", e);
         }
 
-        return item != null ? Arrays.asList(item) : Collections.<Serializable> emptyList();
+        return item != null ? Arrays.<T>asList(item) : Collections.<T> emptyList();
     }
 
     @Override

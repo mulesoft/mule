@@ -109,7 +109,7 @@
 
     <flow name="enrichAttachmentWithoutContentType" processingStrategy="synchronous">
         <flow-ref name="flowEnricher"/>
-        <test:assert expression="#[groovy:message.getInvocationProperty('failure') != null]"/>
+        <test:assert expression="#[groovy:message.getOutboundProperty('failure') != null]"/>
     </flow>
 
     <flow name="flowEnricher" processingStrategy="synchronous">
@@ -118,7 +118,7 @@
             <enrich target="#[message.outboundAttachments['attach']]" source="#[variable:enricherAttachment]"/>
         </enricher>
         <catch-exception-strategy>
-            <set-variable variableName="failure" value="failedExecution"/>
+            <set-property propertyName="failure" value="failedExecution"/>
         </catch-exception-strategy>
     </flow>
 
