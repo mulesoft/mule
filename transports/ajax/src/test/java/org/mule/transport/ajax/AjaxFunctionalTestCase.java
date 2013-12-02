@@ -13,6 +13,7 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.listener.FlowExecutionListener;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
@@ -108,6 +109,7 @@ public class AjaxFunctionalTestCase extends AbstractServiceAndFlowTestCase
         }
     }
 
+    @Ignore("flaky test")
     @Test
     public void testClientSubscribeWithString() throws Exception
     {
