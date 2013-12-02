@@ -46,6 +46,7 @@ public class SftpMessageDispatcherTestCase extends AbstractMuleTestCase
     private SftpClient sftpClient = mock(SftpClient.class);
     private ArgumentCaptor<String> transferFilenameCaptor = ArgumentCaptor.forClass(String.class);
     private ArgumentCaptor<InputStream> inputStreamCaptor = ArgumentCaptor.forClass(InputStream.class);
+    private ArgumentCaptor<SftpClient.WriteMode> writeModeCaptor = ArgumentCaptor.forClass(SftpClient.WriteMode.class);
     private FilenameParser filenameParser = mock(FilenameParser.class);
 
     @Before
@@ -115,4 +116,30 @@ public class SftpMessageDispatcherTestCase extends AbstractMuleTestCase
         IOUtils.copy(inputStream, stringWriter, "UTF-8");
         assertEquals(payload, stringWriter.toString());
     }
+    
+    @Test
+    public void appendFile() throws Exception
+    {
+        when(sftpConnector.getDuplicateHandling()).thenReturn("append");
+        SftpMessageDispatcher sftpMessageDispatcher = new SftpMessageDispatcher(outboundEndpoint);
+        sftpMessageDispatcher.doDispatch(muleEvent);
+        verify(sftpClient).storeFile(transferFilenameCaptor.capture(), inputStreamCaptor.capture(), writeModeCaptor.capture());
+        InputStream inputStream = inputStreamCaptor.getValue();
+        StringWriter stringWriter = new StringWriter();
+        IOUtils.copy(inputStream, stringWriter, "UTF-8");
+        assertEquals(payload, stringWriter.toString());
+    }
+
+    @Test
+    public void overwriteFile() throws Exception
+    {
+        SftpMessageDispatcher sftpMessageDispatcher = new SftpMessageDispatcher(outboundEndpoint);
+        sftpMessageDispatcher.doDispatch(muleEvent);
+        verify(sftpClient).storeFile(transferFilenameCaptor.capture(), inputStreamCaptor.capture());
+        InputStream inputStream = inputStreamCaptor.getValue();
+        StringWriter stringWriter = new StringWriter();
+        IOUtils.copy(inputStream, stringWriter, "UTF-8");
+        assertEquals(payload, stringWriter.toString());        
+    }
+    
 }

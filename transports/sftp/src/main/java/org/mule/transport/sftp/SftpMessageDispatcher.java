@@ -102,7 +102,15 @@ public class SftpMessageDispatcher extends AbstractMessageDispatcher
             }
 
             // send file over sftp
-            client.storeFile(transferFilename, inputStream);
+            // choose appropriate writing mode
+            if (sftpUtil.getDuplicateHandling().equals(SftpConnector.PROPERTY_DUPLICATE_HANDLING_APPEND))
+            {
+                client.storeFile(transferFilename, inputStream, SftpClient.WriteMode.APPEND);
+            }
+            else
+            {
+                client.storeFile(transferFilename, inputStream);
+            }
 
             if (useTempDir)
             {
