@@ -59,6 +59,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Me
         ExpressionManager expressionManager = event.getMuleContext().getExpressionManager();
 
         MuleEvent enricherEvent;
+        //TODO: change DefaultMuleEvent.copy to DefaultMuleEvent.copyPreservingSession
         enricherEvent = DefaultMuleEvent.copy(event);
 
         OptimizedRequestContext.unsafeSetEvent(enricherEvent);
