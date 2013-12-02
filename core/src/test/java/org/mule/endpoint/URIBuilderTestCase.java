@@ -7,6 +7,7 @@
 package org.mule.endpoint;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -123,6 +124,14 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
         assertEquals("http://localhost:8080/test", result);
     }
 
+    @Test
+    public void testConstructAddressWithXPath()
+    {
+        URIBuilder uri = createURIBuilder("localhost", 8080, "http", "#[xpath(//whatever)]");
+        String result = uri.getEncodedConstructor();
+        assertNotNull(result);
+    }
+    
     @Test
     public void testConstructAddressWithRootTrailingSlashInPath()
     {
