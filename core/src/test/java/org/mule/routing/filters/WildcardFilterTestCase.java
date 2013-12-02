@@ -125,36 +125,4 @@ public class WildcardFilterTestCase extends AbstractMuleTestCase
         assertTrue(filter.accept("The quick Brown fox"));
     }
 
-    @Test
-    public void testClassAndSubclass()
-    {
-        WildcardFilter filter = new WildcardFilter();
-
-        filter.setPattern("java.lang.Throwable+");
-        assertTrue(filter.accept(new Exception()));
-        assertTrue(filter.accept(new Throwable()));
-        assertFalse(filter.accept(new Object()));
-
-        filter.setPattern("java.lang.Throwable");
-        assertFalse(filter.accept(new Exception()));
-        assertTrue(filter.accept(new Throwable()));
-        assertFalse(filter.accept(new Object()));
-    }
-
-    @Test
-    public void testClassAndSubclassUsingString()
-    {
-        WildcardFilter filter = new WildcardFilter();
-
-        filter.setPattern("java.lang.Throwable+");
-        assertTrue(filter.accept(new Exception().getClass().getName()));
-        assertTrue(filter.accept(new Throwable().getClass().getName()));
-        assertFalse(filter.accept(new Object().getClass().getName()));
-
-        filter.setPattern("java.lang.Throwable");
-        assertFalse(filter.accept(new Exception().getClass().getName()));
-        assertTrue(filter.accept(new Throwable().getClass().getName()));
-        assertFalse(filter.accept(new Object().getClass().getName()));
-    }
-
 }

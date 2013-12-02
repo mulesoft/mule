@@ -9,7 +9,6 @@ package org.mule.routing.filters;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.routing.filter.ObjectFilter;
-import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
 import org.apache.commons.logging.Log;
@@ -115,28 +114,6 @@ public class WildcardFilter implements Filter, ObjectFilter
                 if (foundMatch)
                 {
                     return true;
-                }
-                else if (pattern.endsWith("+") && pattern.length() > 1)
-                {
-                    String className = pattern.substring(0, pattern.length() - 1);
-                    try
-                    {
-                        Class<?> theClass = ClassUtils.loadClass(className, this.getClass());
-                        if (!(object instanceof String))
-                        {
-                            if (theClass.isInstance(object))
-                            {
-                                return true;
-                            }
-                        }
-                        else if (theClass.isAssignableFrom(ClassUtils.loadClass(object.toString(),this.getClass())))
-                        {
-                            return true;
-                        }
-                    }
-                    catch (ClassNotFoundException e)
-                    {
-                    }
                 }
             }
         }
