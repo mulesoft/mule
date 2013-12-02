@@ -16,6 +16,7 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.custommonkey.xmlunit.XMLAssert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class SimpleXmlTransformerFunctionalTestCase extends FunctionalTestCase
@@ -33,6 +34,7 @@ public class SimpleXmlTransformerFunctionalTestCase extends FunctionalTestCase
         return "org/mule/module/xml/simple-xml-transformer-functional-test-flow.xml";
     }
 
+    @Ignore("flaky test")
     @Test
     public void testXmlOut() throws Exception
     {
