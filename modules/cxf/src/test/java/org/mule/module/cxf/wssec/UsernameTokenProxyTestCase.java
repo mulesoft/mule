@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
@@ -51,6 +52,7 @@ public class UsernameTokenProxyTestCase extends AbstractServiceAndFlowTestCase
         super.doSetUp();
     }
 
+    @Ignore("MULE-6926: Flaky Test")
     @Test
     public void testProxyEnvelope() throws Exception
     {
