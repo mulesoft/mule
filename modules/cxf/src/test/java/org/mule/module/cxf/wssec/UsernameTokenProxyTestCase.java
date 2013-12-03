@@ -15,6 +15,7 @@ import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.InputStream;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -41,6 +42,7 @@ public class UsernameTokenProxyTestCase extends FunctionalTestCase
         super.doSetUp();
     }
 
+    @Ignore("MULE-6926: Flaky Test")
     @Test
     public void testProxyEnvelope() throws Exception 
     {
