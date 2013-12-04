@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.tck;
+package org.mule.tck.junit4;
 
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
@@ -15,7 +15,9 @@ import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.config.spring.SpringXmlDomainConfigurationBuilder;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.*;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
 import org.mule.util.ClassUtils;
 
 import java.util.ArrayList;
@@ -26,30 +28,33 @@ import java.util.Map;
 import org.junit.After;
 import org.junit.Before;
 
-public abstract class DomainFunctionalTestCase extends org.mule.tck.junit4.AbstractMuleTestCase
+public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase
 {
 
-    private Map<String, MuleContext> muleContexts = new HashMap<String, MuleContext>();
-    private List<MuleContext> disposedContexts = new ArrayList<MuleContext>();
+    private final Map<String, MuleContext> muleContexts = new HashMap<String, MuleContext>();
+    private final List<MuleContext> disposedContexts = new ArrayList<MuleContext>();
     private MuleContext domainContext;
 
     protected abstract String getDomainConfig();
 
-    public synchronized void disposeMuleContext(MuleContext muleContext)
+    public synchronized void disposeMuleContext(final MuleContext muleContext)
     {
         disposedContexts.add(muleContext);
         muleContext.dispose();
-        while (!muleContext.isDisposed())
+        new PollingProber(10000,100).check(new Probe()
         {
-            try
+            @Override
+            public boolean isSatisfied()
             {
-                Thread.sleep(100);
+                return muleContext.isDisposed();
             }
-            catch (InterruptedException e)
+
+            @Override
+            public String describeFailure()
             {
-                throw new RuntimeException(e);
+                return "mule context timeout during dispose";
             }
-        }
+        });
     }
 
     protected ConfigurationBuilder getDomainBuilder(String configResource) throws Exception

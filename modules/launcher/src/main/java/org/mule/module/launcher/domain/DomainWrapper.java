@@ -7,6 +7,8 @@
 package org.mule.module.launcher.domain;
 
 import org.mule.api.MuleContext;
+import org.mule.api.config.ConfigurationBuilder;
+import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.artifact.ArtifactWrapper;
 
 import java.io.IOException;
@@ -35,6 +37,12 @@ public class DomainWrapper extends ArtifactWrapper<Domain> implements Domain
     public MuleContext getMuleContext()
     {
         return getDelegate().getMuleContext();
+    }
+
+    @Override
+    public ConfigurationBuilder createApplicationConfigurationBuilder(Application application) throws Exception
+    {
+        return getDelegate().createApplicationConfigurationBuilder(application);
     }
 
     @Override

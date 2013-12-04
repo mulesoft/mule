@@ -7,7 +7,6 @@
 package org.mule.transport.jms;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.transport.AbstractMuleMessageFactory;
@@ -22,10 +21,6 @@ import javax.jms.Message;
 
 public class JmsMuleMessageFactory extends AbstractMuleMessageFactory
 {
-    public JmsMuleMessageFactory(MuleContext context)
-    {
-        super(context);
-    }
 
     @Override
     protected Class<?>[] getSupportedTransportMessageTypes()

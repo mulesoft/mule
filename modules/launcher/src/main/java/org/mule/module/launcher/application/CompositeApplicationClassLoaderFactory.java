@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * Composes a {@link CompositeApplicationClassLoader} using a {@link ApplicationClassLoaderFactory}
- * to create the classloader for a Mule application and the plugin
+ * to getDomainClassLoader the classloader for a Mule application and the plugin
  * classloaders available in the {@link PluginClassLoaderManager}
  */
 public class CompositeApplicationClassLoaderFactory implements ApplicationClassLoaderFactory

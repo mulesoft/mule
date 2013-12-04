@@ -28,9 +28,9 @@ public class PollingReceiverWorkerSchedule implements Runnable
 
     public void run()
     {
+        ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
         try
         {
-            ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
             try
             {
                 Thread.currentThread().setContextClassLoader(classLoader);
@@ -39,14 +39,14 @@ public class PollingReceiverWorkerSchedule implements Runnable
                     workManager.scheduleWork(worker);
                 }
             }
-            finally
+            catch (Exception e)
             {
-                Thread.currentThread().setContextClassLoader(originalCl);
+                receiver.getConnector().getMuleContext().getExceptionListener().handleException(e);
             }
         }
-        catch (Exception e)
+        finally
         {
-            receiver.getConnector().getMuleContext().getExceptionListener().handleException(e);
+            Thread.currentThread().setContextClassLoader(originalCl);
         }
     }
 

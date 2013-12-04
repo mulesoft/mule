@@ -499,7 +499,7 @@ public final class MuleTestUtils
         final MuleSession session = getTestSession(flowConstruct, context);
 
         final MuleMessageFactory factory = endpoint.getConnector().createMuleMessageFactory();
-        final MuleMessage message = factory.create(data, endpoint.getEncoding());
+        final MuleMessage message = factory.create(data, endpoint.getEncoding(), context);
 
         return new DefaultMuleEvent(message, endpoint, flowConstruct, session);
     }
@@ -510,7 +510,7 @@ public final class MuleTestUtils
         final InboundEndpoint endpoint = getTestInboundEndpoint("test1",
             MessageExchangePattern.REQUEST_RESPONSE, context, null);
         final MuleMessageFactory factory = endpoint.getConnector().createMuleMessageFactory();
-        final MuleMessage message = factory.create(data, endpoint.getEncoding());
+        final MuleMessage message = factory.create(data, endpoint.getEncoding(), context);
 
         return new DefaultMuleEvent(message, endpoint, getTestService(context), session);
     }

@@ -297,7 +297,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
                         return;
                     }
                     FtpMuleMessageFactory muleMessageFactory = createMuleMessageFactory(finalClient);
-                    final MuleMessage finalMessage = muleMessageFactory.create(file, endpoint.getEncoding());
+                    final MuleMessage finalMessage = muleMessageFactory.create(file, endpoint.getEncoding(), endpoint.getMuleContext());
                     muleMessage = finalMessage;
                     ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
                     executionTemplate.execute(new ExecutionCallback<MuleEvent>()

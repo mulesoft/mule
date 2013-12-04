@@ -7,6 +7,9 @@
 package org.mule.module.launcher.domain;
 
 import org.mule.api.MuleContext;
+import org.mule.api.config.ConfigurationBuilder;
+import org.mule.module.launcher.application.Application;
+import org.mule.module.launcher.application.DefaultMuleApplication;
 import org.mule.module.launcher.artifact.Artifact;
 
 /**
@@ -28,4 +31,13 @@ public interface Domain extends Artifact
      */
     MuleContext getMuleContext();
 
+    /**
+     * Creates a {@link ConfigurationBuilder} for a certain application which is going to be configured
+     * to use the correct domain.
+     *
+     * @param application application for which the configuration builder should be created.
+     * @return configuration builder to getDomainClassLoader the application
+     * @throws Exception
+     */
+    ConfigurationBuilder createApplicationConfigurationBuilder(Application application) throws Exception;
 }

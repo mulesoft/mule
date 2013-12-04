@@ -13,7 +13,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
-import org.mule.tck.DomainFunctionalTestCase;
+import org.mule.tck.junit4.DomainFunctionalTestCase;
 import org.mule.tck.listener.FlowExecutionListener;
 
 import java.util.Map;
@@ -45,7 +45,6 @@ public class VmInterAppCommunicationTestCase extends DomainFunctionalTestCase
     @Test
     public void requestResponse() throws Exception
     {
-        //TODO remove reference to AbstractMuleTestCase
         Flow clientFlow = getMuleContextForApp(VM_CLIENT_APP).getRegistry().get("clientFlow");
         MuleEvent response = clientFlow.process(new DefaultMuleEvent(new DefaultMuleMessage("test-data", (Map<String, Object>) null, getMuleContextForApp(VM_CLIENT_APP)), MessageExchangePattern.REQUEST_RESPONSE, clientFlow));
         assertThat(response.getMessageAsString(), Is.is("hello world"));
@@ -54,7 +53,6 @@ public class VmInterAppCommunicationTestCase extends DomainFunctionalTestCase
     @Test
     public void requestReply() throws Exception
     {
-        //TODO remove reference to AbstractMuleTestCase
         Flow clientFlow = getMuleContextForApp(VM_CLIENT_APP).getRegistry().get("clientFlowRequestReply");
         MuleEvent response = clientFlow.process(new DefaultMuleEvent(new DefaultMuleMessage("test-data", (Map<String, Object>) null, getMuleContextForApp(VM_CLIENT_APP)), MessageExchangePattern.REQUEST_RESPONSE, clientFlow));
         assertThat(response.getMessageAsString(), Is.is("hello world"));
@@ -63,7 +61,6 @@ public class VmInterAppCommunicationTestCase extends DomainFunctionalTestCase
     @Test
     public void oneWay() throws Exception
     {
-        //TODO remove reference to AbstractMuleTestCase
         Flow clientFlow = getMuleContextForApp(VM_CLIENT_APP).getRegistry().get("clientFlowOneWay");
         FlowExecutionListener flowExecutionListener = new FlowExecutionListener(getMuleContextForApp(VM_SERVER_APP));
         MuleEvent response = clientFlow.process(new DefaultMuleEvent(new DefaultMuleMessage("test-data", (Map<String, Object>) null, getMuleContextForApp(VM_CLIENT_APP)), MessageExchangePattern.REQUEST_RESPONSE, clientFlow));

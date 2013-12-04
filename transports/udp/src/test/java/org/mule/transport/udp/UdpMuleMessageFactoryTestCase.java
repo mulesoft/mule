@@ -25,7 +25,7 @@ public class UdpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTes
     @Override
     protected MuleMessageFactory doCreateMuleMessageFactory()
     {
-        return new UdpMuleMessageFactory(muleContext);
+        return new UdpMuleMessageFactory();
     }
 
     @Override
@@ -46,7 +46,7 @@ public class UdpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTes
     {
         MuleMessageFactory factory = createMuleMessageFactory();
 
-        MuleMessage message = factory.create(getValidTransportMessage(), encoding);
+        MuleMessage message = factory.create(getValidTransportMessage(), encoding, muleContext);
         assertNotNull(message);
         assertPayload(message);
         assertEquals(PORT, message.getInboundProperty(UdpConnector.PORT_PROPERTY));

@@ -16,6 +16,8 @@ import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * Creates default mule applications
  */
@@ -59,7 +61,7 @@ public class DefaultApplicationFactory implements ApplicationFactory
     protected Application createAppFrom(ApplicationDescriptor descriptor) throws IOException
     {
         DefaultMuleApplication delegate;
-        if (descriptor.getDomain() == null || "".equals(descriptor.getDomain().trim()))
+        if (StringUtils.isEmpty(descriptor.getDomain()))
         {
             delegate = new DefaultMuleApplication(descriptor, applicationClassLoaderFactory, domainFactory.createDefaultDomain());
         }

@@ -7,8 +7,10 @@
 package org.mule.module.launcher.domain;
 
 import org.mule.api.MuleContext;
+import org.mule.api.config.ConfigurationBuilder;
 import org.mule.module.launcher.DeploymentStartException;
 import org.mule.module.launcher.InstallException;
+import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
 
 import java.io.File;
@@ -35,6 +37,12 @@ public class TestDomainWrapper implements Domain
     public MuleContext getMuleContext()
     {
         return delegate.getMuleContext();
+    }
+
+    @Override
+    public ConfigurationBuilder createApplicationConfigurationBuilder(Application application) throws Exception
+    {
+        return this.delegate.createApplicationConfigurationBuilder(application);
     }
 
     @Override
@@ -81,21 +89,15 @@ public class TestDomainWrapper implements Domain
     }
 
     @Override
-    public void redeploy()
-    {
-        delegate.redeploy();
-    }
-
-    @Override
     public String getArtifactName()
     {
         return delegate.getArtifactName();
     }
 
     @Override
-    public File[] getConfigResourcesFile()
+    public File[] getResourceFiles()
     {
-        return delegate.getConfigResourcesFile();
+        return delegate.getResourceFiles();
     }
 
     @Override

@@ -44,11 +44,6 @@ public interface Artifact
     void dispose();
 
     /**
-     * Dispose the artifact and installs it again.
-     */
-    void redeploy();
-
-    /**
      * @return the artifact identifier
      */
     String getArtifactName();
@@ -57,10 +52,10 @@ public interface Artifact
      * @return an array with the configuration files of the artifact. Never returns null.
      *         If there's no configuration file then returns an empty array.
      */
-    File[] getConfigResourcesFile();
+    File[] getResourceFiles();
 
     /**
-     * @return class loader risponsible for loading resources for this artifact.
+     * @return class loader responsible for loading resources for this artifact.
      */
     ArtifactClassLoader getArtifactClassLoader();
 

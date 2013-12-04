@@ -30,7 +30,7 @@ public class CompositeApplicationClassLoaderFactoryTestCase extends AbstractMule
 
     private final ApplicationClassLoaderFactory applicationClassLoaderFactory = mock(ApplicationClassLoaderFactory.class, RETURNS_DEEP_STUBS.get());
     private final PluginClassLoaderManager pluginClassLoaderManager = mock(PluginClassLoaderManager.class);
-    private final CompositeApplicationClassLoaderFactory pluginAwareClassLaoderFactory = new CompositeApplicationClassLoaderFactory(applicationClassLoaderFactory, pluginClassLoaderManager);
+    private final CompositeApplicationClassLoaderFactory pluginAwareClassLoaderFactory = new CompositeApplicationClassLoaderFactory(applicationClassLoaderFactory, pluginClassLoaderManager);
     private final ApplicationDescriptor appDescriptor = new ApplicationDescriptor();
 
     @Test
@@ -40,7 +40,7 @@ public class CompositeApplicationClassLoaderFactoryTestCase extends AbstractMule
         when(applicationClassLoaderFactory.create(appDescriptor).getClassLoader()).thenReturn(expectedClassLoader);
         when(pluginClassLoaderManager.getPluginClassLoaders()).thenReturn(Collections.EMPTY_LIST);
 
-        ClassLoader appClassLoader = pluginAwareClassLaoderFactory.create(appDescriptor).getClassLoader();
+        ClassLoader appClassLoader = pluginAwareClassLoaderFactory.create(appDescriptor).getClassLoader();
 
         assertThat(appClassLoader, equalTo(expectedClassLoader));
     }
@@ -56,7 +56,7 @@ public class CompositeApplicationClassLoaderFactoryTestCase extends AbstractMule
         pluginClassLoaders.add(pluginClassLoader);
         when(pluginClassLoaderManager.getPluginClassLoaders()).thenReturn(pluginClassLoaders);
 
-        ClassLoader createdClassLoader = pluginAwareClassLaoderFactory.create(appDescriptor).getClassLoader();
+        ClassLoader createdClassLoader = pluginAwareClassLoaderFactory.create(appDescriptor).getClassLoader();
 
         createdClassLoader.getResource("foo");
         assertThat(appClassLoader.loadedResource, equalTo(true));

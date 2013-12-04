@@ -96,18 +96,17 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
     {
         logger.debug("Building new DefaultMuleContext instance with MuleContextBuilder: " + this);
         DefaultMuleContext muleContext = createDefaultMuleContext();
-        MuleContext muleContextToInject = createMuleContextToInject(muleContext);
-        muleContext.setMuleConfiguration(injectMuleContextIfRequired(getMuleConfiguration(), muleContextToInject));
-        muleContext.setWorkManager(getWorkManager());
+        muleContext.setMuleConfiguration(injectMuleContextIfRequired(getMuleConfiguration(), muleContext));
+        muleContext.setWorkManager(injectMuleContextIfRequired(getWorkManager(), muleContext));
         muleContext.setworkListener(getWorkListener());
-        muleContext.setNotificationManager(injectMuleContextIfRequired(getNotificationManager(), muleContextToInject));
-        muleContext.setLifecycleManager(injectMuleContextIfRequired(getLifecycleManager(), muleContextToInject));
+        muleContext.setNotificationManager(injectMuleContextIfRequired(getNotificationManager(), muleContext));
+        muleContext.setLifecycleManager(injectMuleContextIfRequired(getLifecycleManager(), muleContext));
         muleContext.setExpressionManager(injectMuleContextIfRequired(new DefaultExpressionManager(),muleContext));
-        DefaultRegistryBroker registryBroker = new DefaultRegistryBroker(muleContextToInject);
+        DefaultRegistryBroker registryBroker = new DefaultRegistryBroker(muleContext);
         muleContext.setRegistryBroker(registryBroker);
-        muleContext.setMuleRegistry(new MuleRegistryHelper(registryBroker, muleContextToInject));
-        muleContext.setLocalMuleClient(new DefaultLocalMuleClient(muleContextToInject));
-        muleContext.setExceptionListener(new DefaultSystemExceptionStrategy(muleContextToInject));
+        muleContext.setMuleRegistry(new MuleRegistryHelper(registryBroker, muleContext));
+        muleContext.setLocalMuleClient(new DefaultLocalMuleClient(muleContext));
+        muleContext.setExceptionListener(new DefaultSystemExceptionStrategy(muleContext));
         muleContext.setExecutionClassLoader(Thread.currentThread().getContextClassLoader());
         return muleContext;
     }
@@ -115,11 +114,6 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
     protected DefaultMuleContext createDefaultMuleContext()
     {
         return new DefaultMuleContext();
-    }
-
-    protected MuleContext createMuleContextToInject(final MuleContext muleContext)
-    {
-        return muleContext;
     }
 
     public void setMuleConfiguration(MuleConfiguration config)
@@ -158,7 +152,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
     {
         if (object instanceof MuleContextAware)
         {
-            ((MuleContextAware)object).setMuleContext(muleContext);
+            ((MuleContextAware) object).setMuleContext(muleContext);
         }
         return object;
     }

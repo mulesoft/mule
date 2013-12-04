@@ -10,7 +10,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.api.MuleMessage;
-import org.mule.tck.DomainFunctionalTestCase;
+import org.mule.tck.junit4.DomainFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
@@ -33,8 +33,8 @@ public class HttpSamePortTestCase extends DomainFunctionalTestCase
     @Override
     public ApplicationConfig[] getConfigResources()
     {
-        return new ApplicationConfig[] {new ApplicationConfig(HELLO_WORLD_SERVICE_APP, new String[] {"domain/http-hello-world-service-app.xml"}),
-                new ApplicationConfig(HELLO_MULE_SERVICE_APP, new String[] {"domain/http-hello-mule-service-app.xml"})
+        return new ApplicationConfig[] {new ApplicationConfig(HELLO_WORLD_SERVICE_APP, new String[] {"domain/http-hello-world-app.xml"}),
+                new ApplicationConfig(HELLO_MULE_SERVICE_APP, new String[] {"domain/http-hello-mule-app.xml"})
         };
     }
 

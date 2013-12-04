@@ -17,14 +17,14 @@ import java.util.Map;
 public class DefaultDomainFactory implements DomainFactory
 {
 
-    private final DomainClassLoaderFactory domainClassLoaderFactory;
+    private final DomainClassLoaderRepository domainClassLoaderRepository;
+    private final Map<String, Domain> domains = new HashMap<String, Domain>();
 
-    private Map<String, Domain> domains = new HashMap<String, Domain>();
     protected DeploymentListener deploymentListener;
 
-    public DefaultDomainFactory(DomainClassLoaderFactory domainClassLoaderFactory)
+    public DefaultDomainFactory(DomainClassLoaderRepository domainClassLoaderRepository)
     {
-        this.domainClassLoaderFactory = domainClassLoaderFactory;
+        this.domainClassLoaderRepository = domainClassLoaderRepository;
     }
 
     public void setDeploymentListener(DeploymentListener deploymentListener)
@@ -49,7 +49,7 @@ public class DefaultDomainFactory implements DomainFactory
         {
             throw new IllegalArgumentException("Mule application name may not contain spaces: " + artifactName);
         }
-        DefaultMuleDomain defaultMuleDomain = new DefaultMuleDomain(domainClassLoaderFactory, artifactName);
+        DefaultMuleDomain defaultMuleDomain = new DefaultMuleDomain(domainClassLoaderRepository, artifactName);
         defaultMuleDomain.setDeploymentListener(deploymentListener);
         DomainWrapper domainWrapper = new DomainWrapper(defaultMuleDomain, this);
         domains.put(artifactName, domainWrapper);

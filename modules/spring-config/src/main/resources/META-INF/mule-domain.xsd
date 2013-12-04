@@ -14,7 +14,7 @@
     <xsd:element name="mule-domain" type="muleDomainType">
         <xsd:annotation>
             <xsd:documentation>
-                Either the root element of a Mule configuration, or a "top-level" element in a Spring configuration that contains further Mule elements.
+                Either the root element of a Mule domain configuration, or a "top-level" element in a Spring configuration that contains further Mule elements.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -25,7 +25,7 @@
                     <xsd:element name="description" type="mule:descriptionType" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Holds any kind of documentation that accompanies this configuration file. It is intended to be "human readable" only and is not used by the system.
+                                Holds any kind of documentation that accompanies this domain configuration file. It is intended to be "human readable" only and is not used by the system.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>

@@ -66,7 +66,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         {
             allResources = new ConfigResource[configResources.length + 2];
             allResources[0] = new ConfigResource(MULE_MINIMAL_SPRING_CONFIG);
-
             allResources[1] = new ConfigResource(MULE_SPRING_CONFIG);
             System.arraycopy(configResources, 0, allResources, 2, configResources.length);
         }

@@ -7,7 +7,7 @@
 package org.mule.module.launcher.application;
 
 import org.mule.module.launcher.domain.DefaultDomainFactory;
-import org.mule.module.launcher.domain.MuleDomainClassLoaderFactory;
+import org.mule.module.launcher.domain.MuleDomainClassLoaderRepository;
 
 import java.io.IOException;
 
@@ -23,7 +23,7 @@ public class TestApplicationFactory extends DefaultApplicationFactory
 
     public TestApplicationFactory(ApplicationClassLoaderFactory applicationClassLoaderFactory)
     {
-        super(applicationClassLoaderFactory, new DefaultDomainFactory(new MuleDomainClassLoaderFactory()));
+        super(applicationClassLoaderFactory, new DefaultDomainFactory(new MuleDomainClassLoaderRepository()));
     }
 
     @Override

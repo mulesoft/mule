@@ -26,7 +26,7 @@ public class JmsMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTes
     @Override
     protected MuleMessageFactory doCreateMuleMessageFactory()
     {
-        return new JmsMuleMessageFactory(muleContext);
+        return new JmsMuleMessageFactory();
     }
 
     @Override
@@ -62,7 +62,7 @@ public class JmsMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTes
         MuleMessageFactory factory = createMuleMessageFactory();
 
         Object payload = getValidTransportMessage();
-        MuleMessage message = factory.create(payload, encoding);
+        MuleMessage message = factory.create(payload, encoding, muleContext);
         assertNotNull(message);
         assertEquals(payload, message.getPayload());
         // message factory populates the inbound scope

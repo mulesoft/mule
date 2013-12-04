@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.api.config.MuleProperties;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.tck.size.SmallTest;
 import org.mule.util.FileUtils;
 
 import java.io.File;
@@ -24,6 +25,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+@SmallTest
 public class MuleSharedDomainClassLoaderTestCase extends AbstractMuleTestCase
 {
 
@@ -50,21 +52,19 @@ public class MuleSharedDomainClassLoaderTestCase extends AbstractMuleTestCase
     @Test
     public void whenOldDomainExistsUseOldDomain() throws Exception
     {
-        String defaultDomainName = DEFAULT_DOMAIN_NAME;
-        createOldDomainFolder(defaultDomainName);
-        createDomainFolder(defaultDomainName);
-        createOldDomainResource(defaultDomainName, RESOURCE_FILE_NAME);
-        MuleSharedDomainClassLoader classLoader = new MuleSharedDomainClassLoader(defaultDomainName, getClass().getClassLoader());
+        createOldDomainFolder(DEFAULT_DOMAIN_NAME);
+        createDomainFolder(DEFAULT_DOMAIN_NAME);
+        createOldDomainResource(DEFAULT_DOMAIN_NAME, RESOURCE_FILE_NAME);
+        MuleSharedDomainClassLoader classLoader = new MuleSharedDomainClassLoader(DEFAULT_DOMAIN_NAME, getClass().getClassLoader());
         assertThat(classLoader.findResource(RESOURCE_FILE_NAME), notNullValue());
     }
 
     @Test
     public void whenOldDomainDonNotExistsUseDomainFolder() throws Exception
     {
-        String defaultDomainName = DEFAULT_DOMAIN_NAME;
-        createDomainFolder(defaultDomainName);
-        createDomainResource(defaultDomainName, RESOURCE_FILE_NAME);
-        MuleSharedDomainClassLoader classLoader = new MuleSharedDomainClassLoader(defaultDomainName, getClass().getClassLoader());
+        createDomainFolder(DEFAULT_DOMAIN_NAME);
+        createDomainResource(DEFAULT_DOMAIN_NAME, RESOURCE_FILE_NAME);
+        MuleSharedDomainClassLoader classLoader = new MuleSharedDomainClassLoader(DEFAULT_DOMAIN_NAME, getClass().getClassLoader());
         assertThat(classLoader.findResource(RESOURCE_FILE_NAME), notNullValue());
     }
 
@@ -79,13 +79,11 @@ public class MuleSharedDomainClassLoaderTestCase extends AbstractMuleTestCase
     private void createOldDomainResource(String domainName, String resourceFile) throws Exception
     {
         assertThat(FileUtils.createFile(new File(getOldDomainFolder(domainName), resourceFile).getAbsolutePath()).exists(), is(true));
-        ;
     }
 
     private void createDomainResource(String domainName, String resourceFile) throws Exception
     {
         assertThat(FileUtils.createFile(new File(getDomainFolder(domainName), resourceFile).getAbsolutePath()).exists(), is(true));
-        ;
     }
 
     private void createDomainFolder(String domainName)

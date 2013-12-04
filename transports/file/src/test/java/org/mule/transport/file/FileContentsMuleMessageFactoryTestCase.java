@@ -39,7 +39,7 @@ public class FileContentsMuleMessageFactoryTestCase extends AbstractFileMuleMess
     @Override
     protected MuleMessageFactory doCreateMuleMessageFactory()
     {
-        return new FileContentsMuleMessageFactory(muleContext);
+        return new FileContentsMuleMessageFactory();
     }
 
     @Override
@@ -48,7 +48,7 @@ public class FileContentsMuleMessageFactoryTestCase extends AbstractFileMuleMess
         MuleMessageFactory factory = createMuleMessageFactory();
         
         Object payload = getValidTransportMessage();
-        MuleMessage message = factory.create(payload, encoding);
+        MuleMessage message = factory.create(payload, encoding, muleContext);
         assertNotNull(message);
         assertPayload(message);
     }
@@ -62,7 +62,7 @@ public class FileContentsMuleMessageFactoryTestCase extends AbstractFileMuleMess
         try
         {
             stream = new ReceiverFileInputStream(tempFile, false, null);
-            MuleMessage message = factory.create(stream, encoding);
+            MuleMessage message = factory.create(stream, encoding, muleContext);
             assertNotNull(message);
             
             // delete the file before accessing the payload to make sure it was properly converted

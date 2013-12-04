@@ -6,7 +6,6 @@
  */
 package org.mule.module.launcher.application;
 
-import org.mule.api.MuleContext;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
 
 import java.net.URL;
@@ -25,5 +24,4 @@ public interface ApplicationClassLoader extends ArtifactClassLoader
 
     URL findResource(String s);
 
-    void setMuleContext(MuleContext muleContext);
 }

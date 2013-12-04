@@ -6,13 +6,10 @@
  */
 package org.mule.transport;
 
-import org.mule.api.MuleContext;
-
 public class DefaultMuleMessageFactory extends AbstractMuleMessageFactory
 {
-    public DefaultMuleMessageFactory(MuleContext context)
+    public DefaultMuleMessageFactory()
     {
-        super(context);
     }
 
     @Override

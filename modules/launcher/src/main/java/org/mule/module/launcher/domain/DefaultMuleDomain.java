@@ -13,7 +13,9 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationBuilder;
+import org.mule.api.config.DomainMuleContextAwareConfigurationBuilder;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.config.builders.AutoConfigurationBuilder;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.module.launcher.DeploymentInitException;
@@ -21,9 +23,11 @@ import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentStartException;
 import org.mule.module.launcher.DeploymentStopException;
 import org.mule.module.launcher.MuleDeploymentService;
+import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.NullDeploymentListener;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
 import org.mule.module.launcher.artifact.MuleContextDeploymentListener;
+import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
 
@@ -43,20 +47,21 @@ public class DefaultMuleDomain implements Domain
     protected transient final Log logger = LogFactory.getLog(getClass());
     protected transient final Log deployLogger = LogFactory.getLog(MuleDeploymentService.class);
 
-    private final DomainClassLoaderFactory domainClassLoaderFactory;
-    private final String domain;
-    private final String domainConfigFileLocation = "mule-domain-config.xml";
+    private final static String DOMAIN_CONFIG_FILE_LOCATION = "mule-domain-config.xml";
+
+    private final DomainClassLoaderRepository domainClassLoaderRepository;
+    private final String name;
     private MuleContext muleContext;
     private DeploymentListener deploymentListener;
     private ArtifactClassLoader deploymentClassLoader;
 
     private File configResourceFile;
 
-    public DefaultMuleDomain(DomainClassLoaderFactory domainClassLoaderFactory, String domain)
+    public DefaultMuleDomain(DomainClassLoaderRepository domainClassLoaderRepository, String name)
     {
-        this.domainClassLoaderFactory = domainClassLoaderFactory;
+        this.domainClassLoaderRepository = domainClassLoaderRepository;
         this.deploymentListener = new NullDeploymentListener();
-        this.domain = domain;
+        this.name = name;
     }
 
     public void setDeploymentListener(DeploymentListener deploymentListener)
@@ -66,7 +71,7 @@ public class DefaultMuleDomain implements Domain
 
     public String getName()
     {
-        return domain;
+        return name;
     }
 
     @Override
@@ -76,13 +81,56 @@ public class DefaultMuleDomain implements Domain
     }
 
     @Override
+    public ConfigurationBuilder createApplicationConfigurationBuilder(Application application) throws Exception
+    {
+        String configBuilderClassName = determineConfigBuilderClassNameForApplication(application);
+        ConfigurationBuilder configurationBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(configBuilderClassName,
+                                                                                                       new Object[] {application.getDescriptor().getAbsoluteResourcePaths()}, application.getArtifactClassLoader().getClassLoader());
+
+        if (!containsSharedResources())
+        {
+            return configurationBuilder;
+        }
+        else
+        {
+            if (configurationBuilder instanceof DomainMuleContextAwareConfigurationBuilder)
+            {
+                ((DomainMuleContextAwareConfigurationBuilder) configurationBuilder).setDomainContext(getMuleContext());
+            }
+            else
+            {
+                throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("ConfigurationBuilder %s does not support domain context", configurationBuilder.getClass().getCanonicalName())));
+            }
+            return configurationBuilder;
+        }
+    }
+
+    protected String determineConfigBuilderClassNameForApplication(Application defaultMuleApplication)
+    {
+        // Provide a shortcut for Spring: "-builder spring"
+        final String builderFromDesc = defaultMuleApplication.getDescriptor().getConfigurationBuilder();
+        if ("spring".equalsIgnoreCase(builderFromDesc))
+        {
+            return ApplicationDescriptor.CLASSNAME_SPRING_CONFIG_BUILDER;
+        }
+        else if (builderFromDesc == null)
+        {
+            return AutoConfigurationBuilder.class.getName();
+        }
+        else
+        {
+            return builderFromDesc;
+        }
+    }
+
+    @Override
     public void install()
     {
         if (logger.isInfoEnabled())
         {
             logger.info(miniSplash(String.format("New domain '%s'", getArtifactName())));
         }
-        deploymentClassLoader = domainClassLoaderFactory.create(domain);
+        deploymentClassLoader = domainClassLoaderRepository.getDomainClassLoader(name);
     }
 
 
@@ -96,7 +144,7 @@ public class DefaultMuleDomain implements Domain
 
         try
         {
-            URL resource = deploymentClassLoader.getClassLoader().getResource(this.domainConfigFileLocation);
+            URL resource = deploymentClassLoader.getClassLoader().getResource(this.DOMAIN_CONFIG_FILE_LOCATION);
             if (resource != null)
             {
                 this.configResourceFile = new File(resource.getFile());
@@ -118,9 +166,8 @@ public class DefaultMuleDomain implements Domain
                     {
                         muleContextFactory.addListener(new MuleContextDeploymentListener(getArtifactName(), deploymentListener));
                     }
-                    DomainMuleContextBuilder domainMuleContextBuilder = new DomainMuleContextBuilder(domain);
-                    muleContextFactory.createMuleContext(builders, domainMuleContextBuilder);
-                    this.muleContext = domainMuleContextBuilder.getMuleRealContext();
+                    DomainMuleContextBuilder domainMuleContextBuilder = new DomainMuleContextBuilder(name);
+                    muleContext = muleContextFactory.createMuleContext(builders, domainMuleContextBuilder);
                 }
             }
         }
@@ -173,7 +220,7 @@ public class DefaultMuleDomain implements Domain
         try
         {
             return (ConfigurationBuilder) ClassUtils.instanciateClass("org.mule.config.spring.SpringXmlDomainConfigurationBuilder",
-                                                                      new Object[] {getConfigResourcesFile()[0].getName()}, deploymentClassLoader.getClassLoader());
+                                                                      new Object[] {getResourceFiles()[0].getName()}, deploymentClassLoader.getClassLoader());
         }
         catch (Exception e)
         {
@@ -248,21 +295,17 @@ public class DefaultMuleDomain implements Domain
         {
             this.muleContext.dispose();
         }
-    }
-
-    @Override
-    public void redeploy()
-    {
+        this.deploymentClassLoader.dispose();
     }
 
     @Override
     public String getArtifactName()
     {
-        return domain;
+        return name;
     }
 
     @Override
-    public File[] getConfigResourcesFile()
+    public File[] getResourceFiles()
     {
         return new File[] {configResourceFile};
     }

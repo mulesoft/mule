@@ -20,7 +20,7 @@ public class RmiMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTes
     @Override
     protected MuleMessageFactory doCreateMuleMessageFactory()
     {
-        return new RmiMuleMessageFactory(muleContext);
+        return new RmiMuleMessageFactory();
     }
 
     @Override

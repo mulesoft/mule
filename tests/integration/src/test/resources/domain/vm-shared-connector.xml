@@ -9,6 +9,6 @@
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
 
-<vm:connector name="sharedVmConnector"/>
+    <vm:connector name="sharedVmConnector"/>
 
 </mule-domain>

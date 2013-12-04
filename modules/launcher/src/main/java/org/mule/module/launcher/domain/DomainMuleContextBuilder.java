@@ -6,7 +6,6 @@
  */
 package org.mule.module.launcher.domain;
 
-import org.mule.api.MuleContext;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.context.notification.ClusterNodeNotificationListener;
 import org.mule.api.context.notification.ConnectionNotificationListener;
@@ -16,6 +15,7 @@ import org.mule.api.context.notification.ManagementNotificationListener;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.SecurityNotificationListener;
 import org.mule.config.DefaultMuleConfiguration;
+import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.notification.ClusterNodeNotification;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.CustomNotification;
@@ -24,13 +24,11 @@ import org.mule.context.notification.ManagementNotification;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.context.notification.ServerNotificationManager;
-import org.mule.module.launcher.MuleSharedDomainClassLoader;
-import org.mule.module.launcher.artifact.ArtifactMuleContextBuilder;
 
 /**
  * Builder for domain MuleContext instance.
  */
-public class DomainMuleContextBuilder extends ArtifactMuleContextBuilder
+public class DomainMuleContextBuilder extends DefaultMuleContextBuilder
 {
 
     private final String domainId;
@@ -38,12 +36,6 @@ public class DomainMuleContextBuilder extends ArtifactMuleContextBuilder
     public DomainMuleContextBuilder(String domainId)
     {
         this.domainId = domainId;
-    }
-
-    @Override
-    protected void configureClassLoaderMuleContext(MuleContext muleContext)
-    {
-        ((MuleSharedDomainClassLoader) Thread.currentThread().getContextClassLoader()).setMuleContext(muleContext);
     }
 
     @Override

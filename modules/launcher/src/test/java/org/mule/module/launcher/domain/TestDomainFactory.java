@@ -14,9 +14,9 @@ public class TestDomainFactory extends DefaultDomainFactory
     private boolean failOnStop;
     private boolean failOnDispose;
 
-    public TestDomainFactory(DomainClassLoaderFactory domainClassLoaderFactory)
+    public TestDomainFactory(DomainClassLoaderRepository domainClassLoaderRepository)
     {
-        super(domainClassLoaderFactory);
+        super(domainClassLoaderRepository);
     }
 
     @Override

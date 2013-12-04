@@ -6,8 +6,6 @@
  */
 package org.mule.module.launcher.artifact;
 
-import org.mule.api.MuleContext;
-
 import java.net.URL;
 
 public interface ArtifactClassLoader
@@ -25,16 +23,37 @@ public interface ArtifactClassLoader
     URL findResource(String resource);
 
     /**
-     * @return the mule context created for this artifact
-     */
-    MuleContext getMuleContext();
-
-    /**
-     * Unfortunately ClassLoader is an abstract class and not an interface so in
-     * order to allow a class loader to extend any subclass of ClassLoader this method
-     * is required. Most implementations will return this.
+     * ClassLoader is an abstract class. Not an interface.
+     * There are parts of the code that requires a ClassLoader and others that requires an ArtifactClassLoader.
+     * Ideally I would make ArtifactClassLoader implement ClassLoader interface but there's no such interface.
      *
-     * @return the class loader represented by this class.
+     * So if I have a method that requires a ClassLoader instance and an ArtifactClassLoader I would have to down cast and assume that it can be down casted or send two parameters, one for the ClassLoader and one for the ArtifactClassLoader:
+     *
+     * public void doSomething(ArtifactClassLoader acl)
+     * {
+     *   doSomething2(acl); //this requires an ArtifactClassLoader
+     *   doSomething3((ClassLoader)acl); //this requires a ClassLoader
+     * }
+     *
+     * public void doSomething(ArtifactClassLoader acl, ClassLoader cl)
+     * {
+     *   doSomething2(acl); //this requires an ArtifactClassLoader
+     *   doSomething3(cl); //this requires a ClassLoader
+     * }
+     *
+     * To overcome that problem seems much better to have a method in ArtifactClassLoader that can actually return a ClassLoader instance:
+     *
+     * public void doSomething(ArtifactClassLoader acl)
+     * {
+     *   doSomething2(acl); //this requires an ArtifactClassLoader
+     *   doSomething3(acl.getDomainClassLoader()); //this requires a ClassLoader
+     * }
+     * @return class loader to use for this artifact.
      */
     ClassLoader getClassLoader();
+
+    /**
+     * Gets rid of the class loader resources.
+     */
+    void dispose();
 }

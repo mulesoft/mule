@@ -31,9 +31,14 @@ public class ArtifactWrapper<T extends Artifact> implements Artifact
 
     public void dispose()
     {
-        // moved wrapper logic into the actual implementation, as redeploy() invokes it directly, bypassing
-        // classloader cleanup
-        delegate.dispose();
+        executeWithinArtifactClassLoader(new ArtifactAction()
+        {
+            @Override
+            public void execute()
+            {
+                delegate.dispose();
+            }
+        });
     }
 
     @Override
@@ -49,50 +54,26 @@ public class ArtifactWrapper<T extends Artifact> implements Artifact
 
     public void init()
     {
-        final ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
-        try
+        executeWithinArtifactClassLoader(new ArtifactAction()
         {
-            ClassLoader artifactCl = getArtifactClassLoader().getClassLoader();
-            // if not initialized yet, it can be null
-            if (artifactCl != null)
+            @Override
+            public void execute()
             {
-                Thread.currentThread().setContextClassLoader(artifactCl);
+                delegate.init();
             }
-            delegate.init();
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader(originalCl);
-        }
+        });
     }
 
     public void install() throws InstallException
     {
-        final ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
-        try
+        executeWithinArtifactClassLoader(new ArtifactAction()
         {
-
-            ArtifactClassLoader artifactClassLoader = getArtifactClassLoader();
-            if (artifactClassLoader != null)
+            @Override
+            public void execute()
             {
-                ClassLoader appCl = artifactClassLoader.getClassLoader();
-                // if not initialized yet, it can be null
-                if (appCl != null)
-                {
-                    Thread.currentThread().setContextClassLoader(appCl);
-                }
+                delegate.install();
             }
-            delegate.install();
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader(originalCl);
-        }
-    }
-
-    public void redeploy()
-    {
-        delegate.redeploy();
+        });
     }
 
     @Override
@@ -102,45 +83,50 @@ public class ArtifactWrapper<T extends Artifact> implements Artifact
     }
 
     @Override
-    public File[] getConfigResourcesFile()
+    public File[] getResourceFiles()
     {
-        return delegate.getConfigResourcesFile();
+        return delegate.getResourceFiles();
     }
 
     public void start() throws DeploymentStartException
     {
-        final ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
-        try
+        executeWithinArtifactClassLoader(new ArtifactAction()
         {
-            ClassLoader appCl = getArtifactClassLoader().getClassLoader();
-            // if not initialized yet, it can be null
-            if (appCl != null)
+            @Override
+            public void execute()
             {
-                Thread.currentThread().setContextClassLoader(appCl);
+                delegate.start();
             }
-            delegate.start();
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader(originalCl);
-        }
+        });
     }
 
     public void stop()
     {
+        executeWithinArtifactClassLoader(new ArtifactAction()
+        {
+            @Override
+            public void execute()
+            {
+                delegate.stop();
+            }
+        });
+    }
+
+    private void executeWithinArtifactClassLoader(ArtifactAction artifactAction)
+    {
         final ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
         try
         {
-            ArtifactClassLoader artifactClassLoader = getArtifactClassLoader();
-            if (artifactClassLoader != null)
+            if (getArtifactClassLoader() != null)
             {
-                ClassLoader appCl = artifactClassLoader.getClassLoader();
-                if (appCl != null)
+                // if not initialized yet, it can be null
+                ClassLoader artifactCl = getArtifactClassLoader().getClassLoader();
+                if (artifactCl != null)
                 {
-                    Thread.currentThread().setContextClassLoader(appCl);
+                    Thread.currentThread().setContextClassLoader(artifactCl);
                 }
             }
-            delegate.stop();
+            artifactAction.execute();
         }
         finally
         {
@@ -162,5 +148,10 @@ public class ArtifactWrapper<T extends Artifact> implements Artifact
     public T getDelegate()
     {
         return delegate;
+    }
+
+    private interface ArtifactAction
+    {
+        void execute();
     }
 }

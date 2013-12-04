@@ -25,12 +25,6 @@ public class ApplicationWrapper extends ArtifactWrapper<Application> implements 
         super(delegate);
     }
 
-    @Override
-    public ClassLoader getDeploymentClassLoader()
-    {
-        return getArtifactClassLoader().getClassLoader();
-    }
-
     public String getAppName()
     {
         return getArtifactName();

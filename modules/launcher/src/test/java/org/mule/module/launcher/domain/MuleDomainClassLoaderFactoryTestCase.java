@@ -9,9 +9,9 @@ package org.mule.module.launcher.domain;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.launcher.domain.DomainFactory.DEFAULT_DOMAIN_NAME;
 
 import org.mule.api.config.MuleProperties;
-import org.mule.module.launcher.DefaultMuleSharedDomainClassLoader;
 import org.mule.module.launcher.MuleSharedDomainClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -19,6 +19,7 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import java.io.File;
 import java.io.IOException;
 
+import org.hamcrest.core.Is;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,7 +43,7 @@ public class MuleDomainClassLoaderFactoryTestCase extends AbstractMuleTestCase
     public void createClassLoaderUsingEmptyDomain()
     {
         createOldDomainDefaultDir();
-        assertThat(new MuleDomainClassLoaderFactory().create(null), instanceOf(DefaultMuleSharedDomainClassLoader.class));
+        assertThat(new MuleDomainClassLoaderRepository().getDomainClassLoader(null).getArtifactName(), Is.is(DEFAULT_DOMAIN_NAME));
     }
 
     private void createOldDomainDefaultDir()
@@ -53,7 +54,7 @@ public class MuleDomainClassLoaderFactoryTestCase extends AbstractMuleTestCase
     @Test
     public void createClassLoaderUsingDefaultDomain()
     {
-        assertThat(new MuleDomainClassLoaderFactory().create(DomainFactory.DEFAULT_DOMAIN_NAME), instanceOf(DefaultMuleSharedDomainClassLoader.class));
+        assertThat(new MuleDomainClassLoaderRepository().getDomainClassLoader(DEFAULT_DOMAIN_NAME).getArtifactName(), is(DEFAULT_DOMAIN_NAME));
     }
 
     @Test
@@ -61,7 +62,7 @@ public class MuleDomainClassLoaderFactoryTestCase extends AbstractMuleTestCase
     {
         String domainName = "custom-domain";
         assertThat(new File(muleHomeFolder, "domains" + File.separator + domainName).mkdirs(), is(true));
-        assertThat(new MuleDomainClassLoaderFactory().create(domainName), instanceOf(MuleSharedDomainClassLoader.class));
+        assertThat(new MuleDomainClassLoaderRepository().getDomainClassLoader(domainName).getClassLoader(), instanceOf(MuleSharedDomainClassLoader.class));
     }
 
 

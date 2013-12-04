@@ -7,7 +7,6 @@
 package org.mule.transport.email;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 import org.mule.transport.AbstractMuleMessageFactory;
@@ -38,11 +37,6 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
     public static final String HEADER_LIST_PREFIX = "List:";
 
     private static Log log = LogFactory.getLog(MailMuleMessageFactory.class);
-
-    public MailMuleMessageFactory(MuleContext context)
-    {
-        super(context);
-    }
 
     @Override
     protected Class<?>[] getSupportedTransportMessageTypes()

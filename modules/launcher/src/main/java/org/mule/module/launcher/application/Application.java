@@ -15,17 +15,6 @@ public interface Application extends Artifact
 
     MuleContext getMuleContext();
 
-    /**
-     * @return a classloader associated with this deployment 
-     */
-    ClassLoader getDeploymentClassLoader();
-
-    /**
-     * @deprecated use {@code Artifact.getArtifactName} instead.
-     * @return
-     */
-    @Deprecated
-    String getAppName();
-
     ApplicationDescriptor getDescriptor();
+
 }
