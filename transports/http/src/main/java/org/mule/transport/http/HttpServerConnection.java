@@ -206,7 +206,7 @@ public class HttpServerConnection implements HandshakeCompletedListener
         }
         try
         {
-            cachedRequest = new HttpRequest(getRequestLine(), HttpParser.parseHeaders(this.in, encoding), this.in, encoding);
+            cachedRequest = createHttpRequest();
             return cachedRequest;
         }
         catch (IOException e)
@@ -214,6 +214,11 @@ public class HttpServerConnection implements HandshakeCompletedListener
             close();
             throw e;
         }
+    }
+
+    protected HttpRequest createHttpRequest() throws IOException
+    {
+        return new HttpRequest(getRequestLine(), HttpParser.parseHeaders(this.in, encoding), this.in, encoding);
     }
 
     public HttpResponse readResponse() throws IOException
@@ -492,10 +497,17 @@ public class HttpServerConnection implements HandshakeCompletedListener
      * <p/>
      * Must be called if a new request from the same socket associated with the instance is going to be processed.
      */
-    public void reset()
+    public void reset() throws IOException
     {
         this.requestLine = null;
-        this.cachedRequest = null;
+        if (this.cachedRequest != null)
+        {
+            if (cachedRequest.getBody() != null)
+            {
+                cachedRequest.getBody().close();
+            }
+            this.cachedRequest = null;
+        }
     }
 
     @Override
