@@ -13,10 +13,8 @@ import org.mule.api.security.TlsDirectKeyStore;
 import org.mule.api.security.TlsDirectTrustStore;
 import org.mule.api.security.TlsIndirectKeyStore;
 import org.mule.api.security.tls.TlsConfiguration;
-import org.mule.util.SystemUtils;
 
 import java.io.IOException;
-import java.security.Provider;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManagerFactory;
@@ -298,6 +296,16 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
             sslContextFactory.setSslKeyManagerFactoryAlgorithm(tls.getTrustManagerAlgorithm());
         }
         sslContextFactory.setNeedClientAuth(tls.isRequireClientAuthentication());
+
+        if (tls.getEnabledCipherSuites() != null)
+        {
+            sslContextFactory.setIncludeCipherSuites(tls.getEnabledCipherSuites());
+        }
+        if (tls.getEnabledProtocols() != null)
+        {
+            sslContextFactory.setIncludeProtocols(tls.getEnabledProtocols());
+
+        }
 
         return sslContextFactory;
     }
