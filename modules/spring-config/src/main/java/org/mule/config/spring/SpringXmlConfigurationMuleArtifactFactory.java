@@ -19,6 +19,7 @@ import org.mule.context.DefaultMuleContextFactory;
 import java.io.StringBufferInputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -34,33 +35,49 @@ import org.dom4j.io.DOMReader;
 
 public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurationMuleArtifactFactory
 {
-	
+
 	private Map<MuleArtifact, SpringXmlConfigurationBuilder> builders = new HashMap<MuleArtifact, SpringXmlConfigurationBuilder>();
 	private Map<MuleArtifact, MuleContext> contexts = new HashMap<MuleArtifact, MuleContext>();
-	
+
     @Override
     public MuleArtifact getArtifact(org.w3c.dom.Element element, XmlConfigurationCallback callback)
         throws MuleArtifactFactoryException
     {
         return doGetArtifact(element, callback, false);
     }
-    
+
     @Override
     public MuleArtifact getArtifactForMessageProcessor(org.w3c.dom.Element element, XmlConfigurationCallback callback)
         throws MuleArtifactFactoryException
     {
         return doGetArtifact(element, callback, true);
     }
-    
-    private MuleArtifact doGetArtifact(org.w3c.dom.Element element, XmlConfigurationCallback callback, boolean embedInFlow)
+
+    private MuleArtifact doGetArtifact(org.w3c.dom.Element element, final XmlConfigurationCallback callback, boolean embedInFlow)
                     throws MuleArtifactFactoryException
     {
-    	ConfigResource config = null;
+    	ConfigResource config;
         Document document = DocumentHelper.createDocument();
-        
+
         // the rootElement is the root of the document
         Element rootElement = document.addElement("mule", "http://www.mulesoft.org/schema/mule/core");
-        
+
+        org.w3c.dom.Element[] placeholders = callback.getPropertyPlaceholders();
+        for (org.w3c.dom.Element placeholder : placeholders)
+        {
+            try
+            {
+                Element newPlaceHolder = convert(placeholder);
+                rootElement.add(newPlaceHolder);
+            }
+            catch (ParserConfigurationException e)
+            {
+                throw new MuleArtifactFactoryException("Error parsing XML", e);
+            }
+
+        }
+
+
         // the parentElement is the parent of the element we are adding
         Element parentElement = rootElement;
         addSchemaLocation(rootElement, element, callback);
@@ -117,19 +134,25 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         }
         MuleContext muleContext = null;
         SpringXmlConfigurationBuilder builder = null;
+        Map<String, String> environmentProperties = callback.getEnvironmentProperties();
+        Properties systemProperties = System.getProperties();
+        Map<Object,Object> originalSystemProperties = new HashMap<Object, Object>(systemProperties);
         try
         {
-        	MuleContextFactory factory = new DefaultMuleContextFactory();
-            builder = new SpringXmlConfigurationBuilder(
-                    new ConfigResource[]{config});
+            if(environmentProperties != null)
+            {
+                systemProperties.putAll(environmentProperties);
+            }
+            MuleContextFactory factory = new DefaultMuleContextFactory();
+            builder = new SpringXmlConfigurationBuilder(new ConfigResource[]{config});
             muleContext = factory.createMuleContext(builder);
             muleContext.start();
-            
-            MuleArtifact artifact = null;
+
+            MuleArtifact artifact;
             if (embedInFlow)
             {
                 Pipeline pipeline = (Pipeline)muleContext.getRegistry().lookupFlowConstruct(flowName);
-                artifact = new DefaultMuleArtifact(pipeline.getMessageProcessors().get(0));                
+                artifact = new DefaultMuleArtifact(pipeline.getMessageProcessors().get(0));
             }
             else
             {
@@ -142,10 +165,13 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         catch (Exception e)
         {
         	dispose(builder, muleContext);
-        	throw new MuleArtifactFactoryException("Error initializing", e);	
+        	throw new MuleArtifactFactoryException("Error initializing", e);
+        } finally {
+            systemProperties.clear();
+            systemProperties.putAll(originalSystemProperties);
         }
     }
-    
+
     protected void addSchemaLocation(Element rootElement,
                                      org.w3c.dom.Element element,
                                      XmlConfigurationCallback callback)
@@ -158,7 +184,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
             org.dom4j.QName.get("schemaLocation", "xsi", "http://www.w3.org/2001/XMLSchema-instance"),
             schemaLocation.toString());
     }
-    
+
     protected void addChildSchemaLocations(Element rootElement,
             org.w3c.dom.Element element,
             XmlConfigurationCallback callback)
@@ -170,7 +196,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
 
     /**
      * Convert w3c element to dom4j element
-     * 
+     *
      * @throws ParserConfigurationException
      **/
     public org.dom4j.Element convert(org.w3c.dom.Element element) throws ParserConfigurationException
@@ -196,7 +222,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
 		MuleContext context = contexts.remove(artifact);
 		dispose(builder, context);
 	}
-	
+
 	private void dispose(SpringXmlConfigurationBuilder builder, MuleContext context)
 	{
     	if (context != null)
@@ -205,11 +231,11 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
     	}
     	deleteLoggingThreads();
 	}
-	
+
 	private void deleteLoggingThreads()
 	{
 		String[] threadsToDelete = {"Mule.log.clogging.ref.handler", "Mule.log.slf4j.ref.handler"};
-		
+
 		Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
 		Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
 		for(String threadToDelete : threadsToDelete)

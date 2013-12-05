@@ -13,6 +13,7 @@ import org.mule.common.config.XmlConfigurationCallback;
 import org.mule.common.config.XmlConfigurationMuleArtifactFactory;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.ServiceLoader;
 
 import junit.framework.Assert;
@@ -87,6 +88,16 @@ public class UnsupportedConnectorsMuleArtifactTestCase
                     return s;
                 }
                 else return null;
+            }
+
+            public Element[] getPropertyPlaceholders()
+            {
+                return new Element[0];
+            }
+
+            public Map<String, String> getEnvironmentProperties()
+            {
+                return null;
             }
         };
 

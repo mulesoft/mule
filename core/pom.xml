@@ -144,7 +144,7 @@
         <dependency>
             <groupId>org.mule.common</groupId>
             <artifactId>mule-common</artifactId>
-            <version>0.11.0</version>
+            <version>3.4.2-SNAPSHOT</version>
         </dependency>
 
         <!-- test dependencies -->
