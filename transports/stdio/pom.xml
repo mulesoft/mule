@@ -8,7 +8,7 @@
     </parent>
     <artifactId>mule-transport-stdio</artifactId>
     <packaging>jar</packaging>
-    <name>System I/O Transport</name>
+    <name>System IO Transport</name>
     <description>A Mule transport used as the interface to Java's System.out and System.in objects, typically for testing purposes.</description>
 
     <properties>
