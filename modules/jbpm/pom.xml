@@ -9,7 +9,7 @@
     </parent>
     <artifactId>mule-module-jbpm</artifactId>
     <packaging>jar</packaging>
-    <name>BPM Support: JBoss jBPM</name>
+    <name>BPM Support - JBoss jBPM</name>
     <description>Classes which allow Mule to integrate with JBoss jBPM via the BPM Module.</description>
 
     <properties>
