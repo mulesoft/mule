@@ -7,6 +7,7 @@
 package org.mule.module.launcher;
 
 import org.mule.module.launcher.application.Application;
+import org.mule.module.launcher.domain.Domain;
 
 import java.io.IOException;
 import java.net.URL;
@@ -16,7 +17,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  *  Manages deploy of mule applications
  */
-public interface DeploymentService extends DeploymentListenerManager
+public interface DeploymentService extends DeploymentListenerManager, DomainDeploymentListenerManager
 {
 
     /**
@@ -32,6 +33,17 @@ public interface DeploymentService extends DeploymentListenerManager
      * @return immutable applications list
      */
     List<Application> getApplications();
+
+    /**
+     * @param domainName name of the domain
+     * @return the domain with the name domainName, null if there is no domain with domainName
+     */
+    Domain findDomain(String domainName);
+
+    /**
+     * @return list of domains deployed in mule.
+     */
+    List<Domain> getDomains();
 
     void addStartupListener(StartupListener listener);
 

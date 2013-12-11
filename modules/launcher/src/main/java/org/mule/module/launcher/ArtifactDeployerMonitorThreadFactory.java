@@ -11,7 +11,7 @@ import org.mule.util.concurrent.LoggingUncaughtExceptionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class AppDeployerMonitorThreadFactory implements ThreadFactory
+public class ArtifactDeployerMonitorThreadFactory implements ThreadFactory
 {
 
     static final AtomicInteger poolNumber = new AtomicInteger(1);
@@ -19,7 +19,7 @@ public class AppDeployerMonitorThreadFactory implements ThreadFactory
     final AtomicInteger threadNumber = new AtomicInteger(1);
     final String namePrefix;
 
-    public AppDeployerMonitorThreadFactory()
+    public ArtifactDeployerMonitorThreadFactory()
     {
         SecurityManager s = System.getSecurityManager();
         group = (s != null) ? s.getThreadGroup() :

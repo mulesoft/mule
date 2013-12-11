@@ -29,7 +29,7 @@
         </xsd:appinfo>
     </xsd:annotation>
 
-    <xsd:element name="connector" type="httpConnectorType" substitutionGroup="mule:abstract-connector">
+    <xsd:element name="connector" type="httpConnectorType" substitutionGroup="mule:abstract-shared-connector">
         <xsd:annotation>
             <xsd:documentation>
                 Allows Mule to communicate over HTTP. All parts of the HTTP spec are covered by Mule, so you can expect ETags to be honored as well as keep alive semantics and cookies.

@@ -82,7 +82,7 @@ public class SpringRegistry extends AbstractRegistry
     {
         if (applicationContext instanceof ConfigurableApplicationContext)
         {
-            ((ConfigurableApplicationContext) applicationContext).refresh();
+                ((ConfigurableApplicationContext) applicationContext).refresh();
         }
         //This is used to track the Spring context lifecycle since there is no way to confirm the lifecycle phase from the application context
         springContextInitialised.set(true);
