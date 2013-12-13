@@ -138,6 +138,12 @@ public class ApplicationWrapper implements Application
     }
 
     @Override
+    public ApplicationStatus getStatus()
+    {
+        return delegate.getStatus();
+    }
+
+    @Override
     public String toString()
     {
         return String.format("%s(%s)", getClass().getName(), delegate);

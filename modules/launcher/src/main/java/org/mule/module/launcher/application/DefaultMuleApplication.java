@@ -21,6 +21,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
+import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.module.launcher.AbstractFileWatcher;
 import org.mule.module.launcher.ApplicationMuleContextBuilder;
 import org.mule.module.launcher.ConfigChangeMonitorThreadFactory;
@@ -395,6 +396,19 @@ public class DefaultMuleApplication implements Application
         {
             // TODO add app name to the exception field
             throw new DeploymentStopException(MessageFactory.createStaticMessage(descriptor.getAppName()), e);
+        }
+    }
+
+    @Override
+    public ApplicationStatus getStatus()
+    {
+        if (muleContext != null)
+        {
+            return ApplicationStatusMapper.getApplicationStatus(muleContext.getLifecycleManager().getCurrentPhase());
+        }
+        else
+        {
+            return ApplicationStatusMapper.getApplicationStatus(NotInLifecyclePhase.PHASE_NAME);
         }
     }
 
