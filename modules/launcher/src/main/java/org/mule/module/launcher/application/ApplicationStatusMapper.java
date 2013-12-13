@@ -47,7 +47,7 @@ public class ApplicationStatusMapper
                     statusMapping = new HashMap<String, ApplicationStatus>();
 
                     statusMapping.put(NotInLifecyclePhase.PHASE_NAME, ApplicationStatus.CREATED);
-                    statusMapping.put(Disposable.PHASE_NAME, ApplicationStatus.DISPOSED);
+                    statusMapping.put(Disposable.PHASE_NAME, ApplicationStatus.DESTROYED);
                     statusMapping.put(Stoppable.PHASE_NAME, ApplicationStatus.STOPPED);
                     statusMapping.put(Startable.PHASE_NAME, ApplicationStatus.STARTED);
                     statusMapping.put(Initialisable.PHASE_NAME, ApplicationStatus.INITIALISED);

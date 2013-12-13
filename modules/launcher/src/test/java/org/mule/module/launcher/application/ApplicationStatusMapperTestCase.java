@@ -50,7 +50,7 @@ public class ApplicationStatusMapperTestCase extends AbstractMuleTestCase
     @Test
     public void mapsDisposable() throws Exception
     {
-        doMappingTest(Disposable.PHASE_NAME, ApplicationStatus.DISPOSED);
+        doMappingTest(Disposable.PHASE_NAME, ApplicationStatus.DESTROYED);
     }
 
     @Test(expected = IllegalStateException.class)
