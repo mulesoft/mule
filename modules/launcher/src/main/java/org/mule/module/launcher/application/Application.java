@@ -35,4 +35,9 @@ public interface Application
     String getAppName();
 
     ApplicationDescriptor getDescriptor();
+
+    /**
+     * @return the current status of the application
+     */
+    ApplicationStatus getStatus();
 }
