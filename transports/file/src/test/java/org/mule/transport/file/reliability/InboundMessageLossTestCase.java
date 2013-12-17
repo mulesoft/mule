@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -198,6 +199,7 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
         });
     }
 
+    @Ignore("MULE-6926: Flaky Test")
     @Test
     public void testRollbackExceptionStrategyConsumesMessage() throws Exception
     {

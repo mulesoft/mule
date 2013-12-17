@@ -753,4 +753,65 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:element name="caching-connection-factory" type="connectionFactoryPoolType" substitutionGroup="mule:abstract-extension">
+        <xsd:annotation>
+            <xsd:documentation>
+                Allows to configure a connection factory that caches JMS sessions and producers for a single non-XA JMS connection. You must reference a connection factory though the
+                connectionFactory-ref attribute, and then use this element as the connection factory in the JMS connector.
+                NOTE: as there is a single JMS connection is not recommended to reference the same caching connection factory in multiple connectors.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="connectionFactoryPoolType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                <xsd:attribute name="name" type="mule:substitutableName" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the pool so that a connector can reference it.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="sessionCacheSize" type="mule:substitutableInt" use="optional" default="1">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Defines the maximum amount of connections that can be in the pool.
+                            NOTE: This cache size is the maximum limit for the number of cached Sessions per session acknowledgement type (auto, client, dups_ok, transacted).
+                            As a consequence, the actual number of cached Sessions may be up to four times as high as the specified value - in the unlikely case of mixing and matching different acknowledgement types.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="cacheProducers" type="mule:substitutableBoolean" use="optional" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Indicates whether to cache JMS MessageProducers for the JMS connection. Default is true
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="connectionFactory-ref" type="mule:substitutableName" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Reference to the connection factory
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="username" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The user name for the connection
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="password" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The password for the connection
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 </xsd:schema>

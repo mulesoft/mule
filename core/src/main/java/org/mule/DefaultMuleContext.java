@@ -142,6 +142,8 @@ public class DefaultMuleContext implements MuleContext
     private TransactionManager transactionManager;
 
     private LockFactory lockFactory;
+    
+    private ExpressionLanguage expressionLanguage;
 
     private ProcessingTimeWatcher processingTimeWatcher;
 
@@ -816,7 +818,12 @@ public class DefaultMuleContext implements MuleContext
     @Override
     public ExpressionLanguage getExpressionLanguage()
     {
-        return registryBroker.lookupObject(MuleProperties.OBJECT_EXPRESSION_LANGUAGE);
+        if (this.expressionLanguage == null)
+        {
+            this.expressionLanguage = this.registryBroker.lookupObject(MuleProperties.OBJECT_EXPRESSION_LANGUAGE);
+        }
+
+        return this.expressionLanguage;
     }
 
     @Override

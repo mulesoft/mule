@@ -8,7 +8,7 @@
     </parent>
     <artifactId>mule-example-loanbroker-common-tests</artifactId>
     <packaging>jar</packaging>
-    <name>Loan Broker Example: Shared classes for unit tests</name>
+    <name>Loan Broker Example - Shared classes for unit tests</name>
 
     <properties>
         <licensePath>../../../LICENSE_HEADER.txt</licensePath>

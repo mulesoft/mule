@@ -98,6 +98,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
     private int maxRedelivery = REDELIVERY_FAIL_ON_FIRST;
 
+    @Deprecated
     private boolean cacheJmsSessions = false;
 
     /**
@@ -1181,11 +1182,19 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         this.eagerConsumer = eagerConsumer;
     }
 
+    /**
+     * @deprecated configure a {link ConnectionFactory} that supports session caching instead of using this property.
+     */
+    @Deprecated
     public boolean isCacheJmsSessions()
     {
         return cacheJmsSessions;
     }
 
+    /**
+     * @deprecated configure a {link ConnectionFactory} that supports session caching instead of using this property.
+     */
+    @Deprecated
     public void setCacheJmsSessions(boolean cacheJmsSessions)
     {
         this.cacheJmsSessions = cacheJmsSessions;

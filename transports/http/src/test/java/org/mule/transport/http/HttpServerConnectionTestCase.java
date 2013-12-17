@@ -62,6 +62,8 @@ public class HttpServerConnectionTestCase extends AbstractMuleContextTestCase
     private HttpConnector mockHttpConnector;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private HandshakeCompletedEvent mockHandshakeCompleteEvent;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private HttpRequest mockHttpRequest;
     private Certificate[] mockLocalCertificate = new Certificate[2];
     private Certificate[] mockPeerCertificates = new Certificate[2];
 
@@ -109,11 +111,16 @@ public class HttpServerConnectionTestCase extends AbstractMuleContextTestCase
     @Test
     public void resetConnectionReadNextRequest() throws Exception
     {
-        when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream(String.format("GET %s HTTP/1.1\n\nGET %s HTTP/1.1\n", "/service/order?param1=value1&param2=value2", "/?param1=value1&param2=value2").getBytes()));
+        configureValidRequestForSocketInputStream();
         HttpServerConnection httpServerConnection = new HttpServerConnection(mockSocket, muleContext.getConfiguration().getDefaultEncoding(), mockHttpConnector);
         assertThat(httpServerConnection.getUrlWithoutRequestParams(), is("/service/order"));
         httpServerConnection.reset();
         assertThat(httpServerConnection.getUrlWithoutRequestParams(), is("/"));
+    }
+
+    private void configureValidRequestForSocketInputStream() throws IOException
+    {
+        when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream(String.format("GET %s HTTP/1.1\n\nGET %s HTTP/1.1\n", "/service/order?param1=value1&param2=value2", "/?param1=value1&param2=value2").getBytes()));
     }
 
     @Test
@@ -264,9 +271,26 @@ public class HttpServerConnectionTestCase extends AbstractMuleContextTestCase
         }
     }
 
+    @Test
+    public void resetClosesRequestBody() throws Exception
+    {
+        configureValidRequestForSocketInputStream();
+        HttpServerConnection httpServerConnection = new HttpServerConnection(mockSocket, muleContext.getConfiguration().getDefaultEncoding(), mockHttpConnector)
+        {
+            @Override
+            protected HttpRequest createHttpRequest() throws IOException
+            {
+                return mockHttpRequest;
+            }
+        };
+        httpServerConnection.readRequest();
+        httpServerConnection.reset();
+        verify(mockHttpRequest.getBody(), times(1)).close();
+    }
+
     private HttpServerConnection createHttpServerConnectionForResponseTest(ByteArrayOutputStream responseContent) throws IOException
     {
-        when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream(String.format("GET %s HTTP/1.1\n\nGET %s HTTP/1.1\n", "/service/order?param1=value1&param2=value2", "/?param1=value1&param2=value2").getBytes()));
+        configureValidRequestForSocketInputStream();
         when(mockSocket.getOutputStream()).thenReturn(responseContent);
         return new HttpServerConnection(mockSocket, muleContext.getConfiguration().getDefaultEncoding(), mockHttpConnector);
     }

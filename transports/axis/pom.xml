@@ -8,7 +8,7 @@
     </parent>
     <artifactId>mule-transport-axis</artifactId>
     <packaging>jar</packaging>
-    <name>SOAP Transport: Axis</name>
+    <name>SOAP Transport - Axis</name>
     <description>A Mule transport for Soap Connectivity using Axis.</description>
 
     <properties>

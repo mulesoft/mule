@@ -12,6 +12,7 @@ import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.assembly.configuration.PrefixValueMap;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
@@ -76,6 +77,7 @@ public class JmsNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("selector", new FilterDefinitionParser(JmsSelectorFilter.class));
         registerBeanDefinitionParser("default-jndi-name-resolver", new ChildDefinitionParser("jndiNameResolver", SimpleJndiNameResolver.class));
         registerBeanDefinitionParser("custom-jndi-name-resolver", new ChildDefinitionParser("jndiNameResolver"));
+        registerBeanDefinitionParser("caching-connection-factory", new MuleOrphanDefinitionParser(CachingConnectionFactoryFactoryBean.class, true));
     }
 
     /**
