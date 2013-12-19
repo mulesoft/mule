@@ -309,7 +309,7 @@ public class ServerContextTestCase extends AbstractELTestCase
     @Test
     public void dateTimeAddWeeks()
     {
-        Assert.assertEquals((Calendar.getInstance().get(Calendar.WEEK_OF_YEAR) + 1) % 52,
+        Assert.assertEquals((Calendar.getInstance().get(Calendar.WEEK_OF_YEAR) % 52) + 1,
             evaluate("(int) server.dateTime.plusWeeks(1).weekOfYear"));
     }
 

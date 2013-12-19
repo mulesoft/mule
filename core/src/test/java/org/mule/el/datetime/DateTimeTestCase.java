@@ -98,7 +98,7 @@ public class DateTimeTestCase extends AbstractMuleContextTestCase
     @Test
     public void plusWeeks()
     {
-        Assert.assertEquals((now.getWeekOfYear() + 1) % 52, now.plusWeeks(1).getWeekOfYear());
+        Assert.assertEquals((now.getWeekOfYear() % 52) + 1, now.plusWeeks(1).getWeekOfYear());
     }
 
     @Test
