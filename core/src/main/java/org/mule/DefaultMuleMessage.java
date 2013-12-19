@@ -1797,6 +1797,15 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public void initAfterDeserialisation(MuleContext context) throws MuleException
     {
         this.muleContext = context;
+        if (this.inboundAttachments == null)
+        {
+            this.inboundAttachments = new ConcurrentHashMap<String, DataHandler>();
+        }
+
+        if (this.outboundAttachments == null)
+        {
+            this.outboundAttachments = new ConcurrentHashMap<String, DataHandler>();
+        }
     }
 
     @Override
