@@ -71,6 +71,7 @@ public class TcpConnector extends AbstractConnector
     private GenericKeyedObjectPool socketsPool = new GenericKeyedObjectPool();
     private int keepAliveTimeout = 0;
     private ExpiryMonitor keepAliveMonitor;
+    private Boolean failOnUnresolvedHost = Boolean.TRUE;
 
     /** 
      * If set, the socket is not closed after sending a message.  This attribute 
@@ -564,6 +565,16 @@ public class TcpConnector extends AbstractConnector
     public long getSocketsPoolMaxWait()
     {
         return socketsPool.getMaxWait();
+    }
+
+    public Boolean isFailOnUnresolvedHost() 
+    {
+        return failOnUnresolvedHost;
+    }
+
+    public void setFailOnUnresolvedHost(Boolean failOnUnresolvedHost) 
+    {
+        this.failOnUnresolvedHost = failOnUnresolvedHost;
     }
 
 }
