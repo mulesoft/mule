@@ -135,18 +135,36 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     }
 
     @Test
-    public void noPropagationThroughFlowRefToFlow() throws Exception
+    public void propagationThroughFlowRefToFlow() throws Exception
     {
-        testFlow("noPropagationThroughFlowRefToFlow");
+        testFlow("propagationThroughFlowRefToFlow");
         FlowAssert.verify("FlowRef-1");
         FlowAssert.verify("FlowRef-2");
         FlowAssert.verify("FlowRef-3");
     }
 
     @Test
+    public void overwritePropertyValueInFlowViaFlowRef() throws Exception
+    {
+        testFlow("OverwriteInFlowRef");
+    }
+
+    @Test
     public void propagationThroughFlowRefToSubFlow() throws Exception
     {
         testFlow("propagationThroughFlowRefToSubFlow");
+    }
+
+    @Test
+    public void overwritePropertyValueInSubFlowViaFlowRef() throws Exception
+    {
+        testFlow("OverwriteInSubFlowRef");
+    }
+
+    @Test
+    public void propagationThroughAsyncElement() throws Exception
+    {
+        testFlow("propagationThroughAsyncElement");
     }
 
     @Test
@@ -226,6 +244,27 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     public void allAsync() throws Exception
     {
         testFlow("AllAsync");
+    }
+
+    @Test
+    public void propogationOfPropertiesInMessageSplitWithSplitter() throws Exception
+    {
+        List<Fruit> fruitList = new ArrayList<Fruit>();
+        fruitList.add(new Apple());
+        fruitList.add(new Orange());
+        fruitList.add(new Banana());
+        testFlow("propogationOfPropertiesInMessageSplitWithSplitter", getTestEvent(fruitList));
+    }
+
+    @Test
+    public void aggregationOfPropertiesFromMultipleMessageWithAggregator() throws Exception
+    {
+        List<Fruit> fruitList = new ArrayList<Fruit>();
+        fruitList.add(new Apple());
+        fruitList.add(new Orange());
+        fruitList.add(new Banana());
+        testFlow("aggregationOfPropertiesFromMultipleMessageWithAggregator", getTestEvent(fruitList));
+        FlowAssert.verify("Split");
     }
 
     @Test

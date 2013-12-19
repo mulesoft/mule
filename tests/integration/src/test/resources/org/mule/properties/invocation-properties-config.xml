@@ -113,37 +113,48 @@
         <echo-component />
     </flow>
 
-    <flow name="noPropagationThroughFlowRefToFlow">
+    <flow name="propagationThroughFlowRefToFlow">
         <processor ref="addP1" />
         <test:assert expression="#[P1]" />
         <flow-ref name="FlowRef-1" />
         <test:assert expression="#[P1]" />
-        <test:assert expression="#[flowVars['P2'] == null]" />
-        <test:assert expression="#[flowVars['P4'] == null]" />
+        <test:assert expression="#[P2]" />
+        <test:assert expression="#[header:INVOCATION:P4]" />
         <flow-ref name="FlowRef-2" />
         <test:assert expression="#[P1]" />
-        <test:assert expression="#[flowVars['P2'] == null]" />
+        <test:assert expression="#[P2]" />
         <test:assert expression="#[flowVars['P3'] == null]" />
-        <test:assert expression="#[flowVars['P4'] == null]" message="I failed" />
+        <test:assert expression="#[header:INVOCATION:P4]" message="I failed" />
     </flow>
     <flow name="FlowRef-1" processingStrategy="synchronous">
-        <test:assert expression="#[flowVars['P1'] == null]" />
+        <test:assert expression="#[P1]" />
         <processor ref="addP2" />
         <flow-ref name="FlowRef-3" />
-        <test:assert expression="#[flowVars['P4'] == null]" message="I failed" />
+        <test:assert expression="#[header:INVOCATION:P4]" message="I failed" />
     </flow>
     <flow name="FlowRef-2" processingStrategy="queued-asynchronous">
-        <test:assert expression="#[flowVars['P1'] == null]" />
-        <test:assert expression="#[flowVars['P2'] == null]" />
+        <test:assert expression="#[P1]" />
+        <test:assert expression="#[P2]" />
         <processor ref="addP3" />
         <flow-ref name="FlowRef-3" />
-        <test:assert expression="#[flowVars['P4'] == null]" />
+        <test:assert expression="#[header:INVOCATION:P4]" />
     </flow>
     <flow name="FlowRef-3" processingStrategy="synchronous">
-        <test:assert expression="#[flowVars['P1'] == null]" />
-        <test:assert expression="#[flowVars['P2'] == null]" />
+        <test:assert expression="#[P1]" />
+        <test:assert expression="#[P2]" />
         <processor ref="addP4" />
         <test:assert expression="#[header:INVOCATION:P4]" />
+    </flow>
+    <flow name="OverwriteInFlowRef">
+        <processor ref="addP1" />
+        <test:assert expression="#[P1 == 'P1_VALUE']" />
+        <flow-ref name="OverwriteInFlowRef-1" />
+        <test:assert expression="#[P1 == 'P1_VALUE_NEW']" />
+    </flow>
+    <flow name="OverwriteInFlowRef-1" processingStrategy="synchronous">
+        <message-properties-transformer scope="invocation">
+            <add-message-property key="P1" value="P1_VALUE_NEW" />
+        </message-properties-transformer>
     </flow>
 
     <flow name="propagationThroughFlowRefToSubFlow">
@@ -175,6 +186,26 @@
         <test:assert expression="#[header:INVOCATION:P3]" />
         <processor ref="addP4" />
     </sub-flow>
+    <flow name="OverwriteInSubFlowRef">
+        <processor ref="addP1" />
+        <test:assert expression="#[P1 == 'P1_VALUE']" />
+        <flow-ref name="OverwriteInSubFlowRef-1" />
+        <test:assert expression="#[P1 == 'P1_VALUE_NEW']" />
+    </flow>
+    <flow name="OverwriteInSubFlowRef-1" processingStrategy="synchronous">
+        <message-properties-transformer scope="invocation">
+            <add-message-property key="P1" value="P1_VALUE_NEW" />
+        </message-properties-transformer>
+    </flow>
+
+    <flow name="propagationThroughAsyncElement">
+        <processor ref="addP1" />
+        <async>
+            <processor ref="addP2" />
+            <test:assert expression="#[P1]" />
+            <test:assert expression="#[P2]" />
+        </async>
+    </flow>
     <flow name="propertyAddedInAsyncElementNotAddedinFlow">
         <processor ref="addP1" />
         <async>
@@ -302,6 +333,22 @@
         <test:assert expression="#[flowVars['P2'] == null]" />
         <test:assert expression="#[P3]" />
     </sub-flow>
+
+    <flow name="propogationOfPropertiesInMessageSplitWithSplitter" processingStrategy="synchronous">
+        <processor ref="addP1" />
+        <collection-splitter />
+        <test:assert expression="#[payload is org.mule.tck.testmodels.fruit.Fruit]" count="3" />
+        <test:assert expression="#[P1]" />
+    </flow>
+
+    <flow name="aggregationOfPropertiesFromMultipleMessageWithAggregator">
+        <flow-ref name="propogationOfPropertiesInMessageSplitWithSplitter" />
+        <processor ref="addP2" />
+        <collection-aggregator />
+        <test:assert expression="#[groovy:message instanceof org.mule.api.MuleMessageCollection]" />
+        <test:assert expression="#[P1]" />
+        <test:assert expression="#[P2]" />
+    </flow>
 
     <flow name="defaultExceptionStrategy">
         <processor ref="addP1" />
