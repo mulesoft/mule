@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.custommonkey.xmlunit.XMLAssert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.w3c.dom.Document;
@@ -71,6 +72,7 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
     }
 
     @Test
+    @Ignore("MULE-6926: Flaky Test")
     public void testXmlDomOut() throws MuleException
     {
         Document dom = (Document) request(sendXml(), "xml-dom-out", Document.class);
@@ -85,6 +87,7 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
     }
 
     @Test
+    @Ignore("MULE-6926: Flaky Test")
     public void testDomXmlOut() throws Exception
     {
         String xml = (String) request(sendXml(), "dom-xml-out", String.class);

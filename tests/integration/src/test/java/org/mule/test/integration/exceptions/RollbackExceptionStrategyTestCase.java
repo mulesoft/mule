@@ -9,16 +9,6 @@ package org.mule.test.integration.exceptions;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.apache.commons.lang.mutable.MutableInt;
-import org.hamcrest.core.IsNull;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -36,6 +26,17 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.lang.mutable.MutableInt;
+import org.hamcrest.core.IsNull;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
 
 public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -105,6 +106,7 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
     }
 
     @Test
+    @Ignore("MULE-6926: Flaky Test")
     public void testRedeliveryExhaustedTransactional() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(EXPECTED_DELIVERED_TIMES);
