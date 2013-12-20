@@ -18,6 +18,7 @@ import org.mule.transport.ftp.AbstractFtpServerTestCase;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
@@ -69,6 +70,7 @@ public class InboundMessageLossFlowTestCase extends AbstractFtpServerTestCase
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testNoException() throws Exception
     {
         FlowExecutionListener flowExecutionListener = new FlowExecutionListener("NoException", muleContext);
