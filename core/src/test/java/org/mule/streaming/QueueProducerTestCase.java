@@ -13,12 +13,10 @@ import org.mule.util.queue.Queue;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -68,10 +66,10 @@ public class QueueProducerTestCase
     {
         Set<Serializable> returnedValues = new HashSet<Serializable>();
 
-        List<Serializable> page = this.producer.produce();
-        while (!CollectionUtils.isEmpty(page))
+        Serializable page = this.producer.produce();
+        while (page != null)
         {
-            returnedValues.addAll(page);
+            returnedValues.add(page);
             page = this.producer.produce();
         }
 
@@ -82,7 +80,7 @@ public class QueueProducerTestCase
             Assert.assertTrue(returnedValues.contains(value));
         }
 
-        Assert.assertTrue(CollectionUtils.isEmpty(this.producer.produce()));
+        Assert.assertNull(this.producer.produce());
     }
 
     @Test
@@ -97,7 +95,7 @@ public class QueueProducerTestCase
         this.producer.produce();
         this.producer.close();
 
-        Assert.assertTrue(CollectionUtils.isEmpty(this.producer.produce()));
+        Assert.assertNull(this.producer.produce());
     }
 
 }

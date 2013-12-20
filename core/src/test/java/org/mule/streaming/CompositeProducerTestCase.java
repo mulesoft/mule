@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.streaming;
 
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -35,12 +35,12 @@ public class CompositeProducerTestCase
     private List<String> aggregatedList;
 
     @Mock
-    private Producer<String> producer1;
+    private Producer<List<String>> producer1;
 
     @Mock
-    private Producer<String> producer2;
+    private Producer<List<String>> producer2;
 
-    private CompositeProducer<String> producer;
+    private CompositeProducer<List<String>> producer;
 
     @SuppressWarnings("unchecked")
     @Before
@@ -55,18 +55,13 @@ public class CompositeProducerTestCase
         this.aggregatedList.addAll(this.list2);
         this.aggregatedList.addAll(this.list3);
 
-        Mockito.when(this.producer1.produce())
-            .thenReturn(this.list1)
-            .thenReturn(this.list2)
-            .thenReturn(Collections.<String> emptyList());
+        Mockito.when(this.producer1.produce()).thenReturn(this.list1).thenReturn(this.list2).thenReturn(null);
         Mockito.when(this.producer1.size()).thenReturn(this.list1.size() + this.list2.size());
 
-        Mockito.when(this.producer2.produce())
-            .thenReturn(this.list3)
-            .thenReturn(Collections.<String> emptyList());
+        Mockito.when(this.producer2.produce()).thenReturn(this.list3).thenReturn(null);
         Mockito.when(this.producer2.size()).thenReturn(this.list3.size());
 
-        this.producer = new CompositeProducer<String>(this.producer1, this.producer2);
+        this.producer = new CompositeProducer<List<String>>(this.producer1, this.producer2);
     }
 
     @Test
@@ -78,7 +73,10 @@ public class CompositeProducerTestCase
         while (!CollectionUtils.isEmpty(page))
         {
             page = this.producer.produce();
-            output.addAll(page);
+            if (page != null)
+            {
+                output.addAll(page);
+            }
         }
 
         Assert.assertEquals(output.size(), this.aggregatedList.size());

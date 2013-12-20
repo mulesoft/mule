@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.streaming;
 
 import org.mule.api.Closeable;
@@ -11,9 +12,11 @@ import org.mule.api.Closeable;
 import java.util.List;
 
 /**
- * A PagingDelegate is a {@link org.mule.api.Closeable} capable of consuming a data
- * feed in pages. Implementing this class does not guarantee thread safeness. Check
- * each particular implementation for information about that
+ * A PagingDelegate is a {@link Closeable} capable of consuming a data feed in pages.
+ * Implementing this class does not guarantee thread safeness. Check each particular
+ * implementation for information about that
+ * 
+ * @since 3.5.0
  */
 public abstract class PagingDelegate<T> implements Closeable
 {

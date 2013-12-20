@@ -10,10 +10,6 @@ package org.mule.streaming;
 import org.mule.api.MuleException;
 import org.mule.util.queue.Queue;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,18 +51,17 @@ public class QueueProducer<T> implements Producer<T>
 
     /**
      * {@inheritDoc} This implementation will poll from the queue once and will
-     * return the obtained item in a single element list. If the producer is closed
-     * or if the queue times out while polling, then an empty list is returned. If
-     * the poll method throws {@link InterruptedException} then an empty list is
-     * returned as well
+     * return the obtained item. If the producer is closed or if the queue times out
+     * while polling, then <code>null</code> is returned. If the poll method throws
+     * {@link InterruptedException} then <code>null</code> is returned as well
      */
     @Override
     @SuppressWarnings("unchecked")
-    public List<T> produce()
+    public T produce()
     {
         if (this.queue == null)
         {
-            return Collections.emptyList();
+            return null;
         }
 
         T item = null;
@@ -79,7 +74,7 @@ public class QueueProducer<T> implements Producer<T>
             logger.warn("Thread interrupted while polling in producer. Will return an empty list", e);
         }
 
-        return item != null ? Arrays.<T>asList(item) : Collections.<T> emptyList();
+        return item;
     }
 
     @Override

@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.streaming;
 
 import org.mule.api.MuleException;
@@ -18,18 +19,23 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 @SmallTest
-public class ElementBasedPagingConsumerTestCase extends AbstractPagingConsumerTestCase
+public class ListConsumerTestCase
 {
 
+    private static final int totalCount = 50;
+    private static final int pageSize = 10;
+
     private Consumer<Integer> consumer;
-    private Producer<Integer> producer;
+    private Producer<List<Integer>> producer;
+
+    private List<List<Integer>> pages;
 
     @Before
     public void setUp()
     {
         this.pages = this.getPages();
         this.producer = Mockito.spy(new TestProducer());
-        this.consumer = Mockito.spy(new ElementBasedPagingConsumer<Integer>(this.producer));
+        this.consumer = Mockito.spy(new ListConsumer<Integer>(this.producer));
     }
 
     @Test(expected = ClosedConsumerException.class)
@@ -85,7 +91,25 @@ public class ElementBasedPagingConsumerTestCase extends AbstractPagingConsumerTe
         this.consumer.close();
     }
 
-    private class TestProducer implements Producer<Integer>
+    private List<List<Integer>> getPages()
+    {
+        List<List<Integer>> pages = new ArrayList<List<Integer>>();
+        List<Integer> page = new ArrayList<Integer>();
+
+        for (int i = 1; i <= totalCount; i++)
+        {
+            page.add(i);
+            if (i % pageSize == 0)
+            {
+                pages.add(page);
+                page = new ArrayList<Integer>();
+            }
+        }
+
+        return pages;
+    }
+
+    private class TestProducer implements Producer<List<Integer>>
     {
 
         private int index = 0;
@@ -119,5 +143,4 @@ public class ElementBasedPagingConsumerTestCase extends AbstractPagingConsumerTe
             return totalCount;
         };
     }
-
 }
