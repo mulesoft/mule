@@ -46,4 +46,12 @@ public class InboundMessageLossTransactionsTestCase extends InboundMessageLossTe
         assertTrue("Message should have been redelivered",
             messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
     }
+
+    @Test
+    @Ignore("MULE-6926: flaky test")
+    @Override
+    public void testRollbackExceptionStrategyConsumesMessage() throws Exception
+    {
+        // Overridden to ignore
+    }
 }

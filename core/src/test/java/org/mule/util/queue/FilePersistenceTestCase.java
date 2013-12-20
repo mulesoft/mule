@@ -12,6 +12,9 @@ import org.mule.util.store.QueuePersistenceObjectStore;
 
 import java.io.Serializable;
 
+import org.junit.Ignore;
+import org.junit.Test;
+
 public class FilePersistenceTestCase extends AbstractTransactionQueueManagerTestCase
 {
     @Override
@@ -29,5 +32,13 @@ public class FilePersistenceTestCase extends AbstractTransactionQueueManagerTest
     protected boolean isPersistent()
     {
         return true;
+    }
+
+    @Test
+    @Ignore("MULE-6926: Flaky Test")
+    @Override
+    public void testPoll() throws Exception
+    {
+        // Overridden to ignore
     }
 }
