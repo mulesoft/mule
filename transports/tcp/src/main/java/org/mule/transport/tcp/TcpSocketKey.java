@@ -6,11 +6,10 @@
  */
 package org.mule.transport.tcp;
 
-import org.mule.api.endpoint.ImmutableEndpoint;
-
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.SocketException;
+
+import org.mule.api.endpoint.ImmutableEndpoint;
 
 /**
  * This is used to adapt an endpoint so that it can be used as a key for sockets.  It must
