@@ -6,6 +6,11 @@
  */
 package org.mule.module.launcher.descriptor;
 
+import org.mule.MuleServer;
+import org.mule.module.reboot.MuleContainerBootstrapUtils;
+
+import java.io.File;
+
 /**
  * Encapsulates defaults when no explicit descriptor provided with an app.
  */
@@ -17,6 +22,11 @@ public class EmptyApplicationDescriptor extends ApplicationDescriptor
     public EmptyApplicationDescriptor(String appName)
     {
         this.appName = appName;
+        setConfigResources(new String[] {MuleServer.DEFAULT_CONFIGURATION});
+        File configPathFile = MuleContainerBootstrapUtils.getMuleAppDefaultConfigFile(appName);
+        String configPath = String.format(configPathFile.getAbsolutePath());
+        setAbsoluteResourcePaths(new String[] {configPath});
+        setConfigResourcesFile(new File[] {configPathFile});
     }
 
     public String getAppName()

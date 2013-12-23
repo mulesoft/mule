@@ -19,7 +19,7 @@ public class DefaultMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
     @Override
     protected MuleMessageFactory doCreateMuleMessageFactory()
     {
-        return new DefaultMuleMessageFactory(muleContext);
+        return new DefaultMuleMessageFactory();
     }
 
     @Override

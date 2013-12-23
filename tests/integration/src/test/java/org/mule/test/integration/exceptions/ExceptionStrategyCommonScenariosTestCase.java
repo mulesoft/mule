@@ -42,7 +42,6 @@ import java.util.concurrent.TimeUnit;
 import javax.mail.internet.MimeMessage;
 
 import org.hamcrest.core.IsNull;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
@@ -132,7 +131,6 @@ public class ExceptionStrategyCommonScenariosTestCase extends AbstractServiceAnd
     }
 
     @Test
-    @Ignore("MULE-6926: flaky test")
     public void testRouteByExceptionType() throws Exception
     {
         final CountDownLatch messageProcessedLatch = new CountDownLatch(3);

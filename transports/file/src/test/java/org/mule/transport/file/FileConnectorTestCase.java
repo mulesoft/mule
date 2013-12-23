@@ -168,7 +168,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
         ((FileConnector) connector).setStreaming(false);
 
         Object payload = getValidMessage();
-        MuleMessage message = connector.createMuleMessageFactory().create(payload, encoding);
+        MuleMessage message = connector.createMuleMessageFactory().create(payload, encoding, muleContext);
         assertNotNull(message);
         
         byte[] messagePayload = (byte[]) message.getPayload();

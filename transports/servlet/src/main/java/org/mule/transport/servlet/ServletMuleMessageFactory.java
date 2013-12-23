@@ -7,7 +7,6 @@
 package org.mule.transport.servlet;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.transport.AbstractMuleMessageFactory;
 import org.mule.transport.http.HttpConstants;
@@ -25,11 +24,6 @@ import org.apache.commons.collections.EnumerationUtils;
 public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
 {
     private static final String REMOTE_ADDRESS_HEADER = "remoteAddress";
-
-    public ServletMuleMessageFactory(MuleContext context)
-    {
-        super(context);
-    }
 
     @Override
     protected Class<?>[] getSupportedTransportMessageTypes()

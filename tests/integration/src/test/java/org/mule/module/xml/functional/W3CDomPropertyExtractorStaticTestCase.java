@@ -13,8 +13,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.Ignore;
-import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -54,13 +52,5 @@ public class W3CDomPropertyExtractorStaticTestCase extends AbstractXmlPropertyEx
         endpoint.appendChild(doc.createTextNode(nodeName));
         doc.appendChild(endpoint);
         return doc;
-    }
-
-    @Test
-    @Ignore("MULE-6926: Flaky Test")
-    @Override
-    public void testError() throws Exception
-    {
-        // Overridden to ignore
     }
 }

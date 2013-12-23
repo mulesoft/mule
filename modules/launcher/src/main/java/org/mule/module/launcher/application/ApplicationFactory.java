@@ -6,22 +6,24 @@
  */
 package org.mule.module.launcher.application;
 
+import org.mule.module.launcher.artifact.ArtifactFactory;
+
 import java.io.IOException;
 
 /**
  * Creates {@link Application} instances
  */
-public interface ApplicationFactory
+public interface ApplicationFactory extends ArtifactFactory<Application>
 {
 
     /**
      * Creates an application
      *
-     * @param appName the name of the application to create
+     * @param artifactName the name of the application to create
      * @return the application instance that corresponds to the given name
      * @throws IOException
      */
     //TODO(pablo.kraan): createApp should throw an Exception class more related
     //to the domain instead of a low level IOException
-    public Application createApp(String appName) throws IOException;
+    public Application createArtifact(String artifactName) throws IOException;
 }

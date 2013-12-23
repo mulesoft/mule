@@ -7,7 +7,6 @@
 package org.mule.transport.http;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
 import org.mule.transport.http.multipart.MultiPartInputStream;
 import org.mule.transport.http.multipart.Part;
 import org.mule.transport.http.multipart.PartDataSource;
@@ -22,11 +21,6 @@ public class HttpMultipartMuleMessageFactory extends HttpMuleMessageFactory
 {
 
     private Collection<Part> parts;
-
-    public HttpMultipartMuleMessageFactory(MuleContext context)
-    {
-        super(context);
-    }
 
     @Override
     protected Object extractPayloadFromHttpRequest(HttpRequest httpRequest) throws IOException

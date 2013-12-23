@@ -56,7 +56,7 @@ public class AxisMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
     @Override
     protected MuleMessageFactory doCreateMuleMessageFactory()
     {
-        return new AxisMuleMessageFactory(muleContext);
+        return new AxisMuleMessageFactory();
     }
 
     @Override
@@ -70,7 +70,7 @@ public class AxisMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
     {
         MuleMessageFactory factory = createMuleMessageFactory();
         Object payload = getValidTransportMessage();
-        MuleMessage message = factory.create(payload, encoding);
+        MuleMessage message = factory.create(payload, encoding, muleContext);
         assertEquals(payload, message.getPayload());
         assertEquals("replyTo", message.getReplyTo());
         assertEquals(42, message.getCorrelationGroupSize());

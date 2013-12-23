@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
@@ -72,7 +71,6 @@ public class CxfAndXslTransformerOnSoapTestCase extends AbstractServiceAndFlowTe
      * @throws Exception
      */
     @Test
-    @Ignore("MULE-6926: flaky test")
     public void testUsesTransformersCorrectly() throws Exception
     {
         TestExceptionStrategy exceptionStrategy = new TestExceptionStrategy();

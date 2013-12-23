@@ -22,7 +22,7 @@ public class XmppMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
     @Override
     protected MuleMessageFactory doCreateMuleMessageFactory()
     {
-        return new XmppMuleMessageFactory(muleContext);
+        return new XmppMuleMessageFactory();
     }
 
     @Override
@@ -50,7 +50,7 @@ public class XmppMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         payload.setPacketID(uuid);
      
         MuleMessageFactory factory = createMuleMessageFactory();
-        MuleMessage message = factory.create(payload, encoding);
+        MuleMessage message = factory.create(payload, encoding, muleContext);
         assertNotNull(message);
         assertEquals(Message.class, message.getPayload().getClass());
         assertEquals(TEST_MESSAGE, ((Message) message.getPayload()).getBody());

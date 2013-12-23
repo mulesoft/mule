@@ -7,15 +7,14 @@
 package org.mule.module.launcher;
 
 /**
- *
+ * Manages which {@link org.mule.module.launcher.DeploymentListener} are listening for domain deployment
+ * notifications.
  */
-public class DefaultMuleSharedDomainClassLoader extends MuleSharedDomainClassLoader
+public interface DomainDeploymentListenerManager
 {
 
-    public static final String DEFAULT_DOMAIN_NAME = "default";
+    void addDomainDeploymentListener(DeploymentListener listener);
 
-    public DefaultMuleSharedDomainClassLoader(ClassLoader parent)
-    {
-        super(DEFAULT_DOMAIN_NAME, parent);
-    }
+    void removeDomainDeploymentListener(DeploymentListener listener);
+
 }

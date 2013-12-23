@@ -35,30 +35,6 @@ public class MuleClientTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testClientSendDirectEndpointLeak() throws Exception
-    {
-        MuleClient client = new MuleClient(muleContext);
-
-        // Ensure default endpoint created
-        MuleMessage message = client.sendDirect("TestReceiverUMO", null, "Test Client Send message", null);
-        assertNotNull(message);
-
-        // Determine how many endpoints are created by looking at the number of endpoints
-        int endpointObservationOffset = Math.abs(
-            client.getMuleContext().getRegistry().getEndpoints().size() -
-            client.getMuleContext().getRegistry().getEndpoints().size() );
-      
-        // Verify further endpoints not created
-        int registeredEndpointsBefore = client.getMuleContext().getRegistry().getEndpoints().size();
-        message = client.sendDirect("TestReceiverUMO", null, "Test Client Send message", null);
-        assertNotNull(message);
-
-        assertEquals("Registered endpoint count", 
-            registeredEndpointsBefore + endpointObservationOffset, 
-            client.getMuleContext().getRegistry().getEndpoints().size());
-    }
-
-    @Test
     public void testClientDispatchDirect() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

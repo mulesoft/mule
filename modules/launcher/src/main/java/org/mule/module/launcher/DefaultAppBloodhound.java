@@ -104,7 +104,7 @@ public class DefaultAppBloodhound implements AppBloodhound
                                 String.format("Unsupported deployment descriptor format for app '%s': %s", appName, ext)));
             }
 
-            desc = descriptorParser.parse(descriptorFile);
+            desc = descriptorParser.parse(descriptorFile, appName);
             // app name is external to the deployment descriptor
             desc.setAppName(appName);
         }

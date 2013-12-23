@@ -18,7 +18,6 @@ import org.mule.tck.functional.StringAppendTestTransformer;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
@@ -70,7 +69,6 @@ public class EndpointTransformerMule2131TestCase extends AbstractServiceAndFlowT
     */
 
     @Test
-    @Ignore("MULE-6926: Flaky Test")
     public void testGlobalNameLocalTransformer() throws Exception
     {
         doTestTransformed("global-name-local-transformer");

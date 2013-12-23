@@ -209,7 +209,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
         when(mockInboundEndpoint.getConnector()).thenReturn(mockFileConnector);
         when(mockInboundEndpoint.getFilter()).thenReturn(null);
         when(mockFileConnector.createMuleMessageFactory()).thenReturn(mockMessageFactory);
-        mockMessageFactory = new FileMuleMessageFactory(mockMuleContext) {
+        mockMessageFactory = new FileMuleMessageFactory() {
             @Override
             public MuleMessage create(Object transportMessage, String encoding) throws Exception
             {

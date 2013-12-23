@@ -52,7 +52,7 @@ public class PluginClasspath
         }
         catch (MalformedURLException e)
         {
-            throw new IllegalArgumentException("Failed to create plugin classpath " + pluginDir);
+            throw new IllegalArgumentException("Failed to getDomainClassLoader plugin classpath " + pluginDir);
         }
         return cp;
     }

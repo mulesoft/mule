@@ -7,7 +7,6 @@
 package org.mule.transport.udp;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
 import org.mule.transport.AbstractMuleMessageFactory;
 
 import java.net.DatagramPacket;
@@ -15,10 +14,6 @@ import java.net.InetAddress;
 
 public class UdpMuleMessageFactory extends AbstractMuleMessageFactory
 {
-    public UdpMuleMessageFactory(MuleContext context)
-    {
-        super(context);
-    }
 
     @Override
     protected Class<?>[] getSupportedTransportMessageTypes()
