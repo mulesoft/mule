@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URI;
 import java.security.GeneralSecurityException;
-import java.security.Provider;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLServerSocket;
