@@ -10,10 +10,12 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.security.tls.TlsConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.ClassUtils;
+import org.mule.util.SecurityUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +33,7 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
 
     private static final String SUPPORTED_CIPHER_SUITE = "TLS_DHE_DSS_WITH_AES_128_CBC_SHA";
     private static final String SUPPORTED_PROTOCOL = "TLSv1";
+    private static final String TEST_SECURITY_MODEL = "test";
 
     @Test
     public void testEmptyConfiguration() throws Exception
@@ -105,7 +108,7 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
     @Test
     public void testCipherSuitesFromConfigFile() throws Exception
     {
-        File configFile = createConfigFile();
+        File configFile = createDefaultConfigFile();
 
         try
         {
@@ -127,7 +130,7 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
     @Test
     public void testProtocolsFromConfigFile() throws Exception
     {
-        File configFile = createConfigFile();
+        File configFile = createDefaultConfigFile();
 
         try
         {
@@ -146,18 +149,44 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
+    public void testSecurityModelProperty() throws Exception
+    {
+        String previousSecurityModel = SecurityUtils.getSecurityModel();
+        System.setProperty(MuleProperties.MULE_SECURITY_SYSTEM_PROPERTY, TEST_SECURITY_MODEL);
+        File file = createConfigFile(TEST_SECURITY_MODEL, "enabledCipherSuites=TEST");
 
-    private File createConfigFile() throws IOException
+        try
+        {
+            TlsConfiguration tlsConfiguration = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
+            tlsConfiguration.initialise(true, TlsConfiguration.JSSE_NAMESPACE);
+
+            assertArrayEquals(new String[] {"TEST"}, tlsConfiguration.getEnabledCipherSuites());
+        }
+        finally
+        {
+            System.setProperty(MuleProperties.MULE_SECURITY_SYSTEM_PROPERTY, previousSecurityModel);
+            file.delete();
+        }
+    }
+
+    private File createDefaultConfigFile() throws IOException
+    {
+        String contents = String.format("enabledCipherSuites=UNSUPPORTED,%s\n" +
+                                        "enabledProtocols=UNSUPPORTED,%s", SUPPORTED_CIPHER_SUITE, SUPPORTED_PROTOCOL);
+
+        return createConfigFile(TlsConfiguration.DEFAULT_SECURITY_MODEL, contents);
+    }
+
+    private File createConfigFile(String securityModel, String contents) throws IOException
     {
         String path = ClassUtils.getClassPathRoot(getClass()).getPath();
-        File file = new File(path, TlsConfiguration.DEFAULT_PROPERTIES_FILE);
+        File file = new File(path, String.format(TlsConfiguration.PROPERTIES_FILE_PATTERN, securityModel));
 
         PrintWriter writer = new PrintWriter(file, "UTF-8");
-        writer.println("enabledCipherSuites=UNSUPPORTED," + SUPPORTED_CIPHER_SUITE);
-        writer.println("enabledProtocols=UNSUPPORTED," + SUPPORTED_PROTOCOL);
+        writer.println(contents);
         writer.close();
 
         return file;
     }
-
 }

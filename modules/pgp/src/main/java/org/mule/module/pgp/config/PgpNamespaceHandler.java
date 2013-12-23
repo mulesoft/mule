@@ -14,18 +14,44 @@ import org.mule.config.spring.parsers.specific.SecurityFilterDefinitionParser;
 import org.mule.module.pgp.KeyBasedEncryptionStrategy;
 import org.mule.module.pgp.PGPSecurityProvider;
 import org.mule.module.pgp.filters.PGPSecurityFilter;
+import org.mule.util.SecurityUtils;
 
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
+import org.springframework.beans.factory.xml.ParserContext;
+import org.w3c.dom.Element;
 
 public class PgpNamespaceHandler extends NamespaceHandlerSupport
 {
+
     public void init()
     {
-        registerBeanDefinitionParser("security-manager", new NamedDefinitionParser(MuleProperties.OBJECT_SECURITY_MANAGER));
-        registerBeanDefinitionParser("security-provider", new ChildDefinitionParser("provider", PGPSecurityProvider.class));
-        registerBeanDefinitionParser("security-filters", new ParentDefinitionParser());
-        registerBeanDefinitionParser("security-filter", new SecurityFilterDefinitionParser(PGPSecurityFilter.class));
-        registerBeanDefinitionParser("keybased-encryption-strategy", new ChildDefinitionParser("encryptionStrategy", KeyBasedEncryptionStrategy.class));
+        registerRestrictedBeanDefinitionParser("security-manager", new NamedDefinitionParser(MuleProperties.OBJECT_SECURITY_MANAGER));
+        registerRestrictedBeanDefinitionParser("security-provider", new ChildDefinitionParser("provider", PGPSecurityProvider.class));
+        registerRestrictedBeanDefinitionParser("security-filters", new ParentDefinitionParser());
+        registerRestrictedBeanDefinitionParser("security-filter", new SecurityFilterDefinitionParser(PGPSecurityFilter.class));
+        registerRestrictedBeanDefinitionParser("keybased-encryption-strategy", new ChildDefinitionParser("encryptionStrategy", KeyBasedEncryptionStrategy.class));
+    }
+
+    private void registerRestrictedBeanDefinitionParser(String id, final BeanDefinitionParser beanDefinitionParser)
+    {
+        registerBeanDefinitionParser(id, new BeanDefinitionParser()
+        {
+            @Override
+            public BeanDefinition parse(Element element, ParserContext parserContext)
+            {
+                if (SecurityUtils.isFipsSecurityModel())
+                {
+                    throw new IllegalStateException(String.format("Cannot use PGP module when using FIPS security model. " +
+                                                                  "Element %s is not allowed.", element.getNodeName()));
+                }
+                else
+                {
+                    return beanDefinitionParser.parse(element, parserContext);
+                }
+            }
+        });
     }
 
 }

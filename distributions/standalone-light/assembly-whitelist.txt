@@ -35,6 +35,7 @@
 /mule-standalone-nodocs-${productVersion}/conf/log4j.properties
 /mule-standalone-nodocs-${productVersion}/conf/wrapper.conf
 /mule-standalone-nodocs-${productVersion}/conf/tls-default.conf
+/mule-standalone-nodocs-${productVersion}/conf/tls-fips140-2.conf
 
 
 #
