@@ -29,7 +29,7 @@ import org.junit.Test;
 public class TlsConfigurationTestCase extends AbstractMuleTestCase
 {
 
-    private static final String SUPPORTED_CIPHER_SUITE = "TLS_DHE_DSS_WITH_AES_256_CBC_SHA";
+    private static final String SUPPORTED_CIPHER_SUITE = "TLS_DHE_DSS_WITH_AES_128_CBC_SHA";
     private static final String SUPPORTED_PROTOCOL = "TLSv1";
 
     @Test
@@ -107,16 +107,21 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
     {
         File configFile = createConfigFile();
 
-        TlsConfiguration tlsConfiguration = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
-        tlsConfiguration.initialise(true, TlsConfiguration.JSSE_NAMESPACE);
+        try
+        {
+            TlsConfiguration tlsConfiguration = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
+            tlsConfiguration.initialise(true, TlsConfiguration.JSSE_NAMESPACE);
 
-        SSLSocket socket = (SSLSocket) tlsConfiguration.getSocketFactory().createSocket();
-        SSLServerSocket serverSocket = (SSLServerSocket) tlsConfiguration.getServerSocketFactory().createServerSocket();
+            SSLSocket socket = (SSLSocket) tlsConfiguration.getSocketFactory().createSocket();
+            SSLServerSocket serverSocket = (SSLServerSocket) tlsConfiguration.getServerSocketFactory().createServerSocket();
 
-        assertArrayEquals(new String[] {SUPPORTED_CIPHER_SUITE}, socket.getEnabledCipherSuites());
-        assertArrayEquals(new String[] {SUPPORTED_CIPHER_SUITE}, serverSocket.getEnabledCipherSuites());
-
-        configFile.delete();
+            assertArrayEquals(new String[] {SUPPORTED_CIPHER_SUITE}, socket.getEnabledCipherSuites());
+            assertArrayEquals(new String[] {SUPPORTED_CIPHER_SUITE}, serverSocket.getEnabledCipherSuites());
+        }
+        finally
+        {
+            configFile.delete();
+        }
     }
 
     @Test
@@ -124,16 +129,21 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
     {
         File configFile = createConfigFile();
 
-        TlsConfiguration tlsConfiguration = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
-        tlsConfiguration.initialise(true, TlsConfiguration.JSSE_NAMESPACE);
+        try
+        {
+            TlsConfiguration tlsConfiguration = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
+            tlsConfiguration.initialise(true, TlsConfiguration.JSSE_NAMESPACE);
 
-        SSLSocket socket = (SSLSocket) tlsConfiguration.getSocketFactory().createSocket();
-        SSLServerSocket serverSocket = (SSLServerSocket) tlsConfiguration.getServerSocketFactory().createServerSocket();
+            SSLSocket socket = (SSLSocket) tlsConfiguration.getSocketFactory().createSocket();
+            SSLServerSocket serverSocket = (SSLServerSocket) tlsConfiguration.getServerSocketFactory().createServerSocket();
 
-        assertArrayEquals(new String[] {SUPPORTED_PROTOCOL}, socket.getEnabledProtocols());
-        assertArrayEquals(new String[] {SUPPORTED_PROTOCOL}, serverSocket.getEnabledProtocols());
-
-        configFile.delete();
+            assertArrayEquals(new String[] {SUPPORTED_PROTOCOL}, socket.getEnabledProtocols());
+            assertArrayEquals(new String[] {SUPPORTED_PROTOCOL}, serverSocket.getEnabledProtocols());
+        }
+        finally
+        {
+            configFile.delete();
+        }
     }
 
 

@@ -7,6 +7,7 @@
 package org.mule.api.security.tls;
 
 
+import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
 import java.io.IOException;
@@ -39,7 +40,7 @@ public class TlsProperties
         Properties properties = new Properties();
         try
         {
-            InputStream config = Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName);
+            InputStream config = IOUtils.getResourceAsStream(fileName, TlsProperties.class);
 
             if (config == null)
             {

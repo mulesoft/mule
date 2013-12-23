@@ -127,6 +127,10 @@ public class ArrayUtils extends org.apache.commons.lang.ArrayUtils
         return copy;
     }
 
+    /**
+     * Calculates the intersection between two arrays, as if they were sets.
+     * @return A new array with the intersection.
+     */
     public static String[] intersection(String[] a, String[] b)
     {
         Set<String> result = new HashSet<String>();
