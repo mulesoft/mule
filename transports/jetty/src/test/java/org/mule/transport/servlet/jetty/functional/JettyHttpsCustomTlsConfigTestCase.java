@@ -67,7 +67,7 @@ public class JettyHttpsCustomTlsConfigTestCase extends FunctionalTestCase
     private static File getTlsPropertiesFile()
     {
         String path = ClassUtils.getClassPathRoot(JettyHttpsCustomTlsConfigTestCase.class).getPath();
-        return new File(path, TlsConfiguration.DEFAULT_PROPERTIES_FILE);
+        return new File(path, String.format(TlsConfiguration.PROPERTIES_FILE_PATTERN, TlsConfiguration.DEFAULT_SECURITY_MODEL));
     }
 
     @Test

@@ -13,6 +13,7 @@ import org.mule.api.security.UnauthorisedException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.pgp.i18n.PGPMessages;
 import org.mule.security.AbstractSecurityProvider;
+import org.mule.util.SecurityUtils;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.PGPPublicKey;
@@ -79,7 +80,10 @@ public class PGPSecurityProvider extends AbstractSecurityProvider
     {
         try
         {
-            java.security.Security.addProvider(new BouncyCastleProvider());
+            if (!SecurityUtils.isFipsSecurityModel())
+            {
+                java.security.Security.addProvider(new BouncyCastleProvider());
+            }
             setSecurityContextFactory(new PGPSecurityContextFactory());
         }
         catch (Exception e)

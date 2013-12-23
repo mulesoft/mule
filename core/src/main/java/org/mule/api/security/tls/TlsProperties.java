@@ -48,6 +48,7 @@ public class TlsProperties
             }
             else
             {
+                logger.info(String.format("Loading configuration file: %s", fileName));
                 properties.load(config);
 
                 String enabledCipherSuitesProperty = properties.getProperty("enabledCipherSuites");

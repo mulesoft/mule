@@ -14,6 +14,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ArrayUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
+import org.mule.util.SecurityUtils;
 import org.mule.util.StringUtils;
 
 import java.io.FileNotFoundException;
@@ -112,7 +113,10 @@ public final class TlsConfiguration
     public static final String DEFAULT_KEYMANAGER_ALGORITHM = KeyManagerFactory.getDefaultAlgorithm();
     public static final String DEFAULT_SSL_TYPE = "TLSv1";
     public static final String JSSE_NAMESPACE = "javax.net";
-    public static final String DEFAULT_PROPERTIES_FILE = "tls-default.conf";
+
+    public static final String PROPERTIES_FILE_PATTERN = "tls-%s.conf";
+    public static final String DEFAULT_SECURITY_MODEL = "default";
+    public static final String FIPS_SECURITY_MODEL = "fips140-2";
 
     private Log logger = LogFactory.getLog(getClass());
 
@@ -188,7 +192,7 @@ public final class TlsConfiguration
             new TlsPropertiesMapper(namespace).writeToProperties(System.getProperties(), this);
         }
 
-        tlsProperties.load(DEFAULT_PROPERTIES_FILE);
+        tlsProperties.load(String.format(PROPERTIES_FILE_PATTERN, SecurityUtils.getSecurityModel()));
     }
 
     private void validate(boolean anon) throws CreateException
