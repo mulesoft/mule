@@ -6,10 +6,21 @@
  */
 package org.mule.transport;
 
+import org.mule.api.MuleContext;
+
 public class DefaultMuleMessageFactory extends AbstractMuleMessageFactory
 {
     public DefaultMuleMessageFactory()
     {
+    }
+
+    /**
+     * @deprecated use {@link #DefaultMuleMessageFactory()}  instead
+     */
+    @Deprecated
+    public DefaultMuleMessageFactory(MuleContext context)
+    {
+        super(context);
     }
 
     @Override

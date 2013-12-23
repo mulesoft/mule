@@ -10,12 +10,10 @@
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
     <flow name="clientFlow">
-        <!--TODO review this should not require exchange-pattern -->
         <vm:outbound-endpoint path="helloWorldService"  exchange-pattern="request-response" connector-ref="sharedVmConnector"/>
     </flow>
 
     <flow name="clientFlowRequestReply">
-        <!--TODO review this should not require exchange-pattern -->
         <request-reply>
             <vm:outbound-endpoint path="helloWorldServiceRequestReply" connector-ref="sharedVmConnector"/>
             <vm:inbound-endpoint path="helloWorldServiceRequestReplyResponse" connector-ref="sharedVmConnector"/>
@@ -23,7 +21,6 @@
     </flow>
 
     <flow name="clientFlowOneWay">
-        <!--TODO review this should not require exchange-pattern -->
         <vm:outbound-endpoint path="helloWorldServiceOneWay" connector-ref="sharedVmConnector"/>
     </flow>
 

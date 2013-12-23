@@ -11,6 +11,8 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import org.mule.api.config.MuleProperties;
+import org.mule.module.reboot.MuleContainerBootstrap;
+import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
@@ -93,12 +95,12 @@ public class MuleSharedDomainClassLoaderTestCase extends AbstractMuleTestCase
 
     private File getDomainFolder(String domainName)
     {
-        return new File(muleHomeFolder, "domains" + File.separator + domainName);  //To change body of created methods use File | Settings | File Templates.
+        return new File(muleHomeFolder, MuleContainerBootstrapUtils.MULE_DOMAIN_FOLDER + File.separator + domainName);  //To change body of created methods use File | Settings | File Templates.
     }
 
     private File getOldDomainFolder(String domainName)
     {
-        return new File(muleHomeFolder, "lib" + File.separator + "shared" + File.separator + domainName);
+        return new File(muleHomeFolder, MuleSharedDomainClassLoader.DOMAIN_LIBRARY_FOLDER + File.separator + "shared" + File.separator + domainName);
     }
 
     private void createOldDomainFolder(String domainName)

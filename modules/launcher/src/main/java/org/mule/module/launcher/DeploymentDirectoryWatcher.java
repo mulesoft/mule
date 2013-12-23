@@ -49,7 +49,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * It's in charge of the whole deployment process.
  * <p/>
- * It will deploy / undeploy the applications at the container startup process.
+ * It will deploy the applications at the container startup process.
  * It will periodically scan the artifact directories in order to process new deployments,
  * remove artifacts that were previously deployed but the anchor file was removed and redeploy
  * those applications which configuration has changed.
@@ -195,41 +195,30 @@ public class DeploymentDirectoryWatcher implements Runnable
         deploymentLock.lock();
         try
         {
-            // tear down apps in reverse order
-            Collections.reverse(applications);
-
-            for (Artifact artifact : applications)
-            {
-                try
-                {
-                    artifact.stop();
-                    artifact.dispose();
-                }
-                catch (Throwable t)
-                {
-                    logger.error(t);
-                }
-            }
-
-            // tear down domains in reverse order
-            Collections.reverse(domains);
-
-            for (Artifact artifact : domains)
-            {
-                try
-                {
-                    artifact.stop();
-                    artifact.dispose();
-                }
-                catch (Throwable t)
-                {
-                    logger.error(t);
-                }
-            }
+            stopArtifacts(applications);
+            stopArtifacts(domains);
         }
         finally
         {
             deploymentLock.unlock();
+        }
+    }
+
+    private void stopArtifacts(List<? extends Artifact> artifacts)
+    {
+        Collections.reverse(artifacts);
+
+        for (Artifact artifact : artifacts)
+        {
+            try
+            {
+                artifact.stop();
+                artifact.dispose();
+            }
+            catch (Throwable t)
+            {
+                logger.error(t);
+            }
         }
     }
 
@@ -371,7 +360,7 @@ public class DeploymentDirectoryWatcher implements Runnable
         }
     }
 
-    <T extends Artifact> T findArtifact(String artifactName, ObservableList<T> artifacts)
+    public <T extends Artifact> T findArtifact(String artifactName, ObservableList<T> artifacts)
     {
         return (T) CollectionUtils.find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactName));
     }

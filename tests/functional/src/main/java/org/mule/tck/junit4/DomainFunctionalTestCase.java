@@ -15,7 +15,7 @@ import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.config.spring.SpringXmlDomainConfigurationBuilder;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
-import org.mule.tck.*;
+import org.mule.tck.TestingWorkListener;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.util.ClassUtils;
@@ -41,7 +41,7 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase
     {
         disposedContexts.add(muleContext);
         muleContext.dispose();
-        new PollingProber(10000,100).check(new Probe()
+        new PollingProber(10000, 100).check(new Probe()
         {
             @Override
             public boolean isSatisfied()

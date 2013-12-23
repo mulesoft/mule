@@ -6,6 +6,8 @@
  */
 package org.mule.module.reboot;
 
+import org.mule.MuleServer;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -18,11 +20,11 @@ import java.security.PrivilegedAction;
 
 public final class MuleContainerBootstrapUtils
 {
+    public static final String MULE_DOMAIN_FOLDER = "domains";
+    public static final String MULE_LOCAL_JAR_FILENAME = "mule-local-install.jar";
     private static final String MULE_APPS_FILENAME = "apps";
     private static final String MULE_LIB_FILENAME = "lib/mule";
-    private static final String MULE_DOMAIN_FILENAME = "domains";
     private static final String MULE_TMP_FILENAME = "tmp";
-    public static final String MULE_LOCAL_JAR_FILENAME = "mule-local-install.jar";
 
     private MuleContainerBootstrapUtils()
     {
@@ -57,6 +59,24 @@ public final class MuleContainerBootstrapUtils
     }
 
     /**
+     * @param appName name of the application
+     * @return null if running embedded, otherwise the app dir as a File ref
+     */
+    public static File getMuleAppDir(String appName)
+    {
+        return isStandalone() ? new File(getMuleAppsDir(), appName) : null;
+    }
+
+    /**
+     * @param appName name of the application
+     * @return null if running embedded, otherwise the app default configuration file as a File ref
+     */
+    public static File getMuleAppDefaultConfigFile(String appName)
+    {
+        return isStandalone() ? new File(getMuleAppDir(appName), MuleServer.DEFAULT_CONFIGURATION) : null;
+    }
+
+    /**
      * @return null if running embedded
      */
     public static File getMuleLibDir()
@@ -79,7 +99,7 @@ public final class MuleContainerBootstrapUtils
 
     public static File getMuleDomainsDir()
     {
-        return isStandalone() ? new File(getMuleHome(), MULE_DOMAIN_FILENAME) : null;
+        return isStandalone() ? new File(getMuleHome(), MULE_DOMAIN_FOLDER) : null;
     }
 
     public static class ProxyInfo

@@ -312,7 +312,7 @@ public class ArchiveDeployer<T extends Artifact>
         }
     }
 
-    protected void addZombieApp(Artifact artifact)
+    private void addZombieApp(Artifact artifact)
     {
         File resourceFile = artifact.getResourceFiles()[0];
         ZombieFile zombieFile = new ZombieFile();
@@ -333,7 +333,7 @@ public class ArchiveDeployer<T extends Artifact>
         }
     }
 
-    protected void addZombieFile(String artifactName, File marker)
+    private void addZombieFile(String artifactName, File marker)
     {
         // no sync required as deploy operations are single-threaded
         if (marker == null)
@@ -453,7 +453,7 @@ public class ArchiveDeployer<T extends Artifact>
         }
     }
 
-    void redeploy(T artifact)
+    public void redeploy(T artifact)
     {
         if (logger.isInfoEnabled())
         {

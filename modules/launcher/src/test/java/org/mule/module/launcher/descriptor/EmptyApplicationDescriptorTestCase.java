@@ -11,6 +11,7 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.MuleServer;
 import org.mule.api.config.MuleProperties;
+import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
@@ -35,9 +36,9 @@ public class EmptyApplicationDescriptorTestCase extends AbstractMuleTestCase
         EmptyApplicationDescriptor applicationDescriptor = new EmptyApplicationDescriptor(APP_NAME);
         assertThat(applicationDescriptor.getAppName(), is(APP_NAME));
         assertThat(applicationDescriptor.getConfigResources()[0], is(MuleServer.DEFAULT_CONFIGURATION));
-        String absolutePathForConfigResource = String.format("%s/apps/%s/%s", MULE_HOME_DIR, APP_NAME, MuleServer.DEFAULT_CONFIGURATION);
+        String absolutePathForConfigResource = MuleContainerBootstrapUtils.getMuleAppDefaultConfigFile(APP_NAME).getAbsolutePath();
         assertThat(applicationDescriptor.getAbsoluteResourcePaths()[0], is(absolutePathForConfigResource));
-        assertThat(applicationDescriptor.getConfigResourcesFile()[0].getPath(), is(absolutePathForConfigResource));
+        assertThat(applicationDescriptor.getConfigResourcesFile()[0].getAbsolutePath(), is(absolutePathForConfigResource));
     }
 
 }

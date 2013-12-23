@@ -9,7 +9,9 @@ package org.mule.module.launcher.domain;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.launcher.MuleSharedDomainClassLoader.OLD_DOMAIN_LIBRARY_FOLDER;
 import static org.mule.module.launcher.domain.DomainFactory.DEFAULT_DOMAIN_NAME;
+import static org.mule.module.reboot.MuleContainerBootstrapUtils.MULE_DOMAIN_FOLDER;
 
 import org.mule.api.config.MuleProperties;
 import org.mule.module.launcher.MuleSharedDomainClassLoader;
@@ -46,11 +48,6 @@ public class MuleDomainClassLoaderFactoryTestCase extends AbstractMuleTestCase
         assertThat(new MuleDomainClassLoaderRepository().getDomainClassLoader(null).getArtifactName(), Is.is(DEFAULT_DOMAIN_NAME));
     }
 
-    private void createOldDomainDefaultDir()
-    {
-        assertThat(new File(muleHomeFolder, "lib" + File.separator + "shared" + File.separator + "default").mkdirs(), is(true));
-    }
-
     @Test
     public void createClassLoaderUsingDefaultDomain()
     {
@@ -61,8 +58,13 @@ public class MuleDomainClassLoaderFactoryTestCase extends AbstractMuleTestCase
     public void createClassLoaderUsingCustomDomain()
     {
         String domainName = "custom-domain";
-        assertThat(new File(muleHomeFolder, "domains" + File.separator + domainName).mkdirs(), is(true));
+        assertThat(new File(muleHomeFolder, MULE_DOMAIN_FOLDER + File.separator + domainName).mkdirs(), is(true));
         assertThat(new MuleDomainClassLoaderRepository().getDomainClassLoader(domainName).getClassLoader(), instanceOf(MuleSharedDomainClassLoader.class));
+    }
+
+    private void createOldDomainDefaultDir()
+    {
+        assertThat(new File(muleHomeFolder, OLD_DOMAIN_LIBRARY_FOLDER + File.separator + "default").mkdirs(), is(true));
     }
 
 

@@ -26,6 +26,8 @@ public class MuleSharedDomainClassLoader extends GoodCitizenClassLoader implemen
 {
 
     protected transient Log logger = LogFactory.getLog(getClass());
+    public static final String DOMAIN_LIBRARY_FOLDER = "lib";
+    public static final String OLD_DOMAIN_LIBRARY_FOLDER = DOMAIN_LIBRARY_FOLDER + File.separator + "shared";
 
     private final String domain;
     private File domainDir;
@@ -135,7 +137,7 @@ public class MuleSharedDomainClassLoader extends GoodCitizenClassLoader implemen
 
     private void validateAndGetDomainFolders() throws Exception
     {
-        File oldDomainDir = new File(MuleContainerBootstrapUtils.getMuleHome(), "lib/shared/" + domain);
+        File oldDomainDir = new File(MuleContainerBootstrapUtils.getMuleHome(), OLD_DOMAIN_LIBRARY_FOLDER + File.separator + domain);
         if (oldDomainDir.exists())
         {
             if (!oldDomainDir.canRead())
@@ -161,7 +163,7 @@ public class MuleSharedDomainClassLoader extends GoodCitizenClassLoader implemen
                     String.format("Domain '%s' is not accessible", domain));
         }
         domainDir = newDomainDir;
-        domainLibraryFolder = new File(newDomainDir, "lib");
+        domainLibraryFolder = new File(newDomainDir, DOMAIN_LIBRARY_FOLDER);
         logger.info(String.format("Using domain dir %s for domain %s", domainDir.getAbsolutePath(), domain));
     }
 }

@@ -31,7 +31,6 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
 
             if (t instanceof DeploymentException)
             {
-                // re-throw as is
                 throw ((DeploymentException) t);
             }
 
@@ -51,7 +50,6 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
         {
             if (t instanceof DeploymentException)
             {
-                // re-throw as is
                 throw ((DeploymentException) t);
             }
 

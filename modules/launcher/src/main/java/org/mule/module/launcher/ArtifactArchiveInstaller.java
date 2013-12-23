@@ -20,7 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Installer for mule archetypes inside the mule container directories.
+ * Installer for mule artifacts inside the mule container directories.
  */
 public class ArtifactArchiveInstaller
 {
@@ -47,7 +47,6 @@ public class ArtifactArchiveInstaller
      */
     public String installArtifact(final URL artifactUrl) throws IOException
     {
-        // TODO plug in app-bloodhound/validator here?
         if (!artifactUrl.toString().endsWith(".zip"))
         {
             throw new IllegalArgumentException("Invalid Mule artifact archive: " + artifactUrl);
@@ -94,7 +93,6 @@ public class ArtifactArchiveInstaller
         catch (IOException e)
         {
             errorEncountered = true;
-            // re-throw
             throw e;
         }
         catch (Throwable t)
@@ -108,14 +106,7 @@ public class ArtifactArchiveInstaller
             // delete an artifact dir, as it's broken
             if (errorEncountered && artifactDir != null && artifactDir.exists())
             {
-                final boolean couldNotDelete = FileUtils.deleteTree(artifactDir);
-                /*
-                if (couldNotDelete)
-                {
-                    final String msg = String.format("Couldn't delete artifact directory '%s' after it failed to install", aritfactDir);
-                    logger.error(msg);
-                }
-                */
+                FileUtils.deleteTree(artifactDir);
             }
         }
         return artifactName;
@@ -142,7 +133,6 @@ public class ArtifactArchiveInstaller
         {
             if (t instanceof DeploymentException)
             {
-                // re-throw as is
                 throw ((DeploymentException) t);
             }
 

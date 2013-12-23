@@ -6,7 +6,7 @@
  */
 package org.mule.module.launcher.descriptor;
 
-import org.mule.api.config.MuleProperties;
+import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.StringUtils;
 
@@ -84,7 +84,6 @@ public class PropertiesDescriptorParser implements DescriptorParser
 
     private String[] convertConfigResourcesToAbsolutePatch(final String[] configResources, String appName)
     {
-        // convert to absolute paths
         String[] absoluteResourcePaths = new String[configResources.length];
         for (int i = 0; i < configResources.length; i++)
         {
@@ -102,9 +101,7 @@ public class PropertiesDescriptorParser implements DescriptorParser
      */
     protected String toAbsoluteFile(String path, String appName)
     {
-        final String muleHome = System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
-        String configPath = String.format("%s/apps/%s/%s", muleHome, appName, path);
-        return configPath;
+        return MuleContainerBootstrapUtils.getMuleAppDir(appName).getAbsolutePath() + File.separator + path;
     }
 
     public String getSupportedFormat()
