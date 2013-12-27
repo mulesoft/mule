@@ -949,12 +949,17 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
      */
     public void setTransientServiceName(Object serviceName)
     {
+        if (serializedData == null)
+        {
+            serializedData = new HashMap<String, Object>();
+        }
+        
         serializedData.put("serviceName", serviceName);
     }
 
     private String getTransientServiceName()
     {
-        return (String) serializedData.get("serviceName");
+        return serializedData != null ? (String) serializedData.get("serviceName") : null;
     }
 
     @Override
