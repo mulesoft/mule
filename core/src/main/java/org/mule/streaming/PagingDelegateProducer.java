@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.streaming;
 
 import org.mule.api.MuleException;
@@ -11,10 +12,12 @@ import org.mule.api.MuleException;
 import java.util.List;
 
 /**
- * Implementation of {@link org.mule.streaming.Producer} that uses an instance of
- * {@link org.mule.streaming.PagingDelegate} to get its results
+ * Implementation of {@link Producer} that uses an instance of {@link PagingDelegate}
+ * to get its results
+ * 
+ * @since 3.5.0
  */
-public class PagingDelegateProducer<T> implements Producer<T>
+public class PagingDelegateProducer<T> implements Producer<List<T>>
 {
 
     private PagingDelegate<T> delegate;

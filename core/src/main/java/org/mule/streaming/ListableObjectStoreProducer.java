@@ -14,8 +14,6 @@ import org.mule.api.store.ObjectStoreException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -24,7 +22,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link Producer} to stream the contents of a
- * {@link org.mule.api.store.ListableObjectStore}
+ * {@link ListableObjectStore}
+ * 
+ * @since 3.5.0
  */
 public class ListableObjectStoreProducer<T extends Serializable> implements Producer<T>
 {
@@ -57,18 +57,17 @@ public class ListableObjectStoreProducer<T extends Serializable> implements Prod
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public List<T> produce()
+    public T produce()
     {
         if (this.objectStore == null || !this.keys.hasNext())
         {
-            return Collections.emptyList();
+            return null;
         }
 
         Serializable key = this.keys.next();
         try
         {
-            return Arrays.asList(this.objectStore.retrieve(key));
+            return this.objectStore.retrieve(key);
         }
         catch (ObjectDoesNotExistException e)
         {
@@ -78,7 +77,7 @@ public class ListableObjectStoreProducer<T extends Serializable> implements Prod
                     "key %s no longer available in objectstore. This is likely due to a concurrency issue. Will continue with next key if available",
                     key));
             }
-            
+
             return this.produce();
         }
         catch (ObjectStoreException e)

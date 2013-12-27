@@ -4,12 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.streaming;
 
 import org.mule.api.MuleException;
-import org.mule.streaming.ConsumerIterator;
-import org.mule.streaming.ElementBasedPagingConsumer;
-import org.mule.streaming.PagingDelegateProducer;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
@@ -87,25 +85,26 @@ public class ConsumerIteratorTestCase
     @Test
     public void closedConsumer() throws Exception
     {
-        Producer<String> producer = new PagingDelegateProducer<String>(this.delegate);
-        Consumer<String> consumer = new ElementBasedPagingConsumer<String>(producer);
+        Producer<List<String>> producer = new PagingDelegateProducer<String>(this.delegate);
+        Consumer<String> consumer = new ListConsumer<String>(producer);
 
         ConsumerIterator<String> it = new ConsumerIterator<String>(consumer);
 
         consumer.close();
         Assert.assertFalse(it.hasNext());
     }
-    
+
     @Test
-    public void size() throws Exception {
+    public void size() throws Exception
+    {
         ConsumerIterator<String> it = this.newIterator();
         Assert.assertEquals(it.size(), TOP);
     }
 
     private ConsumerIterator<String> newIterator()
     {
-        Producer<String> producer = new PagingDelegateProducer<String>(this.delegate);
-        Consumer<String> consumer = new ElementBasedPagingConsumer<String>(producer);
+        Producer<List<String>> producer = new PagingDelegateProducer<String>(this.delegate);
+        Consumer<String> consumer = new ListConsumer<String>(producer);
 
         ConsumerIterator<String> it = new ConsumerIterator<String>(consumer);
         return it;

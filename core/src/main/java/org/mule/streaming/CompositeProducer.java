@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.streaming;
 
 import org.mule.api.MuleException;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,6 +19,8 @@ import org.apache.commons.collections.CollectionUtils;
  * Implementation of {@link Producer} to expose streams from several producers as a
  * single data feed. Producers are consumed in order until they're all consumed. All
  * producers need to share the same generic type T
+ * 
+ * @since 3.5.0
  */
 public class CompositeProducer<T> implements Producer<T>
 {
@@ -54,20 +56,20 @@ public class CompositeProducer<T> implements Producer<T>
     /**
      * {@inheritDoc} This method calls the produce method on the current producer.
      * When that producer is exhausted, then it switches to the next one. When the
-     * last producer is also exhausted, then it returns an empty list particular
-     * producer is exhausted. This method does not close any producer when it is
+     * last producer is also exhausted, then it returns
+     * <code>null<c/code>. This method does not close any producer when it is
      * exhausted. Use the close method for that
      */
     @Override
-    public List<T> produce()
+    public T produce()
     {
         if (this.currentProducer == null)
         {
-            return Collections.emptyList();
+            return null;
         }
 
-        List<T> page = this.currentProducer.produce();
-        if (CollectionUtils.isEmpty(page))
+        T next = this.currentProducer.produce();
+        if (next == null)
         {
 
             if (this.producersIterator.hasNext())
@@ -82,7 +84,7 @@ public class CompositeProducer<T> implements Producer<T>
             return this.produce();
         }
 
-        return page;
+        return next;
     }
 
     /**

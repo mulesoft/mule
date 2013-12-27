@@ -19,6 +19,8 @@ import org.slf4j.LoggerFactory;
  * behaviour of the delegate contract so that users don't have to. Concerns such as
  * logging, auto closing the delegate if the consumer has been fully consumed, etc
  * are addressed here
+ * 
+ * @since 3.5.0
  */
 public class PagingDelegateWrapper<T> extends PagingDelegate<T>
 {

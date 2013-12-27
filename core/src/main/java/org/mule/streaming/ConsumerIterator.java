@@ -13,32 +13,19 @@ import org.mule.api.MuleException;
 import java.util.Iterator;
 
 /**
- * Implementation of {@link java.util.Iterator} that takes its elements from a
- * {@link org.mule.streaming.Consumer}. This iterator also implements
- * {@link org.mule.api.Closeable}. Closing this iterator will cause the underlying
- * consumer to be closed. If for any reason the underlying consumer gets closed
- * (either because this iterator closed it or some other reason), then this iterator
- * will consider that it has not next items. remove() operation is not allowed on
- * this instance
+ * Implementation of {@link Iterator} that takes its elements from a {@link Consumer}
+ * . This iterator also implements {@link Closeable}. Closing this iterator will
+ * cause the underlying consumer to be closed. If for any reason the underlying
+ * consumer gets closed (either because this iterator closed it or some other
+ * reason), then this iterator will consider that it has not next items.
+ * {@link #Iterator.remove()} operation is not allowed on this instance
+ * 
+ * @since 3.5.0
  */
 public class ConsumerIterator<T> implements Iterator<T>, Closeable, ProvidesTotalHint
 {
 
     private Consumer<T> consumer;
-
-    /**
-     * Creates a new ConsumerIterator for the given {@link Producer}. Use this
-     * factory method over the {@link #ConsumerIterator(Consumer)} constructor
-     * whenever you want to let the system choose what the best {@link Consumer} is
-     * for your case
-     * 
-     * @param producer a {@link Producer}
-     * @return a new {@link ConsumerIterator}
-     */
-    public static <T> ConsumerIterator<T> forProducer(Producer<T> producer)
-    {
-        return new ConsumerIterator<T>(new ElementBasedPagingConsumer<T>(producer));
-    }
 
     public ConsumerIterator(Consumer<T> consumer)
     {

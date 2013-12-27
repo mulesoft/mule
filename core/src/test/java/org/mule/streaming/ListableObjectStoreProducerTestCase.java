@@ -77,11 +77,11 @@ public class ListableObjectStoreProducerTestCase
     {
         Set<Serializable> returnedValues = new HashSet<Serializable>();
 
-        List<Serializable> page = this.producer.produce();
-        while (!CollectionUtils.isEmpty(page))
+        Serializable item = this.producer.produce();
+        while (item != null)
         {
-            returnedValues.addAll(page);
-            page = this.producer.produce();
+            returnedValues.add(item);
+            item = this.producer.produce();
         }
 
         Assert.assertEquals(returnedValues.size(), this.values.size());
@@ -91,7 +91,7 @@ public class ListableObjectStoreProducerTestCase
             Assert.assertTrue(returnedValues.contains(value));
         }
 
-        Assert.assertTrue(CollectionUtils.isEmpty(this.producer.produce()));
+        Assert.assertNull(this.producer.produce());
     }
 
     @Test
@@ -108,12 +108,13 @@ public class ListableObjectStoreProducerTestCase
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void earlyClose() throws Exception
     {
         this.producer.produce();
         this.producer.close();
 
-        Assert.assertTrue(CollectionUtils.isEmpty(this.producer.produce()));
+        Assert.assertTrue(CollectionUtils.isEmpty((List<Serializable>) this.producer.produce()));
     }
 
 }

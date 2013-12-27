@@ -12,7 +12,7 @@ import org.mule.api.MuleException;
 import org.mule.devkit.processor.DevkitBasedMessageProcessor;
 import org.mule.streaming.Consumer;
 import org.mule.streaming.ConsumerIterator;
-import org.mule.streaming.ElementBasedPagingConsumer;
+import org.mule.streaming.ListConsumer;
 import org.mule.streaming.PagingConfiguration;
 import org.mule.streaming.PagingDelegate;
 import org.mule.streaming.PagingDelegateProducer;
@@ -65,7 +65,7 @@ public abstract class AbstractDevkitBasedPageableMessageProcessor extends Devkit
         delegate = new PagingDelegateWrapper(delegate);
 
         Producer<?> producer = new PagingDelegateProducer(delegate);
-        Consumer<?> consumer = new ElementBasedPagingConsumer(producer);
+        Consumer<?> consumer = new ListConsumer(producer);
 
         event.getMessage().setPayload(new ConsumerIterator(consumer));
 
