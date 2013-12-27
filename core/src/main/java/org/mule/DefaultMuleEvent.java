@@ -756,7 +756,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
             return;
         }
 
-        String serviceName = (String) serializedData.get("serviceName");
+        String serviceName = this.getTransientServiceName();
         // Can be null if service call originates from MuleClient
         if (serviceName != null)
         {
@@ -932,12 +932,29 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         try
         {
             // Optional
-            serializedData.put("serviceName", in.readObject());
+            this.setTransientServiceName(in.readObject());
         }
         catch (OptionalDataException e)
         {
             // ignore
         }
+    }
+    
+    /**
+     * Used to fetch the {@link #flowConstruct} after deserealization since its a
+     * transient value. This is not part of the public API and should only be used
+     * internally for serialization/deserialization
+     * 
+     * @param serviceName the name of the service
+     */
+    public void setTransientServiceName(Object serviceName)
+    {
+        serializedData.put("serviceName", serviceName);
+    }
+
+    private String getTransientServiceName()
+    {
+        return (String) serializedData.get("serviceName");
     }
 
     @Override
