@@ -26,13 +26,14 @@ import org.mule.registry.MuleRegistryHelper;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
+import org.mule.util.OrderedProperties;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.UUID;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Enumeration;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -113,7 +114,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                 {
                     logger.debug("Reading bootstrap file: " + url.toString());
                 }
-                Properties p = new Properties();
+                Properties p = new OrderedProperties();
                 p.load(url.openStream());
                 bootstraps.add(p);
             }
@@ -126,10 +127,10 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         // ... and only then merge and process them
         int objectCounter = 1;
         int transformerCounter = 1;
-        Properties transformers = new Properties();
-        Properties namedObjects = new Properties();
-        Properties unnamedObjects = new Properties();
-        Map<String,String> singleTransactionFactories = new HashMap<String,String>();
+        Properties transformers = new OrderedProperties();
+        Properties namedObjects = new OrderedProperties();
+        Properties unnamedObjects = new OrderedProperties();
+        Map<String,String> singleTransactionFactories = new LinkedHashMap<String,String>();
 
         for (Properties bootstrap : bootstraps)
         {
