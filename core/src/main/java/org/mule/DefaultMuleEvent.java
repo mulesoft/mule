@@ -15,7 +15,6 @@ import org.mule.api.MuleSession;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.Pipeline;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.ProcessingDescriptor;
 import org.mule.api.security.Credentials;
@@ -25,7 +24,6 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.management.stats.ProcessingTime;
-import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.security.MuleCredentials;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transaction.TransactionCoordination;
@@ -756,7 +754,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
             return;
         }
 
-        String serviceName = (String) serializedData.get("serviceName");
+        String serviceName = this.getTransientServiceName();
         // Can be null if service call originates from MuleClient
         if (serviceName != null)
         {
@@ -932,12 +930,33 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         try
         {
             // Optional
-            serializedData.put("serviceName", in.readObject());
+            this.setTransientServiceName(in.readObject());
         }
         catch (OptionalDataException e)
         {
             // ignore
         }
+    }
+    
+    /**
+     * Used to fetch the {@link #flowConstruct} after deserealization since its a
+     * transient value. This is not part of the public API and should only be used
+     * internally for serialization/deserialization
+     * 
+     * @param serviceName the name of the service
+     */
+    public void setTransientServiceName(Object serviceName)
+    {
+        if (serializedData == null)
+        {
+            serializedData = new HashMap<String, Object>();
+        }
+        serializedData.put("serviceName", serviceName);
+    }
+
+    private String getTransientServiceName()
+    {
+        return serializedData != null ? (String) serializedData.get("serviceName") : null;
     }
 
     @Override
