@@ -114,7 +114,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                 {
                     logger.debug("Reading bootstrap file: " + url.toString());
                 }
-                Properties p = new Properties();
+                Properties p = new OrderedProperties();
                 p.load(url.openStream());
                 bootstraps.add(p);
             }
