@@ -15,7 +15,6 @@ import org.mule.api.MuleSession;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.Pipeline;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.ProcessingDescriptor;
 import org.mule.api.security.Credentials;
@@ -25,7 +24,6 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.management.stats.ProcessingTime;
-import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.security.MuleCredentials;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transaction.TransactionCoordination;
@@ -953,7 +951,6 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         {
             serializedData = new HashMap<String, Object>();
         }
-        
         serializedData.put("serviceName", serviceName);
     }
 
