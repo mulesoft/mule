@@ -26,11 +26,10 @@ import org.mule.registry.MuleRegistryHelper;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
+import org.mule.util.OrderedProperties;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.UUID;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -40,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -99,62 +97,26 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
     {
         this.context = context;
     }
-    
-    private Map<String, String> readBootstrap(URL url) throws Exception
-    {
-        InputStreamReader in = null;
-        Map<String, String> bootstrap = new LinkedHashMap<String, String>();
-        try
-        {
-            in = new InputStreamReader(url.openStream());
-            BufferedReader reader = new BufferedReader(in);
-            String line = null;
-
-            while ((line = reader.readLine()) != null)
-            {
-                if (StringUtils.isBlank(line) || line.startsWith("#"))
-                {
-                    continue;
-                }
-                String[] pair = line.split("=");
-                if (pair.length < 2)
-                {
-                    continue;
-                }
-                else if (pair.length > 2)
-                {
-                    for (int i = 2; i < pair.length; i++)
-                    {
-                        pair[1] += "=" + pair[i];
-                    }
-                }
-                bootstrap.put(pair[0], pair[1]);
-            }
-
-            return bootstrap;
-
-        }
-        finally
-        {
-            if (in != null)
-            {
-                in.close();
-            }
-        }
-    }
 
     /** {@inheritDoc} */
     public void initialise() throws InitialisationException
     {
         Enumeration<?> e = ClassUtils.getResources(SERVICE_PATH + REGISTRY_PROPERTIES, getClass());
-        List<Map<String, String>> bootstraps = new LinkedList<Map<String, String>>();
+        List<Properties> bootstraps = new LinkedList<Properties>();
 
         // load ALL of the bootstrap files first
         while (e.hasMoreElements())
         {
             try
             {
-                bootstraps.add(this.readBootstrap((URL) e.nextElement()));
+                URL url = (URL) e.nextElement();
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Reading bootstrap file: " + url.toString());
+                }
+                Properties p = new Properties();
+                p.load(url.openStream());
+                bootstraps.add(p);
             }
             catch (Exception e1)
             {
@@ -165,17 +127,16 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         // ... and only then merge and process them
         int objectCounter = 1;
         int transformerCounter = 1;
-        
-        Map<String, String> transformers = new LinkedHashMap<String, String>();
-        Map<String, String> namedObjects = new LinkedHashMap<String, String>();
-        Map<String, String> unnamedObjects = new LinkedHashMap<String, String>();
-        Map<String, String> singleTransactionFactories = new LinkedHashMap<String, String>();
+        Properties transformers = new OrderedProperties();
+        Properties namedObjects = new OrderedProperties();
+        Properties unnamedObjects = new OrderedProperties();
+        Map<String,String> singleTransactionFactories = new LinkedHashMap<String,String>();
 
-        for (Map<String, String> bootstrap : bootstraps)
+        for (Properties bootstrap : bootstraps)
         {
-            for (Map.Entry<String, String> entry : bootstrap.entrySet())
+            for (Map.Entry entry : bootstrap.entrySet())
             {
-                final String key = entry.getKey();
+                final String key = (String) entry.getKey();
                 if (key.contains(OBJECT_KEY))
                 {
                     String newKey = key.substring(0, key.lastIndexOf(".")) + objectCounter++;
@@ -191,12 +152,12 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                     if (!key.contains(".transaction.resource"))
                     {
                         String transactionResourceKey = key.replace(".transaction.factory",".transaction.resource");
-                        String transactionResource = bootstrap.get(transactionResourceKey);
+                        String transactionResource = bootstrap.getProperty(transactionResourceKey);
                         if (transactionResource == null)
                         {
                             throw new InitialisationException(CoreMessages.createStaticMessage(String.format("Theres no transaction resource specified for transaction factory %s",key)),this);
                         }
-                        singleTransactionFactories.put(entry.getValue(),transactionResource);
+                        singleTransactionFactories.put((String) entry.getValue(),transactionResource);
                     }
                 }
                 else
@@ -239,16 +200,16 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         }
     }
 
-    private void registerTransformers(Map<String, String> bootstrap, MuleRegistry registry) throws Exception
+    private void registerTransformers(Properties props, MuleRegistry registry) throws Exception
     {
         String transString;
         String name = null;
         String returnClassString;
         boolean optional = false;
 
-        for (Map.Entry<String, String> entry : bootstrap.entrySet())
+        for (Map.Entry<Object, Object> entry : props.entrySet())
         {
-            transString = entry.getValue();
+            transString = (String)entry.getValue();
             // reset
             Class<?> returnClass = null;
             returnClassString = null;
@@ -363,23 +324,23 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         }
     }
 
-    private void registerObjects(Map<String, String> props, Registry registry) throws Exception
+    private void registerObjects(Properties props, Registry registry) throws Exception
     {
-        for (Map.Entry<String, String> entry : props.entrySet())
+        for (Map.Entry<Object, Object> entry : props.entrySet())
         {
-            registerObject(entry.getKey(), entry.getValue(), registry);
+            registerObject((String)entry.getKey(), (String)entry.getValue(), registry);
         }
         props.clear();
     }
 
-    private void registerUnnamedObjects(Map<String, String> bootstrap, Registry registry) throws Exception
+    private void registerUnnamedObjects(Properties props, Registry registry) throws Exception
     {
-        for (Map.Entry<String, String> entry : bootstrap.entrySet())
+        for (Map.Entry<Object, Object> entry : props.entrySet())
         {
             final String key = String.format("%s#%s", entry.getKey(), UUID.getUUID());
-            registerObject(key, entry.getValue(), registry);
+            registerObject(key, (String) entry.getValue(), registry);
         }
-        bootstrap.clear();
+        props.clear();
     }
 
     private void registerObject(String key, String value, Registry registry) throws Exception
