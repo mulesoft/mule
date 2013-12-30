@@ -6,13 +6,13 @@
 /mule-standalone-${productVersion}/bin
 /mule-standalone-${productVersion}/conf
 /mule-standalone-${productVersion}/docs
+/mule-standalone-${productVersion}/domains
 /mule-standalone-${productVersion}/examples
 /mule-standalone-${productVersion}/lib
 /mule-standalone-${productVersion}/logs
 /mule-standalone-${productVersion}/src
 /mule-standalone-${productVersion}/LICENSE.txt
 /mule-standalone-${productVersion}/README.txt
-
 
 #
 # /apps
