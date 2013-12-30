@@ -152,6 +152,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="failOnUnresolvedHost" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If set (the default), it will fail during socket creation if the host set on the endpoint cannot be resolved. However, it can be set to false to allow unresolved hosts (this is useful on some circumstances like connecting through a proxy). 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>                
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

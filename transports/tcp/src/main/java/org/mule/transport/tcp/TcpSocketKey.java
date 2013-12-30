@@ -33,6 +33,10 @@ public class TcpSocketKey
         address = new InetSocketAddress(
                 endpoint.getEndpointURI().getHost(),
                 endpoint.getEndpointURI().getPort());
+        if (getConnector().isFailOnUnresolvedHost() && address.isUnresolved())
+        {
+            throw new IllegalArgumentException("Unable to resolve address: " + address.getHostName());
+        }
     }
 
     @Override
