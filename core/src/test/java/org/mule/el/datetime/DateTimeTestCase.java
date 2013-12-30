@@ -92,7 +92,7 @@ public class DateTimeTestCase extends AbstractMuleContextTestCase
     @Test
     public void plusDays()
     {
-        Assert.assertEquals((now.getDayOfYear() + 1) % 365, now.plusDays(1).getDayOfYear());
+        Assert.assertEquals((now.getDayOfYear() % 365) + 1, now.plusDays(1).getDayOfYear());
     }
 
     @Test
