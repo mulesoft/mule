@@ -7,6 +7,7 @@
 package org.mule.transport.jms.redelivery;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
@@ -33,16 +34,16 @@ public abstract class AbstractRedeliveryHandler implements RedeliveryHandler
         this.connector = connector;
     }
     
-    protected MuleMessage createMuleMessage(Message message)
+    protected MuleMessage createMuleMessage(Message message, MuleContext muleContext)
     {
         try
         {
             String encoding = connector.getMuleContext().getConfiguration().getDefaultEncoding();
-            return connector.createMuleMessageFactory().create(message, encoding);
+            return connector.createMuleMessageFactory().create(message, encoding, muleContext);
         }
         catch (Exception e)
         {
-            return new DefaultMuleMessage(message, connector.getMuleContext());
+            return new DefaultMuleMessage(message, muleContext);
         }
     }
 }

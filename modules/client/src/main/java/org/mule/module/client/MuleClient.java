@@ -766,12 +766,11 @@ public class MuleClient implements Disposable
         InboundEndpoint endpoint = ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0);
         if (endpoint != null)
         {
-            List<Transformer> transformers = endpoint.getTransformers();
-            if (transformers != null && !transformers.isEmpty())
+            if (endpoint.getTransformers() != null)
             {
                 // the original code here really did just check the first exception
                 // as far as i can tell
-                if (TransformerUtils.isSourceTypeSupportedByFirst(transformers,
+                if (TransformerUtils.isSourceTypeSupportedByFirst(endpoint.getTransformers(),
                     payload.getClass()))
                 {
                     return endpoint;

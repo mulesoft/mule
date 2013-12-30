@@ -24,7 +24,7 @@ public class DefaultMuleDeployerTestCase extends AbstractMuleTestCase
     @Test
     public void disposesAppOnDeployFailure() throws Exception
     {
-        DefaultMuleDeployer deployer = new DefaultMuleDeployer();
+        DefaultArtifactDeployer deployer = new DefaultArtifactDeployer();
         Application app = mock(Application.class);
         doThrow(new IllegalStateException()).when(app).init();
 

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/domain"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            targetNamespace="http://www.mulesoft.org/schema/mule/domain"
+            attributeFormDefault="unqualified"
+            elementFormDefault="qualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"/>
+
+
+    <xsd:element name="mule-domain" type="muleDomainType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Either the root element of a Mule domain configuration, or a "top-level" element in a Spring configuration that contains further Mule elements.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="muleDomainType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:annotatedType">
+                <xsd:sequence>
+                    <xsd:element name="description" type="mule:descriptionType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Holds any kind of documentation that accompanies this domain configuration file. It is intended to be "human readable" only and is not used by the system.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:choice minOccurs="0" maxOccurs="unbounded">
+                        <xsd:group ref="muleDomainRootElements"/>
+                    </xsd:choice>
+                </xsd:sequence>
+                <xsd:attribute name="version" type ="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:group name="muleDomainRootElements">
+        <xsd:choice>
+            <xsd:element ref="mule:abstract-shared-connector"/>
+        </xsd:choice>
+    </xsd:group>
+
+</xsd:schema>

@@ -15,9 +15,9 @@ import org.mule.routing.outbound.ArrayMessageSequence;
 import org.mule.routing.outbound.CollectionMessageSequence;
 import org.mule.routing.outbound.IteratorMessageSequence;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 public class EventToMessageSequenceSplittingStrategy
     implements SplittingStrategy<MuleEvent, MessageSequence<?>>
@@ -42,7 +42,7 @@ public class EventToMessageSequenceSplittingStrategy
         }
         if (payload instanceof Collection)
         {
-            return new CollectionMessageSequence(new ArrayList((Collection) payload));
+            return new CollectionMessageSequence(new LinkedList((Collection) payload));
         }
         if (payload instanceof Iterable<?>)
         {

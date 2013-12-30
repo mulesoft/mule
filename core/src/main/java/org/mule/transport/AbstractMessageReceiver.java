@@ -170,7 +170,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
             primaryNodeLifecycleNotificationListener.register();
         }
 
-        messageProcessingManager = getConnector().getMuleContext().getRegistry().get(MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER);
+        messageProcessingManager = getEndpoint().getMuleContext().getRegistry().get(MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER);
 
         super.initialise();
     }

@@ -16,19 +16,55 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory
 {
     protected MuleContext muleContext;
 
+    /**
+     * Required by subclasses to instantiate factory through reflection.
+     */
+    public AbstractMuleMessageFactory()
+    {
+    }
+
+    /**
+     * @deprecated use {@link #AbstractMuleMessageFactory()}  instead
+     */
+    @Deprecated
     public AbstractMuleMessageFactory(MuleContext context)
     {
         super();
         muleContext = context;
     }
 
+    /**
+     * @deprecated use {@link #create(Object, String, org.mule.api.MuleContext)} instead.
+     */
+    @Deprecated
     public MuleMessage create(Object transportMessage, String encoding) throws Exception
     {
         return create(transportMessage, null, encoding);
     }
-    
-    public MuleMessage create(Object transportMessage, MuleMessage previousMessage, String encoding) 
+
+    /**
+     * @deprecated use {@link #create(Object, org.mule.api.MuleMessage, String, org.mule.api.MuleContext)} instead.
+     */
+    @Deprecated
+    public MuleMessage create(Object transportMessage, MuleMessage previousMessage, String encoding)
         throws Exception
+    {
+        return doCreate(transportMessage, previousMessage, encoding, muleContext);
+    }
+
+    public MuleMessage create(Object transportMessage, MuleMessage previousMessage, String encoding, MuleContext muleContext) throws Exception
+    {
+        return doCreate(transportMessage, previousMessage, encoding, muleContext);
+    }
+
+    @Override
+    public MuleMessage create(Object transportMessage, String encoding, MuleContext muleContext) throws Exception
+    {
+        return doCreate(transportMessage, null, encoding, muleContext);
+    }
+
+    private MuleMessage doCreate(Object transportMessage, MuleMessage previousMessage, String encoding, MuleContext muleContext)
+            throws Exception
     {
         if (transportMessage == null)
         {

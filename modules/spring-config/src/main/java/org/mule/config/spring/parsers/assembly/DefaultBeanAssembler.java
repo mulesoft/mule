@@ -8,7 +8,7 @@ package org.mule.config.spring.parsers.assembly;
 
 import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
-import org.mule.config.spring.MuleApplicationContext;
+import org.mule.config.spring.MuleArtifactContext;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.config.spring.parsers.assembly.configuration.SingleProperty;
@@ -129,7 +129,7 @@ public class DefaultBeanAssembler implements BeanAssembler
             }
             Object value = beanConfig.translateValue(oldName, oldValue);
             addAnnotationValue(beanDefinition.getPropertyValues(), name, value);
-            MuleContext muleContext = MuleApplicationContext.getCurrentMuleContext().get();
+            MuleContext muleContext = MuleArtifactContext.getCurrentMuleContext().get();
             if (muleContext != null)
             {
                 Map<QName, Set<Object>> annotations = muleContext.getConfigurationAnnotations();

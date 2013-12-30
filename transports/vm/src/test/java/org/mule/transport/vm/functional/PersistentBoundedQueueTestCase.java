@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
@@ -42,7 +41,6 @@ public class PersistentBoundedQueueTestCase extends AbstractServiceAndFlowTestCa
     }
 
     @Test
-    @Ignore("MULE-6926: flaky test")
     public void testBoundedQueue() throws Exception
     {
         MuleClient client = muleContext.getClient();

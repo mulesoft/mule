@@ -611,7 +611,7 @@ public class FileConnector extends AbstractConnector
         // See MULE-3209, MULE-3199
         if (isStreaming())
         {
-            return new FileMuleMessageFactory(muleContext);
+            return new FileMuleMessageFactory();
         }
         else
         {

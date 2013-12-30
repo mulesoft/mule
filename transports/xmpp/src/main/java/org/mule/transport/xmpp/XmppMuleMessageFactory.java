@@ -7,7 +7,6 @@
 package org.mule.transport.xmpp;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
 import org.mule.transport.AbstractMuleMessageFactory;
 
 import java.util.HashMap;
@@ -18,10 +17,6 @@ import org.jivesoftware.smack.packet.Packet;
 
 public class XmppMuleMessageFactory extends AbstractMuleMessageFactory
 {
-    public XmppMuleMessageFactory(MuleContext context)
-    {
-        super(context);
-    }
 
     @Override
     protected Class<?>[] getSupportedTransportMessageTypes()

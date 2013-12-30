@@ -8,7 +8,6 @@ package org.mule.transport.http;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageTypeNotSupportedException;
 import org.mule.transport.AbstractMuleMessageFactory;
@@ -48,9 +47,8 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
     private String cookieSpec;
     private MessageExchangePattern exchangePattern = MessageExchangePattern.REQUEST_RESPONSE;
 
-    public HttpMuleMessageFactory(MuleContext context)
+    public HttpMuleMessageFactory()
     {
-        super(context);
     }
 
     @Override

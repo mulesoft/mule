@@ -278,34 +278,16 @@ public class WorkerContext implements Work
         // and ignore/replace whatever is associated with the current thread.
         try
         {
-            if (executionContext == null || executionContext.getXid() == null)
+            final ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
+            try
             {
-                // TODO currently unused, see below
-                // ExecutionContext context = new ExecutionContext();
-                final ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
-                try
-                {
-                    // execute with the application-specific classloader in the context
-                    Thread.currentThread().setContextClassLoader(executionClassLoader);
-                    worker.run();
-                }
-                finally
-                {
-                    Thread.currentThread().setContextClassLoader(originalCl);
-                    
-                    // ExecutionContext returningContext = new
-                    // ExecutionContext();
-                    // if (context != returningContext) {
-                    // throw new WorkCompletedException("Wrong
-                    // TransactionContext on return from work done");
-                    // }
-                }
-                // TODO should we commit the txContext to flush any leftover
-                // state???
-            }
-            else
-            {
+                // execute with the application or domain specific classloader in the context
+                Thread.currentThread().setContextClassLoader(executionClassLoader);
                 worker.run();
+            }
+            finally
+            {
+                Thread.currentThread().setContextClassLoader(originalCl);
             }
             workListener.workCompleted(new WorkEvent(this, WorkEvent.WORK_COMPLETED, worker, null));
         }

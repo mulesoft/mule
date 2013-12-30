@@ -6,7 +6,6 @@
  */
 package org.mule.transport.file;
 
-import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.util.IOUtils;
 
@@ -21,10 +20,6 @@ import java.io.InputStream;
  */
 public class FileContentsMuleMessageFactory extends FileMuleMessageFactory
 {
-    public FileContentsMuleMessageFactory(MuleContext context)
-    {
-        super(context);
-    }
 
     @Override
     protected Class<?>[] getSupportedTransportMessageTypes()

@@ -46,7 +46,7 @@ public class MailMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
     @Override
     protected MuleMessageFactory doCreateMuleMessageFactory()
     {
-        return new MailMuleMessageFactory(muleContext);
+        return new MailMuleMessageFactory();
     }
 
     @Override
@@ -69,7 +69,7 @@ public class MailMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         Message payload = createMimeMessageWithAttachment();
 
         MuleMessageFactory factory = createMuleMessageFactory();
-        MuleMessage muleMessage = factory.create(payload, encoding);
+        MuleMessage muleMessage = factory.create(payload, encoding, muleContext);
         assertEquals(2, muleMessage.getInboundAttachmentNames().size());
     }
 
@@ -87,7 +87,7 @@ public class MailMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         payload.setSentDate(now);
 
         MuleMessageFactory factory = createMuleMessageFactory();
-        MuleMessage muleMessage = factory.create(payload, encoding);
+        MuleMessage muleMessage = factory.create(payload, encoding, muleContext);
 
         assertEquals(TEST_TO, muleMessage.getInboundProperty(MailProperties.TO_ADDRESSES_PROPERTY));
         assertEquals(TEST_CC, muleMessage.getInboundProperty(MailProperties.CC_ADDRESSES_PROPERTY));
@@ -124,7 +124,7 @@ public class MailMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         payload.setHeader(customProperty, customProperty);
 
         MuleMessageFactory factory = createMuleMessageFactory();
-        MuleMessage muleMessage = factory.create(payload, encoding);
+        MuleMessage muleMessage = factory.create(payload, encoding, muleContext);
 
         assertEquals(TEST_TO, muleMessage.getInboundProperty(MailProperties.TO_ADDRESSES_PROPERTY));
         assertEquals(TEST_CC, muleMessage.getInboundProperty(MailProperties.CC_ADDRESSES_PROPERTY));
@@ -143,7 +143,7 @@ public class MailMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         Message payload = createMimeMessageWithSameAttachmentNames();
 
         MuleMessageFactory factory = createMuleMessageFactory();
-        MuleMessage muleMessage = factory.create(payload, encoding);
+        MuleMessage muleMessage = factory.create(payload, encoding, muleContext);
         assertEquals(3, muleMessage.getInboundAttachmentNames().size());
     }
 

@@ -218,6 +218,12 @@ public class CompositeApplicationClassLoader extends ClassLoader implements Appl
     }
 
     @Override
+    public String getArtifactName()
+    {
+        return this.appName;
+    }
+
+    @Override
     public URL findResource(String name)
     {
         for (ClassLoader classLoader : classLoaders)
@@ -236,6 +242,18 @@ public class CompositeApplicationClassLoader extends ClassLoader implements Appl
         }
 
         return null;
+    }
+
+    @Override
+    public ClassLoader getClassLoader()
+    {
+        return this;
+    }
+
+    @Override
+    public void dispose()
+    {
+        //Nothing to do.
     }
 
     @Override

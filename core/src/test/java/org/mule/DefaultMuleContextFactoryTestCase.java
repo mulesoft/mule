@@ -280,25 +280,19 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
 
     static class TestMuleContextBuilder extends DefaultMuleContextBuilder
     {
-        @Override
-        public MuleContext buildMuleContext()
-        {
-            MuleContextLifecycleManager manager = getLifecycleManager();
 
-            MuleContext context = new TestMuleContext(getMuleConfiguration(), getWorkManager(),
-                getWorkListener(), manager, getNotificationManager());
-            manager.setMuleContext(context);
-            return context;
+        @Override
+        protected DefaultMuleContext createDefaultMuleContext()
+        {
+            return new TestMuleContext();
         }
     }
 
     static class TestMuleContext extends DefaultMuleContext
     {
-        public TestMuleContext(MuleConfiguration config, WorkManager workManager,
-            WorkListener workListener, MuleContextLifecycleManager lifecycleManager,
-            ServerNotificationManager notificationManager)
+        public TestMuleContext()
         {
-            super(config, workManager, workListener, lifecycleManager, notificationManager);
+            super();
         }
     }
 
