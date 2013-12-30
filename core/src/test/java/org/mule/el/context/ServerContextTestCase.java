@@ -302,7 +302,7 @@ public class ServerContextTestCase extends AbstractELTestCase
     @Test
     public void dateTimeAddDays()
     {
-        Assert.assertEquals((Calendar.getInstance().get(Calendar.DAY_OF_YEAR) + 1) % 365,
+        Assert.assertEquals((Calendar.getInstance().get(Calendar.DAY_OF_YEAR) % 365) + 1,
             evaluate("(int) server.dateTime.plusDays(1).dayOfYear"));
     }
 
