@@ -239,7 +239,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
                 }
             }
         });
-        when(mockFileConnector.getMuleContext().getRegistry().get(MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER)).thenReturn(mockMessageManager);
+        when(mockInboundEndpoint.getMuleContext().getRegistry().get(MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER)).thenReturn(mockMessageManager);
         when(mockFileConnector.getMuleContext().getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
     }
 
