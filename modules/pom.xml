@@ -49,6 +49,7 @@
         <module>spring-security</module>
         <module>sxc</module>
         <module>tomcat</module>
+        <module>ws</module>
         <module>xml</module>
     </modules>
 
