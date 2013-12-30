@@ -13,6 +13,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.expression.RequiredValueException;
@@ -26,8 +27,12 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.kahadb.util.ByteArrayInputStream;
 import org.junit.Before;
 import org.junit.Rule;
@@ -507,6 +512,26 @@ public class ForeachTestCase extends FunctionalTestCase
         MuleMessage msg = client.send("vm://input-22", parent);
         assertNotNull(msg);
         assertEquals(msg.getProperty("processedMessages", PropertyScope.SESSION), "0123");
+    }
+    
+    @Test
+    public void foreachWithAsync() throws Exception
+    {
+        final int size = 20;
+        List<String> list = new ArrayList<String>(size);
+
+        for (int i = 0; i < size; i++)
+        {
+            list.add(RandomStringUtils.randomAlphabetic(10));
+        }
+
+        CountDownLatch latch = new CountDownLatch(size);
+        MuleEvent event = getTestEvent(list);
+        event.setFlowVariable("latch", latch);
+
+        this.testFlow("foreachWithAsync", event);
+
+        latch.await(10, TimeUnit.SECONDS);
     }
 }
 
