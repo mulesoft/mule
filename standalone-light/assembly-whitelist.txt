@@ -5,6 +5,7 @@
 /mule-standalone-nodocs-${productVersion}/apps
 /mule-standalone-nodocs-${productVersion}/bin
 /mule-standalone-nodocs-${productVersion}/conf
+/mule-standalone-nodocs-${productVersion}/domains
 /mule-standalone-nodocs-${productVersion}/lib
 /mule-standalone-nodocs-${productVersion}/logs
 /mule-standalone-nodocs-${productVersion}/LICENSE.txt
