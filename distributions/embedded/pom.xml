@@ -250,6 +250,11 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-ws</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-xml</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
