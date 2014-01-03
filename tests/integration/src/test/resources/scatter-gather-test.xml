@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+
+	<spring:bean id="testMergeStrategy" class="org.mule.test.routing.ScatterGatherRouterTestCase$TestAggregationStrategy" />
+    
+    <flow name="minimalConfig">
+        <scatter-gather>
+        	<set-payload value="apple" />
+        	<set-payload value="banana" />
+        	<set-payload value="orange" />
+        </scatter-gather>
+        
+        <flow-ref name="testRoutes" />
+    </flow>
+    
+    <flow name="timeout">
+    	<scatter-gather timeout ="1000">
+        	<set-payload value="apple" />
+        	<set-payload value="banana" />
+        	<expression-component>java.lang.Thread.sleep(10000)</expression-component>
+        </scatter-gather>
+    </flow>
+    
+    <flow name="routeWithException">
+    	<scatter-gather timeout ="1000">
+        	<set-payload value="apple" />
+        	<test:component throwException="true" />
+        	<set-payload value="orange" />
+        </scatter-gather>
+    </flow>
+    
+    <flow name="customMergeStrategyByRef">
+		<scatter-gather>
+        	<set-payload value="apple" />
+        	<set-payload value="banana" />
+        	<set-payload value="orange" />
+        	
+        	<custom-aggregation-strategy ref="testMergeStrategy" />
+        </scatter-gather>
+        <flow-ref name="testAggregationStrategy" />
+    </flow>
+    
+    <flow name="customMergeStrategyByName">
+		<scatter-gather>
+        	<set-payload value="apple" />
+        	<set-payload value="banana" />
+        	<set-payload value="orange" />
+        	
+        	<custom-aggregation-strategy class="org.mule.test.routing.ScatterGatherRouterTestCase$TestAggregationStrategy" />
+        </scatter-gather>
+        <flow-ref name="testAggregationStrategy" />
+    </flow>
+    
+    <flow name="customThreadingProfile">
+    	<scatter-gather>
+        	<set-payload value="apple" />
+        	<set-payload value="banana" />
+        	<set-payload value="orange" />
+        	<expression-component>java.lang.Thread.sleep(2500)</expression-component>
+        	<expression-component>java.lang.Thread.sleep(2500)</expression-component>
+        	
+        	<threading-profile maxThreadsActive="1" poolExhaustedAction="WAIT" />
+        </scatter-gather>
+        
+        <flow-ref name="testRoutes" />
+    </flow>
+    
+    <flow name="onlyOneRoute">
+        <scatter-gather>
+        	<set-payload value="apple" />
+        </scatter-gather>
+        
+        <test:assert expression="#[payload == 'apple']" />
+    </flow>
+    
+    <flow name="exceptionStrategy">
+    	<scatter-gather timeout ="1000">
+        	<set-payload value="apple" />
+        	<test:component throwException="true" />
+        	<test:component throwException="true" />
+        </scatter-gather>
+        
+        <catch-exception-strategy>
+        	<test:assert expression="#[exception is org.mule.routing.CompositeRoutingException]" />
+        	<test:assert expression="#[exception.getExceptionForRouteIndex(2) != null]" />
+        	<test:assert expression="#[exception.getExceptionForRouteIndex(3) != null]" />
+        </catch-exception-strategy>
+    </flow>
+    
+    <flow name="failingMergeStrategy">
+    	<scatter-gather>
+        	<set-payload value="apple" />
+        	<set-payload value="banana" />
+        	<set-payload value="orange" />
+        	
+        	<custom-aggregation-strategy class="org.mule.test.routing.ScatterGatherRouterTestCase$FailingAggregationStrategy" />
+        </scatter-gather>
+    </flow>
+    
+    <flow name="messageProperties">
+    	<set-variable variableName="flow" value="var" />
+    	<set-session-variable variableName="session" value="sessionvar" />
+    	
+    	<flow-ref name="minimalConfig" />
+    	
+    	<test:assert expression="#[flowVars['flow'] == 'var']" />
+    	<test:assert expression="#[sessionVars['session'] == 'sessionvar']" />
+    </flow>
+    
+    <sub-flow name="testAggregationStrategy">
+    	<test:assert expression="#[payload == 'apple banana orange']" />
+    </sub-flow>
+    
+    <sub-flow name="testRoutes">
+    	<combine-collections-transformer />
+        <test:assert expression="#[payload[0] == 'apple']" />
+        <test:assert expression="#[payload[1] == 'banana']" />
+        <test:assert expression="#[payload[2] == 'orange']" />
+    </sub-flow>
+    
+
+</mule>
