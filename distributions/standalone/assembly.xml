@@ -11,6 +11,7 @@
             <directory>src/main/resources</directory>
             <outputDirectory></outputDirectory>
             <excludes>
+                <exclude>**/IGNORE</exclude>
                 <exclude>bin/**</exclude>
                 <exclude>lib/boot/exec/**</exclude>
             </excludes>
