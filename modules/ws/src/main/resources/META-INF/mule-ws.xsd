@@ -118,4 +118,59 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+    
+    <!--==============================================================-->
+    <!--   Message Processors                                         -->
+    <!--==============================================================-->
+    
+    <xsd:element name="consumer" type="consumerType" substitutionGroup="mule:abstract-message-processor"/>
+
+    <xsd:complexType name="consumerType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractMessageProcessorType">
+            	<xsd:sequence>
+	            	<xsd:element name="security" minOccurs="0">
+	            		<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="wss-username-profile" minOccurs="0">
+									<xsd:complexType>
+										<xsd:attribute name="username" type="xsd:string" use="required"/>
+										<xsd:attribute name="password" type="xsd:string" use="required"/>
+									</xsd:complexType>
+								</xsd:element>
+								<xsd:element name="wss-timestamp" minOccurs="0">
+									<xsd:complexType>
+										<xsd:attribute name="expires" type="mule:substitutableLong"/>
+									</xsd:complexType>
+								</xsd:element>
+								<xsd:element name="wss-username-token" minOccurs="0">
+									<xsd:complexType>
+										<xsd:attribute name="username" type="xsd:string" use="required"/>
+										<xsd:attribute name="password" type="xsd:string" use="required"/>
+										<xsd:attribute name="passwordType" use="required" >
+											<xsd:simpleType>
+												<xsd:restriction base="xsd:string">
+													<xsd:enumeration value="TEXT" />
+													<xsd:enumeration value="DIGEST"/>
+												</xsd:restriction>
+											</xsd:simpleType>
+										</xsd:attribute>
+										<xsd:attribute name="addNonce" type="mule:substitutableBoolean"/>
+										<xsd:attribute name="addCreated" type="mule:substitutableBoolean"/>
+									</xsd:complexType>
+								</xsd:element>
+							</xsd:sequence>
+	            		</xsd:complexType>
+	            	</xsd:element>
+            	</xsd:sequence>
+            	<xsd:attribute name="serviceAddress" type="xsd:string" use="required"/>
+            	<xsd:attribute name="wsdlLocation" type="xsd:string" use="required"/>
+            	<xsd:attribute name="wsdlService" type="xsd:string" use="required"/>
+            	<xsd:attribute name="wsdlPort" type="xsd:string" use="required"/>
+            	<xsd:attribute name="wsdlOperation" type="xsd:string" use="required" />
+            	<xsd:attribute name="connector-ref" type="xsd:string" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
 </xsd:schema>
