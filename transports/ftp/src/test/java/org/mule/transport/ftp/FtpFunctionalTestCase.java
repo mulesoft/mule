@@ -43,6 +43,16 @@ public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
     @Test
     public void testSendAndRequest() throws Exception
     {
+        sendAndRequest(TEST_MESSAGE);
+    }
+
+    @Test
+    public void testSendAndRequestEmptyFile() throws Exception
+    {
+        sendAndRequest("");
+    }
+
+    private void sendAndRequest(String inputMessage) throws Exception {
         CountDownLatch latch = new CountDownLatch(1);
         AtomicReference<String> message = new AtomicReference<String>();
 
@@ -53,7 +63,7 @@ public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
         ftc.setEventCallback(new FunctionalEventCallback(latch, message));
 
         MuleClient client = muleContext.getClient();
-        client.dispatch(getMuleFtpEndpoint(), TEST_MESSAGE, null);
+        client.dispatch(getMuleFtpEndpoint(), inputMessage, null);
 
         // TODO DZ: need a reliable way to check the file once it's been written to
         // the ftp server. Currently, once mule processes the ftp'd file, it
@@ -61,7 +71,7 @@ public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
         //assertTrue(getFtpClient().expectFileCount("/", 1, 10000));
 
         latch.await(getTimeout(), TimeUnit.MILLISECONDS);
-        assertEquals(TEST_MESSAGE, message.get());
+        assertEquals(inputMessage, message.get());
     }
 
     protected static class FunctionalEventCallback implements EventCallback
