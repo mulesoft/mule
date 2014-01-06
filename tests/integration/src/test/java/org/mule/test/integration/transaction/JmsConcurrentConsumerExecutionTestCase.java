@@ -7,6 +7,7 @@
 package org.mule.test.integration.transaction;
 
 import org.hamcrest.core.IsNull;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
@@ -44,6 +45,7 @@ public class JmsConcurrentConsumerExecutionTestCase extends FunctionalTestCase
     }
 
     @Test
+    @Ignore("MULE-6926")
     public void testTwoMessagesOneRollbackOneCommit() throws Exception
     {
         MuleClient muleClient = new MuleClient(muleContext);
