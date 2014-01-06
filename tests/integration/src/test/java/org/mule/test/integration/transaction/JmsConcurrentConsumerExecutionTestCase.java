@@ -20,6 +20,7 @@ import org.mule.util.concurrent.Latch;
 import java.util.concurrent.TimeUnit;
 
 import org.hamcrest.core.IsNull;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /*
@@ -43,6 +44,7 @@ public class JmsConcurrentConsumerExecutionTestCase extends FunctionalTestCase
     }
 
     @Test
+    @Ignore("MULE-6926") 
     public void testTwoMessagesOneRollbackOneCommit() throws Exception
     {
         MuleClient muleClient = muleContext.getClient();
