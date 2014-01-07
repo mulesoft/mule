@@ -40,7 +40,7 @@ public abstract class EventProcessingThread extends Thread
      */
     public void stopProcessing()
     {
-        logger.debug("Stopping event processing: " + getName());
+        logger.debug("Stopping " + getName());
         stopRequested = true;
         processNow();
         
@@ -95,7 +95,7 @@ public abstract class EventProcessingThread extends Thread
             }
         }
 
-        logger.debug("Event processing thread fully stopped: " + getName());
+        logger.debug("Fully stopped: " + getName());
     }
 
     /**
