@@ -6440,7 +6440,7 @@
                         <xsd:element name="custom-merge-strategy" type="customMergeStrategyType" minOccurs="0" maxOccurs="1">
                             <xsd:annotation>
                                 <xsd:documentation>
-                                    Threading profile used to process the message processors inside the until-successful.
+                                    Allows customizing the logic used to gather the events back together.
                                 </xsd:documentation>
                             </xsd:annotation>
                         </xsd:element>
