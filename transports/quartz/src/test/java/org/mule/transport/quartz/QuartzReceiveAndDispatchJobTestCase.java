@@ -17,6 +17,7 @@ import org.mule.tck.functional.FunctionalTestComponent;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
@@ -35,6 +36,7 @@ public class QuartzReceiveAndDispatchJobTestCase extends AbstractServiceAndFlowT
     }
 
     @Test
+    @Ignore("MULE-6926")
     public void testMuleClientReceiveAndDispatchJob() throws Exception
     {
         FunctionalTestComponent component = getFunctionalTestComponent("scheduledService");
