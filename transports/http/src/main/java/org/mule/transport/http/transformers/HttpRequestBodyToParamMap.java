@@ -40,25 +40,24 @@ public class HttpRequestBodyToParamMap extends AbstractMessageTransformer
             String contentType = message.getInboundProperty("Content-Type");
             
             boolean isGet = HttpConstants.METHOD_GET.equalsIgnoreCase(httpMethod);
-            boolean isPost = HttpConstants.METHOD_POST.equalsIgnoreCase(httpMethod);
-            boolean isUrlEncoded = false;
+            boolean isFormUrlEncoded = false;
             if (contentType != null)
             {
-                isUrlEncoded = contentType.startsWith("application/x-www-form-urlencoded");
+                isFormUrlEncoded = contentType.startsWith("application/x-www-form-urlencoded");
             }
 
-            if (!(isGet || (isPost && isUrlEncoded)))
+            if (!(isGet || isFormUrlEncoded))
             {
                 throw new Exception("The HTTP method or content type is unsupported!");
             }
 
-            String queryString = null;
+            String queryString;
             if (isGet)
             {
                 URI uri = new URI(message.getPayloadAsString(outputEncoding));
                 queryString = uri.getRawQuery();
             }
-            else if (isPost)
+            else
             {
                 queryString = new String(message.getPayloadAsBytes());
             }
