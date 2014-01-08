@@ -6,9 +6,11 @@
  */
 package org.mule.example.echo;
 
+import org.junit.Ignore;
 /**
  * Tests the echo example using CXF.
  */
+@Ignore("MULE-6926: Flaky test.")
 public class CxfEchoFlowTestCase extends CxfEchoTestCase
 {
 

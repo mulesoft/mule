@@ -9,6 +9,7 @@ package org.mule.transport.email.functional;
 import java.util.Locale;
 
 import org.junit.Test;
+import org.junit.Ignore;
 
 public class SmtpNonAsciiFunctionalTestCase extends AbstractEmailFunctionalTestCase
 {
@@ -18,6 +19,7 @@ public class SmtpNonAsciiFunctionalTestCase extends AbstractEmailFunctionalTestC
         super(STRING_MESSAGE, "smtp", Locale.JAPAN, "iso-2022-jp");
     }
 
+    @Ignore("MULE-6926: Flaky test.")
     @Test
     public void testSend() throws Exception
     {
