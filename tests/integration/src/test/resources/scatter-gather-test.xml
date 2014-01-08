@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+
+	<spring:bean id="testMergeStrategy" class="org.mule.test.routing.ScatterGatherRouterTestCase$TestMergeStrategy" />
+    <flow name="minimalConfig">
+        <scatter-gather>
+        	<set-payload value="apple" />
+        	<set-payload value="banana" />
+        	<set-payload value="orange" />
+        </scatter-gather>
+        
+        <flow-ref name="testRoutes" />
+    </flow>
+    
+    <flow name="timeout">
+    	<scatter-gather timeout ="1000">
+        	<set-payload value="apple" />
+        	<set-payload value="banana" />
+        	<expression-component>java.lang.Thread.sleep(10000)</expression-component>
+        </scatter-gather>
+    </flow>
+    
+    <flow name="routeWithException">
+    	<scatter-gather timeout ="1000">
+        	<set-payload value="apple" />
+        	<test:component throwException="true" />
+        	<set-payload value="orange" />
+        </scatter-gather>
+    </flow>
+    
+    <flow name="customMergeStrategyByRef">
+		<scatter-gather>
+        	<set-payload value="apple" />
+        	<set-payload value="banana" />
+        	<set-payload value="orange" />
+        	
+        	<custom-merge-strategy ref="testMergeStrategy" />
+        </scatter-gather>
+        <flow-ref name="testCustomMergeStrategy" />
+    </flow>
+    
+    <flow name="customMergeStrategyByName">
+		<scatter-gather>
+        	<set-payload value="apple" />
+        	<set-payload value="banana" />
+        	<set-payload value="orange" />
+        	
+        	<custom-merge-strategy class="org.mule.test.routing.ScatterGatherRouterTestCase$TestMergeStrategy" />
+        </scatter-gather>
+        <flow-ref name="testCustomMergeStrategy" />
+    </flow>
+    
+    <flow name="customThreadingProfile">
+    	<scatter-gather>
+        	<set-payload value="apple" />
+        	<set-payload value="banana" />
+        	<set-payload value="orange" />
+        	<expression-component>java.lang.Thread.sleep(2500)</expression-component>
+        	<expression-component>java.lang.Thread.sleep(2500)</expression-component>
+        	
+        	<threading-profile maxThreadsActive="1" poolExhaustedAction="WAIT" />
+        </scatter-gather>
+        
+        <flow-ref name="testRoutes" />
+    </flow>
+    
+    <sub-flow name="testCustomMergeStrategy">
+    	<test:assert expression="#[payload == 'apple banana orange']" />
+    </sub-flow>
+    
+    <sub-flow name="testRoutes">
+    	<combine-collections-transformer />
+        <test:assert expression="#[payload[0] == 'apple']" />
+        <test:assert expression="#[payload[1] == 'banana']" />
+        <test:assert expression="#[payload[2] == 'orange']" />
+    </sub-flow>
+    
+
+</mule>

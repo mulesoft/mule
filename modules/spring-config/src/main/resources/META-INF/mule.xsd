@@ -6425,7 +6425,70 @@
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
-
+    
+    <xsd:element name="scatter-gather" substitutionGroup="abstract-routing-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Sends the same message to multiple message processors or outbound endpoints in parallel.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="abstractRoutingMessageProcessorType">
+                    <xsd:sequence>
+                        <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="unbounded"/>
+                        <xsd:element name="custom-merge-strategy" type="customMergeStrategyType" minOccurs="0" maxOccurs="1">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    Allows customizing the logic used to gather the events back together.
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:element name="threading-profile" type="asynchronousThreadingProfileType" minOccurs="0">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    Threading profile used to process the message processors inside the until-successful.
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                    </xsd:sequence>
+                    <xsd:attribute name="timeout" type="substitutableLong" use="optional" default="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Sets a timeout in milliseconds for each route. Values lower or equals than zero means no timeout. 
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+    
+    <xsd:complexType name="customMergeStrategyType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:attribute name="class" type="substitutableClass" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The canonical name of a class that implements org.mule.routing.EventMergeStrategy.
+                            Such a class is required to have a default constructor.
+                            This property cannot be set at the same time as 'ref'
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="ref" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A reference to a registered bean that implements org.mule.routing.EventMergeStrategy.
+                            This property cannot be set at the same time as 'class'
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+	
     <xsd:element name="round-robin" substitutionGroup="abstract-routing-message-processor"
                  type="processorWithAtLeastOneTargetType">
         <xsd:annotation>
