@@ -6,6 +6,7 @@
  */
 package org.mule.execution;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 
@@ -18,13 +19,18 @@ public interface RequestResponseFlowProcessingPhaseTemplate extends FlowProcessi
 
     /**
      * Template method to send a response after processing the message.
-     *
-     * This method is executed outside the flow. In case of failure the {@link org.mule.api.exception.SystemExceptionHandler}
-     * will be executed.
+     * <p/>
+     * This method is executed within the flow so if it fails it will trigger the exception strategy.
      *
      * @param muleEvent the event with the content of the response to be sent.
-     * @throws MuleException exception thrown during the response is being sent.
+     * @throws MuleException exception thrown when processing the message to send the response. If there's a failure when writing the response
+     *                       using the underlying transport or connector then the exception to throw must be a {@link ResponseDispatchException}.
      */
-    public void sendResponseToClient(MuleEvent muleEvent) throws MuleException;
+    void sendResponseToClient(MuleEvent muleEvent) throws MuleException;
 
+    /**
+     * @param messagingException exception thrown during the flow execution.
+     * @throws MuleException exception thrown when processing the message to send the response.
+     */
+    void sendFailureResponseToClient(MessagingException messagingException) throws MuleException;
 }
