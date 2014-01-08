@@ -11,6 +11,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -24,6 +25,7 @@ import org.mule.execution.MessageProcessContext;
 import org.mule.execution.MessageProcessPhase;
 import org.mule.execution.PhaseResultNotifier;
 import org.mule.execution.RequestResponseFlowProcessingPhaseTemplate;
+import org.mule.execution.ResponseDispatchException;
 import org.mule.execution.ValidationPhase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -52,6 +54,8 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase
     private MessageProcessContext mockContext;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private PhaseResultNotifier mockNotifier;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private ResponseDispatchException mockResponseDispatchException;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private MessagingException mockMessagingException;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
@@ -115,6 +119,48 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase
         inOrderVerify.verify(mockRequestResponseTemplate, times(1)).afterSuccessfulProcessingFlow(any(MuleEvent.class));
         inOrderVerify.verify(mockNotifier, times(1)).phaseSuccessfully();
         verifyOnlySuccessfulWasCalled();
+    }
+
+    @Test
+    public void sendResponseWhenFlowExecutionFailsAndExceptionIsHandled() throws MuleException
+    {
+        when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
+        when(mockRequestResponseTemplate.afterRouteEvent(any(MuleEvent.class))).thenThrow(mockMessagingException);
+        when(mockMessagingException.handled()).thenReturn(true);
+        phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
+        verify(mockRequestResponseTemplate, times(1)).sendResponseToClient(any(MuleEvent.class));
+    }
+
+    @Test
+    public void sendFailureResponseWhenFlowExecutionFailsAndExceptionIsNotHandled() throws MuleException
+    {
+        when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
+        when(mockRequestResponseTemplate.afterRouteEvent(any(MuleEvent.class))).thenThrow(mockMessagingException);
+        when(mockMessagingException.handled()).thenReturn(false);
+        phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
+        verify(mockRequestResponseTemplate).afterFailureProcessingFlow(mockMessagingException);
+    }
+
+    @Test
+    public void doNotSendResponseWhenFlowExecutionFailsSendingResponseAndExceptionIsHandled() throws MuleException
+    {
+        when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
+        doThrow(mockResponseDispatchException).when(mockRequestResponseTemplate).sendResponseToClient(any(MuleEvent.class));
+        when(mockMessagingException.handled()).thenReturn(true);
+        phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
+        verify(mockRequestResponseTemplate, times(1)).sendResponseToClient(any(MuleEvent.class));
+        verify(mockRequestResponseTemplate, times(0)).afterFailureProcessingFlow(mockMessagingException);
+    }
+
+    @Test
+    public void doNotSendFailureResponseWhenFlowExecutionFailsSendingResponseAndExceptionIsNotHandled() throws MuleException
+    {
+        when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
+        doThrow(mockMessagingException).when(mockRequestResponseTemplate).sendResponseToClient(any(MuleEvent.class));
+        when(mockMessagingException.handled()).thenReturn(false);
+        phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
+        verify(mockRequestResponseTemplate, times(1)).sendResponseToClient(any(MuleEvent.class));
+        verify(mockRequestResponseTemplate, times(1)).afterFailureProcessingFlow(mockMessagingException);
     }
 
     private void verifyOnlySuccessfulWasCalled()

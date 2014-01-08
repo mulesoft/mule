@@ -22,6 +22,7 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.config.ExceptionHelper;
 import org.mule.execution.EndPhaseTemplate;
 import org.mule.execution.RequestResponseFlowProcessingPhaseTemplate;
+import org.mule.execution.ResponseDispatchException;
 import org.mule.execution.ThrottlingPhaseTemplate;
 import org.mule.transport.AbstractTransportMessageProcessTemplate;
 import org.mule.transport.NullPayload;
@@ -47,68 +48,16 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     private HttpRequest request;
     private boolean badRequest;
     private Latch messageProcessedLatch = new Latch();
-    private boolean failureSendingResponse;
     private Long remainingRequestInCurrentPeriod;
     private Long maximumRequestAllowedPerPeriod;
     private Long timeUntilNextPeriodInMillis;
     private RequestLine requestLine;
+    private boolean failureResponseSentToClient;
 
     public HttpMessageProcessTemplate(final HttpMessageReceiver messageReceiver, final HttpServerConnection httpServerConnection, final WorkManager flowExecutionWorkManager)
     {
         super(messageReceiver,flowExecutionWorkManager);
         this.httpServerConnection = httpServerConnection;
-    }
-
-    @Override
-    public void afterFailureProcessingFlow(MessagingException messagingException) throws MuleException
-    {
-        if (!failureSendingResponse)
-        {
-            Exception e = messagingException;
-            MuleEvent response = messagingException.getEvent();
-            if (response != null &&
-                response.getMessage().getExceptionPayload() != null &&
-                response.getMessage().getExceptionPayload().getException() instanceof MessagingException)
-            {
-                e = (Exception) response.getMessage().getExceptionPayload().getException();
-            }
-
-            String temp = ExceptionHelper.getErrorMapping(getInboundEndpoint().getConnector().getProtocol(), messagingException.getClass(), getMuleContext());
-            int httpStatus = Integer.valueOf(temp);
-            try
-            {
-                if (e instanceof  MessagingException)
-                {
-                    sendFailureResponseToClient((MessagingException)e, httpStatus);
-                }
-                else
-                {
-                    sendFailureResponseToClient(httpStatus, e.getMessage());
-                }
-            }
-            catch (IOException ioException)
-            {
-                throw new DefaultMuleException(ioException);
-            }
-        }
-    }
-
-    @Override
-    public void afterFailureProcessingFlow(MuleException exception) throws MuleException
-    {
-        if (!failureSendingResponse)
-        {
-            String temp = ExceptionHelper.getErrorMapping(getConnector().getProtocol(), exception.getClass(),getMuleContext());
-            int httpStatus = Integer.valueOf(temp);
-            try
-            {
-                sendFailureResponseToClient(httpStatus, exception.getMessage());
-            }
-            catch (IOException e)
-            {
-                throw new DefaultMuleException(e);
-            }
-        }
     }
 
     @Override
@@ -189,7 +138,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
             }
             catch (Exception e)
             {
-                failureSendingResponse = true;
+                throw new ResponseDispatchException(responseMuleEvent, e);
             }
             if (logger.isTraceEnabled())
             {
@@ -204,6 +153,60 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
                 logger.debug(e);
             }
             throw new MessagingException(responseMuleEvent,e);
+        }
+    }
+
+    @Override
+    public void sendFailureResponseToClient(MessagingException messagingException) throws MuleException
+    {
+        Exception e = messagingException;
+        MuleEvent response = messagingException.getEvent();
+        if (response != null &&
+            response.getMessage().getExceptionPayload() != null &&
+            response.getMessage().getExceptionPayload().getException() instanceof MessagingException)
+        {
+            e = (Exception) response.getMessage().getExceptionPayload().getException();
+        }
+
+        String temp = ExceptionHelper.getErrorMapping(getInboundEndpoint().getConnector().getProtocol(), messagingException.getClass(), getMuleContext());
+        int httpStatus = Integer.valueOf(temp);
+        try
+        {
+            if (e instanceof MessagingException)
+            {
+                sendFailureResponseToClient((MessagingException) e, httpStatus);
+            }
+            else
+            {
+                sendFailureResponseToClient(httpStatus, e.getMessage());
+            }
+        }
+        catch (IOException ioException)
+        {
+            throw new DefaultMuleException(ioException);
+        }
+        failureResponseSentToClient = true;
+    }
+
+    @Override
+    public void afterFailureProcessingFlow(MuleException exception) throws MuleException
+    {
+        if (!failureResponseSentToClient)
+        {
+            String temp = ExceptionHelper.getErrorMapping(getConnector().getProtocol(), exception.getClass(), getMuleContext());
+            int httpStatus = Integer.valueOf(temp);
+            try
+            {
+                sendFailureResponseToClient(httpStatus, exception.getMessage());
+            }
+            catch (Exception e)
+            {
+                logger.warn("Exception sending http response after error: " + e.getMessage());
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(e);
+                }
+            }
         }
     }
 

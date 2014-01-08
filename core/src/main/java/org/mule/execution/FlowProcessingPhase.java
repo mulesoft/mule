@@ -11,8 +11,9 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.execution.ExecutionCallback;
-import org.mule.execution.TransactionalErrorHandlingExecutionTemplate;
 import org.mule.transaction.MuleTransactionConfig;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
@@ -53,6 +54,7 @@ public class FlowProcessingPhase implements MessageProcessPhase<FlowProcessingPh
                 {
                     try
                     {
+                        final AtomicReference exceptionThrowWhileSendingResponse = new AtomicReference();
                         TransactionalErrorHandlingExecutionTemplate transactionTemplate = TransactionalErrorHandlingExecutionTemplate.
                                 createMainExecutionTemplate(messageProcessContext.getFlowConstruct().getMuleContext(),
                                                             (messageProcessContext.getTransactionConfig() == null ? new MuleTransactionConfig() : messageProcessContext.getTransactionConfig()),
@@ -62,26 +64,40 @@ public class FlowProcessingPhase implements MessageProcessPhase<FlowProcessingPh
                             @Override
                             public MuleEvent process() throws Exception
                             {
-                                Object message = flowProcessingPhaseTemplate.getOriginalMessage();
-                                if (message == null)
+                                try
                                 {
-                                    return null;
+                                    Object message = flowProcessingPhaseTemplate.getOriginalMessage();
+                                    if (message == null)
+                                    {
+                                        return null;
+                                    }
+                                    MuleEvent muleEvent = flowProcessingPhaseTemplate.getMuleEvent();
+                                    muleEvent = flowProcessingPhaseTemplate.beforeRouteEvent(muleEvent);
+                                    muleEvent = flowProcessingPhaseTemplate.routeEvent(muleEvent);
+                                    muleEvent = flowProcessingPhaseTemplate.afterRouteEvent(muleEvent);
+                                    sendResponseIfNeccessary(muleEvent, flowProcessingPhaseTemplate);
+                                    return muleEvent;
                                 }
-                                MuleEvent muleEvent = flowProcessingPhaseTemplate.getMuleEvent();
-                                muleEvent = flowProcessingPhaseTemplate.beforeRouteEvent(muleEvent);
-                                muleEvent = flowProcessingPhaseTemplate.routeEvent(muleEvent);
-                                muleEvent = flowProcessingPhaseTemplate.afterRouteEvent(muleEvent);
-                                return muleEvent;
+                                catch (Exception e)
+                                {
+                                    exceptionThrowWhileSendingResponse.set(e);
+                                    throw e;
+                                }
                             }
                         });
-                        if (flowProcessingPhaseTemplate instanceof RequestResponseFlowProcessingPhaseTemplate)
+                        if (exceptionThrowWhileSendingResponse.get() != null && !(exceptionThrowWhileSendingResponse.get() instanceof ResponseDispatchException))
                         {
-                            ((RequestResponseFlowProcessingPhaseTemplate)flowProcessingPhaseTemplate).sendResponseToClient(response);
+                            sendResponseIfNeccessary(response, flowProcessingPhaseTemplate);
                         }
                         flowProcessingPhaseTemplate.afterSuccessfulProcessingFlow(response);
                     }
+                    catch (ResponseDispatchException e)
+                    {
+                        flowProcessingPhaseTemplate.afterFailureProcessingFlow(e);
+                    }
                     catch (MessagingException e)
                     {
+                        sendFailureResponseIfNeccessary(e, flowProcessingPhaseTemplate);
                         flowProcessingPhaseTemplate.afterFailureProcessingFlow(e);
                     }
                     phaseResultNotifier.phaseSuccessfully();
@@ -119,6 +135,22 @@ public class FlowProcessingPhase implements MessageProcessPhase<FlowProcessingPh
         else
         {
             flowExecutionWork.run();
+        }
+    }
+
+    private void sendFailureResponseIfNeccessary(MessagingException messagingException, FlowProcessingPhaseTemplate flowProcessingPhaseTemplate) throws MuleException
+    {
+        if (flowProcessingPhaseTemplate instanceof RequestResponseFlowProcessingPhaseTemplate)
+        {
+            ((RequestResponseFlowProcessingPhaseTemplate) flowProcessingPhaseTemplate).sendFailureResponseToClient(messagingException);
+        }
+    }
+
+    private void sendResponseIfNeccessary(MuleEvent muleEvent, FlowProcessingPhaseTemplate flowProcessingPhaseTemplate) throws MuleException
+    {
+        if (flowProcessingPhaseTemplate instanceof RequestResponseFlowProcessingPhaseTemplate)
+        {
+            ((RequestResponseFlowProcessingPhaseTemplate) flowProcessingPhaseTemplate).sendResponseToClient(muleEvent);
         }
     }
 

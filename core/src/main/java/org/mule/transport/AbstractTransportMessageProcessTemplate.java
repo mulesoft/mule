@@ -6,7 +6,6 @@
  */
 package org.mule.transport;
 
-import org.mule.MessageExchangePattern;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -81,23 +80,8 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
         return messageReceiver.routeEvent(muleEvent);
     }
 
-    protected void sendResponseMessage(MuleEvent responseMuleEvent) throws MessagingException
-    {
-    }
-
     public void afterSuccessfulProcessingFlow(MuleEvent response) throws MuleException
     {
-        if (messageReceiver.getEndpoint().getExchangePattern().equals(MessageExchangePattern.REQUEST_RESPONSE))
-        {
-            try
-            {
-                sendResponseMessage(response);
-            }
-            catch (MessagingException e)
-            {
-                throw new ResponseDispatchMessagingException(response,e);
-            }
-        }
     }
 
     /**
