@@ -31,7 +31,7 @@ public class WSConsumerFactoryBean implements FactoryBean<WSConsumer>, MuleConte
     @Override
     public WSConsumer getObject() throws Exception
     {
-        return new WSConsumer(wsdlLocation, wsdlOperation, serviceAddress, connector, security, muleContext);
+        return new WSConsumer(wsdlLocation, wsdlService, wsdlPort, wsdlOperation, serviceAddress, connector, security, muleContext);
     }
 
     @Override
