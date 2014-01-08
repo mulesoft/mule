@@ -159,33 +159,31 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     @Override
     public void sendFailureResponseToClient(MessagingException messagingException) throws MuleException
     {
-        Exception e = messagingException;
         MuleEvent response = messagingException.getEvent();
-        if (response != null &&
-            response.getMessage().getExceptionPayload() != null &&
-            response.getMessage().getExceptionPayload().getException() instanceof MessagingException)
-        {
-            e = (Exception) response.getMessage().getExceptionPayload().getException();
-        }
-
+        MessagingException e = getExceptionForCreatingFailureResponse(messagingException, response);
         String temp = ExceptionHelper.getErrorMapping(getInboundEndpoint().getConnector().getProtocol(), messagingException.getClass(), getMuleContext());
         int httpStatus = Integer.valueOf(temp);
         try
         {
-            if (e instanceof MessagingException)
-            {
-                sendFailureResponseToClient((MessagingException) e, httpStatus);
-            }
-            else
-            {
-                sendFailureResponseToClient(httpStatus, e.getMessage());
-            }
+            sendFailureResponseToClient(e, httpStatus);
         }
         catch (IOException ioException)
         {
             throw new DefaultMuleException(ioException);
         }
         failureResponseSentToClient = true;
+    }
+
+    private MessagingException getExceptionForCreatingFailureResponse(MessagingException messagingException, MuleEvent response)
+    {
+        MessagingException e = messagingException;
+        if (response != null &&
+            response.getMessage().getExceptionPayload() != null &&
+            response.getMessage().getExceptionPayload().getException() instanceof MessagingException)
+        {
+            e = (MessagingException) response.getMessage().getExceptionPayload().getException();
+        }
+        return e;
     }
 
     @Override

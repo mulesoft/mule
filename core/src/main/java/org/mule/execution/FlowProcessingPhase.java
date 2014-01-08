@@ -54,7 +54,7 @@ public class FlowProcessingPhase implements MessageProcessPhase<FlowProcessingPh
                 {
                     try
                     {
-                        final AtomicReference exceptionThrowWhileSendingResponse = new AtomicReference();
+                        final AtomicReference exceptionThrownDuringFlowProcessing = new AtomicReference();
                         TransactionalErrorHandlingExecutionTemplate transactionTemplate = TransactionalErrorHandlingExecutionTemplate.
                                 createMainExecutionTemplate(messageProcessContext.getFlowConstruct().getMuleContext(),
                                                             (messageProcessContext.getTransactionConfig() == null ? new MuleTransactionConfig() : messageProcessContext.getTransactionConfig()),
@@ -80,12 +80,12 @@ public class FlowProcessingPhase implements MessageProcessPhase<FlowProcessingPh
                                 }
                                 catch (Exception e)
                                 {
-                                    exceptionThrowWhileSendingResponse.set(e);
+                                    exceptionThrownDuringFlowProcessing.set(e);
                                     throw e;
                                 }
                             }
                         });
-                        if (exceptionThrowWhileSendingResponse.get() != null && !(exceptionThrowWhileSendingResponse.get() instanceof ResponseDispatchException))
+                        if (exceptionThrownDuringFlowProcessing.get() != null && !(exceptionThrownDuringFlowProcessing.get() instanceof ResponseDispatchException))
                         {
                             sendResponseIfNeccessary(response, flowProcessingPhaseTemplate);
                         }

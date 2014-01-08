@@ -11,8 +11,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.timeout;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -81,7 +80,7 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase
         when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
         doThrow(mockException).when(mockTemplate).afterSuccessfulProcessingFlow(any(MuleEvent.class));
         phase.runPhase(mockTemplate, mockContext, mockNotifier);
-        verify(mockContext.getFlowConstruct(), Mockito.times(1)).getExceptionListener();
+        verify(mockContext.getFlowConstruct()).getExceptionListener();
         verifyOnlyFailureWasCalled(mockException);
     }
 
@@ -91,7 +90,7 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase
         when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
         when(mockTemplate.routeEvent(Mockito.any(MuleEvent.class))).thenThrow(mockMessagingException);
         phase.runPhase(mockTemplate, mockContext, mockNotifier);
-        verify(mockContext.getFlowConstruct(), Mockito.times(1)).getExceptionListener();
+        verify(mockContext.getFlowConstruct()).getExceptionListener();
         verifyOnlySuccessfulWasCalled();
     }
 
@@ -101,7 +100,7 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase
         when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
         phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
         verifyOnlySuccessfulWasCalled();
-        verify(mockRequestResponseTemplate, times(1)).sendResponseToClient(any(MuleEvent.class));
+        verify(mockRequestResponseTemplate).sendResponseToClient(any(MuleEvent.class));
     }
 
     @Test
@@ -111,13 +110,13 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase
         phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
         InOrder inOrderVerify = Mockito.inOrder(mockContext, mockContext.getFlowConstruct(), mockRequestResponseTemplate, mockNotifier);
         inOrderVerify.verify(mockContext, atLeastOnce()).getTransactionConfig();
-        inOrderVerify.verify(mockContext.getFlowConstruct(), times(1)).getExceptionListener();
-        inOrderVerify.verify(mockRequestResponseTemplate, times(1)).getMuleEvent();
-        inOrderVerify.verify(mockRequestResponseTemplate, times(1)).beforeRouteEvent(any(MuleEvent.class));
-        inOrderVerify.verify(mockRequestResponseTemplate, times(1)).routeEvent(any(MuleEvent.class));
-        inOrderVerify.verify(mockRequestResponseTemplate, times(1)).afterRouteEvent(any(MuleEvent.class));
-        inOrderVerify.verify(mockRequestResponseTemplate, times(1)).afterSuccessfulProcessingFlow(any(MuleEvent.class));
-        inOrderVerify.verify(mockNotifier, times(1)).phaseSuccessfully();
+        inOrderVerify.verify(mockContext.getFlowConstruct()).getExceptionListener();
+        inOrderVerify.verify(mockRequestResponseTemplate).getMuleEvent();
+        inOrderVerify.verify(mockRequestResponseTemplate).beforeRouteEvent(any(MuleEvent.class));
+        inOrderVerify.verify(mockRequestResponseTemplate).routeEvent(any(MuleEvent.class));
+        inOrderVerify.verify(mockRequestResponseTemplate).afterRouteEvent(any(MuleEvent.class));
+        inOrderVerify.verify(mockRequestResponseTemplate).afterSuccessfulProcessingFlow(any(MuleEvent.class));
+        inOrderVerify.verify(mockNotifier).phaseSuccessfully();
         verifyOnlySuccessfulWasCalled();
     }
 
@@ -128,7 +127,7 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase
         when(mockRequestResponseTemplate.afterRouteEvent(any(MuleEvent.class))).thenThrow(mockMessagingException);
         when(mockMessagingException.handled()).thenReturn(true);
         phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
-        verify(mockRequestResponseTemplate, times(1)).sendResponseToClient(any(MuleEvent.class));
+        verify(mockRequestResponseTemplate).sendResponseToClient(any(MuleEvent.class));
     }
 
     @Test
@@ -148,8 +147,8 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase
         doThrow(mockResponseDispatchException).when(mockRequestResponseTemplate).sendResponseToClient(any(MuleEvent.class));
         when(mockMessagingException.handled()).thenReturn(true);
         phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
-        verify(mockRequestResponseTemplate, times(1)).sendResponseToClient(any(MuleEvent.class));
-        verify(mockRequestResponseTemplate, times(0)).afterFailureProcessingFlow(mockMessagingException);
+        verify(mockRequestResponseTemplate).sendResponseToClient(any(MuleEvent.class));
+        verify(mockRequestResponseTemplate, never()).afterFailureProcessingFlow(mockMessagingException);
     }
 
     @Test
@@ -159,22 +158,22 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase
         doThrow(mockMessagingException).when(mockRequestResponseTemplate).sendResponseToClient(any(MuleEvent.class));
         when(mockMessagingException.handled()).thenReturn(false);
         phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
-        verify(mockRequestResponseTemplate, times(1)).sendResponseToClient(any(MuleEvent.class));
-        verify(mockRequestResponseTemplate, times(1)).afterFailureProcessingFlow(mockMessagingException);
+        verify(mockRequestResponseTemplate).sendResponseToClient(any(MuleEvent.class));
+        verify(mockRequestResponseTemplate).afterFailureProcessingFlow(mockMessagingException);
     }
 
     private void verifyOnlySuccessfulWasCalled()
     {
-        verify(mockNotifier, Mockito.times(0)).phaseFailure(any(Exception.class));
-        verify(mockNotifier, Mockito.times(0)).phaseConsumedMessage();
-        verify(mockNotifier, Mockito.times(1)).phaseSuccessfully();
+        verify(mockNotifier, Mockito.never()).phaseFailure(any(Exception.class));
+        verify(mockNotifier, Mockito.never()).phaseConsumedMessage();
+        verify(mockNotifier).phaseSuccessfully();
     }
 
     private void verifyOnlyFailureWasCalled(Exception e)
     {
-        verify(mockNotifier, Mockito.times(1)).phaseFailure(e);
-        verify(mockNotifier, Mockito.times(0)).phaseConsumedMessage();
-        verify(mockNotifier, Mockito.times(0)).phaseSuccessfully();
+        verify(mockNotifier).phaseFailure(e);
+        verify(mockNotifier, Mockito.never()).phaseConsumedMessage();
+        verify(mockNotifier, Mockito.never()).phaseSuccessfully();
     }
 
 }
