@@ -14,6 +14,7 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transport.Connector;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.module.cxf.builder.ProxyClientMessageProcessorBuilder;
@@ -23,69 +24,71 @@ import org.mule.processor.ResponseMessageProcessorAdapter;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.transformer.simple.AutoTransformer;
 
+import javax.wsdl.Definition;
 import javax.wsdl.WSDLException;
-import javax.xml.transform.TransformerConfigurationException;
+import javax.wsdl.xml.WSDLReader;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
+
+import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
 
 public class WSConsumer implements MessageProcessor
 {
 
-    protected MessageProcessor mp;
-    protected String wsdlOperation;
-    protected String targetNamespace;
+    private final MessageProcessor mp;
+    private final String wsdlOperation;
+    private final String targetNamespace;
 
-    public WSConsumer(String wsdlLocation,
-                      String wsdlService,
-                      String wsdlPort,
-                      String wsdlOperation,
-                      String serviceAddress,
-                      Connector connector,
-                      WSSecurity security,
-                      MuleContext muleContext)
-        throws MuleException, TransformerConfigurationException, WSDLException,
-        TransformerFactoryConfigurationError, TransformerException
+    public WSConsumer(String wsdlLocation, String wsdlOperation, String serviceAddress, Connector connector,
+                      WSSecurity security, MuleContext muleContext)
+            throws MuleException, WSDLException, TransformerFactoryConfigurationError, TransformerException
     {
-        super();
-        javax.wsdl.xml.WSDLReader wsdlReader11;
-        wsdlReader11 = javax.wsdl.factory.WSDLFactory.newInstance().newWSDLReader();
-        targetNamespace = wsdlReader11.readWSDL(wsdlLocation).getTargetNamespace();
+
+        WSDLReader wsdlReader11 = javax.wsdl.factory.WSDLFactory.newInstance().newWSDLReader();
+        Definition wsdlDefinition = wsdlReader11.readWSDL(wsdlLocation);
+
+        this.targetNamespace = wsdlDefinition.getTargetNamespace();
         this.wsdlOperation = wsdlOperation;
 
         ProxyClientMessageProcessorBuilder cxfBuilder = new ProxyClientMessageProcessorBuilder();
         cxfBuilder.setMuleContext(muleContext);
 
-        for (SecurityStrategy strategy : security.getStrategies())
+        if (security != null)
         {
-            strategy.apply(cxfBuilder);
+            for (SecurityStrategy strategy : security.getStrategies())
+            {
+                strategy.apply(cxfBuilder);
+            }
         }
 
         MessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder();
         AutoTransformer auto = new AutoTransformer();
-        auto.setReturnClass(String.class);
+        auto.setReturnDataType(DataType.STRING_DATA_TYPE);
         chainBuilder.chain(new ResponseMessageProcessorAdapter(auto));
         chainBuilder.chain(cxfBuilder.build(), createEndpoint(serviceAddress, connector, muleContext));
-        chainBuilder.chain(auto);
         mp = chainBuilder.build();
+
+        // TODO: MULE-7222 The ProxyClientMessageProcessorBuilder removes this interceptor, we need it to throw an exception when a SOAPFault is returned.
+        cxfBuilder.getClient().getEndpoint().getBinding().getInInterceptors().add(new CheckFaultInterceptor());
     }
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        event.getMessage().setOutboundProperty("SOAPAction", targetNamespace + wsdlOperation);
+        // TODO: MULE-7218 Read SOAPAction from wsdl
+        event.getMessage().setOutboundProperty("SOAPAction", wsdlOperation);
         return mp.process(event);
     }
 
     protected OutboundEndpoint createEndpoint(String address, Connector connector, MuleContext muleContext)
-        throws MuleException
+            throws MuleException
     {
         if (connector != null)
         {
             String protocol = new MuleEndpointURI(address, muleContext).getScheme();
             if (!connector.supportsProtocol(protocol))
             {
-                throw new RuntimeException("Connector " + connector + " does not support protocol: "
-                                           + protocol);
+                throw new RuntimeException("Connector " + connector + " does not support protocol: " + protocol);
             }
         }
         EndpointBuilder builder = muleContext.getEndpointFactory().getEndpointBuilder(address);

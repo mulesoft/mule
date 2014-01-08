@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:ws="http://www.mulesoft.org/schema/mule/ws"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd">
+
+    <flow name="server">
+        <inbound-endpoint address="http://localhost:${port1}/services/Echo"/>
+        <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.Echo"/>
+        <component class="org.mule.module.ws.consumer.Echo"/>
+    </flow>
+
+    <flow name="soapFaultWithoutCatchExceptionStrategy">
+        <inbound-endpoint address="vm://soapFaultWithoutCatchExceptionStrategy" exchange-pattern="request-response"/>
+
+        <ws:consumer serviceAddress="http://localhost:${port1}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
+                     wsdlService="EchoService"
+                     wsdlPort="EchoPort" wsdlOperation="fail"/>
+    </flow>
+
+
+    <flow name="soapFaultWithCatchExceptionStrategy" processingStrategy="synchronous">
+        <inbound-endpoint address="vm://soapFaultWithCatchExceptionStrategy" exchange-pattern="request-response"/>
+
+        <ws:consumer serviceAddress="http://localhost:${port1}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
+                     wsdlService="EchoService"
+                     wsdlPort="EchoPort" wsdlOperation="fail"/>
+
+        <catch-exception-strategy>
+            <set-payload value="EXCEPTION"/>
+        </catch-exception-strategy>
+    </flow>
+
+</mule>
