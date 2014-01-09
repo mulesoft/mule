@@ -68,7 +68,7 @@ public class MuleUtils
     {
         @SuppressWarnings("unchecked")
         Map<String, String> env = EnvironmentUtils.getProcEnvironment();
-        for (String envVar: envVars)
+        for (String envVar : envVars)
         {
             EnvironmentUtils.addVariableToEnvironment(env, envVar);
         }

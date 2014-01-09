@@ -39,6 +39,6 @@ public class AppDeploymentProbe implements Probe
 
     public String describeFailure()
     {
-        return "Application [" + appName + "] is " + (check? "not": "") + " deployed.";
+        return "Application [" + appName + "] is " + (check ? "not" : "") + " deployed.";
     }
 }

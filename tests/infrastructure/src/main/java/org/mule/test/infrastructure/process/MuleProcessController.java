@@ -104,7 +104,7 @@ public class MuleProcessController
     }
 
     private int executeSyncCommand(String command, String[] args, Map<Object, Object> newEnv, long timeout)
-        throws MuleControllerException
+            throws MuleControllerException
     {
         CommandLine commandLine = new CommandLine(muleBin);
         commandLine.addArgument(command);
@@ -143,7 +143,9 @@ public class MuleProcessController
             if (app.isFile())
             {
                 FileUtils.copyFileToDirectory(app, appsDir);
-            } else {
+            }
+            else
+            {
                 FileUtils.copyDirectoryToDirectory(app, appsDir);
             }
         }
@@ -212,7 +214,7 @@ public class MuleProcessController
         }
     }
 
-    private void verify(boolean condition, String message, Object...args)
+    private void verify(boolean condition, String message, Object... args)
     {
         if (!condition)
         {
