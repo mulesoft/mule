@@ -12,6 +12,7 @@ import java.util.Locale;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+import org.junit.Ignore;
 
 public class SmtpNonAsciiFunctionalTestCase extends AbstractEmailFunctionalTestCase
 {
@@ -29,7 +30,8 @@ public class SmtpNonAsciiFunctionalTestCase extends AbstractEmailFunctionalTestC
             {ConfigVariant.FLOW, "smtp-functional-test-flow.xml"}
         });
     }      
-    
+
+    @Ignore("MULE-6926: Flaky test.")
     @Test
     public void testSend() throws Exception
     {
