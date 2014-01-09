@@ -7,31 +7,18 @@
 
 package org.mule.module.ws.functional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.module.ws.consumer.SoapFaultException;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.transport.NullPayload;
-import org.mule.util.ClassUtils;
+import java.io.IOException;
 
-import org.junit.Rule;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
+
+import org.apache.ws.security.WSPasswordCallback;
 import org.junit.Test;
 
 
-public class UsernameTokenSecurityFunctionalTestCase extends FunctionalTestCase
+public class UsernameTokenSecurityFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
 {
-
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port");
-
-    @Rule
-    public SystemProperty baseDir = new SystemProperty("baseDir", ClassUtils.getClassPathRoot(getClass()).getPath());
-
-    private static final String ECHO_REQUEST = "<tns:echo xmlns:tns=\"http://consumer.ws.module.mule.org/\"><text>Hello</text></tns:echo>";
 
     @Override
     protected String getConfigFile()
@@ -40,30 +27,51 @@ public class UsernameTokenSecurityFunctionalTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void requestWithValidCredentialsReturnsExpectedResult() throws Exception
+    public void requestWithValidCredentialsTextReturnsExpectedResult() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://clientWithValidCredentials", ECHO_REQUEST, null);
-        assertTrue(response.getPayloadAsString().contains("<text>Hello</text>"));
+        assertValidResponse("vm://clientWithValidCredentialsText");
+    }
+
+    @Test
+    public void requestWithValidCredentialsDigestReturnsExpectedResult() throws Exception
+    {
+        assertValidResponse("vm://clientWithValidCredentialsDigest");
     }
 
     @Test
     public void requestWithInvalidCredentialsReturnsFault() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://clientWithInvalidCredentials", ECHO_REQUEST, null);
-        assertEquals(NullPayload.getInstance(), response.getPayload());
-        assertTrue(response.getExceptionPayload().getException().getCause() instanceof SoapFaultException);
+        assertSoapFault("vm://clientWithInvalidCredentials", "FailedAuthentication");
     }
 
     @Test
     public void requestWithoutCredentialsReturnsFault() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://clientWithoutCredentials", ECHO_REQUEST, null);
-        assertEquals(NullPayload.getInstance(), response.getPayload());
-        assertTrue(response.getExceptionPayload().getException().getCause() instanceof SoapFaultException);
+        assertSoapFault("vm://clientWithoutCredentials", "InvalidSecurity");
     }
 
 
+    /*
+     * Mock password callback that sets the password for the user "admin".
+     */
+    public static class ServerPasswordCallback implements CallbackHandler
+    {
+
+        public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException
+        {
+            WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
+
+            if (pc.getIdentifier().equals("admin"))
+            {
+                if (pc.getType().contains("PasswordText"))
+                {
+                    pc.setPassword("textPassword");
+                }
+                else if (pc.getType().contains("PasswordDigest"))
+                {
+                    pc.setPassword("digestPassword");
+                }
+            }
+        }
+    }
 }

@@ -7,33 +7,16 @@
 
 package org.mule.module.ws.functional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.module.ws.consumer.SoapFaultException;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.transport.NullPayload;
-import org.mule.util.ClassUtils;
-
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class WSConsumerFunctionalTestCase extends FunctionalTestCase
+public class WSConsumerFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
 {
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port");
-
-    @Rule
-    public SystemProperty baseDir = new SystemProperty("baseDir", ClassUtils.getClassPathRoot(getClass()).getPath());
 
     private final String configFile;
 
@@ -57,27 +40,21 @@ public class WSConsumerFunctionalTestCase extends FunctionalTestCase
     @Test
     public void validRequestReturnsExpectedAnswer() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://in", "<tns:echo xmlns:tns=\"http://consumer.ws.module.mule.org/\"><text>Hello</text></tns:echo>", null);
-        assertTrue(response.getPayloadAsString().contains("<text>Hello</text>"));
+        assertValidResponse("vm://in");
     }
 
     @Test
     public void invalidRequestFormatReturnsSOAPFault() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://in", "<tns:echo xmlns:tns=\"http://consumer.ws.module.mule.org/\"><invalid>Hello</invalid></tns:echo>", null);
-        assertEquals(NullPayload.getInstance(), response.getPayload());
-        assertTrue(response.getExceptionPayload().getException().getCause() instanceof SoapFaultException);
+        String message = "<tns:echo xmlns:tns=\"http://consumer.ws.module.mule.org/\"><invalid>Hello</invalid></tns:echo>";
+        assertSoapFault("vm://in", message, "Client");
     }
 
     @Test
     public void invalidNamespaceReturnsSOAPFault() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://in", "<tns:echo xmlns:tns=\"http://invalid/\"><text>Hello</text></tns:echo>", null);
-        assertEquals(NullPayload.getInstance(), response.getPayload());
-        assertTrue(response.getExceptionPayload().getException().getCause() instanceof SoapFaultException);
+        String message = "<tns:echo xmlns:tns=\"http://invalid/\"><text>Hello</text></tns:echo>";
+        assertSoapFault("vm://in", message, "Client");
     }
 
 }

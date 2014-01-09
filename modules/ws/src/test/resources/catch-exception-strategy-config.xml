@@ -13,7 +13,7 @@
                http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd">
 
     <flow name="server">
-        <inbound-endpoint address="http://localhost:${port1}/services/Echo"/>
+        <inbound-endpoint address="http://localhost:${port}/services/Echo"/>
         <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.Echo"/>
         <component class="org.mule.module.ws.consumer.Echo"/>
     </flow>
@@ -21,7 +21,7 @@
     <flow name="soapFaultWithoutCatchExceptionStrategy">
         <inbound-endpoint address="vm://soapFaultWithoutCatchExceptionStrategy" exchange-pattern="request-response"/>
 
-        <ws:consumer serviceAddress="http://localhost:${port1}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
+        <ws:consumer serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
                      wsdlService="EchoService"
                      wsdlPort="EchoPort" wsdlOperation="fail"/>
     </flow>
@@ -30,7 +30,7 @@
     <flow name="soapFaultWithCatchExceptionStrategy" processingStrategy="synchronous">
         <inbound-endpoint address="vm://soapFaultWithCatchExceptionStrategy" exchange-pattern="request-response"/>
 
-        <ws:consumer serviceAddress="http://localhost:${port1}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
+        <ws:consumer serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
                      wsdlService="EchoService"
                      wsdlPort="EchoPort" wsdlOperation="fail"/>
 

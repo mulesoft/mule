@@ -12,22 +12,11 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.ws.consumer.SoapFaultException;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.util.ClassUtils;
 
-import org.junit.Rule;
 import org.junit.Test;
 
-public class CatchExceptionStrategyFunctionalTestCase extends FunctionalTestCase
+public class CatchExceptionStrategyFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
 {
-
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
-
-    @Rule
-    public SystemProperty baseDir = new SystemProperty("baseDir", ClassUtils.getClassPathRoot(getClass()).getPath());
 
     @Override
     protected String getConfigFile()
@@ -44,6 +33,7 @@ public class CatchExceptionStrategyFunctionalTestCase extends FunctionalTestCase
         assertNotNull(response.getExceptionPayload());
         SoapFaultException soapFault = (SoapFaultException) response.getExceptionPayload().getException().getCause();
         assertEquals("Hello", soapFault.getMessage());
+        assertEquals("Server", soapFault.getFaultCode().getLocalPart());
     }
 
     @Test

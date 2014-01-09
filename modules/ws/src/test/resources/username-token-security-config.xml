@@ -10,15 +10,29 @@
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd">
 
-    <flow name="clientWithValidCredentials">
-        <inbound-endpoint address="vm://clientWithValidCredentials" exchange-pattern="request-response" />
+    <flow name="clientWithValidCredentialsText">
+        <inbound-endpoint address="vm://clientWithValidCredentialsText" exchange-pattern="request-response" />
 
         <ws:consumer serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
                      wsdlService="EchoService"
                      wsdlPort="EchoPort" wsdlOperation="echo">
 
             <ws:security>
-                <ws:wss-username-token username="admin" password="admin" passwordType="TEXT" />
+                <ws:wss-username-token username="admin" password="textPassword" passwordType="TEXT" />
+            </ws:security>
+
+        </ws:consumer>
+    </flow>
+
+    <flow name="clientWithValidCredentialsDigest">
+        <inbound-endpoint address="vm://clientWithValidCredentialsDigest" exchange-pattern="request-response" />
+
+        <ws:consumer serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
+                     wsdlService="EchoService"
+                     wsdlPort="EchoPort" wsdlOperation="echo">
+
+            <ws:security>
+                <ws:wss-username-token username="admin" password="digestPassword" passwordType="DIGEST" />
             </ws:security>
 
         </ws:consumer>
@@ -51,7 +65,7 @@
     <cxf:ws-security name="inboundConfig">
         <cxf:ws-config>
             <cxf:property key="action" value="UsernameToken"/>
-            <cxf:property key="passwordCallbackClass" value="org.mule.module.ws.functional.ServerPasswordCallback"/>
+            <cxf:property key="passwordCallbackClass" value="org.mule.module.ws.functional.UsernameTokenSecurityFunctionalTestCase$ServerPasswordCallback"/>
         </cxf:ws-config>
     </cxf:ws-security>
 

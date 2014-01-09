@@ -11,6 +11,9 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 
+/**
+ * Web service used by WS Consumer tests.
+ */
 @WebService
 public class Echo
 {

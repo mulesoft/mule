@@ -29,7 +29,7 @@ public class WssUsernameTokenSecurityStrategy implements SecurityStrategy
 
     private String username;
     private String password;
-    private String passwordType;
+    private PasswordType passwordType;
 
     @Override
     public void apply(ProxyClientMessageProcessorBuilder builder)
@@ -37,6 +37,16 @@ public class WssUsernameTokenSecurityStrategy implements SecurityStrategy
         Map<String, Object> configProperties = new HashMap<String, Object>();
         configProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
         configProperties.put(WSHandlerConstants.USER, username);
+
+        if (passwordType == PasswordType.TEXT)
+        {
+            configProperties.put(WSHandlerConstants.PASSWORD_TYPE, "PasswordText");
+        }
+        else if (passwordType == PasswordType.DIGEST)
+        {
+            configProperties.put(WSHandlerConstants.PASSWORD_TYPE, "PasswordDigest");
+        }
+
         configProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new CallbackHandler()
         {
             @Override
@@ -78,12 +88,12 @@ public class WssUsernameTokenSecurityStrategy implements SecurityStrategy
         this.password = password;
     }
 
-    public String getPasswordType()
+    public PasswordType getPasswordType()
     {
         return passwordType;
     }
 
-    public void setPasswordType(String passwordType)
+    public void setPasswordType(PasswordType passwordType)
     {
         this.passwordType = passwordType;
     }
