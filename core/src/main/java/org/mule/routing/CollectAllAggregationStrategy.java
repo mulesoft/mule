@@ -21,7 +21,7 @@ import org.mule.api.routing.RouterResultsHandler;
  * 
  * @since 3.5.0
  */
-public class ScatterGatherAggregationStrategy implements AggregationStrategy
+public class CollectAllAggregationStrategy implements AggregationStrategy
 {
 
     private RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();

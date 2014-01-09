@@ -233,7 +233,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
 
             if (this.aggregationStrategy == null)
             {
-                this.aggregationStrategy = new ScatterGatherAggregationStrategy();
+                this.aggregationStrategy = new CollectAllAggregationStrategy();
             }
 
             if (this.timeout <= 0)

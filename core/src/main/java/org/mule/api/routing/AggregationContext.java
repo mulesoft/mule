@@ -59,8 +59,8 @@ public final class AggregationContext
      * 
      * @param originalEvent a {@link MuleEvent}. Can be <code>null</code>
      * @param events a {@link List} of {@link MuleEvent}. Cannot be <code>null</code>
-     *            or empty but could be empty. In that case, is up to each consumer
-     *            to decide wether to fail or not
+     *            but could be empty. In that case, is up to each consumer to decide
+     *            wether to fail or not
      */
     public AggregationContext(MuleEvent originalEvent, List<MuleEvent> events)
     {
