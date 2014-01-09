@@ -18,9 +18,9 @@ import org.mule.component.simple.EchoComponent;
 import org.mule.component.simple.LogComponent;
 import org.mule.component.simple.NullComponent;
 import org.mule.component.simple.PassThroughComponent;
-import org.mule.config.spring.factories.*;
 import org.mule.config.spring.factories.ChoiceRouterFactoryBean;
 import org.mule.config.spring.factories.CompositeMessageSourceFactoryBean;
+import org.mule.config.spring.factories.AggregationStrategyDefinitionParser;
 import org.mule.config.spring.factories.DefaultMemoryQueueStoreFactoryBean;
 import org.mule.config.spring.factories.DefaultPersistentQueueStoreFactoryBean;
 import org.mule.config.spring.factories.FileQueueStoreFactoryBean;
@@ -29,9 +29,11 @@ import org.mule.config.spring.factories.MessageProcessorFilterPairFactoryBean;
 import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.config.spring.factories.PollingMessageSourceFactoryBean;
 import org.mule.config.spring.factories.QueueProfileFactoryBean;
+import org.mule.config.spring.factories.ScatterGatherRouterFactoryBean;
 import org.mule.config.spring.factories.SimpleMemoryQueueStoreFactoryBean;
 import org.mule.config.spring.factories.SubflowMessageProcessorChainFactoryBean;
 import org.mule.config.spring.factories.TransactionalMessageProcessorsFactoryBean;
+import org.mule.config.spring.factories.WatermarkFactoryBean;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
@@ -569,6 +571,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("otherwise", new ChildDefinitionParser("defaultRoute", MessageProcessorFilterPairFactoryBean.class));
 
         registerBeanDefinitionParser("all", new ChildDefinitionParser("messageProcessor", MulticastingRouter.class));
+        registerBeanDefinitionParser("scatter-gather", new ChildDefinitionParser("messageProcessor", ScatterGatherRouterFactoryBean.class));
+        registerBeanDefinitionParser("custom-aggregation-strategy", new AggregationStrategyDefinitionParser());
         registerBeanDefinitionParser("recipient-list", new ChildDefinitionParser("messageProcessor", ExpressionRecipientList.class));
 
         registerBeanDefinitionParser("request-reply", new ChildDefinitionParser("messageProcessor", SimpleAsyncRequestReplyRequester.class));
