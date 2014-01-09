@@ -40,7 +40,7 @@ public abstract class EventProcessingThread extends Thread
      */
     public void stopProcessing()
     {
-        logger.debug("Stopping expiring group monitoring");
+        logger.debug("Stopping " + getName());
         stopRequested = true;
         processNow();
         
@@ -95,7 +95,7 @@ public abstract class EventProcessingThread extends Thread
             }
         }
 
-        logger.debug("Expiring group monitoring fully stopped");
+        logger.debug(getName() + " fully stopped");
     }
 
     /**
