@@ -18,10 +18,13 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
 
+import java.util.Map;
+
 import org.junit.Rule;
 
 public class AbstractWSConsumerFunctionalTestCase extends FunctionalTestCase
 {
+
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port");
 
@@ -33,8 +36,13 @@ public class AbstractWSConsumerFunctionalTestCase extends FunctionalTestCase
 
     protected void assertValidResponse(String address) throws Exception
     {
+        assertValidResponse(address, null);
+    }
+
+    protected void assertValidResponse(String address, Map<String, Object> properties) throws Exception
+    {
         MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send(address, ECHO_REQUEST, null);
+        MuleMessage response = client.send(address, ECHO_REQUEST, properties);
         assertTrue(response.getPayloadAsString().contains("<text>Hello</text>"));
     }
 
@@ -45,10 +53,15 @@ public class AbstractWSConsumerFunctionalTestCase extends FunctionalTestCase
 
     protected void assertSoapFault(String address, String message, String expectedFaultCode) throws Exception
     {
+        assertSoapFault(address, message, null, expectedFaultCode);
+    }
+
+    protected void assertSoapFault(String address, String message, Map<String, Object> properties, String expectedFaultCode) throws Exception
+    {
         MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send(address, message, null);
+        MuleMessage response = client.send(address, message, properties);
         assertEquals(NullPayload.getInstance(), response.getPayload());
-        SoapFaultException exception =  (SoapFaultException) response.getExceptionPayload().getException().getCause();
+        SoapFaultException exception = (SoapFaultException) response.getExceptionPayload().getException().getCause();
         assertEquals(expectedFaultCode, exception.getFaultCode().getLocalPart());
     }
 }
