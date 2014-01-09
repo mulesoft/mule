@@ -4,23 +4,23 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.ws.consumer;
+package org.mule.module.ws.functional;
 
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.module.ws.consumer.SoapFaultException;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.ClassUtils;
 
-import org.apache.cxf.binding.soap.SoapFault;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class CatchExceptionStrategyTestCase extends FunctionalTestCase
+public class CatchExceptionStrategyFunctionalTestCase extends FunctionalTestCase
 {
 
     @Rule
@@ -42,9 +42,8 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
         MuleMessage response = client.send("vm://soapFaultWithoutCatchExceptionStrategy", "<tns:fail xmlns:tns=\"http://consumer.ws.module.mule.org/\"><text>Hello</text></tns:fail>", null);
 
         assertNotNull(response.getExceptionPayload());
-        SoapFault soapFault = (SoapFault) response.getExceptionPayload().getException().getCause();
+        SoapFaultException soapFault = (SoapFaultException) response.getExceptionPayload().getException().getCause();
         assertEquals("Hello", soapFault.getMessage());
-
     }
 
     @Test

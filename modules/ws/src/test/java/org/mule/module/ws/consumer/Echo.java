@@ -23,8 +23,8 @@ public class Echo
 
     @WebResult(name = "text")
     @WebMethod(action = "echo")
-    public String fail(@WebParam(name = "text") String s) throws IllegalArgumentException
+    public String fail(@WebParam(name = "text") String s) throws EchoException
     {
-        throw new IllegalArgumentException(s);
+        throw new EchoException(s);
     }
 }

@@ -18,16 +18,21 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transport.Connector;
+import org.mule.api.transport.DispatchException;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.endpoint.MuleEndpointURI;
+import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.builder.ProxyClientMessageProcessorBuilder;
 import org.mule.module.ws.security.SecurityStrategy;
 import org.mule.module.ws.security.WSSecurity;
+import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.ResponseMessageProcessorAdapter;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.transformer.simple.AutoTransformer;
 
 import java.util.List;
 
+import javax.wsdl.Binding;
 import javax.wsdl.BindingOperation;
 import javax.wsdl.Definition;
 import javax.wsdl.Port;
@@ -38,6 +43,7 @@ import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
 
 public class WSConsumer implements MessageProcessor, Initialisable
@@ -73,12 +79,46 @@ public class WSConsumer implements MessageProcessor, Initialisable
         MessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder();
         AutoTransformer auto = new AutoTransformer();
         auto.setReturnDataType(DataType.STRING_DATA_TYPE);
+
+        chainBuilder.chain(new AbstractInterceptingMessageProcessor()
+        {
+
+            @Override
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                try
+                {
+                    return processNext(event);
+                }
+                catch (DispatchException e)
+                {
+                    /* When a Soap Fault is returned in the response, CXF raises a SoapFault exception.
+                     * We need to wrap the information of this exception into a new exception of the WS consumer module */
+
+                    if (e.getCause() instanceof SoapFault)
+                    {
+                        SoapFault soapFault = (SoapFault) e.getCause();
+                        throw new SoapFaultException(soapFault.getFaultCode(), soapFault.getSubCode(), soapFault.getMessage(), soapFault.getDetail());
+                    }
+                    else
+                    {
+                        throw e;
+                    }
+                }
+            }
+        });
+
         chainBuilder.chain(new ResponseMessageProcessorAdapter(auto));
-        chainBuilder.chain(cxfBuilder.build(), createEndpoint(serviceAddress, connector, muleContext));
+
+        CxfOutboundMessageProcessor cxfOutboundMessageProcessor = cxfBuilder.build();
+
+        // We need this interceptor so that an exception is thrown when the response contains a SOAPFault.
+        cxfOutboundMessageProcessor.getClient().getInInterceptors().add(new CheckFaultInterceptor());
+
+        chainBuilder.chain(cxfOutboundMessageProcessor);
+        chainBuilder.chain(createEndpoint(serviceAddress, connector, muleContext));
         mp = chainBuilder.build();
 
-        // TODO: MULE-7222 The ProxyClientMessageProcessorBuilder removes this interceptor, we need it to throw an exception when a SOAPFault is returned.
-        cxfBuilder.getClient().getEndpoint().getBinding().getInInterceptors().add(new CheckFaultInterceptor());
     }
 
     @Override
@@ -89,7 +129,31 @@ public class WSConsumer implements MessageProcessor, Initialisable
             WSDLReader wsdlReader = WSDLFactory.newInstance().newWSDLReader();
             Definition wsdlDefinition = wsdlReader.readWSDL(wsdlLocation);
 
-            this.soapAction = getSoapAction(wsdlDefinition);
+            Service service = wsdlDefinition.getService(new QName(wsdlDefinition.getTargetNamespace(), wsdlService));
+            if (service == null)
+            {
+                throw new InitialisationException(MessageFactory.createStaticMessage(String.format("Service %s not found in WSDL", wsdlService)), this);
+            }
+
+            Port port = service.getPort(wsdlPort);
+            if (port == null)
+            {
+                throw new InitialisationException(MessageFactory.createStaticMessage(String.format("Port %s not found in WSDL", wsdlPort)), this);
+            }
+
+            Binding binding = port.getBinding();
+            if (binding == null)
+            {
+                throw new InitialisationException(MessageFactory.createStaticMessage(String.format("Port %s has no binding", wsdlPort)), this);
+            }
+
+            BindingOperation operation = port.getBinding().getBindingOperation(wsdlOperation, null, null);
+            if (operation == null)
+            {
+                throw new InitialisationException(MessageFactory.createStaticMessage(String.format("Operation %s not found in WSDL", wsdlOperation)), this);
+            }
+
+            this.soapAction = getSoapAction(operation);
         }
         catch (WSDLException e)
         {
@@ -123,12 +187,11 @@ public class WSConsumer implements MessageProcessor, Initialisable
         return muleContext.getEndpointFactory().getOutboundEndpoint(builder);
     }
 
-    private String getSoapAction(Definition wsdlDefinition)
+    /**
+     * Returns the Soap Action for a binding operation of a WSDL, or null if there is no action defined.
+     */
+    private String getSoapAction(BindingOperation bindingOperation)
     {
-        Service service = wsdlDefinition.getService(new QName(wsdlDefinition.getTargetNamespace(), wsdlService));
-        Port port = service.getPort(wsdlPort);
-        BindingOperation bindingOperation = port.getBinding().getBindingOperation(wsdlOperation, null, null);
-
         List extensions = bindingOperation.getExtensibilityElements();
         for (Object extension : extensions)
         {

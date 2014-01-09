@@ -18,15 +18,15 @@ import org.springframework.beans.factory.FactoryBean;
 public class WSConsumerFactoryBean implements FactoryBean<WSConsumer>, MuleContextAware
 {
 
-    protected String wsdlLocation;
-    protected String wsdlService;
-    protected String wsdlPort;
-    protected String wsdlOperation;
-    protected String serviceAddress;
-    protected Connector connector;
-    protected WSSecurity security;
+    private String wsdlLocation;
+    private String wsdlService;
+    private String wsdlPort;
+    private String wsdlOperation;
+    private String serviceAddress;
+    private Connector connector;
+    private WSSecurity security;
 
-    protected MuleContext muleContext;
+    private MuleContext muleContext;
 
     @Override
     public WSConsumer getObject() throws Exception

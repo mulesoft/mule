@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.module.ws.consumer.SoapFaultException;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -20,7 +21,6 @@ import org.mule.util.ClassUtils;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.cxf.interceptor.Fault;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -68,7 +68,7 @@ public class WSConsumerFunctionalTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in", "<tns:echo xmlns:tns=\"http://consumer.ws.module.mule.org/\"><invalid>Hello</invalid></tns:echo>", null);
         assertEquals(NullPayload.getInstance(), response.getPayload());
-        assertTrue(response.getExceptionPayload().getException().getCause() instanceof Fault);
+        assertTrue(response.getExceptionPayload().getException().getCause() instanceof SoapFaultException);
     }
 
     @Test
@@ -77,7 +77,7 @@ public class WSConsumerFunctionalTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in", "<tns:echo xmlns:tns=\"http://invalid/\"><text>Hello</text></tns:echo>", null);
         assertEquals(NullPayload.getInstance(), response.getPayload());
-        assertTrue(response.getExceptionPayload().getException().getCause() instanceof Fault);
+        assertTrue(response.getExceptionPayload().getException().getCause() instanceof SoapFaultException);
     }
 
 }
