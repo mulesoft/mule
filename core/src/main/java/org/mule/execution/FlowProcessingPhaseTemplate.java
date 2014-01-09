@@ -53,6 +53,7 @@ public interface FlowProcessingPhaseTemplate extends MessageProcessTemplate
 
     /**
      * Call after successfully processing the message through the flow
+     * This method will always be called when the flow execution was successful.
      *
      * @param muleEvent
      */
@@ -60,7 +61,8 @@ public interface FlowProcessingPhaseTemplate extends MessageProcessTemplate
 
 
     /**
-     * Call when the processing of the message through the flow fails during message processing
+     * Call when the processing of the message through the flow fails.
+     * This method will always be called when the flow execution failed.
      *
      * @param messagingException
      */
