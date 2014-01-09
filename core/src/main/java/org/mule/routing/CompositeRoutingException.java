@@ -28,7 +28,7 @@ public class CompositeRoutingException extends MessagingException
 
     private static final long serialVersionUID = -4421728527040579607L;
 
-    private final Map<Integer, Exception> exceptions;
+    private final Map<Integer, Throwable> exceptions;
 
     /**
      * Constructs a new {@link CompositeRoutingException}
@@ -37,15 +37,15 @@ public class CompositeRoutingException extends MessagingException
      * @param event the current {@link MuleEvent}
      * @param exceptions a {@link Map} in which the key is an {@link Integer}
      *            describing the index of the route that generated the error and the
-     *            value is the {@link Exception} itself
+     *            value is the {@link Throwable} itself
      */
-    public CompositeRoutingException(Message message, MuleEvent event, Map<Integer, Exception> exceptions)
+    public CompositeRoutingException(Message message, MuleEvent event, Map<Integer, Throwable> exceptions)
     {
         super(message, event);
         this.exceptions = Collections.unmodifiableMap(exceptions);
     }
-    
-    public CompositeRoutingException(MuleEvent event, Map<Integer, Exception> exceptions)
+
+    public CompositeRoutingException(MuleEvent event, Map<Integer, Throwable> exceptions)
     {
         this(buildExceptionMessage(exceptions), event, exceptions);
     }
@@ -57,7 +57,7 @@ public class CompositeRoutingException extends MessagingException
      * @return an {@link Exception} or <code>null</code> if no {@link Exception} was
      *         found for that index
      */
-    public Exception getExceptionForRouteIndex(Integer index)
+    public Throwable getExceptionForRouteIndex(Integer index)
     {
         return this.exceptions.get(index);
     }
@@ -67,12 +67,12 @@ public class CompositeRoutingException extends MessagingException
      *         number of the route that generated the error and the value is the
      *         {@link Exception} itself
      */
-    public Map<Integer, Exception> getExceptions()
+    public Map<Integer, Throwable> getExceptions()
     {
         return this.exceptions;
     }
-    
-    private static Message buildExceptionMessage(Map<Integer, Exception> exceptions)
+
+    private static Message buildExceptionMessage(Map<Integer, Throwable> exceptions)
     {
         StringBuilder builder = new StringBuilder();
         for (Integer route : exceptions.keySet())

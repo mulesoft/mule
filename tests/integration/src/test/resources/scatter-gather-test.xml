@@ -89,8 +89,9 @@
         
         <catch-exception-strategy>
         	<test:assert expression="#[exception is org.mule.routing.CompositeRoutingException]" />
+        	<test:assert expression="#[exception.getExceptionForRouteIndex(0) == null]" />
+        	<test:assert expression="#[exception.getExceptionForRouteIndex(1) != null]" />
         	<test:assert expression="#[exception.getExceptionForRouteIndex(2) != null]" />
-        	<test:assert expression="#[exception.getExceptionForRouteIndex(3) != null]" />
         </catch-exception-strategy>
     </flow>
     

@@ -14,7 +14,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.lifecycle.InitialisationException;
@@ -24,7 +23,6 @@ import org.mule.api.routing.AggregationContext;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.ResponseTimeoutException;
 import org.mule.api.routing.RoutePathNotFoundException;
-import org.mule.api.routing.RouterResultsHandler;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
@@ -32,16 +30,13 @@ import org.mule.message.DefaultExceptionPayload;
 import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.outbound.MulticastingRouter;
+import org.mule.util.Preconditions;
 import org.mule.util.concurrent.ThreadNameHelper;
 import org.mule.work.ProcessingMuleEventWork;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.resource.spi.work.WorkException;
 
@@ -84,8 +79,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @since 3.5.0
  */
-public class ScatterGatherRouter extends AbstractMessageProcessorOwner
-    implements MessageRouter, AggregationStrategy
+public class ScatterGatherRouter extends AbstractMessageProcessorOwner implements MessageRouter
 {
 
     private static final Logger logger = LoggerFactory.getLogger(ScatterGatherRouter.class);
@@ -99,12 +93,12 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner
     /**
      * The routes that the message will be sent to
      */
-    private List<MessageProcessor> routes = new CopyOnWriteArrayList<MessageProcessor>();
+    private List<MessageProcessor> routes = new ArrayList<MessageProcessor>();
 
     /**
      * Wheter or not {@link #initialise()} was already successfully executed
      */
-    private AtomicBoolean initialised = new AtomicBoolean(false);
+    private boolean initialised = false;
 
     /**
      * chains built around the routes
@@ -126,12 +120,6 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner
      */
     private WorkManager workManager;
 
-    /**
-     * handler used to merge the events when using the default
-     * {@link #aggregationStrategy}
-     */
-    private RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
-
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
@@ -147,22 +135,24 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner
         return this.processResponses(event, works);
     }
 
-    @SuppressWarnings("unchecked")
     private MuleEvent processResponses(MuleEvent event, List<ProcessingMuleEventWork> works)
         throws MuleException
     {
         List<MuleEvent> responses = new ArrayList<MuleEvent>(works.size());
-        int routeIndex = 0;
 
-        for (ProcessingMuleEventWork work : works)
+        long remainingTimeout = this.timeout;
+        for (int routeIndex = 0; routeIndex < works.size(); routeIndex++)
         {
             MuleEvent response = null;
             Exception exception = null;
-            MessageProcessor route = this.routes.get(routeIndex++);
 
+            ProcessingMuleEventWork work = works.get(routeIndex);
+            MessageProcessor route = this.routes.get(routeIndex);
+
+            long startedAt = System.currentTimeMillis();
             try
             {
-                response = work.getResult(this.timeout, TimeUnit.MILLISECONDS);
+                response = work.getResult(remainingTimeout, TimeUnit.MILLISECONDS);
             }
             catch (ResponseTimeoutException e)
             {
@@ -170,13 +160,16 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner
             }
             catch (InterruptedException e)
             {
-                exception = e;
+                throw new DefaultMuleException(MessageFactory.createStaticMessage(String.format(
+                    "Was interrupted while waiting for route %d", routeIndex)), e);
             }
             catch (Exception e)
             {
                 exception = new DispatchException(MessageFactory.createStaticMessage(String.format(
                     "route number %d failed to be executed", routeIndex)), event, route, exception);
             }
+
+            remainingTimeout -= System.currentTimeMillis() - startedAt;
 
             if (exception != null)
             {
@@ -187,10 +180,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner
                             event.getId()), exception);
                 }
                 response = DefaultMuleEvent.copy(event);
-                ExceptionPayload ep = new DefaultExceptionPayload(exception);
-
-                ep.getInfo().put(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, routeIndex);
-                response.getMessage().setExceptionPayload(ep);
+                response.getMessage().setExceptionPayload(new DefaultExceptionPayload(exception));
             }
             else
             {
@@ -205,37 +195,6 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner
         }
 
         return this.aggregationStrategy.aggregate(new AggregationContext(event, responses));
-    }
-
-    /**
-     * If no routes generated exeption then it returns a new {@link MuleEvent} under
-     * the rules of {@link DefaultRouterResultsHandler}. If one or more routes
-     * generated exceptions a {@link CompositeRoutingException} is thrown
-     */
-    @Override
-    public MuleEvent aggregate(AggregationContext context) throws MuleException
-    {
-        List<MuleEvent> failedEvents = context.selectEventsWithExceptions();
-        if (CollectionUtils.isEmpty(failedEvents))
-        {
-            return this.resultsHandler.aggregateResults(context.getEvents(), context.getOriginalEvent(),
-                this.muleContext);
-        }
-        else
-        {
-            Map<Integer, Exception> exceptions = new LinkedHashMap<Integer, Exception>(failedEvents.size());
-            for (MuleEvent event : failedEvents)
-            {
-                ExceptionPayload ep = event.getMessage().getExceptionPayload();
-                Integer routeIndex = (Integer) ep.getInfo().get(
-                    MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY);
-                Throwable t = ep.getException();
-                Exception e = t instanceof Exception ? (Exception) t : new DefaultMuleException(t);
-                exceptions.put(routeIndex, e);
-            }
-
-            throw new CompositeRoutingException(context.getOriginalEvent(), exceptions);
-        }
     }
 
     private List<ProcessingMuleEventWork> executeWork(MuleEvent event) throws MuleException
@@ -274,7 +233,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner
 
             if (this.aggregationStrategy == null)
             {
-                this.aggregationStrategy = this;
+                this.aggregationStrategy = new ScatterGatherAggregationStrategy();
             }
 
             if (this.timeout <= 0)
@@ -292,7 +251,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner
         }
 
         super.initialise();
-        this.initialised.compareAndSet(false, true);
+        this.initialised = true;
     }
 
     @Override
@@ -357,11 +316,8 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner
 
     private void checkNotInitialised()
     {
-        if (this.initialised.get())
-        {
-            throw new IllegalStateException(
-                "<scatter-gather> router is not dynamic. Cannot modify routes after initialisation");
-        }
+        Preconditions.checkState(this.initialised == false,
+            "<scatter-gather> router is not dynamic. Cannot modify routes after initialisation");
     }
 
     @Override

@@ -67,9 +67,9 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
             assertNotNull(ep);
             assertSame(e, ep.getException());
 
-            Map<Integer, Exception> exceptions = e.getExceptions();
+            Map<Integer, Throwable> exceptions = e.getExceptions();
             assertEquals(1, exceptions.size());
-            assertTrue(exceptions.get(3) instanceof ResponseTimeoutException);
+            assertTrue(exceptions.get(2) instanceof ResponseTimeoutException);
         }
     }
 
@@ -88,9 +88,9 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
             assertNotNull(ep);
             assertSame(e, ep.getException());
 
-            Map<Integer, Exception> exceptions = e.getExceptions();
+            Map<Integer, Throwable> exceptions = e.getExceptions();
             assertEquals(1, exceptions.size());
-            assertTrue(exceptions.get(2) instanceof DispatchException);
+            assertTrue(exceptions.get(1) instanceof DispatchException);
         }
     }
 
