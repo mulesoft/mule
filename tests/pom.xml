@@ -13,6 +13,7 @@
 
     <modules>
         <module>functional</module>
+        <module>infrastructure</module>
         <module>integration</module>
         <module>integration-axis</module>
     </modules>
