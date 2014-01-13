@@ -5,12 +5,10 @@
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:ws="http://www.mulesoft.org/schema/mule/ws"
       xmlns:https="http://www.mulesoft.org/schema/mule/https"
-      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
                http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd
-               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd">
 
@@ -22,19 +20,17 @@
 
 
     <flow name="client">
-        <inbound-endpoint address="vm://in" exchange-pattern="request-response" />
+        <inbound-endpoint address="vm://in" exchange-pattern="request-response"/>
 
         <ws:consumer serviceAddress="https://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
-                     wsdlService="EchoService"
-                     wsdlPort="EchoPort" wsdlOperation="echo" />
+                     wsdlService="EchoService" wsdlPort="EchoPort" wsdlOperation="echo"/>
     </flow>
 
     <flow name="server">
-        <inbound-endpoint address="https://localhost:${port}/services/Echo"
-                          exchange-pattern="request-response">
+        <inbound-endpoint address="https://localhost:${port}/services/Echo" exchange-pattern="request-response">
             <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.Echo"/>
         </inbound-endpoint>
-        <component class="org.mule.module.ws.consumer.Echo" />
+        <component class="org.mule.module.ws.consumer.Echo"/>
     </flow>
 
 </mule>

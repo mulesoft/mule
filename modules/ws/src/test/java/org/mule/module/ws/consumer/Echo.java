@@ -25,9 +25,10 @@ public class Echo
     }
 
     @WebResult(name = "text")
-    @WebMethod(action = "echo")
+    @WebMethod(action = "fail")
     public String fail(@WebParam(name = "text") String s) throws EchoException
     {
         throw new EchoException(s);
     }
+
 }

@@ -129,14 +129,26 @@ public abstract class MessageFactory
 
     /**
      * Factory method to create a {@link Message} instance that is not read from a resource bundle.
-     * 
+     *
      * @param message Message's message text
      * @return a Messsage instance that has an error code of -1 and no arguments.
      */
     public static Message createStaticMessage(String message)
     {
         return new Message(message, STATIC_ERROR_CODE, EMPTY_ARGS);
-    }    
+    }
+
+    /**
+     * Factory method to create a {@link Message} instance that is not read from a resource bundle.
+     *
+     * @param message Static message text that may contain format specifiers
+     * @param arguments Arguments referenced by the format specifiers in the message string.
+     * @return a Messsage instance that has an error code of -1 and no arguments.
+     */
+    public static Message createStaticMessage(String message, Object... arguments)
+    {
+        return new Message(String.format(message, arguments), STATIC_ERROR_CODE, EMPTY_ARGS);
+    }
 
     /**
      * Factory method to read the message with code <code>code</code> from the resource bundle.

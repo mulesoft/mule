@@ -9,14 +9,26 @@ package org.mule.module.ws.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
+import org.mule.construct.Flow;
 import org.mule.module.ws.consumer.SoapFaultException;
+import org.mule.tck.listener.ExceptionListener;
 
 import org.junit.Test;
 
 public class CatchExceptionStrategyFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
 {
+
+    private static final String FAIL_REQUEST = "<tns:fail xmlns:tns=\"http://consumer.ws.module.mule.org/\">" +
+                                               "<text>Hello</text></tns:fail>";
+
+    private static final String EXPECTED_SOAP_FAULT_DETAIL = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><detail>" +
+                                                             "<ns2:EchoException xmlns:ns2=\"http://consumer.ws.module.mule.org/\">" +
+                                                             "<text>Hello</text></ns2:EchoException></detail>";
 
     @Override
     protected String getConfigFile()
@@ -27,21 +39,44 @@ public class CatchExceptionStrategyFunctionalTestCase extends AbstractWSConsumer
     @Test
     public void soapFaultThrowsException() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://soapFaultWithoutCatchExceptionStrategy", "<tns:fail xmlns:tns=\"http://consumer.ws.module.mule.org/\"><text>Hello</text></tns:fail>", null);
+        Flow flow = (Flow) getFlowConstruct("soapFaultWithoutCatchExceptionStrategy");
 
-        assertNotNull(response.getExceptionPayload());
-        SoapFaultException soapFault = (SoapFaultException) response.getExceptionPayload().getException().getCause();
-        assertEquals("Hello", soapFault.getMessage());
-        assertEquals("Server", soapFault.getFaultCode().getLocalPart());
+        try
+        {
+            flow.process(getTestEvent(FAIL_REQUEST));
+            fail();
+        }
+        catch (MessagingException e)
+        {
+            MuleMessage response = e.getEvent().getMessage();
+
+            assertNotNull(response.getExceptionPayload());
+
+            SoapFaultException soapFault = (SoapFaultException) response.getExceptionPayload().getException();
+            assertTrue(soapFault.getMessage().startsWith("Hello"));
+            assertEquals("Server", soapFault.getFaultCode().getLocalPart());
+        }
+
     }
 
     @Test
     public void catchExceptionStrategyHandlesSoapFault() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://soapFaultWithCatchExceptionStrategy", "<tns:fail xmlns:tns=\"http://consumer.ws.module.mule.org/\"><text>Hello</text></tns:fail>", null);
-        assertEquals("EXCEPTION", response.getPayloadAsString());
+        Flow flow = (Flow) getFlowConstruct("soapFaultWithCatchExceptionStrategy");
+
+        ExceptionListener listener = new ExceptionListener(muleContext);
+        MuleMessage response = flow.process(getTestEvent(FAIL_REQUEST)).getMessage();
+
+        // Assert that the exception was thrown
+        listener.waitUntilAllNotificationsAreReceived();
+
+        assertEquals(EXPECTED_SOAP_FAULT_DETAIL, response.getPayload());
+
+        assertNull(response.getExceptionPayload());
+
+        SoapFaultException soapFault = response.getOutboundProperty("soapFaultException");
+        assertTrue(soapFault.getMessage().startsWith("Hello"));
+        assertEquals("Server", soapFault.getFaultCode().getLocalPart());
     }
 
 }

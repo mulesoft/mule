@@ -49,7 +49,11 @@ import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
 public class WSConsumer implements MessageProcessor, Initialisable
 {
 
-    private final MessageProcessor mp;
+    private static final String SOAP_ACTION_PROPERTY = "SOAPAction";
+
+    private final MessageProcessor messageProcessor;
+    private final MuleContext muleContext;
+
     private final String wsdlLocation;
     private final String wsdlService;
     private final String wsdlPort;
@@ -64,21 +68,14 @@ public class WSConsumer implements MessageProcessor, Initialisable
         this.wsdlService = wsdlService;
         this.wsdlPort = wsdlPort;
         this.wsdlOperation = wsdlOperation;
-
-        ProxyClientMessageProcessorBuilder cxfBuilder = new ProxyClientMessageProcessorBuilder();
-        cxfBuilder.setMuleContext(muleContext);
-
-        if (security != null)
-        {
-            for (SecurityStrategy strategy : security.getStrategies())
-            {
-                strategy.apply(cxfBuilder);
-            }
-        }
+        this.muleContext = muleContext;
 
         MessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder();
-        AutoTransformer auto = new AutoTransformer();
-        auto.setReturnDataType(DataType.STRING_DATA_TYPE);
+
+        final AutoTransformer autoTransformer = new AutoTransformer();
+        autoTransformer.setReturnDataType(DataType.STRING_DATA_TYPE);
+
+        chainBuilder.chain(new ResponseMessageProcessorAdapter(autoTransformer));
 
         chainBuilder.chain(new AbstractInterceptingMessageProcessor()
         {
@@ -98,7 +95,14 @@ public class WSConsumer implements MessageProcessor, Initialisable
                     if (e.getCause() instanceof SoapFault)
                     {
                         SoapFault soapFault = (SoapFault) e.getCause();
-                        throw new SoapFaultException(soapFault.getFaultCode(), soapFault.getSubCode(), soapFault.getMessage(), soapFault.getDetail());
+
+                        event.getMessage().setPayload(soapFault.getDetail());
+
+                        // Manually call the AutoTransformer to convert the payload to String.
+                        autoTransformer.process(event);
+
+                        throw new SoapFaultException(event, soapFault.getFaultCode(), soapFault.getSubCode(),
+                                                     soapFault.getMessage(), soapFault.getDetail());
                     }
                     else
                     {
@@ -108,17 +112,10 @@ public class WSConsumer implements MessageProcessor, Initialisable
             }
         });
 
-        chainBuilder.chain(new ResponseMessageProcessorAdapter(auto));
+        chainBuilder.chain(createCxfOutboundMessageProcessor(security));
+        chainBuilder.chain(createEndpoint(serviceAddress, connector));
 
-        CxfOutboundMessageProcessor cxfOutboundMessageProcessor = cxfBuilder.build();
-
-        // We need this interceptor so that an exception is thrown when the response contains a SOAPFault.
-        cxfOutboundMessageProcessor.getClient().getInInterceptors().add(new CheckFaultInterceptor());
-
-        chainBuilder.chain(cxfOutboundMessageProcessor);
-        chainBuilder.chain(createEndpoint(serviceAddress, connector, muleContext));
-        mp = chainBuilder.build();
-
+        messageProcessor = chainBuilder.build();
     }
 
     @Override
@@ -132,25 +129,25 @@ public class WSConsumer implements MessageProcessor, Initialisable
             Service service = wsdlDefinition.getService(new QName(wsdlDefinition.getTargetNamespace(), wsdlService));
             if (service == null)
             {
-                throw new InitialisationException(MessageFactory.createStaticMessage(String.format("Service %s not found in WSDL", wsdlService)), this);
+                throw new InitialisationException(MessageFactory.createStaticMessage("Service %s not found in WSDL", wsdlService), this);
             }
 
             Port port = service.getPort(wsdlPort);
             if (port == null)
             {
-                throw new InitialisationException(MessageFactory.createStaticMessage(String.format("Port %s not found in WSDL", wsdlPort)), this);
+                throw new InitialisationException(MessageFactory.createStaticMessage("Port %s not found in WSDL", wsdlPort), this);
             }
 
             Binding binding = port.getBinding();
             if (binding == null)
             {
-                throw new InitialisationException(MessageFactory.createStaticMessage(String.format("Port %s has no binding", wsdlPort)), this);
+                throw new InitialisationException(MessageFactory.createStaticMessage("Port %s has no binding", wsdlPort), this);
             }
 
-            BindingOperation operation = port.getBinding().getBindingOperation(wsdlOperation, null, null);
+            BindingOperation operation = binding.getBindingOperation(wsdlOperation, null, null);
             if (operation == null)
             {
-                throw new InitialisationException(MessageFactory.createStaticMessage(String.format("Operation %s not found in WSDL", wsdlOperation)), this);
+                throw new InitialisationException(MessageFactory.createStaticMessage("Operation %s not found in WSDL", wsdlOperation), this);
             }
 
             this.soapAction = getSoapAction(operation);
@@ -166,20 +163,42 @@ public class WSConsumer implements MessageProcessor, Initialisable
     {
         if (soapAction != null)
         {
-            event.getMessage().setOutboundProperty("SOAPAction", soapAction);
+            event.getMessage().setOutboundProperty(SOAP_ACTION_PROPERTY, soapAction);
         }
-        return mp.process(event);
+        return messageProcessor.process(event);
     }
 
-    protected OutboundEndpoint createEndpoint(String address, Connector connector, MuleContext muleContext)
-            throws MuleException
+
+    private CxfOutboundMessageProcessor createCxfOutboundMessageProcessor(WSSecurity security) throws MuleException
+    {
+        ProxyClientMessageProcessorBuilder cxfBuilder = new ProxyClientMessageProcessorBuilder();
+        cxfBuilder.setMuleContext(muleContext);
+
+        if (security != null)
+        {
+            for (SecurityStrategy strategy : security.getStrategies())
+            {
+                strategy.apply(cxfBuilder);
+            }
+        }
+
+        CxfOutboundMessageProcessor cxfOutboundMessageProcessor = cxfBuilder.build();
+
+        // We need this interceptor so that an exception is thrown when the response contains a SOAPFault.
+        cxfOutboundMessageProcessor.getClient().getInInterceptors().add(new CheckFaultInterceptor());
+
+        return cxfOutboundMessageProcessor;
+    }
+
+
+    private OutboundEndpoint createEndpoint(String address, Connector connector) throws MuleException
     {
         if (connector != null)
         {
             String protocol = new MuleEndpointURI(address, muleContext).getScheme();
             if (!connector.supportsProtocol(protocol))
             {
-                throw new RuntimeException("Connector " + connector + " does not support protocol: " + protocol);
+                throw new IllegalStateException(String.format("Connector %s does not support protocol: %s", connector, protocol));
             }
         }
         EndpointBuilder builder = muleContext.getEndpointFactory().getEndpointBuilder(address);

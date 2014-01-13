@@ -10,6 +10,7 @@ package org.mule.module.ws.consumer;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.transport.http.HttpConnector;
 import org.mule.util.ClassUtils;
 
 import org.junit.Test;
@@ -56,6 +57,13 @@ public class WSConsumerTestCase extends AbstractMuleContextTestCase
     {
         WSConsumer wsConsumer = new WSConsumer(wsdlLocation, wsdlService, wsdlPort, "invalidOperation", serviceAddress, null, null, muleContext);
         wsConsumer.initialise();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void failsToInitializeWhenConnectorDoesNotSupportProtocol() throws MuleException
+    {
+        HttpConnector httpConnector = new HttpConnector(muleContext);
+        new WSConsumer(wsdlLocation, wsdlService, wsdlPort, wsdlOperation, "jms://test", httpConnector, null, muleContext);
     }
 
 }

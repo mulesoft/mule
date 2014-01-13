@@ -34,7 +34,9 @@ public class WSConsumerFunctionalTestCase extends AbstractWSConsumerFunctionalTe
     @Parameterized.Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[] {"ws-consumer-http-config.xml"}, new Object[] {"ws-consumer-https-config.xml"}, new Object[] {"ws-consumer-jms-config.xml"});
+        return Arrays.asList(new Object[] {"ws-consumer-http-config.xml"},
+                             new Object[] {"ws-consumer-https-config.xml"},
+                             new Object[] {"ws-consumer-jms-config.xml"});
     }
 
     @Test

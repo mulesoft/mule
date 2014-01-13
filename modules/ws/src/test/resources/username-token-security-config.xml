@@ -11,49 +11,49 @@
                http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd">
 
     <flow name="clientWithValidCredentialsText">
-        <inbound-endpoint address="vm://clientWithValidCredentialsText" exchange-pattern="request-response" />
+        <inbound-endpoint address="vm://clientWithValidCredentialsText" exchange-pattern="request-response"/>
 
         <ws:consumer serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
                      wsdlService="EchoService"
                      wsdlPort="EchoPort" wsdlOperation="echo">
 
             <ws:security>
-                <ws:wss-username-token username="admin" password="textPassword" passwordType="TEXT" />
+                <ws:wss-username-token username="admin" password="${textPasswordPlaceholder}" passwordType="TEXT"/>
             </ws:security>
 
         </ws:consumer>
     </flow>
 
     <flow name="clientWithValidCredentialsDigest">
-        <inbound-endpoint address="vm://clientWithValidCredentialsDigest" exchange-pattern="request-response" />
+        <inbound-endpoint address="vm://clientWithValidCredentialsDigest" exchange-pattern="request-response"/>
 
         <ws:consumer serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
                      wsdlService="EchoService"
                      wsdlPort="EchoPort" wsdlOperation="echo">
 
             <ws:security>
-                <ws:wss-username-token username="admin" password="digestPassword" passwordType="DIGEST" />
+                <ws:wss-username-token username="admin" password="${digestPasswordPlaceholder}" passwordType="DIGEST"/>
             </ws:security>
 
         </ws:consumer>
     </flow>
 
     <flow name="clientWithInvalidCredentials">
-        <inbound-endpoint address="vm://clientWithInvalidCredentials" exchange-pattern="request-response" />
+        <inbound-endpoint address="vm://clientWithInvalidCredentials" exchange-pattern="request-response"/>
 
         <ws:consumer serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
                      wsdlService="EchoService"
                      wsdlPort="EchoPort" wsdlOperation="echo">
 
             <ws:security>
-                <ws:wss-username-token username="admin" password="invalid" passwordType="TEXT" />
+                <ws:wss-username-token username="admin" password="invalid" passwordType="TEXT"/>
             </ws:security>
 
         </ws:consumer>
     </flow>
 
     <flow name="clientWithoutCredentials">
-        <inbound-endpoint address="vm://clientWithoutCredentials" exchange-pattern="request-response" />
+        <inbound-endpoint address="vm://clientWithoutCredentials" exchange-pattern="request-response"/>
 
         <ws:consumer serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
                      wsdlService="EchoService"
@@ -65,7 +65,8 @@
     <cxf:ws-security name="inboundConfig">
         <cxf:ws-config>
             <cxf:property key="action" value="UsernameToken"/>
-            <cxf:property key="passwordCallbackClass" value="org.mule.module.ws.functional.UsernameTokenSecurityFunctionalTestCase$ServerPasswordCallback"/>
+            <cxf:property key="passwordCallbackClass"
+                          value="org.mule.module.ws.functional.UsernameTokenSecurityFunctionalTestCase$ServerPasswordCallback"/>
         </cxf:ws-config>
     </cxf:ws-security>
 
@@ -77,8 +78,7 @@
                 <cxf:ws-security ref="inboundConfig"/>
             </cxf:jaxws-service>
         </inbound-endpoint>
-        <component class="org.mule.module.ws.consumer.Echo" />
+        <component class="org.mule.module.ws.consumer.Echo"/>
     </flow>
-
 
 </mule>

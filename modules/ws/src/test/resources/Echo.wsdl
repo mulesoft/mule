@@ -71,7 +71,7 @@
     <wsdl:binding name="EchoServiceSoapBinding" type="tns:Echo">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="fail">
-            <soap:operation soapAction="echo" style="document"/>
+            <soap:operation soapAction="fail" style="document"/>
             <wsdl:input name="fail">
                 <soap:body use="literal"/>
             </wsdl:input>

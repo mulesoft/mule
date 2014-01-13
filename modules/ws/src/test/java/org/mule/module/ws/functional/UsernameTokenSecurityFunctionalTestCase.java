@@ -7,6 +7,8 @@
 
 package org.mule.module.ws.functional;
 
+import org.mule.tck.junit4.rule.SystemProperty;
+
 import java.io.IOException;
 
 import javax.security.auth.callback.Callback;
@@ -14,11 +16,18 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.ws.security.WSPasswordCallback;
+import org.junit.Rule;
 import org.junit.Test;
 
 
 public class UsernameTokenSecurityFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
 {
+
+    @Rule
+    public SystemProperty textPassword = new SystemProperty("textPasswordPlaceholder", "textPassword");
+
+    @Rule
+    public SystemProperty digestPassword = new SystemProperty("digestPasswordPlaceholder", "digestPassword");
 
     @Override
     protected String getConfigFile()

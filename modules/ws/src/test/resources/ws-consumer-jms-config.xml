@@ -18,14 +18,12 @@
         <inbound-endpoint address="vm://in" exchange-pattern="request-response" />
 
         <ws:consumer serviceAddress="jms://serverQueue?exchangePattern=request-response" wsdlLocation="${baseDir}Echo.wsdl"
-                     wsdlService="EchoService"
-                     wsdlPort="EchoPort" wsdlOperation="echo" />
+                     wsdlService="EchoService" wsdlPort="EchoPort" wsdlOperation="echo" />
 
     </flow>
 
     <flow name="server">
-        <inbound-endpoint address="jms://serverQueue"
-                          exchange-pattern="request-response">
+        <inbound-endpoint address="jms://serverQueue" exchange-pattern="request-response">
             <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.Echo"/>
          </inbound-endpoint>
         <component class="org.mule.module.ws.consumer.Echo" />
