@@ -23,10 +23,12 @@ import javax.transaction.xa.XAResource;
 import bitronix.tm.internal.XAResourceHolderState;
 import bitronix.tm.recovery.RecoveryException;
 import bitronix.tm.resource.ResourceObjectFactory;
+import bitronix.tm.resource.ResourceRegistrar;
 import bitronix.tm.resource.common.ResourceBean;
 import bitronix.tm.resource.common.XAResourceHolder;
 import bitronix.tm.resource.common.XAResourceProducer;
 import bitronix.tm.resource.common.XAStatefulHolder;
+import bitronix.tm.utils.ManagementRegistrar;
 import bitronix.tm.utils.Scheduler;
 
 /**
@@ -105,6 +107,7 @@ public class DefaultXaSessionResourceProducer extends ResourceBean implements XA
     @Override
     public void close()
     {
+        ResourceRegistrar.unregister(this);
     }
 
     @Override

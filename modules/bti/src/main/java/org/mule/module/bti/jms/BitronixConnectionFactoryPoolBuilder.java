@@ -8,15 +8,23 @@ package org.mule.module.bti.jms;
 
 
 import org.mule.api.MuleContext;
+import org.mule.module.bti.BitronixConfigurationUtil;
+import org.mule.module.bti.transaction.BitronixTransactionManagerFactory;
 import org.mule.util.Preconditions;
+import org.mule.util.UUID;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.XAConnectionFactory;
 
+import bitronix.tm.TransactionManagerServices;
 import bitronix.tm.resource.jms.PoolingConnectionFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class BitronixConnectionFactoryPoolBuilder
 {
+
+    protected static final transient Log logger = LogFactory.getLog(BitronixConnectionFactoryPoolBuilder.class);
 
     private int minPoolSize = 4;
     private int maxPoolSize = 32;
@@ -46,7 +54,7 @@ public class BitronixConnectionFactoryPoolBuilder
             poolingConnectionFactory.setMaxIdleTime(maxIdleTime);
             poolingConnectionFactory.setCacheProducersConsumers(false);
             poolingConnectionFactory.setAllowLocalTransactions(true);
-            poolingConnectionFactory.setUniqueName(muleContext.getConfiguration().getId() + "-" + name);
+            poolingConnectionFactory.setUniqueName(BitronixConfigurationUtil.createUniqueIdForResource(muleContext, name));
             poolingConnectionFactory.init();
         }
         return new BitronixConnectionFactoryWrapper(poolingConnectionFactory, muleContext);

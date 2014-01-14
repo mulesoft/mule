@@ -8,14 +8,21 @@ package org.mule.module.bti.jdbc;
 
 
 import org.mule.api.MuleContext;
+import org.mule.module.bti.BitronixConfigurationUtil;
+import org.mule.module.bti.transaction.BitronixTransactionManagerFactory;
 import org.mule.util.Preconditions;
 
 import javax.sql.XADataSource;
 
+import bitronix.tm.TransactionManagerServices;
 import bitronix.tm.resource.jdbc.PoolingDataSource;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class BitronixXaDataSourceBuilder
 {
+
+    protected static final transient Log logger = LogFactory.getLog(BitronixXaDataSourceBuilder.class);
 
     private int minPoolSize = 4;
     private int maxPoolSize = 16;
@@ -44,7 +51,7 @@ public class BitronixXaDataSourceBuilder
             poolingDataSource.setAcquireIncrement(1);
             poolingDataSource.setAllowLocalTransactions(true);
             poolingDataSource.setAutomaticEnlistingEnabled(false);
-            poolingDataSource.setUniqueName(muleContext.getConfiguration().getId() + "-" + name);
+            poolingDataSource.setUniqueName(BitronixConfigurationUtil.createUniqueIdForResource(muleContext, name));
             poolingDataSource.init();
         }
 

@@ -9,6 +9,8 @@ package org.mule.module.bti.jms;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.module.bti.BitronixConfigurationUtil.createUniqueIdForResource;
+
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -29,6 +31,7 @@ import org.mockito.stubbing.Answer;
 public class BitronixConnectionFactoryPoolBuilderTestCase extends AbstractMuleTestCase
 {
 
+    public static final String RESOURCE_NAME = "test";
     private final MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
     private final MuleConfiguration mockMuleConfiguration = mock(MuleConfiguration.class);
     private final XAConnectionFactory mockConnectionFactory = mock(TestConnectionFactory.class);
@@ -51,10 +54,10 @@ public class BitronixConnectionFactoryPoolBuilderTestCase extends AbstractMuleTe
     @Test
     public void createsConnectionFactoryPoolWithDefaultValues()
     {
-        BitronixConnectionFactoryPoolBuilder builder = createBuilder("test", mockConnectionFactory);
+        BitronixConnectionFactoryPoolBuilder builder = createBuilder(RESOURCE_NAME, mockConnectionFactory);
         BitronixConnectionFactoryWrapper wrapper = builder.build(mockMuleContext);
         PoolingConnectionFactory poolingConnectionFactory = wrapper.getWrappedConnectionFactory();
-        assertEquals(muleConfigurationId + "-test", poolingConnectionFactory.getUniqueName());
+        assertEquals(createUniqueIdForResource(mockMuleContext, RESOURCE_NAME), poolingConnectionFactory.getUniqueName());
     }
 
     @Test
@@ -67,7 +70,7 @@ public class BitronixConnectionFactoryPoolBuilderTestCase extends AbstractMuleTe
 
         BitronixConnectionFactoryWrapper wrapper = builder.build(mockMuleContext);
         PoolingConnectionFactory poolingConnectionFactory = wrapper.getWrappedConnectionFactory();
-        assertEquals(muleConfigurationId + "-test", poolingConnectionFactory.getUniqueName());
+        assertEquals(createUniqueIdForResource(mockMuleContext, RESOURCE_NAME), poolingConnectionFactory.getUniqueName());
         assertEquals(8, poolingConnectionFactory.getMinPoolSize());
         assertEquals(10, poolingConnectionFactory.getMaxPoolSize());
         assertEquals(30, poolingConnectionFactory.getMaxIdleTime());

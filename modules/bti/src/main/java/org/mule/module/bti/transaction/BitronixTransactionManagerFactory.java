@@ -6,27 +6,32 @@
  */
 package org.mule.module.bti.transaction;
 
+import static org.mule.module.bti.BitronixConfigurationUtil.createUniqueIdForResource;
+import static org.mule.module.bti.BitronixConfigurationUtil.createUniqueIdForServer;
+import static org.mule.module.bti.BitronixConfigurationUtil.getLogPart1Filename;
+import static org.mule.module.bti.BitronixConfigurationUtil.getLogPart2Filename;
+
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.transaction.TransactionManagerFactory;
+import org.mule.module.bti.BitronixConfigurationUtil;
 import org.mule.module.bti.xa.DefaultXaSessionResourceProducer;
 import org.mule.util.xa.AbstractXAResourceManager;
-
-import java.io.File;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.text.MessageFormat;
 
 import javax.transaction.TransactionManager;
 
 import bitronix.tm.TransactionManagerServices;
-import bitronix.tm.recovery.RecoveryException;
 import bitronix.tm.resource.ResourceRegistrar;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class BitronixTransactionManagerFactory implements TransactionManagerFactory, Disposable, MuleContextAware
 {
+
+    protected static final transient Log logger = LogFactory.getLog(BitronixTransactionManagerFactory.class);
+
 
     private static int numberOfAppsUsingTm;
     private static TransactionManager transactionManager;
@@ -43,6 +48,8 @@ public class BitronixTransactionManagerFactory implements TransactionManagerFact
             {
                 configureTransactionLogsDirectory();
                 configureUniqueServerId();
+                configureTransactionRecoveryExecutionInterval();
+                configureTransactionTimeout();
                 transactionManager = TransactionManagerServices.getTransactionManager();
                 registerMuleQueuesXaResource();
                 transactionManager = new TransactionManagerWrapper(transactionManager, defaultXaSessionResourceProducer);
@@ -56,44 +63,68 @@ public class BitronixTransactionManagerFactory implements TransactionManagerFact
         }
     }
 
-    private void registerMuleQueuesXaResource() throws RecoveryException
+    private void configureTransactionTimeout()
     {
-        String defaultXaSessionUniqueName = muleContext.getConfiguration().getId() + "-default-xa-session";
+        TransactionManagerServices.getConfiguration().setDefaultTransactionTimeout(BitronixConfigurationUtil.getTransactionTimeout());
+    }
+
+    private void configureTransactionRecoveryExecutionInterval()
+    {
+        int transactionRecoveryIntervalInSeconds = BitronixConfigurationUtil.getTransactionRecoveryIntervalInSeconds();
+        logger.info("Using " + transactionRecoveryIntervalInSeconds + " seconds for recovery interval");
+        TransactionManagerServices.getConfiguration().setBackgroundRecoveryIntervalSeconds(transactionRecoveryIntervalInSeconds);
+    }
+
+    private void registerMuleQueuesXaResource() throws Exception
+    {
+        String defaultXaSessionUniqueName = createUniqueIdForResource(muleContext, "default-xa-session");
         defaultXaSessionResourceProducer = new DefaultXaSessionResourceProducer(defaultXaSessionUniqueName, (AbstractXAResourceManager) muleContext.getQueueManager());
         ResourceRegistrar.register(defaultXaSessionResourceProducer);
     }
 
-    private void configureUniqueServerId() throws UnknownHostException
+    private void configureUniqueServerId() throws Exception
     {
-        InetAddress address = InetAddress.getLocalHost();
-        final String xaNodeId = MessageFormat.format("Mule[{0}/{1}]",
-                                                     address.getHostName(), address.getHostAddress());
-        TransactionManagerServices.getConfiguration().setServerId(xaNodeId);
+        String uniqueServerId = createUniqueIdForServer();
+        logger.info("Bitronix server id: " + uniqueServerId);
+        TransactionManagerServices.getConfiguration().setServerId(uniqueServerId);
     }
 
     private void configureTransactionLogsDirectory()
     {
-        String workingDirectory = muleContext.getConfiguration().getWorkingDirectory();
-        String part1Filename = workingDirectory + File.separator + "tx-log" + File.separator + TransactionManagerServices.getConfiguration().getLogPart1Filename();
-        String part2Filename = workingDirectory + File.separator + "tx-log" + File.separator + TransactionManagerServices.getConfiguration().getLogPart2Filename();
-        TransactionManagerServices.getConfiguration().setLogPart1Filename(part1Filename);
-        TransactionManagerServices.getConfiguration().setLogPart2Filename(part2Filename);
+        String logPart1Filename = getLogPart1Filename();
+        String logPart2Filename = getLogPart2Filename();
+        logger.info("Using log file " + logPart1Filename + " for tx log part 1");
+        logger.info("Using log file " + logPart2Filename + " for tx log part 2");
+        TransactionManagerServices.getConfiguration().setLogPart1Filename(logPart1Filename);
+        TransactionManagerServices.getConfiguration().setLogPart2Filename(logPart2Filename);
     }
 
     @Override
     public void dispose()
     {
-        if (transactionManagerUsedByThisApp)
+        try
         {
-            synchronized (BitronixTransactionManagerFactory.class)
+            if (transactionManagerUsedByThisApp)
             {
-                numberOfAppsUsingTm--;
-                if (numberOfAppsUsingTm == 0)
+                synchronized (BitronixTransactionManagerFactory.class)
                 {
-                    TransactionManagerServices.getTransactionManager().shutdown();
-                    transactionManager = null;
-                    transactionManagerUsedByThisApp = false;
+                    numberOfAppsUsingTm--;
+                    if (numberOfAppsUsingTm == 0)
+                    {
+                        TransactionManagerServices.getTransactionManager().shutdown();
+                        transactionManager = null;
+                        transactionManagerUsedByThisApp = false;
+                        defaultXaSessionResourceProducer.close();
+                    }
                 }
+            }
+        }
+        catch (Exception e)
+        {
+            logger.error("Failure shutting down transaction manager" + e.getMessage());
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(e);
             }
         }
     }
