@@ -20,8 +20,8 @@ import javax.jms.Session;
 
 import bitronix.tm.resource.jms.DualSessionWrapper;
 import bitronix.tm.resource.jms.JmsConnectionHandle;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Wrapper for JMS Connection that will return a proxy for JMS transacted sessions in order to make them participate in XA transactions.
@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
 public class BitronixConnectionInvocationHandler implements TargetInvocationHandler
 {
 
-    protected static final transient Log logger = LogFactory.getLog(BitronixConnectionInvocationHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(BitronixConnectionInvocationHandler.class);
     private Connection connection;
 
     public BitronixConnectionInvocationHandler(Connection connecton)

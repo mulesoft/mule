@@ -24,13 +24,13 @@ import javax.transaction.TransactionManager;
 
 import bitronix.tm.TransactionManagerServices;
 import bitronix.tm.resource.ResourceRegistrar;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BitronixTransactionManagerFactory implements TransactionManagerFactory, Disposable, MuleContextAware
 {
 
-    protected static final transient Log logger = LogFactory.getLog(BitronixTransactionManagerFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(BitronixTransactionManagerFactory.class);
 
 
     private static int numberOfAppsUsingTm;
@@ -51,11 +51,11 @@ public class BitronixTransactionManagerFactory implements TransactionManagerFact
                 configureTransactionRecoveryExecutionInterval();
                 configureTransactionTimeout();
                 transactionManager = TransactionManagerServices.getTransactionManager();
-                registerMuleQueuesXaResource();
                 transactionManager = new TransactionManagerWrapper(transactionManager, defaultXaSessionResourceProducer);
             }
             if (!transactionManagerUsedByThisApp)
             {
+                registerMuleQueuesXaResource();
                 transactionManagerUsedByThisApp = true;
                 numberOfAppsUsingTm++;
             }
@@ -109,12 +109,12 @@ public class BitronixTransactionManagerFactory implements TransactionManagerFact
                 synchronized (BitronixTransactionManagerFactory.class)
                 {
                     numberOfAppsUsingTm--;
+                    transactionManagerUsedByThisApp = false;
+                    defaultXaSessionResourceProducer.close();
                     if (numberOfAppsUsingTm == 0)
                     {
                         TransactionManagerServices.getTransactionManager().shutdown();
                         transactionManager = null;
-                        transactionManagerUsedByThisApp = false;
-                        defaultXaSessionResourceProducer.close();
                     }
                 }
             }
@@ -124,7 +124,7 @@ public class BitronixTransactionManagerFactory implements TransactionManagerFact
             logger.error("Failure shutting down transaction manager" + e.getMessage());
             if (logger.isDebugEnabled())
             {
-                logger.debug(e);
+                logger.debug(e.getMessage(), e);
             }
         }
     }

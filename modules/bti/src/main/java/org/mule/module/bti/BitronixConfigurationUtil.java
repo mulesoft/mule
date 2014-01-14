@@ -12,17 +12,16 @@ import org.mule.api.config.MuleProperties;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.text.MessageFormat;
 
 import bitronix.tm.TransactionManagerServices;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BitronixConfigurationUtil
 {
 
-    protected static final transient Log logger = LogFactory.getLog(BitronixConfigurationUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(BitronixConfigurationUtil.class);
 
     public static final String BITRONIX_SERVER_ID = "mule.bitronix.serverId";
     public static final String BITRONIX_RECOVERY_INTERVAL = "mule.bitronix.recoveryinterval";
