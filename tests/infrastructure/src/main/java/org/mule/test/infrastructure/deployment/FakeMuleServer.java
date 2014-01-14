@@ -58,10 +58,15 @@ public class FakeMuleServer
 
     private final List<MuleCoreExtension> coreExtensions;
 
+    public static final String FAKE_SERVER_DISABLE_LOG_REPOSITORY_SELECTOR = "fake.server.disablelogrepositoryselector";
+
     static
     {
         // NOTE: this causes mule.simpleLog to no work on these tests
-        LogManager.setRepositorySelector(new ArtifactAwareRepositorySelector(), new Object());
+        if (!Boolean.getBoolean(FAKE_SERVER_DISABLE_LOG_REPOSITORY_SELECTOR))
+        {
+            LogManager.setRepositorySelector(new ArtifactAwareRepositorySelector(), new Object());
+        }
     }
 
     private DefaultMuleCoreExtensionManager coreExtensionManager;
