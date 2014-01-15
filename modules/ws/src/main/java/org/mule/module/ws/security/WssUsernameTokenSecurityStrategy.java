@@ -8,10 +8,12 @@
 package org.mule.module.ws.security;
 
 import org.mule.module.cxf.builder.ProxyClientMessageProcessorBuilder;
+import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.callback.Callback;
@@ -21,6 +23,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.handler.WSHandlerConstants;
 
@@ -30,6 +33,8 @@ public class WssUsernameTokenSecurityStrategy implements SecurityStrategy
     private String username;
     private String password;
     private PasswordType passwordType;
+    private boolean addNonce;
+    private boolean addCreated;
 
     @Override
     public void apply(ProxyClientMessageProcessorBuilder builder)
@@ -45,6 +50,20 @@ public class WssUsernameTokenSecurityStrategy implements SecurityStrategy
         else if (passwordType == PasswordType.DIGEST)
         {
             configProperties.put(WSHandlerConstants.PASSWORD_TYPE, "PasswordDigest");
+        }
+
+        List<String> additionalElements = new ArrayList<String>(2);
+        if (addNonce)
+        {
+            additionalElements.add(WSConstants.NONCE_LN);
+        }
+        if (addCreated)
+        {
+            additionalElements.add(WSConstants.CREATED_LN);
+        }
+        if (!additionalElements.isEmpty())
+        {
+            configProperties.put(WSHandlerConstants.ADD_UT_ELEMENTS, StringUtils.join(additionalElements, " "));
         }
 
         configProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new CallbackHandler()
@@ -98,4 +117,23 @@ public class WssUsernameTokenSecurityStrategy implements SecurityStrategy
         this.passwordType = passwordType;
     }
 
+    public boolean isAddNonce()
+    {
+        return addNonce;
+    }
+
+    public void setAddNonce(boolean addNonce)
+    {
+        this.addNonce = addNonce;
+    }
+
+    public boolean isAddCreated()
+    {
+        return addCreated;
+    }
+
+    public void setAddCreated(boolean addCreated)
+    {
+        this.addCreated = addCreated;
+    }
 }

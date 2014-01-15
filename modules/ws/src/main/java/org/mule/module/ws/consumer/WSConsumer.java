@@ -72,6 +72,8 @@ public class WSConsumer implements MessageProcessor, Initialisable
 
         MessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder();
 
+        // TODO: MULE-7242 Define if this transformer should be added to the chain or not.
+
         final AutoTransformer autoTransformer = new AutoTransformer();
         autoTransformer.setReturnDataType(DataType.STRING_DATA_TYPE);
 

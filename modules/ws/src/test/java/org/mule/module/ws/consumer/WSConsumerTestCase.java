@@ -10,11 +10,13 @@ package org.mule.module.ws.consumer;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.size.SmallTest;
 import org.mule.transport.http.HttpConnector;
 import org.mule.util.ClassUtils;
 
 import org.junit.Test;
 
+@SmallTest
 public class WSConsumerTestCase extends AbstractMuleContextTestCase
 {
 

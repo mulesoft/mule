@@ -18,7 +18,8 @@
                      wsdlPort="EchoPort" wsdlOperation="echo">
 
             <ws:security>
-                <ws:wss-username-token username="admin" password="${textPasswordPlaceholder}" passwordType="TEXT"/>
+                <ws:wss-username-token username="admin" password="${textPasswordPlaceholder}" passwordType="TEXT"
+                                       addCreated="true" addNonce="true"/>
             </ws:security>
 
         </ws:consumer>
@@ -32,7 +33,8 @@
                      wsdlPort="EchoPort" wsdlOperation="echo">
 
             <ws:security>
-                <ws:wss-username-token username="admin" password="${digestPasswordPlaceholder}" passwordType="DIGEST"/>
+                <ws:wss-username-token username="admin" password="${digestPasswordPlaceholder}" passwordType="DIGEST"
+                                       addCreated="true" addNonce="true"/>
             </ws:security>
 
         </ws:consumer>

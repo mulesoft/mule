@@ -8,6 +8,8 @@ package org.mule.module.ws.security;
 
 import org.mule.module.cxf.builder.ProxyClientMessageProcessorBuilder;
 
+// TODO: MULE-7241 This interface should not depend on the CXF module.
+
 public interface SecurityStrategy
 {
     

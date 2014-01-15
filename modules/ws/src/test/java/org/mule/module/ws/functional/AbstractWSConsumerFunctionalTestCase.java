@@ -61,7 +61,7 @@ public class AbstractWSConsumerFunctionalTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send(address, message, properties);
         assertEquals(NullPayload.getInstance(), response.getPayload());
-        SoapFaultException exception = (SoapFaultException) response.getExceptionPayload().getException().getCause();
+        SoapFaultException exception = (SoapFaultException) response.getExceptionPayload().getException();
         assertEquals(expectedFaultCode, exception.getFaultCode().getLocalPart());
     }
 }
