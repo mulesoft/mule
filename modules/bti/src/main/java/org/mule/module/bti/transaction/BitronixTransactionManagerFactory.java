@@ -6,7 +6,6 @@
  */
 package org.mule.module.bti.transaction;
 
-import static org.mule.module.bti.BitronixConfigurationUtil.createUniqueIdForResource;
 import static org.mule.module.bti.BitronixConfigurationUtil.createUniqueIdForServer;
 import static org.mule.module.bti.BitronixConfigurationUtil.getLogPart1Filename;
 import static org.mule.module.bti.BitronixConfigurationUtil.getLogPart2Filename;
@@ -32,12 +31,11 @@ public class BitronixTransactionManagerFactory implements TransactionManagerFact
 
     private static final Logger logger = LoggerFactory.getLogger(BitronixTransactionManagerFactory.class);
 
-
     private static int numberOfAppsUsingTm;
     private static TransactionManager transactionManager;
+    private static DefaultXaSessionResourceProducer defaultXaSessionResourceProducer;
 
     private MuleContext muleContext;
-    private DefaultXaSessionResourceProducer defaultXaSessionResourceProducer;
     private boolean transactionManagerUsedByThisApp;
 
     public TransactionManager create(MuleConfiguration config) throws Exception
@@ -50,12 +48,12 @@ public class BitronixTransactionManagerFactory implements TransactionManagerFact
                 configureUniqueServerId();
                 configureTransactionRecoveryExecutionInterval();
                 configureTransactionTimeout();
+                registerMuleQueuesXaResource();
                 transactionManager = TransactionManagerServices.getTransactionManager();
                 transactionManager = new TransactionManagerWrapper(transactionManager, defaultXaSessionResourceProducer);
             }
             if (!transactionManagerUsedByThisApp)
             {
-                registerMuleQueuesXaResource();
                 transactionManagerUsedByThisApp = true;
                 numberOfAppsUsingTm++;
             }
@@ -77,7 +75,7 @@ public class BitronixTransactionManagerFactory implements TransactionManagerFact
 
     private void registerMuleQueuesXaResource() throws Exception
     {
-        String defaultXaSessionUniqueName = createUniqueIdForResource(muleContext, "default-xa-session");
+        String defaultXaSessionUniqueName = createUniqueIdForServer() + "-default-xa-session";
         defaultXaSessionResourceProducer = new DefaultXaSessionResourceProducer(defaultXaSessionUniqueName, (AbstractXAResourceManager) muleContext.getQueueManager());
         ResourceRegistrar.register(defaultXaSessionResourceProducer);
     }
@@ -110,11 +108,11 @@ public class BitronixTransactionManagerFactory implements TransactionManagerFact
                 {
                     numberOfAppsUsingTm--;
                     transactionManagerUsedByThisApp = false;
-                    defaultXaSessionResourceProducer.close();
                     if (numberOfAppsUsingTm == 0)
                     {
-                        TransactionManagerServices.getTransactionManager().shutdown();
                         transactionManager = null;
+                        defaultXaSessionResourceProducer.close();
+                        TransactionManagerServices.getTransactionManager().shutdown();
                     }
                 }
             }
