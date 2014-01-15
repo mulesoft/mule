@@ -8,6 +8,7 @@ package org.mule.module.bti.jms;
 
 
 import org.mule.api.MuleContext;
+import org.mule.module.bti.BitronixConfigurationUtil;
 import org.mule.util.Preconditions;
 
 import javax.jms.ConnectionFactory;
@@ -46,7 +47,7 @@ public class BitronixConnectionFactoryPoolBuilder
             poolingConnectionFactory.setMaxIdleTime(maxIdleTime);
             poolingConnectionFactory.setCacheProducersConsumers(false);
             poolingConnectionFactory.setAllowLocalTransactions(true);
-            poolingConnectionFactory.setUniqueName(muleContext.getConfiguration().getId() + "-" + name);
+            poolingConnectionFactory.setUniqueName(BitronixConfigurationUtil.createUniqueIdForResource(muleContext, name));
             poolingConnectionFactory.init();
         }
         return new BitronixConnectionFactoryWrapper(poolingConnectionFactory, muleContext);

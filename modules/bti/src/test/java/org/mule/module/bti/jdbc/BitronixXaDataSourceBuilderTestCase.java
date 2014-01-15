@@ -9,6 +9,8 @@ package org.mule.module.bti.jdbc;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.module.bti.BitronixConfigurationUtil.createUniqueIdForResource;
+
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -27,6 +29,7 @@ import org.mockito.stubbing.Answer;
 public class BitronixXaDataSourceBuilderTestCase extends AbstractMuleTestCase
 {
 
+    private static final String RESOURCE_NAME = "test";
     private final MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
     private final MuleConfiguration mockMuleConfiguration = mock(MuleConfiguration.class);
     private final XADataSource mockDataSource = mock(XADataSource.class, Answers.RETURNS_DEEP_STUBS.get());
@@ -49,10 +52,10 @@ public class BitronixXaDataSourceBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void createsDataSourcePoolWithDefaultValues()
     {
-        BitronixXaDataSourceBuilder builder = createBuilder("test", mockDataSource);
+        BitronixXaDataSourceBuilder builder = createBuilder(RESOURCE_NAME, mockDataSource);
         BitronixXaDataSourceWrapper wrapper = builder.build(mockMuleContext);
         PoolingDataSource poolingDataSource = wrapper.getWrappedDataSource();
-        assertEquals(muleConfigurationId + "-test", poolingDataSource.getUniqueName());
+        assertEquals(createUniqueIdForResource(mockMuleContext, RESOURCE_NAME), poolingDataSource.getUniqueName());
     }
 
     @Test
@@ -65,7 +68,7 @@ public class BitronixXaDataSourceBuilderTestCase extends AbstractMuleTestCase
 
         BitronixXaDataSourceWrapper wrapper = builder.build(mockMuleContext);
         PoolingDataSource poolingDataSource = wrapper.getWrappedDataSource();
-        assertEquals(muleConfigurationId + "-test", poolingDataSource.getUniqueName());
+        assertEquals(createUniqueIdForResource(mockMuleContext, RESOURCE_NAME), poolingDataSource.getUniqueName());
         assertEquals(8, poolingDataSource.getMinPoolSize());
         assertEquals(10, poolingDataSource.getMaxPoolSize());
         assertEquals(30, poolingDataSource.getMaxIdleTime());

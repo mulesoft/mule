@@ -19,16 +19,12 @@ import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 
 import bitronix.tm.resource.jms.PoolingConnectionFactory;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Wrapper for JMS ConnectionFactory that will return a proxy for JMS Connections to make them work inside xa transactions.
  */
 public class BitronixConnectionFactoryWrapper implements ConnectionFactory, Initialisable
 {
-
-    protected static final transient Log logger = LogFactory.getLog(BitronixConnectionFactoryWrapper.class);
 
     private final PoolingConnectionFactory factory;
     private final MuleContext muleContext;

@@ -8,6 +8,7 @@ package org.mule.module.bti.jdbc;
 
 
 import org.mule.api.MuleContext;
+import org.mule.module.bti.BitronixConfigurationUtil;
 import org.mule.util.Preconditions;
 
 import javax.sql.XADataSource;
@@ -44,7 +45,7 @@ public class BitronixXaDataSourceBuilder
             poolingDataSource.setAcquireIncrement(1);
             poolingDataSource.setAllowLocalTransactions(true);
             poolingDataSource.setAutomaticEnlistingEnabled(false);
-            poolingDataSource.setUniqueName(muleContext.getConfiguration().getId() + "-" + name);
+            poolingDataSource.setUniqueName(BitronixConfigurationUtil.createUniqueIdForResource(muleContext, name));
             poolingDataSource.init();
         }
 

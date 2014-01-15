@@ -21,8 +21,8 @@ import javax.transaction.xa.XAResource;
 
 import bitronix.tm.resource.jms.DualSessionWrapper;
 import bitronix.tm.resource.jms.MessageConsumerWrapper;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Wrapper for JMS sessions to make thme participate in XA transactions.
@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
 public class BitronixSessionInvocationHandler implements TargetInvocationHandler, XaTransaction.MuleXaObject
 {
 
-    protected static final transient Log logger = LogFactory.getLog(BitronixSessionInvocationHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(BitronixSessionInvocationHandler.class);
     private final DualSessionWrapper sessionWrapper;
     private boolean reuseSession;
 
