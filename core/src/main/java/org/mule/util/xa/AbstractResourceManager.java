@@ -320,7 +320,7 @@ public abstract class AbstractResourceManager
 
     protected abstract void doBegin(AbstractTransactionContext context);
 
-    protected abstract int doPrepare(AbstractTransactionContext context);
+    protected abstract int doPrepare(AbstractTransactionContext context) throws ResourceManagerException;
 
     protected abstract void doCommit(AbstractTransactionContext context) throws ResourceManagerException;
 
