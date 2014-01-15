@@ -9,6 +9,8 @@ package org.mule.test.integration.transaction.xa;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.module.bti.BitronixConfigurationUtil.createUniqueIdForResource;
+
 import org.mule.module.bti.jms.BitronixConnectionFactoryWrapper;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -36,9 +38,9 @@ public class BitronixConnectionFactoryPoolTestCase extends FunctionalTestCase
     @Test
     public void createsDefaultConnectionFactoryPoolForXADataSource()
     {
-        PoolingConnectionFactory poolingConnectionFactory = getConnectionFactory("jmsConnectorDefaultPool");
-        String expectedDefaultName = muleContext.getConfiguration().getId() + "-jmsConnectorDefaultPool";
-
+        String connectorName = "jmsConnectorDefaultPool";
+        PoolingConnectionFactory poolingConnectionFactory = getConnectionFactory(connectorName);
+        String expectedDefaultName = createUniqueIdForResource(muleContext, connectorName);
         assertEquals(expectedDefaultName, poolingConnectionFactory.getUniqueName());
     }
 
@@ -46,8 +48,7 @@ public class BitronixConnectionFactoryPoolTestCase extends FunctionalTestCase
     public void parsesCustomConnectionFactoryPoolCorrectly()
     {
         PoolingConnectionFactory poolingConnectionFactory = getConnectionFactory("jmsConnectorCustomPool");
-        String expectedName = muleContext.getConfiguration().getId() + "-bitronixConnectionFactory";
-
+        String expectedName = createUniqueIdForResource(muleContext, "bitronixConnectionFactory");
         assertEquals(5, poolingConnectionFactory.getMinPoolSize());
         assertEquals(15, poolingConnectionFactory.getMaxPoolSize());
         assertEquals(40, poolingConnectionFactory.getMaxIdleTime());
