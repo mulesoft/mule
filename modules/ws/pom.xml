@@ -10,7 +10,7 @@
     <artifactId>mule-module-ws</artifactId>
     <packaging>jar</packaging>
     <name>Web Services</name>
-    <description>Provides components for working with web services.</description>
+    <description>Provides components for working with Web Services.</description>
 
     <properties>
         <licensePath>../../LICENSE_HEADER.txt</licensePath>
@@ -32,7 +32,12 @@
             <artifactId>mule-transport-http</artifactId>
             <version>${project.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-cxf</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
         <!-- Unit tests -->
         <dependency>
             <groupId>org.mule.tests</groupId>
@@ -44,6 +49,23 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-jms</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-core</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

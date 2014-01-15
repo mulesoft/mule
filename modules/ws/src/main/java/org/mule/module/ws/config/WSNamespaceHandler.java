@@ -7,7 +7,12 @@
 package org.mule.module.ws.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.module.ws.config.spring.factories.WSConsumerFactoryBean;
 import org.mule.module.ws.config.spring.parsers.specific.WSProxyDefinitionParser;
+import org.mule.module.ws.security.WSSecurity;
+import org.mule.module.ws.security.WssUsernameTokenSecurityStrategy;
 
 /**
  * Registers a Bean Definition Parser for handling <code><ws:*></code> elements.
@@ -18,5 +23,11 @@ public class WSNamespaceHandler extends AbstractMuleNamespaceHandler
     {
         // Flow Constructs
         registerBeanDefinitionParser("proxy", new WSProxyDefinitionParser());
+        registerBeanDefinitionParser("consumer", new MessageProcessorDefinitionParser(
+            WSConsumerFactoryBean.class));
+        registerBeanDefinitionParser("security", new ChildDefinitionParser("security", WSSecurity.class));
+        registerBeanDefinitionParser("wss-username-token", new ChildDefinitionParser("strategy",
+            WssUsernameTokenSecurityStrategy.class));
+
     }
 }
