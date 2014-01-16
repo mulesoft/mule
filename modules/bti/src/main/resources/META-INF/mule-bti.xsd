@@ -94,6 +94,21 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="acquireIncrement" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>Determines how many connections at a time will try to acquire when the pool is exhausted.</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="preparedStatementCacheSize" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>Determines how many statements are cached per pooled connection. Defaults to 0, meaning statement caching is disabled.</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="acquireTimeoutSeconds" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>The number of seconds a client calling getConnection() will wait for a Connection to be checked-in or acquired when the pool is exhausted. Zero means wait indefinitely</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

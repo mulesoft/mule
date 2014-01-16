@@ -48,6 +48,9 @@ public class BitronixDataSourcePoolTestCase extends FunctionalTestCase
         assertEquals(15, dataSource.getMaxPoolSize());
         assertEquals(40, dataSource.getMaxIdleTime());
         assertEquals(expectedName, dataSource.getUniqueName());
+        assertEquals(2, dataSource.getAcquireIncrement());
+        assertEquals(6, dataSource.getPreparedStatementCacheSize());
+        assertEquals(50, dataSource.getAcquisitionTimeout());
     }
 
     private PoolingDataSource getDataSource(String connectorName)

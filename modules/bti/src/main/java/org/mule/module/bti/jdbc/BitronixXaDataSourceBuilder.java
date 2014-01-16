@@ -18,9 +18,19 @@ import bitronix.tm.resource.jdbc.PoolingDataSource;
 public class BitronixXaDataSourceBuilder
 {
 
-    private int minPoolSize = 4;
-    private int maxPoolSize = 16;
-    private int maxIdleTime = 60;
+    public static final int DEFAULT_MIN_POOL_SIZE = 4;
+    public static final int DEFAULT_MAX_POOL_SIZE = 16;
+    public static final int DEFAULT_MAX_IDLE = 60;
+    public static final int DEFAULT_ACQUISITION_TIMEOUT_SECONDS = 30;
+    public static final int DEFAULT_PREPARED_STATEMENT_CACHE_SIZE = 5;
+    public static final int DEFAULT_ACQUIRE_INCREMENT = 1;
+
+    private int minPoolSize = DEFAULT_MIN_POOL_SIZE;
+    private int maxPoolSize = DEFAULT_MAX_POOL_SIZE;
+    private int maxIdleTime = DEFAULT_MAX_IDLE;
+    private int acquisitionTimeoutSeconds = DEFAULT_ACQUISITION_TIMEOUT_SECONDS;
+    private int preparedStatementCacheSize = DEFAULT_PREPARED_STATEMENT_CACHE_SIZE;
+    private int acquireIncrement = DEFAULT_ACQUIRE_INCREMENT;
     private String name;
     private XADataSource dataSource;
 
@@ -31,6 +41,9 @@ public class BitronixXaDataSourceBuilder
         Preconditions.checkState(minPoolSize >= 0, "minPoolSize must be greater or equal than 0");
         Preconditions.checkState(maxPoolSize > 0, "maxPoolSize must be greater than 0");
         Preconditions.checkState(maxIdleTime > 0, "maxIdleTime must be greater than 0");
+        Preconditions.checkState(acquisitionTimeoutSeconds >= 0, "acquisitionTimeoutSeconds must equal to or grater than 0");
+        Preconditions.checkState(preparedStatementCacheSize > 0, "preparedStatementCacheSize must equal to or grater than 0");
+        Preconditions.checkState(acquireIncrement > 0, "acquireIncrement must be greater than 0");
 
         PoolingDataSource poolingDataSource;
         synchronized (BitronixJdbcXaDataSourceProvider.class)
@@ -42,10 +55,12 @@ public class BitronixXaDataSourceBuilder
             poolingDataSource.setMinPoolSize(minPoolSize);
             poolingDataSource.setMaxPoolSize(maxPoolSize);
             poolingDataSource.setMaxIdleTime(maxIdleTime);
-            poolingDataSource.setAcquireIncrement(1);
+            poolingDataSource.setAcquireIncrement(acquireIncrement);
             poolingDataSource.setAllowLocalTransactions(true);
             poolingDataSource.setAutomaticEnlistingEnabled(false);
             poolingDataSource.setUniqueName(BitronixConfigurationUtil.createUniqueIdForResource(muleContext, name));
+            poolingDataSource.setAcquisitionTimeout(acquisitionTimeoutSeconds);
+            poolingDataSource.setPreparedStatementCacheSize(preparedStatementCacheSize);
             poolingDataSource.init();
         }
 
@@ -100,5 +115,35 @@ public class BitronixXaDataSourceBuilder
     public void setDataSource(XADataSource dataSource)
     {
         this.dataSource = dataSource;
+    }
+
+    public int getAcquisitionTimeoutSeconds()
+    {
+        return acquisitionTimeoutSeconds;
+    }
+
+    public void setAcquisitionTimeoutSeconds(int acquisitionTimeoutSeconds)
+    {
+        this.acquisitionTimeoutSeconds = acquisitionTimeoutSeconds;
+    }
+
+    public int getPreparedStatementCacheSize()
+    {
+        return preparedStatementCacheSize;
+    }
+
+    public void setPreparedStatementCacheSize(int preparedStatementCacheSize)
+    {
+        this.preparedStatementCacheSize = preparedStatementCacheSize;
+    }
+
+    public int getAcquireIncrement()
+    {
+        return acquireIncrement;
+    }
+
+    public void setAcquireIncrement(int acquireIncrement)
+    {
+        this.acquireIncrement = acquireIncrement;
     }
 }

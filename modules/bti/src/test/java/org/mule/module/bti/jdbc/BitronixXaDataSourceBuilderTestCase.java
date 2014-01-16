@@ -10,10 +10,10 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.module.bti.BitronixConfigurationUtil.createUniqueIdForResource;
-
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 import org.mule.util.UUID;
 
 import javax.sql.XADataSource;
@@ -25,7 +25,7 @@ import org.mockito.Answers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-
+@SmallTest
 public class BitronixXaDataSourceBuilderTestCase extends AbstractMuleTestCase
 {
 
@@ -56,22 +56,41 @@ public class BitronixXaDataSourceBuilderTestCase extends AbstractMuleTestCase
         BitronixXaDataSourceWrapper wrapper = builder.build(mockMuleContext);
         PoolingDataSource poolingDataSource = wrapper.getWrappedDataSource();
         assertEquals(createUniqueIdForResource(mockMuleContext, RESOURCE_NAME), poolingDataSource.getUniqueName());
+        assertEquals(BitronixXaDataSourceBuilder.DEFAULT_MAX_POOL_SIZE, poolingDataSource.getMaxPoolSize());
+        assertEquals(BitronixXaDataSourceBuilder.DEFAULT_MIN_POOL_SIZE, poolingDataSource.getMinPoolSize());
+        assertEquals(BitronixXaDataSourceBuilder.DEFAULT_MAX_IDLE, poolingDataSource.getMaxIdleTime());
+        assertEquals(BitronixXaDataSourceBuilder.DEFAULT_ACQUISITION_TIMEOUT_SECONDS, poolingDataSource.getAcquisitionTimeout());
+        assertEquals(BitronixXaDataSourceBuilder.DEFAULT_PREPARED_STATEMENT_CACHE_SIZE, poolingDataSource.getPreparedStatementCacheSize());
+        assertEquals(BitronixXaDataSourceBuilder.DEFAULT_ACQUIRE_INCREMENT, poolingDataSource.getAcquireIncrement());
     }
 
     @Test
     public void createsDataSourcePoolWithSpecificValues()
     {
+        final int customMinPoolSize = BitronixXaDataSourceBuilder.DEFAULT_MIN_POOL_SIZE + 1;
+        final int customMaxPoolSize = BitronixXaDataSourceBuilder.DEFAULT_MAX_POOL_SIZE + 1;
+        final int customMaxIdleTime = BitronixXaDataSourceBuilder.DEFAULT_MAX_IDLE + 1;
+        final int customAcquisitionTimeout = BitronixXaDataSourceBuilder.DEFAULT_PREPARED_STATEMENT_CACHE_SIZE + 1;
+        final int customPreparedStatementCacheSize = BitronixXaDataSourceBuilder.DEFAULT_PREPARED_STATEMENT_CACHE_SIZE + 1;
+        final int customAcquireIncrement = BitronixXaDataSourceBuilder.DEFAULT_ACQUIRE_INCREMENT + 1;
+
         BitronixXaDataSourceBuilder builder = createBuilder("test", mockDataSource);
-        builder.setMinPoolSize(8);
-        builder.setMaxPoolSize(10);
-        builder.setMaxIdleTime(30);
+        builder.setMinPoolSize(customMinPoolSize);
+        builder.setMaxPoolSize(customMaxPoolSize);
+        builder.setMaxIdleTime(customMaxIdleTime);
+        builder.setAcquisitionTimeoutSeconds(customAcquisitionTimeout);
+        builder.setPreparedStatementCacheSize(customPreparedStatementCacheSize);
+        builder.setAcquireIncrement(customAcquireIncrement);
 
         BitronixXaDataSourceWrapper wrapper = builder.build(mockMuleContext);
         PoolingDataSource poolingDataSource = wrapper.getWrappedDataSource();
         assertEquals(createUniqueIdForResource(mockMuleContext, RESOURCE_NAME), poolingDataSource.getUniqueName());
-        assertEquals(8, poolingDataSource.getMinPoolSize());
-        assertEquals(10, poolingDataSource.getMaxPoolSize());
-        assertEquals(30, poolingDataSource.getMaxIdleTime());
+        assertEquals(customMinPoolSize, poolingDataSource.getMinPoolSize());
+        assertEquals(customMaxPoolSize, poolingDataSource.getMaxPoolSize());
+        assertEquals(customMaxIdleTime, poolingDataSource.getMaxIdleTime());
+        assertEquals(customAcquisitionTimeout, poolingDataSource.getAcquisitionTimeout());
+        assertEquals(customPreparedStatementCacheSize, poolingDataSource.getPreparedStatementCacheSize());
+        assertEquals(customAcquireIncrement, poolingDataSource.getAcquireIncrement());
     }
 
     @Test(expected = IllegalStateException.class)

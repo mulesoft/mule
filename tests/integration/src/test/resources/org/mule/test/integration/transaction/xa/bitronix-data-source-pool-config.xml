@@ -20,6 +20,7 @@
 
 
     <bti:xa-data-source-pool name="bitronixDataSource" minPoolSize="5" maxPoolSize="15" maxIdleTime="40"
+                             acquireIncrement="2" preparedStatementCacheSize="6" acquireTimeoutSeconds="50"
                              dataSource-ref="jdbcDataSource"/>
 
     <jdbc:connector name="jdbcConnectorCustomPool" dataSource-ref="bitronixDataSource"/>
