@@ -22,11 +22,11 @@
             <schemadoc:page-title>WS Module</schemadoc:page-title>
         </xsd:appinfo>
     </xsd:annotation>
-    
+
     <!--==============================================================-->
     <!--   Flow Constructs                                            -->
     <!--==============================================================-->
-    
+
     <xsd:element name="proxy" type="proxyType" substitutionGroup="mule:abstract-flow-construct">
         <xsd:annotation>
             <xsd:documentation>
@@ -43,21 +43,21 @@
         <xsd:complexContent>
             <xsd:extension base="mule:baseFlowConstructType">
                 <xsd:sequence>
-                  <xsd:element ref="mule:abstract-inbound-endpoint" minOccurs="0" maxOccurs="1">
-                      <xsd:annotation>
-                          <xsd:documentation>
-                              The endpoint on which this proxy is listening.
-                          </xsd:documentation>
-                      </xsd:annotation>
-                  </xsd:element>
-                  <xsd:element ref="mule:abstract-outbound-endpoint" minOccurs="0" maxOccurs="1">
-                      <xsd:annotation>
-                          <xsd:documentation>
-                              The endpoint of the proxied web service.
-                          </xsd:documentation>
-                      </xsd:annotation>
-                  </xsd:element>
-                  <xsd:element ref="mule:legacy-abstract-exception-strategy" minOccurs="0"/>
+                    <xsd:element ref="mule:abstract-inbound-endpoint" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The endpoint on which this proxy is listening.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element ref="mule:abstract-outbound-endpoint" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The endpoint of the proxied web service.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element ref="mule:legacy-abstract-exception-strategy" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="inboundAddress" type="xsd:string">
                     <xsd:annotation>
@@ -101,28 +101,28 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="wsdlLocation" type="xsd:string" > 
-                    <xsd:annotation> 
-                      <xsd:documentation> 
-                          The location URI of the WSDL for your service, if you don't want to use one provided by the target web service.
-                      </xsd:documentation> 
-                  </xsd:annotation> 
-                </xsd:attribute> 
-                <xsd:attribute name="wsdlFile" type="xsd:string" > 
-                    <xsd:annotation> 
-                      <xsd:documentation> 
-                          The location of the WSDL file for your service, if you don't want to use one provided by the target web service.
-                      </xsd:documentation> 
-                  </xsd:annotation> 
-                </xsd:attribute> 
+                <xsd:attribute name="wsdlLocation" type="xsd:string" >
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The location URI of the WSDL for your service, if you don't want to use one provided by the target web service.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="wsdlFile" type="xsd:string" >
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The location of the WSDL file for your service, if you don't want to use one provided by the target web service.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <!--==============================================================-->
     <!--   Message Processors                                         -->
     <!--==============================================================-->
-    
+
     <xsd:element name="consumer" type="consumerType" substitutionGroup="mule:abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -135,65 +135,91 @@
     <xsd:complexType name="consumerType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractMessageProcessorType">
-            	<xsd:sequence>
-	            	<xsd:element name="security" minOccurs="0">
+                <xsd:attribute name="operation" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The operation that will be consumed. It must exist in the WSDL file, bound to the port and service specified.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="config-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A reference to the configuration element for this web service consumer. If only one consumer-config element
+                            is defined in the application, then it will be used by default and there is no need to provide this
+                            attribute. Otherwise, it is required.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
+    <xsd:element name="consumer-config" type="consumerConfigType" substitutionGroup="mule:abstract-extension"/>
+
+    <xsd:complexType name="consumerConfigType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                <xsd:sequence>
+                    <xsd:element name="security" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
                                 Defines security strategies for the web service consumer.
                             </xsd:documentation>
                         </xsd:annotation>
-	            		<xsd:complexType>
-							<xsd:sequence>
-								<xsd:element name="wss-username-token" minOccurs="0">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="wss-username-token" minOccurs="0">
                                     <xsd:annotation>
                                         <xsd:documentation>
                                             Adds a username token header to the SOAP request.
                                         </xsd:documentation>
                                     </xsd:annotation>
                                     <xsd:complexType>
-										<xsd:attribute name="username" type="xsd:string" use="required">
+                                        <xsd:attribute name="username" type="xsd:string" use="required">
                                             <xsd:annotation>
                                                 <xsd:documentation>
                                                     The username to use in the header.
                                                 </xsd:documentation>
                                             </xsd:annotation>
                                         </xsd:attribute>
-										<xsd:attribute name="password" type="xsd:string" use="required">
+                                        <xsd:attribute name="password" type="xsd:string" use="required">
                                             <xsd:annotation>
                                                 <xsd:documentation>
                                                     The password to use in the header.
                                                 </xsd:documentation>
                                             </xsd:annotation>
                                         </xsd:attribute>
-										<xsd:attribute name="passwordType" use="required" >
+                                        <xsd:attribute name="passwordType" use="required" >
                                             <xsd:annotation>
                                                 <xsd:documentation>
                                                     The type of the password (can be either TEXT or DIGEST).
                                                 </xsd:documentation>
                                             </xsd:annotation>
-											<xsd:simpleType>
-												<xsd:restriction base="xsd:string">
-													<xsd:enumeration value="TEXT" />
-													<xsd:enumeration value="DIGEST"/>
-												</xsd:restriction>
-											</xsd:simpleType>
-										</xsd:attribute>
-										<xsd:attribute name="addNonce" type="mule:substitutableBoolean">
+                                            <xsd:simpleType>
+                                                <xsd:restriction base="xsd:string">
+                                                    <xsd:enumeration value="TEXT" />
+                                                    <xsd:enumeration value="DIGEST"/>
+                                                </xsd:restriction>
+                                            </xsd:simpleType>
+                                        </xsd:attribute>
+                                        <xsd:attribute name="addNonce" type="mule:substitutableBoolean">
                                             <xsd:annotation>
                                                 <xsd:documentation>
                                                     If true, a "Nonce" element is added to the UsernameToken in the request.
                                                 </xsd:documentation>
                                             </xsd:annotation>
                                         </xsd:attribute>
-										<xsd:attribute name="addCreated" type="mule:substitutableBoolean">
+                                        <xsd:attribute name="addCreated" type="mule:substitutableBoolean">
                                             <xsd:annotation>
                                                 <xsd:documentation>
                                                     If true, "Created" element is added to the UsernameToken in the request.
                                                 </xsd:documentation>
                                             </xsd:annotation>
                                         </xsd:attribute>
-									</xsd:complexType>
-								</xsd:element>
+                                    </xsd:complexType>
+                                </xsd:element>
                                 <xsd:element name="wss-timestamp" minOccurs="0">
                                     <xsd:annotation>
                                         <xsd:documentation>
@@ -210,56 +236,56 @@
                                         </xsd:attribute>
                                     </xsd:complexType>
                                 </xsd:element>
-							</xsd:sequence>
-	            		</xsd:complexType>
-	            	</xsd:element>
-            	</xsd:sequence>
-            	<xsd:attribute name="serviceAddress" type="xsd:string" use="required">
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="name" type="mule:substitutableName" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the configuration in the registry, so that it can be referenced by the consumer message processor.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="serviceAddress" type="xsd:string" >
                     <xsd:annotation>
                         <xsd:documentation>
                             Specifies the address of the web service.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-            	<xsd:attribute name="wsdlLocation" type="xsd:string" use="required">
+                <xsd:attribute name="wsdlLocation" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
                             The location of the WSDL file. This may be either a path to a local resource or a URL.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-            	<xsd:attribute name="wsdlService" type="xsd:string" use="required">
+                <xsd:attribute name="service" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
                             The name of the service that will be consumed. This service must exist in the WSDL file.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-            	<xsd:attribute name="wsdlPort" type="xsd:string" use="required">
+                <xsd:attribute name="port" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
                             The name of the port that will be used to consume the service. This port must exist in the WSDL file.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-            	<xsd:attribute name="wsdlOperation" type="xsd:string" use="required">
+                <xsd:attribute name="connector-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The operation that will be consumed. It must exist in the WSDL file, bound to the port and service specified.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            	<xsd:attribute name="connector-ref" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            A reference to the connector that will be used by this component. The connector must support the protocol that is
-                            specified in the serviceAddress attribute. If no connector is supplied, the default connector of the underlying
-                            transport will be used.
+                            A reference to the connector that will be used by this component. The protocol of the service
+                            address must be supported by this connector.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
+
 </xsd:schema>
