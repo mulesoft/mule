@@ -8,7 +8,6 @@ package org.mule.module.ws.functional;
 
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.ws.consumer.SoapFaultException;
@@ -31,8 +30,12 @@ public class AbstractWSConsumerFunctionalTestCase extends FunctionalTestCase
     @Rule
     public SystemProperty baseDir = new SystemProperty("baseDir", ClassUtils.getClassPathRoot(getClass()).getPath());
 
-    protected static final String ECHO_REQUEST = "<tns:echo xmlns:tns=\"http://consumer.ws.module.mule.org/\"><text>Hello</text></tns:echo>";
+    protected static final String ECHO_REQUEST = "<tns:echo xmlns:tns=\"http://consumer.ws.module.mule.org/\">" +
+                                                 "<text>Hello</text></tns:echo>";
 
+    protected static final String EXPECTED_ECHO_RESPONSE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                                                           "<ns2:echoResponse xmlns:ns2=\"http://consumer.ws.module.mule.org/\">" +
+                                                           "<text>Hello</text></ns2:echoResponse>";
 
     protected void assertValidResponse(String address) throws Exception
     {
@@ -43,7 +46,7 @@ public class AbstractWSConsumerFunctionalTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send(address, ECHO_REQUEST, properties);
-        assertTrue(response.getPayloadAsString().contains("<text>Hello</text>"));
+        assertEquals(EXPECTED_ECHO_RESPONSE, response.getPayload());
     }
 
     protected void assertSoapFault(String address, String expectedFaultCode) throws Exception

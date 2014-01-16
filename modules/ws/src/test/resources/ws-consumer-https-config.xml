@@ -12,7 +12,7 @@
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd">
 
-    <https:connector name="httpConnector">
+    <https:connector name="httpsConnector">
         <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
         <https:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
         <https:tls-server path="trustStore" storePassword="mulepassword"/>
