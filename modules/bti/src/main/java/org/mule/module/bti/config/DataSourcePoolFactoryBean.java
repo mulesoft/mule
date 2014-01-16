@@ -99,6 +99,37 @@ public class DataSourcePoolFactoryBean extends AbstractFactoryBean<BitronixXaDat
         builder.setName(name);
     }
 
+    public int getAcquireTimeoutSeconds()
+    {
+        return builder.getAcquisitionTimeoutSeconds();
+    }
+
+    public void setAcquireTimeoutSeconds(int acquisitionTimeoutSeconds)
+    {
+        builder.setAcquisitionTimeoutSeconds(acquisitionTimeoutSeconds);
+    }
+
+
+    public int getPreparedStatementCacheSize()
+    {
+        return builder.getPreparedStatementCacheSize();
+    }
+
+    public void setPreparedStatementCacheSize(int preparedStatementCacheSize)
+    {
+        builder.setPreparedStatementCacheSize(preparedStatementCacheSize);
+    }
+
+    public int getAcquireIncrement()
+    {
+        return builder.getAcquireIncrement();
+    }
+
+    public void setAcquireIncrement(int acquireIncrement)
+    {
+        builder.setAcquireIncrement(acquireIncrement);
+    }
+
     @Override
     public void setMuleContext(MuleContext muleContext)
     {
