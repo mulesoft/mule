@@ -361,6 +361,16 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         return message;
     }
 
+    /**
+     * An exception is thrown if http.status >= 400 and exceptions are not disabled
+     * through one of the following mechanisms in order of precedence:
+     *
+     *  - setting to true the flow variable "http.disable.status.code.exception.check"
+     *  - setting to true the outbound property "http.disable.status.code.exception.check"
+     *  - setting to false the outbound endpoint attribute "throwException"
+     *
+     * @return if an exception should be thrown
+     */
     protected boolean returnException(MuleEvent event, HttpMethod httpMethod)
     {
         String disableCheck = event.getMessage().getInvocationProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK);
@@ -368,8 +378,18 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         {
             disableCheck = event.getMessage().getOutboundProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK);
         }
-        return httpMethod.getStatusCode() >= ERROR_STATUS_CODE_RANGE_START
-                && !BooleanUtils.toBoolean(disableCheck);
+
+        boolean throwException;
+        if (disableCheck == null)
+        {
+            throwException = !"false".equals(endpoint.getProperty("throwException"));
+        }
+        else
+        {
+            throwException = !BooleanUtils.toBoolean(disableCheck);
+        }
+
+        return httpMethod.getStatusCode() >= ERROR_STATUS_CODE_RANGE_START && throwException;
     }
 
     protected HostConfiguration getHostConfig(URI uri) throws Exception
