@@ -8,6 +8,7 @@ package org.mule.transport.http;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageTypeNotSupportedException;
 import org.mule.transport.AbstractMuleMessageFactory;
@@ -49,6 +50,15 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
 
     public HttpMuleMessageFactory()
     {
+    }
+
+    /**
+     * @deprecated use {@link #HttpMuleMessageFactory()}  instead
+     */
+    @Deprecated
+    public HttpMuleMessageFactory(MuleContext context)
+    {
+        super(context);
     }
 
     @Override
