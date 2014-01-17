@@ -82,6 +82,7 @@ public class MuleObjectStoreManagerIntegrationTestCase extends AbstractMuleConte
     }
 
     @Test
+    @Ignore("MULE-6926: Flaky Test")
     public void expirationIntervalWithLowTTL() throws Exception
     {
         int maxEntries = 5;

@@ -6,7 +6,8 @@
  */
 package org.mule.util.lock;
 
-import org.junit.Test;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
@@ -21,8 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import org.junit.Ignore;
+import org.junit.Test;
 
 public class ServerLockTestCase extends AbstractMuleTestCase
 {
@@ -35,6 +36,7 @@ public class ServerLockTestCase extends AbstractMuleTestCase
     private InMemoryObjectStore objectStore  = new InMemoryObjectStore();
 
     @Test
+    @Ignore("MULE-6926: Flaky Test")
     public void testHighConcurrency() throws Exception
     {
         List<Thread> threads = new ArrayList<Thread>(THREAD_COUNT);
