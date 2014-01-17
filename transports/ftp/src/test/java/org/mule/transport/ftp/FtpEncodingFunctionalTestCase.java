@@ -6,16 +6,16 @@
  */
 package org.mule.transport.ftp;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.util.FileUtils;
 
 import java.io.File;
 
+import org.junit.Ignore;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class FtpEncodingFunctionalTestCase extends AbstractFtpServerTestCase
 {
@@ -33,6 +33,7 @@ public class FtpEncodingFunctionalTestCase extends AbstractFtpServerTestCase
     }
 
     @Test
+    @Ignore("MULE-6926: Flaky Test")
     public void testReadingFileWithEucJpEncodingGetsTheRightText() throws Exception
     {
         File tmpDir = new File(FTP_SERVER_BASE_DIR);
