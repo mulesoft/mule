@@ -7,10 +7,8 @@
 package org.mule.util.lock;
 
 
-import org.mockito.Answers;
-import org.mockito.Mockito;
-import org.mockito.internal.verification.VerificationModeFactory;
-import org.mockito.verification.VerificationMode;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
@@ -18,7 +16,6 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.concurrent.Latch;
 
-import org.junit.Test;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,8 +23,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.mockito.Answers;
+import org.mockito.Mockito;
+import org.mockito.internal.verification.VerificationModeFactory;
 
 public class InstanceLockGroupTestCase extends AbstractMuleTestCase
 {
@@ -41,24 +41,28 @@ public class InstanceLockGroupTestCase extends AbstractMuleTestCase
     private LockProvider mockLockProvider;
 
     @Test
+    @Ignore("MULE-6926: Flaky Test")
     public void testLockUnlock() throws Exception
     {
         testHighConcurrency(false);
     }
 
     @Test
+    @Ignore("MULE-6926: Flaky Test")
     public void testTryLockUnlock() throws Exception
     {
         testHighConcurrency(true);
     }
     
     @Test
+    @Ignore("MULE-6926: Flaky Test")
     public void testWhenUnlockThenDestroy() throws Exception
     {
         lockUnlockThenDestroy(1);
     }
 
     @Test
+    @Ignore("MULE-6926: Flaky Test")
     public void testWhenSeveralLockOneUnlockThenDestroy() throws Exception
     {
         lockUnlockThenDestroy(5);

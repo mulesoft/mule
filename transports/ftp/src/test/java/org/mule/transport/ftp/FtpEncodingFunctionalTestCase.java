@@ -17,6 +17,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
@@ -44,6 +45,7 @@ public class FtpEncodingFunctionalTestCase extends AbstractFtpServerTestCase
     }      
     
     @Test
+    @Ignore("MULE-6926: Flaky Test")
     public void testReadingFileWithEucJpEncodingGetsTheRightText() throws Exception
     {
         File tmpDir = new File(FTP_SERVER_BASE_DIR);
