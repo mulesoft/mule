@@ -14,7 +14,9 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.runners.Parameterized.Parameters;
+import org.junit.Ignore;
 
+@Ignore("MULE-6926: flaky test")
 public class SpringSecurityWithWsSecurityTestCase extends UsernameTokenTestCase
 {
     public SpringSecurityWithWsSecurityTestCase(ConfigVariant variant, String configResources)
