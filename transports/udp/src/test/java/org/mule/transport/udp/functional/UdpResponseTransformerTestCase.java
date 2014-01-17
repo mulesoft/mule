@@ -12,6 +12,7 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.udp.util.UdpClient;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -27,6 +28,7 @@ public class UdpResponseTransformerTestCase extends FunctionalTestCase
     }
 
     @Test
+    @Ignore("MULE-6926: Flaky Test")
     public void testResponseTransformer() throws Exception
     {
         UdpClient client = null;
