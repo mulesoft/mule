@@ -32,9 +32,12 @@ public class MultiuserSecurityTestCase extends FunctionalTestCase
 {
 
     @Override
-    protected String getConfigFile()
+    protected String[] getConfigFiles()
     {
-        return "multiuser-security-test-flow.xml, singleuser-security-provider.xml";
+        return new String[] {
+                "multiuser-security-test-flow.xml",
+                "singleuser-security-provider.xml"
+        };
     }
 
     @Test

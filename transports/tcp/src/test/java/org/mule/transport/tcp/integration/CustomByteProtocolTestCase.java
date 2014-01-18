@@ -31,7 +31,7 @@ public class CustomByteProtocolTestCase extends FunctionalTestCase
     @Override
     protected String getConfigFile()
     {
-        return "tcp-functional-test-flow.xml";
+        return "custom-serialisation-mule-config-flow.xml";
     }
 
     @Test

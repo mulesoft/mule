@@ -16,8 +16,11 @@ public class MultiuserSecurityWithMultiuserProviderTestCase extends MultiuserSec
 {
 
     @Override
-    protected String getConfigFile()
+    protected String[] getConfigFiles()
     {
-        return "multiuser-security-test-flow.xml, multiuser-security-provider.xml";
+        return new String[] {
+                "multiuser-security-test-flow.xml",
+                "multiuser-security-provider.xml"
+        };
     }
 }
