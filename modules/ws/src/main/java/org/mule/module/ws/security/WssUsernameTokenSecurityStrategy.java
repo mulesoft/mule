@@ -7,12 +7,10 @@
 
 package org.mule.module.ws.security;
 
-import org.mule.module.cxf.builder.ProxyClientMessageProcessorBuilder;
 import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,14 +18,11 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-import org.apache.cxf.interceptor.Interceptor;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.handler.WSHandlerConstants;
 
-public class WssUsernameTokenSecurityStrategy implements SecurityStrategy
+public class WssUsernameTokenSecurityStrategy extends AbstractSecurityStrategy implements SecurityStrategy
 {
 
     private String username;
@@ -37,10 +32,9 @@ public class WssUsernameTokenSecurityStrategy implements SecurityStrategy
     private boolean addCreated;
 
     @Override
-    public void apply(ProxyClientMessageProcessorBuilder builder)
+    public void apply(Map<String, Object> configProperties)
     {
-        Map<String, Object> configProperties = new HashMap<String, Object>();
-        configProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
+        appendAction(configProperties, WSHandlerConstants.USERNAME_TOKEN);
         configProperties.put(WSHandlerConstants.USER, username);
 
         if (passwordType == PasswordType.TEXT)
@@ -79,12 +73,6 @@ public class WssUsernameTokenSecurityStrategy implements SecurityStrategy
             }
         });
 
-        if (builder.getOutInterceptors() == null)
-        {
-            builder.setOutInterceptors(new ArrayList<Interceptor<? extends Message>>());
-        }
-
-        builder.getOutInterceptors().add(new WSS4JOutInterceptor(configProperties));
     }
 
     public void setUsername(String username)

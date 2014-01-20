@@ -194,6 +194,22 @@
                                         </xsd:attribute>
 									</xsd:complexType>
 								</xsd:element>
+                                <xsd:element name="wss-timestamp" minOccurs="0">
+                                    <xsd:annotation>
+                                        <xsd:documentation>
+                                            Adds a timestamp header to the SOAP request.
+                                        </xsd:documentation>
+                                    </xsd:annotation>
+                                    <xsd:complexType>
+                                        <xsd:attribute name="expires" type="mule:substitutableLong" use="required" >
+                                            <xsd:annotation>
+                                                <xsd:documentation>
+                                                    The time difference between creation and expiry time in seconds.
+                                                </xsd:documentation>
+                                            </xsd:annotation>
+                                        </xsd:attribute>
+                                    </xsd:complexType>
+                                </xsd:element>
 							</xsd:sequence>
 	            		</xsd:complexType>
 	            	</xsd:element>

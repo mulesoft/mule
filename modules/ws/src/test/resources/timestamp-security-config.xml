@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:ws="http://www.mulesoft.org/schema/mule/ws"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd">
+
+    <flow name="clientWithTimestamp">
+        <inbound-endpoint address="vm://clientWithTimestamp" exchange-pattern="request-response"/>
+
+        <ws:consumer serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
+                     wsdlService="EchoService"
+                     wsdlPort="EchoPort" wsdlOperation="echo">
+
+            <ws:security>
+                <ws:wss-timestamp expires="60" />
+            </ws:security>
+
+        </ws:consumer>
+    </flow>
+
+    <cxf:ws-security name="inboundConfig">
+        <cxf:ws-config>
+            <cxf:property key="action" value="Timestamp"/>
+        </cxf:ws-config>
+    </cxf:ws-security>
+
+    <flow name="server">
+        <inbound-endpoint address="http://localhost:${port}/services/Echo" exchange-pattern="request-response" />
+        <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.Echo" >
+            <cxf:ws-security ref="inboundConfig"/>
+        </cxf:jaxws-service>
+        <component class="org.mule.module.ws.consumer.Echo"/>
+    </flow>
+
+</mule>
