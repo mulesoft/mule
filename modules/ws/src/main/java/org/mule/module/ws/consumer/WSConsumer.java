@@ -30,7 +30,10 @@ import org.mule.processor.ResponseMessageProcessorAdapter;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.transformer.simple.AutoTransformer;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.wsdl.Binding;
 import javax.wsdl.BindingOperation;
@@ -45,6 +48,9 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
+import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 
 public class WSConsumer implements MessageProcessor, Initialisable
 {
@@ -174,15 +180,24 @@ public class WSConsumer implements MessageProcessor, Initialisable
     private CxfOutboundMessageProcessor createCxfOutboundMessageProcessor(WSSecurity security) throws MuleException
     {
         ProxyClientMessageProcessorBuilder cxfBuilder = new ProxyClientMessageProcessorBuilder();
+        Map<String, Object> configProperties = new HashMap<String, Object>();
+
         cxfBuilder.setMuleContext(muleContext);
 
         if (security != null)
         {
             for (SecurityStrategy strategy : security.getStrategies())
             {
-                strategy.apply(cxfBuilder);
+                strategy.apply(configProperties);
             }
+            if (cxfBuilder.getOutInterceptors() == null)
+            {
+                cxfBuilder.setOutInterceptors(new ArrayList<Interceptor<? extends Message>>());
+            }
+
+            cxfBuilder.getOutInterceptors().add(new WSS4JOutInterceptor(configProperties));
         }
+
 
         CxfOutboundMessageProcessor cxfOutboundMessageProcessor = cxfBuilder.build();
 

@@ -6,13 +6,13 @@
  */
 package org.mule.module.ws.security;
 
-import org.mule.module.cxf.builder.ProxyClientMessageProcessorBuilder;
+import java.util.Map;
 
 // TODO: MULE-7241 This interface should not depend on the CXF module.
 
 public interface SecurityStrategy
 {
     
-    public void apply(ProxyClientMessageProcessorBuilder proxyClientMessageProcessorBuilder);
+    public void apply(Map<String, Object> configProperties);
 
 }

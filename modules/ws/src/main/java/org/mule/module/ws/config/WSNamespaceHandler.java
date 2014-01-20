@@ -12,6 +12,7 @@ import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.module.ws.config.spring.factories.WSConsumerFactoryBean;
 import org.mule.module.ws.config.spring.parsers.specific.WSProxyDefinitionParser;
 import org.mule.module.ws.security.WSSecurity;
+import org.mule.module.ws.security.WssTimestampSecurityStrategy;
 import org.mule.module.ws.security.WssUsernameTokenSecurityStrategy;
 
 /**
@@ -26,8 +27,8 @@ public class WSNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("consumer", new MessageProcessorDefinitionParser(
             WSConsumerFactoryBean.class));
         registerBeanDefinitionParser("security", new ChildDefinitionParser("security", WSSecurity.class));
-        registerBeanDefinitionParser("wss-username-token", new ChildDefinitionParser("strategy",
-            WssUsernameTokenSecurityStrategy.class));
+        registerBeanDefinitionParser("wss-username-token", new ChildDefinitionParser("strategy", WssUsernameTokenSecurityStrategy.class));
+        registerBeanDefinitionParser("wss-timestamp", new ChildDefinitionParser("strategy", WssTimestampSecurityStrategy.class));
 
     }
 }
