@@ -293,10 +293,10 @@ public class FakeMuleServer
 
     public void addZippedPlugin(String resource) throws IOException, URISyntaxException
     {
-        URI uri = getClass().getClassLoader().getResource(resource).toURI();
-        String baseName = FilenameUtils.getName(uri.getPath());
+        URL url = getClass().getClassLoader().getResource(resource).toURI().toURL();
+        String baseName = FilenameUtils.getName(url.getPath());
         File tempFile = new File(getPluginsDir(), baseName);
-        FileUtils.copyURLToFile(uri.toURL(), tempFile);
+        FileUtils.copyURLToFile(url, tempFile);
     }
 
     public File getMuleHome()
