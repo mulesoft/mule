@@ -52,6 +52,9 @@ public class HttpConstants
     // The default content type
     public static final String DEFAULT_CONTENT_TYPE = "text/plain";
 
+    //form-urlencoded content type
+    public static final String FORM_URLENCODED_CONTENT_TYPE = "application/x-www-form-urlencoded";
+
     // Headers
     public static final String HEADER_ACCEPT = "Accept"; // [Request]
     public static final String HEADER_ACCEPT_CHARSET = "Accept-Charset"; // [Request]
