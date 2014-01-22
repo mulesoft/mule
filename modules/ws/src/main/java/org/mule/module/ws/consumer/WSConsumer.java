@@ -10,17 +10,16 @@ package org.mule.module.ws.consumer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
+import org.mule.api.registry.RegistrationException;
 import org.mule.api.transformer.DataType;
-import org.mule.api.transport.Connector;
 import org.mule.api.transport.DispatchException;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.endpoint.MuleEndpointURI;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.builder.ProxyClientMessageProcessorBuilder;
 import org.mule.module.ws.security.SecurityStrategy;
@@ -52,30 +51,77 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 
-public class WSConsumer implements MessageProcessor, Initialisable
+public class WSConsumer implements MessageProcessor, Initialisable, MuleContextAware
 {
 
     private static final String SOAP_ACTION_PROPERTY = "SOAPAction";
 
-    private final MessageProcessor messageProcessor;
-    private final MuleContext muleContext;
-
-    private final String wsdlLocation;
-    private final String wsdlService;
-    private final String wsdlPort;
-    private final String wsdlOperation;
-
+    private MuleContext muleContext;
+    private String operation;
+    private WSConsumerConfig config;
+    private MessageProcessor messageProcessor;
     private String soapAction;
 
-    public WSConsumer(String wsdlLocation, String wsdlService, String wsdlPort, String wsdlOperation, String serviceAddress,
-                      Connector connector, WSSecurity security, MuleContext muleContext) throws MuleException
-    {
-        this.wsdlLocation = wsdlLocation;
-        this.wsdlService = wsdlService;
-        this.wsdlPort = wsdlPort;
-        this.wsdlOperation = wsdlOperation;
-        this.muleContext = muleContext;
 
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        initializeConfiguration();
+        initializeSoapActionFromWsdl();
+
+        try
+        {
+            messageProcessor = createMessageProcessor();
+        }
+        catch (MuleException e)
+        {
+            throw new InitialisationException(e, this);
+        }
+    }
+
+
+    @Override
+    public MuleEvent process(MuleEvent event) throws MuleException
+    {
+        if (soapAction != null)
+        {
+            event.getMessage().setOutboundProperty(SOAP_ACTION_PROPERTY, soapAction);
+        }
+        return messageProcessor.process(event);
+    }
+
+
+    /**
+     * Initializes the configuration for this web service consumer. If no reference to WSConsumerConfig is set,
+     * then it is looked up in the registry (only one object of this type must exist in the registry, or an
+     * InitializationException will be thrown).
+     */
+    private void initializeConfiguration() throws InitialisationException
+    {
+        if (config == null)
+        {
+            try
+            {
+                config = muleContext.getRegistry().lookupObject(WSConsumerConfig.class);
+                if (config == null)
+                {
+                    throw new InitialisationException(CoreMessages.createStaticMessage("No configuration defined for the web service " +
+                                                                                       "consumer. Add a consumer-config element."), this);
+                }
+            }
+            catch (RegistrationException e)
+            {
+                throw new InitialisationException(e, this);
+            }
+        }
+    }
+
+    /**
+     * Creates the message processor chain in which we will delegate the process of mule events.
+     * The chain composes a string transformer, a CXF client proxy and and outbound endpoint.
+     */
+    private MessageProcessor createMessageProcessor() throws MuleException
+    {
         MessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder();
 
         // TODO: MULE-7242 Define if this transformer should be added to the chain or not.
@@ -120,63 +166,15 @@ public class WSConsumer implements MessageProcessor, Initialisable
             }
         });
 
-        chainBuilder.chain(createCxfOutboundMessageProcessor(security));
-        chainBuilder.chain(createEndpoint(serviceAddress, connector));
+        chainBuilder.chain(createCxfOutboundMessageProcessor(config.getSecurity()));
+        chainBuilder.chain(config.createOutboundEndpoint());
 
-        messageProcessor = chainBuilder.build();
+        return chainBuilder.build();
     }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        try
-        {
-            WSDLReader wsdlReader = WSDLFactory.newInstance().newWSDLReader();
-            Definition wsdlDefinition = wsdlReader.readWSDL(wsdlLocation);
-
-            Service service = wsdlDefinition.getService(new QName(wsdlDefinition.getTargetNamespace(), wsdlService));
-            if (service == null)
-            {
-                throw new InitialisationException(MessageFactory.createStaticMessage("Service %s not found in WSDL", wsdlService), this);
-            }
-
-            Port port = service.getPort(wsdlPort);
-            if (port == null)
-            {
-                throw new InitialisationException(MessageFactory.createStaticMessage("Port %s not found in WSDL", wsdlPort), this);
-            }
-
-            Binding binding = port.getBinding();
-            if (binding == null)
-            {
-                throw new InitialisationException(MessageFactory.createStaticMessage("Port %s has no binding", wsdlPort), this);
-            }
-
-            BindingOperation operation = binding.getBindingOperation(wsdlOperation, null, null);
-            if (operation == null)
-            {
-                throw new InitialisationException(MessageFactory.createStaticMessage("Operation %s not found in WSDL", wsdlOperation), this);
-            }
-
-            this.soapAction = getSoapAction(operation);
-        }
-        catch (WSDLException e)
-        {
-            throw new InitialisationException(e, this);
-        }
-    }
-
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        if (soapAction != null)
-        {
-            event.getMessage().setOutboundProperty(SOAP_ACTION_PROPERTY, soapAction);
-        }
-        return messageProcessor.process(event);
-    }
-
-
+    /**
+     * Creates the CXF message processor that will be used to create the SOAP envelope.
+     */
     private CxfOutboundMessageProcessor createCxfOutboundMessageProcessor(WSSecurity security) throws MuleException
     {
         ProxyClientMessageProcessorBuilder cxfBuilder = new ProxyClientMessageProcessorBuilder();
@@ -207,36 +205,80 @@ public class WSConsumer implements MessageProcessor, Initialisable
         return cxfOutboundMessageProcessor;
     }
 
-
-    private OutboundEndpoint createEndpoint(String address, Connector connector) throws MuleException
+    /**
+     * Parses the WSDL file in order to get the SOAP Action (if defined) for the specified service, operation and port.
+     */
+    private void initializeSoapActionFromWsdl() throws InitialisationException
     {
-        if (connector != null)
+        try
         {
-            String protocol = new MuleEndpointURI(address, muleContext).getScheme();
-            if (!connector.supportsProtocol(protocol))
+            WSDLReader wsdlReader = WSDLFactory.newInstance().newWSDLReader();
+            Definition wsdlDefinition = wsdlReader.readWSDL(config.getWsdlLocation());
+
+            Service service = wsdlDefinition.getService(new QName(wsdlDefinition.getTargetNamespace(), config.getService()));
+            if (service == null)
             {
-                throw new IllegalStateException(String.format("Connector %s does not support protocol: %s", connector, protocol));
+                throw new InitialisationException(MessageFactory.createStaticMessage("Service %s not found in WSDL", config.getService()), this);
+            }
+
+            Port port = service.getPort(config.getPort());
+            if (port == null)
+            {
+                throw new InitialisationException(MessageFactory.createStaticMessage("Port %s not found in WSDL", config.getPort()), this);
+            }
+
+            Binding binding = port.getBinding();
+            if (binding == null)
+            {
+                throw new InitialisationException(MessageFactory.createStaticMessage("Port %s has no binding", config.getPort()), this);
+            }
+
+            BindingOperation operation = binding.getBindingOperation(this.operation, null, null);
+            if (operation == null)
+            {
+                throw new InitialisationException(MessageFactory.createStaticMessage("Operation %s not found in WSDL", this.operation), this);
+            }
+
+            List extensions = operation.getExtensibilityElements();
+            for (Object extension : extensions)
+            {
+                if (extension instanceof SOAPOperation)
+                {
+                    this.soapAction = ((SOAPOperation) extension).getSoapActionURI();
+                    return;
+                }
             }
         }
-        EndpointBuilder builder = muleContext.getEndpointFactory().getEndpointBuilder(address);
-        builder.setConnector(connector);
-        return muleContext.getEndpointFactory().getOutboundEndpoint(builder);
+        catch (WSDLException e)
+        {
+            throw new InitialisationException(e, this);
+        }
     }
 
-    /**
-     * Returns the Soap Action for a binding operation of a WSDL, or null if there is no action defined.
-     */
-    private String getSoapAction(BindingOperation bindingOperation)
-    {
-        List extensions = bindingOperation.getExtensibilityElements();
-        for (Object extension : extensions)
-        {
-            if (extension instanceof SOAPOperation)
-            {
-                return ((SOAPOperation) extension).getSoapActionURI();
-            }
-        }
 
-        return null;
+    @Override
+    public void setMuleContext(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+    }
+
+    public WSConsumerConfig getConfig()
+    {
+        return config;
+    }
+
+    public void setConfig(WSConsumerConfig config)
+    {
+        this.config = config;
+    }
+
+    public String getOperation()
+    {
+        return operation;
+    }
+
+    public void setOperation(String operation)
+    {
+        this.operation = operation;
     }
 }

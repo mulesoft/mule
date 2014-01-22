@@ -10,18 +10,16 @@
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd">
 
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
+                        service="EchoService" port="EchoPort" name="configValidCredentialsText">
+        <ws:security>
+            <ws:wss-timestamp expires="60" />
+        </ws:security>
+    </ws:consumer-config>
+
     <flow name="clientWithTimestamp">
         <inbound-endpoint address="vm://clientWithTimestamp" exchange-pattern="request-response"/>
-
-        <ws:consumer serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
-                     wsdlService="EchoService"
-                     wsdlPort="EchoPort" wsdlOperation="echo">
-
-            <ws:security>
-                <ws:wss-timestamp expires="60" />
-            </ws:security>
-
-        </ws:consumer>
+        <ws:consumer operation="echo"/>
     </flow>
 
     <cxf:ws-security name="inboundConfig">

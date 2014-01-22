@@ -16,19 +16,18 @@
         <component class="org.mule.module.ws.consumer.Echo"/>
     </flow>
 
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
+                        service="EchoService" port="EchoPort" name="globalConfig" />
+
     <flow name="soapFaultWithoutCatchExceptionStrategy" processingStrategy="synchronous">
 
-        <ws:consumer serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
-                     wsdlService="EchoService"
-                     wsdlPort="EchoPort" wsdlOperation="fail"/>
+        <ws:consumer operation="fail"/>
     </flow>
 
 
     <flow name="soapFaultWithCatchExceptionStrategy" processingStrategy="synchronous">
 
-        <ws:consumer serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
-                     wsdlService="EchoService"
-                     wsdlPort="EchoPort" wsdlOperation="fail"/>
+        <ws:consumer operation="fail"/>
 
         <catch-exception-strategy>
             <set-property propertyName="soapFaultException" value="#[exception]" />
