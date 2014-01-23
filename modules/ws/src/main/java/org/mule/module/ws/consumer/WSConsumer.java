@@ -17,9 +17,13 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.transformer.DataType;
+import org.mule.api.transformer.Transformer;
+import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.DispatchException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.builder.ProxyClientMessageProcessorBuilder;
 import org.mule.module.ws.security.SecurityStrategy;
@@ -28,6 +32,8 @@ import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.ResponseMessageProcessorAdapter;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.transformer.simple.AutoTransformer;
+import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.SimpleDataType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,15 +52,25 @@ import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.soap.SoapFault;
+import org.apache.cxf.binding.soap.SoapHeader;
+import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.headers.Header;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
+import org.w3c.dom.Document;
+
 
 public class WSConsumer implements MessageProcessor, Initialisable, MuleContextAware
 {
 
-    private static final String SOAP_ACTION_PROPERTY = "SOAPAction";
+    public static final String SOAP_ACTION_PROPERTY = "SOAPAction";
+    public static final String SOAP_HEADERS_PROPERTY_PREFIX = "soap.";
 
     private MuleContext muleContext;
     private String operation;
@@ -167,6 +183,27 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
         });
 
         chainBuilder.chain(createCxfOutboundMessageProcessor(config.getSecurity()));
+
+        // Add a MessageProcessor to remove outbound properties that are mapped to SOAP headers, so that the
+        // underlying transport does not include them as headers.
+        chainBuilder.chain(new MessageProcessor()
+        {
+            @Override
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                List<String> outboundProperties = new ArrayList<String>(event.getMessage().getOutboundPropertyNames());
+
+                for (String outboundProperty : outboundProperties)
+                {
+                    if (outboundProperty.startsWith(SOAP_HEADERS_PROPERTY_PREFIX))
+                    {
+                        event.getMessage().removeProperty(outboundProperty, PropertyScope.OUTBOUND);
+                    }
+                }
+                return event;
+            }
+        });
+
         chainBuilder.chain(config.createOutboundEndpoint());
 
         return chainBuilder.build();
@@ -201,6 +238,9 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
 
         // We need this interceptor so that an exception is thrown when the response contains a SOAPFault.
         cxfOutboundMessageProcessor.getClient().getInInterceptors().add(new CheckFaultInterceptor());
+
+        cxfOutboundMessageProcessor.getClient().getOutInterceptors().add(new InputSoapHeadersInterceptor(muleContext));
+        cxfOutboundMessageProcessor.getClient().getInInterceptors().add(new OutputSoapHeadersInterceptor(muleContext));
 
         return cxfOutboundMessageProcessor;
     }
@@ -280,5 +320,110 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     public void setOperation(String operation)
     {
         this.operation = operation;
+    }
+
+
+    /**
+     * CXF interceptor that adds Soap headers to the SoapMessage based on outbound properties
+     * from the Mule message that start with the soap prefix.
+     */
+    private class InputSoapHeadersInterceptor extends AbstractSoapInterceptor
+    {
+
+        private final MuleContext muleContext;
+
+        public InputSoapHeadersInterceptor(MuleContext muleContext)
+        {
+            super(Phase.PRE_PROTOCOL);
+            this.muleContext = muleContext;
+        }
+
+        @Override
+        public void handleMessage(SoapMessage message) throws Fault
+        {
+            Map<String, Object> invocationContext = (Map<String, Object>) message.get(Message.INVOCATION_CONTEXT);
+            Map<String, Object> requestContext = (Map<String, Object>) invocationContext.get(Client.REQUEST_CONTEXT);
+
+            /* Outbound properties are copied to the CXF request context by the CxfOutboundMessageProcessor. As CXF
+             * generates the message lazily, by the time this interceptor is executed the outbound SOAP headers are
+             * already removed from the Mule message, so we need to read them from the request context. */
+
+            for (String outboundProperty : requestContext.keySet())
+            {
+                if (outboundProperty.startsWith(SOAP_HEADERS_PROPERTY_PREFIX))
+                {
+                    Object value = requestContext.get(outboundProperty);
+
+                    try
+                    {
+                        Transformer transformer = muleContext.getRegistry().lookupTransformer(DataTypeFactory.createFromObject(value),
+                                                                                              new SimpleDataType(Document.class));
+                        Document document = (Document) transformer.transform(value);
+
+                        // This QName is required by the SoapHeader but it is not used.
+                        QName qname = new QName(null, document.getDocumentElement().getTagName());
+
+                        message.getHeaders().add(new SoapHeader(qname, document.getDocumentElement()));
+                    }
+                    catch (TransformerException e)
+                    {
+                        MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
+                        throw new InvalidSoapHeaderException(CoreMessages.createStaticMessage("Outbound property %s " +
+                                                                                              "contains an invalid XML string",
+                                                                                              outboundProperty), e, event);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * CXF interceptor that adds inbound properties to the Mule message based on the SOAP headers
+     * received in the response.
+     */
+    private static class OutputSoapHeadersInterceptor extends AbstractSoapInterceptor
+    {
+
+        private final MuleContext muleContext;
+
+        public OutputSoapHeadersInterceptor(MuleContext muleContext)
+        {
+            super(Phase.PRE_PROTOCOL);
+            this.muleContext = muleContext;
+        }
+
+        @Override
+        public void handleMessage(SoapMessage message) throws Fault
+        {
+            MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
+
+            if (event == null)
+            {
+                return;
+            }
+
+            for (Header header : message.getHeaders())
+            {
+                if (header instanceof SoapHeader)
+                {
+                    try
+                    {
+                        DataType sourceType = DataTypeFactory.createFromObject(header.getObject());
+                        Transformer transformer = muleContext.getRegistry().lookupTransformer(sourceType, DataType.STRING_DATA_TYPE);
+
+                        String key = SOAP_HEADERS_PROPERTY_PREFIX + header.getName().getLocalPart();
+                        String value = (String) transformer.transform(header.getObject());
+
+                        event.getMessage().setProperty(key, value, PropertyScope.INBOUND);
+                    }
+                    catch (TransformerException e)
+                    {
+                        throw new InvalidSoapHeaderException(CoreMessages.createStaticMessage("Cannot parse content " +
+                                                                                              "of SOAP header %s in the response",
+                                                                                              header.getName().getLocalPart()), e, event);
+                    }
+                }
+            }
+        }
     }
 }

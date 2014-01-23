@@ -10,6 +10,7 @@ import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
+import javax.xml.ws.Holder;
 
 /**
  * Web service used by WS Consumer tests.
@@ -29,6 +30,18 @@ public class Echo
     public String fail(@WebParam(name = "text") String s) throws EchoException
     {
         throw new EchoException(s);
+    }
+
+    @WebResult(name = "text")
+    @WebMethod(action = "echoWithHeaders")
+    public String echoWithHeaders(@WebParam(name = "headerIn", header = true, mode = WebParam.Mode.IN) String headerIn,
+                                  @WebParam(name = "headerOut", header = true, mode = WebParam.Mode.OUT) Holder<String> headerOut,
+                                  @WebParam(name = "headerInOut", header = true, mode = WebParam.Mode.INOUT) Holder<String> headerInOut,
+                                  @WebParam(name = "text") String s)
+    {
+        headerOut.value = headerIn + " OUT";
+        headerInOut.value = headerInOut.value + " INOUT";
+        return s;
     }
 
 }
