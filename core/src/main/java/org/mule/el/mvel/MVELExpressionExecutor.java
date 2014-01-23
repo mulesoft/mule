@@ -33,6 +33,7 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
         this.parserContext = parserContext;
     }
 
+    @Override
     public Object execute(String expression, MVELExpressionLanguageContext context)
     {
         // Use reflective optimizer rather than default to avoid concurrency issues with JIT complication.
@@ -46,6 +47,7 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
         return MVEL.executeExpression(getCompiledExpression(expression), context);
     }
 
+    @Override
     public void validate(String expression) throws InvalidExpressionException
     {
         getCompiledExpression(expression);
@@ -66,7 +68,7 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
         }
         else
         {
-            Serializable compiledExpression = MVEL.compileExpression(expression, parserContext);
+            Serializable compiledExpression = MVEL.compileExpression(expression, parserContext.createSubcontext());
             compiledExpressionsCache.put(expression, compiledExpression);
             return compiledExpression;
         }
