@@ -373,8 +373,8 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         }
     }
 
+
     @Test
-    @Ignore("MULE-6926: flaky test")
     public void testConcurrentEvaluation() throws Exception
     {
         muleContext.getRegistry().registerObject("dummy-el-extension", new DummyExpressionLanguageExtension());
