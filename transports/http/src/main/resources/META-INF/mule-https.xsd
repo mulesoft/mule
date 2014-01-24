@@ -32,7 +32,7 @@
         </xsd:appinfo>
     </xsd:annotation>
 
-    <xsd:element name="connector" type="httpsConnectorType" substitutionGroup="mule:abstract-connector">
+    <xsd:element name="connector" type="httpsConnectorType" substitutionGroup="mule:abstract-shared-connector">
         <xsd:annotation>
             <xsd:documentation>
                 This connector provides Secure HTTP connectivity on top of what is already provided with the Mule [HTTP Transport].

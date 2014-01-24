@@ -57,33 +57,16 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase
         });
     }
 
-    protected ConfigurationBuilder getDomainBuilder(String configResource) throws Exception
-    {
-        return new SpringXmlDomainConfigurationBuilder(configResource);
-    }
-
     @Before
     public void setUpMuleContexts() throws Exception
     {
-        createDomainContext();
+        domainContext = new DomainContextBuilder().setDomainConfig(getDomainConfig()).build();
         ApplicationConfig[] applicationConfigs = getConfigResources();
         for (ApplicationConfig applicationConfig : applicationConfigs)
         {
             MuleContext muleContext = createAppMuleContext(applicationConfig.applicationResources);
-            muleContext.start();
             muleContexts.put(applicationConfig.applicationName, muleContext);
         }
-    }
-
-    private void createDomainContext() throws Exception
-    {
-        List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(3);
-        ConfigurationBuilder cfgBuilder = getDomainBuilder(getDomainConfig());
-        builders.add(new DefaultsConfigurationBuilder());
-        builders.add(cfgBuilder);
-        DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-        domainContext = muleContextFactory.createMuleContext(builders, new DefaultMuleContextBuilder());
-        domainContext.start();
     }
 
     @After
@@ -105,38 +88,7 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase
 
     protected MuleContext createAppMuleContext(String[] configResource) throws Exception
     {
-        // Should we set up the manager for every method?
-        MuleContext context;
-        MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-        List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>();
-        //If the annotations module is on the classpath, add the annotations config builder to the list
-        //This will enable annotations config for this instance
-        if (ClassUtils.isClassOnPath(AbstractMuleContextTestCase.CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, getClass()))
-        {
-            builders.add((ConfigurationBuilder) ClassUtils.instanciateClass(AbstractMuleContextTestCase.CLASSNAME_ANNOTATIONS_CONFIG_BUILDER,
-                                                                            ClassUtils.NO_ARGS, getClass()));
-        }
-        builders.add(getAppBuilder(configResource));
-        DefaultMuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
-        configureMuleContext(contextBuilder);
-        context = muleContextFactory.createMuleContext(builders, contextBuilder);
-        return context;
-    }
-
-    protected ConfigurationBuilder getAppBuilder(String[] configResource) throws Exception
-    {
-        SpringXmlConfigurationBuilder springXmlConfigurationBuilder = new SpringXmlConfigurationBuilder(configResource);
-        springXmlConfigurationBuilder.setDomainContext(domainContext);
-        return springXmlConfigurationBuilder;
-    }
-
-    /**
-     * Override this method to set properties of the MuleContextBuilder before it is
-     * used to create the MuleContext.
-     */
-    protected void configureMuleContext(MuleContextBuilder contextBuilder)
-    {
-        contextBuilder.setWorkListener(new TestingWorkListener());
+        return new ApplicationContextBuilder().setDomainContext(domainContext).setApplicationResources(configResource).build();
     }
 
     public abstract ApplicationConfig[] getConfigResources();
