@@ -30,7 +30,7 @@ public class HttpSharePortSamePathTestCase extends AbstractMuleTestCase
     public SystemProperty endpointScheme = getEndpointSchemeSystemProperty();
 
     @Test
-    public void bothServicesBindCorrectly() throws Exception
+    public void samePathDefinedInTwoAppsWithinSameDomain() throws Exception
     {
         MuleContext domainContext = new DomainContextBuilder().setDomainConfig("domain/http-shared-connector.xml").build();
         MuleContext firstAppContext = new ApplicationContextBuilder().setApplicationResources(new String[] {"domain/http-hello-mule-app.xml"}).setDomainContext(domainContext).build();
