@@ -3,6 +3,8 @@
         <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://consumer.ws.module.mule.org/" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://consumer.ws.module.mule.org/">
             <xs:element name="echo" type="tns:echo"/>
             <xs:element name="echoResponse" type="tns:echoResponse"/>
+            <xs:element name="echoWithHeaders" type="tns:echoWithHeaders"/>
+            <xs:element name="echoWithHeadersResponse" type="tns:echoWithHeadersResponse"/>
             <xs:element name="fail" type="tns:fail"/>
             <xs:element name="failResponse" type="tns:failResponse"/>
             <xs:complexType name="fail">
@@ -20,6 +22,16 @@
                     <xs:element minOccurs="0" name="text" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
+            <xs:complexType name="echoWithHeaders">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="text" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="echoWithHeadersResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="text" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
             <xs:complexType name="echo">
                 <xs:sequence>
                     <xs:element minOccurs="0" name="text" type="xs:string"/>
@@ -31,6 +43,9 @@
                 </xs:sequence>
             </xs:complexType>
             <xs:element name="EchoFault" nillable="true" type="tns:echoFault"/>
+            <xs:element name="headerIn" nillable="true" type="xs:string"/>
+            <xs:element name="headerInOut" nillable="true" type="xs:string"/>
+            <xs:element name="headerOut" nillable="true" type="xs:string"/>
         </xs:schema>  </wsdl:types>
     <wsdl:message name="failResponse">
         <wsdl:part element="tns:failResponse" name="parameters">
@@ -48,6 +63,22 @@
         <wsdl:part element="tns:EchoFault" name="EchoException">
         </wsdl:part>
     </wsdl:message>
+    <wsdl:message name="echoWithHeadersResponse">
+        <wsdl:part element="tns:echoWithHeadersResponse" name="result">
+        </wsdl:part>
+        <wsdl:part element="tns:headerOut" name="headerOut">
+        </wsdl:part>
+        <wsdl:part element="tns:headerInOut" name="headerInOut">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="echoWithHeaders">
+        <wsdl:part element="tns:echoWithHeaders" name="parameters">
+        </wsdl:part>
+        <wsdl:part element="tns:headerIn" name="headerIn">
+        </wsdl:part>
+        <wsdl:part element="tns:headerInOut" name="headerInOut">
+        </wsdl:part>
+    </wsdl:message>
     <wsdl:message name="fail">
         <wsdl:part element="tns:fail" name="parameters">
         </wsdl:part>
@@ -60,6 +91,12 @@
             </wsdl:output>
             <wsdl:fault message="tns:EchoException" name="EchoException">
             </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="echoWithHeaders">
+            <wsdl:input message="tns:echoWithHeaders" name="echoWithHeaders">
+            </wsdl:input>
+            <wsdl:output message="tns:echoWithHeadersResponse" name="echoWithHeadersResponse">
+            </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="echo">
             <wsdl:input message="tns:echo" name="echo">
@@ -81,6 +118,23 @@
             <wsdl:fault name="EchoException">
                 <soap:fault name="EchoException" use="literal"/>
             </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="echoWithHeaders">
+            <soap:operation soapAction="echoWithHeaders" style="document"/>
+            <wsdl:input name="echoWithHeaders">
+                <soap:header message="tns:echoWithHeaders" part="headerIn" use="literal">
+                </soap:header>
+                <soap:header message="tns:echoWithHeaders" part="headerInOut" use="literal">
+                </soap:header>
+                <soap:body parts="parameters" use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="echoWithHeadersResponse">
+                <soap:header message="tns:echoWithHeadersResponse" part="headerOut" use="literal">
+                </soap:header>
+                <soap:header message="tns:echoWithHeadersResponse" part="headerInOut" use="literal">
+                </soap:header>
+                <soap:body parts="result" use="literal"/>
+            </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="echo">
             <soap:operation soapAction="echo" style="document"/>

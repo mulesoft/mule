@@ -18,6 +18,7 @@ import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transport.DispatchException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
@@ -51,10 +52,12 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 
+
 public class WSConsumer implements MessageProcessor, Initialisable, MuleContextAware
 {
 
-    private static final String SOAP_ACTION_PROPERTY = "SOAPAction";
+    public static final String SOAP_ACTION_PROPERTY = "SOAPAction";
+    public static final String SOAP_HEADERS_PROPERTY_PREFIX = "soap.";
 
     private MuleContext muleContext;
     private String operation;
@@ -167,6 +170,27 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
         });
 
         chainBuilder.chain(createCxfOutboundMessageProcessor(config.getSecurity()));
+
+        // Add a MessageProcessor to remove outbound properties that are mapped to SOAP headers, so that the
+        // underlying transport does not include them as headers.
+        chainBuilder.chain(new MessageProcessor()
+        {
+            @Override
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                List<String> outboundProperties = new ArrayList<String>(event.getMessage().getOutboundPropertyNames());
+
+                for (String outboundProperty : outboundProperties)
+                {
+                    if (outboundProperty.startsWith(SOAP_HEADERS_PROPERTY_PREFIX))
+                    {
+                        event.getMessage().removeProperty(outboundProperty, PropertyScope.OUTBOUND);
+                    }
+                }
+                return event;
+            }
+        });
+
         chainBuilder.chain(config.createOutboundEndpoint());
 
         return chainBuilder.build();
@@ -201,6 +225,9 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
 
         // We need this interceptor so that an exception is thrown when the response contains a SOAPFault.
         cxfOutboundMessageProcessor.getClient().getInInterceptors().add(new CheckFaultInterceptor());
+
+        cxfOutboundMessageProcessor.getClient().getOutInterceptors().add(new InputSoapHeadersInterceptor(muleContext));
+        cxfOutboundMessageProcessor.getClient().getInInterceptors().add(new OutputSoapHeadersInterceptor(muleContext));
 
         return cxfOutboundMessageProcessor;
     }
@@ -281,4 +308,5 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     {
         this.operation = operation;
     }
+
 }
