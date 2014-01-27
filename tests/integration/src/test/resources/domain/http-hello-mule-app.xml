@@ -8,7 +8,7 @@
 
 
     <flow name="helloMuleFlow">
-        <http:inbound-endpoint path="/service/helloMule" host="localhost" port="${port1}" connector-ref="sharedHttpConnector"/>
+        <inbound-endpoint address="${scheme}://localhost:${port1}/service/helloMule" connector-ref="sharedHttpConnector"/>
         <set-payload value="hello mule"/>
     </flow>
 
