@@ -17,7 +17,7 @@ import org.junit.Test;
 /**
  *
  */
-public class BitronixTransactionManagerTestCase extends FunctionalTestCase
+public class BitronixJmsConnectionPoolWithActiveMqXaConnectorTestCase extends FunctionalTestCase
 {
 
     @Override
@@ -28,7 +28,7 @@ public class BitronixTransactionManagerTestCase extends FunctionalTestCase
 
 
     @Test
-    public void sendMessage() throws Exception
+    public void connectWithUsernameAndPassword() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
 
