@@ -28,7 +28,7 @@
 
         </xsd:appinfo>
     </xsd:annotation>
-    <xsd:element name="connector" type="vmConnectorType" substitutionGroup="mule:abstract-shared-connector"/>
+    <xsd:element name="connector" type="vmConnectorType" substitutionGroup="mule:abstract-connector"/>
     <xsd:complexType name="vmConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:transactedConnectorType">

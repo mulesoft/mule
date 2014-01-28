@@ -2,6 +2,8 @@
 <xsd:schema xmlns="http://www.mulesoft.org/schema/mule/domain"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            xmlns:http="http://www.mulesoft.org/schema/mule/http"
+            xmlns:https="http://www.mulesoft.org/schema/mule/https"
             targetNamespace="http://www.mulesoft.org/schema/mule/domain"
             attributeFormDefault="unqualified"
             elementFormDefault="qualified">
@@ -9,7 +11,10 @@
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
                 schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"/>
-
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/http"
+                schemaLocation="http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/https"
+                schemaLocation="http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd"/>
 
     <xsd:element name="mule-domain" type="muleDomainType">
         <xsd:annotation>
@@ -30,7 +35,7 @@
                         </xsd:annotation>
                     </xsd:element>
                     <xsd:choice minOccurs="0" maxOccurs="unbounded">
-                        <xsd:group ref="muleDomainRootElements"/>
+                        <xsd:group ref="sharedElements"/>
                     </xsd:choice>
                 </xsd:sequence>
                 <xsd:attribute name="version" type ="xsd:string"/>
@@ -38,9 +43,10 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:group name="muleDomainRootElements">
+    <xsd:group name="sharedElements">
         <xsd:choice>
-            <xsd:element ref="mule:abstract-shared-connector"/>
+            <xsd:element ref="http:connector"/>
+            <xsd:element ref="https:connector"/>
         </xsd:choice>
     </xsd:group>
 
