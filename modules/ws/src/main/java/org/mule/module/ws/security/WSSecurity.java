@@ -24,4 +24,9 @@ public class WSSecurity
         this.strategies = strategies;
     }
 
+    public boolean hasStrategies()
+    {
+        return strategies != null && !strategies.isEmpty();
+    }
+
 }
