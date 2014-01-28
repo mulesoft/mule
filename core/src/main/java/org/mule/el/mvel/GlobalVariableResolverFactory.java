@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.ast.Function;
+import org.mule.mvel2.ast.FunctionInstance;
 
 public class GlobalVariableResolverFactory extends MVELExpressionLanguageContext
 {
@@ -43,7 +44,7 @@ public class GlobalVariableResolverFactory extends MVELExpressionLanguageContext
         }
         for (Entry<String, Function> function : el.globalFunctions.entrySet())
         {
-            addFinalVariable(function.getKey(), function.getValue());
+            addFinalVariable(function.getKey(), new FunctionInstance(function.getValue()));
         }
     }
 
