@@ -9,6 +9,7 @@ package org.mule.module.ws.consumer;
 
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.module.ws.security.WSSecurity;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.util.ClassUtils;
@@ -23,6 +24,14 @@ public class WSConsumerTestCase extends AbstractMuleContextTestCase
     public void initialisesCorrectlyWithValidArguments() throws MuleException
     {
         WSConsumer wsConsumer = createConsumer();
+        wsConsumer.initialise();
+    }
+
+    @Test
+    public void initialisesCorrectlyWithNullSecurityStrategyList() throws MuleException
+    {
+        WSConsumer wsConsumer = createConsumer();
+        wsConsumer.getConfig().setSecurity(new WSSecurity());
         wsConsumer.initialise();
     }
 

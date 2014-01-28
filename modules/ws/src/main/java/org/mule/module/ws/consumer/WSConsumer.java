@@ -206,7 +206,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
 
         cxfBuilder.setMuleContext(muleContext);
 
-        if (security != null)
+        if (security != null && security.hasStrategies())
         {
             for (SecurityStrategy strategy : security.getStrategies())
             {
