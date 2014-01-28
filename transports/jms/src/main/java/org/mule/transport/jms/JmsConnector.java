@@ -464,6 +464,8 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
                 BitronixConnectionFactoryPoolBuilder builder = new BitronixConnectionFactoryPoolBuilder();
                 builder.setConnectionFactory((XAConnectionFactory) connectionFactory);
                 builder.setName(getName());
+                builder.setUsername(username);
+                builder.setPassword(password);
                 wrappedConnectionFactory = builder.build(muleContext);
             }
             else

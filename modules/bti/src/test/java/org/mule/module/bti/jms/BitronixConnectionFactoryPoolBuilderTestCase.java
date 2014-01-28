@@ -76,6 +76,20 @@ public class BitronixConnectionFactoryPoolBuilderTestCase extends AbstractMuleTe
         assertEquals(30, poolingConnectionFactory.getMaxIdleTime());
     }
 
+    @Test
+    public void createsConnectionFactoryPoolWithUsernameAndPassword()
+    {
+        BitronixConnectionFactoryPoolBuilder builder = createBuilder("test", mockConnectionFactory);
+        builder.setUsername("theUsername");
+        builder.setPassword("thePassword");
+
+        BitronixConnectionFactoryWrapper wrapper = builder.build(mockMuleContext);
+        PoolingConnectionFactory poolingConnectionFactory = wrapper.getWrappedConnectionFactory();
+        assertEquals(createUniqueIdForResource(mockMuleContext, RESOURCE_NAME), poolingConnectionFactory.getUniqueName());
+        assertEquals("theUsername", poolingConnectionFactory.getUser());
+        assertEquals("thePassword", poolingConnectionFactory.getPassword());
+    }
+
     @Test(expected = IllegalStateException.class)
     public void failsToCreateConnectionFactoryWithoutName()
     {

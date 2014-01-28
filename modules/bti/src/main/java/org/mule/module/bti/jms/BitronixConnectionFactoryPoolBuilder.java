@@ -24,6 +24,8 @@ public class BitronixConnectionFactoryPoolBuilder
     private int maxIdleTime = 60;
     private String name;
     private XAConnectionFactory connectionFactory;
+    private String username;
+    private String password;
 
     public BitronixConnectionFactoryWrapper build(MuleContext muleContext)
     {
@@ -48,6 +50,11 @@ public class BitronixConnectionFactoryPoolBuilder
             poolingConnectionFactory.setCacheProducersConsumers(false);
             poolingConnectionFactory.setAllowLocalTransactions(true);
             poolingConnectionFactory.setUniqueName(BitronixConfigurationUtil.createUniqueIdForResource(muleContext, name));
+            if(username!=null && password!=null)
+            {
+                poolingConnectionFactory.setUser(username);
+                poolingConnectionFactory.setPassword(password);
+            }
             poolingConnectionFactory.init();
         }
         return new BitronixConnectionFactoryWrapper(poolingConnectionFactory, muleContext);
@@ -101,5 +108,15 @@ public class BitronixConnectionFactoryPoolBuilder
     public void setConnectionFactory(XAConnectionFactory connectionFactory)
     {
         this.connectionFactory = connectionFactory;
+    }
+
+    public void setPassword(String password)
+    {
+        this.password = password;
+    }
+
+    public void setUsername(String username)
+    {
+        this.username = username;
     }
 }
