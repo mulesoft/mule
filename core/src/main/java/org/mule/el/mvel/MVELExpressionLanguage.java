@@ -18,6 +18,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.DataType;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.mvel2.ast.FunctionInstance;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 import org.mule.util.IOUtils;
