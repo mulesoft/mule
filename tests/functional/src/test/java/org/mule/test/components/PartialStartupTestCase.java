@@ -6,9 +6,10 @@
  */
 package org.mule.test.components;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
 
 import org.junit.Test;
 
@@ -44,13 +45,30 @@ public class PartialStartupTestCase extends FunctionalTestCase
         //Mule failed to start, so go ahead and dispose it(Mule will not let us call stop at this point)
         muleContext.dispose();
 
-        Thread.sleep(5000);//give it a few seconds, just in case
 
-        //Make sure that there are no Mule threads running
-        for(Thread t : Thread.getAllStackTraces().keySet())
+        new PollingProber(10000, 100).check(new Probe()
         {
-            assertTrue(!t.getName().startsWith("SHUTDOWN_TEST_FLOW"));
-            assertTrue(!t.getName().startsWith("MuleServer"));
-        }
+            @Override
+            public boolean isSatisfied()
+            {
+                boolean threadsStopped = true;
+                //Make sure that there are no Mule threads running
+                for(Thread t : Thread.getAllStackTraces().keySet())
+                {
+                    if(t.getName().startsWith("SHUTDOWN_TEST_FLOW") || t.getName().startsWith("MuleServer"))
+                    {
+                        threadsStopped = false;
+                        break;
+                    }
+                }
+                return threadsStopped;
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "mule threads running during dispose";
+            }
+        });
     }
 }
