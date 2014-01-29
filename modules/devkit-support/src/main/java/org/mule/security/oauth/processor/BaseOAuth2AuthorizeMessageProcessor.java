@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.security.oauth.processor;
 
 import org.mule.api.MessagingException;
@@ -22,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manager<OAuth2Adapter>> extends
     AbstractAuthorizeMessageProcessor
