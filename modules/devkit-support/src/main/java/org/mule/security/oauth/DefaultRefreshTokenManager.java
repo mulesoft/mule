@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.security.oauth;
 
 import org.mule.api.MuleContext;
@@ -16,7 +17,7 @@ import org.mule.config.i18n.MessageFactory;
 
 import java.util.concurrent.locks.Lock;
 
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Implementation of {@link RefreshTokenManager} that guarantees that no refresh
