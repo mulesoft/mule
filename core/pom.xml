@@ -176,8 +176,8 @@
             <artifactId>mule-mvel2</artifactId>
         </dependency>
         <dependency>
-            <groupId>jgrapht</groupId>
-            <artifactId>jgrapht</artifactId>
+            <groupId>org.jgrapht</groupId>
+            <artifactId>jgrapht-jdk1.5</artifactId>
             <version>0.7.3</version>
         </dependency>
         <dependency>
