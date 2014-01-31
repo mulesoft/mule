@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.mule.tools</groupId>
         <artifactId>mule-tools</artifactId>
-        <version>3.5.0-cascade</version>
+        <version>3.5.0-cascade-HF1</version>
     </parent>
     <artifactId>bobberplus</artifactId>
     <packaging>maven-plugin</packaging>

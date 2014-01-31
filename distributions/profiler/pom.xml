@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.mule.distributions</groupId>
         <artifactId>mule-distributions</artifactId>
-        <version>3.5.0-cascade</version>
+        <version>3.5.0-cascade-HF1</version>
     </parent>
     <artifactId>mule-profiler-pack</artifactId>
     <packaging>pom</packaging>

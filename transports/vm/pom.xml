@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.transports</groupId>
         <artifactId>mule-transports</artifactId>
-        <version>3.5.0-cascade</version>
+        <version>3.5.0-cascade-HF1</version>
     </parent>
     <artifactId>mule-transport-vm</artifactId>
     <packaging>jar</packaging>

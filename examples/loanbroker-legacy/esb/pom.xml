@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.examples</groupId>
         <artifactId>mule-example-loanbroker-parent</artifactId>
-        <version>3.5.0-cascade</version>
+        <version>3.5.0-cascade-HF1</version>
     </parent>
     <artifactId>mule-example-loanbroker-esb</artifactId>
     <packaging>jar</packaging>
