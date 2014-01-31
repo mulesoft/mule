@@ -35,11 +35,6 @@ public class BasicJerseyTestCase extends AbstractServiceAndFlowTestCase
     @Rule
     public DynamicPort port = new DynamicPort("port");
 
-    @Override
-    protected boolean isFailOnTimeout(){
-        return false;
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
