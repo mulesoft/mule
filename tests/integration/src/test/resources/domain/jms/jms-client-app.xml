@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+
+    <flow name="jmsService">
+        <inbound-endpoint address="${scheme}://in?${connectorParameter}" />
+        <logger level="ERROR" message="in"/>
+        <outbound-endpoint address="${scheme}://out?${connectorParameter}" exchange-pattern="request-response" />
+        <logger level="ERROR" message="out"/>
+        <outbound-endpoint address="${scheme}://out2?${connectorParameter}" />
+        <logger level="ERROR" message="out2"/>
+    </flow>
+
+    <flow name="jmsServiceRequestReply">
+        <inbound-endpoint address="${scheme}://in2?${connectorParameter}" />
+        <logger level="ERROR" message="- rr in2"/>
+        <request-reply>
+            <outbound-endpoint address="${scheme}://out3?${connectorParameter}" />
+            <inbound-endpoint address="${scheme}://out4?${connectorParameter}" />
+        </request-reply>
+        <logger level="ERROR" message="- rr out4"/>
+        <outbound-endpoint address="${scheme}://out5?${connectorParameter}" />
+        <logger level="ERROR" message="- rr out5"/>
+    </flow>
+
+</mule>
