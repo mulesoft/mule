@@ -51,6 +51,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testMoveAndDeleteStreaming() throws Exception
     {
         File inFile = initForRequest();
@@ -119,6 +120,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testMoveAndDelete() throws Exception
     {
         File inFile = initForRequest();
@@ -163,6 +165,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testMoveAndDeleteFilePayload() throws Exception
     {
         File inFile = initForRequest();
