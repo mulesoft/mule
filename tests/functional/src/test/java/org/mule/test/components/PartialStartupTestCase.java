@@ -18,6 +18,7 @@ import org.junit.Test;
 
 public class PartialStartupTestCase extends FunctionalTestCase
 {
+
     public PartialStartupTestCase()
     {
         super();
@@ -39,7 +40,7 @@ public class PartialStartupTestCase extends FunctionalTestCase
             muleContext.start();
             fail("Expected Mule to fail to start, due to our RudeMessageProcessor");
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             System.err.println("Expected Exception:");
             e.printStackTrace();
@@ -55,8 +56,8 @@ public class PartialStartupTestCase extends FunctionalTestCase
             {
                 List<String> currentThreads = collectThreadNames();
                 return
-                    countOcurrences(currentThreads, "SHUTDOWN_TEST_FLOW")==0 &&
-                    countOcurrences(initialThreads, "MuleServer")==countOcurrences(currentThreads, "MuleServer")+1;
+                        countOcurrences(currentThreads, "SHUTDOWN_TEST_FLOW") == 0 &&
+                        countOcurrences(initialThreads, "MuleServer") == countOcurrences(currentThreads, "MuleServer") + 1;
             }
 
             @Override
@@ -70,7 +71,7 @@ public class PartialStartupTestCase extends FunctionalTestCase
     private static List<String> collectThreadNames()
     {
         List<String> threadNames = new ArrayList<String>();
-        for(Thread t : Thread.getAllStackTraces().keySet())
+        for (Thread t : Thread.getAllStackTraces().keySet())
         {
             threadNames.add(t.getName());
         }
@@ -80,11 +81,11 @@ public class PartialStartupTestCase extends FunctionalTestCase
     private static int countOcurrences(List<String> elements, String prefix)
     {
         int count = 0;
-        if(elements!=null)
+        if (elements != null)
         {
-            for(String element : elements)
+            for (String element : elements)
             {
-                if(element.startsWith(prefix))
+                if (element.startsWith(prefix))
                 {
                     count++;
                 }
