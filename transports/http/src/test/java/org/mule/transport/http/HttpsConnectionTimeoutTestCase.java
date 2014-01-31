@@ -7,6 +7,9 @@
 
 package org.mule.transport.http;
 
+import org.junit.Ignore;
+
+@Ignore("MULE-6926: flaky test")
 public class HttpsConnectionTimeoutTestCase extends HttpConnectionTimeoutTestCase
 {
 
