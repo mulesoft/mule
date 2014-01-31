@@ -14,6 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.IOUtils;
+import org.mule.util.compression.GZipCompression;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -73,4 +74,26 @@ public class GZipTransformerFunctionalTestCase extends FunctionalTestCase
         String uncompressedStr = new String(uncompressedByteArray);
         assertEquals(TEST_DATA, uncompressedStr);
     }
+
+    @Test
+    public void testCompressDecompressString() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+
+        // Compress input.
+        MuleMessage compressedResponse = client.send("vm://compressInput", TEST_DATA, null);
+        assertNotNull(compressedResponse);
+        assertTrue(compressedResponse.getPayload() instanceof byte[]);
+        byte[] bytes = new GZipCompression().uncompressByteArray((byte[]) compressedResponse.getPayload());
+        String clientUncompressed = new String(bytes, "UTF8");
+        assertEquals(TEST_DATA, clientUncompressed);
+
+        // Decompress response.
+        MuleMessage uncompressedResponse = client.send("vm://decompressInputString", compressedResponse.getPayload(), null);
+        assertNotNull(uncompressedResponse);
+        assertTrue(uncompressedResponse.getPayload() instanceof String);
+        assertEquals(TEST_DATA, uncompressedResponse.getPayload());
+
+    }
+
 }
