@@ -13,7 +13,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
 import org.mule.transformer.AbstractTransformerTestCase;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.SerializationUtils;
 import org.mule.util.compression.GZipCompression;
 
 import org.junit.Test;
@@ -37,7 +36,7 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
     {
         try
         {
-            return strat.compressByteArray(SerializationUtils.serialize(TEST_DATA));
+            return strat.compressByteArray(TEST_DATA.getBytes());
         }
         catch (Exception e)
         {
