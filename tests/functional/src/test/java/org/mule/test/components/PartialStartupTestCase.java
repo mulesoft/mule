@@ -14,8 +14,10 @@ import org.mule.tck.probe.Probe;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class PartialStartupTestCase extends FunctionalTestCase
 {
 
