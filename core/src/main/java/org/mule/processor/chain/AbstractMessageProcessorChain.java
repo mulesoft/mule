@@ -24,6 +24,7 @@ import org.mule.endpoint.EndpointAware;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -79,24 +80,39 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
 
     public void start() throws MuleException
     {
-        for (MessageProcessor processor : processors)
+        List<MessageProcessor> startedProcessors = new ArrayList<MessageProcessor>();
+        try
         {
-            if (processor instanceof Startable)
+            for (MessageProcessor processor : processors)
             {
-                ((Startable) processor).start();
+                if (processor instanceof Startable)
+                {
+                    ((Startable) processor).start();
+                    startedProcessors.add(processor);
+                }
             }
+        }
+        catch(MuleException e)
+        {
+            stop(startedProcessors);
+            throw e;
         }
     }
 
-    public void stop() throws MuleException
+    private void stop(List<MessageProcessor> processorsToStop) throws MuleException
     {
-        for (MessageProcessor processor : processors)
+        for (MessageProcessor processor : processorsToStop)
         {
             if (processor instanceof Stoppable)
             {
                 ((Stoppable) processor).stop();
             }
         }
+    }
+
+    public void stop() throws MuleException
+    {
+        stop(processors);
     }
 
     public void dispose()
