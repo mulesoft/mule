@@ -50,8 +50,6 @@ public class BasicJerseyTestCase extends AbstractServiceAndFlowTestCase
     {
         MuleClient client = muleContext.getClient();
 
-//        String URL = "http://localhost:" + port.getNumber() + "%s";
-
         MuleMessage result = client.send(String.format(URL, "/helloworld"), "", null);
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
         assertEquals("Hello World", result.getPayloadAsString());
