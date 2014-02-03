@@ -4,17 +4,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.el.mvel;
 
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.el.ExpressionExecutor;
 import org.mule.api.expression.InvalidExpressionException;
-
-import java.io.Serializable;
-
-import org.apache.commons.collections.map.LRUMap;
 import org.mule.mvel2.MVEL;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.optimizers.OptimizerFactory;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.util.concurrent.UncheckedExecutionException;
+
+import java.io.Serializable;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +33,10 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
     protected static final int COMPILED_EXPRESSION_MAX_CACHE_SIZE = 1000;
 
     protected ParserContext parserContext;
-    protected LRUMap compiledExpressionsCache = new LRUMap(COMPILED_EXPRESSION_MAX_CACHE_SIZE);
+
+    protected Cache<String, Serializable> compiledExpressionsCache = CacheBuilder.newBuilder()
+        .maximumSize(COMPILED_EXPRESSION_MAX_CACHE_SIZE)
+        .build();
 
     public MVELExpressionExecutor(ParserContext parserContext)
     {
@@ -60,18 +70,27 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
      * @param expression Expression to be compiled
      * @return A {@link Serializable} object representing the compiled expression
      */
-    protected Serializable getCompiledExpression(String expression)
+    protected Serializable getCompiledExpression(final String expression)
     {
-        if (compiledExpressionsCache.containsKey(expression))
+        try
         {
-            return (Serializable) compiledExpressionsCache.get(expression);
+            return compiledExpressionsCache.get(expression, new Callable<Serializable>()
+            {
+                @Override
+                public Serializable call()
+                {
+                    return MVEL.compileExpression(expression,
+                        new ParserContext(parserContext.getParserConfiguration()));
+                }
+            });
         }
-        else
+        catch (UncheckedExecutionException e)
         {
-            Serializable compiledExpression = MVEL.compileExpression(expression, parserContext.createSubcontext());
-            compiledExpressionsCache.put(expression, compiledExpression);
-            return compiledExpression;
+            throw (RuntimeException) e.getCause();
+        }
+        catch (ExecutionException e)
+        {
+            throw new MuleRuntimeException(e);
         }
     }
-
 }

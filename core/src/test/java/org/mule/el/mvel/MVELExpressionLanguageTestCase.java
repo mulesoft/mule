@@ -27,6 +27,8 @@ import org.mule.config.MuleManifest;
 import org.mule.el.context.AppContext;
 import org.mule.el.context.MessageContext;
 import org.mule.el.function.RegexExpressionLanguageFuntion;
+import org.mule.mvel2.ParserContext;
+import org.mule.mvel2.ast.Function;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 
@@ -47,6 +49,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
@@ -55,14 +58,11 @@ import javax.activation.DataHandler;
 import javax.activation.MimeType;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.Mockito;
-import org.mule.mvel2.ParserContext;
-import org.mule.mvel2.ast.Function;
 
 @RunWith(Parameterized.class)
 public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
@@ -70,6 +70,15 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
 
     protected Variant variant;
     protected MVELExpressionLanguage mvel;
+    final String largeExpression = "payload = 'Tom,Fennelly,Male,4,Ireland';StringBuffer sb = new StringBuffer(); fields = payload.split(',\');"
+                                   + "if (fields.length > 4) {"
+                                   + "    sb.append('  <Contact>\n');"
+                                   + "    sb.append('    <FirstName>').append(fields[0]).append('</FirstName>\n');"
+                                   + "    sb.append('    <LastName>').append(fields[1]).append('</LastName>\n');"
+                                   + "    sb.append('    <Address>').append(fields[2]).append('</Address>\n');"
+                                   + "    sb.append('    <TelNum>').append(fields[3]).append('</TelNum>\n');"
+                                   + "    sb.append('    <SIN>').append(fields[4]).append('</SIN>\n');"
+                                   + "    sb.append('  </Contact>\n');" + "}" + "sb.toString();";
 
     public MVELExpressionLanguageTestCase(Variant variant)
     {
@@ -366,25 +375,63 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         @Override
         public void configureContext(ExpressionLanguageContext context)
         {
-            for (int i=0; i<20; i++)
+            for (int i = 0; i < 20; i++)
             {
                 context.declareFunction("dummy-function-" + i, new RegexExpressionLanguageFuntion());
             }
         }
     }
 
-
     @Test
-    public void testConcurrentEvaluation() throws Exception
+    public void testConcurrentCompilation() throws Exception
     {
-        muleContext.getRegistry().registerObject("dummy-el-extension", new DummyExpressionLanguageExtension());
         final int N = 100;
         final CountDownLatch start = new CountDownLatch(1);
         final CountDownLatch end = new CountDownLatch(N);
         final AtomicInteger errors = new AtomicInteger(0);
-        for (int i=0; i<N; i++)
+        for (int i = 0; i < N; i++)
         {
-            new Thread(new Runnable(){
+            new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        start.await();
+                        evaluate(largeExpression + new Random().nextInt());
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        errors.incrementAndGet();
+                    }
+                    finally
+                    {
+                        end.countDown();
+                    }
+                }
+            }, "thread-eval-" + i).start();
+        }
+        start.countDown();
+        end.await();
+        if (errors.get() > 0)
+        {
+            fail();
+        }
+    }
+
+    @Test
+    public void testConcurrentEvaluation() throws Exception
+    {
+        final int N = 100;
+        final CountDownLatch start = new CountDownLatch(1);
+        final CountDownLatch end = new CountDownLatch(N);
+        final AtomicInteger errors = new AtomicInteger(0);
+        for (int i = 0; i < N; i++)
+        {
+            new Thread(new Runnable()
+            {
                 @Override
                 public void run()
                 {
@@ -523,7 +570,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     /**
      * Scans all classes accessible from the context class loader which belong to the given package and
      * subpackages.
-     *
+     * 
      * @param packageName The base package
      * @return The classes
      * @throws ClassNotFoundException
@@ -551,7 +598,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
 
     /**
      * Recursive method used to find all classes in a given directory and subdirs.
-     *
+     * 
      * @param directory The base directory
      * @param packageName The package name for classes found inside the base directory
      * @return The classes
