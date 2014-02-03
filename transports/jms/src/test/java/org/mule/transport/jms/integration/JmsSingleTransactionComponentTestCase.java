@@ -6,6 +6,7 @@
  */
 package org.mule.transport.jms.integration;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -20,6 +21,7 @@ public class JmsSingleTransactionComponentTestCase extends AbstractJmsFunctional
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testSingleTransactionComponent() throws Exception
     {
         send(scenarioCommit);
