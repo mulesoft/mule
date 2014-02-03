@@ -29,7 +29,7 @@ public class ProxyWSDLRewriteAddressTestCase extends FunctionalTestCase
     @Rule
     public final DynamicPort httpPort = new DynamicPort("port1");
 
-    private static final String SINGLE_PORT = "StockQuoteHttpPost";
+    private static final String SINGLE_PORT = "StockQuoteSoap";
     private static final String SERVICE_LOCATION = "http://www.webservicex.net/stockquote.asmx";
 
     @Override

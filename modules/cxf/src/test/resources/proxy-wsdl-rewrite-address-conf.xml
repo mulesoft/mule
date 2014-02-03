@@ -17,7 +17,7 @@
     <flow name="proxy-wsdl-port">
         <http:inbound-endpoint host="localhost" port="${port1}" path="single" exchange-pattern="request-response"/>
         <cxf:proxy-service payload="body" service="StockQuote" namespace="http://www.webserviceX.NET/"
-                           wsdlLocation="stockquote.wsdl" port="StockQuoteHttpPost"/>
+                           wsdlLocation="stockquote.wsdl" port="StockQuoteSoap"/>
     </flow>
 
 

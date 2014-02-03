@@ -11,15 +11,21 @@ import java.util.List;
 
 import javax.wsdl.Definition;
 import javax.wsdl.WSDLException;
+import javax.wsdl.xml.WSDLReader;
+import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.catalog.CatalogWSDLLocator;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.wsdl.WSDLManager;
+import org.apache.cxf.wsdl11.ResourceManagerWSDLLocator;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
 
 public class ProxyWSDLQueryHandler extends WSDLQueryHandler
 {
@@ -71,19 +77,69 @@ public class ProxyWSDLQueryHandler extends WSDLQueryHandler
     @Override
     protected Definition getDefinition(EndpointInfo endpointInfo) throws WSDLException
     {
-        WSDLManager manager = bus.getExtension(WSDLManager.class);
-        if (manager != null)
+        WSDLManager wsdlManager = bus.getExtension(WSDLManager.class);
+        if (wsdlManager != null)
         {
-            String wsdlLocation = (String)endpointInfo.getService().getProperty("WSDL_LOCATION");
+            String wsdlLocation = endpointInfo.getService().getProperty("WSDL_LOCATION", String.class);
             if(wsdlLocation != null)
             {
-                return manager.getDefinition((String)endpointInfo.getService().getProperty("WSDL_LOCATION"));
+                return loadDefinition(wsdlManager, wsdlLocation);
             }
 
         }
         return new ServiceWSDLBuilder(bus, endpointInfo.getService()).build();
 
     }
+
+    // Make sure we have a new WSDL definition loaded and not the cached that the WSDLManager
+    // would return because it might have unwanted changes that will impact the resulting WSDL
+    private Definition loadDefinition(WSDLManager wsdlManager, String url) throws WSDLException {
+        WSDLReader reader = wsdlManager.getWSDLFactory().newWSDLReader();
+        reader.setFeature("javax.wsdl.verbose", false);
+        reader.setFeature("javax.wsdl.importDocuments", true);
+        reader.setExtensionRegistry(wsdlManager.getExtensionRegistry());
+        CatalogWSDLLocator catLocator = new CatalogWSDLLocator(url, bus);
+        ResourceManagerWSDLLocator wsdlLocator = new ResourceManagerWSDLLocator(url, catLocator, bus);
+        InputSource src = wsdlLocator.getBaseInputSource();
+        Definition def;
+        if (src.getByteStream() != null || src.getCharacterStream() != null)
+        {
+            Document doc;
+            XMLStreamReader xmlReader = null;
+            try
+            {
+                xmlReader = StaxUtils.createXMLStreamReader(src);
+                doc = StaxUtils.read(xmlReader, true);
+                if (src.getSystemId() != null)
+                {
+                    try
+                    {
+                        doc.setDocumentURI(new String(src.getSystemId()));
+                    }
+                    catch (Exception e)
+                    {
+                        //ignore - probably not DOM level 3
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new WSDLException(WSDLException.PARSER_ERROR, e.getMessage(), e);
+            }
+            finally
+            {
+                StaxUtils.close(xmlReader);
+            }
+            def = reader.readWSDL(wsdlLocator, doc.getDocumentElement());
+        }
+        else
+        {
+            def = reader.readWSDL(wsdlLocator);
+        }
+
+        return def;
+    }
+
 
     private List<Element> findAddresses(Element port, String namespaceUri)
     {
