@@ -104,7 +104,7 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase
     @PerfTest(duration = 30000, threads = 1, warmUp = 10000)
     public void createEventBaseline()
     {
-        for (int i = 0; i < 100000; i++)
+        for (int i = 0; i < 1000; i++)
         {
             createMuleEvent();
         }
