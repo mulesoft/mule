@@ -86,7 +86,16 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
         }
         catch (UncheckedExecutionException e)
         {
-            throw (RuntimeException) e.getCause();
+            // While exception is called UncheckedExecutionException and it generally wraps a RuntimeException
+            // only the javadoc states that a non-runtime exception is also possible.
+            if (e.getCause() instanceof RuntimeException)
+            {
+                throw (RuntimeException) e.getCause();
+            }
+            else
+            {
+                throw new MuleRuntimeException(e);
+            }
         }
         catch (ExecutionException e)
         {
