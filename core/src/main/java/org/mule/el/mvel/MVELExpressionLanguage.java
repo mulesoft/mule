@@ -18,6 +18,13 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.DataType;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.mvel2.CompileException;
+import org.mule.mvel2.ParserContext;
+import org.mule.mvel2.ast.Function;
+import org.mule.mvel2.compiler.ExpressionCompiler;
+import org.mule.mvel2.integration.VariableResolverFactory;
+import org.mule.mvel2.integration.impl.CachedMapVariableResolverFactory;
+import org.mule.mvel2.util.CompilerTools;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 import org.mule.util.IOUtils;
@@ -33,13 +40,6 @@ import java.util.regex.Pattern;
 import javax.activation.DataHandler;
 import javax.activation.MimeType;
 
-import org.mule.mvel2.CompileException;
-import org.mule.mvel2.ParserContext;
-import org.mule.mvel2.ast.Function;
-import org.mule.mvel2.compiler.ExpressionCompiler;
-import org.mule.mvel2.integration.VariableResolverFactory;
-import org.mule.mvel2.integration.impl.CachedMapVariableResolverFactory;
-import org.mule.mvel2.util.CompilerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

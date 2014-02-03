@@ -116,6 +116,7 @@
         <geronimoSpecsStaxVersion>1.0.1</geronimoSpecsStaxVersion>
         <geronimoSpecsServletApiVersion>1.2</geronimoSpecsServletApiVersion>
         <geronimoSpecsWsMetadataVersion>1.1.2</geronimoSpecsWsMetadataVersion>
+        <guavaVersion>16.0</guavaVersion>
         <hibernateVersion>3.6.0.Final</hibernateVersion>
         <jacksonVersion>1.9.11</jacksonVersion>
         <jerseyVersion>1.6</jerseyVersion>
@@ -1232,7 +1233,11 @@
                 <artifactId>aspectjweaver</artifactId>
                 <version>${aspectjVersion}</version>
             </dependency>
-
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guavaVersion}</version>        
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
