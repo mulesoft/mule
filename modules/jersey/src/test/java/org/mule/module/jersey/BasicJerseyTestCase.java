@@ -35,6 +35,8 @@ public class BasicJerseyTestCase extends AbstractServiceAndFlowTestCase
     @Rule
     public DynamicPort port = new DynamicPort("port");
 
+    private String URL = "http://localhost:" + port.getNumber() + "%s";
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -48,21 +50,23 @@ public class BasicJerseyTestCase extends AbstractServiceAndFlowTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        MuleMessage result = client.send("http://localhost:" + port.getNumber() + "/helloworld", "", null);
+//        String URL = "http://localhost:" + port.getNumber() + "%s";
+
+        MuleMessage result = client.send(String.format(URL, "/helloworld"), "", null);
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
         assertEquals("Hello World", result.getPayloadAsString());
 
         // try invalid url
-        result = client.send("http://localhost:" + port.getNumber() + "/hello", "", null);
+        result = client.send(String.format(URL, "/hello"), "", null);
         assertEquals((Integer)404, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
-        result = client.send("http://localhost:" + port.getNumber() + "/helloworld", "", props);
+        result = client.send(String.format(URL, "/helloworld"), "", props);
         assertEquals((Integer)405, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
 
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_DELETE);
-        result = client.send("http://localhost:" + port.getNumber() + "/helloworld", "", props);
+        result = client.send(String.format(URL, "/helloworld"), "", props);
         assertEquals("Hello World Delete", result.getPayloadAsString());
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
     }
@@ -74,21 +78,21 @@ public class BasicJerseyTestCase extends AbstractServiceAndFlowTestCase
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
-        MuleMessage result = client.send("http://localhost:" + port.getNumber() + "/helloworld/sayHelloWithUri/Dan", "", props);
+        MuleMessage result = client.send(String.format(URL, "/helloworld/sayHelloWithUri/Dan"), "", props);
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
         assertEquals("Hello Dan", result.getPayloadAsString());
 
 
-        result = client.send("http://localhost:" + port.getNumber() + "/helloworld/sayHelloWithJson/Dan", "", props);
+        result = client.send(String.format(URL, "/helloworld/sayHelloWithJson/Dan"), "", props);
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
         assertEquals(getJsonHelloBean(), result.getPayloadAsString());
 
-        result = client.send("http://localhost:" + port.getNumber() + "/helloworld/sayHelloWithQuery?name=Dan", "", props);
+        result = client.send(String.format(URL, "/helloworld/sayHelloWithQuery?name=Dan"), "", props);
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
         assertEquals("Hello Dan", result.getPayloadAsString());
 
         props.put("X-Name", "Dan");
-        result = client.send("http://localhost:" + port.getNumber() + "/helloworld/sayHelloWithHeader", "", props);
+        result = client.send(String.format(URL, "/helloworld/sayHelloWithHeader"), "", props);
         assertEquals((Integer)201, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
         assertEquals("Hello Dan", result.getPayloadAsString());
         assertEquals("Dan", result.getInboundProperty("X-ResponseName"));
@@ -106,7 +110,7 @@ public class BasicJerseyTestCase extends AbstractServiceAndFlowTestCase
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
-        MuleMessage result = client.send("http://localhost:" + port.getNumber() + "/helloworld/throwException", "", props);
+        MuleMessage result = client.send(String.format(URL, "/helloworld/throwException"), "", props);
         assertEquals(expectedErrorCode, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
         assertTrue(result.getPayloadAsString().contains(expectedData));
     }
