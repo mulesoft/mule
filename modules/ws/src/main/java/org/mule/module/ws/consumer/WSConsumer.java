@@ -7,29 +7,36 @@
 
 package org.mule.module.ws.consumer;
 
+import org.mule.api.DefaultMuleException;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.registry.RegistrationException;
-import org.mule.api.transformer.DataType;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.builder.ProxyClientMessageProcessorBuilder;
+import org.mule.module.cxf.support.ResetStaxInterceptor;
+import org.mule.module.cxf.support.ReversibleStaxInInterceptor;
 import org.mule.module.ws.security.SecurityStrategy;
 import org.mule.module.ws.security.WSSecurity;
+import org.mule.module.xml.stax.StaxSource;
+import org.mule.module.xml.util.XMLUtils;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
-import org.mule.processor.ResponseMessageProcessorAdapter;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.transformer.simple.AutoTransformer;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,12 +52,24 @@ import javax.wsdl.extensions.soap.SOAPOperation;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.XMLMessage;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 
 public class WSConsumer implements MessageProcessor, Initialisable, MuleContextAware
@@ -127,13 +146,6 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     {
         MessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder();
 
-        // TODO: MULE-7242 Define if this transformer should be added to the chain or not.
-
-        final AutoTransformer autoTransformer = new AutoTransformer();
-        autoTransformer.setReturnDataType(DataType.STRING_DATA_TYPE);
-
-        chainBuilder.chain(new ResponseMessageProcessorAdapter(autoTransformer));
-
         chainBuilder.chain(new AbstractInterceptingMessageProcessor()
         {
 
@@ -142,7 +154,9 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
             {
                 try
                 {
-                    return processNext(event);
+                    MuleEvent result =  processNext(event);
+                    convertPayloadToString(result.getMessage());
+                    return result;
                 }
                 catch (DispatchException e)
                 {
@@ -154,9 +168,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                         SoapFault soapFault = (SoapFault) e.getCause();
 
                         event.getMessage().setPayload(soapFault.getDetail());
-
-                        // Manually call the AutoTransformer to convert the payload to String.
-                        autoTransformer.process(event);
+                        convertPayloadToString(event.getMessage());
 
                         throw new SoapFaultException(event, soapFault.getFaultCode(), soapFault.getSubCode(),
                                                      soapFault.getMessage(), soapFault.getDetail());
@@ -197,6 +209,41 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     }
 
     /**
+     * Converts payload, which is a partial XML document, to a Strign that represents a valid XML document.
+     * This document may contain namespace declarations that were defined at the envelope or body definition level
+     * <p>
+     *     Note that in order to do this, we need to transform the whole document. Currently this is done by
+     *     converting the Stream to a SOAPMessage, extracting the contents of the body, and transforming it to a String
+     * </p>
+     */
+    private void convertPayloadToString(MuleMessage msg) throws MuleException
+    {
+        try {
+            Object payload = msg.getPayload();
+            if (payload instanceof XMLStreamReader) {
+                XMLStreamReader reader = (XMLStreamReader) payload;
+
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                StreamResult tempOut = new StreamResult(out);
+                XMLUtils.getTransformer().transform(XMLUtils.toXmlSource(reader), tempOut);
+
+                SOAPMessage request = javax.xml.soap.MessageFactory.newInstance().createMessage(null, new ByteArrayInputStream(out.toByteArray()));
+
+                Document content = request.getSOAPBody().extractContentAsDocument();
+                msg.setPayload(XMLUtils.toXml(content));
+            }
+            else {
+                // This fallback is needed because the soap fault interceptor sets the payload to a Node
+                msg.setPayload(msg.getPayloadAsString());
+            }
+        }
+        catch (Exception e)
+        {
+            throw new DefaultMuleException(MessageFactory.createStaticMessage("Error fetching SOAP message contents"), e);
+        }
+    }
+
+    /**
      * Creates the CXF message processor that will be used to create the SOAP envelope.
      */
     private CxfOutboundMessageProcessor createCxfOutboundMessageProcessor(WSSecurity security) throws MuleException
@@ -228,6 +275,12 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
 
         cxfOutboundMessageProcessor.getClient().getOutInterceptors().add(new InputSoapHeadersInterceptor(muleContext));
         cxfOutboundMessageProcessor.getClient().getInInterceptors().add(new OutputSoapHeadersInterceptor(muleContext));
+
+        // We will process the whole soap message (for correct materialization of the soap body as a valid xml document)
+        // The following interceptros change the parser to an instance that can backtrack, and reset the parser to the
+        // beginning, so that instead of being at the body it ends at the beginning of the soap document.
+        cxfOutboundMessageProcessor.getClient().getInInterceptors().add(new ReversibleStaxInInterceptor());
+        cxfOutboundMessageProcessor.getClient().getInInterceptors().add(new ResetStaxInterceptor());
 
         return cxfOutboundMessageProcessor;
     }

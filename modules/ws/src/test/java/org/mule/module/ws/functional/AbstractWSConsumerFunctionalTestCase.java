@@ -7,6 +7,7 @@
 package org.mule.module.ws.functional;
 
 
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.junit.Assert.assertEquals;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -46,7 +47,7 @@ public class AbstractWSConsumerFunctionalTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send(address, ECHO_REQUEST, properties);
-        assertEquals(EXPECTED_ECHO_RESPONSE, response.getPayload());
+        assertXMLEqual(EXPECTED_ECHO_RESPONSE, response.getPayloadAsString());
     }
 
     protected void assertSoapFault(String address, String expectedFaultCode) throws Exception

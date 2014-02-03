@@ -7,6 +7,7 @@
 package org.mule.module.ws.functional;
 
 
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -70,7 +71,7 @@ public class CatchExceptionStrategyFunctionalTestCase extends AbstractWSConsumer
         // Assert that the exception was thrown
         listener.waitUntilAllNotificationsAreReceived();
 
-        assertEquals(EXPECTED_SOAP_FAULT_DETAIL, response.getPayload());
+        assertXMLEqual(EXPECTED_SOAP_FAULT_DETAIL, response.getPayloadAsString());
 
         assertNull(response.getExceptionPayload());
 
