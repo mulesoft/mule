@@ -45,8 +45,8 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase
 
     final protected String payload = "Tom,Fennelly,Male,4,Ireland";
 
-    protected static MuleEvent event;
-    protected static long hash;
+    protected MuleEvent event;
+    protected long hash;
 
     @Before
     public void before()
