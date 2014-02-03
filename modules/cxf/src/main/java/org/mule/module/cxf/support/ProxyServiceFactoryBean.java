@@ -88,6 +88,8 @@ public class ProxyServiceFactoryBean extends ReflectionServiceFactoryBean
 
         try
         {
+            getEndpointInfo().getService().setProperty("WSDL_LOCATION", getWsdlURL());
+
             Method invoke = getServiceClass().getMethod("invoke", c);
 
             // Bind every operation to the invoke method.
