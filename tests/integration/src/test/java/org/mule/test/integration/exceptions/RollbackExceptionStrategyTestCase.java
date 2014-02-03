@@ -86,6 +86,7 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
         }
     }
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testAlwaysRollbackJmsNoTransaction() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(EXPECTED_DELIVERED_TIMES);
@@ -105,6 +106,7 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testRedeliveryExhaustedTransactional() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(EXPECTED_DELIVERED_TIMES);
