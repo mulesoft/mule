@@ -38,6 +38,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
 {
 
     public static final String BEANS_ELEMENT = "beans";
+    public static final String IGNORE_UNRESOLVABLE_ATTR = "ignore-unresolvable";
     private Map<MuleArtifact, SpringXmlConfigurationBuilder> builders = new HashMap<MuleArtifact, SpringXmlConfigurationBuilder>();
     private Map<MuleArtifact, MuleContext> contexts = new HashMap<MuleArtifact, MuleContext>();
 
@@ -55,7 +56,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         return doGetArtifact(element, callback, true);
     }
 
-    private String getArtifactMuleConfig(String flowName, org.w3c.dom.Element element, final XmlConfigurationCallback callback, boolean embedInFlow) throws MuleArtifactFactoryException
+    protected String getArtifactMuleConfig(String flowName, org.w3c.dom.Element element, final XmlConfigurationCallback callback, boolean embedInFlow) throws MuleArtifactFactoryException
     {
         Document document = DocumentHelper.createDocument();
 
@@ -63,11 +64,22 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         Element rootElement = document.addElement("mule", "http://www.mulesoft.org/schema/mule/core");
 
         org.w3c.dom.Element[] placeholders = callback.getPropertyPlaceholders();
+        int noIgnoreUnresolvableCount = 0;
         for (org.w3c.dom.Element placeholder : placeholders)
         {
             try
             {
                 Element newPlaceHolder = convert(placeholder);
+                String ignoreUnresolvable = newPlaceHolder.attributeValue(IGNORE_UNRESOLVABLE_ATTR);
+                if (!"true".equalsIgnoreCase(ignoreUnresolvable))
+                {
+                    noIgnoreUnresolvableCount++;
+                }
+                // There are more than one property placeholder and configuration is prune to failure
+                if (noIgnoreUnresolvableCount > 1)
+                {
+                    throw new MuleArtifactFactoryException("There are multiple property-placeholder elements with attribute " + IGNORE_UNRESOLVABLE_ATTR + " missing or set to false. It may be not possible to find all property values. Please fix your Mule configuration file.");
+                }
                 rootElement.add(newPlaceHolder);
             }
             catch (ParserConfigurationException e)
@@ -140,7 +152,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
 
     }
 
-    private MuleArtifact doGetArtifact(org.w3c.dom.Element element, final XmlConfigurationCallback callback, boolean embedInFlow)
+    protected MuleArtifact doGetArtifact(org.w3c.dom.Element element, final XmlConfigurationCallback callback, boolean embedInFlow)
             throws MuleArtifactFactoryException
     {
         String flowName = "flow-" + Integer.toString(element.hashCode());
@@ -150,7 +162,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         SpringXmlConfigurationBuilder builder = null;
         Map<String, String> environmentProperties = callback.getEnvironmentProperties();
         Properties systemProperties = System.getProperties();
-        Map<Object,Object> originalSystemProperties = new HashMap<Object, Object>(systemProperties);
+        Map<Object, Object> originalSystemProperties = new HashMap<Object, Object>(systemProperties);
 
         try
         {
@@ -158,7 +170,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
             // This configuration overrides the default-mule-config one to replace beans that are not required
             ConfigResource defaultConfigOverride = new ConfigResource(getClass().getClassLoader().getResource("default-mule-config-override.xml").toURI().toURL());
 
-            if(environmentProperties != null)
+            if (environmentProperties != null)
             {
                 systemProperties.putAll(environmentProperties);
             }
@@ -227,7 +239,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
      * Convert w3c element to dom4j element
      *
      * @throws ParserConfigurationException
-     **/
+     */
     public org.dom4j.Element convert(org.w3c.dom.Element element) throws ParserConfigurationException
     {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -252,7 +264,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         dispose(builder, context);
     }
 
-    private void dispose(SpringXmlConfigurationBuilder builder, MuleContext context)
+    protected void dispose(SpringXmlConfigurationBuilder builder, MuleContext context)
     {
         try
         {
@@ -273,7 +285,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
 
         Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
         Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
-        for(String threadToDelete : threadsToDelete)
+        for (String threadToDelete : threadsToDelete)
         {
             for (Thread t : threadArray)
             {
