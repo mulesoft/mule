@@ -46,7 +46,6 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase
     final protected String payload = "Tom,Fennelly,Male,4,Ireland";
 
     protected MuleEvent event;
-    protected long hash;
 
     @Before
     public void before()
@@ -97,17 +96,17 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase
     {
         for (int i = 0; i < 1000; i++)
         {
-            muleContext.getExpressionLanguage().evaluate(mel, new DefaultMuleMessage(payload, muleContext));
+            muleContext.getExpressionLanguage().evaluate(mel, event);
         }
     }
 
     @Test
     @PerfTest(duration = 30000, threads = 1, warmUp = 10000)
-    public void createMessageBaseline()
+    public void createEventBaseline()
     {
-        for (int i = 0; i < 1000; i++)
+        for (int i = 0; i < 100000; i++)
         {
-            hash += System.identityHashCode(createMuleEvent());
+            createMuleEvent();
         }
     }
 
