@@ -16,24 +16,6 @@
     </properties>
 
     <build>
-        <plugins>
-            <plugin>
-                <!--
-                    Install a special 'TESTING' version of this module,
-                    used in launcher integration tests
-                -->
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>shitty-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>clean</goal>
-                            <goal>install</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
         <pluginManagement>
         	<plugins>
         		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
@@ -96,25 +78,30 @@
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.databene</groupId>
             <artifactId>contiperf</artifactId>
             <version>2.2.0</version>
+            <scope>test</scope>
         </dependency>    
     </dependencies>
 </project>
