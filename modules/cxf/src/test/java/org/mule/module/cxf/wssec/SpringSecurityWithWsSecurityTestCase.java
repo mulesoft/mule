@@ -34,6 +34,7 @@ public class SpringSecurityWithWsSecurityTestCase extends UsernameTokenTestCase
     }
     
     @Override
+    @Ignore("MULE-6926: flaky test")
     public void testUsernameToken() throws Exception
     {
         super.testUsernameToken();
