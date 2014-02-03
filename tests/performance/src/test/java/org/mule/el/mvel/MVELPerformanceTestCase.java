@@ -87,7 +87,7 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase
     }
 
     /**
-     * Warm start: - Same expression for each iteration - Same context (message) for each iteration
+     * Hot start: - Same expression for each iteration - Same context (message) for each iteration
      */
     @Test
     @PerfTest(duration = 30000, threads = 1, warmUp = 10000)
