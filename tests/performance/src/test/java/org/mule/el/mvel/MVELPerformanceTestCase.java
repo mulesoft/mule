@@ -33,25 +33,20 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase
         return 180;
     }
 
-    final String mel = "StringBuffer sb = new StringBuffer(); fields = payload.split(',\');"
-                       + "if (fields.length > 4) {" + "    sb.append('  <Contact>\n');"
-                       + "    sb.append('    <FirstName>').append(fields[0]).append('</FirstName>\n');"
-                       + "    sb.append('    <LastName>').append(fields[1]).append('</LastName>\n');"
-                       + "    sb.append('    <Address>').append(fields[2]).append('</Address>\n');"
-                       + "    sb.append('    <TelNum>').append(fields[3]).append('</TelNum>\n');"
-                       + "    sb.append('    <SIN>').append(fields[4]).append('</SIN>\n');"
-                       + "    sb.append('  </Contact>\n');" + "}" + "sb.toString();";
+    final protected String mel = "StringBuffer sb = new StringBuffer(); fields = payload.split(',\');"
+                                 + "if (fields.length > 4) {"
+                                 + "    sb.append('  <Contact>\n');"
+                                 + "    sb.append('    <FirstName>').append(fields[0]).append('</FirstName>\n');"
+                                 + "    sb.append('    <LastName>').append(fields[1]).append('</LastName>\n');"
+                                 + "    sb.append('    <Address>').append(fields[2]).append('</Address>\n');"
+                                 + "    sb.append('    <TelNum>').append(fields[3]).append('</TelNum>\n');"
+                                 + "    sb.append('    <SIN>').append(fields[4]).append('</SIN>\n');"
+                                 + "    sb.append('  </Contact>\n');" + "}" + "sb.toString();";
 
-    final String payload = "Tom,Fennelly,Male,4,Ireland";
+    final protected String payload = "Tom,Fennelly,Male,4,Ireland";
 
-    static MuleEvent event;
-    static long hash;
-
-    protected MuleEvent createMuleEvent()
-    {
-        return new DefaultMuleEvent(new DefaultMuleMessage(payload, muleContext),
-            MessageExchangePattern.ONE_WAY, (Flow) null);
-    }
+    protected static MuleEvent event;
+    protected static long hash;
 
     @Before
     public void before()
@@ -114,6 +109,12 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase
         {
             hash += System.identityHashCode(createMuleEvent());
         }
+    }
+
+    protected MuleEvent createMuleEvent()
+    {
+        return new DefaultMuleEvent(new DefaultMuleMessage(payload, muleContext),
+            MessageExchangePattern.ONE_WAY, (Flow) null);
     }
 
 }
