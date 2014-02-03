@@ -25,6 +25,7 @@ import org.apache.abdera.protocol.client.AbderaClient;
 import org.apache.abdera.protocol.client.ClientResponse;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.Ignore;
 
 public class EventTest extends FunctionalTestCase
 {
@@ -88,6 +89,7 @@ public class EventTest extends FunctionalTestCase
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testCustomerProvider() throws Exception
     {
         repository = (Repository) muleContext.getRegistry().lookupObject("jcrRepository");
