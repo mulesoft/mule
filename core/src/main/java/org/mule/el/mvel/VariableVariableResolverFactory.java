@@ -10,7 +10,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.mvel2.ParserConfiguration;
-import org.mule.mvel2.UnresolveablePropertyException;
 import org.mule.mvel2.integration.VariableResolver;
 
 public class VariableVariableResolverFactory extends MVELExpressionLanguageContext
@@ -67,7 +66,7 @@ public class VariableVariableResolverFactory extends MVELExpressionLanguageConte
         }
         else
         {
-            throw new UnresolveablePropertyException("unable to resolve variable '" + name + "'");
+            return null;
         }
     }
 
@@ -208,15 +207,7 @@ public class VariableVariableResolverFactory extends MVELExpressionLanguageConte
         @Override
         public Object getValue()
         {
-            Object value = message.getMuleContext().getRegistry().lookupObject(name);
-            if (value != null)
-            {
-                return value;
-            }
-            else
-            {
-                throw new UnresolveablePropertyException(name);
-            }
+            return message.getMuleContext().getRegistry().lookupObject(name);
         }
 
         @Override

@@ -87,7 +87,7 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
                 return nextFactory.getVariableResolver(name);
             }
         }
-        throw new UnresolveablePropertyException("unable to resolve variable '" + name + "'");
+        return null;
     }
 
     @Override
@@ -95,14 +95,7 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     {
         VariableResolver vr;
 
-        try
-        {
-            vr = getVariableResolver(name);
-        }
-        catch (UnresolveablePropertyException e)
-        {
-            vr = null;
-        }
+        vr = getVariableResolver(name);
 
         if (vr != null)
         {
