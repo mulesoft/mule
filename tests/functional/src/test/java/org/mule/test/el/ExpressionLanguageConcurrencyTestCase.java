@@ -10,7 +10,6 @@ import static org.junit.Assert.fail;
 
 import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -41,19 +40,12 @@ public class ExpressionLanguageConcurrencyTestCase extends FunctionalTestCase
                     try
                     {
                         start.await();
-                        // System.out.println("...evaluating thread " + Thread.currentThread().getName() +
-                        // "...");
-                        System.out.println(String.format(">>>>>>>> before thread %s -> %s",
-                            Thread.currentThread().getName(), new Date()));
                         testFlow("slowRequestHandler", getTestEvent("foo"));
-                        System.out.println(String.format("+++++++++ after thread %s -> %s",
-                            Thread.currentThread().getName(), new Date()));
                     }
                     catch (Exception e)
                     {
                         e.printStackTrace();
                         errors.incrementAndGet();
-                        System.out.println("\n\n incremented error count to " + errors.get());
                     }
                     finally
                     {
@@ -64,8 +56,6 @@ public class ExpressionLanguageConcurrencyTestCase extends FunctionalTestCase
         }
         start.countDown();
         end.await();
-        System.out.println(String.format("end loop -> %s", new Date()));
-        System.out.println("\n\n final error count " + errors.get());
         if (errors.get() > 0)
         {
             fail();
