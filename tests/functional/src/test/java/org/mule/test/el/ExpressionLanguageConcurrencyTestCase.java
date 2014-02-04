@@ -44,7 +44,6 @@ public class ExpressionLanguageConcurrencyTestCase extends FunctionalTestCase
                     }
                     catch (Exception e)
                     {
-                        e.printStackTrace();
                         errors.incrementAndGet();
                     }
                     finally
