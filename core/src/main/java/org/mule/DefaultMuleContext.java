@@ -83,6 +83,17 @@ import org.apache.commons.logging.LogFactory;
 
 public class DefaultMuleContext implements MuleContext
 {
+
+    /**
+     * TODO: Remove these constants.
+     * These constants only make sense until we have a reliable solution for durable persistence in Clustering.
+     * These are not part of Mule's API and you should not use them in applications or extensions
+     */
+    public static final String LOCAL_TRANSIENT_OBJECT_STORE_KEY = "_defaultInMemoryObjectStore";
+    public static final String LOCAL_PERSISTENT_OBJECT_STORE_KEY = "_defaultInMemoryObjectStore";
+    public static final String LOCAL_OBJECT_STORE_MANAGER_KEY = "_localObjectStoreManager";
+    public static final String LOCAL_QUEUE_MANAGER_KEY = "_localQueueManager";
+
     /**
      * logger used by this class
      */
@@ -529,11 +540,39 @@ public class DefaultMuleContext implements MuleContext
         }
         return queueManager;
     }
-    
+
     @Override
     public ObjectStoreManager getObjectStoreManager()
     {
         return this.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_MANAGER);
+    }
+
+    /**
+     * When running in clustered mode, it returns a {@link org.mule.api.store.ObjectStoreManager} that
+     * creates {@link org.mule.api.store.ObjectStore} instances which are only local to the current node.
+     * This is just a workaround until we introduce a solution for durable persistent stores in HA. This is not part of
+     * Mule's API and you should not use this in your apps or extensions
+     *
+     * @return a {@link org.mule.api.store.ObjectStoreManager}
+     * @since 3.5.0
+     */
+    public ObjectStoreManager getLocalObjectStoreManager()
+    {
+        return this.getRegistry().lookupObject(LOCAL_OBJECT_STORE_MANAGER_KEY);
+    }
+
+    /**
+     * When running in clustered mode, it returns a {@link org.mule.util.queue.QueueManager} that
+     * creates {@link org.mule.util.queue.Queue} instances which are only local to the current node.
+     * This is just a workaround until we introduce a solution for durable persistent queues in HA. This is not part of
+     * Mule's API and you should not use this in your apps or extensions
+     *
+     * @return a {@link org.mule.util.queue.QueueManager}
+     * @since 3.5.0
+     */
+    public QueueManager getLocalQueueManager()
+    {
+        return this.getRegistry().lookupObject(LOCAL_QUEUE_MANAGER_KEY);
     }
 
     public void setQueueManager(QueueManager queueManager) throws RegistrationException
