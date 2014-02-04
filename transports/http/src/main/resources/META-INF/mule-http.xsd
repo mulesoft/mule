@@ -297,12 +297,19 @@
                 <xsd:attribute name="followRedirects" type="xsd:boolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            If a request if made using GET that responds with a redirectLocation header, setting this to true will
+                            If a request is made using GET that responds with a redirectLocation header, setting this to true will
                             make the request on the redirect URL.  This only works when using GET since you cannot automatically follow
                             redirects when perfroming a POST (a restriction according to RFC 2616).
                         </xsd:documentation>
                     </xsd:annotation>
-                    </xsd:attribute>
+                </xsd:attribute>
+                <xsd:attribute name="throwException" type="xsd:boolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If a request returns a status code greater or equal than 400 an exception will be thrown.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -323,12 +330,19 @@
                 <xsd:attribute name="followRedirects" type="xsd:boolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            If a request if made using GET that responds with a redirectLocation header, setting this to true will
+                            If a request is made using GET that responds with a redirectLocation header, setting this to true will
                             make the request on the redirect URL.  This only works when using GET since you cannot automatically follow
                             redirects when perfroming a POST (a restriction according to RFC 2616).
                         </xsd:documentation>
                     </xsd:annotation>
-                    </xsd:attribute>
+                </xsd:attribute>
+                <xsd:attribute name="throwException" type="xsd:boolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If a request returns a status code greater or equal than 400 an exception will be thrown.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
