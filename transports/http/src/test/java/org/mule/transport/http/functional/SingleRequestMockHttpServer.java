@@ -18,11 +18,18 @@ public abstract class SingleRequestMockHttpServer extends MockHttpServer
 {
 
     private final String encoding;
+    private String statusLine;
 
     public SingleRequestMockHttpServer(int listenPort, String encoding)
     {
+        this(listenPort, encoding, HTTP_STATUS_LINE_OK);
+    }
+
+    public SingleRequestMockHttpServer(int listenPort, String encoding, String statusLine)
+    {
         super(listenPort);
         this.encoding = encoding;
+        this.statusLine = statusLine;
     }
 
     protected abstract void processSingleRequest(HttpRequest httpRequest) throws Exception;
@@ -36,7 +43,7 @@ public abstract class SingleRequestMockHttpServer extends MockHttpServer
 
         processSingleRequest(request);
 
-        out.write(HTTP_STATUS_LINE_OK.getBytes());
+        out.write(statusLine.getBytes());
         out.write('\n');
         out.flush();
     }
