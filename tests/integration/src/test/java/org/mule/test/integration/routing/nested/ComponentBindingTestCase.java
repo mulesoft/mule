@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
+import org.junit.Ignore;
 import org.junit.runners.Parameterized;
 
 public class ComponentBindingTestCase extends AbstractServiceAndFlowTestCase
@@ -51,6 +52,7 @@ public class ComponentBindingTestCase extends AbstractServiceAndFlowTestCase
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testJmsTopicBinding() throws Exception
     {
         internalTest("jms://topic:t");
