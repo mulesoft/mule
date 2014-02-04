@@ -11,13 +11,8 @@ import org.mule.api.el.ExpressionLanguageContext;
 import org.mule.api.el.ExpressionLanguageFunction;
 import org.mule.api.el.VariableAssignmentCallback;
 import org.mule.config.i18n.CoreMessages;
-
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.mule.mvel2.ImmutableElementException;
+import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.UnresolveablePropertyException;
 import org.mule.mvel2.ast.FunctionInstance;
@@ -25,6 +20,11 @@ import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.VariableResolverFactory;
 import org.mule.mvel2.integration.impl.BaseVariableResolverFactory;
 import org.mule.mvel2.integration.impl.SimpleVariableResolverFactory;
+
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     implements ExpressionLanguageContext
@@ -34,14 +34,14 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     public static final String MULE_MESSAGE_INTERNAL_VARIABLE = "_muleMessage";
     public static final String MULE_CONTEXT_INTERNAL_VARIABLE = "_muleContext";
 
-    protected ParserContext parserContext;
+    protected ParserConfiguration parserConfiguration;
     protected MuleContext muleContext;
     protected InternalVariableResolverFactory localFactory;
     protected Map<String, Object> privateVariables = new HashMap<String, Object>();
 
-    public MVELExpressionLanguageContext(ParserContext parserContext, MuleContext muleContext)
+    public MVELExpressionLanguageContext(ParserConfiguration parserConfiguration, MuleContext muleContext)
     {
-        this.parserContext = parserContext;
+        this.parserConfiguration = parserConfiguration;
         this.muleContext = muleContext;
         this.localFactory = new InternalVariableResolverFactory(Collections.<String, Object> emptyMap());
         this.nextFactory = localFactory;
@@ -49,7 +49,7 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
 
     public MVELExpressionLanguageContext(MVELExpressionLanguageContext context)
     {
-        this.parserContext = context.parserContext;
+        this.parserConfiguration = context.parserConfiguration;
         this.muleContext = context.muleContext;
         this.localFactory = context.localFactory;
         this.nextFactory = context.nextFactory;
@@ -87,7 +87,7 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
                 return nextFactory.getVariableResolver(name);
             }
         }
-        throw new UnresolveablePropertyException("unable to resolve variable '" + name + "'");
+        return null;
     }
 
     @Override
@@ -95,14 +95,7 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     {
         VariableResolver vr;
 
-        try
-        {
-            vr = getVariableResolver(name);
-        }
-        catch (UnresolveablePropertyException e)
-        {
-            vr = null;
-        }
+        vr = getVariableResolver(name);
 
         if (vr != null)
         {
@@ -201,27 +194,27 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     @Override
     public void importClass(Class<?> clazz)
     {
-        if (parserContext.hasImport(clazz.getSimpleName()))
+        if (parserConfiguration.hasImport(clazz.getSimpleName()))
         {
-            parserContext.addImport(clazz);
+            parserConfiguration.addImport(clazz);
         }
     }
 
     @Override
     public void importClass(String name, Class<?> clazz)
     {
-        if (!parserContext.hasImport(name))
+        if (!parserConfiguration.hasImport(name))
         {
-            parserContext.addImport(name, clazz);
+            parserConfiguration.addImport(name, clazz);
         }
     }
 
     @Override
     public void importStaticMethod(String name, Method method)
     {
-        if (!parserContext.hasImport(name))
+        if (!parserConfiguration.hasImport(name))
         {
-            parserContext.addImport(name, method);
+            parserConfiguration.addImport(name, method);
         }
     }
 
@@ -234,7 +227,8 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     @Override
     public void declareFunction(String name, ExpressionLanguageFunction function)
     {
-        addFinalVariable(name, new FunctionInstance(new MVELFunctionAdaptor(name, function, parserContext)));
+        addFinalVariable(name, new FunctionInstance(new MVELFunctionAdaptor(name, function,
+            new ParserContext(parserConfiguration))));
     }
 
     @Override
@@ -255,6 +249,20 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
             }
             vrf.setNextFactory(resolverFactory);
             resolverFactory.setNextFactory(localFactory);
+        }
+    }
+
+    public void insertFactory(VariableResolverFactory resolverFactory)
+    {
+        if (nextFactory == null)
+        {
+            nextFactory = resolverFactory;
+        }
+        else
+        {
+            VariableResolverFactory currentNext = nextFactory;
+            nextFactory = resolverFactory;
+            resolverFactory.setNextFactory(currentNext);
         }
     }
 

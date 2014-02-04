@@ -19,6 +19,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.el.ExpressionLanguageContext;
 import org.mule.api.el.ExpressionLanguageExtension;
+import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.expression.InvalidExpressionException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
@@ -28,6 +29,7 @@ import org.mule.el.context.AppContext;
 import org.mule.el.context.MessageContext;
 import org.mule.el.function.RegexExpressionLanguageFuntion;
 import org.mule.mvel2.ParserContext;
+import org.mule.mvel2.PropertyAccessException;
 import org.mule.mvel2.ast.Function;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.types.DataTypeFactory;
@@ -339,7 +341,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     @Test
     public void addGlobalFunction() throws InitialisationException
     {
-        mvel.addGlobalFunction("hello", new HelloWorldFunction(mvel.parserContext));
+        mvel.addGlobalFunction("hello", new HelloWorldFunction(new ParserContext(mvel.parserConfiguration)));
         mvel.initialise();
         assertEquals("Hello World!", evaluate("hello()"));
     }
@@ -457,6 +459,34 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         if (errors.get() > 0)
         {
             fail();
+        }
+    }
+
+    @Test
+    public void propertyAccessException() throws InitialisationException
+    {
+        try
+        {
+            evaluate("doesntExist");
+        }
+        catch (Exception e)
+        {
+            assertEquals(ExpressionRuntimeException.class, e.getClass());
+            assertEquals(PropertyAccessException.class, e.getCause().getClass());
+        }
+    }
+    
+    @Test
+    public void propertyAccessException2() throws InitialisationException
+    {
+        try
+        {
+            evaluate("app.doesntExist");
+        }
+        catch (Exception e)
+        {
+            assertEquals(ExpressionRuntimeException.class, e.getClass());
+            assertEquals(PropertyAccessException.class, e.getCause().getClass());
         }
     }
 

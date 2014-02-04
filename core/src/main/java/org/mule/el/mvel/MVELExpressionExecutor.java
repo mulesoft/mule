@@ -11,6 +11,7 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.el.ExpressionExecutor;
 import org.mule.api.expression.InvalidExpressionException;
 import org.mule.mvel2.MVEL;
+import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.optimizers.OptimizerFactory;
 
@@ -32,24 +33,24 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
 
     protected static final int COMPILED_EXPRESSION_MAX_CACHE_SIZE = 1000;
 
-    protected ParserContext parserContext;
+    protected ParserConfiguration parserConfiguration;
 
     protected Cache<String, Serializable> compiledExpressionsCache = CacheBuilder.newBuilder()
         .maximumSize(COMPILED_EXPRESSION_MAX_CACHE_SIZE)
         .build();
 
-    public MVELExpressionExecutor(ParserContext parserContext)
+    public MVELExpressionExecutor(ParserConfiguration parserConfiguration)
     {
-        this.parserContext = parserContext;
+        this.parserConfiguration = parserConfiguration;
+        System.setProperty("mvel2.compiler.allow_override_all_prophandling", "true");
+        // Use reflective optimizer rather than default to avoid concurrency issues with JIT complication.
+        // See MULE-6630
+        OptimizerFactory.setDefaultOptimizer(OptimizerFactory.SAFE_REFLECTIVE);
     }
 
     @Override
     public Object execute(String expression, MVELExpressionLanguageContext context)
     {
-        // Use reflective optimizer rather than default to avoid concurrency issues with JIT complication.
-        // See MULE-6630
-        OptimizerFactory.setDefaultOptimizer(OptimizerFactory.SAFE_REFLECTIVE);
-
         if (log.isTraceEnabled())
         {
             log.trace("Executing MVEL expression '" + expression + "' with context: \n" + context.toString());
@@ -79,8 +80,7 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
                 @Override
                 public Serializable call()
                 {
-                    return MVEL.compileExpression(expression,
-                        new ParserContext(parserContext.getParserConfiguration()));
+                    return MVEL.compileExpression(expression, new ParserContext(parserConfiguration));
                 }
             });
         }
