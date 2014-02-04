@@ -68,7 +68,6 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     public MVELExpressionLanguage(MuleContext muleContext)
     {
         this.muleContext = muleContext;
-        System.setProperty("mvel2.compiler.allow_override_all_prophandling", "true");
     }
 
     @Override
@@ -144,7 +143,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     {
         MVELExpressionLanguageContext factory = createExpressionLanguageContext();
         factory.addPrivateVariable(MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE,
-                event.getMessage());
+            event.getMessage());
         if (vars != null)
         {
             factory.appendFactory(new CachedMapVariableResolverFactory(vars));

@@ -42,15 +42,15 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
     public MVELExpressionExecutor(ParserConfiguration parserConfiguration)
     {
         this.parserConfiguration = parserConfiguration;
+        System.setProperty("mvel2.compiler.allow_override_all_prophandling", "true");
+        // Use reflective optimizer rather than default to avoid concurrency issues with JIT complication.
+        // See MULE-6630
+        OptimizerFactory.setDefaultOptimizer(OptimizerFactory.SAFE_REFLECTIVE);
     }
 
     @Override
     public Object execute(String expression, MVELExpressionLanguageContext context)
     {
-        // Use reflective optimizer rather than default to avoid concurrency issues with JIT complication.
-        // See MULE-6630
-        OptimizerFactory.setDefaultOptimizer(OptimizerFactory.SAFE_REFLECTIVE);
-
         if (log.isTraceEnabled())
         {
             log.trace("Executing MVEL expression '" + expression + "' with context: \n" + context.toString());
