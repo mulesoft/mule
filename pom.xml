@@ -143,7 +143,7 @@
         <!-- TODO EE-1395 -->
         <mqSeriesVersion>6.0</mqSeriesVersion>
         <mvelVersion>2.1.3.Final</mvelVersion>
-        <muleMvelVersion>2.1.8.Final-MULE-001</muleMvelVersion>
+        <muleMvelVersion>2.1.8.Final-MULE-002-SNAPSHOT</muleMvelVersion>
         <mx4jVersion>2.1.1</mx4jVersion>
         <ognlVersion>2.7.3</ognlVersion>
         <oroVersion>2.0.8</oroVersion>
