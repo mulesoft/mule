@@ -193,7 +193,7 @@
         <dependency>
             <groupId>org.mule.common</groupId>
             <artifactId>mule-common</artifactId>
-            <version>${project.version}</version>
+            <version>3.5.0-M4-SNAPSHOT</version>
         </dependency>
 
         <!-- test dependencies -->
