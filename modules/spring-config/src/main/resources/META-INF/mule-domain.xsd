@@ -26,7 +26,7 @@
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/bti"
                 schemaLocation="http://www.mulesoft.org/schema/mule/bti/current/mule-bti.xsd"/>
     <xsd:import namespace="http://www.springframework.org/schema/context"
-                schemaLocation="http://www.springframework.org/schema/context/spring-context-3.1.xsd"/>
+                schemaLocation="http://www.springframework.org/schema/context/spring-context-current.xsd"/>
 
     <xsd:element name="mule-domain" type="muleDomainType">
         <xsd:annotation>

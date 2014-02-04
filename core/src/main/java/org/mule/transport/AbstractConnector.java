@@ -2386,11 +2386,6 @@ public abstract class AbstractConnector implements Connector, WorkListener
         throw new UnsupportedOperationException(CoreMessages.streamingNotSupported(this.getProtocol()).toString());
     }
 
-    /**
-     * @deprecated Do not get MuleContext from the connector.
-     * implement {@link org.mule.api.context.MuleContextAware} instead.
-     */
-    @Deprecated
     @Override
     public MuleContext getMuleContext()
     {
