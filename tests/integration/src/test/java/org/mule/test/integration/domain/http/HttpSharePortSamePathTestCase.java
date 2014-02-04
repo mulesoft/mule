@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.integration.domain;
+package org.mule.test.integration.domain.http;
 
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -49,6 +49,6 @@ public class HttpSharePortSamePathTestCase extends AbstractMuleTestCase
 
     public SystemProperty getEndpointSchemeSystemProperty()
     {
-        return new SystemProperty("scheme","http");
+        return new SystemProperty("scheme", "http");
     }
 }

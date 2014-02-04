@@ -7,18 +7,8 @@
 package org.mule.tck.junit4;
 
 import org.mule.api.MuleContext;
-import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.context.MuleContextBuilder;
-import org.mule.api.context.MuleContextFactory;
-import org.mule.config.builders.DefaultsConfigurationBuilder;
-import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.config.spring.SpringXmlDomainConfigurationBuilder;
-import org.mule.context.DefaultMuleContextBuilder;
-import org.mule.context.DefaultMuleContextFactory;
-import org.mule.tck.TestingWorkListener;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
-import org.mule.util.ClassUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -2,8 +2,12 @@
 <xsd:schema xmlns="http://www.mulesoft.org/schema/mule/domain"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            xmlns:spring="http://www.springframework.org/schema/beans"
+            xmlns:spring-context="http://www.springframework.org/schema/context"
             xmlns:http="http://www.mulesoft.org/schema/mule/http"
             xmlns:https="http://www.mulesoft.org/schema/mule/https"
+            xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+            xmlns:bti="http://www.mulesoft.org/schema/mule/bti"
             targetNamespace="http://www.mulesoft.org/schema/mule/domain"
             attributeFormDefault="unqualified"
             elementFormDefault="qualified">
@@ -15,6 +19,14 @@
                 schemaLocation="http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/https"
                 schemaLocation="http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/jms"
+                schemaLocation="http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans/spring-beans-current.xsd"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/bti"
+                schemaLocation="http://www.mulesoft.org/schema/mule/bti/current/mule-bti.xsd"/>
+    <xsd:import namespace="http://www.springframework.org/schema/context"
+                schemaLocation="http://www.springframework.org/schema/context/spring-context-current.xsd"/>
 
     <xsd:element name="mule-domain" type="muleDomainType">
         <xsd:annotation>
@@ -45,8 +57,36 @@
 
     <xsd:group name="sharedElements">
         <xsd:choice>
+            <xsd:element ref="spring:beans">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Allows the embedding of any Spring elements.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element ref="spring:bean">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Allows Spring beans to be defined alongside Mule elements.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element ref="spring-context:property-placeholder">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Allows Spring property placeholders to be configured directly in the Mule configuration file.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
             <xsd:element ref="http:connector"/>
             <xsd:element ref="https:connector"/>
+            <xsd:element ref="jms:connector"/>
+            <xsd:element ref="jms:custom-connector"/>
+            <xsd:element ref="jms:activemq-connector"/>
+            <xsd:element ref="jms:activemq-xa-connector"/>
+            <xsd:element ref="bti:transaction-manager" />
+            <xsd:element ref="bti:xa-data-source-pool" />
+            <xsd:element ref="bti:xa-connection-factory-pool" />
         </xsd:choice>
     </xsd:group>
 
