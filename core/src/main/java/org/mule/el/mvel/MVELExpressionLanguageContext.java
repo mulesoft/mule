@@ -252,6 +252,20 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
         }
     }
 
+    public void insertFactory(VariableResolverFactory resolverFactory)
+    {
+        if (nextFactory == null)
+        {
+            nextFactory = resolverFactory;
+        }
+        else
+        {
+            VariableResolverFactory currentNext = nextFactory;
+            nextFactory = resolverFactory;
+            resolverFactory.setNextFactory(currentNext);
+        }
+    }
+
     @SuppressWarnings("serial")
     class InternalVariableResolverFactory extends SimpleVariableResolverFactory
     {
