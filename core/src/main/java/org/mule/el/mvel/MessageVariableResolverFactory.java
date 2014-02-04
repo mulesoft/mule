@@ -12,19 +12,18 @@ import org.mule.api.el.VariableAssignmentCallback;
 import org.mule.api.transport.PropertyScope;
 import org.mule.el.context.MessageContext;
 import org.mule.el.context.MessagePropertyMapContext;
-
-import org.mule.mvel2.ParserContext;
+import org.mule.mvel2.ParserConfiguration;
 
 class MessageVariableResolverFactory extends MVELExpressionLanguageContext
 {
 
     private static final long serialVersionUID = -6819292692339684915L;
 
-    public MessageVariableResolverFactory(final ParserContext parserContext,
+    public MessageVariableResolverFactory(final ParserConfiguration parserConfiguration,
                                           final MuleContext muleContext,
                                           final MuleMessage message)
     {
-        super(parserContext, muleContext);
+        super(parserConfiguration, muleContext);
 
         if (message != null)
         {

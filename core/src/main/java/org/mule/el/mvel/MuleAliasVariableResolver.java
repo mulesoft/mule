@@ -18,7 +18,7 @@ class MuleAliasVariableResolver extends MuleVariableResolver<Object>
         super(name, null, null, null);
         this.expression = expression;
         this.context = context;
-        this.executor = new MVELExpressionExecutor(context.parserContext);
+        this.executor = new MVELExpressionExecutor(context.parserConfiguration);
     }
 
     @Override

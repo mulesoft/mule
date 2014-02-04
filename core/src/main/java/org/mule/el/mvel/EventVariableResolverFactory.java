@@ -9,17 +9,18 @@ package org.mule.el.mvel;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.construct.FlowConstruct;
-
-import org.mule.mvel2.ParserContext;
+import org.mule.mvel2.ParserConfiguration;
 
 public class EventVariableResolverFactory extends MessageVariableResolverFactory
 {
 
     private static final long serialVersionUID = -6819292692339684915L;
 
-    public EventVariableResolverFactory(ParserContext parserContext, MuleContext muleContext, MuleEvent event)
+    public EventVariableResolverFactory(ParserConfiguration parserConfiguration,
+                                        MuleContext muleContext,
+                                        MuleEvent event)
     {
-        super(parserContext, muleContext, event.getMessage());
+        super(parserConfiguration, muleContext, event.getMessage());
         addFinalVariable("flow", new FlowContext(event.getFlowConstruct()));
     }
 

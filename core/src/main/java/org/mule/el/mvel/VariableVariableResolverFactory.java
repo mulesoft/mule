@@ -9,8 +9,7 @@ package org.mule.el.mvel;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-
-import org.mule.mvel2.ParserContext;
+import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.UnresolveablePropertyException;
 import org.mule.mvel2.integration.VariableResolver;
 
@@ -21,20 +20,20 @@ public class VariableVariableResolverFactory extends MVELExpressionLanguageConte
 
     private MuleMessage message;
 
-    public VariableVariableResolverFactory(ParserContext parserContext,
+    public VariableVariableResolverFactory(ParserConfiguration parserConfiguration,
                                            MuleContext muleContext,
                                            MuleEvent event)
     {
-        super(parserContext, muleContext);
+        super(parserConfiguration, muleContext);
         this.message = event.getMessage();
     }
 
     @Deprecated
-    public VariableVariableResolverFactory(ParserContext parserContext,
+    public VariableVariableResolverFactory(ParserConfiguration parserConfiguration,
                                            MuleContext muleContext,
                                            MuleMessage message)
     {
-        super(parserContext, muleContext);
+        super(parserConfiguration, muleContext);
         this.message = message;
     }
 

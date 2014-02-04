@@ -12,17 +12,16 @@ import org.mule.el.context.MuleInstanceContext;
 import org.mule.el.context.ServerContext;
 import org.mule.el.function.DateTimeExpressionLanguageFuntion;
 import org.mule.el.function.RegexExpressionLanguageFuntion;
-
-import org.mule.mvel2.ParserContext;
+import org.mule.mvel2.ParserConfiguration;
 
 class StaticVariableResolverFactory extends MVELExpressionLanguageContext
 {
 
     private static final long serialVersionUID = -6819292692339684915L;
 
-    public StaticVariableResolverFactory(ParserContext parserContext, MuleContext muleContext)
+    public StaticVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext)
     {
-        super(parserContext, muleContext);
+        super(parserConfiguration, muleContext);
         addVariable("server", new ServerContext());
         addVariable("mule", new MuleInstanceContext(muleContext));
         addVariable("app", new AppContext(muleContext));

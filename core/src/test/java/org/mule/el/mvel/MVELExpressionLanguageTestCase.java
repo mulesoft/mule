@@ -339,7 +339,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     @Test
     public void addGlobalFunction() throws InitialisationException
     {
-        mvel.addGlobalFunction("hello", new HelloWorldFunction(mvel.parserContext));
+        mvel.addGlobalFunction("hello", new HelloWorldFunction(new ParserContext(mvel.parserConfiguration)));
         mvel.initialise();
         assertEquals("Hello World!", evaluate("hello()"));
     }

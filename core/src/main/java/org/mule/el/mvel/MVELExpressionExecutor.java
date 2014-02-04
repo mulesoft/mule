@@ -11,6 +11,7 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.el.ExpressionExecutor;
 import org.mule.api.expression.InvalidExpressionException;
 import org.mule.mvel2.MVEL;
+import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.optimizers.OptimizerFactory;
 
@@ -32,15 +33,15 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
 
     protected static final int COMPILED_EXPRESSION_MAX_CACHE_SIZE = 1000;
 
-    protected ParserContext parserContext;
+    protected ParserConfiguration parserConfiguration;
 
     protected Cache<String, Serializable> compiledExpressionsCache = CacheBuilder.newBuilder()
         .maximumSize(COMPILED_EXPRESSION_MAX_CACHE_SIZE)
         .build();
 
-    public MVELExpressionExecutor(ParserContext parserContext)
+    public MVELExpressionExecutor(ParserConfiguration parserConfiguration)
     {
-        this.parserContext = parserContext;
+        this.parserConfiguration = parserConfiguration;
     }
 
     @Override
@@ -79,8 +80,7 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
                 @Override
                 public Serializable call()
                 {
-                    return MVEL.compileExpression(expression,
-                        new ParserContext(parserContext.getParserConfiguration()));
+                    return MVEL.compileExpression(expression, new ParserContext(parserConfiguration));
                 }
             });
         }

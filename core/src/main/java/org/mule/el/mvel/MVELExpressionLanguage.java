@@ -19,7 +19,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.DataType;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.mvel2.CompileException;
-import org.mule.mvel2.ParserContext;
+import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ast.Function;
 import org.mule.mvel2.compiler.ExpressionCompiler;
 import org.mule.mvel2.integration.VariableResolverFactory;
@@ -50,7 +50,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 {
     private static Logger log = LoggerFactory.getLogger(MVELExpressionLanguage.class);
 
-    protected ParserContext parserContext;
+    protected ParserConfiguration parserConfiguration;
     protected MuleContext muleContext;
     protected MVELExpressionExecutor expressionExecutor;
     protected Collection<ExpressionLanguageExtension> expressionLanguageExtensions;
@@ -74,9 +74,10 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     @Override
     public void initialise() throws InitialisationException
     {
-        parserContext = createParserContext();
-        expressionExecutor = new MVELExpressionExecutor(parserContext);
-        expressionLanguageExtensions = muleContext.getRegistry().lookupObjectsForLifecycle(ExpressionLanguageExtension.class);
+        parserConfiguration = createParserConfiguration();
+        expressionExecutor = new MVELExpressionExecutor(parserConfiguration);
+        expressionLanguageExtensions = muleContext.getRegistry().lookupObjectsForLifecycle(
+            ExpressionLanguageExtension.class);
 
         loadGlobalFunctions();
         createStaticContext();
@@ -84,7 +85,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
     protected void createStaticContext()
     {
-        staticContext = new StaticVariableResolverFactory(parserContext, muleContext);
+        staticContext = new StaticVariableResolverFactory(parserConfiguration, muleContext);
     }
 
     protected void loadGlobalFunctions() throws InitialisationException
@@ -251,43 +252,40 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
     protected MVELExpressionLanguageContext createExpressionLanguageContext()
     {
-        MVELExpressionLanguageContext factory = new MVELExpressionLanguageContext(
-            parserContext.createSubcontext(), muleContext);
+        MVELExpressionLanguageContext factory = new MVELExpressionLanguageContext(parserConfiguration,
+            muleContext);
         factory.appendFactory(new MVELExpressionLanguageContext(staticContext));
         factory.addPrivateVariable(MVELExpressionLanguageContext.MULE_CONTEXT_INTERNAL_VARIABLE, muleContext);
         return factory;
     }
 
-    protected ParserContext createParserContext()
+    protected ParserConfiguration createParserConfiguration()
     {
-        ParserContext parserContext = new ParserContext();
-        configureParserContext(parserContext);
-        return parserContext;
+        ParserConfiguration ParserConfiguration = new ParserConfiguration();
+        configureParserConfiguration(ParserConfiguration);
+        return ParserConfiguration;
     }
 
-    protected void configureParserContext(ParserContext parserContext)
+    protected void configureParserConfiguration(ParserConfiguration parserConfiguration)
     {
-        // Nullify ParserConfiguration classloader to ensure context classloader is used instead
-        parserContext.getParserConfiguration().setClassLoader(null);
-
         // defaults imports
 
         // JRE
-        parserContext.addPackageImport("java.io");
-        parserContext.addPackageImport("java.lang");
-        parserContext.addPackageImport("java.net");
-        parserContext.addPackageImport("java.util");
+        parserConfiguration.addPackageImport("java.io");
+        parserConfiguration.addPackageImport("java.lang");
+        parserConfiguration.addPackageImport("java.net");
+        parserConfiguration.addPackageImport("java.util");
 
-        parserContext.addImport(BigDecimal.class);
-        parserContext.addImport(BigInteger.class);
-        parserContext.addImport(DataHandler.class);
-        parserContext.addImport(MimeType.class);
-        parserContext.addImport(Pattern.class);
+        parserConfiguration.addImport(BigDecimal.class);
+        parserConfiguration.addImport(BigInteger.class);
+        parserConfiguration.addImport(DataHandler.class);
+        parserConfiguration.addImport(MimeType.class);
+        parserConfiguration.addImport(Pattern.class);
 
         // Mule
-        parserContext.addImport(DataType.class);
-        parserContext.addImport(DataTypeFactory.class);
-        parserContext.addImport(NullPayload.class);
+        parserConfiguration.addImport(DataType.class);
+        parserConfiguration.addImport(DataTypeFactory.class);
+        parserConfiguration.addImport(NullPayload.class);
     }
 
     public void setGlobalFunctionsString(String globalFunctionsString)
@@ -332,29 +330,30 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
     protected VariableResolverFactory createGlobalVariableResolverFactory(MVELExpressionLanguageContext context)
     {
-        return new GlobalVariableResolverFactory(this, context, parserContext, muleContext, expressionLanguageExtensions);
+        return new GlobalVariableResolverFactory(this, context, parserConfiguration, muleContext,
+            expressionLanguageExtensions);
     }
 
     protected VariableResolverFactory createEventVariableResolverFactory(MuleEvent event)
     {
-        return new EventVariableResolverFactory(parserContext, muleContext, event);
+        return new EventVariableResolverFactory(parserConfiguration, muleContext, event);
     }
 
     @Deprecated
     protected VariableResolverFactory createMessageVariableResolverFactory(MuleMessage message)
     {
-        return new MessageVariableResolverFactory(parserContext, muleContext, message);
+        return new MessageVariableResolverFactory(parserConfiguration, muleContext, message);
     }
 
     protected VariableResolverFactory createVariableVariableResolverFactory(MuleEvent event)
     {
-        return new VariableVariableResolverFactory(parserContext, muleContext, event);
+        return new VariableVariableResolverFactory(parserConfiguration, muleContext, event);
     }
 
     @Deprecated
     protected VariableResolverFactory createVariableVariableResolverFactory(MuleMessage message)
     {
-        return new VariableVariableResolverFactory(parserContext, muleContext, message);
+        return new VariableVariableResolverFactory(parserConfiguration, muleContext, message);
     }
 
 }
