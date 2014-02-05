@@ -42,16 +42,28 @@
 
     <bean name="_defaultInMemoryObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultInMemoryObjectStore"/>
 
+    <alias name="_defaultInMemoryObjectStore" alias="_localInMemoryObjectStore" />
+
     <bean name="_defaultPersistentObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultPersistentObjectStore"/>
+
+    <alias name="_defaultPersistentObjectStore" alias="_localPersistentObjectStore" />
 
     <bean name="_defaultUserObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserObjectStore"/>
 
+    <alias name="_defaultUserObjectStore" alias="_localUserObjectStore" />
+
     <bean name="_defaultTransientUserObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserTransientObjectStore"/>
+
+    <alias name="_defaultTransientUserObjectStore" alias="_localTransientUserObjectStore" />
 
     <bean name="_muleQueueManager" class="org.mule.util.queue.TransactionalQueueManager"/>
 
-    <bean name="_muleObjectStoreManager" class="org.mule.util.store.MuleObjectStoreManager"/>
+    <alias name="_muleQueueManager" alias="_localQueueManager"/>
 
+    <bean name="_muleObjectStoreManager" class="org.mule.util.store.MuleObjectStoreManager" />
+
+    <alias name="_muleObjectStoreManager" alias="_localObjectStoreManager" />
+    
     <bean name="_defaultThreadingProfile" class="org.mule.config.ChainedThreadingProfile"/>
 
     <bean name="_defaultMessageDispatcherThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
