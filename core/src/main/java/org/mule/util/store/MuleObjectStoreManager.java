@@ -38,8 +38,8 @@ public class MuleObjectStoreManager
     protected ScheduledThreadPoolExecutor scheduler;
     MuleContext muleContext;
     ConcurrentMap<String, ObjectStore<?>> stores = new ConcurrentHashMap<String, ObjectStore<?>>();
-    private String baseTransientStoreKey = MuleProperties.DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME;
-    private String basePersistentStoreKey = MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME;
+    private String baseTransientStoreKey = MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
+    private String basePersistentStoreKey = MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
     private String baseTransientUserStoreKey = MuleProperties.DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME;
     private String basePersistentUserStoreKey = MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME;
 
