@@ -373,7 +373,7 @@ public abstract class AbstractMuleTestCase
     @Before
     public void takeTestCaseName()
     {
-        if( testCaseName==null )
+        if (testCaseName == null)
         {
             testCaseName = this.getClass().getName();
         }

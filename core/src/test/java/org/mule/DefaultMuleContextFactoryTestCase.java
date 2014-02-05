@@ -111,7 +111,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
     {
         TestMuleContextBuilder muleContextBuilder = new TestMuleContextBuilder();
         context = muleContextFactory.createMuleContext(new TestConfigurationBuilder2(),
-                                                                   muleContextBuilder);
+                                                       muleContextBuilder);
 
         assertCustomMuleContext(context);
         assertConfigurationBuilder2Objects(context);

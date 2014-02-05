@@ -110,12 +110,12 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     @Test
     public void disposeObjectStoresIfDisposable() throws Exception
     {
-        mockExpireGroupsObjectStore = mock(DisposableListableObjectStore.class,RETURNS_DEEP_STUBS);
+        mockExpireGroupsObjectStore = mock(DisposableListableObjectStore.class, RETURNS_DEEP_STUBS);
         mockProcessedGroups = mock(DisposableListableObjectStore.class, RETURNS_DEEP_STUBS);
         EventCorrelator eventCorrelator = createEventCorrelator();
         eventCorrelator.dispose();
-        verify((Disposable)mockExpireGroupsObjectStore,times(1)).dispose();
-        verify((Disposable)mockProcessedGroups,times(1)).dispose();
+        verify((Disposable) mockExpireGroupsObjectStore, times(1)).dispose();
+        verify((Disposable) mockProcessedGroups, times(1)).dispose();
     }
 
     @Test
@@ -174,5 +174,6 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
 
     public interface DisposableListableObjectStore extends ListableObjectStore, Disposable
     {
+
     }
 }
