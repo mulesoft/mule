@@ -22,6 +22,7 @@ import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ManagedStoresTestCase extends AbstractMuleContextTestCase
@@ -127,6 +128,7 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase
             false, 10, 10000, 200));
     }
 
+    @Ignore("MULE-6926")
     @Test
     public void testPartitionablePersistenceStore()
         throws ObjectStoreException, RegistrationException, InterruptedException
