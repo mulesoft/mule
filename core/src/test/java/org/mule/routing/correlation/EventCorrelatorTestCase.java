@@ -30,6 +30,7 @@ import org.mule.routing.EventGroup;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.io.Serializable;
 import java.util.Collections;
 
 import org.junit.Test;
@@ -42,7 +43,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class EventCorrelatorTestCase extends AbstractMuleTestCase
 {
-
 
     public static final String OBJECT_STOR_NAME_PREFIX = "prefix";
     public static final String TEST_GROUP_ID = "groupId";
@@ -144,7 +144,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
         when(mockMuleContext.isPrimaryPollingInstance()).thenReturn(primaryNode);
 
         EventCorrelator eventCorrelator = createEventCorrelator();
-        when(mockObjectStore.allKeys()).thenReturn(Collections.singletonList(TEST_GROUP_ID));
+        when(mockObjectStore.allKeys()).thenReturn(Collections.<Serializable>singletonList(TEST_GROUP_ID));
         when(mockEventCorrelatorCallback.createEventGroup(mockMuleEvent, TEST_GROUP_ID)).thenReturn(mockEventGroup);
 
         eventCorrelator.start();
@@ -156,6 +156,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
         finally
         {
             eventCorrelator.stop();
+            eventCorrelator.dispose();
         }
     }
 

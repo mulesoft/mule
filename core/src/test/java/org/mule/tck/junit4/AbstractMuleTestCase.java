@@ -7,7 +7,6 @@
 package org.mule.tck.junit4;
 
 import static org.junit.Assume.assumeThat;
-
 import org.mule.RequestContext;
 import org.mule.tck.junit4.rule.WarningTimeout;
 import org.mule.util.ClassUtils;
@@ -21,7 +20,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.IteratorUtils;
@@ -33,6 +35,7 @@ import org.hamcrest.Description;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.junit.rules.TestRule;
@@ -124,6 +127,7 @@ public abstract class AbstractMuleTestCase
 
     /**
      * Reads the mule-exclusion file for the current test class and
+     *
      * @param test
      */
     protected boolean isTestIncludedInExclusionFile(AbstractMuleTestCase test)
@@ -342,4 +346,69 @@ public abstract class AbstractMuleTestCase
     {
         excluded = null;
     }
+
+    private static List<String> collectThreadNames()
+    {
+        List<String> threadNames = new ArrayList<String>();
+        for (Thread t : Thread.getAllStackTraces().keySet())
+        {
+            if (t.isAlive())
+            {
+                threadNames.add(t.getName() + " - " + t.getId());
+            }
+        }
+        Collections.sort(threadNames);
+        return threadNames;
+    }
+
+
+    private static String testCaseName;
+
+    @BeforeClass
+    public static void clearTestCaseName()
+    {
+        testCaseName = null;
+    }
+
+    @Before
+    public void takeTestCaseName()
+    {
+        if( testCaseName==null )
+        {
+            testCaseName = this.getClass().getName();
+        }
+    }
+
+    @AfterClass
+    public static void dumpFilteredThreadsInTest()
+    {
+        List<String> currentThreads = collectThreadNames();
+        int filteredThreads = 0;
+        StringBuilder builder = new StringBuilder();
+        for (String threadName : currentThreads)
+        {
+            if (threadName.contains("Service") || threadName.contains("service") || threadName.contains("Thread") || threadName.contains("thread") || threadName.contains("Server") || threadName.contains("server"))
+            {
+                builder.append("-> ").append(threadName).append("\n");
+                filteredThreads++;
+            }
+        }
+        if (filteredThreads > 0)
+        {
+            logThreadsResult(String.format("Hung threads count: %d. Test case: %s. Thread names:\n%s", filteredThreads, testCaseName, builder.toString()));
+        }
+        else
+        {
+            logThreadsResult(String.format("No hung threads. Test case: %s\n", testCaseName));
+        }
+    }
+
+    private static void logThreadsResult(String result)
+    {
+        System.out.println(
+                "--------------------------------------------------\n" +
+                result +
+                "--------------------------------------------------");
+    }
+
 }
