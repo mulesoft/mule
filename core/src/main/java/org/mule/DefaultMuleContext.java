@@ -89,8 +89,8 @@ public class DefaultMuleContext implements MuleContext
      * These constants only make sense until we have a reliable solution for durable persistence in Clustering.
      * These are not part of Mule's API and you should not use them in applications or extensions
      */
-    public static final String LOCAL_TRANSIENT_OBJECT_STORE_KEY = "_defaultInMemoryObjectStore";
-    public static final String LOCAL_PERSISTENT_OBJECT_STORE_KEY = "_defaultInMemoryObjectStore";
+    public static final String LOCAL_TRANSIENT_OBJECT_STORE_KEY = "_localInMemoryObjectStore";
+    public static final String LOCAL_PERSISTENT_OBJECT_STORE_KEY = "_localPersistentObjectStore";
     public static final String LOCAL_OBJECT_STORE_MANAGER_KEY = "_localObjectStoreManager";
     public static final String LOCAL_QUEUE_MANAGER_KEY = "_localQueueManager";
 
