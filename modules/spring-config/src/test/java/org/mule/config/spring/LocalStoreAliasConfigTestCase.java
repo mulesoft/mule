@@ -11,18 +11,16 @@ import org.mule.DefaultMuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.MuleProperties;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.size.SmallTest;
 
 import org.junit.Test;
 
-@SmallTest
 public class LocalStoreAliasConfigTestCase extends AbstractMuleContextTestCase
 {
 
     @Override
     protected ConfigurationBuilder getBuilder() throws Exception
     {
-        return new SpringXmlConfigurationBuilder(new String[] {"minimal-mule-config.xml"});
+        return new SpringXmlConfigurationBuilder(new String[] {});
     }
 
     @Test
