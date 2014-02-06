@@ -9,6 +9,7 @@ package org.mule.module.cxf;
 
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleMessage;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -78,7 +79,7 @@ public class GZIPEncodingTestCase extends FunctionalTestCase
     private void validateResponse(MuleMessage response) throws Exception
     {
         String unzipped = unzip(new ByteArrayInputStream(response.getPayloadAsBytes()));
-        XMLUnit.compareXML(getAllResponse, unzipped);
+        assertTrue(XMLUnit.compareXML(getAllResponse, unzipped).identical());
         assertEquals(GZIP, response.getInboundProperty(HttpConstants.HEADER_CONTENT_ENCODING));
     }
 
