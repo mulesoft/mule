@@ -14,7 +14,6 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.mvel2.ImmutableElementException;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ParserContext;
-import org.mule.mvel2.UnresolveablePropertyException;
 import org.mule.mvel2.ast.FunctionInstance;
 import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.VariableResolverFactory;
@@ -76,18 +75,14 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
 
     public VariableResolver getVariableResolver(String name)
     {
-        if (isResolveable(name))
+        if (variableResolvers.containsKey(name))
         {
-            if (variableResolvers.containsKey(name))
-            {
-                return variableResolvers.get(name);
-            }
-            else
-            {
-                return nextFactory.getVariableResolver(name);
-            }
+            return variableResolvers.get(name);
         }
-        return null;
+        else
+        {
+            return nextFactory.getVariableResolver(name);
+        }
     }
 
     @Override
