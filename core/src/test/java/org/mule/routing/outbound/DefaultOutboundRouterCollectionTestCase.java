@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleContextTestCase
@@ -80,6 +81,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleContext
      * @throws Exception if the test fails!
      */
     @Test
+    @Ignore("MULE-6926: Flaky test.")
     public void testSingleDoesNotRequireCopyRouterMatchAllFalse() throws Exception
     {
         getOutboundRouterCollection().setMatchAll(false);
