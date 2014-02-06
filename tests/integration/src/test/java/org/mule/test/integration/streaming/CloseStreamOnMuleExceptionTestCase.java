@@ -140,13 +140,6 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
         assertTrue(inputStream.isClosed());
     }
 
-    // TODO MULE-3558 Streams are not closed if there are exceptions in the message
-    // receiver. Protocol/Transport workers should clean up after themselves if there
-    // is an error (MULE-3559) but exceptions thrown by AbstractMessageReciever will
-    // not result in stream being closed. These exceptions result in
-    // exceptionStrategy being called but because RequestContext is empty the message
-    // is not available in the AbstractExceptionListener and cannot be closed.
-    @Ignore
     @Test
     public void testCloseStreamOnInboundFilterException() throws Exception
     {
