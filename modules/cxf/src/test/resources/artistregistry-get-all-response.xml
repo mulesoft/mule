@@ -1,0 +1,20 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Body>
+        <ns1:getAllResponse xmlns:ns1="http://example.cxf.module.mule.org/">
+            <return>
+                <item>
+                    <artType>AUTHOR</artType>
+                    <famousWorks>Hamlet</famousWorks>
+                    <firstName>William</firstName>
+                    <lastName>Shakespeare</lastName>
+                </item>
+                <item>
+                    <artType>ACTOR</artType>
+                    <famousWorks>Mission Impossible</famousWorks>
+                    <firstName>Tom</firstName>
+                    <lastName>Cruise</lastName>
+                </item>
+            </return>
+        </ns1:getAllResponse>
+    </soap:Body>
+</soap:Envelope>

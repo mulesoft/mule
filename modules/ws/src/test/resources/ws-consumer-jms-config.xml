@@ -14,11 +14,13 @@
 
     <jms:activemq-connector name="jmsConnector" specification="1.1" brokerURL="vm://localhost"/>
 
+    <ws:consumer-config serviceAddress="jms://serverQueue?exchangePattern=request-response" wsdlLocation="${baseDir}Echo.wsdl"
+                        service="EchoService" port="EchoPort" name="globalConfig" />
+
     <flow name="client">
         <inbound-endpoint address="vm://in" exchange-pattern="request-response" />
 
-        <ws:consumer serviceAddress="jms://serverQueue?exchangePattern=request-response" wsdlLocation="${baseDir}Echo.wsdl"
-                     wsdlService="EchoService" wsdlPort="EchoPort" wsdlOperation="echo" />
+        <ws:consumer operation="echo" />
 
     </flow>
 

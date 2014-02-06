@@ -35,10 +35,13 @@ public class MuleObjectStoreManager
     implements ObjectStoreManager, MuleContextAware, Initialisable, Disposable
 {
     private static Logger logger = LoggerFactory.getLogger(MuleObjectStoreManager.class);
-
+    protected ScheduledThreadPoolExecutor scheduler;
     MuleContext muleContext;
     ConcurrentMap<String, ObjectStore<?>> stores = new ConcurrentHashMap<String, ObjectStore<?>>();
-    protected ScheduledThreadPoolExecutor scheduler;
+    private String baseTransientStoreKey = MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
+    private String basePersistentStoreKey = MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
+    private String baseTransientUserStoreKey = MuleProperties.DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME;
+    private String basePersistentUserStoreKey = MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME;
 
     @Override
     public <T extends ObjectStore<? extends Serializable>> T getObjectStore(String name)
@@ -115,13 +118,13 @@ public class MuleObjectStoreManager
         T baseStore;
         if (persistent)
         {
-            baseStore = (T) muleContext.getRegistry().lookupObject(
-                MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME);
+            baseStore = muleContext.getRegistry().lookupObject(
+                    this.basePersistentUserStoreKey);
         }
         else
         {
-            baseStore = (T) muleContext.getRegistry().lookupObject(
-                MuleProperties.DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME);
+            baseStore = muleContext.getRegistry().lookupObject(
+                    this.baseTransientUserStoreKey);
         }
         return baseStore;
     }
@@ -131,13 +134,13 @@ public class MuleObjectStoreManager
         T baseStore;
         if (persistent)
         {
-            baseStore = (T) muleContext.getRegistry().lookupObject(
-                MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME);
+            baseStore = muleContext.getRegistry().lookupObject(
+                    this.basePersistentStoreKey);
         }
         else
         {
-            baseStore = (T) muleContext.getRegistry().lookupObject(
-                MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME);
+            baseStore = muleContext.getRegistry().lookupObject(
+                    this.baseTransientStoreKey);
         }
         return baseStore;
     }
@@ -261,6 +264,33 @@ public class MuleObjectStoreManager
             .getClassLoader()));
     }
 
+    @Override
+    public void disposeStore(ObjectStore<? extends Serializable> store) throws ObjectStoreException
+    {
+        if (store instanceof ObjectStorePartition)
+        {
+            ObjectStorePartition partition = (ObjectStorePartition) store;
+            partition.getBaseStore().disposePartition(partition.getPartitionName());
+        }
+        else
+        {
+            try
+            {
+                store.clear();
+            }
+            catch (UnsupportedOperationException e)
+            {
+                logger.warn(String.format("ObjectStore of class %s does not support clearing",
+                    store.getClass().getCanonicalName()), e);
+            }
+        }
+
+        if (store instanceof Disposable)
+        {
+            ((Disposable) store).dispose();
+        }
+    }
+
     class Monitor implements Runnable
     {
         private final String partitionName;
@@ -299,30 +329,23 @@ public class MuleObjectStoreManager
 
     }
 
-    @Override
-    public void disposeStore(ObjectStore<? extends Serializable> store) throws ObjectStoreException
+    public void setBasePersistentStoreKey(String basePersistentStoreKey)
     {
-        if (store instanceof ObjectStorePartition)
-        {
-            ObjectStorePartition partition = (ObjectStorePartition) store;
-            partition.getBaseStore().disposePartition(partition.getPartitionName());
-        }
-        else
-        {
-            try
-            {
-                store.clear();
-            }
-            catch (UnsupportedOperationException e)
-            {
-                logger.warn(String.format("ObjectStore of class %s does not support clearing",
-                    store.getClass().getCanonicalName()), e);
-            }
-        }
+        this.basePersistentStoreKey = basePersistentStoreKey;
+    }
 
-        if (store instanceof Disposable)
-        {
-            ((Disposable) store).dispose();
-        }
+    public void setBaseTransientStoreKey(String baseTransientStoreKey)
+    {
+        this.baseTransientStoreKey = baseTransientStoreKey;
+    }
+
+    public void setBasePersistentUserStoreKey(String basePersistentUserStoreKey)
+    {
+        this.basePersistentUserStoreKey = basePersistentUserStoreKey;
+    }
+
+    public void setBaseTransientUserStoreKey(String baseTransientUserStoreKey)
+    {
+        this.baseTransientUserStoreKey = baseTransientUserStoreKey;
     }
 }

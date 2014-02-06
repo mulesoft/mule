@@ -6,5 +6,7 @@ http\://www.mulesoft.org/schema/mule/ssl/3.3/mule-ssl.xsd=META-INF/mule-ssl.xsd
 http\://www.mulesoft.org/schema/mule/tls/3.3/mule-tls.xsd=META-INF/mule-tls.xsd
 http\://www.mulesoft.org/schema/mule/ssl/3.4/mule-ssl.xsd=META-INF/mule-ssl.xsd
 http\://www.mulesoft.org/schema/mule/tls/3.4/mule-tls.xsd=META-INF/mule-tls.xsd
+http\://www.mulesoft.org/schema/mule/ssl/3.5/mule-ssl.xsd=META-INF/mule-ssl.xsd
+http\://www.mulesoft.org/schema/mule/tls/3.5/mule-tls.xsd=META-INF/mule-tls.xsd
 http\://www.mulesoft.org/schema/mule/ssl/current/mule-ssl.xsd=META-INF/mule-ssl.xsd
 http\://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd=META-INF/mule-tls.xsd

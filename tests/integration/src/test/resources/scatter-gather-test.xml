@@ -38,35 +38,35 @@
     
     <flow name="customMergeStrategyByRef">
 		<scatter-gather>
+        	<custom-aggregation-strategy ref="testMergeStrategy" />
+
         	<set-payload value="apple" />
         	<set-payload value="banana" />
         	<set-payload value="orange" />
-        	
-        	<custom-aggregation-strategy ref="testMergeStrategy" />
         </scatter-gather>
         <flow-ref name="testAggregationStrategy" />
     </flow>
     
     <flow name="customMergeStrategyByName">
 		<scatter-gather>
+        	<custom-aggregation-strategy class="org.mule.test.routing.ScatterGatherRouterTestCase$TestAggregationStrategy" />
+
         	<set-payload value="apple" />
         	<set-payload value="banana" />
         	<set-payload value="orange" />
-        	
-        	<custom-aggregation-strategy class="org.mule.test.routing.ScatterGatherRouterTestCase$TestAggregationStrategy" />
         </scatter-gather>
         <flow-ref name="testAggregationStrategy" />
     </flow>
     
     <flow name="customThreadingProfile">
     	<scatter-gather>
+        	<threading-profile maxThreadsActive="1" poolExhaustedAction="WAIT" />
+
         	<set-payload value="apple" />
         	<set-payload value="banana" />
         	<set-payload value="orange" />
         	<expression-component>java.lang.Thread.sleep(2500)</expression-component>
         	<expression-component>java.lang.Thread.sleep(2500)</expression-component>
-        	
-        	<threading-profile maxThreadsActive="1" poolExhaustedAction="WAIT" />
         </scatter-gather>
         
         <flow-ref name="testRoutes" />
@@ -97,11 +97,11 @@
     
     <flow name="failingMergeStrategy">
     	<scatter-gather>
+        	<custom-aggregation-strategy class="org.mule.test.routing.ScatterGatherRouterTestCase$FailingAggregationStrategy" />
+
         	<set-payload value="apple" />
         	<set-payload value="banana" />
         	<set-payload value="orange" />
-        	
-        	<custom-aggregation-strategy class="org.mule.test.routing.ScatterGatherRouterTestCase$FailingAggregationStrategy" />
         </scatter-gather>
     </flow>
     

@@ -336,7 +336,18 @@ public class XMLUtils extends org.mule.util.XMLUtils
             return null;
         }
     }
-    
+
+    public static javax.xml.transform.Source toXmlSource(XMLStreamReader src) throws Exception {
+        // StaxSource requires that we advance to a start element/document event
+        if (!src.isStartElement() &&
+            src.getEventType() != XMLStreamConstants.START_DOCUMENT)
+        {
+            src.nextTag();
+        }
+
+        return new StaxSource(src);
+    }
+
     /**
      * Convert our object to a Source type efficiently.
      */ 
@@ -377,16 +388,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
         // TODO MULE-3555
         else if (src instanceof XMLStreamReader)
         {
-            XMLStreamReader xsr = (XMLStreamReader) src;
-            
-            // StaxSource requires that we advance to a start element/document event
-            if (!xsr.isStartElement() && 
-                            xsr.getEventType() != XMLStreamConstants.START_DOCUMENT) 
-            {
-                xsr.nextTag();
-            }
-            
-            return new StaxSource((XMLStreamReader) src);
+            return toXmlSource((XMLStreamReader) src);
         }
         else if (src instanceof org.w3c.dom.Document || src instanceof org.w3c.dom.Element)
         {

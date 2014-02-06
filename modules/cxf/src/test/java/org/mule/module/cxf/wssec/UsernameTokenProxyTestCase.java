@@ -61,6 +61,7 @@ public class UsernameTokenProxyTestCase extends AbstractServiceAndFlowTestCase
         assertTrue(result.getPayloadAsString().contains("joe"));
     }
 
+    @Ignore("MULE-6926: Flaky Test")
     @Test
     public void testProxyBody() throws Exception
     {

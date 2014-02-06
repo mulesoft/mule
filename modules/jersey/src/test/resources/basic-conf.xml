@@ -14,7 +14,7 @@
     
         <service name="helloWorldResource">
             <inbound>
-                <inbound-endpoint address="http://localhost:63081/" exchange-pattern="request-response"/>
+                <inbound-endpoint address="http://localhost:${port}/" exchange-pattern="request-response"/>
             </inbound>
             <jersey:resources>
                 <component class="org.mule.module.jersey.HelloWorldResource"/>

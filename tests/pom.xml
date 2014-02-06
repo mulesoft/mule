@@ -65,5 +65,11 @@
                 <module>integration-jdk6</module>
             </modules>
         </profile>
+        <profile>
+            <id>performance</id>
+            <modules>
+                <module>performance</module>
+            </modules>
+        </profile>    
     </profiles>
 </project>

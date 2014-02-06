@@ -64,11 +64,16 @@ public class TestProcess implements CommandServer.CommandListener
 
     public void waitUntilStarted() throws InterruptedException
     {
+        waitUntilStarted(30);
+    }
+
+    public void waitUntilStarted(int contextStartedTiemout) throws InterruptedException
+    {
         if (!clientSocketAcceptedLatch.await(TestUtils.getTimeout(20), TimeUnit.SECONDS))
         {
             throw new IllegalStateException(String.format("Client process %s didn not connect connect to logger service", instanceId));
         }
-        if (!contextStartedLatch.await(TestUtils.getTimeout(30), TimeUnit.SECONDS))
+        if (!contextStartedLatch.await(TestUtils.getTimeout(contextStartedTiemout), TimeUnit.SECONDS))
         {
             throw new RuntimeException(String.format("Process %s didn not start within 30 seconds", instanceId));
         }

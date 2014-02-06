@@ -18,6 +18,11 @@
     <dependencies>
         <!-- we use some common classes from the CXF module -->
         <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-cxf</artifactId>
             <version>${project.version}</version>

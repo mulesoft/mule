@@ -14,6 +14,7 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -28,6 +29,7 @@ public class JmsClientAcknowledgeTransactionTestCase extends AbstractJmsFunction
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testJmsClientAcknowledgeTransaction() throws Exception
     {
         send(scenarioAcknowledge);

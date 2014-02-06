@@ -98,8 +98,10 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     public MuleMessage onCall(final MuleMessage message) throws MuleException
     {
 
+        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
+            Thread.currentThread().setContextClassLoader(endpoint.getMuleContext().getExecutionClassLoader());
             ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
             MuleEvent resultEvent = executionTemplate.execute(new ExecutionCallback<MuleEvent>()
             {
@@ -136,6 +138,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         finally
         {
             message.release();
+            Thread.currentThread().setContextClassLoader(originalClassLoader);
         }
     }
 

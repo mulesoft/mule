@@ -11,6 +11,7 @@ import org.mule.module.cxf.support.CopyAttachmentInInterceptor;
 import org.mule.module.cxf.support.CopyAttachmentOutInterceptor;
 import org.mule.module.cxf.support.CxfUtils;
 import org.mule.module.cxf.support.OutputPayloadInterceptor;
+import org.mule.module.cxf.support.ProxyRPCInInterceptor;
 import org.mule.module.cxf.support.ProxySchemaValidationInInterceptor;
 import org.mule.module.cxf.support.ProxyService;
 import org.mule.module.cxf.support.ProxyServiceFactoryBean;
@@ -18,13 +19,16 @@ import org.mule.module.cxf.support.ResetStaxInterceptor;
 import org.mule.module.cxf.support.ReversibleStaxInInterceptor;
 import org.mule.module.cxf.support.ReversibleValidatingInterceptor;
 
+import org.apache.cxf.binding.soap.interceptor.RPCInInterceptor;
 import org.apache.cxf.binding.soap.interceptor.RPCOutInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
 import org.apache.cxf.databinding.stax.StaxDataBinding;
 import org.apache.cxf.databinding.stax.StaxDataBindingFeature;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
+import org.apache.cxf.interceptor.BareInInterceptor;
 import org.apache.cxf.interceptor.BareOutInterceptor;
+import org.apache.cxf.interceptor.DocLiteralInInterceptor;
 
 /**
  * Creates an inbound proxy based on a specially configure CXF Server.
@@ -67,16 +71,28 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
             CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getOutInterceptors(), SoapOutInterceptor.class.getName());
         }
 
-        // RPCOutInterceptor adds an operation node to the response, so if it's present replace if by a BareOutInterceptor
-        if(CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getOutInterceptors(), RPCOutInterceptor.class.getName()))
-        {
-            server.getEndpoint().getBinding().getOutInterceptors().add(new BareOutInterceptor());
-        }
+        replaceRPCInterceptors(server);
 
         if (isValidationEnabled())
         {
             server.getEndpoint().getInInterceptors().add(new ProxySchemaValidationInInterceptor(getConfiguration().getCxfBus(), 
                server.getEndpoint().getService().getServiceInfos().get(0)));
+        }
+    }
+
+    /**
+     * When the binding style is RPC we need to replace the default interceptors to avoid truncating the content.
+     */
+    private void replaceRPCInterceptors(Server server)
+    {
+        if(CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getInInterceptors(), RPCInInterceptor.class.getName()))
+        {
+            server.getEndpoint().getBinding().getInInterceptors().add(new ProxyRPCInInterceptor());
+        }
+
+        if(CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getOutInterceptors(), RPCOutInterceptor.class.getName()))
+        {
+            server.getEndpoint().getBinding().getOutInterceptors().add(new BareOutInterceptor());
         }
     }
 

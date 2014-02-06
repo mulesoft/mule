@@ -12,6 +12,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class QuartzJobExceptionTestCase extends FunctionalTestCase
@@ -23,6 +24,7 @@ public class QuartzJobExceptionTestCase extends FunctionalTestCase
     }
 
     @Test
+    @Ignore("MULE-6926: Flaky test.")
     public void invokesFlowExceptionStrategy() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();

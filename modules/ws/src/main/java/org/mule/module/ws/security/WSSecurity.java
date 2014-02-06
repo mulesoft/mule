@@ -7,12 +7,15 @@
 
 package org.mule.module.ws.security;
 
+import org.mule.util.Preconditions;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class WSSecurity
 {
 
-    protected List<SecurityStrategy> strategies;
+    private List<SecurityStrategy> strategies = new ArrayList<SecurityStrategy>();
 
     public List<SecurityStrategy> getStrategies()
     {
@@ -21,7 +24,13 @@ public class WSSecurity
 
     public void setStrategies(List<SecurityStrategy> strategies)
     {
+        Preconditions.checkArgument(strategies != null, "Strategy list cannot be null");
         this.strategies = strategies;
+    }
+
+    public boolean hasStrategies()
+    {
+        return !strategies.isEmpty();
     }
 
 }

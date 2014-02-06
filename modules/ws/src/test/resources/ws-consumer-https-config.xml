@@ -18,12 +18,14 @@
         <https:tls-server path="trustStore" storePassword="mulepassword"/>
     </https:connector>
 
+    <ws:consumer-config serviceAddress="https://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
+                        service="EchoService" port="EchoPort" name="globalConfig" />
+
 
     <flow name="client">
         <inbound-endpoint address="vm://in" exchange-pattern="request-response"/>
 
-        <ws:consumer serviceAddress="https://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
-                     wsdlService="EchoService" wsdlPort="EchoPort" wsdlOperation="echo"/>
+        <ws:consumer operation="echo"/>
     </flow>
 
     <flow name="server">

@@ -128,7 +128,6 @@
             <xsd:element ref="abstract-security-manager"/>
             <xsd:element ref="abstract-transaction-manager"/>
             <xsd:element ref="abstract-connector"/>
-            <xsd:element ref="abstract-shared-connector"/>
             <xsd:element ref="abstract-global-endpoint"/>
             <xsd:element ref="abstract-exception-strategy"/>
             <xsd:element ref="abstract-flow-construct" />
@@ -213,13 +212,6 @@
         </xsd:complexType>
     </xsd:element>
 
-    <xsd:element name="abstract-shared-connector" abstract="true" type="abstractConnectorType">
-        <xsd:annotation>
-            <xsd:documentation>
-                A placeholder for connector elements. Connector elements allow properties to be configured across all endpoints that use the same transport. If multiple connectors are defined for the same transport, each endpoint must name which connector is being used.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
     <xsd:element name="abstract-connector" abstract="true" type="abstractConnectorType">
         <xsd:annotation>
             <xsd:documentation>
@@ -6436,7 +6428,6 @@
             <xsd:complexContent>
                 <xsd:extension base="abstractRoutingMessageProcessorType">
                     <xsd:sequence>
-                        <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="unbounded"/>
                         <xsd:element name="custom-aggregation-strategy" type="aggregationStrategyType" minOccurs="0" maxOccurs="1">
                             <xsd:annotation>
                                 <xsd:documentation>
@@ -6451,6 +6442,7 @@
                                 </xsd:documentation>
                             </xsd:annotation>
                         </xsd:element>
+                        <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="unbounded"/>
                     </xsd:sequence>
                     <xsd:attribute name="timeout" type="substitutableLong" use="optional" default="0">
                         <xsd:annotation>

@@ -11,14 +11,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.mvel2.CompileException;
+import org.mule.mvel2.ParserConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.mule.mvel2.CompileException;
-import org.mule.mvel2.ParserContext;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 
@@ -31,7 +31,7 @@ public class MVELExpressionExecutorTestCase extends AbstractMuleTestCase
     @Before
     public void setupMVEL() throws InitialisationException
     {
-        mvel = new MVELExpressionExecutor(new ParserContext());
+        mvel = new MVELExpressionExecutor(new ParserConfiguration());
         context = Mockito.mock(MVELExpressionLanguageContext.class);
         Mockito.when(context.isResolveable(Mockito.anyString())).thenReturn(false);
     }

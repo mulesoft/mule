@@ -11,12 +11,12 @@
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd">
 
+    <ws:consumer-config serviceAddress="http://localhost:${port}/#[message.inboundProperties['path']]" wsdlLocation="${baseDir}Echo.wsdl"
+                        service="EchoService" port="EchoPort" name="globalConfig" />
+
     <flow name="client">
         <inbound-endpoint address="vm://in" exchange-pattern="request-response"/>
-
-        <ws:consumer serviceAddress="http://localhost:${port}/#[message.inboundProperties['path']]" wsdlLocation="${baseDir}Echo.wsdl"
-                     wsdlService="EchoService"
-                     wsdlPort="EchoPort" wsdlOperation="echo"/>
+        <ws:consumer operation="echo"/>
     </flow>
 
 

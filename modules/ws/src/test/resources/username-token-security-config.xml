@@ -10,57 +10,57 @@
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd">
 
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
+                        service="EchoService" port="EchoPort" name="configValidCredentialsText">
+        <ws:security>
+            <ws:wss-username-token username="admin" password="${textPasswordPlaceholder}" passwordType="TEXT"
+                                   addCreated="true" addNonce="true"/>
+        </ws:security>
+    </ws:consumer-config>
+
     <flow name="clientWithValidCredentialsText">
         <inbound-endpoint address="vm://clientWithValidCredentialsText" exchange-pattern="request-response"/>
 
-        <ws:consumer serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
-                     wsdlService="EchoService"
-                     wsdlPort="EchoPort" wsdlOperation="echo">
-
-            <ws:security>
-                <ws:wss-username-token username="admin" password="${textPasswordPlaceholder}" passwordType="TEXT"
-                                       addCreated="true" addNonce="true"/>
-            </ws:security>
-
-        </ws:consumer>
+        <ws:consumer  operation="echo" config-ref="configValidCredentialsText" />
     </flow>
+
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
+                        service="EchoService" port="EchoPort" name="configValidCredentialsDigest">
+        <ws:security>
+            <ws:wss-username-token username="admin" password="${digestPasswordPlaceholder}" passwordType="DIGEST"
+                                   addCreated="true" addNonce="true"/>
+        </ws:security>
+    </ws:consumer-config>
+
 
     <flow name="clientWithValidCredentialsDigest">
         <inbound-endpoint address="vm://clientWithValidCredentialsDigest" exchange-pattern="request-response"/>
 
-        <ws:consumer serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
-                     wsdlService="EchoService"
-                     wsdlPort="EchoPort" wsdlOperation="echo">
-
-            <ws:security>
-                <ws:wss-username-token username="admin" password="${digestPasswordPlaceholder}" passwordType="DIGEST"
-                                       addCreated="true" addNonce="true"/>
-            </ws:security>
-
-        </ws:consumer>
+        <ws:consumer operation="echo" config-ref="configValidCredentialsDigest" />
     </flow>
+
+
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
+                        service="EchoService" port="EchoPort" name="configInvalidCredentials">
+        <ws:security>
+            <ws:wss-username-token username="admin" password="invalid" passwordType="TEXT"/>
+        </ws:security>
+    </ws:consumer-config>
 
     <flow name="clientWithInvalidCredentials">
         <inbound-endpoint address="vm://clientWithInvalidCredentials" exchange-pattern="request-response"/>
 
-        <ws:consumer serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
-                     wsdlService="EchoService"
-                     wsdlPort="EchoPort" wsdlOperation="echo">
-
-            <ws:security>
-                <ws:wss-username-token username="admin" password="invalid" passwordType="TEXT"/>
-            </ws:security>
-
-        </ws:consumer>
+        <ws:consumer operation="echo" config-ref="configInvalidCredentials" />
     </flow>
+
+
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
+                        service="EchoService" port="EchoPort" name="configWithoutCredentials" />
 
     <flow name="clientWithoutCredentials">
         <inbound-endpoint address="vm://clientWithoutCredentials" exchange-pattern="request-response"/>
 
-        <ws:consumer serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
-                     wsdlService="EchoService"
-                     wsdlPort="EchoPort" wsdlOperation="echo">
-        </ws:consumer>
+        <ws:consumer operation="echo" config-ref="configWithoutCredentials" />
     </flow>
 
 

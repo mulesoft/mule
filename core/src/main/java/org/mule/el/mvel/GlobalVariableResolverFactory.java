@@ -8,12 +8,12 @@ package org.mule.el.mvel;
 
 import org.mule.api.MuleContext;
 import org.mule.api.el.ExpressionLanguageExtension;
+import org.mule.mvel2.ParserConfiguration;
+import org.mule.mvel2.ast.Function;
+import org.mule.mvel2.ast.FunctionInstance;
 
 import java.util.Collection;
 import java.util.Map.Entry;
-
-import org.mule.mvel2.ParserContext;
-import org.mule.mvel2.ast.Function;
 
 public class GlobalVariableResolverFactory extends MVELExpressionLanguageContext
 {
@@ -23,11 +23,11 @@ public class GlobalVariableResolverFactory extends MVELExpressionLanguageContext
 
     public GlobalVariableResolverFactory(MVELExpressionLanguage el,
                                          MVELExpressionLanguageContext parent,
-                                         ParserContext parserContext,
+                                         ParserConfiguration parserConfiguration,
                                          MuleContext muleContext,
                                          Collection<ExpressionLanguageExtension> expressionLanguageExtensions)
     {
-        super(parserContext, muleContext);
+        super(parserConfiguration, muleContext);
         this.parent = parent;
         for (ExpressionLanguageExtension extension : expressionLanguageExtensions)
         {
@@ -43,7 +43,7 @@ public class GlobalVariableResolverFactory extends MVELExpressionLanguageContext
         }
         for (Entry<String, Function> function : el.globalFunctions.entrySet())
         {
-            addFinalVariable(function.getKey(), function.getValue());
+            addFinalVariable(function.getKey(), new FunctionInstance(function.getValue()));
         }
     }
 
