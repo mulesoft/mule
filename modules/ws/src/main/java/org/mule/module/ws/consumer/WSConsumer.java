@@ -7,11 +7,9 @@
 
 package org.mule.module.ws.consumer;
 
-import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -29,6 +27,7 @@ import org.mule.module.ws.security.WSSecurity;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,6 +49,7 @@ import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
+import org.mule.util.IOUtils;
 
 
 public class WSConsumer implements MessageProcessor, Initialisable, MuleContextAware
@@ -238,7 +238,13 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
         try
         {
             WSDLReader wsdlReader = WSDLFactory.newInstance().newWSDLReader();
-            Definition wsdlDefinition = wsdlReader.readWSDL(config.getWsdlLocation());
+
+            URL url = IOUtils.getResourceAsUrl(config.getWsdlLocation(), getClass());
+            if (url == null)
+            {
+                throw new InitialisationException(MessageFactory.createStaticMessage("Can't find wsdl at %s", config.getWsdlLocation()), this);
+            }
+            Definition wsdlDefinition = wsdlReader.readWSDL(url.toString());
 
             Service service = wsdlDefinition.getService(new QName(wsdlDefinition.getTargetNamespace(), config.getService()));
             if (service == null)
