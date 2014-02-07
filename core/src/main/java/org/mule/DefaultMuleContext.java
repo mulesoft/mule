@@ -139,7 +139,9 @@ public class DefaultMuleContext implements MuleContext
 
     protected LocalMuleClient localMuleClient;
 
-    /** Global exception handler which handles "system" exceptions (i.e., when no message is involved). */
+    /**
+     * Global exception handler which handles "system" exceptions (i.e., when no message is involved).
+     */
     protected SystemExceptionHandler exceptionListener;
 
     private PollingController pollingController = new DefaultPollingController();
@@ -153,7 +155,7 @@ public class DefaultMuleContext implements MuleContext
     private TransactionManager transactionManager;
 
     private LockFactory lockFactory;
-    
+
     private ExpressionLanguage expressionLanguage;
 
     private ProcessingTimeWatcher processingTimeWatcher;
@@ -211,15 +213,15 @@ public class DefaultMuleContext implements MuleContext
         {
             throw new MuleRuntimeException(CoreMessages.objectIsNull("workManager"));
         }
-        
+
         try
         {
-        	JdkVersionUtils.validateJdk();
+            JdkVersionUtils.validateJdk();
         }
         catch (RuntimeException e)
         {
-        	throw new InitialisationException(CoreMessages.invalidJdk(SystemUtils.JAVA_VERSION, 
-        			JdkVersionUtils.getSupportedJdks()), this);
+            throw new InitialisationException(CoreMessages.invalidJdk(SystemUtils.JAVA_VERSION,
+                                                                      JdkVersionUtils.getSupportedJdks()), this);
         }
 
         try
@@ -326,7 +328,7 @@ public class DefaultMuleContext implements MuleContext
 
         notificationManager.dispose();
         workManager.dispose();
-        
+
         if (expressionManager != null && expressionManager instanceof Disposable)
         {
             ((Disposable) expressionManager).dispose();
@@ -619,10 +621,15 @@ public class DefaultMuleContext implements MuleContext
     {
         if (transactionManager == null)
         {
-            transactionManager = (TransactionManager) registryBroker.lookupObject(MuleProperties.OBJECT_TRANSACTION_MANAGER);
+            transactionManager = registryBroker.lookupObject(MuleProperties.OBJECT_TRANSACTION_MANAGER);
             if (transactionManager == null)
             {
                 Collection temp = registryBroker.lookupObjects(TransactionManagerFactory.class);
+                if (temp.size() > 1)
+                {
+                    throw new MuleRuntimeException(CoreMessages.createStaticMessage("More than one TX manager has been configured - Only one TX manager can be defined per application. " +
+                                                                                    "Validate your app configuration or if your app belongs to a domain and the domains defines a TX manager then you should use that one."));
+                }
                 if (temp.size() > 0)
                 {
                     try
