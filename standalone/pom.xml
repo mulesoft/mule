@@ -177,6 +177,14 @@
             </exclusions>
         </dependency>
 
+
+        <!-- Including Database connector which is not inside Mule code -->
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-db</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- Modules for standalone container -->
         <dependency>
             <groupId>org.mule.modules</groupId>
