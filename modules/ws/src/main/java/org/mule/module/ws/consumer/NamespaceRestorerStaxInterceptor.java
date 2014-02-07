@@ -13,9 +13,9 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 /**
- * CXF Interceptor that converts makes use of a Namespace Restorer XMLStream to allow the first
+ * CXF Interceptor that makes use of a Namespace Restorer XMLStream to allow the first
  * element of the body to carry all the namespaces from the parent nodes.
- * This interceptoro works with {@link NamespaceSaverStaxInterceptor}
+ * This interceptor works with {@link NamespaceSaverStaxInterceptor}
  */
 public class NamespaceRestorerStaxInterceptor extends AbstractPhaseInterceptor<Message>
 {
