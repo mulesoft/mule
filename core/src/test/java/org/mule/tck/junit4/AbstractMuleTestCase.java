@@ -387,28 +387,44 @@ public abstract class AbstractMuleTestCase
         StringBuilder builder = new StringBuilder();
         for (String threadName : currentThreads)
         {
-            if (threadName.contains("Service") || threadName.contains("service") || threadName.contains("Thread") || threadName.contains("thread") || threadName.contains("Server") || threadName.contains("server"))
+            if (nameContains(threadName, "", "service", "thread", "server", "flow"))
             {
-                builder.append("-> ").append(threadName).append("\n");
+                builder.append("\n-> ").append(threadName);
                 filteredThreads++;
             }
         }
         if (filteredThreads > 0)
         {
-            logThreadsResult(String.format("Hung threads count: %d. Test case: %s. Thread names:\n%s", filteredThreads, testCaseName, builder.toString()));
+            logThreadsResult(String.format("Hung threads count: %d. Test case: %s. Thread names:%s", filteredThreads, testCaseName, builder.toString()));
         }
         else
         {
-            logThreadsResult(String.format("No hung threads. Test case: %s\n", testCaseName));
+            logThreadsResult(String.format("No hung threads. Test case: %s", testCaseName));
         }
     }
 
+    private static boolean nameContains(String threadName, String... values)
+    {
+        String threadNameLowercase = threadName.toLowerCase();
+        if (values != null)
+        {
+            for (String value : values)
+            {
+                if (threadNameLowercase.contains(value.toLowerCase()))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static final transient String THREAD_RESULT_LINE = StringUtils.repeat('-', 80);
+    private static final transient Log LOGGER = LogFactory.getLog(AbstractMuleTestCase.class);
+
     private static void logThreadsResult(String result)
     {
-        System.out.println(
-                "--------------------------------------------------\n" +
-                result +
-                "--------------------------------------------------");
+        LOGGER.info(String.format("\n%s\n%s\n%s\n", THREAD_RESULT_LINE, result, THREAD_RESULT_LINE));
     }
 
 }
