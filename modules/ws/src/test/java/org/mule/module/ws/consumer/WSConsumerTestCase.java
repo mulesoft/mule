@@ -72,7 +72,7 @@ public class WSConsumerTestCase extends AbstractMuleContextTestCase
     {
         WSConsumerConfig wsConsumerConfig = new WSConsumerConfig();
 
-        wsConsumerConfig.setWsdlLocation(ClassUtils.getClassPathRoot(WSConsumerTestCase.class).getPath() + "Echo.wsdl");
+        wsConsumerConfig.setWsdlLocation("Echo.wsdl");
         wsConsumerConfig.setServiceAddress("http://localhost/echo");
         wsConsumerConfig.setService("EchoService");
         wsConsumerConfig.setPort("EchoPort");
