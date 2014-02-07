@@ -24,7 +24,7 @@ import org.apache.cxf.interceptor.InterceptorProvider;
  * the proxy client will decompress it to work with the raw envelope or body in the flow
  * and the proxy service will compress it again before sending it back to the client.
  *
- * If the client invokes the client with a compressed request, the proxy service is
+ * If the client invokes the service with a compressed request, the proxy service is
  * responsible for decompressing it to work with the raw request and the client
  * will compress it back before invoking the end service.
  *

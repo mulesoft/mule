@@ -47,7 +47,8 @@ public class ProxyGZIPInInterceptor extends AbstractProxyGZIPInterceptor
         if(isEncoded(event.getMessage()))
         {
             InputStream is = message.getContent(InputStream.class);
-            if (is == null) {
+            if (is == null)
+            {
                 return;
             }
 
