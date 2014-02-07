@@ -17,6 +17,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class ProxyRPCBindingTestCase extends FunctionalTestCase
 {
     @Rule
@@ -47,14 +49,14 @@ public class ProxyRPCBindingTestCase extends FunctionalTestCase
     public void proxyRPCBodyPayload() throws Exception
     {
         MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/body", getAllRequest, null);
-        XMLUnit.compareXML(getAllResponse, response.getPayloadAsString());
+        assertTrue(XMLUnit.compareXML(getAllResponse, response.getPayloadAsString()).identical());
     }
 
     @Test
     public void proxyRPCBodyEnvelope() throws Exception
     {
         MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/envelope", getAllRequest, null);
-        XMLUnit.compareXML(getAllResponse, response.getPayloadAsString());
+        assertTrue(XMLUnit.compareXML(getAllResponse, response.getPayloadAsString()).identical());
     }
 
 }
