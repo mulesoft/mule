@@ -33,10 +33,6 @@ public class GlobalVariableResolverFactory extends MVELExpressionLanguageContext
         {
             extension.configureContext(parent);
         }
-        for (Entry<String, Class<?>> function : el.imports.entrySet())
-        {
-            importClass(function.getKey(), function.getValue());
-        }
         for (Entry<String, String> alias : el.aliases.entrySet())
         {
             addAlias(alias.getKey(), alias.getValue());

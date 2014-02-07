@@ -75,22 +75,18 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
 
     public VariableResolver getVariableResolver(String name)
     {
-        if (variableResolvers.containsKey(name))
+        VariableResolver variableResolver = variableResolvers.get(name);
+        if (variableResolver == null)
         {
-            return variableResolvers.get(name);
+            variableResolver = nextFactory.getVariableResolver(name);
         }
-        else
-        {
-            return nextFactory.getVariableResolver(name);
-        }
+        return variableResolver;
     }
 
     @Override
     public VariableResolver createVariable(String name, Object value, Class<?> type)
     {
-        VariableResolver vr;
-
-        vr = getVariableResolver(name);
+        VariableResolver vr = getVariableResolver(name);
 
         if (vr != null)
         {

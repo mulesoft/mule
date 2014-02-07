@@ -28,6 +28,7 @@ import org.mule.mvel2.util.CompilerTools;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 import org.mule.util.IOUtils;
+import org.mule.util.MapUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -35,6 +36,7 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import javax.activation.DataHandler;
@@ -64,6 +66,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     protected Map<String, String> aliases = new HashMap<String, String>();
     protected Map<String, Class<?>> imports = new HashMap<String, Class<?>>();
     protected boolean autoResolveVariables = true;
+    protected boolean useGlobalConfiguration = false;
 
     public MVELExpressionLanguage(MuleContext muleContext)
     {
@@ -77,6 +80,10 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         expressionExecutor = new MVELExpressionExecutor(parserConfiguration);
         expressionLanguageExtensions = muleContext.getRegistry().lookupObjectsForLifecycle(
             ExpressionLanguageExtension.class);
+        if (expressionLanguageExtensions.size() > 0)
+        {
+            useGlobalConfiguration = true;
+        }
 
         loadGlobalFunctions();
         createStaticContext();
@@ -126,7 +133,10 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         {
             factory.appendFactory(new CachedMapVariableResolverFactory(vars));
         }
-        factory.appendFactory(createGlobalVariableResolverFactory(factory));
+        if (useGlobalConfiguration)
+        {
+            factory.appendFactory(createGlobalVariableResolverFactory(factory));
+        }
         return (T) evaluateInternal(expression, factory);
     }
 
@@ -149,8 +159,10 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
             factory.appendFactory(new CachedMapVariableResolverFactory(vars));
         }
         factory.appendFactory(createEventVariableResolverFactory(event));
-
-        factory.appendFactory(createGlobalVariableResolverFactory(factory));
+        if (useGlobalConfiguration)
+        {
+            factory.appendFactory(createGlobalVariableResolverFactory(factory));
+        }
         if (autoResolveVariables)
         {
             factory.localFactory.appendFactory(createVariableVariableResolverFactory(event));
@@ -162,15 +174,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     @Deprecated
     public <T> T evaluate(String expression, MuleMessage message)
     {
-        MVELExpressionLanguageContext factory = createExpressionLanguageContext();
-        factory.addPrivateVariable(MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE, message);
-        factory.appendFactory(createMessageVariableResolverFactory(message));
-        factory.appendFactory(createGlobalVariableResolverFactory(factory));
-        if (autoResolveVariables)
-        {
-            factory.localFactory.appendFactory(createVariableVariableResolverFactory(message));
-        }
-        return (T) evaluateInternal(expression, factory);
+        return evaluate(expression, message, null);
     }
 
     @Override
@@ -185,7 +189,10 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         }
         factory.appendFactory(createMessageVariableResolverFactory(message));
 
-        factory.appendFactory(createGlobalVariableResolverFactory(factory));
+        if (useGlobalConfiguration)
+        {
+            factory.appendFactory(createGlobalVariableResolverFactory(factory));
+        }
         if (autoResolveVariables)
         {
             factory.localFactory.appendFactory(createVariableVariableResolverFactory(message));
@@ -285,15 +292,27 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         parserConfiguration.addImport(DataType.class);
         parserConfiguration.addImport(DataTypeFactory.class);
         parserConfiguration.addImport(NullPayload.class);
+
+        // Global imports
+        for (Entry<String, Class<?>> importEntry : imports.entrySet())
+        {
+            parserConfiguration.addImport(importEntry.getKey(), importEntry.getValue());
+        }
+
     }
 
     public void setGlobalFunctionsString(String globalFunctionsString)
     {
+        useGlobalConfiguration = true;
         this.globalFunctionsString = globalFunctionsString;
     }
 
     public void setAliases(Map<String, String> aliases)
     {
+        if (!useGlobalConfiguration && MapUtils.isNotEmpty(aliases))
+        {
+            useGlobalConfiguration = true;
+        }
         this.aliases = aliases;
     }
 
@@ -309,6 +328,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
     public void addGlobalFunction(String name, Function function)
     {
+        useGlobalConfiguration = true;
         this.globalFunctions.put(name, function);
     }
 
@@ -319,11 +339,13 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
     public void addAlias(String name, String expression)
     {
+        useGlobalConfiguration = true;
         this.aliases.put(name, expression);
     }
 
     public void setGlobalFunctionsFile(String globalFunctionsFile)
     {
+        useGlobalConfiguration = true;
         this.globalFunctionsFile = globalFunctionsFile;
     }
 
