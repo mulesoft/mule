@@ -10,13 +10,9 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.concurrent.ConcurrentHashMap;
 
-import bitronix.tm.TransactionManagerServices;
-import bitronix.tm.resource.ResourceRegistrar;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -27,6 +23,7 @@ import org.junit.runners.Parameterized;
 public class EndpointToEndpointXaTransactionTestCase extends FunctionalTestCase
 {
 
+    public static String transactionManagerConfigFile = "org/mule/test/integration/transaction/xa/jboss-transaction-manager-config.xml";
     @ClassRule
     public static DynamicPort port1 = new DynamicPort("port1");
     @ClassRule
@@ -63,85 +60,45 @@ public class EndpointToEndpointXaTransactionTestCase extends FunctionalTestCase
         CompositeTransactionalTestSetUp createTowJmsBrokers = new CompositeTransactionalTestSetUp(createFirstJmsBroker, createSecondJmsBroker);
 
         return Arrays.asList(new Object[][] {
-                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml", //0
+                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml",
                         "org/mule/test/integration/transaction/xa/vm-xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/bitronix-transaction-manager-config.xml"}, null,
+                        transactionManagerConfigFile}, null,
                         new QueueInboundMessageGenerator(), new QueueOutboundMessagesCounter()},
-                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml", //1
-                        "org/mule/test/integration/transaction/xa/vm-xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/jboss-transaction-manager-config.xml"}, null,
-                        new QueueInboundMessageGenerator(), new QueueOutboundMessagesCounter()},
-                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml", //2
-                        "org/mule/test/integration/transaction/xa/vm-different-connectors-xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/bitronix-transaction-manager-config.xml"}, null,
-                        new QueueInboundMessageGenerator(), new QueueOutboundMessagesCounter()}, //3
                 {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml",
                         "org/mule/test/integration/transaction/xa/vm-different-connectors-xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/jboss-transaction-manager-config.xml"}, null,
+                        transactionManagerConfigFile}, null,
                         new QueueInboundMessageGenerator(), new QueueOutboundMessagesCounter()},
-                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml", //4
+                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml",
                         "org/mule/test/integration/transaction/xa/jms-xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/bitronix-transaction-manager-config.xml"}, createFirstJmsBroker,
+                        transactionManagerConfigFile}, createFirstJmsBroker,
                         new QueueInboundMessageGenerator(), JmsOutboundMessagesCounter.createVerifierForBroker(port1.getNumber())},
-                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml", //5
-                        "org/mule/test/integration/transaction/xa/jms-xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/jboss-transaction-manager-config.xml"}, createFirstJmsBroker,
-                        new QueueInboundMessageGenerator(), JmsOutboundMessagesCounter.createVerifierForBroker(port1.getNumber())}, //6
                 {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml",
                         "org/mule/test/integration/transaction/xa/jms-different-connectors-xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/bitronix-transaction-manager-config.xml"}, createTowJmsBrokers,
-                        new QueueInboundMessageGenerator(), JmsOutboundMessagesCounter.createVerifierForBroker(port2.getNumber())},//7
-                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/jms-different-connectors-xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/jboss-transaction-manager-config.xml"}, createTowJmsBrokers,
+                        transactionManagerConfigFile}, createTowJmsBrokers,
                         new QueueInboundMessageGenerator(), JmsOutboundMessagesCounter.createVerifierForBroker(port2.getNumber())},
-                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml", //8
+                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml",
                         "org/mule/test/integration/transaction/xa/jdbc-xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/bitronix-transaction-manager-config.xml"}, jdbcDatabaseSetUp,
+                        transactionManagerConfigFile}, jdbcDatabaseSetUp,
                         jdbcInboundMessageCreator, jdbcOutboundMessagesVerifier},
-                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml", //9
-                        "org/mule/test/integration/transaction/xa/jdbc-xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/jboss-transaction-manager-config.xml"}, jdbcDatabaseSetUp,
-                        jdbcInboundMessageCreator, jdbcOutboundMessagesVerifier},
-                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml", //10
+                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml",
                         "org/mule/test/integration/transaction/xa/jdbc-different-connectors-xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/bitronix-transaction-manager-config.xml"}, createTwoDatabasesSetUp,
+                        transactionManagerConfigFile}, createTwoDatabasesSetUp,
                         jdbcInboundMessageCreator, jdbcOutboundMessagesVerifier2},
-                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml", //11
-                        "org/mule/test/integration/transaction/xa/jdbc-different-connectors-xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/jboss-transaction-manager-config.xml"}, createTwoDatabasesSetUp,
-                        jdbcInboundMessageCreator, jdbcOutboundMessagesVerifier2},
-                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml", //12
+                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml",
                         "org/mule/test/integration/transaction/xa/jdbc-to-jms-xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/bitronix-transaction-manager-config.xml"}, createDatabaseAndJmsBrokerSetUp,
+                        transactionManagerConfigFile}, createDatabaseAndJmsBrokerSetUp,
                         jdbcInboundMessageCreator, JmsOutboundMessagesCounter.createVerifierForBroker(port1.getNumber())},
-                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml", //13
-                        "org/mule/test/integration/transaction/xa/jdbc-to-jms-xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/jboss-transaction-manager-config.xml"}, createDatabaseAndJmsBrokerSetUp,
-                        jdbcInboundMessageCreator, JmsOutboundMessagesCounter.createVerifierForBroker(port1.getNumber())},
-                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml", //14
+                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml",
                         "org/mule/test/integration/transaction/xa/jms-to-jdbc-xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/bitronix-transaction-manager-config.xml"}, createDatabaseAndJmsBrokerSetUp,
+                        transactionManagerConfigFile}, createDatabaseAndJmsBrokerSetUp,
                         new QueueInboundMessageGenerator(), jdbcOutboundMessagesVerifier},
-                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml", //15
-                        "org/mule/test/integration/transaction/xa/jms-to-jdbc-xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/jboss-transaction-manager-config.xml"}, createDatabaseAndJmsBrokerSetUp,
-                        new QueueInboundMessageGenerator(), jdbcOutboundMessagesVerifier},
-                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml", //16
+                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml",
                         "org/mule/test/integration/transaction/xa/vm-to-jdbc-xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/bitronix-transaction-manager-config.xml"}, jdbcDatabaseSetUp,
+                        transactionManagerConfigFile}, jdbcDatabaseSetUp,
                         new QueueInboundMessageGenerator(), jdbcOutboundMessagesVerifier},
-                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml", //17
-                        "org/mule/test/integration/transaction/xa/vm-to-jdbc-xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/jboss-transaction-manager-config.xml"}, jdbcDatabaseSetUp,
-                        new QueueInboundMessageGenerator(), jdbcOutboundMessagesVerifier},
-                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml", //18
+                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml",
                         "org/mule/test/integration/transaction/xa/jdbc-to-vm-xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/bitronix-transaction-manager-config.xml"}, jdbcDatabaseSetUp,
-                        jdbcInboundMessageCreator, new QueueOutboundMessagesCounter()},
-                {new String[] {"org/mule/test/integration/transaction/xa/xa-transaction-config.xml", //19
-                        "org/mule/test/integration/transaction/xa/jdbc-to-vm-xa-transaction-config.xml",
-                        "org/mule/test/integration/transaction/xa/jboss-transaction-manager-config.xml"}, jdbcDatabaseSetUp,
+                        transactionManagerConfigFile}, jdbcDatabaseSetUp,
                         jdbcInboundMessageCreator, new QueueOutboundMessagesCounter()}
         }
         );
@@ -156,7 +113,6 @@ public class EndpointToEndpointXaTransactionTestCase extends FunctionalTestCase
     @Before
     public void injectMuleContext()
     {
-        TransactionManagerServices.getRecoverer().shutdown();
         if (inboundMessagesCreator instanceof MuleContextAware)
         {
             ((MuleContextAware) inboundMessagesCreator).setMuleContext(muleContext);
@@ -191,7 +147,6 @@ public class EndpointToEndpointXaTransactionTestCase extends FunctionalTestCase
 
     protected void doSetUpBeforeMuleContextCreation() throws Exception
     {
-        TransactionManagerServices.getConfiguration().setJournal(null);
         if (testSetUp != null)
         {
             testSetUp.initialize();

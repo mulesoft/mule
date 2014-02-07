@@ -7,7 +7,7 @@
             xmlns:http="http://www.mulesoft.org/schema/mule/http"
             xmlns:https="http://www.mulesoft.org/schema/mule/https"
             xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
-            xmlns:bti="http://www.mulesoft.org/schema/mule/bti"
+            xmlns:jbossts="http://www.mulesoft.org/schema/mule/jbossts"
             targetNamespace="http://www.mulesoft.org/schema/mule/domain"
             attributeFormDefault="unqualified"
             elementFormDefault="qualified">
@@ -21,12 +21,14 @@
                 schemaLocation="http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/jms"
                 schemaLocation="http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/jbossts"
+                schemaLocation="http://www.mulesoft.org/schema/mule/jbossts/current/mule-jbossts.xsd"/>
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans/spring-beans-current.xsd"/>
-    <xsd:import namespace="http://www.mulesoft.org/schema/mule/bti"
-                schemaLocation="http://www.mulesoft.org/schema/mule/bti/current/mule-bti.xsd"/>
     <xsd:import namespace="http://www.springframework.org/schema/context"
                 schemaLocation="http://www.springframework.org/schema/context/spring-context-current.xsd"/>
+
+
 
     <xsd:element name="mule-domain" type="muleDomainType">
         <xsd:annotation>
@@ -84,9 +86,7 @@
             <xsd:element ref="jms:custom-connector"/>
             <xsd:element ref="jms:activemq-connector"/>
             <xsd:element ref="jms:activemq-xa-connector"/>
-            <xsd:element ref="bti:transaction-manager" />
-            <xsd:element ref="bti:xa-data-source-pool" />
-            <xsd:element ref="bti:xa-connection-factory-pool" />
+            <xsd:element ref="jbossts:transaction-manager"/>
         </xsd:choice>
     </xsd:group>
 
