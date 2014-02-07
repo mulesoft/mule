@@ -19,8 +19,6 @@ import static org.mockito.Mockito.when;
 
 import org.mule.api.MuleException;
 import org.mule.api.transaction.Transaction;
-import org.mule.module.bti.jms.BitronixConnectionFactoryWrapper;
-import org.mule.module.bti.transaction.TransactionManagerWrapper;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.jms.xa.ConnectionFactoryWrapper;
@@ -198,14 +196,6 @@ public class JmsConnectorTestCase extends AbstractMuleContextTestCase
         muleContext.setTransactionManager(mock(TransactionManager.class));
         JmsConnector connector = createConnectionFactoryWhenGettingConnection(mock(TestXAConnectionFactory.class));
         assertThat(connector.getConnectionFactory(), IsInstanceOf.instanceOf(ConnectionFactoryWrapper.class));
-    }
-
-    @Test
-    public void createBitronixConnectionFactoryWrapperWhenUsingBtm() throws Exception
-    {
-        muleContext.setTransactionManager(mock(TransactionManagerWrapper.class));
-        JmsConnector connector = createConnectionFactoryWhenGettingConnection(mock(TestXAConnectionFactory.class));
-        assertThat(connector.getConnectionFactory(), IsInstanceOf.instanceOf(BitronixConnectionFactoryWrapper.class));
     }
 
     private JmsConnector createConnectionFactoryWhenGettingConnection(ConnectionFactory mockConnectionFactory) throws JMSException, MuleException

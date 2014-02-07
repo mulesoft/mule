@@ -15,6 +15,7 @@ import org.mule.api.context.notification.ClusterNodeNotificationListener;
 import org.mule.api.context.notification.ConnectionNotificationListener;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.StartException;
 import org.mule.api.processor.MessageProcessor;
@@ -27,9 +28,6 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ClusterNodeNotification;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.NotificationException;
-import org.mule.module.bti.jms.BitronixConnectionFactoryPoolBuilder;
-import org.mule.module.bti.jms.BitronixConnectionFactoryWrapper;
-import org.mule.module.bti.transaction.TransactionManagerWrapper;
 import org.mule.routing.MessageFilter;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
@@ -40,7 +38,6 @@ import org.mule.transport.jms.jndi.JndiNameResolver;
 import org.mule.transport.jms.jndi.SimpleJndiNameResolver;
 import org.mule.transport.jms.redelivery.AutoDiscoveryRedeliveryHandlerFactory;
 import org.mule.transport.jms.redelivery.RedeliveryHandlerFactory;
-import org.mule.transport.jms.xa.ConnectionFactoryWrapper;
 import org.mule.util.BeanUtils;
 
 import java.text.MessageFormat;
@@ -56,7 +53,6 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TemporaryQueue;
 import javax.jms.TemporaryTopic;
-import javax.jms.XAConnectionFactory;
 import javax.naming.CommunicationException;
 import javax.naming.NamingException;
 
@@ -70,6 +66,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 {
 
     public static final String JMS = "jms";
+    public static final String JMS_CONNECTION_FACTORY_DECORATOR = "JMS_CONNECTION_FACTORY_DECORATOR";
 
     /**
      * Indicates that Mule should throw an exception on any redelivery attempt.
@@ -179,6 +176,8 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
      */
     private Boolean sameRMOverrideValue;
 
+    private final CompositeConnectionFactoryDecorator connectionFactoryDecorator = new CompositeConnectionFactoryDecorator();
+
     ////////////////////////////////////////////////////////////////////////
     // Methods
     ////////////////////////////////////////////////////////////////////////
@@ -203,6 +202,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     @Override
     protected void doInitialise() throws InitialisationException
     {
+        connectionFactoryDecorator.init(muleContext);
         if (topicResolver == null)
         {
             topicResolver = new DefaultJmsTopicResolver(this);
@@ -362,9 +362,9 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             connection = null;
         }
 
-        if (connectionFactory != null && connectionFactory instanceof BitronixConnectionFactoryWrapper)
+        if (connectionFactory instanceof Disposable)
         {
-            ((BitronixConnectionFactoryWrapper) connectionFactory).close();
+            ((Disposable) connectionFactory).dispose();
         }
 
         if (jndiNameResolver != null)
@@ -418,7 +418,8 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             // apply connection factory properties
             BeanUtils.populateWithoutFail(connectionFactory, connectionFactoryProperties, true);
         }
-        connectionFactory = createConnectionFactoryWrapper(connectionFactory);
+
+        connectionFactory = connectionFactoryDecorator.decorate(connectionFactory, this, muleContext);
 
         Connection connection;
 
@@ -444,43 +445,6 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             }
         }
         return connection;
-    }
-
-    private ConnectionFactory createConnectionFactoryWrapper(ConnectionFactory connectionFactory) throws InitialisationException
-    {
-        ConnectionFactory wrappedConnectionFactory = connectionFactory;
-        if (connectionFactory instanceof BitronixConnectionFactoryWrapper || connectionFactory instanceof ConnectionFactoryWrapper)
-        {
-            return connectionFactory;
-        }
-        try
-        {
-            if (connectionFactory instanceof XAConnectionFactory && muleContext.getTransactionManager() instanceof TransactionManagerWrapper)
-            {
-                logger.info(String.format("No pool defined for XAConnectionFactory in connector %s. A default pool will be created. " +
-                                          "To customize define a bti:xa-connection-factory-pool element in your config and assign it to " +
-                                          "the connector.", getName()));
-
-                BitronixConnectionFactoryPoolBuilder builder = new BitronixConnectionFactoryPoolBuilder();
-                builder.setConnectionFactory((XAConnectionFactory) connectionFactory);
-                builder.setName(getName());
-                builder.setUsername(username);
-                builder.setPassword(password);
-                wrappedConnectionFactory = builder.build(muleContext);
-            }
-            else
-            {
-                if (connectionFactory instanceof XAConnectionFactory && muleContext.getTransactionManager() != null)
-                {
-                    wrappedConnectionFactory = new ConnectionFactoryWrapper(connectionFactory, sameRMOverrideValue);
-                }
-            }
-            return wrappedConnectionFactory;
-        }
-        catch (Exception e)
-        {
-            throw new InitialisationException(e, this);
-        }
     }
 
     @Override
