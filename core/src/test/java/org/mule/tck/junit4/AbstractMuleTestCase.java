@@ -387,7 +387,7 @@ public abstract class AbstractMuleTestCase
         StringBuilder builder = new StringBuilder();
         for (String threadName : currentThreads)
         {
-            if (nameContains(threadName, "service", "thread", "server", "flow"))
+            if (!nameIn(threadName, "Finalizer", "Monitor Ctrl-Break", "Reference Handler", "Signal Dispatcher", "main"))
             {
                 builder.append("\n-> ").append(threadName);
                 filteredThreads++;
@@ -403,14 +403,14 @@ public abstract class AbstractMuleTestCase
         }
     }
 
-    private static boolean nameContains(String threadName, String... values)
+    private static boolean nameIn(String threadName, String... values)
     {
         String threadNameLowercase = threadName.toLowerCase();
         if (values != null)
         {
             for (String value : values)
             {
-                if (threadNameLowercase.contains(value.toLowerCase()))
+                if (threadNameLowercase.startsWith(value.toLowerCase()))
                 {
                     return true;
                 }
