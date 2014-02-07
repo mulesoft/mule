@@ -387,7 +387,7 @@ public abstract class AbstractMuleTestCase
         StringBuilder builder = new StringBuilder();
         for (String threadName : currentThreads)
         {
-            if (nameContains(threadName, "", "service", "thread", "server", "flow"))
+            if (nameContains(threadName, "service", "thread", "server", "flow"))
             {
                 builder.append("\n-> ").append(threadName);
                 filteredThreads++;
