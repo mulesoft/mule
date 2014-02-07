@@ -135,7 +135,6 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                 try
                 {
                     MuleEvent result =  processNext(event);
-                    convertPayloadToString(result.getMessage());
                     return result;
                 }
                 catch (DispatchException e)
@@ -148,7 +147,6 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                         SoapFault soapFault = (SoapFault) e.getCause();
 
                         event.getMessage().setPayload(soapFault.getDetail());
-                        convertPayloadToString(event.getMessage());
 
                         throw new SoapFaultException(event, soapFault.getFaultCode(), soapFault.getSubCode(),
                                                      soapFault.getMessage(), soapFault.getDetail());
@@ -186,21 +184,6 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
         chainBuilder.chain(config.createOutboundEndpoint());
 
         return chainBuilder.build();
-    }
-
-    /**
-     * Converts payload, which is a partial XML document, to a String that represents a valid XML document.
-     */
-    private void convertPayloadToString(MuleMessage msg) throws MuleException
-    {
-        try
-        {
-            msg.setPayload(msg.getPayloadAsString());
-        }
-        catch (Exception e)
-        {
-            throw new DefaultMuleException(MessageFactory.createStaticMessage("Error fetching SOAP message contents"), e);
-        }
     }
 
     /**
