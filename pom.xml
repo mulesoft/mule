@@ -80,7 +80,6 @@
              Use the name of an Eclipse Java execution environment, Eclipse will
              choose the right one by itself.
         -->
-        <jdk6Name>JavaSE-1.6</jdk6Name>
         <jdk7Name>JavaSE-1.7</jdk7Name>
 
         <activemqVersion>5.5.0</activemqVersion>
@@ -169,11 +168,17 @@
         <xmlSecurityVersion>1.5.3</xmlSecurityVersion>
         <xstreamVersion>1.4.2</xstreamVersion>
         <xaPoolVersion>1.5.0</xaPoolVersion>
+        <muleCommonVersion>3.5.0-M4-SNAPSHOT</muleCommonVersion>
     </properties>
 
     <!-- Declare all dependencies that are used in more than one module here. -->
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.mule.common</groupId>
+                <artifactId>mule-common</artifactId>
+                <version>${muleCommonVersion}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-annotation_1.1_spec</artifactId>
@@ -1396,8 +1401,8 @@
                         <encoding>ISO-8859-1</encoding>
                         <fork>true</fork>
                         <maxmem>512m</maxmem>
-                        <source>1.6</source>
-                        <target>1.6</target>
+                        <source>1.7</source>
+                        <target>1.7</target>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -1620,7 +1625,7 @@
                                 </requireMavenVersion>
                                 <requireJavaVersion>
                                     <!-- Java version must be 1.6 or higher -->
-                                    <version>[1.6.0,)</version>
+                                    <version>[1.7.0,)</version>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>
@@ -1634,9 +1639,9 @@
                 <configuration>
                     <!-- by default download all sources when generating project files -->
                     <downloadSources>true</downloadSources>
-                    <!-- configure a JDK named 'jdk6' for this project -->
+                    <!-- configure a JDK named 'jdk7' for this project -->
                     <classpathContainers>
-                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${vmtype}/${jdk6Name}
+                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${vmtype}/${jdk7Name}
                         </classpathContainer>
                     </classpathContainers>
                 </configuration>
@@ -1646,7 +1651,7 @@
                 <artifactId>maven-idea-plugin</artifactId>
                 <configuration>
                     <downloadSources>true</downloadSources>
-                    <jdkName>1.6</jdkName>
+                    <jdkName>1.7</jdkName>
                 </configuration>
             </plugin>
 
@@ -1682,8 +1687,8 @@
                             <Build-Revision>${buildNumber}</Build-Revision>
                             <Build-Date>${timestamp}</Build-Date>
                             <Dev-List-Email>dev@mule.codehaus.org</Dev-List-Email>
-                            <Supported-Jdks>[1.6,1.8)</Supported-Jdks>
-                            <Recommended-Jdks>[1.6.0_26,1.7),[1.7.0_3,1.8)</Recommended-Jdks>
+                            <Supported-Jdks>[1.7,1.8)</Supported-Jdks>
+                            <Recommended-Jdks>[1.7.0_3,1.8)</Recommended-Jdks>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -1747,11 +1752,11 @@
                                 <maxmemory>512m</maxmemory>
                                 <charset>ISO-8859-1</charset>
                                 <encoding>ISO-8859-1</encoding>
-                                <source>1.6</source>
+                                <source>1.7</source>
                                 <!-- Link to the external online JavaDoc -->
                                 <links>
-                                    <link>http://java.sun.com/j2se/1.6.0/docs/api/</link>
-                                    <link>http://java.sun.com/j2ee/sdk_1.3/techdocs/api/</link>
+                                    <link>http://docs.oracle.com/javase/7/docs/api‎</link>
+                                    <link>http://docs.oracle.com/javaee/6/api/</link>
                                     <link>http://jakarta.apache.org/commons/beanutils/commons-beanutils-1.7.0/docs/api/</link>
                                     <link>http://jakarta.apache.org/commons/collections/api-3.2/</link>
                                     <link>http://jakarta.apache.org/httpcomponents/httpclient-3.x/apidocs/</link>
@@ -1936,7 +1941,7 @@
                         <configuration>
                             <!-- by default download all sources when generating project files -->
                             <downloadSources>true</downloadSources>
-                            <!-- configure a JDK named 'jdk6' for this project -->
+                            <!-- configure a JDK named 'jdk7' for this project -->
                             <classpathContainers>
                                 <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${vmtype}/${jdk7Name}
                                 </classpathContainer>
