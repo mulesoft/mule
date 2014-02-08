@@ -9,6 +9,7 @@ package org.mule.module.cxf.employee;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Ignore;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -39,6 +40,7 @@ public class MtomClientTestCase extends AbstractServiceAndFlowTestCase
     }      
     
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testEchoService() throws Exception
     {
         EmployeeDirectoryImpl svc = (EmployeeDirectoryImpl) getComponent("employeeDirectoryService");

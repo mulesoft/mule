@@ -15,6 +15,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.transaction.Transaction;
@@ -26,15 +27,12 @@ import org.mule.common.TestResult;
 import org.mule.common.Testable;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.module.bti.jdbc.BitronixXaDataSourceBuilder;
-import org.mule.module.bti.jdbc.BitronixXaDataSourceWrapper;
-import org.mule.module.bti.transaction.TransactionManagerWrapper;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectException;
 import org.mule.transport.jdbc.sqlstrategy.DefaultSqlStatementStrategyFactory;
 import org.mule.transport.jdbc.sqlstrategy.SqlStatementStrategyFactory;
-import org.mule.transport.jdbc.xa.DataSourceWrapper;
+import org.mule.transport.jdbc.xa.CompositeDataSourceDecorator;
 import org.mule.util.StringUtils;
 import org.mule.util.TemplateParser;
 
@@ -47,7 +45,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
-import javax.sql.XADataSource;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
@@ -63,6 +60,7 @@ public class JdbcConnector extends AbstractConnector implements Testable
 
     private static final Pattern STATEMENT_ARGS = TemplateParser.WIGGLY_MULE_TEMPLATE_PATTERN;
 
+    private final CompositeDataSourceDecorator databaseDecorator = new CompositeDataSourceDecorator();
     private SqlStatementStrategyFactory sqlStatementStrategyFactory = new DefaultSqlStatementStrategyFactory();
 
     /* Register the SQL Exception reader if this class gets loaded */
@@ -94,6 +92,7 @@ public class JdbcConnector extends AbstractConnector implements Testable
     @Override
     protected void doInitialise() throws InitialisationException
     {
+        databaseDecorator.init(muleContext);
         createMultipleTransactedReceivers = false;
 
         if (dataSource == null)
@@ -122,29 +121,7 @@ public class JdbcConnector extends AbstractConnector implements Testable
 
     private void decorateDataSourceIfRequired()
     {
-        if (dataSource instanceof BitronixXaDataSourceWrapper)
-        {
-            // Nothing to do. There is an explicit Bitronix data source pool.
-            return;
-        }
-        if (dataSource instanceof XADataSource)
-        {
-            if (muleContext.getTransactionManager() instanceof TransactionManagerWrapper)
-            {
-                logger.info(String.format("No pool defined for XADataSource in connector %s. A default pool will be created. " +
-                                          "To customize define a bti:xa-data-source-pool element in your config and assign it to " +
-                                          "the connector.", getName()));
-
-                BitronixXaDataSourceBuilder builder = new BitronixXaDataSourceBuilder();
-                builder.setName(getName());
-                builder.setDataSource((XADataSource) dataSource);
-                this.dataSource = builder.build(muleContext);
-            }
-            else
-            {
-                this.dataSource = new DataSourceWrapper((XADataSource) dataSource);
-            }
-        }
+        dataSource = databaseDecorator.decorate(dataSource, getName(), muleContext);
     }
 
     @Override
@@ -388,9 +365,9 @@ public class JdbcConnector extends AbstractConnector implements Testable
     @Override
     protected void doDispose()
     {
-        if (dataSource instanceof BitronixXaDataSourceWrapper)
+        if (dataSource instanceof Disposable)
         {
-            ((BitronixXaDataSourceWrapper) dataSource).close();
+            ((Disposable) dataSource).dispose();
         }
     }
 

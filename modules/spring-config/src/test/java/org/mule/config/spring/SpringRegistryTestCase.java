@@ -6,16 +6,66 @@
  */
 package org.mule.config.spring;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
 import org.mule.api.registry.Registry;
 import org.mule.registry.AbstractRegistryTestCase;
 
+import java.util.Collection;
+
+import org.hamcrest.core.Is;
+import org.junit.Test;
 import org.springframework.context.support.StaticApplicationContext;
 
 public class SpringRegistryTestCase extends AbstractRegistryTestCase
 {
+
+    public static final String BEAN_KEY = "someBean";
+    public static final String ANOTHER_BEAN_KEY = "someOtherBean";
+    public static final String REGISTERY_ID = "someId";
+
+    private StaticApplicationContext applicationContext;
+    private StaticApplicationContext parentApplicationContext;
+    private SpringRegistry springRegistry;
+
     @Override
     public Registry getRegistry()
     {
         return new SpringRegistry(new StaticApplicationContext(), null);
+    }
+
+    @Test
+    public void lookupByTypeSearchInParentAlso()
+    {
+        createSpringRegistryWithParentContext();
+        applicationContext.registerSingleton(BEAN_KEY, String.class);
+        parentApplicationContext.registerSingleton(ANOTHER_BEAN_KEY, String.class);
+        Collection<String> values = springRegistry.lookupObjects(String.class);
+        assertThat(values.size(), is(2));
+    }
+
+    @Test
+    public void lookupByIdReturnsApplicationContextBean()
+    {
+        createSpringRegistryWithParentContext();
+        applicationContext.registerSingleton(BEAN_KEY, String.class);
+        parentApplicationContext.registerSingleton(BEAN_KEY, Integer.class);
+        assertThat(springRegistry.get(BEAN_KEY), Is.is(String.class));
+    }
+
+    @Test
+    public void lookupByIdReturnsParentApplicationContextBean()
+    {
+        createSpringRegistryWithParentContext();
+        parentApplicationContext.registerSingleton(BEAN_KEY, Object.class);
+        assertThat(springRegistry.get(BEAN_KEY), Is.is(Object.class));
+    }
+
+    private void createSpringRegistryWithParentContext()
+    {
+        applicationContext = new StaticApplicationContext();
+        parentApplicationContext = new StaticApplicationContext();
+        springRegistry = new SpringRegistry(REGISTERY_ID, applicationContext, parentApplicationContext, null);
     }
 }

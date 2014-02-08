@@ -18,8 +18,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.Connector;
 import org.mule.common.TestResult;
 import org.mule.common.Testable;
-import org.mule.module.bti.jdbc.BitronixXaDataSourceWrapper;
-import org.mule.module.bti.transaction.TransactionManagerWrapper;
 import org.mule.tck.util.MuleDerbyTestUtils;
 import org.mule.transport.AbstractConnectorTestCase;
 import org.mule.transport.jdbc.xa.DataSourceWrapper;
@@ -140,15 +138,6 @@ public class JdbcConnectorTestCase extends AbstractConnectorTestCase
         DataSource mockDataSource = mock(TestXADataSource.class);
         DataSource dataSource = getDataSourceAfterInitialization(mockDataSource);
         assertThat(dataSource, instanceOf(DataSourceWrapper.class));
-    }
-
-    @Test
-    public void dataSourceIsWrappedWithBtmWrapperWhenUsingXA() throws Exception
-    {
-        muleContext.setTransactionManager(mock(TransactionManagerWrapper.class));
-        DataSource mockDataSource = mock(TestXADataSource.class, Answers.RETURNS_DEEP_STUBS.get());
-        DataSource dataSource = getDataSourceAfterInitialization(mockDataSource);
-        assertThat(dataSource, instanceOf(BitronixXaDataSourceWrapper.class));
     }
 
     private DataSource getDataSourceAfterInitialization(DataSource mockDataSource) throws InitialisationException

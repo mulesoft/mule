@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import javax.mail.internet.MimeMessage;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import static org.junit.Assert.assertEquals;
@@ -32,6 +33,7 @@ public class SmtpFunctionalTestCase extends AbstractEmailFunctionalTestCase
     }      
     
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testSend() throws Exception
     {
         doSend();

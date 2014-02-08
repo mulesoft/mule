@@ -47,11 +47,6 @@
             <artifactId>xapool</artifactId>
             <version>${xaPoolVersion}</version>
         </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-bti</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <!-- Unit tests -->
         <dependency>
