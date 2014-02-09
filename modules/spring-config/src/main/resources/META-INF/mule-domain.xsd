@@ -7,7 +7,6 @@
             xmlns:http="http://www.mulesoft.org/schema/mule/http"
             xmlns:https="http://www.mulesoft.org/schema/mule/https"
             xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
-            xmlns:jbossts="http://www.mulesoft.org/schema/mule/jbossts"
             targetNamespace="http://www.mulesoft.org/schema/mule/domain"
             attributeFormDefault="unqualified"
             elementFormDefault="qualified">
@@ -21,8 +20,6 @@
                 schemaLocation="http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/jms"
                 schemaLocation="http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd"/>
-    <xsd:import namespace="http://www.mulesoft.org/schema/mule/jbossts"
-                schemaLocation="http://www.mulesoft.org/schema/mule/jbossts/current/mule-jbossts.xsd"/>
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans/spring-beans-current.xsd"/>
     <xsd:import namespace="http://www.springframework.org/schema/context"
@@ -86,7 +83,7 @@
             <xsd:element ref="jms:custom-connector"/>
             <xsd:element ref="jms:activemq-connector"/>
             <xsd:element ref="jms:activemq-xa-connector"/>
-            <xsd:element ref="jbossts:transaction-manager"/>
+            <xsd:element ref="mule:abstract-shared-transaction-manager"/>
         </xsd:choice>
     </xsd:group>
 
