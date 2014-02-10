@@ -7,6 +7,7 @@
 package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
+import org.mule.api.config.ConfigurationException;
 import org.mule.api.construct.Pipeline;
 import org.mule.api.context.MuleContextFactory;
 import org.mule.common.MuleArtifact;
@@ -147,7 +148,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         }
         catch (Throwable t)
         {
-            throw new MuleArtifactFactoryException("Error generating XML", t);
+            throw new MuleArtifactFactoryException("Error generating minimal XML configuration.", t);
         }
 
     }
@@ -209,10 +210,15 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
             contexts.put(artifact, muleContext);
             return artifact;
         }
+        catch (ConfigurationException ce)
+        {
+            dispose(builder, muleContext);
+            throw new MuleArtifactFactoryException("There seems to be a problem in your XML configuration. Please fix and retry.", ce);
+        }
         catch (Throwable t)
         {
             dispose(builder, muleContext);
-            throw new MuleArtifactFactoryException("Error initializing", t);
+            throw new MuleArtifactFactoryException("Error starting minimal XML configuration.", t);
         }
         finally
         {
