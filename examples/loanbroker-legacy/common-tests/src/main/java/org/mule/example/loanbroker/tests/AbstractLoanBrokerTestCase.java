@@ -14,6 +14,7 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -29,6 +30,7 @@ public abstract class AbstractLoanBrokerTestCase extends FunctionalTestCase
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testSingleLoanRequest() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -44,6 +46,7 @@ public abstract class AbstractLoanBrokerTestCase extends FunctionalTestCase
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testLotsOfLoanRequests() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
