@@ -32,6 +32,7 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.Collections;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
@@ -119,6 +120,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     }
 
     @Test
+    @Ignore("MULE-7311")
     public void processesExpiredGroupInPrimaryNode() throws Exception
     {
         doExpiredGroupMonitoringTest(true);
