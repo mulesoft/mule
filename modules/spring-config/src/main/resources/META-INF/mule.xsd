@@ -123,10 +123,12 @@
             <xsd:element ref="configuration"/>
             <xsd:element ref="notifications"/>
             <xsd:element ref="abstract-extension"/>
+            <xsd:element ref="abstract-shared-extension"/>
             <xsd:element ref="abstract-mixed-content-extension"/>
             <xsd:element ref="abstract-agent"/>
             <xsd:element ref="abstract-security-manager"/>
             <xsd:element ref="abstract-transaction-manager"/>
+            <xsd:element ref="abstract-shared-transaction-manager"/>
             <xsd:element ref="abstract-connector"/>
             <xsd:element ref="abstract-global-endpoint"/>
             <xsd:element ref="abstract-exception-strategy"/>
@@ -176,6 +178,13 @@
                 </xsd:annotation>
             </xsd:element>
 
+    <xsd:element name="abstract-shared-extension" abstract="true" type="abstractExtensionType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for arbitrary extensions as children of the 'mule' element or 'mule-domain'. Other transports and modules can extend this if they need to add global elements to the configuration (but consider the more specific elements like abstract-connector first).
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:element name="abstract-extension" abstract="true" type="abstractExtensionType">
         <xsd:annotation>
             <xsd:documentation>
@@ -1207,6 +1216,13 @@
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for transaction manager elements, which are used to coordinate transactions.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="abstract-shared-transaction-manager" abstract="true" type="abstractTransactionManagerType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for transaction manager elements that can be defined as shared resource, which are used to coordinate transactions.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
