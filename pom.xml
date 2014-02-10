@@ -113,7 +113,7 @@
         <geronimoSpecsAnnotationVersion>1.1.1</geronimoSpecsAnnotationVersion>
         <geronimoSpecsStaxVersion>1.0.1</geronimoSpecsStaxVersion>
         <geronimoSpecsWsMetadataVersion>1.1.2</geronimoSpecsWsMetadataVersion>
-        <guavaVersion>16.0</guavaVersion>
+        <guavaVersion>16.0.1</guavaVersion>
         <hibernateVersion>3.6.0.Final</hibernateVersion>
         <jacksonVersion>1.8.0</jacksonVersion>
         <jerseyVersion>1.6</jerseyVersion>
