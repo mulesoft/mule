@@ -6,6 +6,7 @@
  */
 package org.mule.test.construct;
 
+import org.junit.Ignore;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.FileUtils;
@@ -16,6 +17,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+@Ignore("MULE-6926: flaky test")
 public class FlowSyncAsyncProcessingStrategyTestCase extends FunctionalTestCase
 {
     public static final String SLEEP_TIME = "sleepTime";
