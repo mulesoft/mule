@@ -14,7 +14,7 @@ public class HttpsSharePortTestCase extends HttpSharePortTestCase
     @Override
     protected String getDomainConfig()
     {
-        return "domain/https-shared-connector.xml";
+        return "domain/http/https-shared-connector.xml";
     }
 
     @Override

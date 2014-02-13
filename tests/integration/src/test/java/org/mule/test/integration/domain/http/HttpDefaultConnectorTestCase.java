@@ -17,28 +17,29 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpSharePortTestCase extends DomainFunctionalTestCase
+public class HttpDefaultConnectorTestCase extends DomainFunctionalTestCase
 {
 
     public static final String HELLO_WORLD_SERVICE_APP = "helloWorldServiceApp";
     public static final String HELLO_MULE_SERVICE_APP = "helloMuleServiceApp";
 
     @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
-    @Rule
     public SystemProperty endpointScheme = getEndpointSchemeSystemProperty();
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
     protected String getDomainConfig()
     {
-        return "domain/http/http-shared-connector.xml";
+        return "domain/empty-domain-config.xml";
     }
 
     @Override
     public ApplicationConfig[] getConfigResources()
     {
-        return new ApplicationConfig[] {new ApplicationConfig(HELLO_WORLD_SERVICE_APP, new String[] {"domain/http/http-hello-world-app.xml"}),
-                new ApplicationConfig(HELLO_MULE_SERVICE_APP, new String[] {"domain/http/http-hello-mule-app.xml"})
+        return new ApplicationConfig[] {new ApplicationConfig(HELLO_WORLD_SERVICE_APP, new String[] {"domain/http/http-hello-world-app-no-connector.xml"}),
+                new ApplicationConfig(HELLO_MULE_SERVICE_APP, new String[] {"domain/http/http-hello-mule-app-no-connector.xml"})
         };
     }
 
