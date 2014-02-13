@@ -22,11 +22,16 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class FlowSyncAsyncProcessingStrategyTestCase extends FunctionalTestCase
 {
     public static final String SLEEP_TIME = "sleepTime";
     private static final String FILE_PATH = "./test/testfile.txt";
     private File file;
+
+    protected transient final static Logger logger = LoggerFactory.getLogger(FlowSyncAsyncProcessingStrategyTestCase.class);
 
     @Override
     protected String getConfigFile()
@@ -57,8 +62,8 @@ public class FlowSyncAsyncProcessingStrategyTestCase extends FunctionalTestCase
         sendMessage("vm://testAsynch");
 
         file = new File(FILE_PATH);
-        Prober prober = new PollingProber(20000, 3000);
-        prober.check(new FileCompleteProbe(file));
+        Prober prober = new PollingProber(2000, 300);
+        prober.check(new FileCompleteProbe());
     }
 
     private void sendMessage(String endpoint) throws Exception
@@ -68,27 +73,26 @@ public class FlowSyncAsyncProcessingStrategyTestCase extends FunctionalTestCase
         client.dispatch(endpoint, "Part 1;Part 2", null);
     }
 
-    private static class FileCompleteProbe implements Probe
+    private class FileCompleteProbe implements Probe
     {
-        private final File testFile;
         private String output;
-
-        public FileCompleteProbe(File file)
-        {
-            testFile = file;
-        }
 
         public boolean isSatisfied()
         {
-            if(testFile.exists()) {
-                try {
-                    output = FileUtils.readFileToString(testFile);
-                } catch (IOException e) {
-                    e.printStackTrace();
+            if(file.exists())
+            {
+                try
+                {
+                    output = FileUtils.readFileToString(file);
+                }
+                catch (IOException e)
+                {
+                    logger.debug("Could not read from file.");
                 }
                 return "Part 2Part 1".equals(output);
             }
-            else {
+            else
+            {
                 return false;
             }
         }
