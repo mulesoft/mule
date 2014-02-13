@@ -6,9 +6,6 @@
  */
 package org.mule.transport.http.functional;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-
 import org.mule.api.MuleContext;
 import org.mule.tck.junit4.ApplicationContextBuilder;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -18,29 +15,31 @@ import java.net.BindException;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class HttpSamePortTestCase
 {
 
     public static final String PATH_PROPERTY = "path";
+
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port");
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
-    @Test(expected = BindException.class)
+    @Test
     public void twoApplicationCannotUseSamePort() throws Throwable
     {
         MuleContext firstMuleContext = null;
         MuleContext secondMuleContext = null;
-        boolean firstMuleContextCreatedSuccessfully = false;
         try
         {
             firstMuleContext = buildApp("helloWorld");
-            firstMuleContextCreatedSuccessfully = true;
+            thrown.expect(BindException.class);
             secondMuleContext = buildApp("helloMule");
         }
         catch (Exception e)
         {
-            assertThat(firstMuleContextCreatedSuccessfully, is(true));
             throw ExceptionUtils.getRootCause(e);
         }
         finally
@@ -64,7 +63,7 @@ public class HttpSamePortTestCase
 
     private MuleContext buildApp(String path) throws Exception
     {
-        System.setProperty(PATH_PROPERTY,path);
+        System.setProperty(PATH_PROPERTY, path);
         try
         {
             return new ApplicationContextBuilder().setApplicationResources(new String[] {"http-same-port-config.xml"}).build();
