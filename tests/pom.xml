@@ -15,6 +15,7 @@
         <module>functional</module>
         <module>infrastructure</module>
         <module>integration</module>
+        <module>integration-jdk6</module>
         <module>integration-axis</module>
     </modules>
 
@@ -50,19 +51,6 @@
             </activation>
             <modules>
                 <module>archetypes</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>beyond-jdk6</id>
-            <activation>
-                <!--
-                    Minimum JDK version for the build is JDK5. Everything with
-                    a higher version number enables this profile.
-                -->
-                <jdk>!1.5</jdk>
-            </activation>
-            <modules>
-                <module>integration-jdk6</module>
             </modules>
         </profile>
         <profile>
