@@ -61,14 +61,12 @@
     </modules>
 
     <properties>
-        
         <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
         <licensePath>LICENSE_HEADER.txt</licensePath>
         <coberturaVersion>2.5</coberturaVersion>
         <eclipsePluginVersion>2.5.1</eclipsePluginVersion>
         <gmavenPluginVersion>1.4</gmavenPluginVersion>
         <javadocPluginVersion>2.8</javadocPluginVersion>
-        <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
 
         <!--
             The above project.url will not be picked up in the manifest,
@@ -86,7 +84,7 @@
         <antVersion>1.7.0</antVersion>
         <antlrVersion>3.1.1</antlrVersion>
         <asmVersion>3.3.1</asmVersion>
-        <aspectjVersion>1.6.11</aspectjVersion>
+        <aspectjVersion>1.7.3</aspectjVersion>
         <bitronixTMVersion>2.1.4</bitronixTMVersion>
         <bshVersion>2.0b4</bshVersion>
         <bouncycastleVersion>1.46</bouncycastleVersion>
@@ -1265,25 +1263,17 @@
                 <version>${aspectjVersion}</version>
             </dependency>
             <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjtools</artifactId>
+                <version>${aspectjVersion}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guavaVersion}</version>        
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <ciManagement>
-        <system>bamboo</system>
-        <url>http://bamboo.mulesoft.org</url>
-        <notifiers>
-            <notifier>
-                <type>mail</type>
-                <configuration>
-                    <address>scm@mule.codehaus.org</address>
-                </configuration>
-            </notifier>
-        </notifiers>
-    </ciManagement>
 
     <distributionManagement>
         <downloadUrl>http://www.mulesoft.org/display/MULE/Download</downloadUrl>
@@ -1346,11 +1336,6 @@
     </repositories>
 
     <pluginRepositories>
-        <pluginRepository>
-            <id>mule-deps</id>
-            <name>Mule Dependencies</name>
-            <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
-        </pluginRepository>
         <!-- this is needed to download dependencies of plugins from our custom repo -->
         <pluginRepository>
             <id>mule-plugins-deps</id>
@@ -1367,7 +1352,7 @@
             <extension>
                 <groupId>org.apache.maven.wagon</groupId>
                 <artifactId>wagon-webdav-jackrabbit</artifactId>
-                <version>1.0-beta-7</version>
+                <version>1.0</version>
             </extension>
         </extensions>
 
@@ -1417,11 +1402,6 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-idea-plugin</artifactId>
-                    <version>2.2</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>2.3.1</version>
                 </plugin>
@@ -1449,6 +1429,9 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
                     <version>2.4.2</version>
+                    <configuration>
+                        <encoding>ISO-8859-1</encoding>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1469,6 +1452,17 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.6-MULE-2</version>
+                    <configuration>
+                        <argLine>-Xms64m -Xmx512m</argLine>
+                        <excludes>
+                            <!-- Surefire should be able to detect that classes are abstract but it seems it isn't -->
+                            <exclude>**/Abstract*.*</exclude>
+                            <!-- Our tests never start with Test* but we have a lot of test helpers that match -->
+                            <exclude>**/Test*.java</exclude>
+                            <!-- exclude inner classes -->
+                            <exclude>**/*$*</exclude>
+                        </excludes>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1522,6 +1516,38 @@
                         </execution>
                     </executions>
                 </plugin>
+
+                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>
+                                            org.apache.maven.plugins
+                                        </groupId>
+                                        <artifactId>
+                                            maven-enforcer-plugin
+                                        </artifactId>
+                                        <versionRange>
+                                            [1.0-alpha-4,)
+                                        </versionRange>
+                                        <goals>
+                                            <goal>enforce</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -1529,45 +1555,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <configuration>
-                    <encoding>ISO-8859-1</encoding>
-                </configuration>
             </plugin>
-            <!-- Global test exclusions -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <!--
-                    Fix surefire-report:report goal, which failed to
-                    complete if there were test errors (no report was
-                    generated).
-                <version>RELEASE</version>
-                -->
-                <configuration>
-                    <argLine>-Xms64m -Xmx512m</argLine>
-                    <excludes>
-                        <!-- Surefire should be able to detect that classes are abstract but it seems it isn't -->
-                        <exclude>**/Abstract*.*</exclude>
-                        <!-- Our tests never start with Test* but we have a lot of test helpers that match -->
-                        <exclude>**/Test*.java</exclude>
-                        <!-- exclude inner classes -->
-                        <exclude>**/*$*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-            <!-- Delete code coverage database when 'mvn clean' is executed -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <version>${coberturaVersion}</version>
-                <executions>
-                    <execution>
-                        <id>clean</id>
-                        <goals>
-                            <goal>clean</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <!--
                  Needed for checkstyle to find the license header file from the classpath.
@@ -1590,7 +1581,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.0-alpha-4</version>
+                <version>1.0.1</version>
                 <executions>
                     <execution>
                         <id>enforce-maven-version</id>
@@ -1600,39 +1591,15 @@
                         <configuration>
                             <rules>
                                 <requireMavenVersion>
-                                    <!-- minimum version is 3.0.0, higher versions allowed -->
                                     <version>[3.0.0,)</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <!-- Java version must be 1.6 or higher -->
                                     <version>[1.7.0,)</version>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-eclipse-plugin</artifactId>
-                <version>${eclipsePluginVersion}</version>
-                <configuration>
-                    <!-- by default download all sources when generating project files -->
-                    <downloadSources>true</downloadSources>
-                    <!-- configure a JDK named 'jdk7' for this project -->
-                    <classpathContainers>
-                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${vmtype}/${jdk7Name}
-                        </classpathContainer>
-                    </classpathContainers>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-idea-plugin</artifactId>
-                <configuration>
-                    <downloadSources>true</downloadSources>
-                    <jdkName>1.7</jdkName>
-                </configuration>
             </plugin>
 
             <!-- The maven-jar-plugin generates the MANIFEST.MF for all modules
@@ -1642,11 +1609,6 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
-                        <!--
-                            Disabled for http://mule.mulesoft.org/jira/browse/MULE-1153
-                            and http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4408526
-                         -->
-                        <index>false</index>
                         <!-- List dependencies in the MANIFEST.MF -->
                         <manifest>
                             <!-- Note that we do not generate a classpath into the manifest, since doing so
@@ -1666,7 +1628,7 @@
                             <!-- include repository revision from buildnumber plugin -->
                             <Build-Revision>${buildNumber}</Build-Revision>
                             <Build-Date>${timestamp}</Build-Date>
-                            <Dev-List-Email>dev@mule.codehaus.org</Dev-List-Email>
+                            <Dev-List-Email>mule-esb@mulesoft.com</Dev-List-Email>
                             <Supported-Jdks>[1.7,1.8)</Supported-Jdks>
                             <Recommended-Jdks>[1.7.0_3,1.8)</Recommended-Jdks>
                         </manifestEntries>
@@ -1883,64 +1845,6 @@
 
     <profiles>
         <profile>
-            <id>jdk7</id>
-            <activation>
-                <jdk>1.7</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-enforcer-plugin</artifactId>
-                        <version>1.0-alpha-4</version>
-                        <executions>
-                            <execution>
-                                <id>enforce-maven-version</id>
-                                <goals>
-                                    <goal>enforce</goal>
-                                </goals>
-                                <configuration>
-                                    <rules>
-                                        <requireMavenVersion>
-                                            <!-- minimum version is 3.0.0, higher versions allowed -->
-                                            <version>[3.0.0,)</version>
-                                        </requireMavenVersion>
-                                        <requireJavaVersion>
-                                            <!-- Java version must be 1.6 or higher -->
-                                            <version>[1.7.0,)</version>
-                                        </requireJavaVersion>
-                                    </rules>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-eclipse-plugin</artifactId>
-                        <version>${eclipsePluginVersion}</version>
-                        <configuration>
-                            <!-- by default download all sources when generating project files -->
-                            <downloadSources>true</downloadSources>
-                            <!-- configure a JDK named 'jdk7' for this project -->
-                            <classpathContainers>
-                                <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${vmtype}/${jdk7Name}
-                                </classpathContainer>
-                            </classpathContainers>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-idea-plugin</artifactId>
-                        <configuration>
-                            <downloadSources>true</downloadSources>
-                            <jdkName>1.7</jdkName>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
             <id>distributions</id>
             <modules>
                 <module>distributions</module>
@@ -1951,88 +1855,12 @@
             <id>mule-tests</id>
             <activation>
                 <property>
-                    <!--
-                        This profile is activated if NO system property
-                        'skipMuleTests' is found. Disable this profile
-                        by specifying -DskipMuleTests=true on the commandline
-                     -->
                     <name>!skipMuleTests</name>
                 </property>
             </activation>
             <modules>
                 <module>tests</module>
             </modules>
-        </profile>
-
-        <profile>
-            <id>ci-server</id>
-            <distributionManagement>
-                <site>
-                    <id>mule-site</id>
-                    <url>file:///home/luntbuild/publish/mule/docs/${project.version}</url>
-                </site>
-            </distributionManagement>
-        </profile>
-
-        <profile>
-            <id>bamboo</id>
-            <distributionManagement>
-                <site>
-                    <id>mule-site</id>
-                    <url>file:///var/www/html/docs/site/${project.version}</url>
-                </site>
-            </distributionManagement>
-        </profile>
-
-        <profile>
-            <id>buildnumber-plugin</id>
-            <activation>
-                <property>
-                    <!--
-                         This profile is activated if NO system property
-                         'skipBuildnumber' is found. Disable this profile
-                         by specifying -DskipBuildnumber=true on the commandline
-                    -->
-                    <name>!skipBuildnumber</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <!-- add repository revision to manifests -->
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>buildnumber-maven-plugin</artifactId>
-                        <version>1.1</version>
-                        <executions>
-                            <execution>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>create</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <!-- never touch vcs -->
-                            <doCheck>false</doCheck>
-                            <doUpdate>false</doUpdate>
-                            <timestampFormat>{0,date,yyyy-MMM-dd HH:mm:ss}</timestampFormat>
-                            <shortRevisionLength>8</shortRevisionLength>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>mac</id>
-            <activation>
-                <os>
-                    <family>mac</family>
-                </os>
-            </activation>
-            <properties>
-                <vmtype>org.eclipse.jdt.internal.launching.macosx.MacOSXType</vmtype>
-            </properties>
         </profile>
 
         <!--
@@ -2048,7 +1876,7 @@
 
             In order to make the release process less error prone, the javadoc plugin is bound
             to the install lifecycle phase here but only if Maven was invoked with
-            -DperformRelease=true. The javadoc plugin then generates the toplevel, aggregated
+            -DperformRelease. The javadoc plugin then generates the toplevel, aggregated
             javadocs that are included into the full distro, only a single Maven invocation
             is needed now for building a proper set of distributions.
         -->
@@ -2057,7 +1885,6 @@
             <activation>
                 <property>
                     <name>performRelease</name>
-                    <value>true</value>
                 </property>
             </activation>
             <build>
@@ -2111,24 +1938,6 @@
                     <url>https://repository-master.mulesoft.org/nexus/content/repositories/releases-ee</url>
                 </repository>
             </distributionManagement>
-        </profile>
-        <profile>
-            <id>default</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <repositories>
-                <repository>
-                    <id>java.net</id>
-                    <url>https://maven-repository.dev.java.net/nonav/repository</url>
-                    <releases>
-                        <enabled>false</enabled>
-                    </releases>
-                    <snapshots>
-                        <enabled>false</enabled>
-                    </snapshots>
-                </repository>
-            </repositories>
         </profile>
     </profiles>
 </project>
