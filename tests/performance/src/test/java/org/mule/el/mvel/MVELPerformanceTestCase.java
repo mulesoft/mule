@@ -19,6 +19,7 @@ import org.databene.contiperf.PerfTest;
 import org.databene.contiperf.Required;
 import org.databene.contiperf.junit.ContiPerfRule;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -50,6 +51,7 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase
     @Before
     public void before()
     {
+        ((MVELExpressionLanguage)muleContext.getExpressionLanguage()).setAutoResolveVariables(false);
         event = createMuleEvent();
         // Warmup
         for (int i = 0; i < 5000; i++)
@@ -100,6 +102,7 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase
         }
     }
 
+    @Ignore
     @Test
     @PerfTest(duration = 30000, threads = 1, warmUp = 10000)
     public void createEventBaseline()

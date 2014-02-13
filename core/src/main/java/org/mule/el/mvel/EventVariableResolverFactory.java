@@ -6,22 +6,52 @@
  */
 package org.mule.el.mvel;
 
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.mvel2.ParserConfiguration;
+import org.mule.mvel2.integration.VariableResolver;
+import org.mule.mvel2.integration.impl.ImmutableDefaultFactory;
+import org.mule.mvel2.integration.impl.SimpleValueResolver;
 
-public class EventVariableResolverFactory extends MessageVariableResolverFactory
+public class EventVariableResolverFactory extends ImmutableDefaultFactory
 {
 
     private static final long serialVersionUID = -6819292692339684915L;
 
-    public EventVariableResolverFactory(ParserConfiguration parserConfiguration,
-                                        MuleContext muleContext,
-                                        MuleEvent event)
+    private final String FLOW = "flow";
+    private MuleEvent event;
+
+    public EventVariableResolverFactory(MuleEvent event)
     {
-        super(parserConfiguration, muleContext, event.getMessage());
-        addFinalVariable("flow", new FlowContext(event.getFlowConstruct()));
+        this.event = event;
+    }
+
+    @Override
+    public VariableResolver getVariableResolver(String name)
+    {
+        if (event != null)
+        {
+            if (FLOW.equals(name))
+            {
+                return new SimpleValueResolver(new FlowContext(event.getFlowConstruct()));
+            }
+            else if (MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE.equals(name))
+            {
+                return new SimpleValueResolver(event);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean isTarget(String name)
+    {
+        return FLOW.equals(name) || MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE.equals(name);
+    }
+
+    @Override
+    public boolean isResolveable(String name)
+    {
+        return isTarget(name);
     }
 
     public static class FlowContext
