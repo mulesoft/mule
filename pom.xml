@@ -1863,16 +1863,6 @@
             </modules>
         </profile>
 
-        <!--<profile>-->
-            <!--<id>bamboo</id>-->
-            <!--<distributionManagement>-->
-                <!--<site>-->
-                    <!--<id>mule-site</id>-->
-                    <!--<url>file:///var/www/html/docs/site/${project.version}</url>-->
-                <!--</site>-->
-            <!--</distributionManagement>-->
-        <!--</profile>-->
-
         <!--
             This profile is somewhat similar to what's in Maven's toplevel POM. It will be
             activated when -DperformRelease=true is given on the commandline which is
@@ -1949,23 +1939,5 @@
                 </repository>
             </distributionManagement>
         </profile>
-        <!--<profile>-->
-            <!--<id>default</id>-->
-            <!--<activation>-->
-                <!--<activeByDefault>true</activeByDefault>-->
-            <!--</activation>-->
-            <!--<repositories>-->
-                <!--<repository>-->
-                    <!--<id>java.net</id>-->
-                    <!--<url>https://maven-repository.dev.java.net/nonav/repository</url>-->
-                    <!--<releases>-->
-                        <!--<enabled>false</enabled>-->
-                    <!--</releases>-->
-                    <!--<snapshots>-->
-                        <!--<enabled>false</enabled>-->
-                    <!--</snapshots>-->
-                <!--</repository>-->
-            <!--</repositories>-->
-        <!--</profile>-->
     </profiles>
 </project>
