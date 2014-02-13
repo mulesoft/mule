@@ -62,7 +62,7 @@ public class FlowSyncAsyncProcessingStrategyTestCase extends FunctionalTestCase
         sendMessage("vm://testAsynch");
 
         file = new File(FILE_PATH);
-        Prober prober = new PollingProber(2000, 300);
+        Prober prober = new PollingProber(10000, 2000);
         prober.check(new FileCompleteProbe());
     }
 
