@@ -6,7 +6,7 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <flow name="helloWorldFlow">
-        <inbound-endpoint address="${scheme}://localhost:${port1}/service/helloWorld" />
+        <inbound-endpoint address="http://localhost:${port1}/service/helloWorld" />
         <set-payload value="hello world"/>
     </flow>
 
