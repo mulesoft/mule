@@ -14,7 +14,7 @@
 
     <http:connector name="httpConnector" />
 
-    <ws:consumer-config wsdlLocation="${baseDir}Echo.wsdl" service="EchoService" port="EchoPort"
+    <ws:consumer-config wsdlLocation="Echo.wsdl" service="EchoService" port="EchoPort"
                         serviceAddress="http://localhost:${port}/services/Echo" connector-ref="httpConnector" name="globalConfig"/>
 
     <flow name="client">
