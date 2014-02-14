@@ -13,7 +13,8 @@ import org.mule.el.context.MessageContext;
 import org.mule.el.context.MessagePropertyMapContext;
 import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.impl.ImmutableDefaultFactory;
-import org.mule.mvel2.integration.impl.SimpleValueResolver;
+
+import java.util.Map;
 
 class MessageVariableResolverFactory extends ImmutableDefaultFactory
 {
@@ -43,7 +44,8 @@ class MessageVariableResolverFactory extends ImmutableDefaultFactory
         {
             if (MESSAGE.equals(name))
             {
-                return new SimpleValueResolver(new MessageContext(muleMessage));
+                return new MuleImmutableVariableResolver<MessageContext>(MESSAGE, new MessageContext(
+                    muleMessage), null);
             }
             else if (PAYLOAD.equals(name))
             {
@@ -59,28 +61,30 @@ class MessageVariableResolverFactory extends ImmutableDefaultFactory
             }
             else if (FLOW_VARS.equals(name))
             {
-                return new SimpleValueResolver(new MessagePropertyMapContext(muleMessage,
-                    PropertyScope.INVOCATION));
+                return new MuleImmutableVariableResolver<Map<String, Object>>(FLOW_VARS,
+                    new MessagePropertyMapContext(muleMessage, PropertyScope.INVOCATION), null);
             }
             else if (EXCEPTION.equals(name))
             {
                 if (muleMessage.getExceptionPayload() != null)
                 {
-                    return new SimpleValueResolver(muleMessage.getExceptionPayload().getException());
+                    return new MuleImmutableVariableResolver<Throwable>(EXCEPTION,
+                        muleMessage.getExceptionPayload().getException(), null);
                 }
                 else
                 {
-                    return new SimpleValueResolver(null);
+                    return new MuleImmutableVariableResolver<MuleMessage>(EXCEPTION, null, null);
                 }
             }
             else if (SESSION_VARS.equals(name))
             {
-                return new SimpleValueResolver(new MessagePropertyMapContext(muleMessage,
-                    PropertyScope.SESSION));
+                return new MuleImmutableVariableResolver<Map<String, Object>>(SESSION_VARS,
+                    new MessagePropertyMapContext(muleMessage, PropertyScope.SESSION), null);
             }
             else if (MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE.equals(name))
             {
-                return new SimpleValueResolver(muleMessage);
+                return new MuleImmutableVariableResolver<MuleMessage>(
+                    MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE, muleMessage, null);
             }
         }
         return null;

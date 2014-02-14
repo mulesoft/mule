@@ -10,7 +10,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.impl.ImmutableDefaultFactory;
-import org.mule.mvel2.integration.impl.SimpleValueResolver;
 
 public class EventVariableResolverFactory extends ImmutableDefaultFactory
 {
@@ -32,11 +31,13 @@ public class EventVariableResolverFactory extends ImmutableDefaultFactory
         {
             if (FLOW.equals(name))
             {
-                return new SimpleValueResolver(new FlowContext(event.getFlowConstruct()));
+                return new MuleImmutableVariableResolver<FlowContext>(FLOW, (new FlowContext(
+                    event.getFlowConstruct())), null);
             }
             else if (MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE.equals(name))
             {
-                return new SimpleValueResolver(event);
+                return new MuleImmutableVariableResolver<MuleEvent>(
+                    MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE, event, null);
             }
         }
         return null;

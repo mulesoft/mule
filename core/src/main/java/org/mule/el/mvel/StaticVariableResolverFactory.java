@@ -10,13 +10,13 @@ import org.mule.api.MuleContext;
 import org.mule.el.context.AppContext;
 import org.mule.el.context.MuleInstanceContext;
 import org.mule.el.context.ServerContext;
+import org.mule.el.function.DateTimeExpressionLanguageFuntion;
 import org.mule.el.function.RegexExpressionLanguageFuntion;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.ast.FunctionInstance;
 import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.impl.ImmutableDefaultFactory;
-import org.mule.mvel2.integration.impl.SimpleValueResolver;
 
 class StaticVariableResolverFactory extends ImmutableDefaultFactory
 {
@@ -38,8 +38,8 @@ class StaticVariableResolverFactory extends ImmutableDefaultFactory
         this.muleContext = muleContext;
         regexFunction = new FunctionInstance(new MVELFunctionAdaptor(REGEX,
             new RegexExpressionLanguageFuntion(), new ParserContext(parserConfiguration)));
-        dateTimeFunction = new FunctionInstance(new MVELFunctionAdaptor(REGEX,
-            new RegexExpressionLanguageFuntion(), new ParserContext(parserConfiguration)));
+        dateTimeFunction = new FunctionInstance(new MVELFunctionAdaptor(DATE_TIME,
+            new DateTimeExpressionLanguageFuntion(), new ParserContext(parserConfiguration)));
 
     }
 
@@ -48,27 +48,29 @@ class StaticVariableResolverFactory extends ImmutableDefaultFactory
     {
         if (SERVER.equals(name))
         {
-            return new SimpleValueResolver(new ServerContext());
+            return new MuleImmutableVariableResolver<ServerContext>(SERVER, new ServerContext(), null);
         }
         else if (MULE.equals(name))
         {
-            return new SimpleValueResolver(new MuleInstanceContext(muleContext));
+            return new MuleImmutableVariableResolver<MuleInstanceContext>(MULE, new MuleInstanceContext(
+                muleContext), null);
         }
         else if (APP.equals(name))
         {
-            return new SimpleValueResolver(new AppContext(muleContext));
+            return new MuleImmutableVariableResolver<AppContext>(APP, new AppContext(muleContext), null);
         }
         else if (REGEX.equals(name))
         {
-            return new SimpleValueResolver(regexFunction);
+            return new MuleImmutableVariableResolver<FunctionInstance>(REGEX, regexFunction, null);
         }
         else if (DATE_TIME.equals(name))
         {
-            return new SimpleValueResolver(dateTimeFunction);
+            return new MuleImmutableVariableResolver<FunctionInstance>(DATE_TIME, dateTimeFunction, null);
         }
         else if (MVELExpressionLanguageContext.MULE_CONTEXT_INTERNAL_VARIABLE.equals(name))
         {
-            return new SimpleValueResolver(muleContext);
+            return new MuleImmutableVariableResolver<MuleContext>(
+                MVELExpressionLanguageContext.MULE_CONTEXT_INTERNAL_VARIABLE, muleContext, null);
         }
         else
         {
