@@ -31,7 +31,7 @@ public class FlowSyncAsyncProcessingStrategyTestCase extends FunctionalTestCase
     private static final String FILE_PATH = "./test/testfile.txt";
     private File file;
 
-    protected transient final static Logger logger = LoggerFactory.getLogger(FlowSyncAsyncProcessingStrategyTestCase.class);
+    private static final Logger logger = LoggerFactory.getLogger(FlowSyncAsyncProcessingStrategyTestCase.class);
 
     @Override
     protected String getConfigFile()
