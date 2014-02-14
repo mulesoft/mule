@@ -51,7 +51,7 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase
     @Before
     public void before()
     {
-        ((MVELExpressionLanguage)muleContext.getExpressionLanguage()).setAutoResolveVariables(false);
+        ((MVELExpressionLanguage) muleContext.getExpressionLanguage()).setAutoResolveVariables(false);
         event = createMuleEvent();
         // Warmup
         for (int i = 0; i < 5000; i++)
