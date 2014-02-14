@@ -23,4 +23,8 @@ public interface DomainClassLoaderRepository
      */
     ArtifactClassLoader getDomainClassLoader(String domain);
 
+    /**
+     * @return the ArtifactClassLoader used by the default domain.
+     */
+    ArtifactClassLoader getDefaultDomainClassLoader();
 }

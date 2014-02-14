@@ -217,7 +217,11 @@ public class DefaultMuleApplication implements Application
         // classloader cleanup
         try
         {
-            ClassLoader appCl = getArtifactClassLoader().getClassLoader();
+            ClassLoader appCl = null;
+            if (getArtifactClassLoader() != null)
+            {
+                appCl = getArtifactClassLoader().getClassLoader();
+            }
             // if not initialized yet, it can be null
             if (appCl != null)
             {
