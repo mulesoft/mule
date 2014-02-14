@@ -18,7 +18,7 @@
         <https:tls-server path="trustStore" storePassword="mulepassword"/>
     </https:connector>
 
-    <ws:consumer-config serviceAddress="https://localhost:${port}/services/Echo" wsdlLocation="${baseDir}Echo.wsdl"
+    <ws:consumer-config serviceAddress="https://localhost:${port}/services/Echo" wsdlLocation="Echo.wsdl"
                         service="EchoService" port="EchoPort" name="globalConfig" />
 
 

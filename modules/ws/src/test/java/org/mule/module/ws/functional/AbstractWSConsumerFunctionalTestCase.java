@@ -9,14 +9,13 @@ package org.mule.module.ws.functional;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.ws.consumer.SoapFaultException;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transport.NullPayload;
-import org.mule.util.ClassUtils;
 
 import java.util.Map;
 
@@ -27,9 +26,6 @@ public class AbstractWSConsumerFunctionalTestCase extends FunctionalTestCase
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port");
-
-    @Rule
-    public SystemProperty baseDir = new SystemProperty("baseDir", ClassUtils.getClassPathRoot(getClass()).getPath());
 
     protected static final String ECHO_REQUEST = "<tns:echo xmlns:tns=\"http://consumer.ws.module.mule.org/\">" +
                                                  "<text>Hello</text></tns:echo>";
