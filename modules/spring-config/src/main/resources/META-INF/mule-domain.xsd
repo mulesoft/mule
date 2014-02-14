@@ -4,9 +4,6 @@
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
             xmlns:spring="http://www.springframework.org/schema/beans"
             xmlns:spring-context="http://www.springframework.org/schema/context"
-            xmlns:http="http://www.mulesoft.org/schema/mule/http"
-            xmlns:https="http://www.mulesoft.org/schema/mule/https"
-            xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
             targetNamespace="http://www.mulesoft.org/schema/mule/domain"
             attributeFormDefault="unqualified"
             elementFormDefault="qualified">
@@ -14,12 +11,6 @@
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
                 schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"/>
-    <xsd:import namespace="http://www.mulesoft.org/schema/mule/http"
-                schemaLocation="http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd"/>
-    <xsd:import namespace="http://www.mulesoft.org/schema/mule/https"
-                schemaLocation="http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd"/>
-    <xsd:import namespace="http://www.mulesoft.org/schema/mule/jms"
-                schemaLocation="http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd"/>
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans/spring-beans-current.xsd"/>
     <xsd:import namespace="http://www.springframework.org/schema/context"
@@ -77,12 +68,7 @@
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
-            <xsd:element ref="http:connector"/>
-            <xsd:element ref="https:connector"/>
-            <xsd:element ref="jms:connector"/>
-            <xsd:element ref="jms:custom-connector"/>
-            <xsd:element ref="jms:activemq-connector"/>
-            <xsd:element ref="jms:activemq-xa-connector"/>
+            <xsd:element ref="mule:abstract-shared-connector"/>
             <xsd:element ref="mule:abstract-shared-transaction-manager"/>
         </xsd:choice>
     </xsd:group>
