@@ -31,7 +31,7 @@
     </xsd:annotation>
 
     <!-- Generic JMS Connector -->
-    <xsd:element name="connector" type="genericConnectorType" substitutionGroup="mule:abstract-connector">
+    <xsd:element name="connector" type="genericConnectorType" substitutionGroup="mule:abstract-shared-connector">
         <xsd:annotation>
             <xsd:documentation>
                 The connector element configures a generic connector for sending and receiving messages over JMS queues.
@@ -59,7 +59,7 @@
     </xsd:complexType>
 
     <!-- Custom JMS Connector -->
-    <xsd:element name="custom-connector" substitutionGroup="mule:abstract-connector">
+    <xsd:element name="custom-connector" substitutionGroup="mule:abstract-shared-connector">
         <xsd:annotation>
             <xsd:documentation>
                 The custom-connector element configures a custom connector for sending and receiving messages over JMS queues.
@@ -282,14 +282,14 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="activemq-connector" type="activeMqConnectorType" substitutionGroup="mule:abstract-connector">
+    <xsd:element name="activemq-connector" type="activeMqConnectorType" substitutionGroup="mule:abstract-shared-connector">
         <xsd:annotation>
             <xsd:documentation>
                 The activemq-connector element configures an ActiveMQ version of the JMS connector.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:element name="activemq-xa-connector" type="activeMqConnectorType" substitutionGroup="mule:abstract-connector">
+    <xsd:element name="activemq-xa-connector" type="activeMqConnectorType" substitutionGroup="mule:abstract-shared-connector">
         <xsd:annotation>
             <xsd:documentation>
                 The activemq-xa-connector element configures an ActiveMQ version of the JMS connector with XA transaction support.
