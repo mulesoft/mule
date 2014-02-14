@@ -47,7 +47,7 @@
             <message-properties-transformer
                 scope="invocation">
                 <add-message-property key="sleepTime"
-                    value="5000" />
+                    value="3000" />
             </message-properties-transformer>
 
         </file:outbound-endpoint>
