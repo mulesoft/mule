@@ -13,7 +13,6 @@ import org.mule.mvel2.ast.Function;
 import org.mule.mvel2.ast.FunctionInstance;
 import org.mule.mvel2.integration.VariableResolverFactory;
 
-import java.util.Collection;
 import java.util.Map.Entry;
 
 public class GlobalVariableResolverFactory extends MVELExpressionLanguageContext
@@ -23,7 +22,6 @@ public class GlobalVariableResolverFactory extends MVELExpressionLanguageContext
     public GlobalVariableResolverFactory(MVELExpressionLanguage el,
                                          ParserConfiguration parserConfiguration,
                                          MuleContext muleContext,
-                                         Collection<ExpressionLanguageExtension> expressionLanguageExtensions,
                                          VariableResolverFactory... context)
     {
         super(parserConfiguration, muleContext);
@@ -31,15 +29,15 @@ public class GlobalVariableResolverFactory extends MVELExpressionLanguageContext
         {
             addChildContext(mvelExpressionLanguageContext);
         }
-        for (ExpressionLanguageExtension extension : expressionLanguageExtensions)
+        for (ExpressionLanguageExtension extension : el.getExpressionLanguageExtensions())
         {
             extension.configureContext(this);
         }
-        for (Entry<String, String> alias : el.aliases.entrySet())
+        for (Entry<String, String> alias : el.getAliases().entrySet())
         {
             addAlias(alias.getKey(), alias.getValue());
         }
-        for (Entry<String, Function> function : el.globalFunctions.entrySet())
+        for (Entry<String, Function> function : el.getGlobalFunctions().entrySet())
         {
             addFinalVariable(function.getKey(), new FunctionInstance(function.getValue()));
         }

@@ -356,8 +356,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
     protected VariableResolverFactory createGlobalVariableResolverFactory(VariableResolverFactory... parents)
     {
-        return new GlobalVariableResolverFactory(this, parserConfiguration, muleContext,
-            expressionLanguageExtensions, parents);
+        return new GlobalVariableResolverFactory(this, parserConfiguration, muleContext, parents);
     }
 
     protected VariableResolverFactory createVariableVariableResolverFactory(MuleEvent event)
@@ -369,6 +368,21 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     protected VariableResolverFactory createVariableVariableResolverFactory(MuleMessage message)
     {
         return new VariableVariableResolverFactory(parserConfiguration, muleContext, message);
+    }
+
+    protected Collection<ExpressionLanguageExtension> getExpressionLanguageExtensions()
+    {
+        return expressionLanguageExtensions;
+    }
+
+    protected Map<String, String> getAliases()
+    {
+        return aliases;
+    }
+
+    protected Map<String, Function> getGlobalFunctions()
+    {
+        return globalFunctions;
     }
 
 }
