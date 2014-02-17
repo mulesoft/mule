@@ -12,6 +12,7 @@ import org.mule.api.agent.Agent;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.model.Model;
 import org.mule.api.registry.InjectProcessor;
 import org.mule.api.registry.MuleRegistry;
@@ -24,13 +25,16 @@ import org.mule.api.transport.Connector;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.util.CollectionUtils;
+import org.mule.util.ExceptionUtils;
 import org.mule.util.StringUtils;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -45,6 +49,7 @@ import org.apache.commons.logging.Log;
 //@ThreadSafe
 public class TransientRegistry extends AbstractRegistry
 {
+
     public static final String REGISTRY_ID = "org.mule.Registry.Transient";
 
     private final RegistryMap registryMap = new RegistryMap(logger);
@@ -87,7 +92,36 @@ public class TransientRegistry extends AbstractRegistry
     @Override
     protected void doDispose()
     {
+        disposeUnregisteredObjects();
         registryMap.clear();
+    }
+
+    private void disposeUnregisteredObjects()
+    {
+        for (Entry entry : registryMap.entrySet())
+        {
+            disposeObject(entry.getValue());
+        }
+        for (Object obj : registryMap.getLostObjects())
+        {
+            disposeObject(obj);
+        }
+    }
+
+    private void disposeObject(Object obj)
+    {
+        if (obj != null && obj instanceof Disposable)
+        {
+            try
+            {
+                getLifecycleManager().applyPhase(obj, lifecycleManager.getCurrentPhase(), Disposable.PHASE_NAME);
+            }
+            catch (LifecycleException e)
+            {
+                logger.warn("Can not dispose object. " + ExceptionUtils.getMessage(e));
+                logger.debug("Can not dispose object. " + ExceptionUtils.getFullStackTrace(e));
+            }
+        }
     }
 
     protected Map<String, Object> applyProcessors(Map<String, Object> objects)
@@ -189,7 +223,7 @@ public class TransientRegistry extends AbstractRegistry
     {
         Object theObject = object;
 
-        if(!hasFlag(metadata, MuleRegistry.INJECT_PROCESSORS_BYPASS_FLAG))
+        if (!hasFlag(metadata, MuleRegistry.INJECT_PROCESSORS_BYPASS_FLAG))
         {
             //Process injectors first
             Collection<InjectProcessor> injectProcessors = lookupObjects(InjectProcessor.class);
@@ -199,14 +233,14 @@ public class TransientRegistry extends AbstractRegistry
             }
         }
 
-        if(!hasFlag(metadata, MuleRegistry.PRE_INIT_PROCESSORS_BYPASS_FLAG))
+        if (!hasFlag(metadata, MuleRegistry.PRE_INIT_PROCESSORS_BYPASS_FLAG))
         {
             //Then any other processors
             Collection<PreInitProcessor> processors = lookupObjects(PreInitProcessor.class);
             for (PreInitProcessor processor : processors)
             {
                 theObject = processor.process(theObject);
-                if(theObject==null)
+                if (theObject == null)
                 {
                     return null;
                 }
@@ -255,7 +289,7 @@ public class TransientRegistry extends AbstractRegistry
         {
             if (!hasFlag(metadata, MuleRegistry.LIFECYCLE_BYPASS_FLAG))
             {
-                if(logger.isDebugEnabled())
+                if (logger.isDebugEnabled())
                 {
                     logger.debug("applying lifecycle to object: " + object);
                 }
@@ -270,7 +304,7 @@ public class TransientRegistry extends AbstractRegistry
 
     protected void checkDisposed() throws RegistrationException
     {
-        if(getLifecycleManager().isPhaseComplete(Disposable.PHASE_NAME))
+        if (getLifecycleManager().isPhaseComplete(Disposable.PHASE_NAME))
         {
             throw new RegistrationException(MessageFactory.createStaticMessage("Cannot register objects on the registry as the context is disposed"));
         }
@@ -285,10 +319,10 @@ public class TransientRegistry extends AbstractRegistry
      * Will remove an object by name from the registry. By default the registry will apply all remaining lifecycle phases
      * to the object when it is removed.
      *
-     * @param key the name or key of the object to remove from the registry
+     * @param key      the name or key of the object to remove from the registry
      * @param metadata Meta data flags supported are {@link org.mule.api.registry.MuleRegistry#LIFECYCLE_BYPASS_FLAG}
      * @throws RegistrationException if there is a problem unregistering the object. Typically this will be because
-     * the object's lifecycle threw an exception
+     *                               the object's lifecycle threw an exception
      */
     public void unregisterObject(String key, Object metadata) throws RegistrationException
     {
@@ -334,8 +368,22 @@ public class TransientRegistry extends AbstractRegistry
      */
     private static class RegistryMap
     {
+
         private final Map<String, Object> registry = new HashMap<String, Object>();
         private final ReadWriteLock registryLock = new ReentrantReadWriteLock();
+        private final Set<Object> lostObjects = new TreeSet<Object>(new Comparator<Object>()
+        {
+            @Override
+            public int compare(Object o1, Object o2)
+            {
+                return o1 == o2 ? 0 : nvl(o1) - nvl(o2);
+            }
+
+            private int nvl(Object o)
+            {
+                return o != null ? o.hashCode() : 0;
+            }
+        });
 
         private Log logger;
 
@@ -366,6 +414,7 @@ public class TransientRegistry extends AbstractRegistry
             {
                 writeLock.lock();
                 registry.clear();
+                lostObjects.clear();
             }
             finally
             {
@@ -380,14 +429,15 @@ public class TransientRegistry extends AbstractRegistry
             {
                 writeLock.lock();
 
-                if (registry.containsKey(key))
+                final Object previousObject = registry.put(key, object);
+                if (previousObject != null && previousObject != object)
                 {
+                    lostObjects.add(previousObject);
                     // registry.put(key, value) would overwrite a previous entity with the same name.  Is this really what we want?
                     // Not sure whether to throw an exception or log a warning here.
                     //throw new RegistrationException("TransientRegistry already contains an object named '" + key + "'.  The previous object would be overwritten.");
                     logger.warn("TransientRegistry already contains an object named '" + key + "'.  The previous object will be overwritten.");
                 }
-                registry.put(key, object);
             }
             finally
             {
@@ -441,6 +491,11 @@ public class TransientRegistry extends AbstractRegistry
         public Set<Entry<String, Object>> entrySet()
         {
             return registry.entrySet();
+        }
+
+        public Set<Object> getLostObjects()
+        {
+            return lostObjects;
         }
 
         public void lockForReading()
