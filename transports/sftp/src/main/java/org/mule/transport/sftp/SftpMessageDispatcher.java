@@ -19,11 +19,15 @@ package org.mule.transport.sftp;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.transport.OutputHandler;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.sftp.notification.SftpNotifier;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 
 /**
  * <code>SftpMessageDispatcher</code> dispatches files via sftp to a remote sftp
@@ -150,7 +154,7 @@ public class SftpMessageDispatcher extends AbstractMessageDispatcher
 
     }
 
-    private InputStream generateInputStream(MuleEvent event)
+    private InputStream generateInputStream(MuleEvent event) throws IOException
     {
         Object data = event.getMessage().getPayload();
         // byte[], String, or InputStream payloads supported.
@@ -170,6 +174,13 @@ public class SftpMessageDispatcher extends AbstractMessageDispatcher
         else if (data instanceof String)
         {
             inputStream = new ByteArrayInputStream(((String) data).getBytes());
+        }
+        else if (data instanceof OutputHandler)
+        {
+            OutputHandler outputHandler = (OutputHandler) data;
+            PipedOutputStream dataPipe = new PipedOutputStream();
+            inputStream = new PipedInputStream(dataPipe);
+            outputHandler.write(event, dataPipe);
         }
         else
         {
