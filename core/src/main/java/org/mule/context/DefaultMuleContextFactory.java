@@ -226,8 +226,11 @@ public class DefaultMuleContextFactory implements MuleContextFactory
                 }
                 catch (Exception e1)
                 {
-                    logger.warn ("Can not dispose context. " + ExceptionUtils.getMessage(e1));
-                    logger.debug("Can not dispose context. " + ExceptionUtils.getFullStackTrace(e1));
+                    logger.warn("Can not dispose context. " + ExceptionUtils.getMessage(e1));
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Can not dispose context. " + ExceptionUtils.getFullStackTrace(e1));
+                    }
                 }
             }
             throw e;
