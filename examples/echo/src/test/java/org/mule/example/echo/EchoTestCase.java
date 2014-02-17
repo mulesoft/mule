@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
+import org.junit.Ignore;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -31,6 +32,7 @@ public class EchoTestCase extends FunctionalTestCase
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void httpGetToFlowUrlEchoesSentMessage() throws Exception
     {
         MuleClient client = muleContext.getClient();
