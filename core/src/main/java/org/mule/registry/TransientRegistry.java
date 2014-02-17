@@ -119,7 +119,10 @@ public class TransientRegistry extends AbstractRegistry
             catch (LifecycleException e)
             {
                 logger.warn("Can not dispose object. " + ExceptionUtils.getMessage(e));
-                logger.debug("Can not dispose object. " + ExceptionUtils.getFullStackTrace(e));
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Can not dispose object. " + ExceptionUtils.getFullStackTrace(e));
+                }
             }
         }
     }
