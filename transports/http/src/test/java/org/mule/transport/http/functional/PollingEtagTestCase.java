@@ -9,6 +9,7 @@ package org.mule.transport.http.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Ignore;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -30,6 +31,7 @@ public class PollingEtagTestCase extends AbstractServiceAndFlowTestCase
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testPollingReceiversRestart() throws Exception
     {
         Object ftc = getComponent("Test");
