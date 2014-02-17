@@ -6,8 +6,10 @@
  */
 package org.mule.transport.http.functional;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Ignore;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -23,12 +25,13 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class PollingEtagTestCase extends AbstractServiceAndFlowTestCase
 {
-    private static final int WAIT_TIME = 3000;
+    private static final int WAIT_TIME = 2500;
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testPollingReceiversRestart() throws Exception
     {
         Object ftc = getComponent("Test");
@@ -40,8 +43,7 @@ public class PollingEtagTestCase extends AbstractServiceAndFlowTestCase
         // should be enough to poll for multiple messages
         Thread.sleep(WAIT_TIME);
 
-        assertTrue(pollCounter.get() >= 1);
-        assertTrue(pollCounter.get() <= 2);
+        assertEquals(1, pollCounter.get());
     }
 
     public PollingEtagTestCase(ConfigVariant variant, String configResources)
