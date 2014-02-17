@@ -25,15 +25,16 @@ import org.mule.api.transport.Connector;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.util.CollectionUtils;
+import org.mule.util.ExceptionUtils;
 import org.mule.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -117,7 +118,8 @@ public class TransientRegistry extends AbstractRegistry
             }
             catch (LifecycleException e)
             {
-                logger.warn("Can not dispose object. " + e.getDetailedMessage());
+                logger.warn("Can not dispose object. " + ExceptionUtils.getMessage(e));
+                logger.debug("Can not dispose object. " + ExceptionUtils.getFullStackTrace(e));
             }
         }
     }
@@ -369,7 +371,19 @@ public class TransientRegistry extends AbstractRegistry
 
         private final Map<String, Object> registry = new HashMap<String, Object>();
         private final ReadWriteLock registryLock = new ReentrantReadWriteLock();
-        private final List<Object> lostObjects = new ArrayList<Object>();
+        private final Set<Object> lostObjects = new TreeSet<Object>(new Comparator<Object>()
+        {
+            @Override
+            public int compare(Object o1, Object o2)
+            {
+                return o1 == o2 ? 0 : nvl(o1) - nvl(o2);
+            }
+
+            private int nvl(Object o)
+            {
+                return o != null ? o.hashCode() : 0;
+            }
+        });
 
         private Log logger;
 
@@ -418,7 +432,7 @@ public class TransientRegistry extends AbstractRegistry
                 final Object previousObject = registry.put(key, object);
                 if (previousObject != null && previousObject != object)
                 {
-                    addToLostObjectsListOnlyOnce(previousObject);
+                    lostObjects.add(previousObject);
                     // registry.put(key, value) would overwrite a previous entity with the same name.  Is this really what we want?
                     // Not sure whether to throw an exception or log a warning here.
                     //throw new RegistrationException("TransientRegistry already contains an object named '" + key + "'.  The previous object would be overwritten.");
@@ -428,22 +442,6 @@ public class TransientRegistry extends AbstractRegistry
             finally
             {
                 writeLock.unlock();
-            }
-        }
-
-        private void addToLostObjectsListOnlyOnce(final Object theObject)
-        {
-            boolean isInList = CollectionUtils.exists(lostObjects, new Predicate()
-            {
-                @Override
-                public boolean evaluate(Object o)
-                {
-                    return o == theObject;
-                }
-            });
-            if (!isInList)
-            {
-                lostObjects.add(theObject);
             }
         }
 
@@ -495,7 +493,7 @@ public class TransientRegistry extends AbstractRegistry
             return registry.entrySet();
         }
 
-        public List<Object> getLostObjects()
+        public Set<Object> getLostObjects()
         {
             return lostObjects;
         }
