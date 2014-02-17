@@ -129,6 +129,7 @@ public class AjaxFunctionalJsonBindingsTestCase extends AbstractServiceAndFlowTe
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testClientPublishWithJsonObject() throws Exception
     {
         client.publish("/test2", "{\"name\":\"Ross\"}", null);
