@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -219,7 +220,15 @@ public class DefaultMuleContextFactory implements MuleContextFactory
         {
             if (muleContext != null && !muleContext.isDisposed())
             {
-                muleContext.dispose();
+                try
+                {
+                    muleContext.dispose();
+                }
+                catch (Exception e1)
+                {
+                    logger.warn ("Can not dispose context. " + ExceptionUtils.getMessage(e1));
+                    logger.debug("Can not dispose context. " + ExceptionUtils.getFullStackTrace(e1));
+                }
             }
             throw e;
         }
