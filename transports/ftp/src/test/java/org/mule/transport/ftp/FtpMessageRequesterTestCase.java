@@ -13,6 +13,7 @@ import static org.junit.Assert.assertNull;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -44,6 +45,21 @@ public class FtpMessageRequesterTestCase extends AbstractFtpServerTestCase
         assertNotNull(message);
         assertEquals(TEST_MESSAGE, message.getPayloadAsString());
 
+        // verify that the file was deleted
+        MuleMessage message2 = client.request(getMuleFtpEndpoint(), getTimeout());
+        assertNull(message2);
+    }
+    
+    @Test
+    public void testMessageRequesterForSingleFile() throws Exception
+    {
+        createFileOnFtpServer("test.txt");
+        
+        MuleClient client = muleContext.getClient();
+        MuleMessage message = client.request(getMuleFtpEndpoint() + File.separator + "test.txt", getTimeout());
+        assertNotNull(message);
+        assertEquals(TEST_MESSAGE, message.getPayloadAsString());
+        
         // verify that the file was deleted
         MuleMessage message2 = client.request(getMuleFtpEndpoint(), getTimeout());
         assertNull(message2);
