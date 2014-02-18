@@ -91,36 +91,27 @@ public class TransientRegistry extends AbstractRegistry
     @Override
     protected void doDispose()
     {
-        disposeUnregisteredObjects();
+        disposeLostObjects();
         registryMap.clear();
     }
 
-    private void disposeUnregisteredObjects()
+    private void disposeLostObjects()
     {
-        for (Entry entry : registryMap.entrySet())
-        {
-            disposeObject(entry.getValue());
-        }
         for (Object obj : registryMap.getLostObjects())
         {
-            disposeObject(obj);
-        }
-    }
-
-    private void disposeObject(Object obj)
-    {
-        if (obj != null && obj instanceof Disposable)
-        {
-            try
+            if (obj != null && obj instanceof Disposable)
             {
-                ((Disposable) obj).dispose();
-            }
-            catch (Exception e)
-            {
-                logger.warn("Can not dispose object. " + ExceptionUtils.getMessage(e));
-                if (logger.isDebugEnabled())
+                try
                 {
-                    logger.debug("Can not dispose object. " + ExceptionUtils.getFullStackTrace(e));
+                    ((Disposable) obj).dispose();
+                }
+                catch (Exception e)
+                {
+                    logger.warn("Can not dispose object. " + ExceptionUtils.getMessage(e));
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Can not dispose object. " + ExceptionUtils.getFullStackTrace(e));
+                    }
                 }
             }
         }
