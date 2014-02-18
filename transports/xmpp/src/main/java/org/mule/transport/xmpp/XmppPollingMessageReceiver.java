@@ -71,7 +71,7 @@ public class XmppPollingMessageReceiver extends AbstractPollingMessageReceiver
         }
         catch (Exception e)
         {
-            connector.getMuleContext().getExceptionListener().handleException(e);
+            getEndpoint().getMuleContext().getExceptionListener().handleException(e);
             throw e;
         }
     }

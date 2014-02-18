@@ -211,7 +211,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
         }
         catch (Exception e)
         {
-            getConnector().getMuleContext().getExceptionListener().handleException(e);
+            getEndpoint().getMuleContext().getExceptionListener().handleException(e);
             // This will cause a negative ack for JMS
             throw new MuleRuntimeException(e);
         }

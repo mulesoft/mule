@@ -1441,7 +1441,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
      */
     public ReplyToHandler getReplyToHandler(ImmutableEndpoint endpoint)
     {
-        return new DefaultReplyToHandler(muleContext);
+        return new DefaultReplyToHandler(endpoint.getMuleContext());
     }
 
     /**
@@ -2138,6 +2138,9 @@ public abstract class AbstractConnector implements Connector, WorkListener
         }
     }
 
+    /**
+     * {@inheritDoc}.
+     */
     @Override
     public MuleMessage request(String uri, long timeout) throws Exception
     {
@@ -2386,6 +2389,9 @@ public abstract class AbstractConnector implements Connector, WorkListener
         throw new UnsupportedOperationException(CoreMessages.streamingNotSupported(this.getProtocol()).toString());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MuleContext getMuleContext()
     {

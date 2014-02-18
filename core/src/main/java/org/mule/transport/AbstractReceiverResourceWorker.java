@@ -46,7 +46,7 @@ public abstract class AbstractReceiverResourceWorker extends AbstractReceiverWor
         }
         catch (Exception e)
         {
-            receiver.getConnector().getMuleContext().getExceptionListener().handleException(e);
+            endpoint.getMuleContext().getExceptionListener().handleException(e);
         }
     }
 

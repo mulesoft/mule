@@ -44,12 +44,13 @@ public class MuleAjaxServlet extends ContinuationCometdServlet
 
     private Set<Class<?>> ignoreClasses = new HashSet<Class<?>>();
     private Set<Class<?>> jsonBindings = new HashSet<Class<?>>();
+    private MuleContext muleContext;
 
     @Override
     public void init() throws ServletException
     {
         super.init();
-        MuleContext muleContext = (MuleContext)getServletContext().getAttribute(MuleProperties.MULE_CONTEXT_PROPERTY);
+        this.muleContext = (MuleContext)getServletContext().getAttribute(MuleProperties.MULE_CONTEXT_PROPERTY);
         if(muleContext==null)
         {
             throw new ServletException("Attribute " + MuleProperties.MULE_CONTEXT_PROPERTY + " not set on ServletContext");
@@ -90,7 +91,7 @@ public class MuleAjaxServlet extends ContinuationCometdServlet
         {
             ((BayeuxAware)connector).setBayeux(getBayeux());
             jsonTransformer = new ObjectToJson();
-            connector.getMuleContext().getRegistry().applyProcessorsAndLifecycle(jsonTransformer);
+            muleContext.getRegistry().applyProcessorsAndLifecycle(jsonTransformer);
         }
         catch (MuleException e)
         {

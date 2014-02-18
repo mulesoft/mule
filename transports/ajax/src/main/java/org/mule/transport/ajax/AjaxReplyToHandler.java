@@ -6,6 +6,7 @@
  */
 package org.mule.transport.ajax;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -33,9 +34,9 @@ public class AjaxReplyToHandler extends DefaultReplyToHandler
      */
     private static final long serialVersionUID = 1L;
     
-    public AjaxReplyToHandler(Connector connector)
+    public AjaxReplyToHandler(Connector connector, MuleContext muleContext)
     {
-        super(connector.getMuleContext());
+        super(muleContext);
         this.connector = connector;
     }
 

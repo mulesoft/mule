@@ -128,7 +128,7 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
     public void poll() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, (Map<String, Object>) null,
-                                                     connector.getMuleContext());
+                                                     getEndpoint().getMuleContext());
         pollWith(request);
     }
 
@@ -178,7 +178,7 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
         }
         catch (Exception e)
         {
-            connector.getMuleContext().getExceptionListener().handleException(e);
+            getEndpoint().getMuleContext().getExceptionListener().handleException(e);
         }
     }
 

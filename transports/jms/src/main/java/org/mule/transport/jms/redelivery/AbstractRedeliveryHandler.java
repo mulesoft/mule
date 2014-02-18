@@ -38,7 +38,7 @@ public abstract class AbstractRedeliveryHandler implements RedeliveryHandler
     {
         try
         {
-            String encoding = connector.getMuleContext().getConfiguration().getDefaultEncoding();
+            String encoding = muleContext.getConfiguration().getDefaultEncoding();
             return connector.createMuleMessageFactory().create(message, encoding, muleContext);
         }
         catch (Exception e)

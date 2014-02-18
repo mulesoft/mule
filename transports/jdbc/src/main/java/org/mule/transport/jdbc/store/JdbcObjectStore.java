@@ -11,6 +11,8 @@ import java.sql.SQLException;
 
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.ArrayHandler;
+
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.store.ObjectAlreadyExistsException;
@@ -22,7 +24,7 @@ import org.mule.execution.TransactionalExecutionTemplate;
 import org.mule.transport.jdbc.JdbcConnector;
 import org.mule.util.store.AbstractMonitoredObjectStore;
 
-public class JdbcObjectStore<T extends Serializable> extends AbstractMonitoredObjectStore<T>
+public class JdbcObjectStore<T extends Serializable> extends AbstractMonitoredObjectStore<T> implements MuleContextAware
 {
 
     private JdbcConnector jdbcConnector;
@@ -219,7 +221,7 @@ public class JdbcObjectStore<T extends Serializable> extends AbstractMonitoredOb
         throws Exception
     {
         ExecutionTemplate<Object> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(
-            this.jdbcConnector.getMuleContext(), this.transactionConfig);
+            getMuleContext(), this.transactionConfig);
         return executionTemplate.execute(processingCallback);
     }
 

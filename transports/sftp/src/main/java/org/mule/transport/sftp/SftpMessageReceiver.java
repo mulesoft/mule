@@ -118,7 +118,7 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
         catch (Exception e)
         {
             logger.error("Error in poll", e);
-            connector.getMuleContext().getExceptionListener().handleException(e);
+            getEndpoint().getMuleContext().getExceptionListener().handleException(e);
             throw e;
         }
     }
@@ -126,7 +126,7 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
     @Override
     protected void doInitialise() throws InitialisationException
     {
-        this.lockFactory = getConnector().getMuleContext().getLockFactory();
+        this.lockFactory = getEndpoint().getMuleContext().getLockFactory();
         boolean synchronousProcessing = false;
         if (getFlowConstruct() instanceof Flow)
         {

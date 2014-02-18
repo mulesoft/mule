@@ -35,7 +35,7 @@ public class HttpClientMessageRequester extends AbstractMessageRequester
         super(endpoint);
         this.connector = (HttpConnector) endpoint.getConnector();
         this.receiveTransformer = new HttpClientMethodResponseToObject();
-        this.receiveTransformer.setMuleContext(connector.getMuleContext());
+        this.receiveTransformer.setMuleContext(getEndpoint().getMuleContext());
     }
 
     protected void doConnect() throws Exception

@@ -89,7 +89,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         }
 
         consumers = new CopyOnWriteArrayList<SubReceiver>();
-        reconnectWorkManager = new ReconnectWorkManager(connector.getMuleContext());
+        reconnectWorkManager = new ReconnectWorkManager(getEndpoint().getMuleContext());
     }
 
 
@@ -453,7 +453,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                 }
                 else
                 {
-                    getConnector().getMuleContext().getExceptionListener().handleException(e, rollbackMethod);
+                    getEndpoint().getMuleContext().getExceptionListener().handleException(e, rollbackMethod);
                 }
             }
             finally

@@ -494,7 +494,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
 
     private WorkManager createWorkManager()
     {
-        int shutdownTimeout = connector.getMuleContext().getConfiguration().getShutdownTimeout();
+        int shutdownTimeout = endpoint.getMuleContext().getConfiguration().getShutdownTimeout();
 
         return new TrackingWorkManager(new WorkManagerHolder()
         {

@@ -57,7 +57,7 @@ public class PollingReceiverWorker implements Work
                 }
                 catch (MuleException e1)
                 {
-                    receiver.getConnector().getMuleContext().getExceptionListener().handleException(e1);
+                    receiver.getEndpoint().getMuleContext().getExceptionListener().handleException(e1);
                 }
             }
             catch (MessagingException e)
@@ -66,7 +66,7 @@ public class PollingReceiverWorker implements Work
             }
             catch (Exception e)
             {
-                receiver.getConnector().getMuleContext().getExceptionListener().handleException(e);
+                receiver.getEndpoint().getMuleContext().getExceptionListener().handleException(e);
             }
             finally
             {

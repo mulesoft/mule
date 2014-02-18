@@ -171,7 +171,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
                 }
                 catch (Exception e)
                 {
-                    getConnector().getMuleContext().getExceptionListener().handleException(e);
+                    getEndpoint().getMuleContext().getExceptionListener().handleException(e);
                 }
             }
         }
