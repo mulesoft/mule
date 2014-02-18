@@ -113,12 +113,15 @@ public class TransientRegistry extends AbstractRegistry
         {
             try
             {
-                ((Disposable)obj).dispose();
+                ((Disposable) obj).dispose();
             }
             catch (Exception e)
             {
                 logger.warn("Can not dispose object. " + ExceptionUtils.getMessage(e));
-                logger.debug("Can not dispose object. " + ExceptionUtils.getFullStackTrace(e));
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Can not dispose object. " + ExceptionUtils.getFullStackTrace(e));
+                }
             }
         }
     }
