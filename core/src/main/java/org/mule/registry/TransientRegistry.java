@@ -12,7 +12,6 @@ import org.mule.api.agent.Agent;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.model.Model;
 import org.mule.api.registry.InjectProcessor;
 import org.mule.api.registry.MuleRegistry;
@@ -114,12 +113,15 @@ public class TransientRegistry extends AbstractRegistry
         {
             try
             {
-                getLifecycleManager().applyPhase(obj, lifecycleManager.getCurrentPhase(), Disposable.PHASE_NAME);
+                ((Disposable) obj).dispose();
             }
-            catch (LifecycleException e)
+            catch (Exception e)
             {
                 logger.warn("Can not dispose object. " + ExceptionUtils.getMessage(e));
-                logger.debug("Can not dispose object. " + ExceptionUtils.getFullStackTrace(e));
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Can not dispose object. " + ExceptionUtils.getFullStackTrace(e));
+                }
             }
         }
     }
