@@ -49,7 +49,6 @@ import org.mule.util.ClassUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Utilities for creating test and Mock Mule objects
@@ -57,8 +56,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class MuleTestUtils
 {
 
-    private static AtomicInteger serviceCounter = new AtomicInteger(0);
-    private static AtomicInteger flowCounter = new AtomicInteger(0);
+    public static final String APPLE_SERVICE = "appleService";
+    public static final String APPLE_FLOW = "appleFlow";
 
     // public static Endpoint getTestEndpoint(String name, String type, MuleContext
     // context) throws Exception
@@ -570,22 +569,12 @@ public final class MuleTestUtils
     @Deprecated
     public static Service getTestService(MuleContext context) throws Exception
     {
-        return getTestService("appleService-" + getServiceCounter(), Apple.class, context);
-    }
-
-    private static int getServiceCounter()
-    {
-        return serviceCounter.getAndIncrement();
+        return getTestService(APPLE_SERVICE, Apple.class, context);
     }
 
     public static Flow getTestFlow(MuleContext context) throws Exception
     {
-        return getTestFlow("appleFlow-" + getFlowCounter(), context);
-    }
-
-    private static int getFlowCounter()
-    {
-        return flowCounter.getAndIncrement();
+        return getTestFlow(APPLE_FLOW, context);
     }
 
     @Deprecated
