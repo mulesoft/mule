@@ -652,10 +652,20 @@ public class FtpConnector extends AbstractConnector
                 path = path.substring(1);
             }
 
-            if (!client.changeWorkingDirectory(path))
+            //Checking if it is a file or a directory
+            FTPFile[] listFiles = client.listFiles(path);
+            boolean isFile = listFiles.length == 1 && listFiles[0].isFile();
+            if (!isFile && !client.changeWorkingDirectory(path))
             {
                 throw new IOException(MessageFormat.format("Failed to change working directory to {0}. Ftp error: {1}",
                                                            path, client.getReplyCode()));
+            }
+            else if (isFile)
+            {
+                // Changing the working directory to the parent folder, it should be better if
+                // the ftpClient API would provide a way to retrieve the parent folder
+                String directory = path.replaceAll(listFiles[0].getName(), "");
+                client.changeWorkingDirectory(directory);
             }
         }
         return client;
