@@ -41,7 +41,7 @@ public class PollingReceiverWorkerSchedule implements Runnable
             }
             catch (Exception e)
             {
-                receiver.getConnector().getMuleContext().getExceptionListener().handleException(e);
+                receiver.getEndpoint().getMuleContext().getExceptionListener().handleException(e);
             }
         }
         finally

@@ -9,6 +9,7 @@ package org.mule.transport.vm;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -91,7 +92,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     public void onMessage(MuleMessage message) throws MuleException
     {
         // Rewrite the message to treat it as a new message
-        MuleMessage newMessage = new DefaultMuleMessage(message.getPayload(), message, connector.getMuleContext());
+        MuleMessage newMessage = new DefaultMuleMessage(message.getPayload(), message, endpoint.getMuleContext());
         routeMessage(newMessage);
     }
 
@@ -102,13 +103,14 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         try
         {
             Thread.currentThread().setContextClassLoader(endpoint.getMuleContext().getExecutionClassLoader());
+            final MuleMessage messageToRoute = new DefaultMuleMessage(message.getPayload() ,message, endpoint.getMuleContext());
             ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
             MuleEvent resultEvent = executionTemplate.execute(new ExecutionCallback<MuleEvent>()
             {
                 @Override
                 public MuleEvent process() throws Exception
                 {
-                    MuleEvent event = routeMessage(message);
+                    MuleEvent event = routeMessage(messageToRoute);
                     MuleMessage returnedMessage = event == null ? null : event.getMessage();
                     if (returnedMessage != null)
                     {
@@ -117,7 +119,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
                     return event;
                 }
             });
-            return resultEvent != null ? resultEvent.getMessage() : null;
+            return resultEvent != null ? new DefaultMuleMessage(resultEvent.getMessage().getPayload(), resultEvent.getMessage(), message.getMuleContext()) : null;
 
         }
         catch (MessagingException e)
@@ -157,7 +159,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
             }
             
             List<MuleMessage> messages = new ArrayList<MuleMessage>(1);
-            messages.add(message.getMessage());
+            messages.add(new DefaultMuleMessage(message.getMessage().getPayload(), message.getMessage(), endpoint.getMuleContext()));
             return messages;
         }
         else
@@ -183,7 +185,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         if (message != null)
         {
             // keep first dequeued event
-            messages.add(message.getMessage());
+            messages.add(new DefaultMuleMessage(message.getMessage().getPayload(), message.getMessage(), endpoint.getMuleContext()));
 
             // keep batching if more events are available
             for (int i = 0; i < batchSize && message != null; i++)
@@ -191,7 +193,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
                 message = (MuleEvent)queue.poll(0);
                 if (message != null)
                 {
-                    messages.add(message.getMessage());
+                    messages.add(new DefaultMuleMessage(message.getMessage(), endpoint.getMuleContext()));
                 }
             }
         }

@@ -161,7 +161,7 @@ public class EndpointPollingJob extends AbstractJob
                 private MuleMessage request() throws MuleException, Exception
                 {
                     String endpointUri = jobConfig.getEndpointRef();
-                    MuleContext context = connector.getMuleContext();
+                    MuleContext context = receiver.getEndpoint().getMuleContext();
                     InboundEndpoint inboundEndpoint = context.getEndpointFactory().getInboundEndpoint(endpointUri);
 
                     int timeout = jobConfig.getTimeout();

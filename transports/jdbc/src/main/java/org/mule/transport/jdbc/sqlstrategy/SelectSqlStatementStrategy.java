@@ -109,7 +109,7 @@ public  class SelectSqlStatementStrategy implements SqlStatementStrategy
         if (ackStmt != null)
         {
             Object[] params = connector.getParams(endpoint, ackParams,
-                    new DefaultMuleMessage(result, (Map)null, connector.getMuleContext()), ackStmt);
+                    new DefaultMuleMessage(result, (Map)null, endpoint.getMuleContext()), ackStmt);
             if (logger.isDebugEnabled())
             {
                 logger.debug("SQL UPDATE: " + ackStmt + ", params = " + ArrayUtils.toString(params));
@@ -125,11 +125,11 @@ public  class SelectSqlStatementStrategy implements SqlStatementStrategy
         MuleMessage message = null;
         if (event != null)
         {
-            message = new DefaultMuleMessage(result, event.getMessage(), connector.getMuleContext());
+            message = new DefaultMuleMessage(result, event.getMessage(), endpoint.getMuleContext());
         }
         else
         {
-            message = new DefaultMuleMessage(result, connector.getMuleContext());
+            message = new DefaultMuleMessage(result, endpoint.getMuleContext());
         }
         return message;
     }

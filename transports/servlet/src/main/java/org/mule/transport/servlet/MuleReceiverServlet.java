@@ -414,7 +414,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         }
         else if (t instanceof Exception)
         {
-            connector.getMuleContext().getExceptionListener().handleException((Exception) t);
+            muleContext.getExceptionListener().handleException((Exception) t);
         }
 
         super.handleException(t, message, response);

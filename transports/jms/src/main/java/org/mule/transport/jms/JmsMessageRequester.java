@@ -84,7 +84,7 @@ public class JmsMessageRequester extends AbstractMessageRequester
             {
                 // register a session close listener
                 final Session finalSession = session;
-                getConnector().getMuleContext().registerListener(new TransactionNotificationListener<TransactionNotification>()
+                getEndpoint().getMuleContext().registerListener(new TransactionNotificationListener<TransactionNotification>()
                 {
                     public void onNotification(TransactionNotification txNotification)
                     {
@@ -110,7 +110,7 @@ public class JmsMessageRequester extends AbstractMessageRequester
                 final String expressionTemplate = selectorFilter.getExpression();
                 if (StringUtils.isNotBlank(expressionTemplate))
                 {
-                    selector = connector.getMuleContext().getExpressionManager().parse(expressionTemplate, (MuleMessage) null);
+                    selector = getEndpoint().getMuleContext().getExpressionManager().parse(expressionTemplate, (MuleMessage) null);
                 }
             }
             else if (endpoint.getProperties() != null)
@@ -120,7 +120,7 @@ public class JmsMessageRequester extends AbstractMessageRequester
                 final String expressionTemplate = (String) endpoint.getProperty(JmsConstants.JMS_SELECTOR_PROPERTY);
                 if (StringUtils.isNotBlank(expressionTemplate))
                 {
-                    selector = connector.getMuleContext().getExpressionManager().parse(expressionTemplate, (MuleMessage) null);
+                    selector = getEndpoint().getMuleContext().getExpressionManager().parse(expressionTemplate, (MuleMessage) null);
                 }
             }
             String tempDurable = (String) endpoint.getProperties().get(JmsConstants.DURABLE_PROPERTY);

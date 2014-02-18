@@ -72,7 +72,7 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         doDispatch(event);
-        return new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
+        return new DefaultMuleMessage(NullPayload.getInstance(), getEndpoint().getMuleContext());
     }
 
     protected void doConnect() throws Exception

@@ -15,6 +15,8 @@ import static org.mockito.Mockito.when;
 
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.execution.MessageProcessContext;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.ByteArrayInputStream;
@@ -34,7 +36,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class HttpRequestDispatcherWorkTestCase
+public class HttpRequestDispatcherWorkTestCase extends AbstractMuleTestCase
 {
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)

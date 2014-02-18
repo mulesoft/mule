@@ -186,7 +186,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         List<MuleMessage> messages = new LinkedList<MuleMessage>();
         for (Object record : records)
         {
-            messages.add(new DefaultMuleMessage(record, connector.getMuleContext()));
+            messages.add(new DefaultMuleMessage(record, getEndpoint().getMuleContext()));
         }
 
         return messages;

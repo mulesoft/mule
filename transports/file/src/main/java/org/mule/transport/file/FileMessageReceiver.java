@@ -134,14 +134,14 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     @Override
     protected void doInitialise() throws InitialisationException
     {
-        this.lockFactory = getConnector().getMuleContext().getLockFactory();
+        this.lockFactory = getEndpoint().getMuleContext().getLockFactory();
         boolean synchronousProcessing = false;
         if (getFlowConstruct() instanceof Flow)
         {
             synchronousProcessing = ((Flow)getFlowConstruct()).getProcessingStrategy() instanceof SynchronousProcessingStrategy;
         }
         this.poolOnPrimaryInstanceOnly = Boolean.valueOf(System.getProperty(MULE_TRANSPORT_FILE_SINGLEPOLLINSTANCE,"false")) || !synchronousProcessing;
-        ObjectStoreManager objectStoreManager = getConnector().getMuleContext().getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER);
+        ObjectStoreManager objectStoreManager = getEndpoint().getMuleContext().getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER);
         filesBeingProcessingObjectStore = objectStoreManager.getObjectStore(getEndpoint().getName(),false,1000,60000,20000);
     }
 
@@ -245,7 +245,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
         catch (Exception e)
         {
-            getConnector().getMuleContext().getExceptionListener().handleException(e);
+            getEndpoint().getMuleContext().getExceptionListener().handleException(e);
         }
     }
 
@@ -285,7 +285,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
         // This isn't nice but is needed as MuleMessage is required to resolve
         // destination file name
-        DefaultMuleMessage fileParserMessasge = new DefaultMuleMessage(null, connector.getMuleContext());
+        DefaultMuleMessage fileParserMessasge = new DefaultMuleMessage(null, getEndpoint().getMuleContext());
         fileParserMessasge.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
 
         // The file may get moved/renamed here so store the original file info.
@@ -450,7 +450,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         catch (Exception e)
         {
             rollbackFileMoveIfRequired(originalSourceFile, sourceFile);
-            connector.getMuleContext().getExceptionListener().handleException(e);
+            getEndpoint().getMuleContext().getExceptionListener().handleException(e);
         }
         finally
         {
@@ -510,7 +510,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
         catch (Exception e)
         {
-            connector.getMuleContext().getExceptionListener().handleException(e);
+            getEndpoint().getMuleContext().getExceptionListener().handleException(e);
         }
     }
 

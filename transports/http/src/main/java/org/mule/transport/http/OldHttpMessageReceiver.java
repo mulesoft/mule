@@ -109,7 +109,7 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
             String encoding = endpoint.getEncoding();
             if (encoding == null)
             {
-                encoding = connector.getMuleContext().getConfiguration().getDefaultEncoding();
+                encoding = getEndpoint().getMuleContext().getConfiguration().getDefaultEncoding();
             }
 
             conn = new HttpServerConnection(socket, encoding, (HttpConnector) connector);
@@ -168,7 +168,7 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
                         }
                         else
                         {
-                            getConnector().getMuleContext().getExceptionListener().handleException(e);
+                            getEndpoint().getMuleContext().getExceptionListener().handleException(e);
                         }
 
                         if (response != null &&
@@ -213,7 +213,7 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
             }
             catch (Exception e)
             {
-                getConnector().getMuleContext().getExceptionListener().handleException(e);
+                getEndpoint().getMuleContext().getExceptionListener().handleException(e);
             }
             finally
             {
@@ -437,7 +437,7 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
                         HttpResponse expected = new HttpResponse();
                         expected.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_CONTINUE);
                         final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(expected,
-                                                                                                   connector.getMuleContext()), (InboundEndpoint) endpoint, flowConstruct);
+                                                                                                   getEndpoint().getMuleContext()), (InboundEndpoint) endpoint, flowConstruct);
                         RequestContext.setEvent(event);
                         conn.writeResponse(transformResponse(expected, event));
                     }
@@ -458,7 +458,7 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
             response.setStatusLine(version, statusCode);
             response.setBody(description);
             DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(response,
-                                                                                 connector.getMuleContext()), (InboundEndpoint) endpoint, flowConstruct);
+                                                                                 getEndpoint().getMuleContext()), (InboundEndpoint) endpoint, flowConstruct);
             RequestContext.setEvent(event);
             // The DefaultResponseTransformer will set the necessary headers
             return transformResponse(response, event);
@@ -553,7 +553,7 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
         }
         else
         {
-            message = new DefaultMuleMessage(response, connector.getMuleContext());
+            message = new DefaultMuleMessage(response, getEndpoint().getMuleContext());
         }
         //TODO RM*: Maybe we can have a generic Transformer wrapper rather that using DefaultMuleMessage (or another static utility
         //class

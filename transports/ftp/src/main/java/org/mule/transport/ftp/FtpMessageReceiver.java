@@ -284,7 +284,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         {
             FTPClient client = null;
             MuleMessage muleMessage = null;
-            Lock lock = connector.getMuleContext().getLockFactory().createLock(file.getName());
+            Lock lock = getEndpoint().getMuleContext().getLockFactory().createLock(file.getName());
             if (lock.tryLock())
             {
                 try
@@ -328,7 +328,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
                 }
                 catch (Exception e)
                 {
-                    getConnector().getMuleContext().getExceptionListener().handleException(e);
+                    getEndpoint().getMuleContext().getExceptionListener().handleException(e);
                 }
                 finally
                 {

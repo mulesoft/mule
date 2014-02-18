@@ -34,6 +34,7 @@ import javax.net.ssl.HandshakeCompletedEvent;
 import javax.resource.spi.work.Work;
 
 import org.junit.Test;
+import org.mockito.Answers;
 
 /**
  * Test for SSL handshake timeouts. Unfortunately, there is no easy way to blackbox-test this
@@ -67,7 +68,7 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleContextTestCase
         MockSslSocket socket = new MockSslSocket();
         socket.setInputStream(new ByteArrayInputStream("GET /path/to/file/index.html HTTP/1.0\n\n\n".getBytes()));
         HttpServerConnection serverConnection = new HttpServerConnection(socket, "utf-8", (HttpConnector) messageReceiver.getConnector());
-        HttpMessageProcessTemplate messageContext = (HttpMessageProcessTemplate) messageReceiver.createMessageContext(serverConnection);
+        HttpMessageProcessTemplate messageContext = messageReceiver.createMessageContext(serverConnection);
 
         invokeHandshakeCompleted(serverConnection, socket);
 
@@ -92,7 +93,7 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleContextTestCase
 
         Map<String, Object> properties = Collections.emptyMap();
 
-        InboundEndpoint inboundEndpoint = mock(InboundEndpoint.class);
+        InboundEndpoint inboundEndpoint = mock(InboundEndpoint.class, Answers.RETURNS_DEEP_STUBS.get());
         when(inboundEndpoint.getConnector()).thenReturn(httpsConnector);
         when(inboundEndpoint.getProperties()).thenReturn(properties);
 

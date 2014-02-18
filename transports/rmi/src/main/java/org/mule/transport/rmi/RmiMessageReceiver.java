@@ -125,7 +125,7 @@ public class RmiMessageReceiver extends AbstractPollingMessageReceiver
         }
         catch (Exception e)
         {
-            getConnector().getMuleContext().getExceptionListener().handleException(e);
+            getEndpoint().getMuleContext().getExceptionListener().handleException(e);
         }
     }
 

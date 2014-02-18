@@ -174,7 +174,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
                     if (!connector.isDisposed() && !disposing.get())
                     {
                         logger.debug("Accept failed on socket: " + e, e);
-                        getConnector().getMuleContext().getExceptionListener().handleException(e);
+                        getEndpoint().getMuleContext().getExceptionListener().handleException(e);
                     }
                 }
             }
@@ -261,7 +261,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
             {
                 if (!disposing.get())
                 {
-                    getConnector().getMuleContext().getExceptionListener().handleException(e);
+                    getEndpoint().getMuleContext().getExceptionListener().handleException(e);
                 }
             }
             finally

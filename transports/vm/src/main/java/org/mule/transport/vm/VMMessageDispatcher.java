@@ -116,7 +116,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         if (!endpoint.getExchangePattern().hasResponse())
         {
             // use the default queue profile to configure this queue.
-            connector.getQueueProfile().configureQueue(connector.getMuleContext(),
+            connector.getQueueProfile().configureQueue(endpoint.getMuleContext(),
                 endpoint.getEndpointURI().getAddress(), connector.getQueueManager());
         }
     }
