@@ -7,6 +7,8 @@
 
 package org.mule.module.cxf.support;
 
+import org.mule.module.cxf.CxfConstants;
+
 import java.util.List;
 
 import javax.wsdl.Definition;
@@ -44,13 +46,16 @@ public class ProxyWSDLQueryHandler extends WSDLQueryHandler
                                                                         "http://schemas.xmlsoap.org/wsdl/",
                                                                         "service");
 
-        for (Element serviceEl : serviceList) {
+        for (Element serviceEl : serviceList)
+        {
             String serviceName = serviceEl.getAttribute("name");
-            if (serviceName.equals(ei.getService().getName().getLocalPart())) {
+            if (serviceName.equals(ei.getService().getName().getLocalPart()))
+            {
                 List<Element> elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
                                                                   "http://schemas.xmlsoap.org/wsdl/",
                                                                   "port");
-                for (Element el : elementList) {
+                for (Element el : elementList)
+                {
                      if(rewritePortAddress(el))
                      {
                          List<Element> addresses = findAddresses(el, WSDLConstants.NS_SOAP);
@@ -80,7 +85,7 @@ public class ProxyWSDLQueryHandler extends WSDLQueryHandler
         WSDLManager wsdlManager = bus.getExtension(WSDLManager.class);
         if (wsdlManager != null)
         {
-            String wsdlLocation = endpointInfo.getService().getProperty("WSDL_LOCATION", String.class);
+            String wsdlLocation = endpointInfo.getService().getProperty(CxfConstants.WSDL_LOCATION, String.class);
             if(wsdlLocation != null)
             {
                 return loadDefinition(wsdlManager, wsdlLocation);
