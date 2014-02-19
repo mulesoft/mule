@@ -95,15 +95,14 @@ public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFa
                 ;
         XmlConfigurationCallback callback = new DatabaseConfigurationCallback(Collections.singletonMap("jdbcDataSource", refDef));
 
-        doTest(document, callback);
-        doTest(document, callback);
-        doTest(document, callback);
+        doTest(document, callback, true);
+        doTest(document, callback, true);
+        doTest(document, callback, true);
     }
 
-    // ignored mysql test because mysql.mysql-connector-java/mysql-connector-java-x.jar is not on build path by default
-    // and now that the artifact is started at creation, the test cannot work without the jar.
-    @Ignore
+    // This will required having MySQL drivers in the classpath and a MySQL instance running
     @Test
+    @Ignore
     public void testMySql() throws SAXException, IOException, MuleArtifactFactoryException
     {
         String config = "<jdbc:connector name=\"jdbcConnector\" pollingFrequency=\"1000\" dataSource-ref=\"mysqlDatasource\" queryTimeout=\"3000\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"/>";
@@ -127,9 +126,9 @@ public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFa
                 ;
         XmlConfigurationCallback callback = new DatabaseConfigurationCallback(Collections.singletonMap("mysqlDatasource", refDef));
 
-        doTest(document, callback);
-        doTest(document, callback);
-        doTest(document, callback);
+        doTest(document, callback, false);
+        doTest(document, callback, false);
+        doTest(document, callback, false);
     }
 
     @Test
@@ -150,9 +149,9 @@ public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFa
                 + "</spring:bean>"
                 ;
         XmlConfigurationCallback callback = new DatabaseConfigurationCallback(Collections.singletonMap("h2Datasource", refDef));
-        doTest(document, callback);
-        doTest(document, callback);
-        doTest(document, callback);
+        doTest(document, callback, true);
+        doTest(document, callback, true);
+        doTest(document, callback, true);
 
         refDef =
                 "<spring:bean xmlns:spring=\"http://www.springframework.org/schema/beans\" class=\"org.enhydra.jdbc.standard.StandardXADataSource\" destroy-method=\"shutdown\" id=\"h2Datasource\">"
@@ -163,9 +162,9 @@ public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFa
                 + "</spring:bean>"
         ;
         callback = new DatabaseConfigurationCallback(Collections.singletonMap("h2Datasource", refDef));
-        doTest(document, callback);
-        doTest(document, callback);
-        doTest(document, callback);
+        doTest(document, callback, true);
+        doTest(document, callback, true);
+        doTest(document, callback, true);
 
         refDef =
                 "<spring:bean xmlns:spring=\"http://www.springframework.org/schema/beans\" class=\"org.apache.commons.dbcp.BasicDataSource\" destroy-method=\"close\" id=\"h2Datasource\">"
@@ -176,9 +175,9 @@ public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFa
                 + "</spring:bean>"
         ;
         callback = new DatabaseConfigurationCallback(Collections.singletonMap("h2Datasource", refDef));
-        doTest(document, callback);
-        doTest(document, callback);
-        doTest(document, callback);
+        doTest(document, callback, true);
+        doTest(document, callback, true);
+        doTest(document, callback, true);
     }
 
     @Test
@@ -206,9 +205,9 @@ public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFa
                 + "</spring:bean>"
         ;
         XmlConfigurationCallback callback = new DatabaseConfigurationCallback(Collections.singletonMap("hsqlDatasource", refDef));
-        doTest(document, callback);
-        doTest(document, callback);
-        doTest(document, callback);
+        doTest(document, callback, true);
+        doTest(document, callback, true);
+        doTest(document, callback, true);
     }
 
 }
