@@ -58,6 +58,7 @@
         <module>patterns</module>
         <module>tools</module>
         <module>transports</module>
+        <module>tests</module>
     </modules>
 
     <properties>
@@ -1848,18 +1849,6 @@
             <id>distributions</id>
             <modules>
                 <module>distributions</module>
-            </modules>
-        </profile>
-
-        <profile>
-            <id>mule-tests</id>
-            <activation>
-                <property>
-                    <name>!skipMuleTests</name>
-                </property>
-            </activation>
-            <modules>
-                <module>tests</module>
             </modules>
         </profile>
 

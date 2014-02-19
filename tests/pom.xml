@@ -14,9 +14,6 @@
     <modules>
         <module>functional</module>
         <module>infrastructure</module>
-        <module>integration</module>
-        <module>integration-jdk6</module>
-        <module>integration-axis</module>
     </modules>
 
     <properties>
@@ -38,14 +35,22 @@
 
     <profiles>
         <profile>
+            <id>integration-suite</id>
+            <activation>
+                <property>
+                    <name>!skipIntegrationTests</name>
+                </property>
+            </activation>
+            <modules>
+                <module>integration</module>
+                <module>integration-jdk6</module>
+                <module>integration-axis</module>
+            </modules>
+        </profile>
+        <profile>
             <id>archetype-tests</id>
             <activation>
                 <property>
-                    <!--
-                         This profile is activated if NO system property
-                         'skipArchetypeTests' is found. Disable this profile
-                         by specifying -DskipArchetypeTests=true on the commandline
-                    -->
                     <name>!skipArchetypeTests</name>
                 </property>
             </activation>

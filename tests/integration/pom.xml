@@ -20,15 +20,6 @@
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<!-- Fork each test in its own VM to minimize side effects of failed 
-						AMQ shutdowns and other unrelated failures. -->
-					<forkMode>pertest</forkMode>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<executions>
 					<execution>
