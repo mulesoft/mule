@@ -125,6 +125,11 @@ public abstract class Watermark extends MessageProcessorPollingOverride
 
     public final void updateWith(MuleEvent event, Serializable newValue) throws ObjectStoreException
     {
+        if (!this.validateNewWatermarkValue(newValue))
+        {
+            return;
+        }
+
         String variableName = this.resolveVariable(event);
 
         synchronized (objectStore)
@@ -152,11 +157,7 @@ public abstract class Watermark extends MessageProcessorPollingOverride
         {
             Object watermarkValue = this.getUpdatedValue(event);
 
-            if (watermarkValue == null)
-            {
-                logger.warn(CoreMessages.nullWatermark().getMessage());
-                return;
-            }
+            this.validateNewWatermarkValue(watermarkValue);
 
             if (watermarkValue instanceof Serializable)
             {
@@ -182,5 +183,19 @@ public abstract class Watermark extends MessageProcessorPollingOverride
      * @return the new watermark value
      */
     protected abstract Object getUpdatedValue(MuleEvent event);
+
+    private boolean validateNewWatermarkValue(Object value)
+    {
+        if (value == null)
+        {
+            if (logger.isInfoEnabled())
+            {
+                logger.info(CoreMessages.nullWatermark().getMessage());
+            }
+            return false;
+        }
+
+        return true;
+    }
 
 }
