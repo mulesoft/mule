@@ -23,36 +23,30 @@ import java.io.Serializable;
 public class SelectorWatermark extends Watermark
 {
 
-    private final WatermarkSelector selector;
+    private final WatermarkSelectorBroker selectorBroker;
     private final String selectorExpression;
 
     public SelectorWatermark(ObjectStore<Serializable> objectStore,
                              String variable,
                              String defaultExpression,
-                             WatermarkSelector selector,
+                             WatermarkSelectorBroker selectorBroker,
                              String selectorExpression)
     {
         super(objectStore, variable, defaultExpression);
-        this.selector = selector;
+        this.selectorBroker = selectorBroker;
         this.selectorExpression = selectorExpression;
     }
 
     /**
-     * Returns the {@link #selector} value and resets it so that its reusable. Notice
-     * that the selector is reusable without risk of concurrency issues because
+     * Returns the {@link #selectorBroker} value and resets it so that its reusable. Notice
+     * that the selectorBroker is reusable without risk of concurrency issues because
      * watermark only works on synchronous flows
      */
     @Override
-    protected Object getUpdatedValue(MuleEvent event, String variableName)
+    protected Object getUpdatedValue(MuleEvent event)
     {
-        try
-        {
-            return this.selector.getSelectedValue();
-        }
-        finally
-        {
-            this.selector.reset();
-        }
+        // interceptor is responsible for returning the selected value
+        return null;
     }
 
     /**
@@ -62,7 +56,7 @@ public class SelectorWatermark extends Watermark
     @Override
     public MessageProcessorPollingInterceptor interceptor()
     {
-        return new SelectorWatermarkPollingInterceptor(this, this.selector, this.selectorExpression);
+        return new SelectorWatermarkPollingInterceptor(this, this.selectorBroker.newSelector(), this.selectorExpression);
     }
 
 }

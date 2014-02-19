@@ -9,11 +9,13 @@ package org.mule.transport.polling.watermark.selector;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.store.ObjectStoreException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.streaming.ProvidesTotalHint;
 import org.mule.transport.polling.watermark.Watermark;
 import org.mule.transport.polling.watermark.WatermarkPollingInterceptor;
 
+import java.io.Serializable;
 import java.util.Iterator;
 
 /**
@@ -89,6 +91,12 @@ public class SelectorWatermarkPollingInterceptor extends WatermarkPollingInterce
         }
 
         return event;
+    }
+
+    @Override
+    public void postProcessRouting(MuleEvent event) throws ObjectStoreException
+    {
+        this.watermark.updateWith(event, (Serializable) this.selector.getSelectedValue());
     }
 
     private static class SelectorIteratorProxy<T> implements Iterator<T>, ProvidesTotalHint
