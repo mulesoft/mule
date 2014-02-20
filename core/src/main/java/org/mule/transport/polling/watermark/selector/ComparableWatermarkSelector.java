@@ -21,11 +21,6 @@ public abstract class ComparableWatermarkSelector extends WatermarkSelector
 
     private static final Logger logger = LoggerFactory.getLogger(ComparableWatermarkSelector.class);
 
-    public ComparableWatermarkSelector(String selectorExpression)
-    {
-        super(selectorExpression);
-    }
-
     /**
      * Returns an int value according to the {@link Comparable} contract (-1, 0, 1).
      * Then the result of the comparation matches this method's return value, then
@@ -34,7 +29,6 @@ public abstract class ComparableWatermarkSelector extends WatermarkSelector
     protected abstract int comparableQualifier();
 
     @Override
-    @SuppressWarnings("unchecked")
     public final void acceptValue(Object value)
     {
         if (value == null)

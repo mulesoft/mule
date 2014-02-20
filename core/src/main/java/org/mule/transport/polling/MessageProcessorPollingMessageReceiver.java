@@ -7,6 +7,7 @@
 package org.mule.transport.polling;
 
 import static org.mule.config.i18n.CoreMessages.pollSourceReturnedNull;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
@@ -16,20 +17,24 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.schedule.SchedulerFactory;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.NullPayload;
-import org.mule.util.Predicate;
 import org.mule.util.StringUtils;
 
 import java.util.Map;
@@ -200,6 +205,16 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
         sourceMessageProcessor = getSourceMessageProcessor();
         override = getPollOverride();
 
+        if (override instanceof MuleContextAware)
+        {
+            ((MuleContextAware) override).setMuleContext(endpoint.getMuleContext());
+        }
+
+        if (override instanceof Initialisable)
+        {
+            ((Initialisable) override).initialise();
+        }
+
         getSchedulerFactory().create(schedulerNameOf(this), createWork());
     }
 
@@ -213,14 +228,42 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
     protected void doStart() throws MuleException
     {
         // The initialization phase if handled by the scheduler
+        if (override instanceof Startable)
+        {
+            ((Startable) override).start();
+        }
     }
 
     @Override
     protected void doStop() throws MuleException
     {
         // The stop phase if handled by the scheduler
+        if (override instanceof Stoppable)
+        {
+            ((Stoppable) override).stop();
+        }
     }
 
+    @Override
+    protected void doDispose()
+    {
+        if (override instanceof Disposable)
+        {
+            try
+            {
+                ((Disposable) override).dispose();
+            }
+            catch (Exception e)
+            {
+                logger.warn(String.format("Could not dispose polling override of class %s. Message receiver will continue to dispose", override.getClass().getCanonicalName()), e);
+            }
+            finally
+            {
+                super.doDispose();
+
+            }
+        }
+    }
 
     // Only consider response for source message processor a new message if it is not
     // null and payload is not NullPayload

@@ -24,7 +24,7 @@ import org.mule.transport.polling.MessageProcessorPollingInterceptor;
 public class WatermarkPollingInterceptor extends MessageProcessorPollingInterceptor
 {
 
-    private final Watermark watermark;
+    protected final Watermark watermark;
 
     public WatermarkPollingInterceptor(Watermark watermark)
     {

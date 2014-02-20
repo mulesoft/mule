@@ -7,18 +7,26 @@
 
 package org.mule.transport.polling.watermark;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.expression.InvalidExpressionException;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.store.ObjectStore;
-import org.mule.util.StringUtils;
+import org.mule.config.i18n.MessageFactory;
+import org.mule.transport.polling.MessageProcessorPollingInterceptor;
 
 import java.io.NotSerializableException;
 import java.io.Serializable;
+
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Implementation of {@link Watermark} in which the value is updated through a MEL
  * expression
  */
-public class UpdateExpressionWatermark extends Watermark
+public class UpdateExpressionWatermark extends Watermark implements Initialisable, MuleContextAware
 {
 
     /**
@@ -26,6 +34,9 @@ public class UpdateExpressionWatermark extends Watermark
      * optional so it can be null.
      */
     private final String updateExpression;
+    private final MessageProcessorPollingInterceptor interceptor;
+
+    private MuleContext muleContext;
 
     public UpdateExpressionWatermark(ObjectStore<Serializable> objectStore,
                                      String variable,
@@ -34,6 +45,26 @@ public class UpdateExpressionWatermark extends Watermark
     {
         super(objectStore, variable, defaultExpression);
         this.updateExpression = updateExpression;
+        this.interceptor = new WatermarkPollingInterceptor(this);
+    }
+
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        if (!StringUtils.isEmpty(this.updateExpression))
+        {
+            try
+            {
+                this.muleContext.getExpressionManager().validateExpression(this.updateExpression);
+            }
+            catch (InvalidExpressionException e)
+            {
+                throw new InitialisationException(
+                        MessageFactory.createStaticMessage(
+                                String.format("update-expression requires a valid MEL expression. '%s' was found instead", this.updateExpression))
+                        , e, this);
+            }
+        }
     }
 
     /**
@@ -42,22 +73,33 @@ public class UpdateExpressionWatermark extends Watermark
      * 
      * @param event the @{link {@link MuleEvent} in which the watermark is being
      *            evaluated
-     * @param variableName the name of the flowVar that will hold the new value
      * @return a {@link Serializable} value
      */
     @Override
-    protected Object getUpdatedValue(MuleEvent event, String variableName)
+    protected Object getUpdatedValue(MuleEvent event)
     {
         try
         {
             return StringUtils.isEmpty(this.updateExpression)
-                                                             ? event.getFlowVariable(variableName)
-                                                             : WatermarkUtils.evaluate(this.updateExpression,
-                                                                 event);
+                   ? event.getFlowVariable(this.resolveVariable(event))
+                   : WatermarkUtils.evaluate(this.updateExpression,
+                                             event);
         }
         catch (NotSerializableException e)
         {
             throw new IllegalArgumentException(e);
         }
+    }
+
+    @Override
+    public MessageProcessorPollingInterceptor interceptor()
+    {
+        return this.interceptor;
+    }
+
+    @Override
+    public void setMuleContext(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
     }
 }
