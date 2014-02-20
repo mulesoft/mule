@@ -28,4 +28,7 @@
         <!-- other processors may be applied later -->
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
     </bean>
+
+    <bean name="_muleParentContextPropertyPlaceholderProcessor" class="org.mule.config.spring.processors.ParentContextPropertyPlaceholderProcessor"/>
+
 </beans>
