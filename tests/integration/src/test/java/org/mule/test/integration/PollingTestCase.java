@@ -7,8 +7,13 @@
 package org.mule.test.integration;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.RequestContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.schedule.Schedulers;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -21,8 +26,20 @@ import org.junit.Test;
 
 public class PollingTestCase extends FunctionalTestCase
 {
-    private static List<String> foo = new ArrayList<String>();
-    private static List<String> bar = new ArrayList<String>();
+    private static List<String> foo;
+    private static List<String> bar;
+    private static List<MuleEvent> events;
+    private static List<String> eventIds;
+
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+        foo = new ArrayList<String>();
+        bar = new ArrayList<String>();
+        events = new ArrayList<MuleEvent>();
+        eventIds = new ArrayList<String>();
+    }
 
     @Override
     protected String getConfigFile()
@@ -34,7 +51,7 @@ public class PollingTestCase extends FunctionalTestCase
     public void testPolling() throws Exception
     {
         Collection<Scheduler> schedulers = muleContext.getRegistry().lookupScheduler(Schedulers.allPollSchedulers());
-        assertEquals(3, schedulers.size());
+        assertEquals(4, schedulers.size());
 
         Thread.sleep(5000);
         synchronized (foo)
@@ -51,6 +68,18 @@ public class PollingTestCase extends FunctionalTestCase
             for (String s: bar)
             {
                 assertEquals(s, "bar");
+            }
+        }
+
+        synchronized (events)
+        {
+            assertTrue(events.size() > 0);
+            assertEquals(events.size(), eventIds.size());
+
+            for (int i = 0; i < events.size(); i++)
+            {
+                assertNotNull(events.get(i));
+                assertEquals(events.get(i).getId(), eventIds.get(i));
             }
         }
     }
@@ -87,4 +116,20 @@ public class PollingTestCase extends FunctionalTestCase
             return false;
         }
     }
+
+    public static class EventWireTrap implements MessageProcessor
+    {
+
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            synchronized (events)
+            {
+                events.add(RequestContext.getEvent());
+                eventIds.add(event.getId());
+            }
+            return event;
+        }
+    }
+
 }

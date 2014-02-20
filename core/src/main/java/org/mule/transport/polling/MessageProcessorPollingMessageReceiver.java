@@ -10,6 +10,7 @@ import static org.mule.config.i18n.CoreMessages.pollSourceReturnedNull;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.OptimizedRequestContext;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -157,6 +158,8 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
 
                     MuleEvent event = new DefaultMuleEvent(request, ep.getExchangePattern(), flowConstruct);
                     event = interceptor.prepareSourceEvent(event);
+
+                    OptimizedRequestContext.criticalSetEvent(event);
 
                     MuleEvent sourceEvent = sourceMessageProcessor.process(event);
                     if (isNewMessage(sourceEvent))
