@@ -285,7 +285,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         this(message.getPayload(), message, message.getMuleContext());
     }
 
-    private void setMuleContext(MuleContext context)
+    public void setMuleContext(MuleContext context)
     {
         if (context == null)
         {
@@ -313,6 +313,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         return getPayload(outputType, getEncoding());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MuleContext getMuleContext()
     {
