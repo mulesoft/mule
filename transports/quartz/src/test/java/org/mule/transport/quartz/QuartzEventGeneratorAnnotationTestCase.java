@@ -15,6 +15,7 @@ import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class QuartzEventGeneratorAnnotationTestCase extends FunctionalTestCase
@@ -25,6 +26,7 @@ public class QuartzEventGeneratorAnnotationTestCase extends FunctionalTestCase
         return "quartz-event-generator-with-annotation.xml";
     }
 
+    @Ignore("MULE-6926: flaky test")
     @Test
     public void testReceiveEvent() throws Exception
     {
