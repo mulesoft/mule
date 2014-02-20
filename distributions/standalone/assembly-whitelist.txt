@@ -127,6 +127,7 @@
 /mule-standalone-${productVersion}/examples/echo/src/main
 /mule-standalone-${productVersion}/examples/echo/src/main/app
 /mule-standalone-${productVersion}/examples/echo/src/main/app/adding-logging-to-a-flow.xml
+/mule-standalone-${productVersion}/examples/echo/src/main/app/mule-app.properties
 /mule-standalone-${productVersion}/examples/echo/src/main/app/mule-deploy.properties
 /mule-standalone-${productVersion}/examples/echo/src/test
 /mule-standalone-${productVersion}/examples/echo/src/test/java
