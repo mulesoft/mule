@@ -6,6 +6,7 @@
  */
 package org.mule.transport.vm;
 
+import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
@@ -13,6 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -20,6 +22,7 @@ import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.ContinuousPollingReceiverWorker;
 import org.mule.transport.PollingReceiverWorker;
 import org.mule.transport.TransactedPollingMessageReceiver;
@@ -100,17 +103,19 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     {
 
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
+        //TODO remove code to change message MuleContext once MULE-7357 gets fixed
+        MuleContext originaMuleContext = message.getMuleContext();
         try
         {
             Thread.currentThread().setContextClassLoader(endpoint.getMuleContext().getExecutionClassLoader());
-            final MuleMessage messageToRoute = new DefaultMuleMessage(message.getPayload() ,message, endpoint.getMuleContext());
+            ((DefaultMuleMessage)message).setMuleContext(originaMuleContext);
             ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
             MuleEvent resultEvent = executionTemplate.execute(new ExecutionCallback<MuleEvent>()
             {
                 @Override
                 public MuleEvent process() throws Exception
                 {
-                    MuleEvent event = routeMessage(messageToRoute);
+                    MuleEvent event = routeMessage(message);
                     MuleMessage returnedMessage = event == null ? null : event.getMessage();
                     if (returnedMessage != null)
                     {
@@ -119,8 +124,16 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
                     return event;
                 }
             });
-            return resultEvent != null ? new DefaultMuleMessage(resultEvent.getMessage().getPayload(), resultEvent.getMessage(), message.getMuleContext()) : null;
-
+            if (resultEvent != null)
+            {
+                DefaultMuleMessage resultMessage = (DefaultMuleMessage) resultEvent.getMessage();
+                resultMessage.setMuleContext(originaMuleContext);
+                return resultMessage;
+            }
+            else
+            {
+                return null;
+            }
         }
         catch (MessagingException e)
         {
@@ -139,6 +152,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         }
         finally
         {
+            ((DefaultMuleMessage) message).setMuleContext(originaMuleContext);
             message.release();
             Thread.currentThread().setContextClassLoader(originalClassLoader);
         }
@@ -159,7 +173,8 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
             }
             
             List<MuleMessage> messages = new ArrayList<MuleMessage>(1);
-            messages.add(new DefaultMuleMessage(message.getMessage().getPayload(), message.getMessage(), endpoint.getMuleContext()));
+            ((DefaultMuleMessage)message.getMessage()).setMuleContext(endpoint.getMuleContext());
+            messages.add(message.getMessage());
             return messages;
         }
         else
@@ -185,7 +200,8 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         if (message != null)
         {
             // keep first dequeued event
-            messages.add(new DefaultMuleMessage(message.getMessage().getPayload(), message.getMessage(), endpoint.getMuleContext()));
+            ((DefaultMuleMessage)message.getMessage()).setMuleContext(endpoint.getMuleContext());
+            messages.add(message.getMessage());
 
             // keep batching if more events are available
             for (int i = 0; i < batchSize && message != null; i++)
