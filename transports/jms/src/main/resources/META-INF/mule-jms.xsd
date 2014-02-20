@@ -754,7 +754,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="caching-connection-factory" type="connectionFactoryPoolType" substitutionGroup="mule:abstract-extension">
+    <xsd:element name="caching-connection-factory" type="connectionFactoryPoolType" substitutionGroup="mule:abstract-shared-extension">
         <xsd:annotation>
             <xsd:documentation>
                 Allows to configure a connection factory that caches JMS sessions and producers for a single non-XA JMS connection. You must reference a connection factory though the
