@@ -37,6 +37,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -193,13 +194,57 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 
     private void registerTransactionFactories(Map<String, String> singleTransactionFactories, MuleContext context) throws Exception
     {
-        for (String transactionFactoryClassName : singleTransactionFactories.keySet())
+        for (Entry<String, String> entry : singleTransactionFactories.entrySet())
         {
-            String transactionResourceClassName = singleTransactionFactories.get(transactionFactoryClassName);
-            context.getTransactionFactoryManager().registerTransactionFactory(Class.forName(transactionResourceClassName), (TransactionFactory) Class.forName(transactionFactoryClassName).newInstance());
+            String transactionResourceClassNameProperties = entry.getValue();
+            String transactionFactoryClassName = entry.getKey();
+            String name = null;
+            boolean optional = false;
+            // reset
+            int x = transactionResourceClassNameProperties.indexOf(",");
+            if (x > -1)
+            {
+                Properties p = PropertiesUtils.getPropertiesFromString(transactionResourceClassNameProperties.substring(x + 1), ',');
+                name = p.getProperty("name", null);
+                optional = p.containsKey("optional");
+            }
+            final String transactionResourceClassName = (x == -1 ? transactionResourceClassNameProperties : transactionResourceClassNameProperties.substring(0, x));
+            try
+            {
+                context.getTransactionFactoryManager().registerTransactionFactory(Class.forName(transactionResourceClassName), (TransactionFactory) Class.forName(transactionFactoryClassName).newInstance());
+
+            }
+            catch (NoClassDefFoundError ncdfe)
+            {
+                if (optional)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Ignoring optional transaction factory: " + transactionResourceClassName);
+                    }
+                }
+                else
+                {
+                    throw ncdfe;
+                }
+            }
+            catch (ClassNotFoundException cnfe)
+            {
+                if (optional)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Ignoring optional transaction factory: " + transactionResourceClassName);
+                    }
+                }
+                else
+                {
+                    throw cnfe;
+                }
+            }
+            
         }
     }
-
     private void registerTransformers(Properties props, MuleRegistry registry) throws Exception
     {
         String transString;
