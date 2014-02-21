@@ -14,8 +14,8 @@
 
     <http:connector name="httpConnector" />
 
-    <ws:consumer-config wsdlLocation="Echo.wsdl" service="EchoService" port="EchoPort"
-                        serviceAddress="http://localhost:${port}/services/Echo" connector-ref="httpConnector" name="globalConfig"/>
+    <ws:consumer-config wsdlLocation="Test.wsdl" service="TestService" port="TestPort"
+                        serviceAddress="http://localhost:${port}/services/Test" connector-ref="httpConnector" name="globalConfig"/>
 
     <flow name="client">
         <inbound-endpoint address="vm://in" exchange-pattern="request-response"/>
@@ -24,10 +24,10 @@
     </flow>
 
     <flow name="server">
-        <inbound-endpoint address="http://localhost:${port}/services/Echo" exchange-pattern="request-response">
-            <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.Echo"/>
+        <inbound-endpoint address="http://localhost:${port}/services/Test" exchange-pattern="request-response">
+            <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService"/>
         </inbound-endpoint>
-        <component class="org.mule.module.ws.consumer.Echo"/>
+        <component class="org.mule.module.ws.consumer.TestService"/>
     </flow>
 
 </mule>
