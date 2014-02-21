@@ -119,7 +119,7 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
                 ScheduledFuture schedule = i.next();
                 schedule.cancel(false);
                 // Wait until in-progress PollingRecevierWorker completes.
-                int shutdownTimeout = connector.getMuleContext().getConfiguration().getShutdownTimeout();
+                int shutdownTimeout = endpoint.getMuleContext().getConfiguration().getShutdownTimeout();
                 PollingReceiverWorker worker = schedules.get(schedule);
                 for (int elapsed = 0; worker.isRunning() && elapsed < shutdownTimeout; elapsed += 50)
                 {

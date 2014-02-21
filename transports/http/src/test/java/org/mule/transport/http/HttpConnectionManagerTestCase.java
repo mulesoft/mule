@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.endpoint.MuleEndpointURI;
@@ -63,7 +64,7 @@ public class HttpConnectionManagerTestCase extends AbstractMuleTestCase
         new HttpConnectionManager(null, mockWorkManager);
     }
 
-    @Test(expected = ConnectException.class)
+    @Test(expected = MuleRuntimeException.class)
     public void workSchedulingFails() throws Exception
     {
         when(mockHttpConnector.getServerSocket(any(URI.class))).thenThrow(IOException.class);

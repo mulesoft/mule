@@ -8,7 +8,6 @@ package org.mule.endpoint.inbound;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.endpoint.AbstractMessageProcessorTestCase;
 import org.mule.message.DefaultExceptionPayload;
 
@@ -24,8 +23,8 @@ public class InboundExceptionDetailsProcessorTestCase extends AbstractMessagePro
     public void testProcess() throws Exception
     {
         InboundEndpoint endpoint = createTestInboundEndpoint(null, null);
-        MessageProcessor mp = new InboundExceptionDetailsMessageProcessor(endpoint.getConnector());
-
+        InboundExceptionDetailsMessageProcessor mp = new InboundExceptionDetailsMessageProcessor(endpoint.getConnector());
+        mp.setMuleContext(muleContext);
         MuleEvent event = createTestInboundEvent(endpoint);
         event.getMessage().setExceptionPayload(new DefaultExceptionPayload(new RuntimeException()));
 
@@ -35,4 +34,5 @@ public class InboundExceptionDetailsProcessorTestCase extends AbstractMessagePro
         final int status = result.getMessage().getOutboundProperty("status", 0);
         assertEquals(500, status);
     }
+
 }

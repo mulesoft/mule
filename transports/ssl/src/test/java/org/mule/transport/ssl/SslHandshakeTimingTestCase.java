@@ -78,6 +78,7 @@ public class SslHandshakeTimingTestCase extends AbstractMuleContextTestCase
         when(endpoint.getProperties()).thenReturn(properties);
         when(endpoint.getConnector()).thenReturn(connector);
         when(endpoint.getEncoding()).thenReturn(new DefaultMuleConfiguration().getDefaultEncoding());
+        when(endpoint.getMuleContext()).thenReturn(muleContext);
 
         Service service = mock(Service.class);
         return new SslMessageReceiver(connector, service, endpoint);

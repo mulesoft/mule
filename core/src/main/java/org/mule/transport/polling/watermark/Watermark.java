@@ -12,7 +12,6 @@ import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.transport.polling.MessageProcessorPollingInterceptor;
 import org.mule.transport.polling.MessageProcessorPollingOverride;
 
 import java.io.NotSerializableException;
@@ -124,42 +123,50 @@ public abstract class Watermark extends MessageProcessorPollingOverride
         }
     }
 
+    public final void updateWith(MuleEvent event, Serializable newValue) throws ObjectStoreException
+    {
+        if (!this.validateNewWatermarkValue(newValue))
+        {
+            return;
+        }
+
+        String variableName = this.resolveVariable(event);
+
+        synchronized (objectStore)
+        {
+            if (objectStore.contains(variableName))
+            {
+                objectStore.remove(variableName);
+            }
+            if (newValue != null)
+            {
+                objectStore.store(variableName, newValue);
+            }
+        }
+    }
+
     /**
      * Updates the watermark in persistent storage based on the flow variable defined
      * in the event
-     * 
+     *
      * @param event The event containing the watermark as a flow variable
      */
     public final void updateFrom(MuleEvent event) throws ObjectStoreException
     {
         try
         {
-            String variableName = resolveVariable(event);
+            Object watermarkValue = this.getUpdatedValue(event);
 
-            Object watermarkValue = this.getUpdatedValue(event, variableName);
+            this.validateNewWatermarkValue(watermarkValue);
 
-            if (watermarkValue == null)
+            if (watermarkValue instanceof Serializable)
             {
-                logger.warn(CoreMessages.nullWatermark().getMessage());
-            }
-            else if (watermarkValue instanceof Serializable)
-            {
-                synchronized (objectStore)
-                {
-                    if (objectStore.contains(variableName))
-                    {
-                        objectStore.remove(variableName);
-                    }
-                    if (watermarkValue != null)
-                    {
-                        objectStore.store(variableName, (Serializable) watermarkValue);
-                    }
-                }
+                this.updateWith(event, (Serializable) watermarkValue);
             }
             else
             {
-                throw new IllegalArgumentException(CoreMessages.notSerializableWatermark(variableName)
-                    .getMessage());
+                throw new IllegalArgumentException(CoreMessages.notSerializableWatermark(this.resolveVariable(event))
+                                                           .getMessage());
             }
         }
         catch (Exception e)
@@ -172,15 +179,23 @@ public abstract class Watermark extends MessageProcessorPollingOverride
      * This method is executed once the flow containing the poll has been executed.
      * This method must return the watermark's new value
      * 
-     * @param event the {@link MuleEvent} that was returne by the owning flow
-     * @param variableName the name of the watermark variable
+     * @param event the {@link MuleEvent} that was returned by the owning flow
      * @return the new watermark value
      */
-    protected abstract Object getUpdatedValue(MuleEvent event, String variableName);
+    protected abstract Object getUpdatedValue(MuleEvent event);
 
-    @Override
-    public MessageProcessorPollingInterceptor interceptor()
+    private boolean validateNewWatermarkValue(Object value)
     {
-        return new WatermarkPollingInterceptor(this);
+        if (value == null)
+        {
+            if (logger.isInfoEnabled())
+            {
+                logger.info(CoreMessages.nullWatermark().getMessage());
+            }
+            return false;
+        }
+
+        return true;
     }
+
 }

@@ -101,7 +101,7 @@ public class VMConnector extends AbstractConnector
     {
         if (!endpoint.getExchangePattern().hasResponse())
         {
-            queueProfile.configureQueue(getMuleContext(), endpoint.getEndpointURI().getAddress(), queueManager);
+            queueProfile.configureQueue(endpoint.getMuleContext(), endpoint.getEndpointURI().getAddress(), queueManager);
         }
         return serviceDescriptor.createMessageReceiver(this, flowConstruct, endpoint);
     }

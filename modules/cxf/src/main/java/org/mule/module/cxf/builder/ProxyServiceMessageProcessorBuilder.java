@@ -6,6 +6,7 @@
  */
 package org.mule.module.cxf.builder;
 
+import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
 import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.support.CopyAttachmentInInterceptor;
 import org.mule.module.cxf.support.CopyAttachmentOutInterceptor;
@@ -42,7 +43,7 @@ import org.apache.cxf.interceptor.DocLiteralInInterceptor;
 public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageProcessorBuilder
 {
     private String payload;
-    
+
     @Override
     protected ServerFactoryBean createServerFactory() throws Exception
     {
@@ -51,9 +52,9 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
         sfb.getFeatures().add(new StaxDataBindingFeature());
         sfb.setServiceFactory(new ProxyServiceFactoryBean());
         sfb.setServiceClass(ProxyService.class);
-        
+
         addProxyInterceptors(sfb);
-        
+
         return sfb;
     }
 
@@ -66,17 +67,18 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
     @Override
     protected void configureServer(Server server)
     {
-        if (isProxyEnvelope()) 
+        if (isProxyEnvelope())
         {
             CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getOutInterceptors(), SoapOutInterceptor.class.getName());
         }
+        CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getInInterceptors(), MustUnderstandInterceptor.class.getName());
 
         replaceRPCInterceptors(server);
 
         if (isValidationEnabled())
         {
-            server.getEndpoint().getInInterceptors().add(new ProxySchemaValidationInInterceptor(getConfiguration().getCxfBus(), 
-               server.getEndpoint().getService().getServiceInfos().get(0)));
+            server.getEndpoint().getInInterceptors().add(new ProxySchemaValidationInInterceptor(getConfiguration().getCxfBus(),
+                    server.getEndpoint().getService().getServiceInfos().get(0)));
         }
     }
 
@@ -107,8 +109,8 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
         sfb.getOutInterceptors().add(new OutputPayloadInterceptor());
         sfb.getInInterceptors().add(new CopyAttachmentInInterceptor());
         sfb.getOutInterceptors().add(new CopyAttachmentOutInterceptor());
-        
-        if (isProxyEnvelope()) 
+
+        if (isProxyEnvelope())
         {
             sfb.getInInterceptors().add(new ReversibleStaxInInterceptor());
             sfb.getInInterceptors().add(new ResetStaxInterceptor());
@@ -137,5 +139,5 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
     {
         this.payload = payload;
     }
-    
+
 }

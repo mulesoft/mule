@@ -88,7 +88,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
         // set default value if empty/null
         if (StringUtils.isEmpty(backupFolder))
         {
-            this.backupFolder = connector.getMuleContext().getConfiguration().getWorkingDirectory()
+            this.backupFolder = getEndpoint().getMuleContext().getConfiguration().getWorkingDirectory()
                                 + "/mail/" + folder.getName();
         }
 
@@ -191,7 +191,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                             }
                             catch (Exception e)
                             {
-                                connector.getMuleContext().getExceptionListener().handleException(e);
+                                getEndpoint().getMuleContext().getExceptionListener().handleException(e);
                                 throw e;
                             }
                         }
@@ -368,7 +368,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                 catch (MessagingException e)
                 {
                     done = true;
-                    getConnector().getMuleContext().getExceptionListener().handleException(e);
+                    getEndpoint().getMuleContext().getExceptionListener().handleException(e);
                 }
                 finally
                 {

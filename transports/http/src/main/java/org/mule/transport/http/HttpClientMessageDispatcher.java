@@ -67,7 +67,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         else if (ts.size() == 0)
         {
             this.sendTransformer = new ObjectToHttpClientMethodRequest();
-            this.sendTransformer.setMuleContext(httpConnector.getMuleContext());
+            this.sendTransformer.setMuleContext(getEndpoint().getMuleContext());
             this.sendTransformer.setEndpoint(endpoint);
         }
         else
@@ -335,7 +335,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             throw new HttpResponseException(method.getStatusText(), method.getStatusCode());
         }
         OutboundEndpoint out = new EndpointURIEndpointBuilder(locationHeader.getValue(),
-            httpConnector.getMuleContext()).buildOutboundEndpoint();
+            getEndpoint().getMuleContext()).buildOutboundEndpoint();
         MuleEvent result = out.process(event);
         if (result != null && !VoidMuleEvent.getInstance().equals(result))
         {

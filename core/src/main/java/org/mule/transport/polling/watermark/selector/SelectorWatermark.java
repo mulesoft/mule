@@ -7,8 +7,14 @@
 
 package org.mule.transport.polling.watermark.selector;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.expression.InvalidExpressionException;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.store.ObjectStore;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.transport.polling.MessageProcessorPollingInterceptor;
 import org.mule.transport.polling.watermark.Watermark;
 
@@ -20,39 +26,51 @@ import java.io.Serializable;
  * 
  * @since 3.5.0
  */
-public class SelectorWatermark extends Watermark
+public class SelectorWatermark extends Watermark implements Initialisable, MuleContextAware
 {
 
-    private final WatermarkSelector selector;
+    private final WatermarkSelectorBroker selectorBroker;
     private final String selectorExpression;
+
+    private MuleContext muleContext;
 
     public SelectorWatermark(ObjectStore<Serializable> objectStore,
                              String variable,
                              String defaultExpression,
-                             WatermarkSelector selector,
+                             WatermarkSelectorBroker selectorBroker,
                              String selectorExpression)
     {
         super(objectStore, variable, defaultExpression);
-        this.selector = selector;
+        this.selectorBroker = selectorBroker;
         this.selectorExpression = selectorExpression;
     }
 
-    /**
-     * Returns the {@link #selector} value and resets it so that its reusable. Notice
-     * that the selector is reusable without risk of concurrency issues because
-     * watermark only works on synchronous flows
-     */
     @Override
-    protected Object getUpdatedValue(MuleEvent event, String variableName)
+    public void initialise() throws InitialisationException
     {
         try
         {
-            return this.selector.getSelectedValue();
+            this.muleContext.getExpressionManager().validateExpression(this.selectorExpression);
         }
-        finally
+        catch (InvalidExpressionException e)
         {
-            this.selector.reset();
+            throw new InitialisationException(
+                    MessageFactory.createStaticMessage(
+                            String.format("selector-expression requires a valid MEL expression. '%s' was found instead", this.selectorExpression))
+                    , e, this);
         }
+    }
+
+    /**
+     * Returns the {@link #selectorBroker} value and resets it so that its reusable. Notice
+     * that the selectorBroker is reusable without risk of concurrency issues because
+     * watermark only works on synchronous flows
+     */
+    @Override
+    protected Object getUpdatedValue(MuleEvent event)
+    {
+        // interceptor is responsible for returning the selected value
+        return null;
     }
 
     /**
@@ -62,7 +80,12 @@ public class SelectorWatermark extends Watermark
     @Override
     public MessageProcessorPollingInterceptor interceptor()
     {
-        return new SelectorWatermarkPollingInterceptor(this, this.selector, this.selectorExpression);
+        return new SelectorWatermarkPollingInterceptor(this, this.selectorBroker.newSelector(), this.selectorExpression);
     }
 
+    @Override
+    public void setMuleContext(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+    }
 }

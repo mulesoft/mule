@@ -207,6 +207,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
     private void configureMocks() throws CreateException
     {
         when(mockInboundEndpoint.getConnector()).thenReturn(mockFileConnector);
+        when(mockInboundEndpoint.getMuleContext()).thenReturn(mockMuleContext);
         when(mockInboundEndpoint.getFilter()).thenReturn(null);
         when(mockFileConnector.createMuleMessageFactory()).thenReturn(mockMessageFactory);
         mockMessageFactory = new FileMuleMessageFactory() {
@@ -240,7 +241,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
             }
         });
         when(mockInboundEndpoint.getMuleContext().getRegistry().get(MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER)).thenReturn(mockMessageManager);
-        when(mockFileConnector.getMuleContext().getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
+        when(mockInboundEndpoint.getMuleContext().getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
     }
 
     private void configureWorkingDirectory(String workingDirectory)

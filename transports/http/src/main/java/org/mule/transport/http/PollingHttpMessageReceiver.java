@@ -93,7 +93,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
     @Override
     public void poll() throws Exception
     {
-        MuleContext muleContext = connector.getMuleContext();
+        MuleContext muleContext = getEndpoint().getMuleContext();
 
         if (outboundEndpoint == null)
         {

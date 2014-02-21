@@ -62,7 +62,7 @@ public class LocalSocketTcpMessageDispatcher extends TcpMessageDispatcher
                     Object result = receiveFromSocket(socket, event.getTimeout(), endpoint);
                     if (result == null)
                     {
-                        return new DefaultMuleMessage(NullPayload.getInstance(), this.getConnector().getMuleContext());
+                        return new DefaultMuleMessage(NullPayload.getInstance(), this.getEndpoint().getMuleContext());
                     }
 
                     if (result instanceof MuleMessage)
@@ -70,7 +70,7 @@ public class LocalSocketTcpMessageDispatcher extends TcpMessageDispatcher
                         return (MuleMessage) result;
                     }
 
-                    return new DefaultMuleMessage(result, this.getConnector()
+                    return new DefaultMuleMessage(result, this.getEndpoint()
                             .getMuleContext());
                 }
                 catch (Exception ex)

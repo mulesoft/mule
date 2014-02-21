@@ -31,14 +31,14 @@ public class HttpSharePortTestCase extends DomainFunctionalTestCase
     @Override
     protected String getDomainConfig()
     {
-        return "domain/http-shared-connector.xml";
+        return "domain/http/http-shared-connector.xml";
     }
 
     @Override
     public ApplicationConfig[] getConfigResources()
     {
-        return new ApplicationConfig[] {new ApplicationConfig(HELLO_WORLD_SERVICE_APP, new String[] {"domain/http-hello-world-app.xml"}),
-                new ApplicationConfig(HELLO_MULE_SERVICE_APP, new String[] {"domain/http-hello-mule-app.xml"})
+        return new ApplicationConfig[] {new ApplicationConfig(HELLO_WORLD_SERVICE_APP, new String[] {"domain/http/http-hello-world-app.xml"}),
+                new ApplicationConfig(HELLO_MULE_SERVICE_APP, new String[] {"domain/http/http-hello-mule-app.xml"})
         };
     }
 

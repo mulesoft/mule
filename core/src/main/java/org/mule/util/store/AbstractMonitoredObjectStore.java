@@ -96,6 +96,11 @@ public abstract class AbstractMonitoredObjectStore<T extends Serializable>
         }
     }
 
+    protected MuleContext getMuleContext()
+    {
+        return this.context;
+    }
+
     public void setEntryTTL(int entryTTL)
     {
         this.entryTTL = entryTTL;

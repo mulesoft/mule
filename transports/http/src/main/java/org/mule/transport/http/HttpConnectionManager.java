@@ -6,9 +6,9 @@
  */
 package org.mule.transport.http;
 
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.transport.ConnectException;
 
 import java.net.ServerSocket;
 import java.util.HashMap;
@@ -47,7 +47,7 @@ class HttpConnectionManager
         this.workManager = workManager;
     }
 
-    synchronized void addConnection(final EndpointURI endpointURI) throws ConnectException
+    synchronized void addConnection(final EndpointURI endpointURI)
     {
         try
         {
@@ -67,7 +67,7 @@ class HttpConnectionManager
         }
         catch (Exception e)
         {
-            throw new ConnectException(e, connector);
+            throw new MuleRuntimeException(e);
         }
     }
 

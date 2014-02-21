@@ -17,19 +17,9 @@ public abstract class WatermarkSelector
 {
 
     /**
-     * A MEL expression to be evaluated on the received values
-     */
-    protected final String selectorExpression;
-
-    /**
      * The selected value
      */
     protected Object value;
-
-    public WatermarkSelector(String selectorExpression)
-    {
-        this.selectorExpression = selectorExpression;
-    }
 
     /**
      * Receives a value which is candidate to become the new watermark value. No
@@ -40,11 +30,11 @@ public abstract class WatermarkSelector
 
     /**
      * Returns the selected value. This contract does not guarantee idempotency.
-     * Continuous invokations to this method might return different values if
+     * Continuous invocations to this method might return different values if
      * {@link #acceptValue(Object)} is invoked in between. Thread-safeness is also
      * not guaranteed by this contract
      * 
-     * @return the selected valuee
+     * @return the selected value
      */
     public Object getSelectedValue()
     {

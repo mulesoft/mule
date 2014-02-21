@@ -367,6 +367,11 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         return MuleTestUtils.getTestEvent(data, service, mep, muleContext);
     }
 
+    public static MuleEvent getTestEvent(Object data, MuleContext muleContext) throws Exception
+    {
+        return MuleTestUtils.getTestEvent(data, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
+    }
+
     public static MuleEvent getTestEvent(Object data) throws Exception
     {
         return MuleTestUtils.getTestEvent(data, MessageExchangePattern.REQUEST_RESPONSE, muleContext);

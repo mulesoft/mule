@@ -17,11 +17,6 @@ package org.mule.transport.polling.watermark.selector;
 public class MaxValueWatermarkSelector extends ComparableWatermarkSelector
 {
 
-    public MaxValueWatermarkSelector(String selectorExpression)
-    {
-        super(selectorExpression);
-    }
-
     @Override
     protected int comparableQualifier()
     {

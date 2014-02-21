@@ -539,7 +539,7 @@ public class HttpConnector extends TcpConnector
         this.proxyNtlmAuthentication = proxyNtlmAuthentication;
     }
 
-    public void connect(EndpointURI endpointURI) throws ConnectException
+    public void connect(EndpointURI endpointURI)
     {
         connectionManager.addConnection(endpointURI);
     }

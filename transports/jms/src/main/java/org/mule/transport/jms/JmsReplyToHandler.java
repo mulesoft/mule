@@ -54,9 +54,9 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
     private transient JmsConnector jmsConnector;
     private transient ObjectToJMSMessage toJmsMessage;
 
-    public JmsReplyToHandler(JmsConnector connector)
+    public JmsReplyToHandler(JmsConnector connector, MuleContext muleContext)
     {
-        super(connector.getMuleContext());
+        super(muleContext);
         this.connector = this.jmsConnector = connector;
         toJmsMessage = new ObjectToJMSMessage();
     }
