@@ -42,7 +42,9 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
     public MVELExpressionExecutor(ParserConfiguration parserConfiguration)
     {
         this.parserConfiguration = parserConfiguration;
-        System.setProperty("mvel2.compiler.allow_override_all_prophandling", "true");
+
+        MVEL.COMPILER_OPT_NULL_SAFE_DEFAULT = true;
+
         // Use reflective optimizer rather than default to avoid concurrency issues with JIT complication.
         // See MULE-6630
         OptimizerFactory.setDefaultOptimizer(OptimizerFactory.SAFE_REFLECTIVE);

@@ -12,6 +12,7 @@ import static org.junit.Assert.fail;
 
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.mvel2.CompileException;
+import org.mule.mvel2.MVEL;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -58,6 +59,12 @@ public class MVELExpressionExecutorTestCase extends AbstractMuleTestCase
     public void invalidExpression()
     {
         mvel.validate("a9-#'");
+    }
+
+    @Test
+    public void nullSafeGetIsEnabled()
+    {
+        assertEquals(null, mvel.execute("['test1' : null].test1.test2", null));
     }
 
     @Test
