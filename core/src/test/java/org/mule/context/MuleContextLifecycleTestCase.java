@@ -6,6 +6,13 @@
  */
 package org.mule.context;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mule.tck.MuleAssert.assertTrue;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextBuilder;
@@ -20,6 +27,7 @@ import org.mule.api.security.SecurityManager;
 import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.lifecycle.MuleContextLifecycleManager;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.JdkVersionUtils;
 import org.mule.util.UUID;
 import org.mule.util.queue.QueueManager;
@@ -30,38 +38,42 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mule.tck.MuleAssert.assertTrue;
-
-public class MuleContextLifecycleTestCase 
+public class MuleContextLifecycleTestCase extends AbstractMuleTestCase
 {
+
     private MuleContextBuilder ctxBuilder;
     private SensingLifecycleManager lifecycleManager;
-    
+    private MuleContext ctx;
+
     @Before
     public void setup() throws Exception
     {
         ctxBuilder = new DefaultMuleContextBuilder();
         lifecycleManager = new SensingLifecycleManager();
         ctxBuilder.setLifecycleManager(lifecycleManager);
+        ctx = ctxBuilder.buildMuleContext();
     }
-    
+
+    @After
+    public void tearDown() throws Exception
+    {
+        if (ctx != null && !ctx.isDisposed())
+        {
+            ctx.dispose();
+        }
+    }
+
     //
     // Initialize
     //
     @Test
     public void initaliseSuccessful() throws Exception
     {
-        MuleContext ctx = ctxBuilder.buildMuleContext();
         assertFalse(ctx.isInitialised());
         assertFalse(ctx.isInitialising());
         assertFalse(ctx.isStarted());
@@ -76,20 +88,18 @@ public class MuleContextLifecycleTestCase
         assertFalse(ctx.isDisposing());
     }
 
-    @Test(expected=IllegalStateException.class)
+    @Test(expected = IllegalStateException.class)
     public void initialiseOnInitialised() throws MuleException
     {
-        MuleContext ctx = ctxBuilder.buildMuleContext();
         ctx.initialise();
 
         // Can't call twice
         ctx.initialise();
     }
-    
-    @Test(expected=IllegalStateException.class)
+
+    @Test(expected = IllegalStateException.class)
     public void initialiseOnStarted() throws Exception
     {
-        MuleContext ctx = ctxBuilder.buildMuleContext();
         ctx.initialise();
         new DefaultsConfigurationBuilder().configure(ctx);
         ctx.start();
@@ -98,23 +108,21 @@ public class MuleContextLifecycleTestCase
         ctx.initialise();
     }
 
-    @Test(expected=IllegalStateException.class)
+    @Test(expected = IllegalStateException.class)
     public void initialiseOnStopped() throws Exception
     {
-        MuleContext ctx = ctxBuilder.buildMuleContext();
         ctx.initialise();
         new DefaultsConfigurationBuilder().configure(ctx);
         ctx.start();
         ctx.stop();
-        
+
         // Attempt to initialise once stopped should fail!
         ctx.initialise();
     }
 
-    @Test(expected=IllegalStateException.class)
+    @Test(expected = IllegalStateException.class)
     public void initialiseOnDisposed() throws Exception
     {
-        MuleContext ctx = ctxBuilder.buildMuleContext();
         ctx.initialise();
         new DefaultsConfigurationBuilder().configure(ctx);
         ctx.start();
@@ -128,24 +136,22 @@ public class MuleContextLifecycleTestCase
     //
     // Start
     //    
-    @Test(expected=IllegalStateException.class)
+    @Test(expected = IllegalStateException.class)
     public void startBeforeInitialise() throws Exception
     {
-        MuleContext ctx = ctxBuilder.buildMuleContext();
         ctx.start();
     }
-    
+
     @Test
     public void startOnInitialised() throws Exception
     {
-        MuleContext ctx = ctxBuilder.buildMuleContext();
         ctx.initialise();
-        
+
         new DefaultsConfigurationBuilder().configure(ctx);
         NotificationListener listener = new NotificationListener();
         ctx.registerListener(listener);
         ctx.start();
-        
+
         assertTrue(ctx.isInitialised());
         assertFalse(ctx.isInitialising());
         assertTrue(ctx.isStarted());
@@ -156,12 +162,11 @@ public class MuleContextLifecycleTestCase
         assertTrue("CONTEXT_STARTED notification never fired", listener.startedNotificationFired);
     }
 
-    @Test(expected=IllegalStateException.class)
+    @Test(expected = IllegalStateException.class)
     public void startOnStarted() throws Exception
     {
-        MuleContext ctx = ctxBuilder.buildMuleContext();
         ctx.initialise();
-        
+
         new DefaultsConfigurationBuilder().configure(ctx);
         NotificationListener listener = new NotificationListener();
         ctx.registerListener(listener);
@@ -169,7 +174,7 @@ public class MuleContextLifecycleTestCase
 
         assertTrue("CONTEXT_STARTING notification never fired", listener.startingNotificationFired);
         assertTrue("CONTEXT_STARTED notification never fired", listener.startedNotificationFired);
-        
+
         // Can't call twice
         ctx.start();
     }
@@ -177,7 +182,6 @@ public class MuleContextLifecycleTestCase
     @Test
     public void startOnStopped() throws Exception
     {
-        MuleContext ctx = ctxBuilder.buildMuleContext();
         ctx.initialise();
         new DefaultsConfigurationBuilder().configure(ctx);
         ctx.start();
@@ -191,44 +195,40 @@ public class MuleContextLifecycleTestCase
         assertFalse(ctx.isDisposing());
     }
 
-    @Test(expected=IllegalStateException.class)
+    @Test(expected = IllegalStateException.class)
     public void startOnDisposed() throws Exception
     {
-        MuleContext ctx = ctxBuilder.buildMuleContext();
         ctx.initialise();
         ctx.dispose();
-        
+
         // Attempt to start once disposed should fail!
         ctx.start();
     }
-    
+
     //
     // Stop
     //
-    @Test(expected=IllegalStateException.class)
+    @Test(expected = IllegalStateException.class)
     public void stopBeforeInitialise() throws Exception
     {
-        MuleContext ctx = ctxBuilder.buildMuleContext();
-
         // Attempt to stop before initialise should fail!
         ctx.stop();
     }
- 
-    @Test(expected=IllegalStateException.class)
+
+    @Test(expected = IllegalStateException.class)
     public void stopOnInitialised() throws Exception
     {
-        MuleContext ctx = ctxBuilder.buildMuleContext();
         ctx.initialise();
-        
+
         // cannot stop if not started
         ctx.stop();
     }
-    
+
     @Test
     public void stopOnStarted() throws Exception
     {
-        MuleContext ctx = buildStartedMuleContext();
-        
+        buildStartedMuleContext();
+
         ctx.stop();
         assertTrue(ctx.isInitialised());
         assertFalse(ctx.isInitialising());
@@ -236,24 +236,24 @@ public class MuleContextLifecycleTestCase
         assertFalse(ctx.isDisposed());
         assertFalse(ctx.isDisposing());
     }
-    
-    @Test(expected=IllegalStateException.class)
+
+    @Test(expected = IllegalStateException.class)
     public void stopOnStopped() throws Exception
     {
-        MuleContext ctx = buildStartedMuleContext();
+        buildStartedMuleContext();
         ctx.stop();
-        
+
         // Can't call twice
         ctx.stop();
     }
-    
-    @Test(expected=IllegalStateException.class)
+
+    @Test(expected = IllegalStateException.class)
     public void stopOnDisposed() throws Exception
     {
-        MuleContext ctx = buildStartedMuleContext();
+        buildStartedMuleContext();
         ctx.stop();
         ctx.dispose();
-        
+
         // Attempt to stop once disposed should fail!
         ctx.stop();
     }
@@ -264,21 +264,19 @@ public class MuleContextLifecycleTestCase
     @Test
     public void disposeBeforeInitialised()
     {
-        MuleContext ctx = ctxBuilder.buildMuleContext();
         ctx.dispose();
         assertFalse(ctx.isInitialised());
         assertFalse(ctx.isInitialising());
         assertFalse(ctx.isStarted());
         assertTrue(ctx.isDisposed());
         assertFalse(ctx.isDisposing());
-        
+
         assertLifecycleManagerDidApplyPhases(Disposable.PHASE_NAME);
     }
-    
+
     @Test
     public void disposeOnInitialised() throws Exception
     {
-        MuleContext ctx = ctxBuilder.buildMuleContext();
         ctx.initialise();
         ctx.dispose();
         assertFalse(ctx.isInitialised());
@@ -286,14 +284,13 @@ public class MuleContextLifecycleTestCase
         assertFalse(ctx.isStarted());
         assertTrue(ctx.isDisposed());
         assertFalse(ctx.isDisposing());
-        
+
         assertLifecycleManagerDidApplyPhases(Initialisable.PHASE_NAME, Disposable.PHASE_NAME);
     }
-    
+
     @Test
     public void disposeOnStarted() throws Exception
     {
-        MuleContext ctx = ctxBuilder.buildMuleContext();
         ctx.initialise();
         new DefaultsConfigurationBuilder().configure(ctx);
         final NotificationListener listener = new NotificationListener();
@@ -313,11 +310,10 @@ public class MuleContextLifecycleTestCase
         assertTrue("CONTEXT_STOPPING notification never fired", listener.stoppingNotificationFired.get());
         assertTrue("CONTEXT_STOPPED notification never fired", listener.stoppedNotificationFired.get());
     }
-    
+
     @Test
     public void disposeOnStopped() throws Exception
     {
-        MuleContext  ctx = ctxBuilder.buildMuleContext();
         ctx.initialise();
         new DefaultsConfigurationBuilder().configure(ctx);
         ctx.start();
@@ -328,17 +324,16 @@ public class MuleContextLifecycleTestCase
         assertFalse(ctx.isStarted());
         assertTrue(ctx.isDisposed());
         assertFalse(ctx.isDisposing());
-        
+
         assertLifecycleManagerDidApplyAllPhases();
     }
-    
-    @Test(expected=IllegalStateException.class)
+
+    @Test(expected = IllegalStateException.class)
     public void disposeOnDisposed() throws Exception
     {
-        MuleContext ctx = ctxBuilder.buildMuleContext();
         ctx.initialise();
         ctx.dispose();
-        
+
         // can't call twice
         ctx.dispose();
     }
@@ -346,21 +341,20 @@ public class MuleContextLifecycleTestCase
     @Test
     public void notificationHasMuleContextRef() throws Exception
     {
-        MuleContext ctx = ctxBuilder.buildMuleContext();
         ctx.initialise();
         new DefaultsConfigurationBuilder().configure(ctx);
-        
+
         final AtomicReference<MuleContext> contextFromNotification = new AtomicReference<MuleContext>();
         final AtomicReference<String> resourceId = new AtomicReference<String>();
-        MuleContextNotificationListener<MuleContextNotification> listener = 
-            new MuleContextNotificationListener<MuleContextNotification>()
-        {
-            public void onNotification(MuleContextNotification notification)
-            {
-                contextFromNotification.set(notification.getMuleContext());
-                resourceId.set(notification.getResourceIdentifier());
-            }
-        };
+        MuleContextNotificationListener<MuleContextNotification> listener =
+                new MuleContextNotificationListener<MuleContextNotification>()
+                {
+                    public void onNotification(MuleContextNotification notification)
+                    {
+                        contextFromNotification.set(notification.getMuleContext());
+                        resourceId.set(notification.getResourceIdentifier());
+                    }
+                };
         ctx.registerListener(listener);
         ctx.start();
 
@@ -371,16 +365,15 @@ public class MuleContextLifecycleTestCase
 
     private MuleContext buildStartedMuleContext() throws Exception
     {
-        MuleContext ctx = ctxBuilder.buildMuleContext();
         ctx.initialise();
-    
+
         // DefaultMuleContext refuses to start without these objects in place
         SecurityManager securityManager = Mockito.mock(SecurityManager.class);
         ctx.getRegistry().registerObject(UUID.getUUID(), securityManager);
-        
+
         QueueManager queueManager = Mockito.mock(QueueManager.class);
         ctx.getRegistry().registerObject(UUID.getUUID(), queueManager);
-        
+
         ctx.start();
         return ctx;
     }
@@ -389,20 +382,21 @@ public class MuleContextLifecycleTestCase
     {
         assertTrue(lifecycleManager.didApplyPhases(phaseNames));
     }
-    
+
     private void assertLifecycleManagerDidApplyAllPhases()
     {
         assertLifecycleManagerDidApplyPhases(
-            Initialisable.PHASE_NAME,
-            Startable.PHASE_NAME,
-            Stoppable.PHASE_NAME,
-            Disposable.PHASE_NAME);
+                Initialisable.PHASE_NAME,
+                Startable.PHASE_NAME,
+                Stoppable.PHASE_NAME,
+                Disposable.PHASE_NAME);
     }
 
     private static class SensingLifecycleManager extends MuleContextLifecycleManager
     {
+
         private List<String> appliedLifecyclePhases;
-        
+
         public SensingLifecycleManager()
         {
             super();
@@ -422,9 +416,10 @@ public class MuleContextLifecycleTestCase
             super.fireLifecycle(phase);
         }
     }
-    
+
     static class NotificationListener implements MuleContextNotificationListener<MuleContextNotification>
     {
+
         final AtomicBoolean startingNotificationFired = new AtomicBoolean(false);
         final AtomicBoolean startedNotificationFired = new AtomicBoolean(false);
         final AtomicBoolean stoppingNotificationFired = new AtomicBoolean(false);
@@ -434,62 +429,62 @@ public class MuleContextLifecycleTestCase
         {
             switch (notification.getAction())
             {
-                case MuleContextNotification.CONTEXT_STARTING: 
-                    startingNotificationFired.set(true); 
+                case MuleContextNotification.CONTEXT_STARTING:
+                    startingNotificationFired.set(true);
                     break;
-                    
-                case MuleContextNotification.CONTEXT_STARTED: 
-                    startedNotificationFired.set(true); 
+
+                case MuleContextNotification.CONTEXT_STARTED:
+                    startedNotificationFired.set(true);
                     break;
-                    
-                case MuleContextNotification.CONTEXT_STOPPING: 
-                    stoppingNotificationFired.set(true); 
+
+                case MuleContextNotification.CONTEXT_STOPPING:
+                    stoppingNotificationFired.set(true);
                     break;
-                    
-                case MuleContextNotification.CONTEXT_STOPPED: 
-                    stoppedNotificationFired.set(true); 
+
+                case MuleContextNotification.CONTEXT_STOPPED:
+                    stoppedNotificationFired.set(true);
                     break;
             }
         }
     }
-    
-    @Test(expected=InitialisationException.class)
+
+    @Test(expected = InitialisationException.class)
     public void testIsInValidJdk() throws InitialisationException
     {
-    	try
-    	{
-    		JdkVersionUtils.validateJdk();
-    	}
-    	catch (RuntimeException e)
-    	{
-    		fail("Jdk version or vendor is invalid. Update the valid versions");
-    	}
-    	
-    	String javaVersion = System.setProperty("java.version", "1.5.0_12");
-    	try
-    	{
-	    	try
-	    	{
-	    		JdkVersionUtils.validateJdk();
-	    		fail("Test is invalid because the Jdk version or vendor is supposed to now be invalid");
-	    	}
-	    	catch (RuntimeException e)
-	    	{
-	    		// expected
-	    	}
-	    	
-	        MuleContext ctx = ctxBuilder.buildMuleContext();
-	        assertFalse(ctx.isInitialised());
-	        assertFalse(ctx.isInitialising());
-	        assertFalse(ctx.isStarted());
-	        assertFalse(ctx.isDisposed());
-	        assertFalse(ctx.isDisposing());
-	
-	        ctx.initialise();
-    	}
-    	finally
-    	{
-    		System.setProperty("java.version", javaVersion);
-    	}
+        try
+        {
+            JdkVersionUtils.validateJdk();
+        }
+        catch (RuntimeException e)
+        {
+            fail("Jdk version or vendor is invalid. Update the valid versions");
+        }
+
+        String javaVersion = System.setProperty("java.version", "1.5.0_12");
+        try
+        {
+            try
+            {
+                JdkVersionUtils.validateJdk();
+                fail("Test is invalid because the Jdk version or vendor is supposed to now be invalid");
+            }
+            catch (RuntimeException e)
+            {
+                // expected
+            }
+
+            MuleContext ctx = ctxBuilder.buildMuleContext();
+            assertFalse(ctx.isInitialised());
+            assertFalse(ctx.isInitialising());
+            assertFalse(ctx.isStarted());
+            assertFalse(ctx.isDisposed());
+            assertFalse(ctx.isDisposing());
+
+            ctx.initialise();
+        }
+        finally
+        {
+            System.setProperty("java.version", javaVersion);
+        }
     }
 }

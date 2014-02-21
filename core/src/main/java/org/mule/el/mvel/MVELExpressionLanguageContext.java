@@ -18,12 +18,10 @@ import org.mule.mvel2.ast.FunctionInstance;
 import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.VariableResolverFactory;
 import org.mule.mvel2.integration.impl.BaseVariableResolverFactory;
-import org.mule.mvel2.integration.impl.SimpleVariableResolverFactory;
 
 import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     implements ExpressionLanguageContext
@@ -31,26 +29,23 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
 
     private static final long serialVersionUID = 909413730991198290L;
     public static final String MULE_MESSAGE_INTERNAL_VARIABLE = "_muleMessage";
+    public static final String MULE_EVENT_INTERNAL_VARIABLE = "_muleEvent";
     public static final String MULE_CONTEXT_INTERNAL_VARIABLE = "_muleContext";
 
     protected ParserConfiguration parserConfiguration;
     protected MuleContext muleContext;
-    protected InternalVariableResolverFactory localFactory;
-    protected Map<String, Object> privateVariables = new HashMap<String, Object>();
+    protected List<VariableResolverFactory> children = new ArrayList<VariableResolverFactory>(8);
 
     public MVELExpressionLanguageContext(ParserConfiguration parserConfiguration, MuleContext muleContext)
     {
         this.parserConfiguration = parserConfiguration;
         this.muleContext = muleContext;
-        this.localFactory = new InternalVariableResolverFactory(Collections.<String, Object> emptyMap());
-        this.nextFactory = localFactory;
     }
 
     public MVELExpressionLanguageContext(MVELExpressionLanguageContext context)
     {
         this.parserConfiguration = context.parserConfiguration;
         this.muleContext = context.muleContext;
-        this.localFactory = context.localFactory;
         this.nextFactory = context.nextFactory;
         this.variableResolvers = context.variableResolvers;
     }
@@ -58,7 +53,21 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     @Override
     public boolean isTarget(String name)
     {
-        return variableResolvers.containsKey(name);
+        if (variableResolvers.containsKey(name))
+        {
+            return true;
+        }
+        else
+        {
+            for (VariableResolverFactory child : children)
+            {
+                if (child.isResolveable(name))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override
@@ -78,7 +87,17 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
         VariableResolver variableResolver = variableResolvers.get(name);
         if (variableResolver == null)
         {
-            variableResolver = nextFactory.getVariableResolver(name);
+            for (VariableResolverFactory child : children)
+            {
+                if (child.isResolveable(name))
+                {
+                    return child.getVariableResolver(name);
+                }
+            }
+            if (nextFactory != null)
+            {
+                return nextFactory.getVariableResolver(name);
+            }
         }
         return variableResolver;
     }
@@ -135,21 +154,14 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     @Override
     public <T> T getVariable(String name)
     {
-        if (privateVariables.containsKey(name))
+        VariableResolver resolver = getVariableResolver(name);
+        if (resolver != null)
         {
-            return (T) privateVariables.get(name);
+            return (T) resolver.getValue();
         }
         else
         {
-            VariableResolver resolver = getVariableResolver(name);
-            if (resolver != null)
-            {
-                return (T) resolver.getValue();
-            }
-            else
-            {
-                return null;
-            }
+            return null;
         }
     }
 
@@ -166,20 +178,13 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
      */
     protected void addResolver(String name, VariableResolver vr)
     {
-        if (this.getClass().equals(MVELExpressionLanguageContext.class))
-        {
-            localFactory.addResolver(name, vr);
-        }
-        else
-        {
-            variableResolvers.put(name, vr);
-        }
+        variableResolvers.put(name, vr);
     }
 
     @Override
     public void addAlias(String alias, String expression)
     {
-        addResolver(alias, new MuleAliasVariableResolver(alias, expression, getParentContext()));
+        addResolver(alias, new MuleAliasVariableResolver(alias, expression, this));
     }
 
     @Override
@@ -225,21 +230,18 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     @Override
     public void appendFactory(VariableResolverFactory resolverFactory)
     {
-        if (nextFactory instanceof InternalVariableResolverFactory)
+        if (nextFactory == null)
         {
             setNextFactory(resolverFactory);
-            resolverFactory.setNextFactory(localFactory);
         }
         else
         {
             VariableResolverFactory vrf = nextFactory;
-            while (vrf.getNextFactory() != null
-                   && !(vrf.getNextFactory() instanceof InternalVariableResolverFactory))
+            while (vrf.getNextFactory() != null)
             {
                 vrf = vrf.getNextFactory();
             }
             vrf.setNextFactory(resolverFactory);
-            resolverFactory.setNextFactory(localFactory);
         }
     }
 
@@ -257,29 +259,15 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
         }
     }
 
-    @SuppressWarnings("serial")
-    class InternalVariableResolverFactory extends SimpleVariableResolverFactory
-    {
-        public InternalVariableResolverFactory(Map<String, Object> variables)
-        {
-            super(variables);
-        }
-
-        public void addResolver(String name, VariableResolver resolver)
-        {
-            variableResolvers.put(name, resolver);
-        }
-    }
-
-    MVELExpressionLanguageContext getParentContext()
-    {
-        return this;
-    }
-
     @Override
     public <T> void addPrivateVariable(String name, T value)
     {
-        privateVariables.put(name, value);
+        addFinalVariable(name, value);
+    }
+
+    public void addChildContext(VariableResolverFactory child)
+    {
+        children.add(child);
     };
 
 }

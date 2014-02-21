@@ -59,7 +59,7 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
         }
         catch (WorkException e)
         {
-            getConnector().getMuleContext().getExceptionListener().handleException(e);
+            getEndpoint().getMuleContext().getExceptionListener().handleException(e);
         }
     }
 }

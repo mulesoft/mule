@@ -14,6 +14,7 @@ import static org.mule.module.launcher.domain.DomainFactory.DEFAULT_DOMAIN_NAME;
 import static org.mule.module.reboot.MuleContainerBootstrapUtils.MULE_DOMAIN_FOLDER;
 
 import org.mule.api.config.MuleProperties;
+import org.mule.module.launcher.DeploymentException;
 import org.mule.module.launcher.MuleSharedDomainClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -27,7 +28,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class MuleDomainClassLoaderFactoryTestCase extends AbstractMuleTestCase
+public class MuleDomainClassLoaderRepositoryTestCase extends AbstractMuleTestCase
 {
 
     @ClassRule
@@ -36,7 +37,7 @@ public class MuleDomainClassLoaderFactoryTestCase extends AbstractMuleTestCase
     public final SystemProperty muleHomeSystemProperty = new SystemProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, temporaryFolder.getRoot().getCanonicalPath());
     private final File muleHomeFolder;
 
-    public MuleDomainClassLoaderFactoryTestCase() throws IOException
+    public MuleDomainClassLoaderRepositoryTestCase() throws IOException
     {
         muleHomeFolder = temporaryFolder.getRoot();
     }
@@ -45,7 +46,7 @@ public class MuleDomainClassLoaderFactoryTestCase extends AbstractMuleTestCase
     public void createClassLoaderUsingEmptyDomain()
     {
         createOldDomainDefaultDir();
-        assertThat(new MuleDomainClassLoaderRepository().getDomainClassLoader(null).getArtifactName(), Is.is(DEFAULT_DOMAIN_NAME));
+        assertThat(new MuleDomainClassLoaderRepository().getDefaultDomainClassLoader().getArtifactName(), Is.is(DEFAULT_DOMAIN_NAME));
     }
 
     @Test
@@ -60,6 +61,12 @@ public class MuleDomainClassLoaderFactoryTestCase extends AbstractMuleTestCase
         String domainName = "custom-domain";
         assertThat(new File(muleHomeFolder, MULE_DOMAIN_FOLDER + File.separator + domainName).mkdirs(), is(true));
         assertThat(new MuleDomainClassLoaderRepository().getDomainClassLoader(domainName).getClassLoader(), instanceOf(MuleSharedDomainClassLoader.class));
+    }
+
+    @Test(expected = DeploymentException.class)
+    public void validateDomainBeforeCreatingClassLoader()
+    {
+        new MuleDomainClassLoaderRepository().getDomainClassLoader("someDomain");
     }
 
     private void createOldDomainDefaultDir()

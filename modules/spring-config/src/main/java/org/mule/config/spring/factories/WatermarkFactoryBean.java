@@ -65,7 +65,7 @@ public class WatermarkFactoryBean extends AbstractFactoryBean<Watermark>
                                                                                     : this.selectorExpression;
 
             return new SelectorWatermark(this.acquireObjectStore(), this.variable, this.defaultExpression,
-                this.selector.newSelector(selectorExpression), selectorExpression);
+                this.selector, selectorExpression);
         }
         else
         {

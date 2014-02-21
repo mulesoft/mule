@@ -85,7 +85,7 @@ public abstract class AbstractMessageRequester extends AbstractTransportMessageH
             EndpointMessageNotification beginNotification = null;
             if (connector.isEnableMessageEvents())
             {
-                MuleMessage dummyMessage = new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
+                MuleMessage dummyMessage = new DefaultMuleMessage(NullPayload.getInstance(), endpoint.getMuleContext());
                 beginNotification = new EndpointMessageNotification(dummyMessage, endpoint, null, EndpointMessageNotification.MESSAGE_REQUEST_BEGIN);
             }
             // Make sure we are connected

@@ -32,12 +32,12 @@ public class HttpSharePortSamePathTestCase extends AbstractMuleTestCase
     @Test
     public void samePathDefinedInTwoAppsWithinSameDomain() throws Exception
     {
-        MuleContext domainContext = new DomainContextBuilder().setDomainConfig("domain/http-shared-connector.xml").build();
-        MuleContext firstAppContext = new ApplicationContextBuilder().setApplicationResources(new String[] {"domain/http-hello-mule-app.xml"}).setDomainContext(domainContext).build();
+        MuleContext domainContext = new DomainContextBuilder().setDomainConfig("domain/http/http-shared-connector.xml").build();
+        MuleContext firstAppContext = new ApplicationContextBuilder().setApplicationResources(new String[] {"domain/http/http-hello-mule-app.xml"}).setDomainContext(domainContext).build();
         ApplicationContextBuilder secondApp = new ApplicationContextBuilder();
         try
         {
-            secondApp.setApplicationResources(new String[] {"domain/http-hello-mule-app.xml"}).setDomainContext(domainContext).build();
+            secondApp.setApplicationResources(new String[] {"domain/http/http-hello-mule-app.xml"}).setDomainContext(domainContext).build();
             fail("Second app context start should fail");
         }
         catch (Exception e)

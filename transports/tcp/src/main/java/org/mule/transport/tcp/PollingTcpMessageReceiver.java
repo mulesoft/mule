@@ -69,7 +69,7 @@ public class PollingTcpMessageReceiver extends AbstractPollingMessageReceiver
             Object result = TcpMessageDispatcher.receiveFromSocket(socket, timeout, endpoint);
             if (!(result == null))
             {
-                this.routeMessage(new DefaultMuleMessage(result, connector.getMuleContext()));
+                this.routeMessage(new DefaultMuleMessage(result, getEndpoint().getMuleContext()));
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Routing new message: " + result);

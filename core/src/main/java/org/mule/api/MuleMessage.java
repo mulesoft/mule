@@ -745,6 +745,12 @@ public interface MuleMessage extends Serializable
      */
     String getPayloadForLogging(String encoding);
 
+    /**
+     * @deprecated
+     * Avoid getting access to the MuleContext through the message.
+     * You can get access to the MuleContext by making your class implement {@link org.mule.api.context.MuleContextAware}
+     */
+    @Deprecated
     MuleContext getMuleContext();
 
     /**

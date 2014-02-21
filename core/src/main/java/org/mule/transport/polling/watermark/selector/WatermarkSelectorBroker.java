@@ -19,46 +19,44 @@ public enum WatermarkSelectorBroker
     {
 
         @Override
-        public WatermarkSelector newSelector(String selectorExpression)
+        public WatermarkSelector newSelector()
         {
-            return new MinValueWatermarkSelector(selectorExpression);
+            return new MinValueWatermarkSelector();
         }
     },
     MAX
     {
 
         @Override
-        public WatermarkSelector newSelector(String selectorExpression)
+        public WatermarkSelector newSelector()
         {
-            return new MaxValueWatermarkSelector(selectorExpression);
+            return new MaxValueWatermarkSelector();
         }
     },
     FIRST
     {
 
         @Override
-        public WatermarkSelector newSelector(String selectorExpression)
+        public WatermarkSelector newSelector()
         {
-            return new FirstItemWatermarkSelector(selectorExpression);
+            return new FirstItemWatermarkSelector();
         }
     },
     LAST
     {
 
         @Override
-        public WatermarkSelector newSelector(String selectorExpression)
+        public WatermarkSelector newSelector()
         {
-            return new LastItemWatermarkSelector(selectorExpression);
+            return new LastItemWatermarkSelector();
         }
     };
 
     /**
-     * Returns a new instance of {@link WatermarkSelector}. Each invokation returns a
+     * Returns a new instance of {@link WatermarkSelector}. Each invocation returns a
      * different instance
      * 
-     * @param selectorExpression the expression the selector is going to use to
-     *            evaluate
      * @return a {@link WatermarkSelector}
      */
-    public abstract WatermarkSelector newSelector(String selectorExpression);
+    public abstract WatermarkSelector newSelector();
 }

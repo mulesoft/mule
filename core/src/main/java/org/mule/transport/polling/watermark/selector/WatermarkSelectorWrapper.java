@@ -22,12 +22,13 @@ public class WatermarkSelectorWrapper extends WatermarkSelector
 
     private static final Logger logger = LoggerFactory.getLogger(WatermarkSelectorWrapper.class);
 
+    private final String selectorExpression;
     private final WatermarkSelector wrapped;
     private final MuleEvent muleEvent;
 
     protected WatermarkSelectorWrapper(WatermarkSelector wrapped, String selectorExpression, MuleEvent muleEvent)
     {
-        super(selectorExpression);
+        this.selectorExpression = selectorExpression;
         this.wrapped = wrapped;
         this.muleEvent = DefaultMuleEvent.copy(muleEvent);
     }

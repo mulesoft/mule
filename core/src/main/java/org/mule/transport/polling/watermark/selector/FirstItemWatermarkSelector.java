@@ -17,11 +17,6 @@ package org.mule.transport.polling.watermark.selector;
 public class FirstItemWatermarkSelector extends WatermarkSelector
 {
 
-    public FirstItemWatermarkSelector(String selectorExpression)
-    {
-        super(selectorExpression);
-    }
-
     @Override
     public void acceptValue(Object value)
     {

@@ -45,7 +45,7 @@ public class TransactedPollingMessageReceiverTestCase
         when(mockEndpoint.getConnector()).thenReturn(mockConnector);
         TransactedPollingMessageReceiver messageReceiver = new TestTransactedPollingMessageReceiver(mockConnector, mockFlowConstruct, mockEndpoint);
         messageReceiver.poll();
-        verify(mockConnector.getMuleContext(), timeout(1)).handleException(any(Exception.class));
+        verify(mockEndpoint.getMuleContext(), timeout(1)).handleException(any(Exception.class));
     }
 
     @Test
@@ -55,7 +55,7 @@ public class TransactedPollingMessageReceiverTestCase
         TransactedPollingMessageReceiver messageReceiver = new TestTransactedPollingMessageReceiver(mockConnector, mockFlowConstruct, mockEndpoint);
         messageReceiver.setReceiveMessagesInTransaction(true);
         messageReceiver.poll();
-        verify(mockConnector.getMuleContext(), timeout(1)).handleException(any(Exception.class));
+        verify(mockEndpoint.getMuleContext(), timeout(1)).handleException(any(Exception.class));
     }
 
     public static class TestTransactedPollingMessageReceiver extends TransactedPollingMessageReceiver

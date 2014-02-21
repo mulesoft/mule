@@ -78,6 +78,8 @@ public class FixedFrequencySchedulerTest extends AbstractMuleContextTestCase
                 return "The scheduler was never run";
             }
         });
+
+        scheduler.stop();
     }
 
     private FixedFrequencyScheduler createVoidScheduler()

@@ -75,7 +75,7 @@ public abstract class AbstractReceiverWorker implements Work
         }
         catch (Exception e)
         {
-            receiver.getConnector().getMuleContext().getExceptionListener().handleException(e);
+            endpoint.getMuleContext().getExceptionListener().handleException(e);
         }
     }
 
@@ -87,7 +87,7 @@ public abstract class AbstractReceiverWorker implements Work
     public void processMessages() throws Exception
     {
         //No need to do error handling. It will be done by inner TransactionTemplate per Message
-        ExecutionTemplate<List<MuleEvent>> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(receiver.getConnector().getMuleContext(), endpoint.getTransactionConfig());
+        ExecutionTemplate<List<MuleEvent>> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(receiver.getEndpoint().getMuleContext(), endpoint.getTransactionConfig());
 
         // Receive messages and process them in a single transaction
         // Do not enable threading here, but serveral workers

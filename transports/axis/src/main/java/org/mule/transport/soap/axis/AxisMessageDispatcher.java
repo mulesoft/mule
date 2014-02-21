@@ -128,7 +128,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         // the axis.one.way property is set
         call.setProperty("axis.one.way", Boolean.TRUE);
         call.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
-        call.setProperty(MuleProperties.MULE_CONTEXT_PROPERTY, connector.getMuleContext());
+        call.setProperty(MuleProperties.MULE_CONTEXT_PROPERTY, getEndpoint().getMuleContext());
         call.invoke(args);
     }
 
@@ -142,7 +142,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         result = call.invoke(args);
         if (result == null)
         {
-            return new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
+            return new DefaultMuleMessage(NullPayload.getInstance(), getEndpoint().getMuleContext());
         }
         else
         {
@@ -170,7 +170,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         // set Mule event here so that handlers can extract info
         call.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
         call.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, endpoint);
-        call.setProperty(MuleProperties.MULE_CONTEXT_PROPERTY, connector.getMuleContext());
+        call.setProperty(MuleProperties.MULE_CONTEXT_PROPERTY, getEndpoint().getMuleContext());
 
         setCustomProperties(event, call);
         call.setTimeout(new Integer(event.getTimeout()));

@@ -30,6 +30,7 @@ import org.mule.routing.EventGroup;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.io.Serializable;
 import java.util.Collections;
 
 import org.junit.Ignore;
@@ -43,7 +44,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class EventCorrelatorTestCase extends AbstractMuleTestCase
 {
-
 
     public static final String OBJECT_STOR_NAME_PREFIX = "prefix";
     public static final String TEST_GROUP_ID = "groupId";
@@ -111,12 +111,12 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     @Test
     public void disposeObjectStoresIfDisposable() throws Exception
     {
-        mockExpireGroupsObjectStore = mock(DisposableListableObjectStore.class,RETURNS_DEEP_STUBS);
+        mockExpireGroupsObjectStore = mock(DisposableListableObjectStore.class, RETURNS_DEEP_STUBS);
         mockProcessedGroups = mock(DisposableListableObjectStore.class, RETURNS_DEEP_STUBS);
         EventCorrelator eventCorrelator = createEventCorrelator();
         eventCorrelator.dispose();
-        verify((Disposable)mockExpireGroupsObjectStore,times(1)).dispose();
-        verify((Disposable)mockProcessedGroups,times(1)).dispose();
+        verify((Disposable) mockExpireGroupsObjectStore, times(1)).dispose();
+        verify((Disposable) mockProcessedGroups, times(1)).dispose();
     }
 
     @Test
@@ -146,7 +146,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
         when(mockMuleContext.isPrimaryPollingInstance()).thenReturn(primaryNode);
 
         EventCorrelator eventCorrelator = createEventCorrelator();
-        when(mockObjectStore.allKeys()).thenReturn(Collections.singletonList(TEST_GROUP_ID));
+        when(mockObjectStore.allKeys()).thenReturn(Collections.<Serializable>singletonList(TEST_GROUP_ID));
         when(mockEventCorrelatorCallback.createEventGroup(mockMuleEvent, TEST_GROUP_ID)).thenReturn(mockEventGroup);
 
         eventCorrelator.start();
@@ -158,6 +158,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
         finally
         {
             eventCorrelator.stop();
+            eventCorrelator.dispose();
         }
     }
 
@@ -175,5 +176,6 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
 
     public interface DisposableListableObjectStore extends ListableObjectStore, Disposable
     {
+
     }
 }

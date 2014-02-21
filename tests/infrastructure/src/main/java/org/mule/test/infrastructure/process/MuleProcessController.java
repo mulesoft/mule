@@ -4,13 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.infrastructure.process;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -29,6 +33,8 @@ public class MuleProcessController
     private static final String ADD_LIBRARY_ERROR = "Error copying jar file [%s] to lib directory [%s].";
     private static final String MULE_HOME_VARIABLE = "MULE_HOME";
     private static final String ANCHOR_SUFFIX = "-anchor.txt";
+    private static final String STATUS = "Mule Enterprise Edition is running \\(([0-9]+)\\)\\.";
+    private static final Pattern STATUS_PATTERN = Pattern.compile(STATUS);
     private static final IOFileFilter ANCHOR_FILTER = FileFilterUtils.suffixFileFilter(ANCHOR_SUFFIX);
     private static final int IS_RUNNING_STATUS_CODE = 0;
     public static final int TIMEOUT = 30000;
@@ -88,6 +94,34 @@ public class MuleProcessController
         return runSync("status", args);
     }
 
+    public int getProcessId()
+    {
+        Map<Object, Object> newEnv = this.copyEnvironmentVariables();
+        DefaultExecutor executor = new DefaultExecutor();
+        ExecuteWatchdog watchdog = new ExecuteWatchdog((long) TIMEOUT);
+        executor.setWatchdog(watchdog);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
+        executor.setStreamHandler(streamHandler);
+        if (this.doExecution(executor, new CommandLine(this.muleBin).addArgument("status"), newEnv) == 0)
+        {
+            Matcher matcher = STATUS_PATTERN.matcher(outputStream.toString());
+            if (matcher.find())
+            {
+                return Integer.parseInt(matcher.group(1));
+            }
+            else
+            {
+                throw new MuleControllerException("bin/mule status didn't return the expected pattern: "
+                                                  + STATUS);
+            }
+        }
+        else
+        {
+            throw new MuleControllerException("Mule ESB is not running");
+        }
+    }
+
     public void restart(String... args)
     {
         int error = runSync("restart", args);
@@ -104,7 +138,7 @@ public class MuleProcessController
     }
 
     private int executeSyncCommand(String command, String[] args, Map<Object, Object> newEnv, long timeout)
-            throws MuleControllerException
+        throws MuleControllerException
     {
         CommandLine commandLine = new CommandLine(muleBin);
         commandLine.addArgument(command);
