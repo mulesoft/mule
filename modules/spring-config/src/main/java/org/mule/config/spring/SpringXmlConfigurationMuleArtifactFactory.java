@@ -118,6 +118,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
             {
                 parentElement.addElement("logger", "http://www.mulesoft.org/schema/mule/core");
             }
+
             return document.asXML();
         }
         catch (Throwable t)

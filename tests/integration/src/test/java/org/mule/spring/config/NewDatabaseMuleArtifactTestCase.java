@@ -59,7 +59,7 @@ public class NewDatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifac
     }
 
     @Test(expected = MuleArtifactFactoryException.class)
-    public void testNewDatabaseGenericMySqlTemplateWithTemplateQueryRef() throws SAXException, IOException, MuleArtifactFactoryException
+    public void testNewDatabaseGenericMySqlTemplateWithMissingQueryRef() throws SAXException, IOException, MuleArtifactFactoryException
     {
         String config = "<db:select config-ref=\"mysql-config\" xmlns:db=\"http://www.mulesoft.org/schema/mule/db\"><db:template-query-ref name=\"template1\"/></db:select>";
         Document document = XMLUnit.buildControlDocument(config);
@@ -78,7 +78,7 @@ public class NewDatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifac
     }
 
     @Test
-    public void testNewDatabaseGenericMySqlTemplateWithMissingQueryRef() throws SAXException, IOException, MuleArtifactFactoryException
+    public void testNewDatabaseGenericMySqlTemplateWithTemplateQueryRef() throws SAXException, IOException, MuleArtifactFactoryException
     {
         String config = "<db:select config-ref=\"mysql-config\" xmlns:db=\"http://www.mulesoft.org/schema/mule/db\"><db:template-query-ref name=\"template1\"/></db:select>";
         Document document = XMLUnit.buildControlDocument(config);
