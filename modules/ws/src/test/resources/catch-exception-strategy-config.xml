@@ -11,13 +11,13 @@
                http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd">
 
     <flow name="server">
-        <inbound-endpoint address="http://localhost:${port}/services/Echo"/>
-        <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.Echo"/>
-        <component class="org.mule.module.ws.consumer.Echo"/>
+        <inbound-endpoint address="http://localhost:${port}/services/Test"/>
+        <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService"/>
+        <component class="org.mule.module.ws.consumer.TestService"/>
     </flow>
 
-    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="Echo.wsdl"
-                        service="EchoService" port="EchoPort" name="globalConfig" />
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Test" wsdlLocation="Test.wsdl"
+                        service="TestService" port="TestPort" name="globalConfig" />
 
     <flow name="soapFaultWithoutCatchExceptionStrategy" processingStrategy="synchronous">
 
