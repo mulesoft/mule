@@ -12,7 +12,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.module.ws.security.WSSecurity;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.util.ClassUtils;
 
 import org.junit.Test;
 
@@ -72,7 +71,7 @@ public class WSConsumerTestCase extends AbstractMuleContextTestCase
     {
         WSConsumerConfig wsConsumerConfig = new WSConsumerConfig();
 
-        wsConsumerConfig.setWsdlLocation("Echo.wsdl");
+        wsConsumerConfig.setWsdlLocation("Test.wsdl");
         wsConsumerConfig.setServiceAddress("http://localhost/echo");
         wsConsumerConfig.setService("EchoService");
         wsConsumerConfig.setPort("EchoPort");

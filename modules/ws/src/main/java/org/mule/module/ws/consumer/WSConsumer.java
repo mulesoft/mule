@@ -18,6 +18,7 @@ import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.PropertyScope;
+import org.mule.common.metadata.DefaultXmlMetaDataModel;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
@@ -26,8 +27,10 @@ import org.mule.module.ws.security.SecurityStrategy;
 import org.mule.module.ws.security.WSSecurity;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.util.IOUtils;
 
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,20 +39,24 @@ import java.util.Map;
 import javax.wsdl.Binding;
 import javax.wsdl.BindingOperation;
 import javax.wsdl.Definition;
+import javax.wsdl.Part;
 import javax.wsdl.Port;
 import javax.wsdl.Service;
 import javax.wsdl.WSDLException;
+import javax.wsdl.extensions.soap.SOAPBody;
 import javax.wsdl.extensions.soap.SOAPOperation;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
+import javax.xml.transform.TransformerException;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
-import org.mule.util.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class WSConsumer implements MessageProcessor, Initialisable, MuleContextAware
@@ -58,18 +65,20 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     public static final String SOAP_ACTION_PROPERTY = "SOAPAction";
     public static final String SOAP_HEADERS_PROPERTY_PREFIX = "soap.";
 
+    private static final Logger logger = LoggerFactory.getLogger(WSConsumer.class);
+
     private MuleContext muleContext;
     private String operation;
     private WSConsumerConfig config;
     private MessageProcessor messageProcessor;
     private String soapAction;
-
+    private String requestBody;
 
     @Override
     public void initialise() throws InitialisationException
     {
         initializeConfiguration();
-        initializeSoapActionFromWsdl();
+        parseWsdl();
 
         try
         {
@@ -134,6 +143,14 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
             {
                 try
                 {
+                    /* If the requestBody variable is set, it will be used as the payload to send instead
+                     * of the payload of the message. This will happen when an operation required no input parameters. */
+
+                    if (requestBody != null)
+                    {
+                        event.getMessage().setPayload(requestBody);
+                    }
+
                     MuleEvent result =  processNext(event);
                     return result;
                 }
@@ -231,61 +248,143 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     }
 
     /**
-     * Parses the WSDL file in order to get the SOAP Action (if defined) for the specified service, operation and port.
+     * Parses the WSDL file in order to validate the service, port and operation, to get the SOAP Action (if defined)
+     * and to check if the operation requires input parameters or not.
      */
-    private void initializeSoapActionFromWsdl() throws InitialisationException
+    private void parseWsdl() throws InitialisationException
     {
+        Definition wsdlDefinition = null;
+
+        URL url = IOUtils.getResourceAsUrl(config.getWsdlLocation(), getClass());
+        if (url == null)
+        {
+            throw new InitialisationException(MessageFactory.createStaticMessage("Can't find wsdl at %s", config.getWsdlLocation()), this);
+        }
+
         try
         {
             WSDLReader wsdlReader = WSDLFactory.newInstance().newWSDLReader();
-
-            URL url = IOUtils.getResourceAsUrl(config.getWsdlLocation(), getClass());
-            if (url == null)
-            {
-                throw new InitialisationException(MessageFactory.createStaticMessage("Can't find wsdl at %s", config.getWsdlLocation()), this);
-            }
-            Definition wsdlDefinition = wsdlReader.readWSDL(url.toString());
-
-            Service service = wsdlDefinition.getService(new QName(wsdlDefinition.getTargetNamespace(), config.getService()));
-            if (service == null)
-            {
-                throw new InitialisationException(MessageFactory.createStaticMessage("Service %s not found in WSDL", config.getService()), this);
-            }
-
-            Port port = service.getPort(config.getPort());
-            if (port == null)
-            {
-                throw new InitialisationException(MessageFactory.createStaticMessage("Port %s not found in WSDL", config.getPort()), this);
-            }
-
-            Binding binding = port.getBinding();
-            if (binding == null)
-            {
-                throw new InitialisationException(MessageFactory.createStaticMessage("Port %s has no binding", config.getPort()), this);
-            }
-
-            BindingOperation operation = binding.getBindingOperation(this.operation, null, null);
-            if (operation == null)
-            {
-                throw new InitialisationException(MessageFactory.createStaticMessage("Operation %s not found in WSDL", this.operation), this);
-            }
-
-            List extensions = operation.getExtensibilityElements();
-            for (Object extension : extensions)
-            {
-                if (extension instanceof SOAPOperation)
-                {
-                    this.soapAction = ((SOAPOperation) extension).getSoapActionURI();
-                    return;
-                }
-            }
+            wsdlDefinition = wsdlReader.readWSDL(url.toString());
         }
         catch (WSDLException e)
         {
             throw new InitialisationException(e, this);
         }
+
+        Service service = wsdlDefinition.getService(new QName(wsdlDefinition.getTargetNamespace(), config.getService()));
+        if (service == null)
+        {
+            throw new InitialisationException(MessageFactory.createStaticMessage("Service %s not found in WSDL", config.getService()), this);
+        }
+
+        Port port = service.getPort(config.getPort());
+        if (port == null)
+        {
+            throw new InitialisationException(MessageFactory.createStaticMessage("Port %s not found in WSDL", config.getPort()), this);
+        }
+
+        Binding binding = port.getBinding();
+        if (binding == null)
+        {
+            throw new InitialisationException(MessageFactory.createStaticMessage("Port %s has no binding", config.getPort()), this);
+        }
+
+        BindingOperation bindingOperation = binding.getBindingOperation(this.operation, null, null);
+        if (bindingOperation == null)
+        {
+            throw new InitialisationException(MessageFactory.createStaticMessage("Operation %s not found in WSDL", this.operation), this);
+        }
+
+        this.soapAction = getSoapAction(bindingOperation);
+        this.requestBody = generateRequestBody(wsdlDefinition, bindingOperation);
+
     }
 
+    /**
+     * Returns the SOAP action related to an operation, or null if not specified.
+     */
+    private String getSoapAction(BindingOperation bindingOperation)
+    {
+        List extensions = bindingOperation.getExtensibilityElements();
+        for (Object extension : extensions)
+        {
+            if (extension instanceof SOAPOperation)
+            {
+                return ((SOAPOperation) extension).getSoapActionURI();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Checks if the operation requires input parameters (if the XML required in the body is just one constant element).
+     * If so, the body with this XML will be returned in order to send it in every request instead of the payload.
+     */
+    private String generateRequestBody(Definition wsdlDefinition, BindingOperation bindingOperation)
+    {
+        List<String> schemas;
+
+        try
+        {
+            schemas = WSDLUtils.getSchemas(wsdlDefinition);
+        }
+        catch (TransformerException e)
+        {
+            logger.warn("Unable to get schemas from WSDL, cannot check if the operation requires input parameters", e);
+            return null;
+        }
+
+        SOAPBody soapBody = WSDLUtils.getSoapBody(bindingOperation);
+
+        if (soapBody == null)
+        {
+            logger.warn("No SOAP body defined in the WSDL for the specified operation, cannot check if the operation requires input parameters");
+            return null;
+        }
+
+        Part part = getPart(soapBody, bindingOperation.getOperation().getInput().getMessage());
+
+        DefaultXmlMetaDataModel model = new DefaultXmlMetaDataModel(schemas, part.getElementName(), Charset.defaultCharset());
+
+        if (model.getFields().isEmpty())
+        {
+            logger.info("The selected operation does not require input parameters, the payload will be ignored");
+            QName element = part.getElementName();
+            return String.format("<ns:%s xmlns:ns=\"%s\" />", element.getLocalPart(), element.getNamespaceURI());
+        }
+
+        return null;
+    }
+
+    /**
+     * Finds the part of the input message that must be used in the SOAP body.
+     */
+    private Part getPart(SOAPBody soapBody, javax.wsdl.Message inputMessage)
+    {
+        if (soapBody.getParts() == null || soapBody.getParts().isEmpty())
+        {
+            Map parts = inputMessage.getParts();
+
+            if (parts.isEmpty())
+            {
+                return null;
+            }
+            if (parts.size() > 1)
+            {
+                logger.warn("Input messages with multiple parts are not supported");
+            }
+            return (Part) parts.values().iterator().next();
+        }
+        else
+        {
+            if (soapBody.getParts().size() > 1)
+            {
+                logger.warn("Input messages with multiple parts in the SOAP body are not supported");
+            }
+            String partName = (String) soapBody.getParts().get(0);
+            return inputMessage.getPart(partName);
+        }
+    }
 
     @Override
     public void setMuleContext(MuleContext muleContext)

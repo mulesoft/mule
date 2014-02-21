@@ -25,7 +25,7 @@ public class DynamicAddressFunctionalTestCase extends AbstractWSConsumerFunction
     public void returnsExpectedResponseWhenValidPathIsProvided() throws Exception
     {
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("path", "services/Echo");
+        properties.put("path", "services/Test");
         assertValidResponse("vm://in", properties);
     }
 
