@@ -6,33 +6,21 @@
  */
 package org.mule.test.integration.message;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class JmsPropertyScopeTestCase extends AbstractPropertyScopeTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            { ConfigVariant.SERVICE, "org/mule/test/message/jms-property-scope.xml" } ,
-            { ConfigVariant.FLOW, "org/mule/test/message/jms-property-scope-flow.xml" }
-        });
-    }
 
-    public JmsPropertyScopeTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/message/jms-property-scope-flow.xml";
     }
 
     @Override

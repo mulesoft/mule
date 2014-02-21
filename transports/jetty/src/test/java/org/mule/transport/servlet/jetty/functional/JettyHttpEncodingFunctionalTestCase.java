@@ -8,37 +8,25 @@ package org.mule.transport.servlet.jetty.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.functional.HttpFunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class JettyHttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
 {
     protected static String TEST_MESSAGE = "Test Http Request (R�dgr�d), 57 = \u06f7\u06f5 in Arabic";
 
-    public JettyHttpEncodingFunctionalTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "jetty-http-encoding-test-service.xml"},
-            {ConfigVariant.FLOW, "jetty-http-encoding-test-flow.xml"}
-        });
+        return "jetty-http-encoding-test-flow.xml";
     }
 
     @Test

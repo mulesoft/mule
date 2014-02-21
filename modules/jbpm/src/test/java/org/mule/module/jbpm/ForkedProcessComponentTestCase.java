@@ -9,8 +9,8 @@ package org.mule.module.jbpm;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
+import org.mule.construct.Flow;
 import org.mule.module.bpm.BPMS;
 import org.mule.tck.junit4.FunctionalTestCase;
 
@@ -22,7 +22,7 @@ public class ForkedProcessComponentTestCase extends FunctionalTestCase
     @Override
     protected String getConfigFile()
     {
-        return "jbpm-component-functional-test-service.xml";
+        return "jbpm-component-config.xml";
     }
 
     @Test
@@ -47,7 +47,8 @@ public class ForkedProcessComponentTestCase extends FunctionalTestCase
         assertEquals("waitForResponseA", bpms.getState(process));
 
         // Start ServiceA
-        muleContext.getRegistry().lookupService("ServiceA").resume();
+        Flow flow = muleContext.getRegistry().lookupObject("ServiceA");
+        flow.start();
         Thread.sleep(2000);
                     
         // The process should have ended.

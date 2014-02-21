@@ -9,12 +9,14 @@ package org.mule.module.cxf.issues;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.util.IOUtils;
+import org.mule.util.SystemUtils;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -23,17 +25,12 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.IOUtils;
-import org.mule.util.SystemUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-public class ProxyServiceServingWsdlMule4092TestCase extends AbstractServiceAndFlowTestCase
+public class ProxyServiceServingWsdlMule4092TestCase extends FunctionalTestCase
 {
 
     private String expectedWsdlFileName;
@@ -41,17 +38,10 @@ public class ProxyServiceServingWsdlMule4092TestCase extends AbstractServiceAndF
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public ProxyServiceServingWsdlMule4092TestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "issues/proxy-service-serving-wsdl-mule4092-service.xml"},
-            {ConfigVariant.FLOW, "issues/proxy-service-serving-wsdl-mule4092-flow.xml"}});
+        return "issues/proxy-service-serving-wsdl-mule4092-flow.xml";
     }
 
     @Override

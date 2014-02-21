@@ -6,13 +6,10 @@
  */
 package org.mule.transport.http.issues;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.Rule;
-import org.junit.runners.Parameterized.Parameters;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.tcp.issues.AbstractStreamingDownloadMule1389TestCase;
+
+import org.junit.Rule;
 
 /**
  * This fails to work as described in the issue.  We need more info.
@@ -23,18 +20,9 @@ public class StreamingDownloadMule1389TestCase extends AbstractStreamingDownload
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public StreamingDownloadMule1389TestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "streaming-download-mule-1389-flow.xml";
     }
-    
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "streaming-download-mule-1389-service.xml"},
-            {ConfigVariant.FLOW, "streaming-download-mule-1389-flow.xml"}
-        });
-    }
-
 }

@@ -6,38 +6,25 @@
  */
 package org.mule.test.integration.messaging.meps;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-//START SNIPPET: full-class
-public class InOutOutOnlyTestCase extends AbstractServiceAndFlowTestCase
+public class InOutOutOnlyTestCase extends FunctionalTestCase
 {
     public static final long TIMEOUT = 3000;
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/messaging/meps/pattern_In-Out_Out-Only-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/messaging/meps/pattern_In-Out_Out-Only-flow.xml"}});
-    }
-
-    public InOutOutOnlyTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/messaging/meps/pattern_In-Out_Out-Only-flow.xml";
     }
 
     @Test

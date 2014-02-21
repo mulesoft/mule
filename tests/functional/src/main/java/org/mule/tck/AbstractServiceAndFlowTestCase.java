@@ -27,33 +27,6 @@ public abstract class AbstractServiceAndFlowTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-
-        switch (variant)
-        {
-            case FLOW:
-                doSetUpForFlow();
-                break;
-
-            case SERVICE:
-                doSetUpForService();
-                break;
-        }
-    }
-
-    protected void doSetUpForFlow()
-    {
-        // subclasses can override this method with setup that is specific for the flow test variant
-    }
-
-    protected void doSetUpForService()
-    {
-        // subclasses can override this method with setup that is specific for the service test variant
-    }
-
-    @Override
     protected String getConfigFile()
     {
         if (configResources.contains(","))
@@ -81,6 +54,6 @@ public abstract class AbstractServiceAndFlowTestCase extends FunctionalTestCase
 
     public static enum ConfigVariant
     {
-        FLOW, SERVICE, FLOW_EL
+        FLOW, FLOW_EL
     }
 }

@@ -8,51 +8,28 @@ package org.mule.test.spring;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.service.Service;
 import org.mule.construct.Flow;
-import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class InheritedPropertiesMule2458TestCase extends AbstractServiceAndFlowTestCase
+public class InheritedPropertiesMule2458TestCase extends FunctionalTestCase
 {
-    public InheritedPropertiesMule2458TestCase(ConfigVariant variant, String configResources)
+
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/spring/inherited-properties-mule-2458-test-flow.xml";
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/spring/inherited-properties-mule-2458-test-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/spring/inherited-properties-mule-2458-test-flow.xml"}
-        });
-    }      
-    
     @Test
     public void testProperties()
     {
-        ImmutableEndpoint endpoint;
         Object service = muleContext.getRegistry().lookupObject("service");
         assertNotNull(service);
-               
-        if (variant.equals(ConfigVariant.FLOW))
-        {
-            endpoint = (ImmutableEndpoint) ((Flow)service).getMessageSource();    
-        }
-        else
-        {
-            endpoint = ((ServiceCompositeMessageSource) ((Service) service).getMessageSource()).getEndpoints().get(0);
-        }       
-               
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) ((Flow)service).getMessageSource();
+
         assertNotNull(endpoint);
         assertProperty(endpoint, "global-only", "global");
         assertProperty(endpoint, "local-only", "local");

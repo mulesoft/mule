@@ -27,19 +27,16 @@ import org.mule.util.concurrent.Latch;
 
 public class JdbcTxNotSupportedTestCase extends AbstractJdbcFunctionalTestCase
 {
-    public JdbcTxNotSupportedTestCase(ConfigVariant variant, String configResources)
+
+    @Override
+    protected String[] getConfigFiles()
     {
-        super(variant, configResources);
+        return new String[] {
+                AbstractJdbcFunctionalTestCase.getConfig(),
+                "jdbc-tx-not-supported-config.xml"
+        };
     }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-                {ConfigVariant.FLOW, AbstractJdbcFunctionalTestCase.getConfig() + ",jdbc-tx-not-supported-config.xml"}
-        });
-    }
-    
     @Before
     public void setUp() throws Exception
     {

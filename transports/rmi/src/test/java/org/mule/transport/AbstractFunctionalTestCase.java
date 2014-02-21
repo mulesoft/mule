@@ -10,28 +10,21 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.Message;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.rmi.i18n.RmiMessages;
 
 import java.util.HashMap;
 
 import org.junit.Test;
 
-public abstract class AbstractFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
 {
     protected String prefix;
 
-    public AbstractFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
-    // from earlier multiple target test case
 
     @Test
     public void testCase() throws Exception

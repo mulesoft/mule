@@ -8,21 +8,17 @@ package org.mule.transport.tcp;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class TcpLengthFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public class TcpLengthFunctionalTestCase extends FunctionalTestCase
 {
+
     protected static String TEST_MESSAGE = "Test TCP Request";
     private int timeout = 60 * 1000 / 20;
 
@@ -35,19 +31,15 @@ public class TcpLengthFunctionalTestCase extends AbstractServiceAndFlowTestCase
     @ClassRule
     public static DynamicPort dynamicPort3 = new DynamicPort("port3");
 
-    public TcpLengthFunctionalTestCase(ConfigVariant variant, String configResources)
+    public TcpLengthFunctionalTestCase()
     {
-        super(variant, configResources);
         setDisposeContextPerClass(true);
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "tcp-length-functional-test-service.xml"},
-            {ConfigVariant.FLOW, "tcp-length-functional-test-flow.xml"}
-        });
+        return "tcp-length-functional-test-flow.xml";
     }
 
     @Test

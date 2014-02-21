@@ -6,21 +6,16 @@
  */
 package org.mule.transport.jms;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import org.mule.processor.AbstractRedeliveryPolicy;
+
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-import org.mule.processor.AbstractRedeliveryPolicy;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class JmsNoRedeliveryTestCase extends AbstractJmsRedeliveryTestCase
 {
-
-    public JmsNoRedeliveryTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Override
     protected int getMaxRedelivery()

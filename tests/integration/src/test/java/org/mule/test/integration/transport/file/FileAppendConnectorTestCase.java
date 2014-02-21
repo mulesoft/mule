@@ -9,43 +9,31 @@ package org.mule.test.integration.transport.file;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.context.notification.EndpointMessageNotification;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class FileAppendConnectorTestCase extends AbstractServiceAndFlowTestCase implements EndpointMessageNotificationListener<EndpointMessageNotification>
+public class FileAppendConnectorTestCase extends FunctionalTestCase implements EndpointMessageNotificationListener<EndpointMessageNotification>
 {
     protected static final String OUTPUT_DIR = "myout";
     protected static final String OUTPUT_FILE = "out.txt";
 
     protected CountDownLatch fileReceiveLatch = new CountDownLatch(2);
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/providers/file/mule-fileappend-connector-config-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/providers/file/mule-fileappend-connector-config-flow.xml"}
-        });
-    }
-
-    public FileAppendConnectorTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/providers/file/mule-fileappend-connector-config-flow.xml";
     }
 
     @Override

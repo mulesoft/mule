@@ -10,29 +10,25 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
 
 import org.apache.cxf.interceptor.Fault;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
-public class CxfErrorBehaviorTestCase extends AbstractServiceAndFlowTestCase
+public class CxfErrorBehaviorTestCase extends FunctionalTestCase
 {
     private static final String requestFaultPayload =
         "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
@@ -58,18 +54,11 @@ public class CxfErrorBehaviorTestCase extends AbstractServiceAndFlowTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public CxfErrorBehaviorTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.SERVICE, "cxf-error-behavior-service.xml"},
-                {ConfigVariant.FLOW, "cxf-error-behavior-flow.xml"}
-        });
+        return "cxf-error-behavior-flow.xml";
     }
 
     @Test

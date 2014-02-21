@@ -28,17 +28,11 @@ public class CachedHttpProxyTestCase extends HttpProxyTestCase
 {
     private static boolean invokedCache;
 
-    public CachedHttpProxyTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][] {{ConfigVariant.SERVICE,
-                "org/mule/test/integration/construct/cached-http-proxy-config.xml"}
-        });
+        return "org/mule/test/integration/construct/cached-http-proxy-config.xml";
     }
 
     @Before

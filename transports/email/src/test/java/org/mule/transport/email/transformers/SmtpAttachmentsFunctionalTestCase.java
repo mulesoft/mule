@@ -8,11 +8,9 @@ package org.mule.transport.email.transformers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.transport.email.functional.AbstractEmailFunctionalTestCase;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import javax.activation.MimeType;
@@ -20,26 +18,22 @@ import javax.mail.BodyPart;
 import javax.mail.internet.MimeMultipart;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class SmtpAttachmentsFunctionalTestCase extends AbstractEmailFunctionalTestCase
 {
 
-    public SmtpAttachmentsFunctionalTestCase(ConfigVariant variant, String configResources)
+    public SmtpAttachmentsFunctionalTestCase()
     {
-        super(variant, STRING_MESSAGE, "smtp", configResources);
+        super(STRING_MESSAGE, "smtp");
         setAddAttachments(true);
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "smtp-functional-test-all-attachments-service.xml"},
-            {ConfigVariant.FLOW, "smtp-functional-test-all-attachments-service.xml"}
-        });
-    }      
-    
+        return "smtp-functional-test-all-attachments-flow.xml";
+    }
+
     @Test
     public void testSend() throws Exception
     {

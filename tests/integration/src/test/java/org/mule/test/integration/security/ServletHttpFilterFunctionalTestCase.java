@@ -10,11 +10,6 @@ import org.mule.module.spring.security.HttpFilterFunctionalTestCase;
 import org.mule.transport.servlet.MuleReceiverServlet;
 import org.mule.transport.servlet.jetty.util.EmbeddedJettyServer;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.runners.Parameterized.Parameters;
-
 public class ServletHttpFilterFunctionalTestCase extends HttpFilterFunctionalTestCase
 {
 
@@ -22,18 +17,10 @@ public class ServletHttpFilterFunctionalTestCase extends HttpFilterFunctionalTes
 
     private EmbeddedJettyServer httpServer;
 
-    public ServletHttpFilterFunctionalTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/security/servlet-http-filter-test-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/security/servlet-http-filter-test-flow.xml"}});
+        return "org/mule/test/integration/security/servlet-http-filter-test-flow.xml";
     }
 
     @Override

@@ -11,9 +11,9 @@ import java.util.Properties;
 public class BeanPropertyExtractorTestCase extends AbstractXmlPropertyExtractorTestCase
 {
 
-    public BeanPropertyExtractorTestCase(ConfigVariant variant, String configResources)
+    public BeanPropertyExtractorTestCase()
     {
-        super(variant, configResources, true);
+        super(true);
     }
 
     @Override

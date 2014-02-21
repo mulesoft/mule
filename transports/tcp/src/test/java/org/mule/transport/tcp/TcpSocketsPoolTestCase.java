@@ -6,28 +6,24 @@
  */
 package org.mule.transport.tcp;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 import org.mule.ResponseOutputStream;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transport.DispatchException;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
-public class TcpSocketsPoolTestCase extends AbstractServiceAndFlowTestCase
+public class TcpSocketsPoolTestCase extends FunctionalTestCase
 {
 
     protected static String TEST_MESSAGE = "Test TCP Request";
@@ -36,18 +32,10 @@ public class TcpSocketsPoolTestCase extends AbstractServiceAndFlowTestCase
     public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
 
-    public TcpSocketsPoolTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.SERVICE, "tcp-sockets-pool-test-service.xml"},
-                {ConfigVariant.FLOW, "tcp-sockets-pool-test-flow.xml"}
-        });
+        return "tcp-sockets-pool-test-flow.xml";
     }
 
     @Test

@@ -8,7 +8,6 @@ package org.mule.test.integration.routing.outbound;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -29,8 +28,6 @@ public class ExpressionRecipientListAsyncTestCase extends AbstractServiceAndFlow
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/routing/outbound/expression-recipient-list-async-test-service.xml"},
             {ConfigVariant.FLOW,
                 "org/mule/test/integration/routing/outbound/expression-recipient-list-async-test-flow.xml"},
             {ConfigVariant.FLOW_EL,

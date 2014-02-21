@@ -16,10 +16,6 @@ import org.mule.transport.http.HttpConnector;
 
 public class HttpBadEncodingFunctionalTestCase extends HttpEncodingFunctionalTestCase
 {
-    public HttpBadEncodingFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Override
     public void testSend() throws Exception

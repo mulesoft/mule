@@ -14,6 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Callable;
 import org.mule.component.ComponentException;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 
@@ -26,7 +27,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-public class RestServiceWrapperFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase
 {
     protected static String TEST_REQUEST = "Test Http Request";
 
@@ -36,19 +37,15 @@ public class RestServiceWrapperFunctionalTestCase extends AbstractServiceAndFlow
     @Rule
     public DynamicPort port2 = new DynamicPort("port2");
 
-    public RestServiceWrapperFunctionalTestCase(ConfigVariant variant, String configResources)
+    public RestServiceWrapperFunctionalTestCase()
     {
-        super(variant, configResources);
         setDisposeContextPerClass(true);
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "http-rest-service-wrapper-functional-test-service.xml"},
-            {ConfigVariant.FLOW, "http-rest-service-wrapper-functional-test-flow.xml"}
-        });
+        return "http-rest-service-wrapper-functional-test-flow.xml";
     }
 
     @Test

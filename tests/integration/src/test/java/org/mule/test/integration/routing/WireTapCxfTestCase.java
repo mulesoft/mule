@@ -15,6 +15,7 @@ import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.concurrent.Latch;
 
@@ -26,24 +27,17 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-public class WireTapCxfTestCase extends AbstractServiceAndFlowTestCase
+public class WireTapCxfTestCase extends FunctionalTestCase
 {
     private static final Latch tapLatch = new Latch();
 
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/routing/wire-tap-cxf-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/routing/wire-tap-cxf-flow.xml"}});
-    }
-
-    public WireTapCxfTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/routing/wire-tap-cxf-flow.xml";
     }
 
     @Override

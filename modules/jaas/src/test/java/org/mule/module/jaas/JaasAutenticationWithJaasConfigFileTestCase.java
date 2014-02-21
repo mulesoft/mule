@@ -9,30 +9,21 @@ package org.mule.module.jaas;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.security.UnauthorisedException;
 import org.mule.util.ExceptionUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class JaasAutenticationWithJaasConfigFileTestCase extends AbstractJaasFunctionalTestCase
 {
-    public JaasAutenticationWithJaasConfigFileTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "mule-conf-for-jaas-conf-file-service.xml"},
-            {ConfigVariant.FLOW, "mule-conf-for-jaas-conf-file-flow.xml"}});
+        return "mule-conf-for-jaas-conf-file-flow.xml";
     }
 
     @Test

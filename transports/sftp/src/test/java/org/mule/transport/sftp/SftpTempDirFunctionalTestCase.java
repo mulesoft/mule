@@ -8,16 +8,12 @@ package org.mule.transport.sftp;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class SftpTempDirFunctionalTestCase extends AbstractSftpTestCase
 {
@@ -27,16 +23,10 @@ public class SftpTempDirFunctionalTestCase extends AbstractSftpTestCase
     private static final String OUTBOUND_ENDPOINT_NAME2 = "outboundEndpoint2";
     private static final String TEMP_DIR = "uploading";
 
-    public SftpTempDirFunctionalTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "mule-sftp-temp-dir-config-service.xml"},
-            {ConfigVariant.FLOW, "mule-sftp-temp-dir-config-flow.xml"}});
+        return "mule-sftp-temp-dir-config-flow.xml";
     }
 
     @Override

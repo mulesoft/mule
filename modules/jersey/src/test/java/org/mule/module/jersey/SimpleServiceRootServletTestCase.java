@@ -6,26 +6,20 @@
  */
 package org.mule.module.jersey;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class SimpleServiceRootServletTestCase extends AbstractServletTestCase
 {
 
-    public SimpleServiceRootServletTestCase(ConfigVariant variant, String configResources)
+    public SimpleServiceRootServletTestCase()
     {
-        super(variant, configResources, "/*");
+        super("/*");
     }
-    
-    @Parameters
-    public static Collection<Object[]> parameters()
+
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "simple-service-servlet-conf.xml"}
-        });
+        return "simple-service-servlet-conf.xml";
     }
 
     @Test

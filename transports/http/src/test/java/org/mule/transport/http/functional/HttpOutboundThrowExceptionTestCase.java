@@ -8,9 +8,11 @@ package org.mule.transport.http.functional;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.tck.AbstractServiceAndFlowTestCase.ConfigVariant;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpRequest;
@@ -36,18 +38,15 @@ public class HttpOutboundThrowExceptionTestCase extends AbstractMockHttpServerTe
 
     private Latch testLatch = new Latch();
 
-    public HttpOutboundThrowExceptionTestCase(ConfigVariant variant, String configResources)
+    public HttpOutboundThrowExceptionTestCase()
     {
-        super(variant, configResources);
         setDisposeContextPerClass(true);
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "http-outbound-throw-exception-config.xml"}
-        });
+        return "http-outbound-throw-exception-config.xml";
     }
 
     @Override

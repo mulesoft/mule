@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
       xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
@@ -9,32 +8,22 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/current/mule-jdbc.xsd">
 
-    <model>
-        <service name="NoException">
-            <inbound>
-                <jdbc:inbound-endpoint queryKey="getTest1" />
-            </inbound>
-            <test:component />
-        </service>
-        <service name="TransformerException">
-            <inbound>
-                <jdbc:inbound-endpoint queryKey="getTest2" />
-                <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer" />
-            </inbound>
-            <test:component />
-        </service>
-        <service name="RouterException">
-            <inbound>
-                <jdbc:inbound-endpoint queryKey="getTest3" />
-                <custom-inbound-router class="org.mule.tck.testmodels.mule.FailingRouter" />
-            </inbound>
-            <test:component />
-        </service>
-        <service name="ComponentException">
-            <inbound>
-                <jdbc:inbound-endpoint queryKey="getTest4" />
-            </inbound>
-            <test:component throwException="true" />
-        </service>
-    </model>
+    <flow name="NoException">
+        <jdbc:inbound-endpoint queryKey="getTest1"/>
+        <test:component/>
+    </flow>
+    <flow name="TransformerException">
+        <jdbc:inbound-endpoint queryKey="getTest2"/>
+        <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer"/>
+        <test:component/>
+    </flow>
+    <flow name="RouterException">
+        <jdbc:inbound-endpoint queryKey="getTest3"/>
+        <custom-processor class="org.mule.tck.testmodels.mule.FailingRouter"/>
+        <test:component/>
+    </flow>
+    <flow name="ComponentException">
+        <jdbc:inbound-endpoint queryKey="getTest4"/>
+        <test:component throwException="true"/>
+    </flow>
 </mule>

@@ -6,30 +6,24 @@
  */
 package org.mule.transport.email.functional;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Locale;
 
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.junit.Ignore;
+import org.junit.Test;
 
 public class SmtpNonAsciiFunctionalTestCase extends AbstractEmailFunctionalTestCase
 {
 
-    public SmtpNonAsciiFunctionalTestCase(ConfigVariant variant, String configResources)
+    public SmtpNonAsciiFunctionalTestCase()
     {
-        super(variant, STRING_MESSAGE, "smtp", configResources, Locale.JAPAN, "iso-2022-jp");
+        super(STRING_MESSAGE, "smtp", Locale.JAPAN, "iso-2022-jp");
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "smtp-functional-test-service.xml"},
-            {ConfigVariant.FLOW, "smtp-functional-test-flow.xml"}
-        });
-    }      
+        return "smtp-functional-test-flow.xml";
+    }
 
     @Ignore("MULE-6926: Flaky test.")
     @Test

@@ -14,9 +14,9 @@ public class JXPathExpressionTestCase extends AbstractXmlPropertyExtractorTestCa
 
     public static final String MESSAGE = "<endpoint>{0}</endpoint>";
 
-    public JXPathExpressionTestCase(ConfigVariant variant, String configResources)
+    public JXPathExpressionTestCase()
     {
-        super(variant, configResources, true);
+        super(true);
     }
 
     @Override

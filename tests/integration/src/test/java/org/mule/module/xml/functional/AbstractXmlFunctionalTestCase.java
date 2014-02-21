@@ -8,23 +8,17 @@ package org.mule.module.xml.functional;
 
 
 import static org.junit.Assert.assertNotNull;
-
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
 
-public abstract class AbstractXmlFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public abstract class AbstractXmlFunctionalTestCase extends FunctionalTestCase
 {
     public static final long TIMEOUT = 3000L;
     
-    public AbstractXmlFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-		super(variant, configResources);
-	}
-
     protected String getConfigAsString() throws IOException
     {
         return getResourceAsString(getConfigFile());

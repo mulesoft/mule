@@ -9,35 +9,22 @@ package org.mule.test.integration.exceptions;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.message.ExceptionMessage;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class ExceptionListenerTestCase extends AbstractServiceAndFlowTestCase
+public class ExceptionListenerTestCase extends FunctionalTestCase
 {
     private MuleClient client;
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/exception-listener-config-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/exception-listener-config-flow.xml"}
-        });
-    }
-
-    public ExceptionListenerTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/exceptions/exception-listener-config-flow.xml";
     }
 
     @Override

@@ -8,14 +8,11 @@ package org.mule.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.cxf.config.FlowConfiguringMessageProcessor;
 import org.mule.module.cxf.config.ProxyServiceFactoryBean;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.cxf.Bus;
@@ -23,24 +20,16 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.message.Message;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class ConfigurationTestCase extends AbstractServiceAndFlowTestCase
+public class ConfigurationTestCase extends FunctionalTestCase
 {
-    public ConfigurationTestCase(ConfigVariant variant, String configResources)
+
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "configuration-conf-flow.xml";
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "configuration-conf-service.xml"},
-            {ConfigVariant.FLOW, "configuration-conf-flow.xml"}
-        });
-    }      
-    
     @Test
     public void testBusConfiguration() throws Exception
     {

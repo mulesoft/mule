@@ -6,39 +6,26 @@
  */
 package org.mule.test.integration.endpoints;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.client.DefaultLocalMuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-public class DynamicEndpointWithAsyncResponseTestCase extends AbstractServiceAndFlowTestCase
+public class DynamicEndpointWithAsyncResponseTestCase extends FunctionalTestCase
 {
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
-            "org/mule/test/integration/endpoints/dynamic-endpoint-with-async-response-config.xml"}
-
-        });
-    }
-
-    public DynamicEndpointWithAsyncResponseTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/endpoints/dynamic-endpoint-with-async-response-config.xml";
     }
 
     @Test

@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.listener.FlowExecutionListener;
 import org.mule.tck.probe.PollingProber;
@@ -19,8 +19,6 @@ import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.util.concurrent.Latch;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -32,12 +30,11 @@ import org.cometd.MessageListener;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.mortbay.cometd.client.BayeuxClient;
 import org.mortbay.jetty.client.Address;
 import org.mortbay.jetty.client.HttpClient;
 
-public class AjaxFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public class AjaxFunctionalTestCase extends FunctionalTestCase
 {
     public static int SERVER_PORT = -1;
 
@@ -47,21 +44,17 @@ public class AjaxFunctionalTestCase extends AbstractServiceAndFlowTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public AjaxFunctionalTestCase(ConfigVariant variant, String configResources)
+    public AjaxFunctionalTestCase()
     {
         // start the embedded servers before starting mule to try and avoid
         // intermittent failures in testClientPublishWithString
-        super(variant, configResources);
         setStartContext(false);
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "ajax-embedded-functional-test-service.xml"},
-            {ConfigVariant.FLOW, "ajax-embedded-functional-test-flow.xml"}
-        });
+        return "ajax-embedded-functional-test-flow.xml";
     }
 
     @Override

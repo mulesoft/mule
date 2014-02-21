@@ -8,31 +8,19 @@ package org.mule.transport.quartz;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.CountdownCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-public class QuartzFunctionalTestCase extends AbstractServiceAndFlowTestCase
+import org.junit.Test;
+
+public class QuartzFunctionalTestCase extends FunctionalTestCase
 {
 
-    public QuartzFunctionalTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "quartz-functional-test-service.xml"},
-            {ConfigVariant.FLOW, "quartz-functional-test-flow.xml"}
-        });
+        return "quartz-functional-test-flow.xml";
     }
 
     @Test

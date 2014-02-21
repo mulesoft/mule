@@ -6,13 +6,9 @@
  */
 package org.mule.transport.sftp;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test sending and receiving a very large message.
@@ -30,18 +26,15 @@ public class SftpSendReceiveLargeFileFunctionalTestCase extends AbstractSftpTest
     // Size of the generated stream - 200 Mb
     final static int SEND_SIZE = 1024 * 1024 * 10;
 
-    public SftpSendReceiveLargeFileFunctionalTestCase(ConfigVariant variant, String configResources)
+    public SftpSendReceiveLargeFileFunctionalTestCase()
     {
-        super(variant, configResources);
         System.setProperty(TEST_TIMEOUT_SYSTEM_PROPERTY, "600000");
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {        
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "mule-send-receive-large-file-test-config-service.xml"},
-            {ConfigVariant.FLOW, "mule-send-receive-large-file-test-config-flow.xml"}});
+    @Override
+    protected String getConfigFile()
+    {
+        return "mule-send-receive-large-file-test-config-flow.xml";
     }
 
     public void before() throws Exception

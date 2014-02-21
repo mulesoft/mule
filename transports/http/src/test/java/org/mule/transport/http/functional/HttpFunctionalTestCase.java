@@ -8,13 +8,12 @@ package org.mule.transport.http.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
@@ -28,7 +27,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-public class HttpFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public class HttpFunctionalTestCase extends FunctionalTestCase
 {
     protected static String TEST_MESSAGE = "Test Http Request (R�dgr�d), 57 = \u06f7\u06f5 in Arabic";
     protected boolean checkPathProperties = true;
@@ -36,18 +35,10 @@ public class HttpFunctionalTestCase extends AbstractServiceAndFlowTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public HttpFunctionalTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-      //      {ConfigVariant.SERVICE, "http-functional-test-service.xml"},
-      //      {ConfigVariant.FLOW, "http-functional-test-flow.xml"}
-        });
+        return "http-functional-test-flow.xml";
     }
 
     @Test

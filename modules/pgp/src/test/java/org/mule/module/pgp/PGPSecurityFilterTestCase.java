@@ -6,44 +6,33 @@
  */
 package org.mule.module.pgp;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.IOUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-public class PGPSecurityFilterTestCase extends AbstractServiceAndFlowTestCase
+public class PGPSecurityFilterTestCase extends FunctionalTestCase
 {
     protected static final String TARGET = "/encrypted.txt";
-    protected static final String DIRECTORY = "output";
     protected static final String MESSAGE_EXCEPTION = "Crypto Failure";
 
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "test-pgp-encrypt-config-service.xml"},
-            {ConfigVariant.FLOW, "test-pgp-encrypt-config-flow.xml"}});
-    }
 
-    public PGPSecurityFilterTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "test-pgp-encrypt-config-flow.xml";
     }
 
     @Override

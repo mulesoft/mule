@@ -26,18 +26,11 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class JaasAuthenticationNoJaasConfigFileTestCase extends AbstractJaasFunctionalTestCase
 {
-    public JaasAuthenticationNoJaasConfigFileTestCase(ConfigVariant variant, String configResources)
+
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-    
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "mule-conf-with-no-jaas-config-file-service.xml"},
-            {ConfigVariant.FLOW, "mule-conf-with-no-jaas-config-file-flow.xml"}
-        });
+        return "mule-conf-with-no-jaas-config-file-flow.xml";
     }
 
     @Test

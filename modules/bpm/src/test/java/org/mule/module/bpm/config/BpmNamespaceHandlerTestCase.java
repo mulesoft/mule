@@ -9,51 +9,30 @@ package org.mule.module.bpm.config;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
 import org.mule.construct.Flow;
 import org.mule.module.bpm.BPMS;
 import org.mule.module.bpm.ProcessComponent;
 import org.mule.module.bpm.test.TestBpms;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Tests the Spring XML namespace for the BPM transport.
  */
-public class BpmNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
+public class BpmNamespaceHandlerTestCase extends FunctionalTestCase
 {
-    public BpmNamespaceHandlerTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "bpm-namespace-config-service.xml"},
-            {ConfigVariant.FLOW, "bpm-namespace-config-flow.xml"}});
+        return "bpm-namespace-config-flow.xml";
     }
 
     @Test
     public void testDefaultsComponent() throws Exception
     {
-        ProcessComponent c;
-        
-        if (variant.equals(ConfigVariant.FLOW))
-        {
-            c = (ProcessComponent) ((Flow) muleContext.getRegistry().lookupObject("Service1")).getMessageProcessors()
-                .get(0);
-        }
-        else
-        {
-            c = (ProcessComponent) muleContext.getRegistry().lookupService("Service1").getComponent();
-        }
-
+        ProcessComponent c = (ProcessComponent) ((Flow) muleContext.getRegistry().lookupObject("Service1")).getMessageProcessors().get(0);
         assertNotNull(c);
 
         assertEquals("test.def", c.getResource());
@@ -69,18 +48,7 @@ public class BpmNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testConfigComponent() throws Exception
     {
-        ProcessComponent c;
-
-        if (variant.equals(ConfigVariant.FLOW))
-        {
-            c = (ProcessComponent) ((Flow) muleContext.getRegistry().lookupObject("Service2")).getMessageProcessors()
-                .get(0);
-        }
-        else
-        {
-            c = (ProcessComponent) muleContext.getRegistry().lookupService("Service2").getComponent();
-        }
-        
+        ProcessComponent c = (ProcessComponent) ((Flow) muleContext.getRegistry().lookupObject("Service2")).getMessageProcessors().get(0);
         assertNotNull(c);
 
         assertEquals("test.def", c.getResource());

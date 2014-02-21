@@ -9,36 +9,27 @@ package org.mule.transport.quartz;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import org.mule.api.MuleEventContext;
+import org.mule.tck.functional.CountdownCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleEventContext;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.functional.CountdownCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
 
-public class QuartzEventGeneratorTestCase extends AbstractServiceAndFlowTestCase
+public class QuartzEventGeneratorTestCase extends FunctionalTestCase
 {
 
     private static final String PAYLOAD = "TRIGGER STRING";
 
     private final List<String> receivedPayloads = new ArrayList<String>();
 
-    public QuartzEventGeneratorTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "quartz-event-generator-service.xml"},
-            {ConfigVariant.FLOW, "quartz-event-generator-flow.xml"}});
+        return "quartz-event-generator-flow.xml";
     }
 
     @Test

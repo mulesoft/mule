@@ -10,33 +10,27 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.transport.NullPayload;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class JdbcNullParamsTestCase extends AbstractJdbcFunctionalTestCase
 {
-    public JdbcNullParamsTestCase(ConfigVariant variant, String configResources)
+    public JdbcNullParamsTestCase()
     {
-        super(variant, configResources);
         setPopulateTestData(false);
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "jdbc-null-params.xml"}
-        });
+        return "jdbc-null-params.xml";
     }
 
     @Test

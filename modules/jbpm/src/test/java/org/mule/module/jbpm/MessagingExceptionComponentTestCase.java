@@ -9,33 +9,22 @@ package org.mule.module.jbpm;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transformer.TransformerException;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.ExceptionUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class MessagingExceptionComponentTestCase extends AbstractServiceAndFlowTestCase
+public class MessagingExceptionComponentTestCase extends FunctionalTestCase
 {
-    public MessagingExceptionComponentTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "jbpm-component-functional-test-flow.xml"},
-            {ConfigVariant.FLOW, "jbpm-component-functional-test-service.xml"}});
+        return "jbpm-component-config.xml";
     }
 
     @Test

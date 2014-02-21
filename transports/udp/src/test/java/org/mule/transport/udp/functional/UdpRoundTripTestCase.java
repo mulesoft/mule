@@ -6,7 +6,8 @@
  */
 package org.mule.transport.udp.functional;
 
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import static org.junit.Assert.assertEquals;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.ByteArrayInputStream;
@@ -18,15 +19,11 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-
-public class UdpRoundTripTestCase extends AbstractServiceAndFlowTestCase
+public class UdpRoundTripTestCase extends FunctionalTestCase
 {
 
     @Rule
@@ -35,18 +32,10 @@ public class UdpRoundTripTestCase extends AbstractServiceAndFlowTestCase
     @Rule
     public DynamicPort inPort = new DynamicPort("inPort");
 
-    public UdpRoundTripTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "udp-roundtrip-test-config-service.xml"},
-            {ConfigVariant.FLOW, "udp-roundtrip-test-config-flow.xml"}
-        });
+        return "udp-roundtrip-test-config-flow.xml";
     }
 
     @Test

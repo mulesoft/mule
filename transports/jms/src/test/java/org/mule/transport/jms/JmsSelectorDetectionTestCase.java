@@ -6,38 +6,29 @@
  */
 package org.mule.transport.jms;
 
+import static org.junit.Assert.assertNotNull;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.source.MessageSource;
 import org.mule.construct.Flow;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.jms.filters.JmsSelectorFilter;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
-import static org.junit.Assert.assertNotNull;
-
-public class JmsSelectorDetectionTestCase extends AbstractServiceAndFlowTestCase
+public class JmsSelectorDetectionTestCase extends FunctionalTestCase
 {
 
-    public JmsSelectorDetectionTestCase(ConfigVariant variant, String configResources)
+    public JmsSelectorDetectionTestCase()
     {
-        super(variant, configResources);
         setStartContext(false);
     }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.SERVICE, "jms-selector-detection-service.xml"},
-                {ConfigVariant.FLOW, "jms-selector-detection-flow.xml"}
-        });
+        return "jms-selector-detection-flow.xml";
     }
 
     @Test

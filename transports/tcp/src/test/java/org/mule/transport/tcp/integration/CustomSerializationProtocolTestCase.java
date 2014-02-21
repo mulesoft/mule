@@ -8,42 +8,30 @@ package org.mule.transport.tcp.integration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * This test was set for the new changes due to Mule1199
  */
-public class CustomSerializationProtocolTestCase extends AbstractServiceAndFlowTestCase
+public class CustomSerializationProtocolTestCase extends FunctionalTestCase
 {
+
     final private int messages = 1;
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public CustomSerializationProtocolTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "custom-serialisation-mule-config-service.xml"},
-            {ConfigVariant.FLOW, "custom-serialisation-mule-config-flow.xml"}
-        });
+        return "custom-serialisation-mule-config-flow.xml";
     }
 
     @Test

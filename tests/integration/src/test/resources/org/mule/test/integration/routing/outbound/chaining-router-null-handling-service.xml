@@ -1,88 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-        xmlns:test="http://www.mulesoft.org/schema/mule/test"
-       xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <model name="ChainingRouterNullsModel">
-        <!--
-            Both first and last link elements succeed
-        -->
-        <service name="bridge1">
-            <inbound>
-                <inbound-endpoint address="vm://incomingPass" exchange-pattern="request-response"/>
-            </inbound>
+    <!--
+        Both first and last link elements succeed
+    -->
+    <flow name="bridge1">
+        <inbound-endpoint address="vm://incomingPass" exchange-pattern="request-response"/>
 
-            <outbound>
-                <chaining-router>
-                    <outbound-endpoint address="vm://component1" exchange-pattern="request-response"/>
-                    <outbound-endpoint address="vm://component2Pass" exchange-pattern="request-response"/>
-                </chaining-router>
-            </outbound>
-        </service>
+        <outbound-endpoint address="vm://component1" exchange-pattern="request-response"/>
+        <outbound-endpoint address="vm://component2Pass" exchange-pattern="request-response"/>
+    </flow>
 
-        <!--
-            First passes and tags the message, but the last one fails
-        -->
-        <service name="bridge2">
-            <inbound>
-                <inbound-endpoint address="vm://incomingLastFail" exchange-pattern="request-response"/>
-            </inbound>
+    <!--
+        First passes and tags the message, but the last one fails
+    -->
+    <flow name="bridge2">
+        <inbound-endpoint address="vm://incomingLastFail" exchange-pattern="request-response"/>
 
-            <outbound>
-                <chaining-router>
-                    <outbound-endpoint address="vm://component1" exchange-pattern="request-response"/>
-                    <outbound-endpoint address="vm://component2Fail" exchange-pattern="request-response"/>
-                </chaining-router>
-            </outbound>
-        </service>
+        <outbound-endpoint address="vm://component1" exchange-pattern="request-response"/>
+        <outbound-endpoint address="vm://component2Fail" exchange-pattern="request-response"/>
+    </flow>
 
-        <!--
-            First chain component fails, second never fires
-        -->
-        <service name="bridge3">
-            <inbound>
-                <inbound-endpoint address="vm://incomingFirstFail" exchange-pattern="request-response"/>
-            </inbound>
+    <!--
+        First chain component fails, second never fires
+    -->
+    <flow name="bridge3">
+        <inbound-endpoint address="vm://incomingFirstFail" exchange-pattern="request-response"/>
 
-            <outbound>
-                <chaining-router>
-                    <outbound-endpoint address="vm://component1Fail" exchange-pattern="request-response"/>
-                    <outbound-endpoint address="vm://component2Pass" exchange-pattern="one-way"/>
-                </chaining-router>
-            </outbound>
-        </service>
+        <outbound-endpoint address="vm://component1Fail" exchange-pattern="request-response"/>
+        <outbound-endpoint address="vm://component2Pass" exchange-pattern="one-way"/>
+    </flow>
 
-        <service name="component1">
-            <inbound>
-                <inbound-endpoint address="vm://component1" exchange-pattern="request-response"/>
-            </inbound>
-            <test:component appendString=" Received #[context:serviceName]"/>
-        </service>
+    <flow name="component1">
+        <inbound-endpoint address="vm://component1" exchange-pattern="request-response"/>
+        <test:component appendString=" Received #[context:serviceName]"/>
+    </flow>
 
-        <service name="component1Fail">
-            <inbound>
-                <inbound-endpoint address="vm://component1Fail" exchange-pattern="request-response"/>
-            </inbound>
-            <test:component throwException="true" exceptionToThrow="org.mule.test.integration.routing.outbound.Component1Exception" />
-        </service>
+    <flow name="component1Fail">
+        <inbound-endpoint address="vm://component1Fail" exchange-pattern="request-response"/>
+        <test:component throwException="true"
+                        exceptionToThrow="org.mule.test.integration.routing.outbound.Component1Exception"/>
+    </flow>
 
-        <service name="component2Pass">
-            <inbound>
-                <inbound-endpoint address="vm://component2Pass" exchange-pattern="request-response"/>
-            </inbound>
-            <test:component appendString=" Received #[context:serviceName]"/>
-        </service>
+    <flow name="component2Pass">
+        <inbound-endpoint address="vm://component2Pass" exchange-pattern="request-response"/>
+        <test:component appendString=" Received #[context:serviceName]"/>
+    </flow>
 
-        <service name="component2Fail">
-            <inbound>
-                <inbound-endpoint address="vm://component2Fail" exchange-pattern="request-response"/>
-            </inbound>
-            <test:component throwException="true" exceptionToThrow="org.mule.test.integration.routing.outbound.Component2Exception" />
-        </service>
-    </model>
+    <flow name="component2Fail">
+        <inbound-endpoint address="vm://component2Fail" exchange-pattern="request-response"/>
+        <test:component throwException="true"
+                        exceptionToThrow="org.mule.test.integration.routing.outbound.Component2Exception"/>
+    </flow>
 </mule>

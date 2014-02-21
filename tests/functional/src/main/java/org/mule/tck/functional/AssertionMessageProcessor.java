@@ -14,7 +14,8 @@ import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -34,7 +35,7 @@ public class AssertionMessageProcessor implements MessageProcessor, FlowConstruc
         this.expression = expression;
     }
 
-    private int timeout = AbstractMuleTestCase.RECEIVE_TIMEOUT;
+    private int timeout = AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
 
     private MuleEvent event;
     private CountDownLatch latch;

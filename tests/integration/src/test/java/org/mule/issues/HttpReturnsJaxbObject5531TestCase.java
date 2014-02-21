@@ -8,22 +8,17 @@ package org.mule.issues;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleEventContext;
 import org.mule.api.client.MuleClient;
 import org.mule.api.lifecycle.Callable;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.simple.ObjectToString;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class HttpReturnsJaxbObject5531TestCase extends AbstractServiceAndFlowTestCase
+public class HttpReturnsJaxbObject5531TestCase extends FunctionalTestCase
 {
     private static final String ZIP_RESPONSE = "<?xml version='1.0' encoding='utf-8'?><soap:Envelope xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/' "
                                                + "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:xsd='http://www.w3.org/2001/XMLSchema'>"
@@ -37,18 +32,10 @@ public class HttpReturnsJaxbObject5531TestCase extends AbstractServiceAndFlowTes
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
-            "org/mule/issues/http-returns-jaxb-object-mule-5531-test.xml"}
-
-        });
-    }
-
-    public HttpReturnsJaxbObject5531TestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/issues/http-returns-jaxb-object-mule-5531-test.xml";
     }
 
     @Test

@@ -47,16 +47,10 @@ public class HttpOutboundKeepAliveTestCase extends AbstractMockHttpServerTestCas
 
     private Prober prober = new PollingProber(2000, 100);
 
-    public HttpOutboundKeepAliveTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "http-outbound-keep-alive.xml"}});
+        return "http-outbound-keep-alive.xml";
     }
 
     @Override

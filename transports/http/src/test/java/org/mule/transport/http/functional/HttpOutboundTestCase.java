@@ -14,13 +14,10 @@ import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpRequest;
 import org.mule.util.concurrent.Latch;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
 {
@@ -32,19 +29,15 @@ public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
     private String httpMethod;
     private String body;
 
-    public HttpOutboundTestCase(ConfigVariant variant, String configResources)
+    public HttpOutboundTestCase()
     {
-        super(variant, configResources);
         setDisposeContextPerClass(true);
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "http-outbound-config-service.xml"},
-            {ConfigVariant.FLOW, "http-outbound-config-flow.xml"}
-        });
+        return "http-outbound-config-flow.xml";
     }
 
     @Override

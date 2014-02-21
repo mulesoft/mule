@@ -6,11 +6,10 @@
  */
 package org.mule.module.spring.security;
 
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.http.HttpConstants;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -18,25 +17,14 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-public class HttpFilterFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public class HttpFilterFunctionalTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "http-filter-test.xml"}
-        });
-    }
 
-    public HttpFilterFunctionalTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-
+        return "http-filter-test.xml";
     }
 
     protected String getUrl()

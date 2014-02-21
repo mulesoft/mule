@@ -9,37 +9,27 @@ package org.mule.transport.vm;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class VMQueueTestCase extends AbstractServiceAndFlowTestCase
+public class VMQueueTestCase extends FunctionalTestCase
 {
+
     public static final long WAIT = 3000L;
 
-    public VMQueueTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "vm/vm-queue-test-service.xml"},
-            {ConfigVariant.FLOW, "vm/vm-queue-test-flow.xml"}
-        });
+        return "vm/vm-queue-test-flow.xml";
     }
 
     @Test

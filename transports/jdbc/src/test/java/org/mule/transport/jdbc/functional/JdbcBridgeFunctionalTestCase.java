@@ -10,36 +10,30 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.sql.Connection;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class JdbcBridgeFunctionalTestCase extends AbstractJdbcFunctionalTestCase
 {
 
     private static final int TEST_ROWS = 10;
-    
-    public JdbcBridgeFunctionalTestCase(ConfigVariant variant, String configResources)
+
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-        setPopulateTestData(false);
+        return "jdbc-bridge-flow.xml";
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    public JdbcBridgeFunctionalTestCase()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "jdbc-bridge-service.xml"},
-            {ConfigVariant.FLOW, "jdbc-bridge-flow.xml"}
-        });
-    }          
-    
+        setPopulateTestData(false);
+
+    }
+
     @Override
     protected void createTable() throws Exception
     {

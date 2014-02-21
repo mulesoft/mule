@@ -7,40 +7,29 @@
 package org.mule.transport.quartz;
 
 import static org.junit.Assert.assertTrue;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.StatefulJob;
 
-public class QuartzCustomStatefulJobTestCase extends AbstractServiceAndFlowTestCase
+public class QuartzCustomStatefulJobTestCase extends FunctionalTestCase
 {
-    public QuartzCustomStatefulJobTestCase(ConfigVariant variant, String configResources)
+
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "quartz-custom-stateful-job-flow.xml";
     }
 
- 
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "quartz-custom-stateful-job-service.xml"},
-            {ConfigVariant.FLOW, "quartz-custom-stateful-job-flow.xml"}
-        });
-    }
-    
     @Test
     public void testCustomStatefulJob() throws Exception
     {
-        CountDownLatch eventLatch = (CountDownLatch) muleContext.getRegistry().lookupObject("latch");
+        CountDownLatch eventLatch = muleContext.getRegistry().lookupObject("latch");
 
         // we wait up to 60 seconds here which is WAY too long for one tick but it seems that 
         // "sometimes" it takes a very long time for Quartz go kick in. Once it starts 

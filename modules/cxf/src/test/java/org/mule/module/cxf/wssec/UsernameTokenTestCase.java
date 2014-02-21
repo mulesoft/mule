@@ -7,38 +7,29 @@
 package org.mule.module.cxf.wssec;
 
 import static org.junit.Assert.assertTrue;
-
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.concurrent.Latch;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class UsernameTokenTestCase extends AbstractServiceAndFlowTestCase
+public class UsernameTokenTestCase extends FunctionalTestCase
 {
     private Latch greetLatch;
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public UsernameTokenTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String[] getConfigFiles()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/module/cxf/wssec/cxf-secure-service-service.xml, org/mule/module/cxf/wssec/username-token-conf.xml"},
-            {ConfigVariant.FLOW, "org/mule/module/cxf/wssec/cxf-secure-service-flow.xml, org/mule/module/cxf/wssec/username-token-conf.xml"}
-        });
+        return new String[] {
+                "org/mule/module/cxf/wssec/cxf-secure-service-flow.xml",
+                "org/mule/module/cxf/wssec/username-token-conf.xml"
+        };
     }
 
     @Override

@@ -7,24 +7,20 @@
 package org.mule.test.integration.construct;
 
 import static org.junit.Assert.assertEquals;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.StringUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class HttpProxyTestCase extends AbstractServiceAndFlowTestCase
+public class HttpProxyTestCase extends FunctionalTestCase
 {
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
@@ -32,21 +28,13 @@ public class HttpProxyTestCase extends AbstractServiceAndFlowTestCase
     @Rule
     public DynamicPort port2 = new DynamicPort("port2");
 
-    public HttpProxyTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
-            "org/mule/test/integration/construct/http-proxy-config.xml"}
-
-        });
-    }
-
     private MuleClient muleClient;
+
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/test/integration/construct/http-proxy-config.xml";
+    }
 
     @Override
     protected void doSetUp() throws Exception

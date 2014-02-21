@@ -8,45 +8,30 @@ package org.mule.test.integration.transport.file;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.context.notification.EndpointMessageNotification;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.util.FileUtils;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import junit.framework.AssertionFailedError;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class OutputPatternFromEndpointTestCase extends AbstractServiceAndFlowTestCase
-implements EndpointMessageNotificationListener<EndpointMessageNotification>
+public class OutputPatternFromEndpointTestCase extends FunctionalTestCase implements EndpointMessageNotificationListener<EndpointMessageNotification>
 {
     protected CountDownLatch fileReceiveLatch;
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-            "org/mule/test/integration/providers/file/mule-file-output-pattern-from-endpoint-service.xml"},
-            {ConfigVariant.FLOW,
-            "org/mule/test/integration/providers/file/mule-file-output-pattern-from-endpoint-flow.xml"}});
-    }
-
-    public OutputPatternFromEndpointTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/providers/file/mule-file-output-pattern-from-endpoint-flow.xml";
     }
 
     @Override

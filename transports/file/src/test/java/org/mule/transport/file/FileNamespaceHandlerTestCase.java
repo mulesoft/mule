@@ -10,38 +10,26 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.routing.filter.Filter;
-import org.mule.api.service.Service;
 import org.mule.construct.Flow;
-import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.file.filters.FilenameRegexFilter;
 import org.mule.transport.file.transformers.FileToByteArray;
 import org.mule.transport.file.transformers.FileToString;
 import org.mule.util.FileUtils;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class FileNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
+public class FileNamespaceHandlerTestCase extends FunctionalTestCase
 {
-    public FileNamespaceHandlerTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "file-namespace-config-service.xml"},
-            {ConfigVariant.FLOW, "file-namespace-config-flow.xml"}});
+        return "file-namespace-config-flow.xml";
     }
 
     @Override
@@ -123,18 +111,7 @@ public class FileNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
         Object service = muleContext.getRegistry().lookupObject("Test");
         assertNotNull(service);
 
-        InboundEndpoint endpoint;
-
-        if (variant.equals(ConfigVariant.FLOW))
-        {
-            endpoint = (InboundEndpoint) ((Flow) service).getMessageSource();            
-        }
-        else
-        {
-            List endpoints = ((ServiceCompositeMessageSource) ((Service) service).getMessageSource()).getEndpoints();
-            assertEquals(1, endpoints.size());
-            endpoint = (InboundEndpoint) endpoints.get(0);
-        }
+        InboundEndpoint endpoint = (InboundEndpoint) ((Flow) service).getMessageSource();
 
         Filter filter = endpoint.getFilter();
         assertNotNull(filter);

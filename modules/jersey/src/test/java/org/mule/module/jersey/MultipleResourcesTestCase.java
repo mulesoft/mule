@@ -7,39 +7,28 @@
 package org.mule.module.jersey;
 
 import static org.junit.Assert.assertEquals;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Tests that the jersey:resources component can handle multiple components
  * correctly.
  */
-public class MultipleResourcesTestCase extends AbstractServiceAndFlowTestCase
+public class MultipleResourcesTestCase extends FunctionalTestCase
 {
-    public MultipleResourcesTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "multiple-resources-conf-service.xml"},
-            {ConfigVariant.FLOW, "multiple-resources-conf-flow.xml"}
-        });
+        return "multiple-resources-conf-flow.xml";
     }
 
     @Test

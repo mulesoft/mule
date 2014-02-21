@@ -15,9 +15,9 @@ import org.dom4j.Element;
 public class Dom4jPropertyExtractorMultipleEndpointsTestCase extends AbstractXmlPropertyExtractorTestCase
 {
 
-    public Dom4jPropertyExtractorMultipleEndpointsTestCase(ConfigVariant variant, String configResources)
+    public Dom4jPropertyExtractorMultipleEndpointsTestCase()
     {
-        super(variant, configResources, false);
+        super(false);
     }
 
     @Override

@@ -27,10 +27,6 @@ import org.junit.Test;
 
 public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestCase
 {
-    public FileRequestorMoveDeleteTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Test
     public void testMoveAndDeleteStreaming() throws Exception
