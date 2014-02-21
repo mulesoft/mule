@@ -34,12 +34,17 @@ import org.dom4j.Element;
 import org.dom4j.Namespace;
 import org.dom4j.QName;
 import org.dom4j.io.DOMReader;
+import org.w3c.dom.Node;
 
 public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurationMuleArtifactFactory
 {
 
     public static final String BEANS_ELEMENT = "beans";
     public static final String IGNORE_UNRESOLVABLE_ATTR = "ignore-unresolvable";
+    public static final String REF_SUFFIX = "-ref";
+    public static final String REF_ATTRIBUTE_NAME = "ref";
+    public static final String NAME_ATTRIBUTE_NAME = "name";
+
     private Map<MuleArtifact, SpringXmlConfigurationBuilder> builders = new HashMap<MuleArtifact, SpringXmlConfigurationBuilder>();
     private Map<MuleArtifact, MuleContext> contexts = new HashMap<MuleArtifact, MuleContext>();
 
@@ -105,38 +110,8 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         try
         {
             parentElement.add(convert(element));
-            for (int i = 0; i < element.getAttributes().getLength(); i++)
-            {
-                String attributeName = element.getAttributes().item(i).getLocalName();
-                if (attributeName != null && attributeName.endsWith("-ref"))
-                {
-                    org.w3c.dom.Element dependentElement = callback.getGlobalElement(element.getAttributes()
-                                                                                             .item(i)
-                                                                                             .getNodeValue());
-                    if (dependentElement != null)
-                    {
-                        // if the element is a spring bean, wrap the element in a top-level spring beans element
-                        if ("http://www.springframework.org/schema/beans".equals(dependentElement.getNamespaceURI()))
-                        {
-                            String namespaceUri = dependentElement.getNamespaceURI();
-                            Namespace namespace = new Namespace(dependentElement.getPrefix(), namespaceUri);
-                            Element beans = rootElement.element(new QName(BEANS_ELEMENT, namespace));
-                            if (beans == null)
-                            {
-                                beans = rootElement.addElement(BEANS_ELEMENT, namespaceUri);
-                            }
-                            beans.add(convert(dependentElement));
-                        }
-                        else
-                        {
-                            rootElement.add(convert(dependentElement));
-                            addSchemaLocation(rootElement, dependentElement, callback);
-                        }
-                        // TODO: If required in the future addChileSchemaLocations here
-                    }
-                    // if missing a dependent element, try anyway because it might not be needed.
-                }
-            }
+
+            processGlobalReferences(element, callback, rootElement);
 
             // For message sources to work, the flow should be valid, this means needs to have a MP
             if (embedInFlow)
@@ -151,6 +126,78 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
             throw new MuleArtifactFactoryException("Error generating minimal XML configuration.", t);
         }
 
+    }
+
+    private void processGlobalReferences(org.w3c.dom.Element element, XmlConfigurationCallback callback, Element rootElement) throws ParserConfigurationException
+    {
+        processGlobalReferencesInAttributes(element, callback, rootElement);
+
+        processGlobalReferencesInChildElements(element, callback, rootElement);
+    }
+
+    private void processGlobalReferencesInChildElements(org.w3c.dom.Element element, XmlConfigurationCallback callback, Element rootElement) throws ParserConfigurationException
+    {
+        if (element != null && element.getChildNodes() != null)
+        {
+            // Look for references in first level of child nodes
+            for (int i = 0; i < element.getChildNodes().getLength(); i++)
+            {
+                processGlobalReferencesInAttributes(element.getChildNodes().item(i), callback, rootElement);
+            }
+        }
+    }
+
+    private void processGlobalReferencesInAttributes(Node element, XmlConfigurationCallback callback, Element rootElement) throws ParserConfigurationException
+    {
+        if (element != null && element.getAttributes() != null)
+        {
+            for (int i = 0; i < element.getAttributes().getLength(); i++)
+            {
+                String attributeName = element.getAttributes().item(i).getLocalName();
+                if (attributeName != null && ((attributeName.endsWith(REF_SUFFIX) || attributeName.equals(REF_ATTRIBUTE_NAME)) || (element.getNodeName().endsWith(REF_SUFFIX) && attributeName.equals(NAME_ATTRIBUTE_NAME))))
+                {
+                    org.w3c.dom.Element dependentElement = callback.getGlobalElement(element.getAttributes()
+                                                                                             .item(i)
+                                                                                             .getNodeValue());
+                    addReferencedGlobalElement(callback, rootElement, dependentElement);
+                }
+            }
+        }
+
+    }
+
+    private void addReferencedGlobalElement(XmlConfigurationCallback callback, Element rootElement, org.w3c.dom.Element dependentElement) throws ParserConfigurationException
+    {
+        if (dependentElement != null)
+        {
+            if (isSpringBean(dependentElement))
+            {
+                wrapElementInSpringBeanContainer(rootElement, dependentElement);
+            }
+            else
+            {
+                rootElement.add(convert(dependentElement));
+                addSchemaLocation(rootElement, dependentElement, callback);
+            }
+            processGlobalReferences(dependentElement, callback, rootElement);
+        }
+    }
+
+    private void wrapElementInSpringBeanContainer(Element rootElement, org.w3c.dom.Element dependentElement) throws ParserConfigurationException
+    {
+        String namespaceUri = dependentElement.getNamespaceURI();
+        Namespace namespace = new Namespace(dependentElement.getPrefix(), namespaceUri);
+        Element beans = rootElement.element(new QName(BEANS_ELEMENT, namespace));
+        if (beans == null)
+        {
+            beans = rootElement.addElement(BEANS_ELEMENT, namespaceUri);
+        }
+        beans.add(convert(dependentElement));
+    }
+
+    private boolean isSpringBean(org.w3c.dom.Element dependentElement)
+    {
+        return "http://www.springframework.org/schema/beans".equals(dependentElement.getNamespaceURI());
     }
 
     protected MuleArtifact doGetArtifact(org.w3c.dom.Element element, final XmlConfigurationCallback callback, boolean embedInFlow)
@@ -309,5 +356,4 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
             }
         }
     }
-
 }

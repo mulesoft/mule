@@ -23,27 +23,21 @@ import org.xml.sax.SAXException;
 public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFactoryTestCase
 {
     @Test(expected = MuleArtifactFactoryException.class)
-    public void testMissingAttribute() throws SAXException, IOException, MuleArtifactFactoryException
+    public void detectsMissingAttribute() throws SAXException, IOException, MuleArtifactFactoryException
     {
         Document document = XMLUnit.buildControlDocument("<jdbc:connector name=\"jdbcConnector\" pollingFrequency=\"1000\" queryTimeout=\"3000\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"/>");
         XmlConfigurationCallback callback = new DatabaseConfigurationCallback();
 
-        System.out.println((lookupArtifact().getArtifact(document.getDocumentElement(), callback)));
+        lookupArtifact().getArtifact(document.getDocumentElement(), callback);
     }
 
     @Test(expected = MuleArtifactFactoryException.class)
-    public void testMissingDependentElement() throws SAXException, IOException, MuleArtifactFactoryException
+    public void detectsMissingDependentElement() throws SAXException, IOException, MuleArtifactFactoryException
     {
         Document document = XMLUnit.buildControlDocument("<jdbc:connector name=\"jdbcConnector\" pollingFrequency=\"1000\" dataSource-ref=\"unknownJdbcDataSource\" queryTimeout=\"3000\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"/>");
         XmlConfigurationCallback callback = new DatabaseConfigurationCallback();
 
-        System.out.println((lookupArtifact().getArtifact(document.getDocumentElement(), callback)));
-    }
-
-
-    @Override
-    public int getTestTimeoutSecs() {
-        return 99999;
+        lookupArtifact().getArtifact(document.getDocumentElement(), callback);
     }
 
     protected static class DatabaseConfigurationCallback extends MapXmlConfigurationCallback
@@ -72,27 +66,10 @@ public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFa
         String config = "<jdbc:connector name=\"jdbcConnector\" pollingFrequency=\"1000\" dataSource-ref=\"jdbcDataSource\" queryTimeout=\"3000\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"/>";
         Document document = XMLUnit.buildControlDocument(config);
         String refDef =
-                //              "<jdbc:derby-data-source name=\"jdbcDataSource\" url=\"jdbc:derby:muleEmbeddedDB;create=true\"  xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"/>"
-
-                //          	"<spring:bean xmlns:spring=\"http://www.springframework.org/schema/beans\" class=\"org.apache.derby.jdbc.EmbeddedXADataSource\" id=\"jdbcDataSource\" name=\"Bean\">"
-                //          	+ "<spring:property name=\"databaseName\" value=\"muleEmbeddedDB\"/>"
-                //				+ "</spring:bean>"
-
-                //          	"<spring:bean xmlns:spring=\"http://www.springframework.org/schema/beans\" class=\"org.enhydra.jdbc.standard.StandardXADataSource\" destroy-method=\"shutdown\" id=\"jdbcDataSource\" name=\"Bean\">"
-                //				+ "<spring:property name=\"driverName\" value=\"org.apache.derby.jdbc.EmbeddedDriver\"/>"
-                //				+ "<spring:property name=\"url\" value=\"jdbc:derby:muleEmbeddedDB;create=true\"/>"
-                //				+ "</spring:bean>"
-
                 "<spring:bean xmlns:spring=\"http://www.springframework.org/schema/beans\" class=\"org.apache.commons.dbcp.BasicDataSource\" destroy-method=\"close\" id=\"jdbcDataSource\" name=\"Bean\">"
                 + "<spring:property name=\"driverClassName\" value=\"org.apache.derby.jdbc.EmbeddedDriver\"/>"
                 + "<spring:property name=\"url\" value=\"jdbc:derby:muleEmbeddedDB;create=true\"/>"
-                + "</spring:bean>"
-
-                //              	"<spring:bean xmlns:spring=\"http://www.springframework.org/schema/beans\" class=\"com.mchange.v2.c3p0.ComboPooledDataSource\" destroy-method=\"close\" id=\"jdbcDataSource\" name=\"Bean\">"
-                //					+ "<spring:property name=\"driverClass\" value=\"org.apache.derby.jdbc.EmbeddedDriver\"/>"
-                //					+ "<spring:property name=\"jdbcUrl\" value=\"jdbc:derby:muleEmbeddedDB;create=true\"/>"
-                //					+ "</spring:bean>"
-                ;
+                + "</spring:bean>";
         XmlConfigurationCallback callback = new DatabaseConfigurationCallback(Collections.singletonMap("jdbcDataSource", refDef));
 
         doTest(document, callback);
@@ -100,31 +77,20 @@ public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFa
         doTest(document, callback);
     }
 
-    // ignored mysql test because mysql.mysql-connector-java/mysql-connector-java-x.jar is not on build path by default
-    // and now that the artifact is started at creation, the test cannot work without the jar.
-    @Ignore
+    // This will required having MySQL drivers in the classpath and a MySQL instance running
     @Test
+    @Ignore
     public void testMySql() throws SAXException, IOException, MuleArtifactFactoryException
     {
         String config = "<jdbc:connector name=\"jdbcConnector\" pollingFrequency=\"1000\" dataSource-ref=\"mysqlDatasource\" queryTimeout=\"3000\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"/>";
         Document document = XMLUnit.buildControlDocument(config);
         String refDef =
-                //    	"<jdbc:mysql-data-source name=\"mysqlDatasource\" user=\"myUser\" password=\"secret\" host=\"localhost\" database=\"test\"  port=\"3306\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"/>"
-
                 "<spring:bean xmlns:spring=\"http://www.springframework.org/schema/beans\" class=\"org.apache.commons.dbcp.BasicDataSource\" destroy-method=\"close\" id=\"mysqlDatasource\" name=\"Bean\">"
                 + "<spring:property name=\"driverClassName\" value=\"com.mysql.jdbc.Driver\"/>"
                 + "<spring:property name=\"url\" value=\"jdbc:mysql://localhost/test\"/>"
                 + "<spring:property name=\"username\" value=\"myUser\"/>"
                 + "<spring:property name=\"password\" value=\"secret\"/>"
-                + "</spring:bean>"
-
-                //        	"<spring:bean xmlns:spring=\"http://www.springframework.org/schema/beans\" class=\"org.enhydra.jdbc.standard.StandardXADataSource\" destroy-method=\"shutdown\" id=\"mysqlDatasource\" name=\"Bean\">"
-                //			+ "<spring:property name=\"driverName\" value=\"com.mysql.jdbc.Driver\"/>"
-                //			+ "<spring:property name=\"url\" value=\"jdbc:mysql://localhost/test\"/>"
-                //			+ "<spring:property name=\"user\" value=\"myUser\"/>"
-                //			+ "<spring:property name=\"password\" value=\"secret\"/>"
-                //			+ "</spring:bean>"
-                ;
+                + "</spring:bean>";
         XmlConfigurationCallback callback = new DatabaseConfigurationCallback(Collections.singletonMap("mysqlDatasource", refDef));
 
         doTest(document, callback);
@@ -173,8 +139,7 @@ public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFa
                 + "<spring:property name=\"url\" value=\"jdbc:h2:dbname\"/>"
                 + "<spring:property name=\"username\" value=\"user\"/>"
                 + "<spring:property name=\"password\" value=\"password\"/>"
-                + "</spring:bean>"
-        ;
+                + "</spring:bean>";
         callback = new DatabaseConfigurationCallback(Collections.singletonMap("h2Datasource", refDef));
         doTest(document, callback);
         doTest(document, callback);
@@ -186,25 +151,13 @@ public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFa
     {
         String config = "<jdbc:connector name=\"jdbcConnector\" pollingFrequency=\"1000\" dataSource-ref=\"hsqlDatasource\" queryTimeout=\"3000\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"/>";
         Document document = XMLUnit.buildControlDocument(config);
-
-        //String refDef =
-        //        "<spring:bean xmlns:spring=\"http://www.springframework.org/schema/beans\" class=\"org.h2.jdbcx.JdbcConnectionPool\" destroy-method=\"dispose\" id=\"hsqlDatasource\">"
-        //        + "<springjdbc:embedded-database xmlns:springjdbc=\"http://www.springframework.org/schema/jdbc\" id=\"embeddedDatasource\" type=\"HSQL\"/>"
-        //        + "</spring:bean>"
-        //        ;
-        //XmlConfigurationCallback callback = new DatabaseConfigurationCallback(Collections.singletonMap("hsqlDatasource", refDef));
-        //doTest(document, callback);
-        //doTest(document, callback);
-        //doTest(document, callback);
-
         String refDef =
                 "<spring:bean xmlns:spring=\"http://www.springframework.org/schema/beans\" class=\"org.apache.commons.dbcp.BasicDataSource\" destroy-method=\"close\" id=\"hsqlDatasource\">"
                 + "<spring:property name=\"driverClassName\" value=\"org.hsqldb.jdbcDriver\"/>"
                 + "<spring:property name=\"url\" value=\"jdbc:hsqldb:mem:spring-playground\"/>"
                 + "<spring:property name=\"username\" value=\"sa\"/>"
                 + "<spring:property name=\"password\" value=\"\"/>"
-                + "</spring:bean>"
-        ;
+                + "</spring:bean>";
         XmlConfigurationCallback callback = new DatabaseConfigurationCallback(Collections.singletonMap("hsqlDatasource", refDef));
         doTest(document, callback);
         doTest(document, callback);
