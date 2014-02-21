@@ -6,6 +6,10 @@
  */
 package org.mule.spring.config;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
 import org.mule.common.MuleArtifact;
 import org.mule.common.MuleArtifactFactoryException;
 import org.mule.common.TestResult;
@@ -18,25 +22,28 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-import junit.framework.Assert;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public abstract class XmlConfigurationMuleArtifactFactoryTestCase extends AbstractMuleTestCase
 {
-
-    protected void doTestMessageProcessor(Document document, XmlConfigurationCallback callback, boolean canConnect) throws MuleArtifactFactoryException
+    protected void doTestMessageProcessorCapabilities(Document document, XmlConfigurationCallback callback) throws MuleArtifactFactoryException
     {
-        doTestMessageProcessor(document, callback, TestResult.Status.SUCCESS, canConnect);
+        doTestMessageProcessor(document, callback, null);
     }
 
-    protected void doTest(Document document, XmlConfigurationCallback callback, boolean canConnect) throws MuleArtifactFactoryException
+    protected void doTestMessageProcessor(Document document, XmlConfigurationCallback callback) throws MuleArtifactFactoryException
     {
-        doTest(document, callback, TestResult.Status.SUCCESS, canConnect);
+        doTestMessageProcessor(document, callback, TestResult.Status.SUCCESS);
     }
 
-    protected void doTestMessageProcessor(Document document, XmlConfigurationCallback callback, TestResult.Status expectedResult, boolean canConnect)
+    protected void doTest(Document document, XmlConfigurationCallback callback) throws MuleArtifactFactoryException
+    {
+        doTest(document, callback, TestResult.Status.SUCCESS);
+    }
+
+    private void doTestMessageProcessor(Document document, XmlConfigurationCallback callback, TestResult.Status expectedResult)
             throws MuleArtifactFactoryException
     {
         XmlConfigurationMuleArtifactFactory factory = lookupArtifact();
@@ -46,14 +53,14 @@ public abstract class XmlConfigurationMuleArtifactFactoryTestCase extends Abstra
         {
             artifact = factory.getArtifactForMessageProcessor(document.getDocumentElement(), callback);
 
-            Assert.assertNotNull(artifact);
-            Assert.assertTrue(artifact.hasCapability(OperationMetaDataEnabled.class));
-            Assert.assertTrue(artifact.getCapability(OperationMetaDataEnabled.class) instanceof OperationMetaDataEnabled);
-            if (canConnect)
+            assertNotNull(artifact);
+            assertTrue(artifact.hasCapability(OperationMetaDataEnabled.class));
+            assertTrue(artifact.getCapability(OperationMetaDataEnabled.class) instanceof OperationMetaDataEnabled);
+            if (expectedResult != null)
             {
                 OperationMetaDataEnabled m = artifact.getCapability(OperationMetaDataEnabled.class);
-                Assert.assertNull(m.getInputMetaData());
-                Assert.assertEquals(expectedResult, m.getOutputMetaData(null).getStatus());
+                assertNull(m.getInputMetaData());
+                assertEquals(expectedResult, m.getOutputMetaData(null).getStatus());
             }
         }
         finally
@@ -66,7 +73,7 @@ public abstract class XmlConfigurationMuleArtifactFactoryTestCase extends Abstra
 
     }
 
-    protected void doTest(Document document, XmlConfigurationCallback callback, TestResult.Status expectedResult, boolean canConnect)
+    private void doTest(Document document, XmlConfigurationCallback callback, TestResult.Status expectedResult)
             throws MuleArtifactFactoryException
     {
         XmlConfigurationMuleArtifactFactory factory = lookupArtifact();
@@ -75,13 +82,13 @@ public abstract class XmlConfigurationMuleArtifactFactoryTestCase extends Abstra
         try
         {
             artifact = factory.getArtifact(document.getDocumentElement(), callback);
-            Assert.assertNotNull(artifact);
-            Assert.assertTrue(artifact.hasCapability(Testable.class));
-            Assert.assertTrue(artifact.getCapability(Testable.class) instanceof Testable);
-            if (canConnect)
+            assertNotNull(artifact);
+            assertTrue(artifact.hasCapability(Testable.class));
+            assertTrue(artifact.getCapability(Testable.class) instanceof Testable);
+            if (expectedResult != null)
             {
                 Testable t = artifact.getCapability(Testable.class);
-                Assert.assertEquals(expectedResult, t.test().getStatus());
+                assertEquals(expectedResult, t.test().getStatus());
             }
         }
         finally

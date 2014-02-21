@@ -22,27 +22,21 @@ public class NewDatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifac
 {
 
     @Test(expected = MuleArtifactFactoryException.class)
-    public void testMissingAttribute() throws SAXException, IOException, MuleArtifactFactoryException
+    public void detectsMissingAttribute() throws SAXException, IOException, MuleArtifactFactoryException
     {
         Document document = XMLUnit.buildControlDocument("<db:select xmlns:db=\"http://www.mulesoft.org/schema/mule/db\"><db:template-query-ref name=\"template\"/></db:select>");
         XmlConfigurationCallback callback = new DatabaseConfigurationCallback();
 
-        System.out.println((lookupArtifact().getArtifactForMessageProcessor(document.getDocumentElement(), callback)));
+        lookupArtifact().getArtifactForMessageProcessor(document.getDocumentElement(), callback);
     }
 
     @Test(expected = MuleArtifactFactoryException.class)
-    public void testMissingDependentElement() throws SAXException, IOException, MuleArtifactFactoryException
+    public void detectsMissingDependentElement() throws SAXException, IOException, MuleArtifactFactoryException
     {
         Document document = XMLUnit.buildControlDocument("<db:select config-ref=\"mysql-config\" xmlns:db=\"http://www.mulesoft.org/schema/mule/db\"><db:template-query-ref name=\"template\"/></db:select>");
         XmlConfigurationCallback callback = new DatabaseConfigurationCallback();
 
-        System.out.println((lookupArtifact().getArtifactForMessageProcessor(document.getDocumentElement(), callback)));
-    }
-
-    @Override
-    public int getTestTimeoutSecs()
-    {
-        return 99999;
+        lookupArtifact().getArtifactForMessageProcessor(document.getDocumentElement(), callback);
     }
 
     @Test
@@ -59,9 +53,9 @@ public class NewDatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifac
         callbackData.put("template", templateRef);
 
         XmlConfigurationCallback callback = new DatabaseConfigurationCallback(callbackData);
-        doTestMessageProcessor(document, callback, false);
-        doTestMessageProcessor(document, callback, false);
-        doTestMessageProcessor(document, callback, false);
+        doTestMessageProcessorCapabilities(document, callback);
+        doTestMessageProcessorCapabilities(document, callback);
+        doTestMessageProcessorCapabilities(document, callback);
     }
 
     @Test(expected = MuleArtifactFactoryException.class)
@@ -78,9 +72,9 @@ public class NewDatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifac
         callbackData.put("template1", templateRef1);
 
         XmlConfigurationCallback callback = new DatabaseConfigurationCallback(callbackData);
-        doTestMessageProcessor(document, callback, false);
-        doTestMessageProcessor(document, callback, false);
-        doTestMessageProcessor(document, callback, false);
+        doTestMessageProcessorCapabilities(document, callback);
+        doTestMessageProcessorCapabilities(document, callback);
+        doTestMessageProcessorCapabilities(document, callback);
     }
 
     @Test
@@ -99,9 +93,9 @@ public class NewDatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifac
         callbackData.put("template2", templateRef2);
 
         XmlConfigurationCallback callback = new DatabaseConfigurationCallback(callbackData);
-        doTestMessageProcessor(document, callback, false);
-        doTestMessageProcessor(document, callback, false);
-        doTestMessageProcessor(document, callback, false);
+        doTestMessageProcessorCapabilities(document, callback);
+        doTestMessageProcessorCapabilities(document, callback);
+        doTestMessageProcessorCapabilities(document, callback);
     }
 
     @Test
@@ -118,9 +112,9 @@ public class NewDatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifac
         callbackData.put("template", templateRef);
 
         XmlConfigurationCallback callback = new DatabaseConfigurationCallback(callbackData);
-        doTestMessageProcessor(document, callback, true);
-        doTestMessageProcessor(document, callback, true);
-        doTestMessageProcessor(document, callback, true);
+        doTestMessageProcessor(document, callback);
+        doTestMessageProcessor(document, callback);
+        doTestMessageProcessor(document, callback);
     }
 
     protected static class DatabaseConfigurationCallback extends MapXmlConfigurationCallback

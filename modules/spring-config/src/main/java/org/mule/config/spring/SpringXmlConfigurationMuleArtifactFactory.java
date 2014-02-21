@@ -111,15 +111,13 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         {
             parentElement.add(convert(element));
 
-            // Look for references in attributes and child elements (only first level)
-            processElement(element, callback, rootElement);
+            processGlobalReferences(element, callback, rootElement);
 
             // For message sources to work, the flow should be valid, this means needs to have a MP
             if (embedInFlow)
             {
                 parentElement.addElement("logger", "http://www.mulesoft.org/schema/mule/core");
             }
-
             return document.asXML();
         }
         catch (Throwable t)
@@ -129,10 +127,15 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
 
     }
 
-    private void processElement(org.w3c.dom.Element element, XmlConfigurationCallback callback, Element rootElement) throws ParserConfigurationException
+    private void processGlobalReferences(org.w3c.dom.Element element, XmlConfigurationCallback callback, Element rootElement) throws ParserConfigurationException
     {
         processGlobalReferencesInAttributes(element, callback, rootElement);
 
+        processGlobalReferencesInChildElements(element, callback, rootElement);
+    }
+
+    private void processGlobalReferencesInChildElements(org.w3c.dom.Element element, XmlConfigurationCallback callback, Element rootElement) throws ParserConfigurationException
+    {
         if (element != null && element.getChildNodes() != null)
         {
             // Look for references in first level of child nodes
@@ -166,26 +169,34 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
     {
         if (dependentElement != null)
         {
-            // if the element is a spring bean, wrap the element in a top-level spring beans element
-            if ("http://www.springframework.org/schema/beans".equals(dependentElement.getNamespaceURI()))
+            if (isSpringBean(dependentElement))
             {
-                String namespaceUri = dependentElement.getNamespaceURI();
-                Namespace namespace = new Namespace(dependentElement.getPrefix(), namespaceUri);
-                Element beans = rootElement.element(new QName(BEANS_ELEMENT, namespace));
-                if (beans == null)
-                {
-                    beans = rootElement.addElement(BEANS_ELEMENT, namespaceUri);
-                }
-                beans.add(convert(dependentElement));
+                wrapElementInSpringBeanContainer(rootElement, dependentElement);
             }
             else
             {
                 rootElement.add(convert(dependentElement));
                 addSchemaLocation(rootElement, dependentElement, callback);
             }
-            processElement(dependentElement, callback, rootElement);
+            processGlobalReferences(dependentElement, callback, rootElement);
         }
-        // if missing a dependent element, try anyway because it might not be needed.
+    }
+
+    private void wrapElementInSpringBeanContainer(Element rootElement, org.w3c.dom.Element dependentElement) throws ParserConfigurationException
+    {
+        String namespaceUri = dependentElement.getNamespaceURI();
+        Namespace namespace = new Namespace(dependentElement.getPrefix(), namespaceUri);
+        Element beans = rootElement.element(new QName(BEANS_ELEMENT, namespace));
+        if (beans == null)
+        {
+            beans = rootElement.addElement(BEANS_ELEMENT, namespaceUri);
+        }
+        beans.add(convert(dependentElement));
+    }
+
+    private boolean isSpringBean(org.w3c.dom.Element dependentElement)
+    {
+        return "http://www.springframework.org/schema/beans".equals(dependentElement.getNamespaceURI());
     }
 
     protected MuleArtifact doGetArtifact(org.w3c.dom.Element element, final XmlConfigurationCallback callback, boolean embedInFlow)
