@@ -40,7 +40,7 @@ public class NewDatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifac
     }
 
     @Test
-    public void testNewDatabaseGenericMySqlTemplateQueryRef() throws SAXException, IOException, MuleArtifactFactoryException
+    public void validatesDbConnectorGenericMySqlTemplateQueryRefResolution() throws SAXException, IOException, MuleArtifactFactoryException
     {
         String config = "<db:select config-ref=\"mysql-config\" xmlns:db=\"http://www.mulesoft.org/schema/mule/db\"><db:template-query-ref name=\"template\"/></db:select>";
         Document document = XMLUnit.buildControlDocument(config);
@@ -54,12 +54,10 @@ public class NewDatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifac
 
         XmlConfigurationCallback callback = new DatabaseConfigurationCallback(callbackData);
         doTestMessageProcessorCapabilities(document, callback);
-        doTestMessageProcessorCapabilities(document, callback);
-        doTestMessageProcessorCapabilities(document, callback);
     }
 
     @Test(expected = MuleArtifactFactoryException.class)
-    public void testNewDatabaseGenericMySqlTemplateWithMissingQueryRef() throws SAXException, IOException, MuleArtifactFactoryException
+    public void detectsDbConnectorGenericMySqlMissingTemplateQueryRef() throws SAXException, IOException, MuleArtifactFactoryException
     {
         String config = "<db:select config-ref=\"mysql-config\" xmlns:db=\"http://www.mulesoft.org/schema/mule/db\"><db:template-query-ref name=\"template1\"/></db:select>";
         Document document = XMLUnit.buildControlDocument(config);
@@ -73,12 +71,10 @@ public class NewDatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifac
 
         XmlConfigurationCallback callback = new DatabaseConfigurationCallback(callbackData);
         doTestMessageProcessorCapabilities(document, callback);
-        doTestMessageProcessorCapabilities(document, callback);
-        doTestMessageProcessorCapabilities(document, callback);
     }
 
     @Test
-    public void testNewDatabaseGenericMySqlTemplateWithTemplateQueryRef() throws SAXException, IOException, MuleArtifactFactoryException
+    public void validatesDbConnectorGenericMySqlOverriddenTemplateResolution() throws SAXException, IOException, MuleArtifactFactoryException
     {
         String config = "<db:select config-ref=\"mysql-config\" xmlns:db=\"http://www.mulesoft.org/schema/mule/db\"><db:template-query-ref name=\"template1\"/></db:select>";
         Document document = XMLUnit.buildControlDocument(config);
@@ -94,26 +90,22 @@ public class NewDatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifac
 
         XmlConfigurationCallback callback = new DatabaseConfigurationCallback(callbackData);
         doTestMessageProcessorCapabilities(document, callback);
-        doTestMessageProcessorCapabilities(document, callback);
-        doTestMessageProcessorCapabilities(document, callback);
     }
 
     @Test
-    public void testNewDatabaseDerbyTemplateQueryRef() throws SAXException, IOException, MuleArtifactFactoryException
+    public void validatesDbDerbyConnectorTemplateQueryRefResolution() throws SAXException, IOException, MuleArtifactFactoryException
     {
         String config = "<db:select config-ref=\"derby-config\" xmlns:db=\"http://www.mulesoft.org/schema/mule/db\"><db:template-query-ref name=\"template\"/></db:select>";
         Document document = XMLUnit.buildControlDocument(config);
 
         String configRef = "<db:derby-config name=\"derby-config\" url=\"jdbc:derby:muleEmbeddedDB;create=true\" xmlns:db=\"http://www.mulesoft.org/schema/mule/db\" driverClassName=\"org.apache.derby.jdbc.EmbeddedDriver\"/>";
-        String templateRef = "<db:template-query name=\"template\" xmlns:db=\"http://www.mulesoft.org/schema/mule/db\"><db:parameterized-query><![CDATA[SELECT CURRENT_TIMESTAMP FROM SYSIBM.SYSDUMMY1]]></db:parameterized-query><db:in-param name=\"myParameter1\" defaultValue=\"lala\"/><db:in-param name=\"myParameter2\" defaultValue=\"#[payload.parameter2]\"/></db:template-query>";
+        String templateRef = "<db:template-query name=\"template\" xmlns:db=\"http://www.mulesoft.org/schema/mule/db\"><db:parameterized-query><![CDATA[SELECT CURRENT_TIMESTAMP FROM SYSIBM.SYSDUMMY1]]></db:parameterized-query></db:template-query>";
 
         Map<String, String> callbackData = new HashMap<String, String>();
         callbackData.put("derby-config", configRef);
         callbackData.put("template", templateRef);
 
         XmlConfigurationCallback callback = new DatabaseConfigurationCallback(callbackData);
-        doTestMessageProcessor(document, callback);
-        doTestMessageProcessor(document, callback);
         doTestMessageProcessor(document, callback);
     }
 

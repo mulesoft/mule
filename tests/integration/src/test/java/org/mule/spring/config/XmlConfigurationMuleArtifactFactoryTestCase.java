@@ -58,9 +58,9 @@ public abstract class XmlConfigurationMuleArtifactFactoryTestCase extends Abstra
             assertTrue(artifact.getCapability(OperationMetaDataEnabled.class) instanceof OperationMetaDataEnabled);
             if (expectedResult != null)
             {
-                OperationMetaDataEnabled m = artifact.getCapability(OperationMetaDataEnabled.class);
-                assertNull(m.getInputMetaData());
-                assertEquals(expectedResult, m.getOutputMetaData(null).getStatus());
+                OperationMetaDataEnabled artifactCapability = artifact.getCapability(OperationMetaDataEnabled.class);
+                assertNull(artifactCapability.getInputMetaData());
+                assertEquals(expectedResult, artifactCapability.getOutputMetaData(null).getStatus());
             }
         }
         finally
@@ -87,8 +87,8 @@ public abstract class XmlConfigurationMuleArtifactFactoryTestCase extends Abstra
             assertTrue(artifact.getCapability(Testable.class) instanceof Testable);
             if (expectedResult != null)
             {
-                Testable t = artifact.getCapability(Testable.class);
-                assertEquals(expectedResult, t.test().getStatus());
+                Testable artifactCapability = artifact.getCapability(Testable.class);
+                assertEquals(expectedResult, artifactCapability.test().getStatus());
             }
         }
         finally
