@@ -198,14 +198,12 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         {
             String transactionResourceClassNameProperties = entry.getValue();
             String transactionFactoryClassName = entry.getKey();
-            String name = null;
             boolean optional = false;
             // reset
             int x = transactionResourceClassNameProperties.indexOf(",");
             if (x > -1)
             {
                 Properties p = PropertiesUtils.getPropertiesFromString(transactionResourceClassNameProperties.substring(x + 1), ',');
-                name = p.getProperty("name", null);
                 optional = p.containsKey("optional");
             }
             final String transactionResourceClassName = (x == -1 ? transactionResourceClassNameProperties : transactionResourceClassNameProperties.substring(0, x));
@@ -216,35 +214,16 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
             }
             catch (NoClassDefFoundError ncdfe)
             {
-                if (optional)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Ignoring optional transaction factory: " + transactionResourceClassName);
-                    }
-                }
-                else
-                {
-                    throw ncdfe;
-                }
+                throwExceptionIfNotOptional(optional,ncdfe,"Ignoring optional transaction factory: " + transactionResourceClassName);
             }
             catch (ClassNotFoundException cnfe)
             {
-                if (optional)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Ignoring optional transaction factory: " + transactionResourceClassName);
-                    }
-                }
-                else
-                {
-                    throw cnfe;
-                }
+                throwExceptionIfNotOptional(optional,cnfe,"Ignoring optional transaction factory: " + transactionResourceClassName);
             }
             
         }
     }
+
     private void registerTransformers(Properties props, MuleRegistry registry) throws Exception
     {
         String transString;
@@ -314,45 +293,16 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
             catch (InvocationTargetException itex)
             {
                 Throwable cause = ExceptionUtils.getCause(itex);
-                if (cause instanceof NoClassDefFoundError && optional)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Ignoring optional transformer: " + transClass);
-                    }
-                }
-                else
-                {
-                    throw new Exception(cause);
-                }
+                throwExceptionIfNotOptional(cause instanceof NoClassDefFoundError && optional, cause, "Ignoring optional transformer: " + transClass);
             }
             catch (NoClassDefFoundError ncdfe)
             {
-                if (optional)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Ignoring optional transformer: " + transClass);
-                    }
-                }
-                else
-                {
-                    throw ncdfe;
-                }
+                throwExceptionIfNotOptional( optional, ncdfe, "Ignoring optional transformer: " + transClass);
+
             }
             catch (ClassNotFoundException cnfe)
             {
-                if (optional)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Ignoring optional transformer: " + transClass);
-                    }
-                }
-                else
-                {
-                    throw cnfe;
-                }
+                throwExceptionIfNotOptional( optional, cnfe, "Ignoring optional transformer: " + transClass);
             }
 
             name = null;
@@ -426,45 +376,34 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         catch (InvocationTargetException itex)
         {
             Throwable cause = ExceptionUtils.getCause(itex);
-            if (cause instanceof NoClassDefFoundError && optional)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Ignoring optional object: " + className);
-                }
-            }
-            else
-            {
-                throw new Exception(cause);
-            }
+            throwExceptionIfNotOptional(cause instanceof NoClassDefFoundError && optional, cause, "Ignoring optional object: " + className);
         }
         catch (NoClassDefFoundError ncdfe)
         {
-            if (optional)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Ignoring optional object: " + className);
-                }
-            }
-            else
-            {
-                throw ncdfe;
-            }
+            throwExceptionIfNotOptional(optional, ncdfe, "Ignoring optional object: " + className);
         }
         catch (ClassNotFoundException cnfe)
         {
-            if (optional)
+            throwExceptionIfNotOptional(optional, cnfe, "Ignoring optional object: " + className);
+        }
+    }
+
+    private void throwExceptionIfNotOptional(boolean optional, Throwable t, String message) throws Exception 
+    {
+        if (optional)
+        {
+            if (logger.isDebugEnabled())
             {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Ignoring optional object: " + className);
-                }
+                logger.debug(message);
             }
-            else
-            {
-                throw cnfe;
-            }
+        }
+        else if ( t instanceof Exception)
+        {
+            throw (Exception)t;
+        }
+        else
+        {
+            throw new Exception(t);
         }
     }
 }
