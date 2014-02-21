@@ -8,6 +8,7 @@ package org.mule.routing.correlation;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -30,14 +31,13 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.tck.size.SmallTest;
+import org.mule.util.store.SimpleMemoryObjectStore;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mule.util.store.SimpleMemoryObjectStore;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +73,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private MuleEvent mockMuleEvent;
 
-    private SimpleMemoryObjectStore memoryObjectStore = new SimpleMemoryObjectStore();
+    private ListableObjectStore<EventGroup> memoryObjectStore = new SimpleMemoryObjectStore<EventGroup>();
 
     @Test(expected = CorrelationTimeoutException.class)
     public void initAfterDeserializationAfterForceGroupExpiry() throws Exception
@@ -153,16 +153,21 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
         {
             Prober prober = new PollingProber(1000, 50);
             prober.check(new Probe() {
-                public boolean isSatisfied() {
-                    try {
+                public boolean isSatisfied()
+                {
+                    try
+                    {
                         return !memoryObjectStore.contains(TEST_GROUP_ID);
-                    } catch (ObjectStoreException e) {
+                    }
+                    catch (ObjectStoreException e)
+                    {
                         logger.debug("Could not access object store.");
                         return false;
                     }
                 }
 
-                public String describeFailure() {
+                public String describeFailure()
+                {
                     return "Event group not expired.";
                 }
             });
@@ -179,7 +184,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
         when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
         when(mockObjectStoreManager.getObjectStore(OBJECT_STOR_NAME_PREFIX + ".expiredAndDispatchedGroups", USE_PERSISTENT_STORE)).thenReturn(mockExpireGroupsObjectStore);
         when(mockObjectStoreManager.getObjectStore(OBJECT_STOR_NAME_PREFIX + ".processedGroups", USE_PERSISTENT_STORE, EventCorrelator.MAX_PROCESSED_GROUPS, -1, 1000)).thenReturn(mockProcessedGroups);
-        when(mockObjectStoreManager.getObjectStore(OBJECT_STOR_NAME_PREFIX + ".eventGroups", USE_PERSISTENT_STORE)).thenReturn(memoryObjectStore);
+        doReturn(memoryObjectStore).when(mockObjectStoreManager).getObjectStore(OBJECT_STOR_NAME_PREFIX + ".eventGroups", USE_PERSISTENT_STORE);
         memoryObjectStore.store(TEST_GROUP_ID, mockEventGroup);
         when(mockEventGroup.getGroupId()).thenReturn(TEST_GROUP_ID);
         when(mockEventGroup.toMessageCollection()).thenReturn(null);
