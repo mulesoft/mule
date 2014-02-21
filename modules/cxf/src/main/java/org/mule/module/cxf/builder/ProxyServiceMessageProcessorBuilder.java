@@ -16,6 +16,7 @@ import org.mule.module.cxf.support.ProxyRPCInInterceptor;
 import org.mule.module.cxf.support.ProxySchemaValidationInInterceptor;
 import org.mule.module.cxf.support.ProxyService;
 import org.mule.module.cxf.support.ProxyServiceFactoryBean;
+import org.mule.module.cxf.support.ProxyWSDLQueryHandler;
 import org.mule.module.cxf.support.ResetStaxInterceptor;
 import org.mule.module.cxf.support.ReversibleStaxInInterceptor;
 import org.mule.module.cxf.support.ReversibleValidatingInterceptor;
@@ -27,9 +28,8 @@ import org.apache.cxf.databinding.stax.StaxDataBinding;
 import org.apache.cxf.databinding.stax.StaxDataBindingFeature;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
-import org.apache.cxf.interceptor.BareInInterceptor;
 import org.apache.cxf.interceptor.BareOutInterceptor;
-import org.apache.cxf.interceptor.DocLiteralInInterceptor;
+import org.apache.cxf.transports.http.QueryHandler;
 
 /**
  * Creates an inbound proxy based on a specially configure CXF Server.
@@ -62,6 +62,12 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
     protected Class<?> getServiceClass()
     {
         return ProxyService.class;
+    }
+
+    @Override
+    protected QueryHandler getWSDLQueryHandler()
+    {
+        return new ProxyWSDLQueryHandler(getConfiguration().getCxfBus(), getPort());
     }
 
     @Override

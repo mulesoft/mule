@@ -21,6 +21,8 @@ import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+
+import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.i18n.CxfMessages;
 
 public class ProxyServiceFactoryBean extends ReflectionServiceFactoryBean
@@ -88,6 +90,8 @@ public class ProxyServiceFactoryBean extends ReflectionServiceFactoryBean
 
         try
         {
+            getEndpointInfo().getService().setProperty(CxfConstants.WSDL_LOCATION, getWsdlURL());
+
             Method invoke = getServiceClass().getMethod("invoke", c);
 
             // Bind every operation to the invoke method.

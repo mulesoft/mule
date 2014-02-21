@@ -22,6 +22,7 @@ import javax.wsdl.Import;
 import javax.wsdl.Port;
 import javax.wsdl.Service;
 import javax.wsdl.Types;
+import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.schema.Schema;
 import javax.wsdl.extensions.schema.SchemaImport;
@@ -58,7 +59,7 @@ import org.xml.sax.InputSource;
  */
 public class WSDLQueryHandler implements StemMatchingQueryHandler {
     private static final Logger LOG = LogUtils.getL7dLogger(WSDLQueryHandler.class);
-    private Bus bus;
+    protected Bus bus;
 
     public WSDLQueryHandler(Bus b) {
         bus = b;
@@ -148,7 +149,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
             }
 
             if (!mp.containsKey("")) {
-                Definition def = new ServiceWSDLBuilder(bus, endpointInfo.getService()).build();
+                Definition def = getDefinition(endpointInfo);
 
                 mp.put("", def);
                 updateDefinition(def, mp, smp, base, endpointInfo);
@@ -238,6 +239,12 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
         }
     }
 
+
+    protected Definition getDefinition(EndpointInfo endpointInfo) throws WSDLException
+    {
+        return new ServiceWSDLBuilder(bus, endpointInfo.getService()).build();
+    }
+
     protected void updateDoc(Document doc, String base,
                            Map<String, Definition> mp,
                            Map<String, SchemaReference> smp,
@@ -289,12 +296,24 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                                                       base), e);
         }
 
+        rewriteOperationAddress(ei, doc, base);
+
+        try {
+            doc.setXmlStandalone(true);
+        } catch (Exception ex) {
+            //likely not DOM level 3
+        }
+    }
+
+    protected void rewriteOperationAddress(EndpointInfo ei, Document doc, String base)
+    {
         Boolean rewriteSoapAddress = ei.getProperty("autoRewriteSoapAddress", Boolean.class);
+        List<Element> elementList = null;
 
         if (rewriteSoapAddress != null && rewriteSoapAddress.booleanValue()) {
             List<Element> serviceList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
-                                                              "http://schemas.xmlsoap.org/wsdl/",
-                                                              "service");
+                                                                            "http://schemas.xmlsoap.org/wsdl/",
+                                                                            "service");
             for (Element serviceEl : serviceList) {
                 String serviceName = serviceEl.getAttribute("name");
                 if (serviceName.equals(ei.getService().getName().getLocalPart())) {
@@ -305,19 +324,14 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                         String name = el.getAttribute("name");
                         if (name.equals(ei.getName().getLocalPart())) {
                             Element soapAddress = DOMUtils.findAllElementsByTagNameNS(el,
-                                                                 "http://schemas.xmlsoap.org/wsdl/soap/",
-                                                                 "address")
-                                                                       .iterator().next();
+                                                                                      "http://schemas.xmlsoap.org/wsdl/soap/",
+                                                                                      "address")
+                                    .iterator().next();
                             soapAddress.setAttribute("location", base);
                         }
                     }
                 }
             }
-        }
-        try {
-            doc.setXmlStandalone(true);
-        } catch (Exception ex) {
-            //likely not DOM level 3
         }
     }
 
