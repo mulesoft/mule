@@ -10,8 +10,8 @@
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd">
 
-    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="Echo.wsdl"
-                        service="EchoService" port="EchoPort" name="configWithTimestamp">
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Test" wsdlLocation="Test.wsdl"
+                        service="TestService" port="TestPort" name="configWithTimestamp">
     <ws:security>
             <ws:wss-timestamp expires="60" />
         </ws:security>
@@ -22,8 +22,8 @@
         <ws:consumer operation="echo" config-ref="configWithTimestamp"/>
     </flow>
 
-    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="Echo.wsdl"
-                        service="EchoService" port="EchoPort" name="configWithoutTimestamp"/>
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Test" wsdlLocation="Test.wsdl"
+                        service="TestService" port="TestPort" name="configWithoutTimestamp"/>
 
     <flow name="clientWithoutTimestamp">
         <inbound-endpoint address="vm://clientWithoutTimestamp" exchange-pattern="request-response"/>
@@ -37,11 +37,11 @@
     </cxf:ws-security>
 
     <flow name="server">
-        <inbound-endpoint address="http://localhost:${port}/services/Echo" exchange-pattern="request-response" />
-        <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.Echo" >
+        <inbound-endpoint address="http://localhost:${port}/services/Test" exchange-pattern="request-response" />
+        <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService" >
             <cxf:ws-security ref="inboundConfig"/>
         </cxf:jaxws-service>
-        <component class="org.mule.module.ws.consumer.Echo"/>
+        <component class="org.mule.module.ws.consumer.TestService"/>
     </flow>
 
 </mule>
