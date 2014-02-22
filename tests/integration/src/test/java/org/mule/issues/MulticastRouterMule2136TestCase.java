@@ -9,17 +9,12 @@ package org.mule.issues;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.xml.functional.AbstractXmlFunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * This is a simplified version of
@@ -35,18 +30,10 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
                                             + "  <child/>\n"
                                             + "</org.mule.issues.MulticastRouterMule2136TestCase_-Parent>";
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/issues/multicast-router-mule-2136-test-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/issues/multicast-router-mule-2136-test-flow.xml"}
-        });
-    }
-
-    public MulticastRouterMule2136TestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/issues/multicast-router-mule-2136-test-flow.xml";
     }
 
     protected MuleClient sendObject() throws MuleException

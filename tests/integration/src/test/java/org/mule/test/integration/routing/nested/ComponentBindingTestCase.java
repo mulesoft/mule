@@ -9,34 +9,21 @@ package org.mule.test.integration.routing.nested;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.Test;
 import org.junit.Ignore;
-import org.junit.runners.Parameterized;
+import org.junit.Test;
 
-public class ComponentBindingTestCase extends AbstractServiceAndFlowTestCase
+public class ComponentBindingTestCase extends FunctionalTestCase
 {
     private static final int number = 0xC0DE;
 
-    public ComponentBindingTestCase(AbstractServiceAndFlowTestCase.ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE, "org/mule/test/integration/routing/nested/interface-binding-test.xml"},
-            {AbstractServiceAndFlowTestCase.ConfigVariant.FLOW, "org/mule/test/integration/routing/nested/interface-binding-test-flow.xml"}
-        });
+        return "org/mule/test/integration/routing/nested/interface-binding-test-flow.xml";
     }
 
     @Test

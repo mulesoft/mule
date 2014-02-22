@@ -8,41 +8,32 @@ package org.mule.module.jersey;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import org.junit.Rule;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class BasicJerseyTestCase extends AbstractServiceAndFlowTestCase
+public class BasicJerseyTestCase extends FunctionalTestCase
 {
-    public BasicJerseyTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Rule
     public DynamicPort port = new DynamicPort("port");
 
     private String URL = "http://localhost:" + port.getNumber() + "%s";
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "basic-conf.xml"},
-        });
+        return "basic-conf.xml";
     }
 
     @Test
@@ -99,7 +90,7 @@ public class BasicJerseyTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testThrowException() throws Exception
     {
-        callThrowException(500, "Failed to invoke JerseyResourcesComponent{helloWorldResource.component}. Component that caused exception is: JerseyResourcesComponent{helloWorldResource.component}. Message payload is of type: String");
+        callThrowException(500, "Failed to invoke JerseyResourcesComponent");
     }
 
     protected void callThrowException(Integer expectedErrorCode, String expectedData) throws Exception

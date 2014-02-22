@@ -8,10 +8,9 @@ package org.mule.transport.sftp.dataintegrity;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleException;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Prober;
@@ -20,8 +19,6 @@ import org.mule.transport.sftp.SftpClient;
 import org.mule.transport.sftp.util.SftpServer;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -31,7 +28,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test the three different types of handling when duplicate files (i.e. file names)
@@ -41,7 +37,7 @@ import org.junit.runners.Parameterized.Parameters;
  * implemented) - SftpConnector.PROPERTY_DUPLICATE_HANDLING_ASS_SEQ_NO = "addSeqNo"
  */
 @Ignore
-public class SftpCheckDuplicateFileHandlingTestCase extends AbstractServiceAndFlowTestCase
+public class SftpCheckDuplicateFileHandlingTestCase extends FunctionalTestCase
 {
     private static final String DUPLICATED_FILENAME = "file_1.txt";
 
@@ -56,10 +52,6 @@ public class SftpCheckDuplicateFileHandlingTestCase extends AbstractServiceAndFl
 
     private static SftpServer sftpServer;
 
-    public SftpCheckDuplicateFileHandlingTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     private static final HashMap<String, Object> MESSAGE_PROPERTIES = new HashMap<String, Object>();
     {
@@ -70,12 +62,10 @@ public class SftpCheckDuplicateFileHandlingTestCase extends AbstractServiceAndFl
 
     private MuleClient muleClient;
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "dataintegrity/sftp-dataintegrity-duplicate-handling-service.xml"},
-            {ConfigVariant.FLOW, "dataintegrity/sftp-dataintegrity-duplicate-handling-flow.xml"}});
+        return "dataintegrity/sftp-dataintegrity-duplicate-handling-flow.xml";
     }
 
     /**

@@ -15,14 +15,11 @@ import org.mule.transport.http.functional.AbstractMockHttpServerTestCase;
 import org.mule.transport.http.functional.MockHttpServer;
 import org.mule.transport.http.functional.SingleRequestMockHttpServer;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class RestServiceComponentDeleteTestCase extends AbstractMockHttpServerTestCase
 {
@@ -32,17 +29,10 @@ public class RestServiceComponentDeleteTestCase extends AbstractMockHttpServerTe
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public RestServiceComponentDeleteTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "rest-service-component-delete-test-service.xml"},
-            {ConfigVariant.FLOW, "rest-service-component-delete-test-flow.xml"}});
+        return "rest-service-component-delete-test-flow.xml";
     }
 
     @Override

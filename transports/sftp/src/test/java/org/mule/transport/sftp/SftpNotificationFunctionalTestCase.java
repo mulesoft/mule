@@ -8,13 +8,9 @@ package org.mule.transport.sftp;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.transport.sftp.notification.SftpTransportNotificationTestListener;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
-import org.mule.transport.sftp.notification.SftpTransportNotificationTestListener;
 
 /**
  * Test the notification features.
@@ -27,18 +23,11 @@ public class SftpNotificationFunctionalTestCase extends AbstractSftpTestCase
     // Size of the generated stream - 2 Mb
     private final static int SEND_SIZE = 1024 * 1024 * 2;
 
-    public SftpNotificationFunctionalTestCase(ConfigVariant variant, String configResources)
+
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-    
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "mule-sftp-notification-test-config-service.xml"},
-            {ConfigVariant.FLOW, "mule-sftp-notification-test-config-flow.xml"}
-        });
+        return "mule-sftp-notification-test-config-flow.xml";
     }
 
     @Override

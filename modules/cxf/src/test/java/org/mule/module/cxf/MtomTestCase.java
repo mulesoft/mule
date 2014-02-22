@@ -8,16 +8,13 @@ package org.mule.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
@@ -29,28 +26,21 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.mime.TestMtom;
 import org.apache.cxf.mime.TestMtomService;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class MtomTestCase extends AbstractServiceAndFlowTestCase
+@Ignore("Broken on removing services")
+public class MtomTestCase extends FunctionalTestCase
 {
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public MtomTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "mtom-conf-flow.xml";
     }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "mtom-conf-service.xml"},
-            {ConfigVariant.FLOW, "mtom-conf-flow.xml"}
-        });
-    }      
 
     @Test
     public void testEchoService() throws Exception

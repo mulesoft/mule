@@ -12,39 +12,25 @@ import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.OutboundRouterCollection;
-import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.construct.Flow;
-import org.mule.routing.outbound.OutboundPassThroughRouter;
-import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestInboundTransformer;
 import org.mule.tck.testmodels.mule.TestResponseTransformer;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class EndpointTranformersInUriTestCase extends AbstractServiceAndFlowTestCase
+public class EndpointTranformersInUriTestCase extends FunctionalTestCase
 {
-    public EndpointTranformersInUriTestCase(ConfigVariant variant, String configResources)
+
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return  "org/mule/config/spring/parsers/endpoint/endpoint-uri-transformers-flow.xml";
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/config/spring/parsers/endpoint/endpoint-uri-transformers-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/config/spring/parsers/endpoint/endpoint-uri-transformers-flow.xml"}
-        });
-    }      
-    
     @Test
     public void testGlobalEndpoint1() throws MuleException
     {
@@ -104,19 +90,9 @@ public class EndpointTranformersInUriTestCase extends AbstractServiceAndFlowTest
     @Test
     public void testGlobalEndpoints() throws MuleException
     {
-        ImmutableEndpoint endpoint;       
         Object service = muleContext.getRegistry().lookupObject("globalEndpoints");
-        
-        if (variant.equals(ConfigVariant.FLOW))
-        {            
-            endpoint = (ImmutableEndpoint) ((Flow) service).getMessageSource();
-        }
-        else
-        {         
-            endpoint = ((ServiceCompositeMessageSource) ((Service) service).getMessageSource()).getEndpoints()
-                            .get(0);
-        }                              
-        
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) ((Flow) service).getMessageSource();
+
         List <MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
         assertEquals(1, processors.size());
@@ -137,15 +113,9 @@ public class EndpointTranformersInUriTestCase extends AbstractServiceAndFlowTest
         assertEquals(1, transformers.size());
         assertTrue(transformers.get(0) instanceof TestResponseTransformer);    
 
-        if (variant.equals(ConfigVariant.FLOW))
-        {
-            endpoint = (ImmutableEndpoint) ((Flow) service).getMessageProcessors().get(0); 
-        }
-        else
-        {            
-            endpoint = (ImmutableEndpoint) ((OutboundPassThroughRouter) ((OutboundRouterCollection) ((Service) service).getOutboundMessageProcessor()).getRoutes()
-                .get(0)).getRoutes().get(0);
-        }           
+
+        endpoint = (ImmutableEndpoint) ((Flow) service).getMessageProcessors().get(0);
+
                 
         processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
@@ -175,19 +145,9 @@ public class EndpointTranformersInUriTestCase extends AbstractServiceAndFlowTest
    @Test
     public void testLocalEndpoints() throws MuleException
     {              
-        ImmutableEndpoint endpoint;       
         Object service = muleContext.getRegistry().lookupObject("localEndpoints");
-        
-        if (variant.equals(ConfigVariant.FLOW))
-        {            
-            endpoint = (ImmutableEndpoint) ((Flow) service).getMessageSource();
-        }
-        else
-        {         
-            endpoint = ((ServiceCompositeMessageSource) ((Service) service).getMessageSource()).getEndpoints()
-                            .get(0);
-        }        
-        
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) ((Flow) service).getMessageSource();
+
         List <MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
         assertEquals(1, processors.size());
@@ -207,17 +167,9 @@ public class EndpointTranformersInUriTestCase extends AbstractServiceAndFlowTest
         assertNotNull(transformers);
         assertEquals(1, transformers.size());
         assertTrue(transformers.get(0) instanceof TestResponseTransformer);
-        
-        if (variant.equals(ConfigVariant.FLOW))
-        {
-            endpoint = (ImmutableEndpoint) ((Flow) service).getMessageProcessors().get(0); 
-        }
-        else
-        {            
-            endpoint = (ImmutableEndpoint) ((OutboundPassThroughRouter) ((OutboundRouterCollection) ((Service) service).getOutboundMessageProcessor()).getRoutes()
-                .get(0)).getRoutes().get(0);
-        }    
-        
+
+        endpoint = (ImmutableEndpoint) ((Flow) service).getMessageProcessors().get(0);
+
         processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
         assertEquals(1, processors.size());

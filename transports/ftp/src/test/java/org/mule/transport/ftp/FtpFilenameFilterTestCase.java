@@ -12,26 +12,16 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 public class FtpFilenameFilterTestCase extends AbstractFtpServerTestCase
 {
 
-    public FtpFilenameFilterTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "ftp-filename-filter-config-flow.xml"}
-        });
+        return "ftp-filename-filter-config-flow.xml";
     }
 
     @Test

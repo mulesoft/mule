@@ -9,34 +9,23 @@ package org.mule.transport.vm.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class VMRequestorTestCase extends AbstractServiceAndFlowTestCase
+public class VMRequestorTestCase extends FunctionalTestCase
 {
-    public VMRequestorTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "vm/vm-functional-test-service.xml"},
-            {ConfigVariant.FLOW, "vm/vm-functional-test-flow.xml"}
-        });
+        return "vm/vm-functional-test-flow.xml";
     }
 
     @Test

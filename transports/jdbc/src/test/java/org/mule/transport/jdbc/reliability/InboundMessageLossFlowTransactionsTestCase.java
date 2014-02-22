@@ -6,13 +6,6 @@
  */
 package org.mule.transport.jdbc.reliability;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.runners.Parameterized.Parameters;
-
-
-
 /**
  * Verify that no inbound messages are lost when exceptions occur.  
  * The message must either make it all the way to the SEDA queue (in the case of 
@@ -23,17 +16,13 @@ import org.junit.runners.Parameterized.Parameters;
  */
 public class InboundMessageLossFlowTransactionsTestCase extends InboundMessageLossTransactionsTestCase
 {
-    public InboundMessageLossFlowTransactionsTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String[] getConfigFiles()
     {
-        return Arrays.asList(new Object[][]{            
-            {ConfigVariant.FLOW, "reliability/jdbc-connector.xml, reliability/inbound-message-loss-flow-transactions.xml"}
-        });
-    }      
-    
+        return new String[] {
+                "reliability/jdbc-connector.xml",
+                "reliability/inbound-message-loss-flow-transactions.xml"
+        };
+    }
 }

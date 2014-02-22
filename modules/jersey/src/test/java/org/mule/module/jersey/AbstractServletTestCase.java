@@ -7,11 +7,10 @@
 package org.mule.module.jersey;
 
 import static org.junit.Assert.assertEquals;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
@@ -27,7 +26,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.junit.Rule;
 
-public abstract class AbstractServletTestCase extends AbstractServiceAndFlowTestCase
+public abstract class AbstractServletTestCase extends FunctionalTestCase
 {
     @Rule
     public DynamicPort httpPort = new DynamicPort("httpPort");
@@ -35,9 +34,8 @@ public abstract class AbstractServletTestCase extends AbstractServiceAndFlowTest
     private Server httpServer;
     private String context;
 
-    public AbstractServletTestCase(ConfigVariant variant, String configResources, String context)
+    protected AbstractServletTestCase(String context)
     {
-        super(variant, configResources);
         this.context = context;
     }
 

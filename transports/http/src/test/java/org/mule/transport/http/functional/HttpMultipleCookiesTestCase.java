@@ -8,13 +8,10 @@ package org.mule.transport.http.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -38,9 +35,8 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class HttpMultipleCookiesTestCase extends AbstractServiceAndFlowTestCase
+public class HttpMultipleCookiesTestCase extends FunctionalTestCase
 {
     
     protected static String TEST_MESSAGE = "Test Http Request ";
@@ -58,21 +54,17 @@ public class HttpMultipleCookiesTestCase extends AbstractServiceAndFlowTestCase
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    public HttpMultipleCookiesTestCase(ConfigVariant variant, String configResources)
+    public HttpMultipleCookiesTestCase()
     {
-        super(variant, configResources);
         setStartContext(false);
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "http-multiple-cookies-test-flow.xml"},
-            {ConfigVariant.FLOW, "http-multiple-cookies-test-service.xml"}
-        });
-    }      
-    
+        return "http-multiple-cookies-test-service.xml";
+    }
+
     @Override
     protected void doSetUp() throws Exception
     {

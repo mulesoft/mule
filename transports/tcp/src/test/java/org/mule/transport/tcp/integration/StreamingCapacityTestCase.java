@@ -8,11 +8,7 @@ package org.mule.transport.tcp.integration;
 
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Rule;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * This will happily send 1GB while running in significantly less memory, but it takes some time.
@@ -32,17 +28,15 @@ public class StreamingCapacityTestCase extends AbstractStreamingCapacityTestCase
     @Rule
     public DynamicPort port2 = new DynamicPort("port2");    
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    public StreamingCapacityTestCase()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "tcp-streaming-test-service.xml", 10 * ONE_GB},
-            {ConfigVariant.FLOW, "tcp-streaming-test-flow.xml", 10 * ONE_GB}});
+        super(10 * ONE_GB);
     }
 
-    public StreamingCapacityTestCase(ConfigVariant variant, String configResources, long size)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources, size);
+        return "tcp-streaming-test-flow.xml";
     }
 }
 

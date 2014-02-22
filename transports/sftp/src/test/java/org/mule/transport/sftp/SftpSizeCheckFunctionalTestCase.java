@@ -6,11 +6,7 @@
  */
 package org.mule.transport.sftp;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test the sizeCheck feature
@@ -23,18 +19,10 @@ public class SftpSizeCheckFunctionalTestCase extends AbstractSftpTestCase
     // Size of the generated stream - 2 Mb
     final static int SEND_SIZE = 1024 * 1024 * 2;
 
-    public SftpSizeCheckFunctionalTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-    
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "mule-sftp-sizeCheck-test-config-service.xml"},
-            {ConfigVariant.FLOW, "mule-sftp-sizeCheck-test-config-flow.xml"}
-        });
+        return "mule-sftp-sizeCheck-test-config-flow.xml";
     }
 
     @Override

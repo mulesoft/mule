@@ -8,30 +8,27 @@ package org.mule.test.integration.exceptions;
 
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import org.hamcrest.core.IsNull;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.api.context.notification.TransactionNotificationListener;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.context.notification.TransactionNotification;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class ExceptionStrategyExceptionPatternTestCase extends AbstractServiceAndFlowTestCase
+import org.hamcrest.core.IsNull;
+import org.junit.Before;
+import org.junit.Test;
+
+public class ExceptionStrategyExceptionPatternTestCase extends FunctionalTestCase
 {
 
     public static final String PAYLOAD = "some text";
@@ -41,18 +38,12 @@ public class ExceptionStrategyExceptionPatternTestCase extends AbstractServiceAn
     private Latch rollbackLatch = new Latch();
     private AtomicReference<Exception> exceptionHolder = new AtomicReference<Exception>();
 
-    public ExceptionStrategyExceptionPatternTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/integration/exceptions/exception-strategy-exception-pattern-flow.xml";
     }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{{AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/exception-strategy-exception-pattern-service.xml"},
-                {AbstractServiceAndFlowTestCase.ConfigVariant.FLOW, "org/mule/test/integration/exceptions/exception-strategy-exception-pattern-flow.xml"}});
-    }
-    
     @Before
     public void setUp() throws Exception
     {

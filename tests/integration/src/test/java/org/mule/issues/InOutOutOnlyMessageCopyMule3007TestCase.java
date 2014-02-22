@@ -7,37 +7,24 @@
 package org.mule.issues;
 
 import static org.junit.Assert.assertNull;
-
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class InOutOutOnlyMessageCopyMule3007TestCase extends AbstractServiceAndFlowTestCase
+public class InOutOutOnlyMessageCopyMule3007TestCase extends FunctionalTestCase
 {
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/issues/inout-outonly-message-copy-mule3007-test-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/issues/inout-outonly-message-copy-mule3007-test-flow.xml"}
-        });
-    }
-
-    public InOutOutOnlyMessageCopyMule3007TestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/issues/inout-outonly-message-copy-mule3007-test-flow.xml";
     }
 
     @Test

@@ -9,7 +9,6 @@ package org.mule.transport.xmpp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -20,15 +19,12 @@ import org.mule.transport.xmpp.JabberSender.Callback;
 import org.mule.util.UUID;
 import org.mule.util.concurrent.Latch;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class XmppMucSyncTestCase extends AbstractXmppTestCase
 {
@@ -38,18 +34,10 @@ public class XmppMucSyncTestCase extends AbstractXmppTestCase
 
     private final String testMessage = UUID.getUUID().toString();
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "xmpp-muc-sync-config-service.xml"},
-            {ConfigVariant.FLOW, "xmpp-muc-sync-config-flow.xml"}
-        });
-    }
-
-    public XmppMucSyncTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "xmpp-muc-sync-config-flow.xml";
     }
 
     @Override

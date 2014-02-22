@@ -8,7 +8,6 @@ package org.mule.transport.sftp.dataintegrity;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.transport.sftp.AbstractSftpTestCase;
 import org.mule.transport.sftp.SftpClient;
@@ -18,11 +17,6 @@ import java.io.IOException;
 public abstract class AbstractSftpDataIntegrityTestCase extends AbstractSftpTestCase
 {
     protected static final String TEMP_DIR = "uploading";
-
-    public AbstractSftpDataIntegrityTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     protected void verifyInAndOutFiles(String inboundEndpointName,
                                        String outboundEndpointName,

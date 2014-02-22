@@ -9,22 +9,17 @@ package org.mule.test.integration.components;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * This test re-written to use entry point resolvers.  As a consequence, some tests, which verified
  * implementation details rather than functionality, were dropped.
  */
-public class NoArgsCallComponentTestCase extends AbstractServiceAndFlowTestCase
+public class NoArgsCallComponentTestCase extends FunctionalTestCase
 {
     public static final String INPUT_DC_QUEUE_NAME = "vm://in";
     public static final String OUTPUT_DC_QUEUE_NAME = "vm://out";
@@ -36,18 +31,10 @@ public class NoArgsCallComponentTestCase extends AbstractServiceAndFlowTestCase
 
     public static final int TIMEOUT = 5000;
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/components/no-args-call-component-functional-test-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/components/no-args-call-component-functional-test-flow.xml"}
-        });
-    }
-
-    public NoArgsCallComponentTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/components/no-args-call-component-functional-test-flow.xml";
     }
 
     @Test

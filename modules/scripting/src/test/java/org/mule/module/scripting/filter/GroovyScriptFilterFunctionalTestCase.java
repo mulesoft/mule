@@ -9,34 +9,27 @@ package org.mule.module.scripting.filter;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class GroovyScriptFilterFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public class GroovyScriptFilterFunctionalTestCase extends FunctionalTestCase
 {
-    public GroovyScriptFilterFunctionalTestCase(ConfigVariant variant, String configResources)
+
+    public GroovyScriptFilterFunctionalTestCase()
     {
-        super(variant, configResources);
         // Groovy really hammers the startup time since it needs to create the
         // interpreter on every start
         setDisposeContextPerClass(true);
+
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "groovy-filter-config-service.xml"},
-            {ConfigVariant.FLOW, "groovy-filter-config-flow.xml"}
-        });
+        return "groovy-filter-config-flow.xml";
     }
 
     @Test

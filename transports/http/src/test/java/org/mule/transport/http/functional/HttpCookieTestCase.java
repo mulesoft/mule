@@ -15,8 +15,6 @@ import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpRequest;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +24,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.httpclient.Header;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
 {
@@ -38,17 +35,10 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public HttpCookieTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "http-cookie-test-service.xml"},
-            {ConfigVariant.FLOW, "http-cookie-test-flow.xml"}});
+        return "http-cookie-test-flow.xml";
     }
 
     @Override

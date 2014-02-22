@@ -7,7 +7,6 @@
 package org.mule.transport.email.functional;
 
 import static org.junit.Assert.assertEquals;
-
 import org.mule.api.MuleEventContext;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.Callable;
@@ -19,15 +18,12 @@ import org.mule.transport.email.ImapConnector;
 import org.mule.transport.email.RetrieveMessageReceiver;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import javax.mail.internet.MimeMessage;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 /**
  * Tests the correct undeployment of an application with an IMAP inbound endpoint. This test is related to MULE-6737.
@@ -41,17 +37,15 @@ public class ImapUndeployTestCase extends AbstractEmailFunctionalTestCase
     private static final CountDownLatch disposeLatch = new CountDownLatch(1);
     private static final CountDownLatch mailProcessorLatch = new CountDownLatch(1);
 
-    public ImapUndeployTestCase(ConfigVariant variant, String configResources)
+    public ImapUndeployTestCase()
     {
-        super(variant, STRING_MESSAGE, "imap", configResources);
+        super(STRING_MESSAGE, "imap");
     }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW, "imap-undeploy-test.xml"}
-        });
+        return "imap-undeploy-test.xml";
     }
 
     protected void generateAndStoreEmail() throws Exception

@@ -15,9 +15,9 @@ import javax.xml.parsers.ParserConfigurationException;
 public class W3CDomPropertyExtractorMultipleEndpointsTestCase extends AbstractXmlPropertyExtractorTestCase
 {
 
-    public W3CDomPropertyExtractorMultipleEndpointsTestCase(ConfigVariant variant, String configResources)
+    public W3CDomPropertyExtractorMultipleEndpointsTestCase()
     {
-        super(variant, configResources, false);
+        super(false);
     }
 
     @Override

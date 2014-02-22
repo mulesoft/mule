@@ -9,7 +9,6 @@ package org.mule.transport.http.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -19,28 +18,17 @@ import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpsConnector;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.junit.runners.Parameterized.Parameters;
-
 public class HttpsFunctionalTestCase extends HttpFunctionalTestCase
 {
-    public HttpsFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "https-functional-test-service.xml"},
-            {ConfigVariant.FLOW, "https-functional-test-flow.xml"}
-        });
+        return "https-functional-test-flow.xml";
     }
 
     @Override

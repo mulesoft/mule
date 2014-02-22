@@ -9,7 +9,6 @@ package org.mule.transport.xmpp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.transport.xmpp.JabberSender.Callback;
 
 import java.util.Properties;
@@ -30,10 +29,6 @@ public abstract class AbstractXmppTestCase extends XmppEnableDisableTestCase
     protected String conversationPartner;
     protected String muleJabberUserId;
 
-    public AbstractXmppTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, COMMON_CONFIG + configResources);
-    }
 
     @Override
     protected void doSetUp() throws Exception

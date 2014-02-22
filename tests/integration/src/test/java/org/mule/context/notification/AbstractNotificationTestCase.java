@@ -7,9 +7,8 @@
 package org.mule.context.notification;
 
 import static org.junit.Assert.fail;
-
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Iterator;
 
@@ -18,21 +17,16 @@ import org.junit.Test;
 /**
  * Tests must define a "notificationLogger" listener
  */
-public abstract class AbstractNotificationTestCase extends AbstractServiceAndFlowTestCase
+public abstract class AbstractNotificationTestCase extends FunctionalTestCase
 {
     private NotificationLogger notificationLogger;
 
-    public AbstractNotificationTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Test
     public final void testNotifications() throws Exception
     {
         doTest();
-        notificationLogger = (NotificationLogger) muleContext.getRegistry()
-            .lookupObject("notificationLogger");
+        notificationLogger = muleContext.getRegistry().lookupObject("notificationLogger");
 
         // Need to explicitly dispose manager here to get disposal notifications
         muleContext.dispose();

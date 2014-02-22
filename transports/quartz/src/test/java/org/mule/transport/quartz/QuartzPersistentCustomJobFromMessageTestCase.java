@@ -8,33 +8,21 @@ package org.mule.transport.quartz;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.quartz.jobs.ScheduledDispatchJobConfig;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class QuartzPersistentCustomJobFromMessageTestCase extends AbstractServiceAndFlowTestCase
+public class QuartzPersistentCustomJobFromMessageTestCase extends FunctionalTestCase
 {
     private static final long TIMEOUT = 30000;
 
-    public QuartzPersistentCustomJobFromMessageTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "quartz-persistent-custom-job-generator-service.xml"},
-            {ConfigVariant.FLOW, "quartz-persistent-custom-job-generator-flow.xml"}});
+        return "quartz-persistent-custom-job-generator-flow.xml";
     }
 
     @Test

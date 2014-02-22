@@ -6,21 +6,17 @@
  */
 package org.mule.module.jaas;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.mule.api.EncryptionStrategy;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.security.CryptoFailureException;
 import org.mule.security.MuleCredentials;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-public abstract class AbstractJaasFunctionalTestCase extends AbstractServiceAndFlowTestCase
+import java.util.HashMap;
+import java.util.Map;
+
+public abstract class AbstractJaasFunctionalTestCase extends FunctionalTestCase
 {
-    public AbstractJaasFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     protected Map<String, Object> createMessagePropertiesWithCredentials(String username, String password)
         throws CryptoFailureException

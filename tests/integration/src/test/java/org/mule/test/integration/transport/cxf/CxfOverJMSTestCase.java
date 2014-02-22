@@ -8,21 +8,16 @@ package org.mule.test.integration.transport.cxf;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transport.PropertyScope;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class CxfOverJMSTestCase extends AbstractServiceAndFlowTestCase
+public class CxfOverJMSTestCase extends FunctionalTestCase
 {
     private static final String req = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
                                       + "<soap:Body>"
@@ -32,18 +27,10 @@ public class CxfOverJMSTestCase extends AbstractServiceAndFlowTestCase
                                       + "</soap:Body>"
                                       + "</soap:Envelope>";
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/transport/cxf/cxf-over-jms-config-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/transport/cxf/cxf-over-jms-config-flow.xml"}
-        });
-    }
-
-    public CxfOverJMSTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/transport/cxf/cxf-over-jms-config-flow.xml";
     }
 
     @Test

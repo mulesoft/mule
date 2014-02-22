@@ -8,17 +8,14 @@ package org.mule.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.StringUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.dom4j.Document;
@@ -26,25 +23,16 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class CxfBadSoapRequestTestCase extends AbstractServiceAndFlowTestCase
+public class CxfBadSoapRequestTestCase extends FunctionalTestCase
 {
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public CxfBadSoapRequestTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "soap-request-conf-service.xml"},
-            {ConfigVariant.FLOW, "soap-request-conf-flow.xml"}
-        });
+        return "soap-request-conf-flow.xml";
     }
 
     @Test

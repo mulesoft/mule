@@ -9,33 +9,21 @@ package org.mule.transport.quartz;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class QuartzPersistentQueueEventGeneratorTestCase extends AbstractServiceAndFlowTestCase
+public class QuartzPersistentQueueEventGeneratorTestCase extends FunctionalTestCase
 {
     private static final long TIMEOUT = 30000;
 
-    public QuartzPersistentQueueEventGeneratorTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "quartz-persistent-event-generator-service.xml"},
-            {ConfigVariant.FLOW, "quartz-persistent-event-generator-flow.xml"}});
+        return "quartz-persistent-event-generator-flow.xml";
     }
 
     @Test

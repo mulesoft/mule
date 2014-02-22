@@ -6,27 +6,16 @@
  */
 package org.mule.config.spring.parsers;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class DuplicateBeanNameTestCase extends AbstractBadConfigTestCase
 {
 
-    public DuplicateBeanNameTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);     
+        return "org/mule/config/spring/parsers/duplicate-bean-name-test.xml";
     }
-    
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/config/spring/parsers/duplicate-bean-name-test.xml"},            
-        });
-    }      
 
     @Test
     public void testBeanError() throws Exception

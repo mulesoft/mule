@@ -11,9 +11,9 @@ import java.util.Properties;
 public class JXPathPropertyExtractorMultipleEndpointsTestCase extends AbstractXmlPropertyExtractorTestCase
 {
 
-    public JXPathPropertyExtractorMultipleEndpointsTestCase(ConfigVariant variant, String configResources)
+    public JXPathPropertyExtractorMultipleEndpointsTestCase()
     {
-        super(variant, configResources, true);
+        super(true);
     }
 
     @Override

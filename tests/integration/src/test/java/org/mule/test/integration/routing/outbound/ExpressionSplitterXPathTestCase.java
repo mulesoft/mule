@@ -61,7 +61,6 @@ public class ExpressionSplitterXPathTestCase extends AbstractServiceAndFlowTestC
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/routing/outbound/expression-splitter-xpath-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/routing/outbound/expression-splitter-xpath-test-flow.xml"},
             {ConfigVariant.FLOW_EL, "org/mule/test/integration/routing/outbound/expression-splitter-xpath-test-flow-el.xml"}
         });

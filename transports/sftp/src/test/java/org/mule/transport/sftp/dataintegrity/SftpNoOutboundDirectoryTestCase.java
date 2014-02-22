@@ -8,18 +8,14 @@ package org.mule.transport.sftp.dataintegrity;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.client.MuleClient;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.transport.sftp.SftpClient;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Verify that the original file is not lost if the outbound directory doesn't exist
@@ -28,17 +24,10 @@ public class SftpNoOutboundDirectoryTestCase extends AbstractSftpDataIntegrityTe
 {
     private static final String ENDPOINT_NAME = "inboundEndpoint";
 
-    public SftpNoOutboundDirectoryTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "dataintegrity/sftp-no-outbound-directory-config-service.xml"},
-            {ConfigVariant.FLOW, "dataintegrity/sftp-no-outbound-directory-config-flow.xml"}});
+        return "dataintegrity/sftp-no-outbound-directory-config-flow.xml";
     }
 
     @Override

@@ -6,38 +6,25 @@
  */
 package org.mule.test.integration.client;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-public class MuleClientListenerTestCase extends AbstractServiceAndFlowTestCase
+public class MuleClientListenerTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/client/mule-client-listener-config-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/client/mule-client-listener-config-flow.xml"}});
-    }
 
-    public MuleClientListenerTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/integration/client/mule-client-listener-config-flow.xml";
     }
 
     public void doTestRegisterListener(String component, String endpoint, boolean canSendWithoutReceiver)
@@ -58,11 +45,6 @@ public class MuleClientListenerTestCase extends AbstractServiceAndFlowTestCase
         }
 
         Object c = muleContext.getRegistry().lookupObject(component);
-
-        if (variant.equals(ConfigVariant.SERVICE))
-        {
-            ((Startable) c).start();
-        }
 
         MuleMessage message = client.send(endpoint, "Test Client Send message", null);
         assertNotNull(message);

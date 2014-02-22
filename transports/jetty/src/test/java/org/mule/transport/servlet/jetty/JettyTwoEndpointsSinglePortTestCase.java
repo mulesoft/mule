@@ -8,40 +8,28 @@ package org.mule.transport.servlet.jetty;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transformer.DataType;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class JettyTwoEndpointsSinglePortTestCase extends AbstractServiceAndFlowTestCase
+public class JettyTwoEndpointsSinglePortTestCase extends FunctionalTestCase
 {
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public JettyTwoEndpointsSinglePortTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "jetty-two-endpoints-single-port-service.xml"},
-            {ConfigVariant.FLOW, "jetty-two-endpoints-single-port-flow.xml"}
-        });
+        return "jetty-two-endpoints-single-port-flow.xml";
     }
 
     @Test

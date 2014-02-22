@@ -6,21 +6,16 @@
  */
 package org.mule.module.cxf;
 
+import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
-import static org.junit.Assert.assertTrue;
-
-public class ProxySoapVersionTestCase extends AbstractServiceAndFlowTestCase
+public class ProxySoapVersionTestCase extends FunctionalTestCase
 {
     String doGoogleSearch = "<urn:doGoogleSearch xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:urn=\"urn:GoogleSearch\">";
 
@@ -52,21 +47,13 @@ public class ProxySoapVersionTestCase extends AbstractServiceAndFlowTestCase
         + "<!-- comment 7 -->"
         + "</soap12:Envelope>";
 
-    public ProxySoapVersionTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant,  configResources);
-    }
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][] {
-                {AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE, "proxy-soap-version-conf-service.xml"},
-                {AbstractServiceAndFlowTestCase.ConfigVariant.FLOW, "proxy-soap-version-conf-flow.xml"}
-        });
+        return "proxy-soap-version-conf-flow.xml";
     }
 
     @Test

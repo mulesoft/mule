@@ -8,34 +8,22 @@ package org.mule.transport.vm;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Simple synch test used to study message flow.
  */
-public class VMSynchTestCase extends AbstractServiceAndFlowTestCase
+public class VMSynchTestCase extends FunctionalTestCase
 {
-    public VMSynchTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "vm/vm-synch-test-service.xml"},
-            {ConfigVariant.FLOW, "vm/vm-synch-test-flow.xml"}
-        });
+        return "vm/vm-synch-test-flow.xml";
     }
 
     @Test

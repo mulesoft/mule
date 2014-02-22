@@ -7,18 +7,15 @@
 package org.mule.test.integration.streaming;
 
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.client.MuleClient;
 import org.mule.module.xml.stax.DelegateXMLStreamReader;
 import org.mule.module.xml.stax.StaxSource;
 import org.mule.module.xml.util.XMLUtils;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import javax.xml.stream.XMLInputFactory;
@@ -30,10 +27,9 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.xml.sax.InputSource;
 
-public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTestCase
+public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
 {
     private final int timeoutMs = 3000;
     private static Latch inputStreamLatch = new Latch();
@@ -42,19 +38,10 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
     private TestByteArrayInputStream inputStream;
     private MuleClient client;
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-            "org/mule/test/integration/streaming/close-stream-on-mule-exception-test-service.xml"},
-            {ConfigVariant.FLOW,
-            "org/mule/test/integration/streaming/close-stream-on-mule-exception-test-flow.xml"}});
-    }
-
-    public CloseStreamOnMuleExceptionTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/streaming/close-stream-on-mule-exception-test-flow.xml";
     }
 
     @Override

@@ -16,10 +16,6 @@ import org.mule.transport.http.HttpConnector;
 
 public class JettyHttpBadEncodingFunctionalTestCase extends JettyHttpEncodingFunctionalTestCase
 {
-    public JettyHttpBadEncodingFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Override
     public void testSend() throws Exception

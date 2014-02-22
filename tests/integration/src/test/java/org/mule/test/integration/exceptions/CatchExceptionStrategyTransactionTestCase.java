@@ -6,24 +6,21 @@
  */
 package org.mule.test.integration.exceptions;
 
-import org.hamcrest.core.IsNull;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import org.hamcrest.core.IsNull;
+import org.junit.Test;
 
-public class CatchExceptionStrategyTransactionTestCase extends AbstractServiceAndFlowTestCase
+public class CatchExceptionStrategyTransactionTestCase extends FunctionalTestCase
 {
 
     public static final int TIMEOUT = 5000;
@@ -31,16 +28,10 @@ public class CatchExceptionStrategyTransactionTestCase extends AbstractServiceAn
     public static final int SHORT_TIMEOUT = 500;
     private Latch messageConsumed = new Latch();
 
-    public CatchExceptionStrategyTransactionTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{{AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/catch-exception-strategy-transaction-service.xml"},
-                {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/catch-exception-strategy-transaction-flow.xml"}});
+        return "org/mule/test/integration/exceptions/catch-exception-strategy-transaction-flow.xml";
     }
 
     @Test

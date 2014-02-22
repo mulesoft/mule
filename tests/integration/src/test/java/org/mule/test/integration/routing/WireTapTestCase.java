@@ -12,6 +12,7 @@ import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
 import java.util.Arrays;
@@ -21,19 +22,13 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-public class WireTapTestCase extends AbstractServiceAndFlowTestCase
+public class WireTapTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/routing/wire-tap-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/routing/wire-tap-flow.xml"}});
-    }
 
-    public WireTapTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/integration/routing/wire-tap-flow.xml";
     }
 
     @Test

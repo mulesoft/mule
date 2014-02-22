@@ -6,26 +6,20 @@
  */
 package org.mule.test.integration.message;
 
+import static org.junit.Assert.assertEquals;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
-public abstract class AbstractPropertyScopeTestCase extends AbstractServiceAndFlowTestCase
+public abstract class AbstractPropertyScopeTestCase extends FunctionalTestCase
 {
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
-
-    public AbstractPropertyScopeTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
 
     @Test
     public void testRequestResponse() throws Exception

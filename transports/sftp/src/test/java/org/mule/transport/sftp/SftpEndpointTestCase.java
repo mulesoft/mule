@@ -9,37 +9,24 @@ package org.mule.transport.sftp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class SftpEndpointTestCase extends AbstractSftpTestCase
 {
     @Rule
     public DynamicPort dynamicPort1 = new DynamicPort("SFTP_PORT");
 
-    public SftpEndpointTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "mule-sftp-endpoint-config-service.xml"},
-            {ConfigVariant.FLOW, "mule-sftp-endpoint-config-flow.xml"}
-        });
+        return "mule-sftp-endpoint-config-flow.xml";
     }
 
     @Test

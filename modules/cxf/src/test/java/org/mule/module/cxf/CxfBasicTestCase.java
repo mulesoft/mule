@@ -9,20 +9,17 @@ package org.mule.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.config.i18n.LocaleMessageHandler;
 import org.mule.module.xml.util.XMLUtils;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.IOUtils;
 
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -32,27 +29,18 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class CxfBasicTestCase extends AbstractServiceAndFlowTestCase
+public class CxfBasicTestCase extends FunctionalTestCase
 {
     private String echoWsdl;
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    public CxfBasicTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "basic-conf-service.xml"},
-            {ConfigVariant.FLOW, "basic-conf-flow.xml"}
-        });
+        return "basic-conf-flow.xml";
     }
 
     @Override

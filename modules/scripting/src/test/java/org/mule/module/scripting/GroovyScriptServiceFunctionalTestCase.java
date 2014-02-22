@@ -17,6 +17,12 @@ import org.junit.Test;
 
 public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase
 {
+    @Override
+    protected String getConfigFile()
+    {
+        return "groovy-component-config.xml";
+    }
+
     @Test
     public void testInlineScript() throws Exception
     {
@@ -55,11 +61,5 @@ public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase
         MuleMessage response = client.request("vm://out4", RECEIVE_TIMEOUT);
         assertNotNull(response);
         assertEquals("Important Message Received A-OK", response.getPayloadAsString());
-    }
-
-    @Override
-    protected String getConfigFile()
-    {
-        return "groovy-component-config-service.xml";
     }
 }
