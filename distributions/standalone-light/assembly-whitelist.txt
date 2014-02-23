@@ -94,7 +94,7 @@
 # /lib/mule
 #
 /mule-standalone-nodocs-${productVersion}/lib/mule
-/mule-standalone-nodocs-${productVersion}/lib/mule/mule-common-${productVersion}.jar
+/mule-standalone-nodocs-${productVersion}/lib/mule/mule-common-3.5.0-M4-SNAPSHOT.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-core-${productVersion}-tests.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-core-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-annotations-${productVersion}.jar
@@ -169,8 +169,8 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/asm-3.3.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/asm-commons-3.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/asm-tree-3.1.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/aspectjrt-1.6.11.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/aspectjweaver-1.6.11.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/aspectjrt-1.7.3.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/aspectjweaver-1.7.3.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/axiom-api-1.2.5.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/axiom-impl-1.2.5.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/bcmail-jdk16-1.46.jar
