@@ -1724,6 +1724,11 @@
     <profiles>
         <profile>
             <id>distributions</id>
+            <activation>
+                <property>
+                    <name>!skipDistributions</name>
+                </property>
+            </activation>
             <modules>
                 <module>distributions</module>
             </modules>
