@@ -25,12 +25,14 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.lang.StringUtils;
 
 public class MuleProcessController
 {
 
     private static final String ANCHOR_DELETE_ERROR = "Could not delete anchor file [%s] when stopping Mule ESB.";
     private static final String ADD_LIBRARY_ERROR = "Error copying jar file [%s] to lib directory [%s].";
+    private static final String CREATE_DOMAIN_ERROR = "Error creating domain [%s] with config [%s].";
     private static final String MULE_HOME_VARIABLE = "MULE_HOME";
     private static final String ANCHOR_SUFFIX = "-anchor.txt";
     private static final String STATUS = "Mule Enterprise Edition is running \\(([0-9]+)\\)\\.";
@@ -40,6 +42,7 @@ public class MuleProcessController
     public static final int TIMEOUT = 30000;
     private String muleHome;
     private String muleBin;
+    private File domainsDir;
     private File appsDir;
     private File libsDir;
 
@@ -47,6 +50,7 @@ public class MuleProcessController
     {
         this.muleHome = muleHome;
         this.muleBin = muleHome + "/bin/mule";
+        this.domainsDir = new File(muleHome + "/domains");
         this.appsDir = new File(muleHome + "/apps/");
         this.libsDir = new File(muleHome + "/lib/user");
     }
@@ -234,7 +238,7 @@ public class MuleProcessController
 
     public void addLibrary(File jar)
     {
-        verify(jar.exists(), "Jar file does not exists: %s", jar);
+        verify(jar.exists(), "Jar file does not exist: %s", jar);
         verify("jar".equals(FilenameUtils.getExtension(jar.getAbsolutePath())), "Library [%s] don't have .jar extension.", jar);
         verify(jar.canRead(), "Cannot read jar file: %s", jar);
         verify(libsDir.canWrite(), "Cannot write on lib dir: %", libsDir);
@@ -255,4 +259,24 @@ public class MuleProcessController
             throw new MuleControllerException(String.format(message, args));
         }
     }
+
+    public void createDomain(String domainName, File domainConfig)
+    {
+        verify(domainConfig.exists(), "Domain configuration file does not exist: %s", domainConfig);
+        verify(StringUtils.isNotEmpty(domainName), "Domain name is empty");
+        verify(domainConfig.exists(), "Domain configuration file does not exist: %s", domainConfig);
+        File domain = new File(this.domainsDir, domainName);
+        verify(!domain.exists(), "Domain %s already exists", domainName);
+        verify(domain.mkdir(), "Couldn't create domain directory %s", domain);
+        try
+        {
+            FileUtils.copyFileToDirectory(domainConfig, domain);
+        }
+        catch (IOException e)
+        {
+            throw new MuleControllerException(String.format(CREATE_DOMAIN_ERROR, domainName, domainConfig), e);
+        }
+
+    }
+
 }
