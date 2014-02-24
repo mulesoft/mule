@@ -55,13 +55,6 @@
         <plugins>        
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <forkMode>pertest</forkMode>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
@@ -103,7 +96,7 @@
                                 <artifactItem>
                                     <groupId>${groupId}</groupId>
                                     <artifactId>${artifactId}</artifactId>
-                                    <version>${version}</version>
+                                    <version>${project.version}</version>
                                     <destFileName>${artifactId}.jar</destFileName>
                                 </artifactItem>
                             </artifactItems>
@@ -123,7 +116,7 @@
                                 <artifactItem>
                                     <groupId>${groupId}</groupId>
                                     <artifactId>${artifactId}</artifactId>
-                                    <version>${version}</version>
+                                    <version>${project.version}</version>
                                     <destFileName>${artifactId}.jar</destFileName>
                                 </artifactItem>
                             </artifactItems>

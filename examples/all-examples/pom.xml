@@ -24,37 +24,37 @@
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-bookstore</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <type>zip</type>
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-echo</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <type>zip</type>
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-errorhandler</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <type>zip</type>
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-gpswalker</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <type>zip</type>
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-hello</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <type>zip</type>
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-loanbroker-bpm</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <type>zip</type>
             <exclusions>
 	            <exclusion>
@@ -66,31 +66,31 @@
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-loanbroker-simple</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <type>zip</type>
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-notifications</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <type>zip</type>
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-scripting</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <type>zip</type>
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-stockquote</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <type>zip</type>
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-launcher</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <type>zip</type>
         </dependency>
     </dependencies>

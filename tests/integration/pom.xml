@@ -12,7 +12,9 @@
     <packaging>jar</packaging>
 
     <properties>
+        <skipExportTests>false</skipExportTests>
         <licensePath>../../LICENSE_HEADER.txt</licensePath>
+        <skipTests>${skipIntegrationTests}</skipTests>
     </properties>
 
     <build>
@@ -21,23 +23,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <!--
-                        Fork each test in its own VM to minimize side effects of
-                        failed AMQ shutdowns and other unrelated failures.
-                    -->
-                    <forkMode>pertest</forkMode>
+                    <argLine>-Xmx512m -XX:MaxPermSize=128m</argLine>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
@@ -46,13 +33,13 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -64,7 +51,7 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-modules-all</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <type>pom</type>
             <scope>test</scope>
         </dependency>
@@ -72,14 +59,14 @@
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transports-all</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <type>pom</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.patterns</groupId>
             <artifactId>mule-patterns-all</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <type>pom</type>
             <scope>test</scope>
         </dependency>
@@ -88,7 +75,7 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-cxf</artifactId>
             <classifier>tests</classifier>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -101,7 +88,7 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-security</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -143,7 +130,7 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-extras</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -152,7 +139,7 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-email</artifactId>
             <classifier>tests</classifier>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
 

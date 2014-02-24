@@ -16,6 +16,7 @@
     <name>Mule 3 Launcher</name>
 
     <properties>
+        <skipExportTests>false</skipExportTests>
         <licensePath>../../LICENSE_HEADER.txt</licensePath>
     </properties>
 
@@ -23,19 +24,19 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-reboot</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>tanukisoft</groupId>
@@ -49,14 +50,14 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-builders</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -22,7 +22,7 @@
         <dependency>
             <groupId>org.mule.patterns</groupId>
             <artifactId>mule-pattern-core</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>

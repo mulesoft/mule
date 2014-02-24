@@ -7,6 +7,12 @@
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang.SystemUtils
 
+if (project.properties.skipArchetypeTests == "true")
+{
+    log.info("Skipping tests")
+    return
+}
+
 /*
  * Make sure that the archetype can do its job, i.e. remove any leftovers from
  * the last invocation of the archetype

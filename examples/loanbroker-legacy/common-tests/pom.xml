@@ -18,12 +18,12 @@
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-loanbroker-common</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

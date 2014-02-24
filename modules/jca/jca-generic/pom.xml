@@ -19,7 +19,7 @@
         <dependency>
             <groupId>org.mule.modules.jca</groupId>
             <artifactId>mule-module-jca-core</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>

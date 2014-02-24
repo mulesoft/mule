@@ -59,10 +59,28 @@
         <module>tests</module>
         <module>tools</module>
         <module>transports</module>
+        <module>distributions</module>
     </modules>
 
     <properties>
         <licensePath>LICENSE_HEADER.txt</licensePath>
+
+        <!-- Properties that can be overriden in submodules -->
+        <skipExportTests>true</skipExportTests>
+
+        <!-- Properties that can be used to enable/disable parts of the build via cmd line or profiles -->
+        <skipIntegrationTests>false</skipIntegrationTests>
+        <skipPerformanceTests>true</skipPerformanceTests>
+        <skipArchetypeTests>true</skipArchetypeTests>
+
+        <skipDistributions>true</skipDistributions>
+        <skipVerifications>false</skipVerifications>
+        <skipInstalls>false</skipInstalls>
+
+        <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+        <coberturaVersion>2.5</coberturaVersion>
+        <eclipsePluginVersion>2.5.1</eclipsePluginVersion>
+        <javadocPluginVersion>2.8</javadocPluginVersion>
 
         <!--
             The above project.url will not be picked up in the manifest,
@@ -1246,7 +1264,7 @@
         <site>
             <id>mule-site</id>
             <name>Mule Website</name>
-            <url>dav:https://dav.codehaus.org/mule/docs/${version}</url>
+            <url>dav:https://dav.codehaus.org/mule/docs/${project.version}</url>
         </site>
     </distributionManagement>
 
@@ -1335,12 +1353,23 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>2.1</version>
+                    <version>2.2.1</version>
+                    <configuration>
+                        <skipAssembly>${skipDistributions}</skipAssembly>
+                    </configuration>
                 </plugin>
                 <plugin>
-                    <groupId>org.mule.tools</groupId>
-                    <artifactId>mule-assembly-verifier</artifactId>
-                    <version>1.2</version>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>2.4</version>
+                    <configuration>
+                        <skip>${skipInstalls}</skip>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>2.9.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1366,9 +1395,35 @@
                     <version>1.7.1</version>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>2.2.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.6</version>
+                    <configuration>
+                        <argLine>-Xms64m -Xmx512m</argLine>
+                        <excludes>
+                            <!-- Surefire should be able to detect that classes are abstract but it seems it isn't -->
+                            <exclude>**/Abstract*.*</exclude>
+                            <!-- Our tests never start with Test* but we have a lot of test helpers that match -->
+                            <exclude>**/Test*.java</exclude>
+                            <!-- exclude inner classes -->
+                            <exclude>**/*$*</exclude>
+                        </excludes>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>2.1</version>
+                </plugin>
+                <plugin>
                     <groupId>org.codehaus.gmaven</groupId>
                     <artifactId>gmaven-plugin</artifactId>
-                    <version>1.2</version>
+                    <version>1.4</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -1395,6 +1450,140 @@
                         </execution>
                     </executions>
                 </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>shitty-maven-plugin</artifactId>
+                    <version>1.0-alpha-3</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.mule.tools</groupId>
+                    <artifactId>mule-assembly-verifier</artifactId>
+                    <version>1.2</version>
+                    <configuration>
+                        <skip>${skipDistributions}</skip>
+                    </configuration>
+                    <dependencies>
+                        <!--
+                            Groovy dependency is handled by Mule differently,
+                            declare the compatible one explicitly for the plugin.
+                        -->
+                        <dependency>
+                            <groupId>org.codehaus.groovy</groupId>
+                            <artifactId>groovy-all</artifactId>
+                            <version>1.6.0</version>
+                        </dependency>
+                    </dependencies>
+
+                    <executions>
+                        <execution>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>buildnumber-maven-plugin</artifactId>
+                    <version>1.1</version>
+                    <executions>
+                        <execution>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>create</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <!-- never touch vcs -->
+                        <doCheck>false</doCheck>
+                        <doUpdate>false</doUpdate>
+                        <timestampFormat>{0,date,yyyy-MMM-dd HH:mm:ss}</timestampFormat>
+                        <shortRevisionLength>8</shortRevisionLength>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>com.mycila</groupId>
+                    <artifactId>license-maven-plugin</artifactId>
+                    <version>2.6</version>
+                    <configuration>
+                        <skip>${skipVerifications}</skip>
+                        <header>${licensePath}</header>
+                        <excludes>
+                            <exclude>target/**</exclude>
+                            <exclude>**/.gitignore</exclude>
+                            <exclude>**/*.txt</exclude>
+                            <exclude>**/*.groovy</exclude>
+                            <exclude>**/*.sh</exclude>
+                            <exclude>**/*.bat</exclude>
+                            <exclude>**/*.ftl</exclude>
+                            <exclude>**/*.xml</exclude>
+                            <exclude>**/*.properties</exclude>
+                            <exclude>**/*.sample</exclude>
+                            <exclude>**/*.md</exclude>
+                            <exclude>**/*.xsl</exclude>
+                            <exclude>**/*.html</exclude>
+                            <exclude>**/*.css</exclude>
+                            <exclude>**/build-number.txt</exclude>
+
+                            <exclude>**/BndMojo.java</exclude>
+                            <exclude>**/BobberArchetype.java</exclude>
+                            <exclude>**/BobberArchetypeMojo.java</exclude>
+                            <exclude>**/DummySSLServerSocketFactory.java</exclude>
+                            <exclude>**/ConfigurationPatternArchetypeMojo.java</exclude>
+                            <exclude>**/ModuleArchetypeMojo.java</exclude>
+                            <exclude>**/MultipartConfiguration.java</exclude>
+
+                            <exclude>**/ParamReader.java</exclude>
+                            <exclude>**/Part.java</exclude>
+                            <exclude>**/ProjectArchetypeMojo.java</exclude>
+                            <exclude>**/TransportArchetypeMojo.java</exclude>
+                            <exclude>**/XMLStreamReaderToContentHandler.java</exclude>
+                            <exclude>**/__artifactId__IBean.java</exclude>
+                            <exclude>**/__artifactId__IBeanTestCase.java</exclude>
+                            <exclude>**/jetty/WebAppDeployer.java</exclude>
+                        </excludes>
+                        <includes>
+                            <include>**/*.java</include>
+                        </includes>
+                        <mapping>
+                            <java>SLASHSTAR_STYLE</java>
+                        </mapping>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>1.0.1</version>
+                    <executions>
+                        <execution>
+                            <id>enforce-maven-version</id>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <configuration>
+                                <skip>${skipVerifications}</skip>
+                                <rules>
+                                    <requireMavenVersion>
+                                        <version>[3.0.0,)</version>
+                                    </requireMavenVersion>
+                                    <requireJavaVersion>
+                                        <version>[1.6.0,)</version>
+                                    </requireJavaVersion>
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -1402,26 +1591,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.0-alpha-4</version>
-                <executions>
-                    <execution>
-                        <id>enforce-maven-version</id>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <requireMavenVersion>
-                                    <version>[2.0.8,)</version>
-                                </requireMavenVersion>
-                                <requireJavaVersion>
-                                    <!-- Java version must be 1.5 or higher, JDK6 not allowed -->
-                                    <version>[1.5.0,1.6.0)</version>
-                                </requireJavaVersion>
-                            </rules>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
 
             <!--
@@ -1431,11 +1600,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.5.1</version>
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
                     <encoding>ISO-8859-1</encoding>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
             </plugin>
 
             <!-- Global test exclusions -->
@@ -1491,7 +1665,7 @@
                     <dependency>
                         <groupId>org.mule</groupId>
                         <artifactId>mule-buildtools</artifactId>
-                        <version>${version}</version>
+                        <version>${project.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -1512,6 +1686,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-idea-plugin</artifactId>
+                <version>2.2</version>
                 <configuration>
                     <downloadSources>true</downloadSources>
                     <jdkName>1.5</jdkName>
@@ -1523,6 +1698,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.2</version>
                 <configuration>
                     <archive>
                         <!--
@@ -1540,10 +1716,10 @@
                         <!-- Custom Entries -->
                         <manifestEntries>
                             <More-Info>For more information go to ${productUrl}</More-Info>
-                            <Support>Get commercial support: ${pom.organization.url}/support</Support>
+                            <Support>Get commercial support: ${project.organization.url}/support</Support>
                             <Description>Mule ESB and Integration Platform</Description>
                             <License>CPAL v1.0 http://www.mulesoft.com/CPAL/</License>
-                            <Vendor-Url>${pom.organization.url}</Vendor-Url>
+                            <Vendor-Url>${project.organization.url}</Vendor-Url>
                             <Product-Url>${productUrl}</Product-Url>
                             <Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date>
                             <!-- include repository revision from buildnumber plugin -->
@@ -1553,6 +1729,17 @@
                         </manifestEntries>
                     </archive>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-test-jar</id>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${skipExportTests}</skip>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <!--
                 we are using 'mule' as the packaging type in our examples
@@ -1564,59 +1751,146 @@
                 <extensions>true</extensions>
             </plugin>
             <plugin>
-                <groupId>com.mycila.maven-license-plugin</groupId>
-                <artifactId>maven-license-plugin</artifactId>
-                <version>1.9.0</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <!--
+                    Do not inherit the site config to child modules. This is the only approach that works
+                    to generate aggregated javadocs (which is the main purpose of the site) and that does
+                    not fork the complete lifecycle for each child module.
+                -->
+                <inherited>false</inherited>
                 <configuration>
-                    <header>${licensePath}</header>
-                    <excludes>
-                        <exclude>target/**</exclude>
-                        <exclude>**/.gitignore</exclude>
-                        <exclude>**/*.txt</exclude>
-                        <exclude>**/*.groovy</exclude>
-                        <exclude>**/*.sh</exclude>
-                        <exclude>**/*.bat</exclude>
-                        <exclude>**/*.ftl</exclude>
-                        <exclude>**/*.xml</exclude>
-                        <exclude>**/*.properties</exclude>
-                        <exclude>**/*.sample</exclude>
-                        <exclude>**/*.md</exclude>
-                        <exclude>**/*.xsl</exclude>
-                        <exclude>**/*.html</exclude>
-                        <exclude>**/*.css</exclude>
-                        <exclude>**/build-number.txt</exclude>
+                    <reportPlugins>
+                        <!--
+                            Disabled for now, the main purpose of the site is to generate javadocs. We
+                            never actually used the JXR output anyway.
 
-                        <exclude>**/BndMojo.java</exclude>
-                        <exclude>**/BobberArchetype.java</exclude>
-                        <exclude>**/BobberArchetypeMojo.java</exclude>
-                        <exclude>**/DummySSLServerSocketFactory.java</exclude>
-                        <exclude>**/ConfigurationPatternArchetypeMojo.java</exclude>
-                        <exclude>**/ModuleArchetypeMojo.java</exclude>
-                        <exclude>**/MultipartConfiguration.java</exclude>
+                        <reportPlugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-jxr-plugin</artifactId>
+                            <version>2.2</version>
+                            <configuration>
+                                <aggregate>true</aggregate>
+                            </configuration>
+                        </reportPlugin>
+                        -->
+                        <reportPlugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-project-info-reports-plugin</artifactId>
+                            <reportSets>
+                                <reportSet>
+                                    <reports>
+                                        <report>dependencies</report>
+                                        <report>index</report>
+                                    </reports>
+                                </reportSet>
+                            </reportSets>
+                        </reportPlugin>
+                        <reportPlugin>
+                            <groupId>org.mule.tools</groupId>
+                            <artifactId>mule-test-exclusions-report-plugin</artifactId>
+                            <version>1.2</version>
+                        </reportPlugin>
+                        <reportPlugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-javadoc-plugin</artifactId>
+                            <version>${javadocPluginVersion}</version>
+                            <configuration>
+                                <minmemory>128m</minmemory>
+                                <maxmemory>512m</maxmemory>
+                                <charset>ISO-8859-1</charset>
+                                <encoding>ISO-8859-1</encoding>
+                                <source>1.6</source>
+                                <!-- Link to the external online JavaDoc -->
+                                <links>
+                                    <link>http://java.sun.com/j2se/1.6.0/docs/api/</link>
+                                    <link>http://java.sun.com/j2ee/sdk_1.3/techdocs/api/</link>
+                                    <link>http://jakarta.apache.org/commons/beanutils/commons-beanutils-1.7.0/docs/api/</link>
+                                    <link>http://jakarta.apache.org/commons/collections/api-3.2/</link>
+                                    <link>http://jakarta.apache.org/httpcomponents/httpclient-3.x/apidocs/</link>
+                                    <link>http://jakarta.apache.org/commons/io/api-1.2/</link>
+                                    <link>http://jakarta.apache.org/commons/lang/api-2.1/</link>
+                                    <link>http://jakarta.apache.org/commons/pool/apidocs/</link>
+                                    <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
+                                    <link>http://www.slf4j.org/api/</link>
+                                    <link>http://junit.sourceforge.net/javadoc/</link>
+                                </links>
+                                <groups>
+                                    <group>
+                                        <title>Mule Core</title>
+                                        <packages>org.mule*</packages>
+                                    </group>
+                                    <group>
+                                        <title>Modules (not part of the Mule core)</title>
+                                        <packages>org.mule.module.*:org.mule.components.*</packages>
+                                    </group>
+                                    <group>
+                                        <title>Transports</title>
+                                        <packages>org.mule.transport.*</packages>
+                                    </group>
+                                    <group>
+                                        <title>Testing Framework</title>
+                                        <packages>org.mule.tck*</packages>
+                                    </group>
+                                    <group>
+                                        <title>Tools</title>
+                                        <packages>org.mule.tools.*</packages>
+                                    </group>
+                                    <group>
+                                        <title>Examples</title>
+                                        <packages>org.mule.example.*</packages>
+                                    </group>
+                                </groups>
+                            </configuration>
+                        </reportPlugin>
+                        <!--
+                            When there is JXR cross-refernce output available,
+                            it will be linked to in case of test failures
 
-                        <exclude>**/ParamReader.java</exclude>
-                        <exclude>**/Part.java</exclude>
-                        <exclude>**/ProjectArchetypeMojo.java</exclude>
-                        <exclude>**/TransportArchetypeMojo.java</exclude>
-                        <exclude>**/XMLStreamReaderToContentHandler.java</exclude>
-                        <exclude>**/WebAppDeployer.java</exclude>
-                        <exclude>**/__artifactId__IBean.java</exclude>
-                        <exclude>**/__artifactId__IBeanTestCase.java</exclude>
-                    </excludes>
-                    <includes>
-                        <include>**/*.java</include>
-                    </includes>
-                    <mapping>
-                        <java>SLASHSTAR_STYLE</java>
-                    </mapping>
+                            Disabled for now, the main purpose of the site is to generate javadocs. The
+                            current tests status is available through bamboo anyway.
+
+                        <reportPlugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-surefire-report-plugin</artifactId>
+                            <version>2.9</version>
+                            <configuration>
+                                <!- Display failed tests only ->
+                                <showSuccess>false</showSuccess>
+                            </configuration>
+                        </reportPlugin>
+                        -->
+                        <!--
+                            Disabled for now, the main purpose of the site is to generate javadocs.
+                            The site plugin configuration is currently not inherited to child modules,
+                            which means that the checkstyle plugin will not create any meaningful
+                            report anyway.
+                        <reportPlugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-checkstyle-plugin</artifactId>
+                            <configuration>
+                                <configLocation>codecheck/checkstyle.xml</configLocation>
+                                <headerLocation>codecheck/LicenseHeader.txt</headerLocation>
+                                <!- do not link to JXR output as that is aggregated and the checkstyle
+                                    plugin does not recognize that.
+                                ->
+                                <linkXRef>false</linkXRef>
+                            </configuration>
+                        </reportPlugin>
+                        -->
+                        <!-- Code Coverage by Cobertura -->
+                        <!--
+                            This plugin is currently disabled, it causes trouble with
+                            the dependency unpack goal in the catalog archetype
+
+                        <reportPlugin>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>cobertura-maven-plugin</artifactId>
+                            <version>${coberturaVersion}</version>
+                        </reportPlugin>
+                        -->
+                    </reportPlugins>
                 </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
@@ -1711,6 +1985,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
+                <version>2.2</version>
                 <configuration>
                     <aggregate>true</aggregate>
                 </configuration>
@@ -1734,6 +2009,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>2.8</version>
                 <configuration>
                     <configLocation>codecheck/checkstyle.xml</configLocation>
                     <headerLocation>codecheck/LicenseHeader.txt</headerLocation>
@@ -1881,7 +2157,7 @@
             <id>ci-server</id>
             <distributionManagement>
                 <site>
-                    <url>file:///home/luntbuild/publish/mule/docs/${version}</url>
+                    <url>file:///home/luntbuild/publish/mule/docs/${project.version}</url>
                 </site>
             </distributionManagement>
         </profile>
@@ -1891,107 +2167,10 @@
             <distributionManagement>
                 <site>
                     <id>mule-site</id> 
-                    <url>file:///var/www/html/docs/site/${version}</url>
+                    <url>file:///var/www/html/docs/site/${project.version}</url>
                 </site>
             </distributionManagement>
         </profile>
-
-        <profile>
-            <id>buildnumber-plugin</id>
-            <activation>
-                <property>
-                    <!--
-                         This profile is activated if NO system property
-                         'skipBuildnumber' is found. Disable this profile
-                         by specifying -DskipBuildnumber=true on the commandline
-                    -->
-                    <name>!skipBuildnumber</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <!-- add repository revision to manifests -->
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>buildnumber-maven-plugin</artifactId>
-                        <version>1.1</version>
-                        <executions>
-                            <execution>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>create</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <!-- never touch vcs -->
-                            <doCheck>false</doCheck>
-                            <doUpdate>false</doUpdate>
-                            <timestampFormat>{0,date,yyyy-MMM-dd HH:mm:ss}</timestampFormat>
-                            <shortRevisionLength>8</shortRevisionLength>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>mac</id>
-            <activation>
-                <os>
-                    <family>mac</family>
-                </os>
-            </activation>
-            <properties>
-                <vmtype>org.eclipse.jdt.internal.launching.macosx.MacOSXType</vmtype>
-            </properties>
-        </profile>
-
-        <!--
-            This profile is somewhat similar to what's in Maven's toplevel POM. It will be
-            activated when -DperformRelease=true is given on the commandline which is
-            usually used in conjunction with the install or deploy goal.
-            (See http://www.propellors.net/maven/site/guides/introduction/introduction-to-the-pom.html).
-
-            The full distribution (distributions/server/full) wants to package javadocs. This
-            was previously a manual process, i.e. one had to call "mvn site" first and only
-            when running "mvn -DperformRelease=true" afterwards (and not running "mvn clean" in
-            between) we would end up with a valid full distro.
-
-            In order to make the release process less error prone, the javadoc plugin is bound
-            to the install lifecycle phase here but only if Maven was invoked with
-            -DperformRelease=true. The javadoc plugin then generates the toplevel, aggregated
-            javadocs that are included into the full distro, only a single Maven invocation
-            is needed now for building a proper set of distributions.
-        -->
-        <profile>
-            <id>release-profile</id>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <inherited>false</inherited>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>aggregated-javadocs</id>
-                                <phase>install</phase>
-                                <goals>
-                                    <goal>javadoc</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
         <profile>
             <id>nexus</id>
             <activation>
@@ -2013,9 +2192,6 @@
         </profile>
         <profile>
             <id>nexus-ee</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
             <distributionManagement>
                 <repository>
                     <id>mule-ee-customer-releases</id>
@@ -2024,23 +2200,123 @@
                 </repository>
             </distributionManagement>
         </profile>
-        <profile>
-            <id>default</id>
+       <profile>
+            <id>mac</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <os>
+                    <family>mac</family>
+                </os>
             </activation>
-            <repositories>
-                <repository>
-                    <id>java.net</id>
-                    <url>https://maven-repository.dev.java.net/nonav/repository</url>
-                    <releases>
-                        <enabled>false</enabled>
-                    </releases>
-                    <snapshots>
-                        <enabled>false</enabled>
-                    </snapshots>
-                </repository>
-            </repositories>
+            <properties>
+                <vmtype>org.eclipse.jdt.internal.launching.macosx.MacOSXType</vmtype>
+            </properties>
+       </profile>       
+
+        <!-- C.I. staged build profiles -->
+        <profile>
+            <id>compile</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>buildnumber-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+            <properties>
+                <skipIntegrationTests>true</skipIntegrationTests>
+                <skipDistributions>true</skipDistributions>
+                <skipVerifications>false</skipVerifications>
+                <skipInstalls>true</skipInstalls>
+                <skipTests>true</skipTests>
+            </properties>
+        </profile>
+        <profile>
+            <id>unit</id>
+            <build>
+                <defaultGoal>test</defaultGoal>
+            </build>
+            <properties>
+                <skipIntegrationTests>true</skipIntegrationTests>
+                <skipDistributions>true</skipDistributions>
+                <skipVerifications>true</skipVerifications>
+                <skipInstalls>true</skipInstalls>
+                <!-- This version of Mule doesn't split tests into unit and functional -->
+                <skipTests>true</skipTests>
+            </properties>
+        </profile>
+        <profile>
+            <id>functional</id>
+            <build>
+                <defaultGoal>test</defaultGoal>
+            </build>
+            <properties>
+                <skipIntegrationTests>true</skipIntegrationTests>
+                <skipDistributions>true</skipDistributions>
+                <skipVerifications>true</skipVerifications>
+                <skipInstalls>true</skipInstalls>
+            </properties>
+        </profile>
+        <profile>
+            <id>integration</id>
+            <build>
+                <defaultGoal>verify</defaultGoal>
+            </build>
+            <properties>
+                <skipIntegrationTests>false</skipIntegrationTests>
+                <skipDistributions>true</skipDistributions>
+                <skipVerifications>true</skipVerifications>
+                <skipInstalls>true</skipInstalls>
+                <skipTests>true</skipTests>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>release</id>
+            <properties>
+                <skipIntegrationTests>true</skipIntegrationTests>
+                <skipDistributions>false</skipDistributions>
+                <skipVerifications>true</skipVerifications>
+                <skipInstalls>false</skipInstalls>
+                <skipTests>true</skipTests>
+            </properties>
+            <build>
+                <defaultGoal>deploy</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <inherited>false</inherited>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>aggregated-javadocs</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>javadoc</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

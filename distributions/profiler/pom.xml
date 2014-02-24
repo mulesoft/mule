@@ -16,52 +16,57 @@
         <licensePath>../../LICENSE_HEADER.txt</licensePath>
     </properties>
 
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <!--
-                                'attached' ensures there's only a single run bound to m2's lifecycle.
-                                The default 'assembly' goal would run every plugin in this pom twice.
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <!--
+                                        'attached' ensures there's only a single run bound to m2's lifecycle.
+                                        The default 'assembly' goal would run every plugin in this pom twice.
+                                    -->
+                                    <goal>attached</goal>
+                                </goals>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>assembly.xml</descriptor>
+                                    </descriptors>
+                                    <appendAssemblyId>false</appendAssemblyId>
+                                    <tarLongFileMode>gnu</tarLongFileMode>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.mule.tools</groupId>
+                        <artifactId>mule-assembly-verifier</artifactId>
+                        <executions>
+                            <!-- Disable for now since this will completely change for OSGi.
+                            <execution>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
                             -->
-                            <goal>attached</goal>
-                        </goals>
+                        </executions>
                         <configuration>
-                            <descriptors>
-                                <descriptor>assembly.xml</descriptor>
-                            </descriptors>
-                            <appendAssemblyId>false</appendAssemblyId>
-                            <tarLongFileMode>gnu</tarLongFileMode>
+                            <projectOutputFile>${pom.artifactId}-${pom.version}.zip</projectOutputFile>
+                            <whitelist>assembly-whitelist.txt</whitelist>
                         </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+                    </plugin>
 
-            <plugin>
-                <groupId>org.mule.tools</groupId>
-                <artifactId>mule-assembly-verifier</artifactId>
-                <executions>
-                    <!-- Disable for now since this will completely change for OSGi.
-                    <execution>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                    -->
-                </executions>
-                <configuration>
-                    <projectOutputFile>${pom.artifactId}-${pom.version}.zip</projectOutputFile>
-                    <whitelist>assembly-whitelist.txt</whitelist>
-                </configuration>
-            </plugin>
-
-        </plugins>
-    </build>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <dependencies>
         <dependency>

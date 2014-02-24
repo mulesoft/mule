@@ -29,7 +29,7 @@
         <dependency>
             <groupId>org.mule.tools</groupId>
             <artifactId>mule-catalog-archetype</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
