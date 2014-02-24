@@ -16,6 +16,7 @@
 
     <properties>
         <licensePath>../../LICENSE_HEADER.txt</licensePath>
+        <skipTests>${skipIntegrationTests}</skipTests>
     </properties>
 
     <build>
@@ -24,7 +25,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <skip>${skipIntegrationTests}</skip>
                     <argLine>-Xmx512m -XX:MaxPermSize=128m</argLine>
                 </configuration>
             </plugin>
