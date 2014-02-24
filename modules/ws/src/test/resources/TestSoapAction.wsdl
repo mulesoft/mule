@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+                  xmlns:tns="http://consumer.ws.module.mule.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="http://consumer.ws.module.mule.org/"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+    <wsdl:types>
+        <s:schema elementFormDefault="qualified" targetNamespace="http://consumer.ws.module.mule.org/">
+            <s:element name="TestMessage">
+                <s:complexType />
+            </s:element>
+        </s:schema>
+    </wsdl:types>
+    <wsdl:message name="TestMessageIn">
+        <wsdl:part name="parameters" element="tns:TestMessage" />
+    </wsdl:message>
+    <wsdl:message name="TestMessageOut">
+        <wsdl:part name="parameters" element="tns:TestMessage" />
+    </wsdl:message>
+
+    <wsdl:portType name="TestPortType">
+        <wsdl:operation name="TestOperationWithSoapAction">
+            <wsdl:input message="tns:TestMessageIn" />
+            <wsdl:output message="tns:TestMessageOut" />
+        </wsdl:operation>
+        <wsdl:operation name="TestOperationWithNoSoapAction">
+            <wsdl:input message="tns:TestMessageIn" />
+            <wsdl:output message="tns:TestMessageOut" />
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <wsdl:binding name="TestBindingSoap" type="tns:TestPortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="TestOperationWithSoapAction">
+            <soap:operation soapAction="TestOperationWithSoapAction" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="TestOperationWithNoSoapAction">
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+
+    <wsdl:binding name="TestBindingSoap12" type="tns:TestPortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="TestOperationWithSoapAction">
+            <soap12:operation soapAction="TestOperationWithSoapAction" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="TestOperationWithNoSoapAction">
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+
+    <wsdl:service name="TestService">
+        <wsdl:port name="TestPortSoap" binding="tns:TestBindingSoap">
+            <soap:address location="http://localhost:5555/Test" />
+        </wsdl:port>
+        <wsdl:port name="TestPortSoap12" binding="tns:TestBindingSoap12">
+            <soap12:address location="http://localhost:5555/Test12" />
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
