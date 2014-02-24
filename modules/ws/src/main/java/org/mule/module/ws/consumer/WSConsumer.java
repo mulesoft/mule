@@ -45,6 +45,7 @@ import javax.wsdl.Service;
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.soap.SOAPBody;
 import javax.wsdl.extensions.soap.SOAPOperation;
+import javax.wsdl.extensions.soap12.SOAP12Operation;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
@@ -311,6 +312,10 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
             if (extension instanceof SOAPOperation)
             {
                 return ((SOAPOperation) extension).getSoapActionURI();
+            }
+            if (extension instanceof SOAP12Operation)
+            {
+                return ((SOAP12Operation) extension).getSoapActionURI();
             }
         }
         return null;
