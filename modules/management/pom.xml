@@ -93,6 +93,7 @@
                     -->
                     <forkMode>pertest</forkMode>
                 </configuration>
+
             </plugin>
         </plugins>
     </build>

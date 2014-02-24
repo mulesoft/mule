@@ -22,6 +22,8 @@
                 <artifactId>maven-deploy-plugin</artifactId>
                 <configuration>
                     <skip>${skipDistributions}</skip>
+                    <repositoryId>mule-dist-releases</repositoryId>
+                    <snapshotRepositoryId>mule-dist-snapshots</snapshotRepositoryId>
                 </configuration>
             </plugin>
             <plugin>
