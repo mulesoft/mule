@@ -15,8 +15,8 @@ import javax.xml.ws.Holder;
 /**
  * Web service used by WS Consumer tests.
  */
-@WebService
-public class Echo
+@WebService(portName = "TestPort", serviceName = "TestService")
+public class TestService
 {
     @WebResult(name = "text")
     @WebMethod(action = "echo")
@@ -43,5 +43,20 @@ public class Echo
         headerInOut.value = headerInOut.value + " INOUT";
         return s;
     }
+
+    @WebResult(name = "text")
+    @WebMethod(action = "noParams")
+    public String noParams()
+    {
+        return "TEST";
+    }
+
+    @WebResult(name = "text")
+    @WebMethod(action = "noParams")
+    public String noParamsWithHeader(@WebParam(name = "header", header = true, mode = WebParam.Mode.IN) String header)
+    {
+        return header;
+    }
+
 
 }
