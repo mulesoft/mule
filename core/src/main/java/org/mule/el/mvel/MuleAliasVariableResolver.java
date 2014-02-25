@@ -30,8 +30,9 @@ class MuleAliasVariableResolver extends MuleVariableResolver<Object>
     @Override
     public void setValue(Object value)
     {
+        MVELExpressionLanguageContext newContext = new MVELExpressionLanguageContext(context);
         expression = expression + "= ___value";
-        context.addFinalVariable("___value", value);
-        executor.execute(expression, context);
+        newContext.addFinalVariable("___value", value);
+        executor.execute(expression, newContext);
     }
 }

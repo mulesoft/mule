@@ -11,36 +11,41 @@ import org.mule.api.el.ExpressionLanguageExtension;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ast.Function;
 import org.mule.mvel2.ast.FunctionInstance;
-import org.mule.mvel2.integration.VariableResolverFactory;
 
+import java.util.Collection;
 import java.util.Map.Entry;
 
 public class GlobalVariableResolverFactory extends MVELExpressionLanguageContext
 {
+    private MVELExpressionLanguageContext parent;
+
     private static final long serialVersionUID = -6819292692339684915L;
 
     public GlobalVariableResolverFactory(MVELExpressionLanguage el,
+                                         MVELExpressionLanguageContext parent,
                                          ParserConfiguration parserConfiguration,
                                          MuleContext muleContext,
-                                         VariableResolverFactory... context)
+                                         Collection<ExpressionLanguageExtension> expressionLanguageExtensions)
     {
         super(parserConfiguration, muleContext);
-        for (VariableResolverFactory mvelExpressionLanguageContext : context)
+        this.parent = parent;
+        for (ExpressionLanguageExtension extension : expressionLanguageExtensions)
         {
-            addChildContext(mvelExpressionLanguageContext);
+            extension.configureContext(parent);
         }
-        for (ExpressionLanguageExtension extension : el.getExpressionLanguageExtensions())
-        {
-            extension.configureContext(this);
-        }
-        for (Entry<String, String> alias : el.getAliases().entrySet())
+        for (Entry<String, String> alias : el.aliases.entrySet())
         {
             addAlias(alias.getKey(), alias.getValue());
         }
-        for (Entry<String, Function> function : el.getGlobalFunctions().entrySet())
+        for (Entry<String, Function> function : el.globalFunctions.entrySet())
         {
             addFinalVariable(function.getKey(), new FunctionInstance(function.getValue()));
         }
     }
 
+    @Override
+    MVELExpressionLanguageContext getParentContext()
+    {
+        return parent;
+    }
 }

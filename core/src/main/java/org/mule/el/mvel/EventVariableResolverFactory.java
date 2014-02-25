@@ -6,53 +6,22 @@
  */
 package org.mule.el.mvel;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.mvel2.integration.VariableResolver;
-import org.mule.mvel2.integration.impl.ImmutableDefaultFactory;
+import org.mule.mvel2.ParserConfiguration;
 
-public class EventVariableResolverFactory extends ImmutableDefaultFactory
+public class EventVariableResolverFactory extends MessageVariableResolverFactory
 {
 
     private static final long serialVersionUID = -6819292692339684915L;
 
-    private final String FLOW = "flow";
-    private MuleEvent event;
-
-    public EventVariableResolverFactory(MuleEvent event)
+    public EventVariableResolverFactory(ParserConfiguration parserConfiguration,
+                                        MuleContext muleContext,
+                                        MuleEvent event)
     {
-        this.event = event;
-    }
-
-    @Override
-    public VariableResolver getVariableResolver(String name)
-    {
-        if (event != null)
-        {
-            if (FLOW.equals(name))
-            {
-                return new MuleImmutableVariableResolver<FlowContext>(FLOW, (new FlowContext(
-                    event.getFlowConstruct())), null);
-            }
-            else if (MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE.equals(name))
-            {
-                return new MuleImmutableVariableResolver<MuleEvent>(
-                    MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE, event, null);
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public boolean isTarget(String name)
-    {
-        return FLOW.equals(name) || MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE.equals(name);
-    }
-
-    @Override
-    public boolean isResolveable(String name)
-    {
-        return isTarget(name);
+        super(parserConfiguration, muleContext, event.getMessage());
+        addFinalVariable("flow", new FlowContext(event.getFlowConstruct()));
     }
 
     public static class FlowContext

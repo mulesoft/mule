@@ -41,10 +41,10 @@ public class VariableVariableResolverFactory extends MVELExpressionLanguageConte
     {
         if (message == null)
         {
-            return false;
+            return isNextResolveable(name);
         }
         return message.getInvocationPropertyNames().contains(name)
-               || message.getSessionPropertyNames().contains(name);
+               || message.getSessionPropertyNames().contains(name) || isNextResolveable(name);
     }
 
     @SuppressWarnings("deprecation")
@@ -60,7 +60,7 @@ public class VariableVariableResolverFactory extends MVELExpressionLanguageConte
         {
             return new SessionVariableVariableResolver(name);
         }
-        else if (nextFactory.isResolveable(name))
+        else if (nextFactory != null)
         {
             return nextFactory.getVariableResolver(name);
         }
