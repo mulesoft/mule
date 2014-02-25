@@ -58,6 +58,7 @@
         <module>patterns</module>
         <module>tools</module>
         <module>transports</module>
+        <module>tests</module>
     </modules>
 
     <properties>
@@ -1241,19 +1242,6 @@
         </dependencies>
     </dependencyManagement>
 
-    <ciManagement>
-        <system>bamboo</system>
-        <url>http://bamboo.mulesoft.org</url>
-        <notifiers>
-            <notifier>
-                <type>mail</type>
-                <configuration>
-                    <address>scm@mule.codehaus.org</address>
-                </configuration>
-            </notifier>
-        </notifiers>
-    </ciManagement>
-
     <distributionManagement>
         <downloadUrl>http://www.mulesoft.org/display/MULE/Download</downloadUrl>
         <repository>
@@ -1438,6 +1426,17 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.6-MULE-2</version>
+                    <configuration>
+                        <argLine>-Xms64m -Xmx512m</argLine>
+                        <excludes>
+                            <!-- Surefire should be able to detect that classes are abstract but it seems it isn't -->
+                            <exclude>**/Abstract*.*</exclude>
+                            <!-- Our tests never start with Test* but we have a lot of test helpers that match -->
+                            <exclude>**/Test*.java</exclude>
+                            <!-- exclude inner classes -->
+                            <exclude>**/*$*</exclude>
+                        </excludes>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1526,23 +1525,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <!--
-                    Fix surefire-report:report goal, which failed to
-                    complete if there were test errors (no report was
-                    generated).
-                <version>RELEASE</version>
-                -->
-                <configuration>
-                    <argLine>-Xms64m -Xmx256m</argLine>
-                    <excludes>
-                        <!-- Surefire should be able to detect that classes are abstract but it seems it isn't -->
-                        <exclude>**/Abstract*.*</exclude>
-                        <!-- Our tests never start with Test* but we have a lot of test helpers that match -->
-                        <exclude>**/Test*.java</exclude>
-                        <!-- exclude inner classes -->
-                        <exclude>**/*$*</exclude>
-                    </excludes>
-                </configuration>
             </plugin>
             <!-- Delete code coverage database when 'mvn clean' is executed -->
             <plugin>
@@ -1578,31 +1560,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.0-alpha-4</version>
-                <executions>
-                    <execution>
-                        <id>enforce-maven-version</id>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <requireMavenVersion>
-                                    <!-- minimum version is 3.0.0, higher versions allowed -->
-                                    <version>[3.0.0,)</version>
-                                </requireMavenVersion>
-                                <requireJavaVersion>
-                                    <!-- Java version must be 1.6 or higher -->
-                                    <version>[1.6.0,)</version>
-                                </requireJavaVersion>
-                            </rules>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-eclipse-plugin</artifactId>
                 <version>${eclipsePluginVersion}</version>
                 <configuration>
@@ -1613,14 +1570,6 @@
                         <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${vmtype}/${jdk6Name}
                         </classpathContainer>
                     </classpathContainers>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-idea-plugin</artifactId>
-                <configuration>
-                    <downloadSources>true</downloadSources>
-                    <jdkName>1.6</jdkName>
                 </configuration>
             </plugin>
 
@@ -1813,61 +1762,6 @@
                     </reportPlugins>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>com.mycila.maven-license-plugin</groupId>
-                <artifactId>maven-license-plugin</artifactId>
-                <version>1.9.0</version>
-                <configuration>
-                    <header>${licensePath}</header>
-                    <excludes>
-                        <exclude>target/**</exclude>
-                        <exclude>**/.gitignore</exclude>
-                        <exclude>**/*.txt</exclude>
-                        <exclude>**/*.groovy</exclude>
-                        <exclude>**/*.sh</exclude>
-                        <exclude>**/*.bat</exclude>
-                        <exclude>**/*.ftl</exclude>
-                        <exclude>**/*.xml</exclude>
-                        <exclude>**/*.properties</exclude>
-                        <exclude>**/*.sample</exclude>
-                        <exclude>**/*.md</exclude>
-                        <exclude>**/*.xsl</exclude>
-                        <exclude>**/*.html</exclude>
-                        <exclude>**/*.css</exclude>
-                        <exclude>**/build-number.txt</exclude>
-
-                        <exclude>**/BndMojo.java</exclude>
-                        <exclude>**/BobberArchetype.java</exclude>
-                        <exclude>**/BobberArchetypeMojo.java</exclude>
-                        <exclude>**/DummySSLServerSocketFactory.java</exclude>
-                        <exclude>**/ConfigurationPatternArchetypeMojo.java</exclude>
-                        <exclude>**/ModuleArchetypeMojo.java</exclude>
-                        <exclude>**/MultipartConfiguration.java</exclude>
-
-                        <exclude>**/ParamReader.java</exclude>
-                        <exclude>**/Part.java</exclude>
-                        <exclude>**/ProjectArchetypeMojo.java</exclude>
-                        <exclude>**/TransportArchetypeMojo.java</exclude>
-                        <exclude>**/XMLStreamReaderToContentHandler.java</exclude>
-                        <exclude>**/WebAppDeployer.java</exclude>
-                        <exclude>**/__artifactId__IBean.java</exclude>
-                        <exclude>**/__artifactId__IBeanTestCase.java</exclude>
-                    </excludes>
-                    <includes>
-                        <include>**/*.java</include>
-                    </includes>
-                    <mapping>
-                        <java>SLASHSTAR_STYLE</java>
-                    </mapping>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 
@@ -1879,31 +1773,6 @@
             </activation>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-enforcer-plugin</artifactId>
-                        <version>1.0-alpha-4</version>
-                        <executions>
-                            <execution>
-                                <id>enforce-maven-version</id>
-                                <goals>
-                                    <goal>enforce</goal>
-                                </goals>
-                                <configuration>
-                                    <rules>
-                                        <requireMavenVersion>
-                                            <!-- minimum version is 3.0.0, higher versions allowed -->
-                                            <version>[3.0.0,)</version>
-                                        </requireMavenVersion>
-                                        <requireJavaVersion>
-                                            <!-- Java version must be 1.6 or higher -->
-                                            <version>[1.7.0,)</version>
-                                        </requireJavaVersion>
-                                    </rules>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-eclipse-plugin</artifactId>
@@ -1932,29 +1801,109 @@
 
         <profile>
             <id>distributions</id>
+            <activation>
+                <property>
+                    <name>!skipDistributions</name>
+                </property>
+            </activation>
             <modules>
                 <module>distributions</module>
             </modules>
         </profile>
 
         <profile>
-            <id>mule-tests</id>
+            <id>verifications</id>
             <activation>
                 <property>
-                    <!--
-                        This profile is activated if NO system property
-                        'skipMuleTests' is found. Disable this profile
-                        by specifying -DskipMuleTests=true on the commandline
-                     -->
-                    <name>!skipMuleTests</name>
+                    <name>!skipVerifications</name>
                 </property>
             </activation>
-            <modules>
-                <module>tests</module>
-            </modules>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.mycila.maven-license-plugin</groupId>
+                        <artifactId>maven-license-plugin</artifactId>
+                        <version>1.9.0</version>
+                        <configuration>
+                            <header>${licensePath}</header>
+                            <excludes>
+                                <exclude>target/**</exclude>
+                                <exclude>**/.gitignore</exclude>
+                                <exclude>**/*.txt</exclude>
+                                <exclude>**/*.groovy</exclude>
+                                <exclude>**/*.sh</exclude>
+                                <exclude>**/*.bat</exclude>
+                                <exclude>**/*.ftl</exclude>
+                                <exclude>**/*.xml</exclude>
+                                <exclude>**/*.properties</exclude>
+                                <exclude>**/*.sample</exclude>
+                                <exclude>**/*.md</exclude>
+                                <exclude>**/*.xsl</exclude>
+                                <exclude>**/*.html</exclude>
+                                <exclude>**/*.css</exclude>
+                                <exclude>**/build-number.txt</exclude>
+
+                                <exclude>**/BndMojo.java</exclude>
+                                <exclude>**/BobberArchetype.java</exclude>
+                                <exclude>**/BobberArchetypeMojo.java</exclude>
+                                <exclude>**/DummySSLServerSocketFactory.java</exclude>
+                                <exclude>**/ConfigurationPatternArchetypeMojo.java</exclude>
+                                <exclude>**/ModuleArchetypeMojo.java</exclude>
+                                <exclude>**/MultipartConfiguration.java</exclude>
+
+                                <exclude>**/ParamReader.java</exclude>
+                                <exclude>**/Part.java</exclude>
+                                <exclude>**/ProjectArchetypeMojo.java</exclude>
+                                <exclude>**/TransportArchetypeMojo.java</exclude>
+                                <exclude>**/XMLStreamReaderToContentHandler.java</exclude>
+                                <exclude>**/WebAppDeployer.java</exclude>
+                                <exclude>**/__artifactId__IBean.java</exclude>
+                                <exclude>**/__artifactId__IBeanTestCase.java</exclude>
+                            </excludes>
+                            <includes>
+                                <include>**/*.java</include>
+                            </includes>
+                            <mapping>
+                                <java>SLASHSTAR_STYLE</java>
+                            </mapping>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <version>1.0.1</version>
+                        <executions>
+                            <execution>
+                                <id>enforce-maven-version</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireMavenVersion>
+                                            <version>[3.0.0,)</version>
+                                        </requireMavenVersion>
+                                        <requireJavaVersion>
+                                            <version>[1.6.0,)</version>
+                                        </requireJavaVersion>
+                                    </rules>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                </plugins>
+            </build>
         </profile>
 
-        <profile>
+         <profile>
             <id>ci-server</id>
             <distributionManagement>
                 <site>
