@@ -29,8 +29,8 @@ public class DynamicPort extends SystemProperty
     public static final String MIN_PORT_SYSTEM_PROPERTY = "mule.test.minPort";
     public static final String MAX_PORT_SYSTEM_PROPERTY = "mule.test.maxPort";
 
-    private static final int DEFAULT_MIN_PORT = 5000;
-    private static final int DEFAULT_MAX_PORT = 6000;
+    private static final int DEFAULT_MIN_PORT = 10000;
+    private static final int DEFAULT_MAX_PORT = 40000;
 
     protected static FreePortFinder freePortFinder;
 
