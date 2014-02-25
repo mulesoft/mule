@@ -135,9 +135,9 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-        </dependency
+        </dependency>
  
-       <dependency>
+        <dependency>
             <groupId>mockobjects</groupId>
             <artifactId>mockobjects-core</artifactId>
             <scope>test</scope>
