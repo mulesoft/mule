@@ -57,6 +57,14 @@ public class WSConsumerConfigTestCase extends AbstractMuleContextTestCase
         config.createOutboundEndpoint();
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void failToCreateOutboundEndpointWithEmptyServiceAddress() throws MuleException
+    {
+        WSConsumerConfig config = createConsumerConfig();
+        config.setServiceAddress(null);
+        config.createOutboundEndpoint();
+    }
+
     private WSConsumerConfig createConsumerConfig()
     {
         WSConsumerConfig config = new WSConsumerConfig();
