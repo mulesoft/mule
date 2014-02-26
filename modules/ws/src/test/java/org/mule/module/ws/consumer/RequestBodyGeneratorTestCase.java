@@ -23,70 +23,64 @@ import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
 
-import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
 public class RequestBodyGeneratorTestCase extends AbstractMuleTestCase
 {
-
     private static final String EXPECTED_BODY_PATTERN = "<ns:%s xmlns:ns=\"http://consumer.ws.module.mule.org/\" />";
 
-    private Definition wsdlDefinition;
-    private Service service;
-    private Port port;
-    private Binding binding;
-    private RequestBodyGenerator requestBodyGenerator;
-
-    @Before
-    public void setup() throws Exception
-    {
-        URL url = IOUtils.getResourceAsUrl("TestParams.wsdl", getClass());
-        WSDLReader wsdlReader = WSDLFactory.newInstance().newWSDLReader();
-        wsdlDefinition = wsdlReader.readWSDL(url.toString());
-        service = wsdlDefinition.getService(new QName(wsdlDefinition.getTargetNamespace(), "TestParamsService"));
-        port = service.getPort("TestParamsPort");
-        binding = port.getBinding();
-        requestBodyGenerator = new RequestBodyGenerator(wsdlDefinition);
-    }
-
     @Test
-    public void noRequestBodyForOperationWithParameter()
+    public void noRequestBodyForOperationWithParameter() throws Exception
     {
-        assertNoRequestBody("echo");
-    }
-
-    @Test
-    public void noRequestBodyForOperationWithParameterSimpleType()
-    {
-        assertNoRequestBody("echoSimpleType");
-    }
-
-    @Test
-    public void requestBodyGeneratedForOperationWithNoParameters()
-    {
-        assertRequestBody("noParams");
-    }
-
-    @Test
-    public void requestBodyGeneratedForOperationWithHeadersAndNoParameters()
-    {
-        assertRequestBody("noParamsWithHeader");
-    }
-
-
-    private void assertNoRequestBody(String operationName)
-    {
-        BindingOperation operation = binding.getBindingOperation(operationName, null, null);
-        String requestBody = requestBodyGenerator.generateRequestBody(operation);
+        String requestBody = generateRequestBody("TestParams.wsdl", "TestParamsService", "TestParamsPort", "echo");
         assertNull(requestBody);
     }
 
-    private void assertRequestBody(String operationName)
+    @Test
+    public void noRequestBodyForOperationWithParameterSimpleType() throws Exception
     {
-        BindingOperation operation = binding.getBindingOperation(operationName, null, null);
-        String requestBody = requestBodyGenerator.generateRequestBody(operation);
-        assertEquals(String.format(EXPECTED_BODY_PATTERN, operationName), requestBody);
+        String requestBody = generateRequestBody("TestParams.wsdl", "TestParamsService", "TestParamsPort", "echoSimpleType");
+        assertNull(requestBody);
+    }
+
+    @Test
+    public void requestBodyGeneratedForOperationWithNoParameters() throws Exception
+    {
+        String requestBody = generateRequestBody("TestParams.wsdl", "TestParamsService", "TestParamsPort", "noParams");
+        assertEquals(String.format(EXPECTED_BODY_PATTERN, "noParams"), requestBody);
+    }
+
+    @Test
+    public void requestBodyGeneratedForOperationWithHeadersAndNoParameters() throws Exception
+    {
+        String requestBody = generateRequestBody("TestParams.wsdl", "TestParamsService", "TestParamsPort", "noParamsWithHeader");
+        assertEquals(String.format(EXPECTED_BODY_PATTERN, "noParamsWithHeader"), requestBody);
+    }
+
+    @Test
+    public void noRequestBodyForOperationWithNoParametersInInvalidWsdl() throws Exception
+    {
+        // Assert that if a WSDL has an invalid definition of types (for example because of a missing schema), we don't
+        // create any request body (because we are unable to get the type for the XML element).
+        String requestBody = generateRequestBody("TestParamsInvalid.wsdl", "TestParamsService", "TestParamsPort", "noParams");
+        assertNull(requestBody);
+    }
+
+    private String generateRequestBody(String wsdlLocation, String serviceName, String portName, String operationName) throws Exception
+    {
+        URL url = IOUtils.getResourceAsUrl(wsdlLocation, getClass());
+
+        WSDLReader wsdlReader = WSDLFactory.newInstance().newWSDLReader();
+        Definition wsdlDefinition = wsdlReader.readWSDL(url.toString());
+        Service service = wsdlDefinition.getService(new QName(wsdlDefinition.getTargetNamespace(), serviceName));
+        Port port = service.getPort(portName);
+        Binding binding = port.getBinding();
+
+        RequestBodyGenerator requestBodyGenerator = new RequestBodyGenerator(wsdlDefinition);
+        BindingOperation bindingOperation = binding.getBindingOperation(operationName, null, null);
+
+        return requestBodyGenerator.generateRequestBody(bindingOperation);
     }
 
 }
