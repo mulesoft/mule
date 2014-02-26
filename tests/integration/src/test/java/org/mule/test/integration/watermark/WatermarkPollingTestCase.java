@@ -507,7 +507,7 @@ public class WatermarkPollingTestCase extends FunctionalTestCase
     private void executePollOf(String flowName) throws Exception
     {
         Collection<Scheduler> schedulers = muleContext.getRegistry().lookupScheduler(
-            Schedulers.flowPollingSchedulers(flowName));
+            Schedulers.flowConstructPollingSchedulers(flowName));
         for (Scheduler scheduler : schedulers)
         {
             scheduler.schedule();
