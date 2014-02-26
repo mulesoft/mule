@@ -86,8 +86,8 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         registry.registerObject(MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE,
             new DefaultStreamCloserService());
 
-        registry.registerObject(MuleProperties.OBJECT_LOCK_FACTORY, new MuleLockFactory());
         registry.registerObject(MuleProperties.OBJECT_LOCK_PROVIDER, new SingleServerLockProvider());
+        registry.registerObject(MuleProperties.OBJECT_LOCK_FACTORY, new MuleLockFactory());
 
         registry.registerObject(MuleProperties.OBJECT_PROCESSING_TIME_WATCHER,
             new DefaultProcessingTimeWatcher());
