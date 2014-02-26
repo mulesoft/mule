@@ -58,7 +58,7 @@ public class StoppedCronSchedulerTestCase  extends FunctionalTestCase
     private void runSchedulersOnce() throws Exception
     {
         Collection<Scheduler> schedulers = muleContext.getRegistry().lookupScheduler(
-                Schedulers.flowPollingSchedulers("pollfoo"));
+                Schedulers.flowConstructPollingSchedulers("pollfoo"));
 
         for (Scheduler scheduler : schedulers)
         {

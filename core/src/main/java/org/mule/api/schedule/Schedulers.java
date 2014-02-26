@@ -34,16 +34,16 @@ public class Schedulers
 
     /**
      * @return Predicate used to request the  {@link org.mule.api.registry.MuleRegistry} all the polling {@link org.mule.api.schedule.Scheduler}
-     *         for a particular {@link org.mule.construct.Flow}
+     *         for a particular {@link org.mule.api.construct.FlowConstruct}
      */
-    public static Predicate<String> flowPollingSchedulers(final String flowName)
+    public static Predicate<String> flowConstructPollingSchedulers(final String flowConstruct)
     {
         return new Predicate<String>()
         {
             @Override
             public boolean evaluate(String s)
             {
-                return s.startsWith(MessageProcessorPollingMessageReceiver.POLLING_TRANSPORT + "://" + flowName + "/");
+                return s.startsWith(MessageProcessorPollingMessageReceiver.POLLING_TRANSPORT + "://" + flowConstruct + "/");
             }
         };
     }
