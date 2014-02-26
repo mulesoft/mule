@@ -18,7 +18,6 @@ import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.PropertyScope;
-import org.mule.common.metadata.DefaultXmlMetaDataModel;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
@@ -30,7 +29,6 @@ import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.util.IOUtils;
 
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,17 +37,14 @@ import java.util.Map;
 import javax.wsdl.Binding;
 import javax.wsdl.BindingOperation;
 import javax.wsdl.Definition;
-import javax.wsdl.Part;
 import javax.wsdl.Port;
 import javax.wsdl.Service;
 import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.soap.SOAPBody;
 import javax.wsdl.extensions.soap.SOAPOperation;
 import javax.wsdl.extensions.soap12.SOAP12Operation;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
-import javax.xml.transform.TransformerException;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
@@ -297,7 +292,9 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
         }
 
         this.soapAction = getSoapAction(bindingOperation);
-        this.requestBody = generateRequestBody(wsdlDefinition, bindingOperation);
+
+        RequestBodyGenerator requestBodyGenerator = new RequestBodyGenerator(wsdlDefinition);
+        this.requestBody = requestBodyGenerator.generateRequestBody(bindingOperation);
 
     }
 
@@ -321,75 +318,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
         return null;
     }
 
-    /**
-     * Checks if the operation requires input parameters (if the XML required in the body is just one constant element).
-     * If so, the body with this XML will be returned in order to send it in every request instead of the payload.
-     */
-    private String generateRequestBody(Definition wsdlDefinition, BindingOperation bindingOperation)
-    {
-        List<String> schemas;
 
-        try
-        {
-            schemas = WSDLUtils.getSchemas(wsdlDefinition);
-        }
-        catch (TransformerException e)
-        {
-            logger.warn("Unable to get schemas from WSDL, cannot check if the operation requires input parameters", e);
-            return null;
-        }
-
-        SOAPBody soapBody = WSDLUtils.getSoapBody(bindingOperation);
-
-        if (soapBody == null)
-        {
-            logger.warn("No SOAP body defined in the WSDL for the specified operation, cannot check if the operation requires input parameters");
-            return null;
-        }
-
-        Part part = getPart(soapBody, bindingOperation.getOperation().getInput().getMessage());
-
-        DefaultXmlMetaDataModel model = new DefaultXmlMetaDataModel(schemas, part.getElementName(), Charset.defaultCharset());
-
-        if (model.getFields().isEmpty())
-        {
-            logger.info("The selected operation does not require input parameters, the payload will be ignored");
-            QName element = part.getElementName();
-            return String.format("<ns:%s xmlns:ns=\"%s\" />", element.getLocalPart(), element.getNamespaceURI());
-        }
-
-        return null;
-    }
-
-    /**
-     * Finds the part of the input message that must be used in the SOAP body.
-     */
-    private Part getPart(SOAPBody soapBody, javax.wsdl.Message inputMessage)
-    {
-        if (soapBody.getParts() == null || soapBody.getParts().isEmpty())
-        {
-            Map parts = inputMessage.getParts();
-
-            if (parts.isEmpty())
-            {
-                return null;
-            }
-            if (parts.size() > 1)
-            {
-                logger.warn("Input messages with multiple parts are not supported");
-            }
-            return (Part) parts.values().iterator().next();
-        }
-        else
-        {
-            if (soapBody.getParts().size() > 1)
-            {
-                logger.warn("Input messages with multiple parts in the SOAP body are not supported");
-            }
-            String partName = (String) soapBody.getParts().get(0);
-            return inputMessage.getPart(partName);
-        }
-    }
 
     @Override
     public void setMuleContext(MuleContext muleContext)
