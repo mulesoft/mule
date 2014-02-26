@@ -25,14 +25,13 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.lang.StringUtils;
 
 public class MuleProcessController
 {
 
     private static final String ANCHOR_DELETE_ERROR = "Could not delete anchor file [%s] when stopping Mule ESB.";
     private static final String ADD_LIBRARY_ERROR = "Error copying jar file [%s] to lib directory [%s].";
-    private static final String CREATE_DOMAIN_ERROR = "Error creating domain [%s] with config [%s].";
+    private static final String DOMAIN_DEPLOY_ERROR = "Error deploying domain %s.";
     private static final String MULE_HOME_VARIABLE = "MULE_HOME";
     private static final String ANCHOR_SUFFIX = "-anchor.txt";
     private static final String STATUS = "Mule Enterprise Edition is running \\(([0-9]+)\\)\\.";
@@ -142,7 +141,7 @@ public class MuleProcessController
     }
 
     private int executeSyncCommand(String command, String[] args, Map<Object, Object> newEnv, long timeout)
-        throws MuleControllerException
+            throws MuleControllerException
     {
         CommandLine commandLine = new CommandLine(muleBin);
         commandLine.addArgument(command);
@@ -260,23 +259,25 @@ public class MuleProcessController
         }
     }
 
-    public void createDomain(String domainName, File domainConfig)
+    public void deployDomain(String domain)
     {
-        verify(domainConfig.exists(), "Domain configuration file does not exist: %s", domainConfig);
-        verify(StringUtils.isNotEmpty(domainName), "Domain name is empty");
-        verify(domainConfig.exists(), "Domain configuration file does not exist: %s", domainConfig);
-        File domain = new File(this.domainsDir, domainName);
-        verify(!domain.exists(), "Domain %s already exists", domainName);
-        verify(domain.mkdir(), "Couldn't create domain directory %s", domain);
+        File domainFile = new File(domain);
+        verify(domainFile.exists(), "Domain does not exist: %s", domain);
         try
         {
-            FileUtils.copyFileToDirectory(domainConfig, domain);
+            if (domainFile.isDirectory())
+            {
+                FileUtils.copyDirectoryToDirectory(domainFile, this.domainsDir);
+            }
+            else
+            {
+                FileUtils.copyFileToDirectory(domainFile, this.domainsDir);
+            }
         }
         catch (IOException e)
         {
-            throw new MuleControllerException(String.format(CREATE_DOMAIN_ERROR, domainName, domainConfig), e);
+            throw new MuleControllerException(String.format(DOMAIN_DEPLOY_ERROR, domain), e);
         }
-
     }
 
 }
