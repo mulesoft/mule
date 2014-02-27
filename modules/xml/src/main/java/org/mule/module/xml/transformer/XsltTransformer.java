@@ -119,7 +119,7 @@ public class XsltTransformer extends AbstractXmlTransformer
     }
 
     @Override
-    public void initialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
         logger.debug("Initialising transformer: " + this);
         try
@@ -360,6 +360,7 @@ public class XsltTransformer extends AbstractXmlTransformer
             }
 
             factory.setURIResolver(getUriResolver());
+
             return factory.newTransformer(source);
         }
     }

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
+
+
+    <flow name="safeXxe">
+        <mulexml:xslt-transformer name="xslt">
+            <mulexml:xslt-text>
+                <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                    <xsl:template match="/">
+                        <users>
+                            <xsl:copy-of select="." />
+                        </users>
+                    </xsl:template>
+                </xsl:stylesheet>
+            </mulexml:xslt-text>
+        </mulexml:xslt-transformer>
+        <object-to-string-transformer />
+    </flow>
+
+    <flow name="unsafeXxe">
+        <mulexml:xslt-transformer name="unsafeXslt" acceptExternalEntities="true">
+            <mulexml:xslt-text>
+                <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                    <xsl:template match="/">
+                        <users>
+                            <xsl:copy-of select="." />
+                        </users>
+                    </xsl:template>
+                </xsl:stylesheet>
+            </mulexml:xslt-text>
+        </mulexml:xslt-transformer>
+        <object-to-string-transformer />
+    </flow>
+
+
+</mule>
+
