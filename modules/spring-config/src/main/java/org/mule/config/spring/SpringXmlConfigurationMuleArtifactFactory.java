@@ -314,7 +314,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
     {
         StringBuffer schemaLocation = new StringBuffer();
 
-        for(String key : schemaLocations.keySet())
+        for (String key : schemaLocations.keySet())
         {
             schemaLocation.append(key + " " + schemaLocations.get(key) + "\n");
         }
