@@ -36,6 +36,7 @@ public interface ExpressionLanguageContext
 
     boolean contains(String name);
 
+    @Deprecated
     <T> void addPrivateVariable(String name, T value);
 
 }
