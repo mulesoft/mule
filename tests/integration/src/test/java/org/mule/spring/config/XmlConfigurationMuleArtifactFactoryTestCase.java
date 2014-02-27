@@ -28,6 +28,27 @@ import org.w3c.dom.Element;
 
 public abstract class XmlConfigurationMuleArtifactFactoryTestCase extends AbstractMuleTestCase
 {
+
+    protected void doTestMessageProcessorArtifactRetrieval(Document document, XmlConfigurationCallback callback) throws MuleArtifactFactoryException
+    {
+        XmlConfigurationMuleArtifactFactory factory = lookupArtifact();
+        MuleArtifact artifact = null;
+
+        try
+        {
+            artifact = factory.getArtifactForMessageProcessor(document.getDocumentElement(), callback);
+
+            assertNotNull(artifact);
+        }
+        finally
+        {
+            if (artifact != null)
+            {
+                factory.returnArtifact(artifact);
+            }
+        }
+    }
+
     protected void doTestMessageProcessorCapabilities(Document document, XmlConfigurationCallback callback) throws MuleArtifactFactoryException
     {
         doTestMessageProcessor(document, callback, null);
