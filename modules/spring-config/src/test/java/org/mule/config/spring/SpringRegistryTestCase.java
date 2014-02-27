@@ -62,6 +62,15 @@ public class SpringRegistryTestCase extends AbstractRegistryTestCase
         assertThat(springRegistry.get(BEAN_KEY), Is.is(Object.class));
     }
 
+    @Test
+    public void lookupByLifecycleReturnsApplicationContextBeanOnly()
+    {
+        createSpringRegistryWithParentContext();
+        applicationContext.registerSingleton(BEAN_KEY, String.class);
+        parentApplicationContext.registerSingleton(ANOTHER_BEAN_KEY, String.class);
+        assertThat(springRegistry.lookupObjectsForLifecycle(String.class).size(), is(1));
+    }
+
     private void createSpringRegistryWithParentContext()
     {
         applicationContext = new StaticApplicationContext();
