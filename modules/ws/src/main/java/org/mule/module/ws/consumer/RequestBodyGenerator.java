@@ -7,7 +7,6 @@
 package org.mule.module.ws.consumer;
 
 import org.mule.common.metadata.DefaultXmlMetaDataModel;
-import org.mule.common.metadata.MetaDataGenerationException;
 
 import java.nio.charset.Charset;
 import java.util.List;
@@ -60,8 +59,7 @@ public class RequestBodyGenerator
 
         if (soapBody == null)
         {
-            logger.warn("No SOAP body defined in the WSDL for the specified operation, cannot check if the operation " +
-                        "requires input parameters. The payload will be used as SOAP body.");
+            logger.warn("No SOAP body defined in the WSDL for the specified operation, cannot check if the operation requires input parameters");
             return null;
         }
 
@@ -74,22 +72,15 @@ public class RequestBodyGenerator
             return null;
         }
 
+        DefaultXmlMetaDataModel model = new DefaultXmlMetaDataModel(schemas, part.getElementName(), Charset.defaultCharset());
 
-        try
+        if (model.getFields().isEmpty())
         {
-            DefaultXmlMetaDataModel model = new DefaultXmlMetaDataModel(schemas, part.getElementName(), Charset.defaultCharset());
+            logger.info("The selected operation does not require input parameters, the payload will be ignored");
+            QName element = part.getElementName();
+            return String.format("<ns:%s xmlns:ns=\"%s\" />", element.getLocalPart(), element.getNamespaceURI());
+        }
 
-            if (model.getFields().isEmpty())
-            {
-                logger.info("The selected operation does not require input parameters, the payload will be ignored");
-                QName element = part.getElementName();
-                return String.format("<ns:%s xmlns:ns=\"%s\" />", element.getLocalPart(), element.getNamespaceURI());
-            }
-        }
-        catch (MetaDataGenerationException e)
-        {
-            logger.warn("Unable to check if the operation requires input parameters, the payload will be used as SOAP body", e);
-        }
         return null;
     }
 
