@@ -91,7 +91,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
     }
 
     @Override
-    public void initialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
         if (xquery != null && xqueryFile != null)
         {
