@@ -11,45 +11,28 @@
     <packaging>pom</packaging>
     <name>Mule Tests</name>
 
+    <modules>
+        <module>functional</module>
+        <module>archetypes</module>
+        <module>integration</module>
+        <module>integration-jdk6</module>
+        <module>integration-axis</module>
+    </modules>
+
     <properties>
         <licensePath>../LICENSE_HEADER.txt</licensePath>
     </properties>
 
-    <modules>
-        <module>functional</module>
-        <module>integration</module>
-        <module>integration-axis</module>
-    </modules>
-
-    <profiles>
-        <profile>
-            <id>archetype-tests</id>
-            <activation>
-                <property>
-                    <!--
-                         This profile is activated if NO system property
-                         'skipArchetypeTests' is found. Disable this profile
-                         by specifying -DskipArchetypeTests=true on the commandline
-                    -->
-                    <name>!skipArchetypeTests</name>
-                </property>
-            </activation>
-            <modules>
-                <module>archetypes</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>beyond-jdk6</id>
-            <activation>
-                <!--
-                    Minimum JDK version for the build is JDK5. Everything with
-                    a higher version number enables this profile.
-                -->
-                <jdk>!1.5</jdk>
-            </activation>
-            <modules>
-                <module>integration-jdk6</module>
-            </modules>
-        </profile>
-    </profiles>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                    <skipDeploy>true</skipDeploy>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
