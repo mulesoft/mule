@@ -91,13 +91,22 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
             {
                 if (child.isResolveable(name))
                 {
-                    return child.getVariableResolver(name);
+                    variableResolver = child.getVariableResolver(name);
+                    break;
                 }
             }
             if (nextFactory != null)
             {
-                return nextFactory.getVariableResolver(name);
+                variableResolver = nextFactory.getVariableResolver(name);
             }
+        }
+        // In order to allow aliases to use message context without requiring the creating of a
+        // GlobalVariableResolver for each expression evaluation, we create a new resolver on the fly with
+        // current context instead.
+        if (variableResolver instanceof MuleAliasVariableResolver)
+        {
+            variableResolver = new MuleAliasVariableResolver((MuleAliasVariableResolver) variableResolver,
+                this);
         }
         return variableResolver;
     }
@@ -184,7 +193,7 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     @Override
     public void addAlias(String alias, String expression)
     {
-        addResolver(alias, new MuleAliasVariableResolver(alias, expression, this));
+        addResolver(alias, new MuleAliasVariableResolver(alias, expression, this, parserConfiguration));
     }
 
     @Override

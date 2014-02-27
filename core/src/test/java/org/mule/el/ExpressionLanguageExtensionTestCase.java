@@ -54,7 +54,7 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
         MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
         return mvel;
     }
-
+    
     @Test
     public void importClass() throws RegistrationException, InitialisationException
     {
@@ -210,12 +210,12 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
                     b = newValue;
                 }
             });
-            context.addVariable("appShortcut", context.getVariable("app"));
+            context.addAlias("appShortcut", "app");
             context.addFinalVariable("final", "final");
             context.addAlias("p", "message.payload");
             try
             {
-                context.addVariable("m",context.getVariable(MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE));
+                context.addAlias("m","_muleMessage");
             }
             catch (Exception e)
             {
