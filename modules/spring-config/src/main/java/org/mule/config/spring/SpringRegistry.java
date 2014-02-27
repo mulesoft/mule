@@ -159,7 +159,7 @@ public class SpringRegistry extends AbstractRegistry
     @Override
     public <T> Collection<T> lookupObjectsForLifecycle(Class<T> type)
     {
-        return internalLookupByType(type, false, false).values();
+        return internalLookupByTypeWithoutAncestors(type, false, false).values();
     }
 
     @Override
@@ -173,6 +173,25 @@ public class SpringRegistry extends AbstractRegistry
         try
         {
             return BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, type, nonSingletons, eagerInit);
+        }
+        catch (FatalBeanException fbex)
+        {
+            // FBE is a result of a broken config, propagate it (see MULE-3297 for more details)
+            String message = String.format("Failed to lookup beans of type %s from the Spring registry", type);
+            throw new MuleRuntimeException(MessageFactory.createStaticMessage(message), fbex);
+        }
+        catch (Exception e)
+        {
+            logger.debug(e);
+            return Collections.emptyMap();
+        }
+    }
+
+    protected <T> Map<String, T> internalLookupByTypeWithoutAncestors(Class<T> type, boolean nonSingletons, boolean eagerInit)
+    {
+        try
+        {
+            return applicationContext.getBeansOfType(type, nonSingletons, eagerInit);
         }
         catch (FatalBeanException fbex)
         {
