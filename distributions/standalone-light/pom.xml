@@ -39,6 +39,7 @@
                             <goal>unpack</goal>
                         </goals>
                         <configuration>
+                            <skip>${skipDistributions}</skip>
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>org.mule.distributions</groupId>

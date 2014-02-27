@@ -11,13 +11,17 @@
     <packaging>pom</packaging>
     <name>Mule Tests</name>
 
+    <modules>
+        <module>functional</module>
+        <module>archetypes</module>
+        <module>integration</module>
+        <module>integration-jdk6</module>
+        <module>integration-axis</module>
+    </modules>
+
     <properties>
         <licensePath>../LICENSE_HEADER.txt</licensePath>
     </properties>
-
-    <modules>
-        <module>functional</module>
-    </modules>
 
     <build>
         <plugins>
@@ -31,32 +35,4 @@
             </plugin>
         </plugins>
     </build>
-
-
-    <profiles>
-        <profile>
-            <id>integration-suite</id>
-            <activation>
-                <property>
-                    <name>!skipIntegrationTests</name>
-                </property>
-            </activation>
-            <modules>
-                <module>integration</module>
-                <module>integration-jdk6</module>
-                <module>integration-axis</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>archetype-tests</id>
-            <activation>
-                <property>
-                    <name>!skipArchetypeTests</name>
-                </property>
-            </activation>
-            <modules>
-                <module>archetypes</module>
-            </modules>
-        </profile>
-    </profiles>
 </project>
