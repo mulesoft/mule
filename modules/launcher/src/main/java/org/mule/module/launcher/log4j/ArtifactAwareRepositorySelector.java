@@ -32,6 +32,7 @@ import org.apache.log4j.xml.DOMConfigurator;
 
 public class ArtifactAwareRepositorySelector implements RepositorySelector
 {
+
     protected static final String PATTERN_LAYOUT = "%-5p %d [%t] %c: %m%n";
 
     protected static final Integer NO_CCL_CLASSLOADER = 0;
@@ -165,11 +166,11 @@ public class ArtifactAwareRepositorySelector implements RepositorySelector
         // Checks if there's an app-specific logging configuration available,
         // scope the lookup to this classloader only, as getResource() will delegate to parents
         // locate xml config first, fallback to properties format if not found
-        URL appLogConfig = muleCL.findResource("log4j.xml");
+        URL appLogConfig = findResourceOutsideJar(muleCL, "log4j.xml");
 
         if (appLogConfig == null)
         {
-            appLogConfig = muleCL.findResource("log4j.properties");
+            appLogConfig = findResourceOutsideJar(muleCL, "log4j.properties");
         }
 
         if (appLogConfig != null && logger.isInfoEnabled())
@@ -178,6 +179,17 @@ public class ArtifactAwareRepositorySelector implements RepositorySelector
         }
 
         return appLogConfig;
+    }
+
+    private URL findResourceOutsideJar(ArtifactClassLoader muleCL, String resourceName)
+    {
+        URL resource = muleCL.findResource(resourceName);
+
+        if (resource != null && !resource.getProtocol().equals("jar"))
+        {
+            return resource;
+        }
+        return null;
     }
 
     protected void configureFrom(URL url, LoggerRepository repository)
@@ -194,6 +206,7 @@ public class ArtifactAwareRepositorySelector implements RepositorySelector
 
     protected static class LoggerRepositoryCache
     {
+
         protected ConcurrentMap<Integer, LoggerRepository> repositories = new ConcurrentHashMap<Integer, LoggerRepository>();
 
         public LoggerRepository getLoggerRepository(ClassLoader classLoader)
@@ -221,6 +234,7 @@ public class ArtifactAwareRepositorySelector implements RepositorySelector
     // this is a modified and unified version from log4j to better fit Mule's app lifecycle
     protected class ConfigWatchDog extends Thread
     {
+
         protected LoggerRepository repository;
         protected File file;
         protected long lastModif = 0;
