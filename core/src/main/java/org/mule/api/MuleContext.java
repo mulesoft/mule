@@ -237,4 +237,13 @@ public interface MuleContext extends Lifecycle
      * @return {@link {ProcessingTimeWatcher} used to compute processing time of finalized events
      */
     ProcessingTimeWatcher getProcessorTimeWatcher();
+
+    /**
+     * Makes the caller wait until the {@link MuleContext} was started
+     *
+     * @param timeout maximum number of milliseconds that will be waiting
+     * @return true if the context started before the timeout, false otherwise
+     * @throws InterruptedException if the current thread is interrupted while waiting
+     */
+    boolean waitUtilStarted(int timeout) throws InterruptedException;
 }

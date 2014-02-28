@@ -6,6 +6,7 @@
  */
 package org.mule.construct;
 
+import static org.junit.Assert.assertEquals;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -13,8 +14,6 @@ import org.mule.api.transport.Connector;
 import org.mule.tck.MuleTestUtils;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class BridgeTestCase extends AbstractFlowConstuctTestCase
 {
@@ -45,10 +44,12 @@ public class BridgeTestCase extends AbstractFlowConstuctTestCase
     @Test
     public void testProcess() throws Exception
     {
+        muleContext.start();
+
         bridge.initialise();
         bridge.start();
-        MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestInboundEvent("hello",
-            muleContext));
+        MuleEvent testEvent = MuleTestUtils.getTestEvent("hello", muleContext);
+        MuleEvent response = directInboundMessageSource.process(testEvent);
 
         assertEquals("hello", response.getMessageAsString());
     }

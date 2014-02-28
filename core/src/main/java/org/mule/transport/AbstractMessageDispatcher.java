@@ -9,6 +9,7 @@ package org.mule.transport;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -20,6 +21,7 @@ import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageDispatcher;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.service.ServiceAsyncReplyCompositeMessageSource;
 
 import java.util.List;
@@ -77,6 +79,11 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
             connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(),event.getMessage());
             if (forceSync || hasResponse || isTransacted)
             {
+                if (!event.getMuleContext().waitUtilStarted(event.getTimeout()))
+                {
+                    throw new MessagingException(MessageFactory.createStaticMessage("Timeout waiting for mule context to be completely started"), event);
+                }
+
                 MuleMessage resultMessage = doSend(event);
                 if (hasResponse && resultMessage != null)
                 {
