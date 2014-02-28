@@ -60,6 +60,8 @@ import org.mule.util.ServerStartupSplashScreen;
 import org.mule.util.SplashScreen;
 import org.mule.util.SystemUtils;
 import org.mule.util.UUID;
+import org.mule.util.concurrent.Latch;
+import org.mule.util.lock.LockFactory;
 import org.mule.util.queue.QueueManager;
 
 import java.io.Serializable;
@@ -67,6 +69,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.resource.spi.work.WorkListener;
 import javax.transaction.TransactionManager;
@@ -138,6 +141,8 @@ public class DefaultMuleContext implements MuleContext
     private TransactionManager transactionManager;
 
     private ProcessingTimeWatcher processingTimeWatcher;
+
+    private final Latch startLatch = new Latch();
 
     public DefaultMuleContext(MuleConfiguration config,
                               WorkManager workManager,
@@ -248,6 +253,8 @@ public class DefaultMuleContext implements MuleContext
 
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTED));
 
+        startLatch.release();
+
         if (logger.isInfoEnabled())
         {
             SplashScreen startupScreen = buildStartupSplash();
@@ -263,6 +270,8 @@ public class DefaultMuleContext implements MuleContext
      */
     public synchronized void stop() throws MuleException
     {
+        startLatch.release();
+
         getLifecycleManager().checkPhase(Stoppable.PHASE_NAME);
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STOPPING));
         getLifecycleManager().fireLifecycle(Stoppable.PHASE_NAME);
@@ -826,4 +835,11 @@ public class DefaultMuleContext implements MuleContext
 
         return this.processingTimeWatcher;
     }
+
+    @Override
+    public boolean waitUtilStarted(int timeout) throws InterruptedException
+    {
+        return startLatch.await(timeout, TimeUnit.MILLISECONDS);
+    }
+
 }
