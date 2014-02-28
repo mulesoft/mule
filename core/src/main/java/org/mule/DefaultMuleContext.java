@@ -908,7 +908,7 @@ public class DefaultMuleContext implements MuleContext
     }
 
     @Override
-    public boolean waitUtilStarted(int timeout) throws InterruptedException
+    public boolean waitUntilStarted(int timeout) throws InterruptedException
     {
         return startLatch.await(timeout, TimeUnit.MILLISECONDS);
     }
