@@ -98,76 +98,88 @@ public class MuleDeploymentService implements DeploymentService
     @Override
     public void start()
     {
-        DeploymentStatusTracker deploymentStatusTracker = new DeploymentStatusTracker();
-        addDeploymentListener(deploymentStatusTracker);
-
-        StartupSummaryDeploymentListener summaryDeploymentListener = new StartupSummaryDeploymentListener(deploymentStatusTracker);
-        addStartupListener(summaryDeploymentListener);
-
-        deleteAllAnchors();
-
-        // mule -app app1:app2:app3 will restrict deployment only to those specified apps
-        final Map<String, Object> options = StartupContext.get().getStartupOptions();
-        String appString = (String) options.get("app");
-
-        if (appString == null)
+        lock.lock();
+        try
         {
-            String[] explodedApps = appsDir.list(DirectoryFileFilter.DIRECTORY);
-            String[] packagedApps = appsDir.list(ZIP_APPS_FILTER);
+            DeploymentStatusTracker deploymentStatusTracker = new DeploymentStatusTracker();
+            addDeploymentListener(deploymentStatusTracker);
 
-            deployPackedApps(packagedApps);
-            deployExplodedApps(explodedApps);
-        }
-        else
-        {
-            String[] apps = appString.split(":");
-            apps = removeDuplicateAppNames(apps);
+            StartupSummaryDeploymentListener summaryDeploymentListener = new StartupSummaryDeploymentListener(deploymentStatusTracker);
+            addStartupListener(summaryDeploymentListener);
 
-            for (String app : apps)
+            deleteAllAnchors();
+
+            // mule -app app1:app2:app3 will restrict deployment only to those specified apps
+            final Map<String, Object> options = StartupContext.get().getStartupOptions();
+            String appString = (String) options.get("app");
+
+            if (appString == null)
+            {
+                String[] explodedApps = appsDir.list(DirectoryFileFilter.DIRECTORY);
+                String[] packagedApps = appsDir.list(ZIP_APPS_FILTER);
+
+                deployPackedApps(packagedApps);
+                deployExplodedApps(explodedApps);
+            }
+            else
+            {
+                String[] apps = appString.split(":");
+                apps = removeDuplicateAppNames(apps);
+
+                for (String app : apps)
+                {
+                    try
+                    {
+                        File applicationFile = new File(appsDir, app + ZIP_FILE_SUFFIX);
+
+                        if (applicationFile.exists() && applicationFile.isFile())
+                        {
+                            deployPackedApp(app + ZIP_FILE_SUFFIX);
+                        }
+                        else
+                        {
+                            deployExplodedApp(app);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        // Ignore and continue
+                    }
+                }
+            }
+
+
+            for (StartupListener listener : startupListeners)
             {
                 try
                 {
-                    File applicationFile = new File(appsDir, app + ZIP_FILE_SUFFIX);
-
-                    if (applicationFile.exists() && applicationFile.isFile())
-                    {
-                        deployPackedApp(app + ZIP_FILE_SUFFIX);
-                    }
-                    else
-                    {
-                        deployExplodedApp(app);
-                    }
+                    listener.onAfterStartup();
                 }
-                catch (Exception e)
+                catch (Throwable t)
                 {
-                    // Ignore and continue
+                    logger.error(t);
+                }
+            }
+
+            // only start the monitor thread if we launched in default mode without explicitly
+            // stated applications to launch
+            if (!(appString != null))
+            {
+                scheduleChangeMonitor(appsDir);
+            }
+            else
+            {
+                if (logger.isInfoEnabled())
+                {
+                    logger.info(miniSplash("Mule is up and running in a fixed app set mode"));
                 }
             }
         }
-
-        for (StartupListener listener : startupListeners)
+        finally
         {
-            try
+            if (lock.isHeldByCurrentThread())
             {
-                listener.onAfterStartup();
-            }
-            catch (Throwable t)
-            {
-                logger.error(t);
-            }
-        }
-
-        // only start the monitor thread if we launched in default mode without explicitly
-        // stated applications to launch
-        if (!(appString != null))
-        {
-            scheduleChangeMonitor(appsDir);
-        }
-        else
-        {
-            if (logger.isInfoEnabled())
-            {
-                logger.info(miniSplash("Mule is up and running in a fixed app set mode"));
+                lock.unlock();
             }
         }
     }
