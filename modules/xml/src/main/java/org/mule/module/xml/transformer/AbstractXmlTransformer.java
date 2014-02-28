@@ -356,4 +356,9 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
     {
         this.acceptExternalEntities = acceptExternalEntities;
     }
+
+    public boolean getAcceptExternalEntities()
+    {
+        return this.acceptExternalEntities;
+    }
 }
