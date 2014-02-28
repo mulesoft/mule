@@ -50,11 +50,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.mockito.verification.VerificationMode;
 
 public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
@@ -1000,6 +1004,67 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertDeploymentSuccess(applicationDeploymentListener, "incompleteApp");
         assertEquals("Failed app still appears as zombie after a successful redeploy", 0, deploymentService.getZombieApplications().size());
+    }
+
+    @Test
+    public void synchronizesDeploymentOnStart() throws Exception
+    {
+        addPackedAppFromResource("/empty-app.zip");
+
+        Thread deploymentServiceThread = new Thread(new Runnable()
+        {
+            public void run()
+            {
+                deploymentService.start();
+            }
+        });
+
+        final boolean[] lockedFromClient = new boolean[1];
+
+        Mockito.doAnswer(new Answer()
+        {
+            public Object answer(InvocationOnMock invocation) throws Throwable
+            {
+
+                Thread deploymentClientThread = new Thread(new Runnable()
+                {
+                    public void run()
+                    {
+                        ReentrantLock deploymentLock = deploymentService.getLock();
+
+                        try
+                        {
+                            try
+                            {
+                                lockedFromClient[0] = deploymentLock.tryLock(1000, TimeUnit.MILLISECONDS);
+                            }
+                            catch (InterruptedException e)
+                            {
+                                // Ignore
+                            }
+                        }
+                        finally
+                        {
+                            if (deploymentLock.isHeldByCurrentThread())
+                            {
+                                deploymentLock.unlock();
+                            }
+                        }
+                    }
+                });
+
+                deploymentClientThread.start();
+                deploymentClientThread.join();
+
+                return null;
+            }
+        }).when(applicationDeploymentListener).onDeploymentStart("empty-app");
+
+        deploymentServiceThread.start();
+
+        assertDeploymentSuccess(applicationDeploymentListener, "empty-app");
+
+        assertFalse("Able to lock deployment service during start", lockedFromClient[0]);
     }
 
     @Test
