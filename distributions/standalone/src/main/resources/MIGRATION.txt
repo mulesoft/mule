@@ -1,0 +1,26 @@
+MIGRATION GUIDE
+===============
+
+The following is a list of changes you have to execute to migrate from Mule ESB Community edition version 3.4.x to version 3.5.0.
+Please check http://www.mulesoft.org/documentation/display/current/Mule+Release+Notes for more details.
+
+MULE-6968: In the previous version, requests to "/" were only received by an HTTP endpoint when no path was defined, and rejected if path was set to "" or "/". Now requests are received by the endpoint in any of the three cases.
+MULE-7013: keepSendSocketOpen attribute in the HTTP/S connector is deprecated. It is inherited from TCP Connector but has no effect on outbound HTTP connections and will be removed in the future.
+MULE-7023: The keep-alive attribute in inbound and outbound HTTP/S endpoints is renamed to keepAlive.
+MULE-7011: org.mule.util.queue.Queue class now has a clear() method to discard all elements in the queue while leaving the queue still usable. If you have your own implementation of a Mule Queue you'll need to implement it
+MULE-7010: ObjectStore class now has a clear() method which discards all elements while leaving the store still usable. If you have your own implementation of ObjectStore you'll need to implement this method
+MULE-7090: Mule will use the default security provider and TLSv1 as default algorithm for secure socket connections
+           tlsProtocolHandler attribute from TLS configuration in SSL/TLS/smtps/jettry https transports is deprecated and will
+           be ignored. Mule uses the default settings defined in the JVM platform. This parameter is no longer needed in
+           supported JDKs.
+MULE-7061: Jetty transport is now using Jetty 8. Applications using a custom jetty.xml configuration file must update the Jetty classes referenced in this file due to package names changed from version 6 to 7, as explained here: http://wiki.eclipse.org/Jetty/Starting/Porting_to_Jetty_7/Packages_and_Classes
+MULE-7138: MD5MuleEventKeyGenerator is now deprecated, a new implementation is provided: SHA256MuleEventKeyGenerator.
+MULE-7097: A new configuration file 'conf/tls-default.conf' has been added. This file defines two properties, that allow to limit the cipher suites and protocols used by Mule in SSL sockets.
+MULE-7103: There is now a new system property 'mule.security.model' that may be used to alter the security setup of Mule and its modules. If not defined, or defined with the value 'default',
+            no restrictions will apply and Mule will read the TLS configuration from the file 'conf/tls-default.conf'.
+            If defined with the value 'fips140-2' Mule will work with a Fips compliant security model: any cryptographic modes of operation not approved in the standard will be disabled
+            (the pgp module will be disabled, and the TLS configuration properties will be read from 'conf/tls-fips140-2.conf'). Note that full compliance also requires a certified JCE provider installed.
+MULE-7390: The following transformers no longer support external entities out of the box: xslt-transformer, dom-to-xml-transformer, xml-to-dom-transformer
+            dom-to-output-handler-transformer, xquery-transformer. For cases in which external entities processing is needed, the attribute acceptExternalEntities has been added
+            as optional (defaults to false). Use this attribute with extreme care in cases in which you trust the source only.
+

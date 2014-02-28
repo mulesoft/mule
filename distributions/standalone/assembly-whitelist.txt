@@ -13,6 +13,7 @@
 /mule-standalone-${productVersion}/src
 /mule-standalone-${productVersion}/LICENSE.txt
 /mule-standalone-${productVersion}/README.txt
+/mule-standalone-${productVersion}/MIGRATION.txt
 
 #
 # /apps
