@@ -60,6 +60,7 @@ public abstract class AbstractWSProxyTestCase extends AbstractFlowConstuctTestCa
     {
         wsProxy.initialise();
         wsProxy.start();
+        muleContext.start();
     }
 
     @Test
