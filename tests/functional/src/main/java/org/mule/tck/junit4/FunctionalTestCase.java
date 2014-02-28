@@ -30,8 +30,8 @@ import org.mule.util.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 
+import junit.framework.Assert;
 import org.junit.After;
-import org.junit.Before;
 
 /**
  * A base test case for tests that initialize Mule using a configuration file. The
@@ -78,6 +78,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
                                                                                + " not found in Registry"));
         }
     }
+
 
     /**
      * Returns an instance of the service's component object. Note that depending on
@@ -187,5 +188,86 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     {
         FlowAssert.reset();
     }
+
+    /**
+     * Runs the given flow with a default event
+     *
+     * @param flowName the name of the flow to be executed
+     * @return the resulting <code>MuleEvent</code>
+     * @throws Exception
+     */
+    protected MuleEvent runFlow(String flowName) throws Exception
+    {
+        return this.runFlow(flowName, null);
+    }
+
+    /**
+     * Executes the given flow with a default message carrying the payload
+     *
+     * @param flowName the name of the flow to be executed
+     * @param payload the payload to use int he message
+     * @return the resulting <code>MuleEvent</code>
+     * @throws Exception
+     */
+    protected <T> MuleEvent runFlow(String flowName, T payload) throws Exception
+    {
+        Flow flow = lookupFlowConstruct(flowName);
+        return flow.process(getTestEvent(payload));
+    }
+
+    /**
+     * Run the flow specified by name and assert equality on the expected output
+     *
+     * @param flowName The name of the flow to run
+     * @param expect The expected output
+     */
+    protected <T> void runFlowAndExpect(String flowName, T expect) throws Exception
+    {
+        Assert.assertEquals(expect, this.runFlow(flowName).getMessage().getPayload());
+    }
+
+    /**
+     * Runs the given flow and asserts for property name in the outbound scope to
+     * match the expected value
+     *
+     * @param flowName the name of the flow to be executed
+     * @param propertyName the name of the property to test
+     * @param expect the expected value
+     * @throws Exception
+     */
+    protected <T> void runFlowAndExpectProperty(String flowName, String propertyName, T expect)
+            throws Exception
+    {
+        Flow flow = lookupFlowConstruct(flowName);
+        MuleEvent event = getTestEvent(null);
+        MuleEvent responseEvent = flow.process(event);
+
+        Assert.assertEquals(expect, responseEvent.getMessage().getOutboundProperty(propertyName));
+    }
+
+    /**
+     * Run the flow specified by name using the specified payload and assert equality
+     * on the expected output
+     *
+     * @param flowName The name of the flow to run
+     * @param expect The expected output
+     * @param payload The payload of the input event
+     */
+    protected <T, U> void runFlowWithPayloadAndExpect(String flowName, T expect, U payload) throws Exception
+    {
+        Assert.assertEquals(expect, this.runFlow(flowName).getMessage().getPayload());
+    }
+
+    /**
+     * Retrieve a flow by name from the registry
+     *
+     * @param name Name of the flow to retrieve
+     */
+    protected Flow lookupFlowConstruct(String name)
+    {
+        return (Flow) muleContext.getRegistry().lookupFlowConstruct(name);
+    }
+
+
 
 }

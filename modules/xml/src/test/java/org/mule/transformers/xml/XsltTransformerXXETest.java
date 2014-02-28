@@ -29,7 +29,7 @@ public class XsltTransformerXXETest extends FunctionalTestCase
 {
 
     @Override
-    protected String getConfigFile()
+    protected String getConfigResources()
     {
         return "xslt-xxe-config.xml";
     }
