@@ -321,6 +321,6 @@ public interface MuleContext extends Lifecycle
      * @return true if the context started before the timeout, false otherwise
      * @throws InterruptedException if the current thread is interrupted while waiting
      */
-    boolean waitUtilStarted(int timeout) throws InterruptedException;
+    boolean waitUntilStarted(int timeout) throws InterruptedException;
 }
 

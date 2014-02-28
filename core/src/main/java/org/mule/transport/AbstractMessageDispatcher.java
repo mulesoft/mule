@@ -76,7 +76,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
 
             if (hasResponse)
             {
-                if (!event.getMuleContext().waitUtilStarted(event.getTimeout()))
+                if (!event.getMuleContext().waitUntilStarted(event.getTimeout()))
                 {
                     throw new MessagingException(MessageFactory.createStaticMessage("Timeout waiting for mule context to be completely started"), event);
                 }
