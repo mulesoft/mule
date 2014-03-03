@@ -2,24 +2,26 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
-       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd">
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+            http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+            http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+            http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-    <custom-transformer name="transformer1" class="org.mule.test.integration.CompositeSourceStartDelayTestCase$StuckTransformer" />
-
-    <endpoint name="sleepingTestIn" address="vm://sleepingTestIn" transformer-refs="transformer1"/>
+    <spring:bean name="_muleEndpointFactory" class="org.mule.test.integration.CompositeSourceStartDelayTestCase$DelayedStartEndpointFactory"/>
 
     <flow name="MainFlow">
         <composite-source>
-            <vm:inbound-endpoint name="testInEndpoint" path="testIn" exchange-pattern="request-response"/>
-            <vm:inbound-endpoint ref="sleepingTestIn" exchange-pattern="request-response"/>
+            <http:inbound-endpoint name="testInEndpoint" address="http://localhost:${httpPort}"
+                                   exchange-pattern="request-response"/>
+            <vm:inbound-endpoint name="sleepingTestIn" address="vm://sleepingTestIn"
+                                 exchange-pattern="request-response"/>
         </composite-source>
 
-        <custom-processor class="org.mule.test.integration.CompositeSourceStartDelayTestCase$AwakeSourceMessageProcessor"/>
-
-        <test:component appendString=" received"/>
+        <test:component appendString="Processed"/>
     </flow>
 </mule>
