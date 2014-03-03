@@ -17,13 +17,17 @@ public interface ProcessingStrategy
 {
 
     public void configureProcessors(List<MessageProcessor> processors,
-                                    StageNameSource nameSource,
+                                    org.mule.api.processor.StageNameSource nameSource,
                                     MessageProcessorChainBuilder chainBuilder,
                                     MuleContext muleContext);
 
-    public interface StageNameSource
+    /**
+     * To be removed in Mule 4. Use {@link org.mule.api.processor.StageNameSource} instead
+     */
+    @Deprecated
+    public interface StageNameSource extends org.mule.api.processor.StageNameSource
     {
-        String getName();
+
     }
 
 }
