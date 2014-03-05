@@ -61,7 +61,6 @@ import org.mule.util.SplashScreen;
 import org.mule.util.SystemUtils;
 import org.mule.util.UUID;
 import org.mule.util.concurrent.Latch;
-import org.mule.util.lock.LockFactory;
 import org.mule.util.queue.QueueManager;
 
 import java.io.Serializable;
