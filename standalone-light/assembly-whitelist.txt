@@ -10,7 +10,7 @@
 /mule-standalone-nodocs-${productVersion}/logs
 /mule-standalone-nodocs-${productVersion}/LICENSE.txt
 /mule-standalone-nodocs-${productVersion}/README.txt
-
+/mule-standalone-nodocs-${productVersion}/MIGRATION.txt
 
 #
 # /apps
