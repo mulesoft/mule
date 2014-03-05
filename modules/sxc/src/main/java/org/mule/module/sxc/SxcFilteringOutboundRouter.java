@@ -11,6 +11,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.transformer.TransformerException;
@@ -38,12 +39,8 @@ import java.util.Map;
 public class SxcFilteringOutboundRouter extends FilteringOutboundRouter
 {
     private final static ThreadLocal<MuleMessage> messages = new ThreadLocal<MuleMessage>();
-    private final static XmlToXMLStreamReader transformer = new XmlToXMLStreamReader();
 
-    static
-    {
-        transformer.setReversible(true);
-    }
+    private XmlToXMLStreamReader transformer = new XmlToXMLStreamReader();
 
     private Map<String, String> namespaces;
     private XPathEvaluator evaluator;
@@ -123,24 +120,19 @@ public class SxcFilteringOutboundRouter extends FilteringOutboundRouter
         }
     }
 
-    protected void initialize() throws Exception
+    @Override
+    public void initialise() throws InitialisationException
     {
-        if (evaluator == null)
-        {
-            doInitialize();
-        }
-    }
+        super.initialise();
 
-    private synchronized void doInitialize()
-    {
-        if (evaluator == null)
-        {
-            builder = new XPathBuilder();
-            builder.setNamespaceContext(namespaces);
-            addEventHandlers(builder, getFilter());
+        transformer.setReversible(true);
+        transformer.initialise();
 
-            evaluator = builder.compile();
-        }
+        builder = new XPathBuilder();
+        builder.setNamespaceContext(namespaces);
+        addEventHandlers(builder, getFilter());
+
+        evaluator = builder.compile();
     }
 
     @Override
@@ -149,7 +141,6 @@ public class SxcFilteringOutboundRouter extends FilteringOutboundRouter
         ReversibleXMLStreamReader reader = null;
         try
         {
-            initialize();
             messages.set(message);
 
             reader = getXMLStreamReader(message);
