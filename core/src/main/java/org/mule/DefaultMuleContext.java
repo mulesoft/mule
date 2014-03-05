@@ -38,6 +38,7 @@ import org.mule.api.security.SecurityManager;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.transaction.TransactionManagerFactory;
+import org.mule.api.util.StreamCloserService;
 import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.ClusterConfiguration;
 import org.mule.config.DefaultMuleConfiguration;
@@ -135,6 +136,8 @@ public class DefaultMuleContext implements MuleContext
     private long startDate;
 
     private ExpressionManager expressionManager;
+
+    private StreamCloserService streamCloserService;
 
     private ClassLoader executionClassLoader;
 
@@ -692,6 +695,21 @@ public class DefaultMuleContext implements MuleContext
     public ThreadingProfile getDefaultServiceThreadingProfile()
     {
         return (ThreadingProfile) getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public StreamCloserService getStreamCloserService()
+    {
+        if (this.streamCloserService == null)
+        {
+            this.streamCloserService = this.getRegistry().lookupObject(
+                    MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE);
+        }
+
+        return this.streamCloserService;
     }
 
     public ThreadingProfile getDefaultThreadingProfile()
