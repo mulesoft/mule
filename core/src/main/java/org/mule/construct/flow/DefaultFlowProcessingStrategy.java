@@ -21,7 +21,7 @@ public class DefaultFlowProcessingStrategy extends QueuedAsynchronousProcessingS
 {
 
     @Override
-    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(StageNameSource nameSource,
+    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(org.mule.api.processor.StageNameSource nameSource,
                                                                             MuleContext muleContext)
     {
         Integer timeout = queueTimeout != null ? queueTimeout : muleContext.getConfiguration()

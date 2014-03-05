@@ -19,8 +19,11 @@ import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
+import org.mule.api.processor.NamedStageNameSource;
 import org.mule.api.processor.ProcessingStrategy;
-import org.mule.api.processor.ProcessingStrategy.StageNameSource;
+import org.mule.api.processor.SequentialStageNameSource;
+import org.mule.api.processor.StageNameSource;
+import org.mule.api.processor.StageNameSourceProvider;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.construct.flow.DefaultFlowProcessingStrategy;
@@ -43,15 +46,16 @@ import org.mule.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
  * transactions message processing in another thread asynchronously.</li>
  * </ul>
  */
-public class Flow extends AbstractPipeline implements MessageProcessor
+public class Flow extends AbstractPipeline implements MessageProcessor, StageNameSourceProvider
 {
     private int stageCount = 0;
-    private int asyncCount = 0;
+    private final StageNameSource sequentialStageNameSource;
 
     public Flow(String name, MuleContext muleContext)
     {
         super(name, muleContext);
         processingStrategy = new DefaultFlowProcessingStrategy();
+        this.sequentialStageNameSource = new SequentialStageNameSource(name);
     }
 
     @Override
@@ -152,7 +156,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor
     protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException
     {
         getProcessingStrategy().configureProcessors(getMessageProcessors(),
-            new ProcessingStrategy.StageNameSource()
+            new StageNameSource()
             {
                 @Override
                 public String getName()
@@ -162,28 +166,22 @@ public class Flow extends AbstractPipeline implements MessageProcessor
             }, builder, muleContext);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public StageNameSource getAsyncStageNameSource()
     {
-        return new ProcessingStrategy.StageNameSource()
-        {
-            @Override
-            public String getName()
-            {
-                return String.format("%s.async%s", Flow.this.getName(), ++asyncCount);
-            }
-        };
+        return this.sequentialStageNameSource;
     }
 
-    public StageNameSource getAsyncStageNameSource(final String asyncName)
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public StageNameSource getAsyncStageNameSource(String asyncName)
     {
-        return new ProcessingStrategy.StageNameSource()
-        {
-            @Override
-            public String getName()
-            {
-                return String.format("%s.%s", Flow.this.getName(), asyncName);
-            }
-        };
+        return new NamedStageNameSource(this.name, asyncName);
     }
 
 }

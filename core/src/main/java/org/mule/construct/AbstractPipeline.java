@@ -24,6 +24,7 @@ import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.api.processor.ProcessingStrategy;
+import org.mule.api.processor.StageNameSource;
 import org.mule.api.source.ClusterizableMessageSource;
 import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.source.MessageSource;
@@ -217,7 +218,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException
     {
         getProcessingStrategy().configureProcessors(getMessageProcessors(),
-                new ProcessingStrategy.StageNameSource()
+                new StageNameSource()
                 {
                     @Override
                     public String getName()
