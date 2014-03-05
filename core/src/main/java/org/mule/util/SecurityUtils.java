@@ -22,4 +22,9 @@ public final class SecurityUtils
     {
         return getSecurityModel().equals(TlsConfiguration.FIPS_SECURITY_MODEL);
     }
+
+    public static boolean isDefaultSecurityModel()
+    {
+        return getSecurityModel().equals(TlsConfiguration.DEFAULT_SECURITY_MODEL);
+    }
 }
