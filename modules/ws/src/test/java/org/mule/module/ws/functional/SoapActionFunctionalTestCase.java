@@ -8,6 +8,7 @@ package org.mule.module.ws.functional;
 
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.construct.Flow;
@@ -44,13 +45,13 @@ public class SoapActionFunctionalTestCase extends AbstractWSConsumerFunctionalTe
     @Test
     public void operationWithSoapActionVersion12() throws Exception
     {
-        assertSoapActionInRequest("operationWithSoapActionVersion12", "TestOperationWithSoapAction");
+        assertSoapActionInRequest("operationWithSoapActionVersion12", null);
     }
 
     @Test
     public void operationWithNoSoapActionVersion12() throws Exception
     {
-        assertSoapActionInRequest("operationWithNoSoapActionVersion12", "");
+        assertSoapActionInRequest("operationWithNoSoapActionVersion12", null);
     }
 
 
@@ -64,8 +65,16 @@ public class SoapActionFunctionalTestCase extends AbstractWSConsumerFunctionalTe
             @Override
             public void eventReceived(MuleEventContext context, Object component) throws Exception
             {
-                errorCollector.checkThat((String) context.getMessage().getInboundProperty("SOAPAction"),
-                                         equalTo(String.format("\"%s\"", expectedSoapAction)));
+                String soapAction = context.getMessage().getInboundProperty("SOAPAction");
+
+                if (expectedSoapAction == null)
+                {
+                    errorCollector.checkThat(soapAction, nullValue());
+                }
+                else
+                {
+                    errorCollector.checkThat(soapAction, equalTo(String.format("\"%s\"", expectedSoapAction)));
+                }
             }
         });
 

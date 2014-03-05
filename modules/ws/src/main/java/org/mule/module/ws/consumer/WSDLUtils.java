@@ -11,12 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.wsdl.Binding;
 import javax.wsdl.BindingOperation;
 import javax.wsdl.Definition;
 import javax.wsdl.Types;
 import javax.wsdl.extensions.schema.Schema;
 import javax.wsdl.extensions.schema.SchemaReference;
+import javax.wsdl.extensions.soap.SOAPBinding;
 import javax.wsdl.extensions.soap.SOAPBody;
+import javax.wsdl.extensions.soap12.SOAP12Binding;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -88,6 +91,26 @@ public class WSDLUtils
             if (extension instanceof SOAPBody)
             {
                 return (SOAPBody) extension;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Retrieves the SOAP version of a WSDL binding, or null if it is not a SOAP binding.
+     */
+    public static SoapVersion getSoapVersion(Binding binding)
+    {
+        List extensions = binding.getExtensibilityElements();
+        for (Object extension : extensions)
+        {
+            if (extension instanceof SOAPBinding)
+            {
+                return SoapVersion.SOAP_11;
+            }
+            if (extension instanceof SOAP12Binding)
+            {
+                return SoapVersion.SOAP_12;
             }
         }
         return null;

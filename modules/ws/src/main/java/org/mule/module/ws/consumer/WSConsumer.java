@@ -69,6 +69,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     private MessageProcessor messageProcessor;
     private String soapAction;
     private String requestBody;
+    private SoapVersion soapVersion;
 
     @Override
     public void initialise() throws InitialisationException
@@ -90,7 +91,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        if (soapAction != null)
+        if (shouldAddSoapActionHeader())
         {
             event.getMessage().setOutboundProperty(SOAP_ACTION_PROPERTY, soapAction);
         }
@@ -208,6 +209,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
         Map<String, Object> configProperties = new HashMap<String, Object>();
 
         cxfBuilder.setMuleContext(muleContext);
+        cxfBuilder.setSoapVersion(soapVersion.getVersion());
 
         if (security != null && security.hasStrategies())
         {
@@ -291,6 +293,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
             throw new InitialisationException(MessageFactory.createStaticMessage("Operation %s not found in WSDL", this.operation), this);
         }
 
+        this.soapVersion = WSDLUtils.getSoapVersion(binding);
         this.soapAction = getSoapAction(bindingOperation);
 
         RequestBodyGenerator requestBodyGenerator = new RequestBodyGenerator(wsdlDefinition);
@@ -318,7 +321,10 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
         return null;
     }
 
-
+    private boolean shouldAddSoapActionHeader()
+    {
+        return soapAction != null && soapVersion == SoapVersion.SOAP_11;
+    }
 
     @Override
     public void setMuleContext(MuleContext muleContext)
