@@ -28,6 +28,7 @@ import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreManager;
+import org.mule.api.util.StreamCloserService;
 import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
@@ -204,6 +205,14 @@ public interface MuleContext extends Lifecycle
     ThreadingProfile getDefaultServiceThreadingProfile();
 
     ThreadingProfile getDefaultThreadingProfile();
+
+    /**
+     * Returns the configured {@link org.mule.api.util.StreamCloserService}
+     *
+     * @return a {@link org.mule.api.util.StreamCloserService}
+     * @since 3.5.0
+     */
+    public StreamCloserService getStreamCloserService();
 
     // TODO This should ideally only be available via an Admin interface
     void addRegistry(Registry registry);

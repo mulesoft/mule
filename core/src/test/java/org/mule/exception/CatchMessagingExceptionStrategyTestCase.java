@@ -6,6 +6,26 @@
  */
 package org.mule.exception;
 
+import static java.util.Arrays.asList;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
+
+import org.mule.api.ExceptionPayload;
+import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.api.transaction.Transaction;
+import org.mule.api.transaction.TransactionException;
+import org.mule.api.util.StreamCloserService;
+import org.mule.tck.testmodels.mule.TestTransaction;
+import org.mule.transaction.TransactionCoordination;
+
 import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,26 +36,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.internal.verification.VerificationModeFactory;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mule.api.ExceptionPayload;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionException;
-import org.mule.api.util.StreamCloserService;
-import org.mule.tck.testmodels.mule.TestTransaction;
-import org.mule.transaction.TransactionCoordination;
-
-import static org.hamcrest.core.Is.is;
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertThat;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CatchMessagingExceptionStrategyTestCase
@@ -68,8 +68,7 @@ public class CatchMessagingExceptionStrategyTestCase
         }
         catchMessagingExceptionStrategy = new CatchMessagingExceptionStrategy();
         catchMessagingExceptionStrategy.setMuleContext(mockMuleContext);
-        when(mockMuleContext.getRegistry().lookupObject(
-                MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE)).thenReturn(mockStreamCloserService);
+        when(mockMuleContext.getStreamCloserService()).thenReturn(mockStreamCloserService);
         when(mockMuleEvent.getMessage()).thenReturn(mockMuleMessage);
     }
 
