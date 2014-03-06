@@ -63,10 +63,12 @@
     </modules>
 
     <properties>
-        <skipIntegrationTests>true</skipIntegrationTests>
+        <!-- Properties that can be used to enable/disable parts of the build via cmd line or profiles -->
+        <skipIntegrationTests>false</skipIntegrationTests>
         <skipPerformanceTests>true</skipPerformanceTests>
         <skipArchetypeTests>true</skipArchetypeTests>
         <skipDistributions>true</skipDistributions>
+        <skipVerifications>false</skipVerifications>
 
         <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
         <licensePath>LICENSE_HEADER.txt</licensePath>
@@ -1552,6 +1554,106 @@
                         </execution>
                     </executions>
                 </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>buildnumber-maven-plugin</artifactId>
+                    <version>1.1</version>
+                    <executions>
+                        <execution>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>create</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <!-- never touch vcs -->
+                        <doCheck>false</doCheck>
+                        <doUpdate>false</doUpdate>
+                        <timestampFormat>{0,date,yyyy-MMM-dd HH:mm:ss}</timestampFormat>
+                        <shortRevisionLength>8</shortRevisionLength>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>com.mycila.maven-license-plugin</groupId>
+                    <artifactId>maven-license-plugin</artifactId>
+                    <version>1.9.0</version>
+                    <configuration>
+                        <skip>${skipVerifications}</skip>
+                        <header>${licensePath}</header>
+                        <excludes>
+                            <exclude>target/**</exclude>
+                            <exclude>**/.gitignore</exclude>
+                            <exclude>**/*.txt</exclude>
+                            <exclude>**/*.groovy</exclude>
+                            <exclude>**/*.sh</exclude>
+                            <exclude>**/*.bat</exclude>
+                            <exclude>**/*.ftl</exclude>
+                            <exclude>**/*.xml</exclude>
+                            <exclude>**/*.properties</exclude>
+                            <exclude>**/*.sample</exclude>
+                            <exclude>**/*.md</exclude>
+                            <exclude>**/*.xsl</exclude>
+                            <exclude>**/*.html</exclude>
+                            <exclude>**/*.css</exclude>
+                            <exclude>**/build-number.txt</exclude>
+
+                            <exclude>**/BndMojo.java</exclude>
+                            <exclude>**/BobberArchetype.java</exclude>
+                            <exclude>**/BobberArchetypeMojo.java</exclude>
+                            <exclude>**/DummySSLServerSocketFactory.java</exclude>
+                            <exclude>**/ConfigurationPatternArchetypeMojo.java</exclude>
+                            <exclude>**/ModuleArchetypeMojo.java</exclude>
+                            <exclude>**/MultipartConfiguration.java</exclude>
+
+                            <exclude>**/ParamReader.java</exclude>
+                            <exclude>**/Part.java</exclude>
+                            <exclude>**/ProjectArchetypeMojo.java</exclude>
+                            <exclude>**/TransportArchetypeMojo.java</exclude>
+                            <exclude>**/XMLStreamReaderToContentHandler.java</exclude>
+                            <exclude>**/__artifactId__IBean.java</exclude>
+                            <exclude>**/__artifactId__IBeanTestCase.java</exclude>
+                        </excludes>
+                        <includes>
+                            <include>**/*.java</include>
+                        </includes>
+                        <mapping>
+                            <java>SLASHSTAR_STYLE</java>
+                        </mapping>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>1.0.1</version>
+                    <executions>
+                        <execution>
+                            <id>enforce-maven-version</id>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <configuration>
+                                <skip>${skipVerifications}</skip>
+                                <rules>
+                                    <requireMavenVersion>
+                                        <version>[3.0.0,)</version>
+                                    </requireMavenVersion>
+                                    <requireJavaVersion>
+                                        <version>[1.6.0,)</version>
+                                    </requireJavaVersion>
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -1562,6 +1664,14 @@
                 <configuration>
                     <encoding>ISO-8859-1</encoding>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
             </plugin>
             <!-- Global test exclusions -->
             <plugin>
@@ -1860,7 +1970,6 @@
                 </site>
             </distributionManagement>
         </profile>
-
         <profile>
             <id>mac</id>
             <activation>
@@ -1872,7 +1981,6 @@
                 <vmtype>org.eclipse.jdt.internal.launching.macosx.MacOSXType</vmtype>
             </properties>
         </profile>
-
         <profile>
             <id>nexus</id>
             <activation>
@@ -1903,131 +2011,55 @@
             </distributionManagement>
         </profile>
 
+        <!-- C.I. staged build profiles -->
         <profile>
             <id>compile</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>buildnumber-maven-plugin</artifactId>
-                        <version>1.1</version>
-                        <executions>
-                            <execution>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>create</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <!-- never touch vcs -->
-                            <doCheck>false</doCheck>
-                            <doUpdate>false</doUpdate>
-                            <timestampFormat>{0,date,yyyy-MMM-dd HH:mm:ss}</timestampFormat>
-                            <shortRevisionLength>8</shortRevisionLength>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>com.mycila.maven-license-plugin</groupId>
-                        <artifactId>maven-license-plugin</artifactId>
-                        <version>1.9.0</version>
-                        <configuration>
-                            <header>${licensePath}</header>
-                            <excludes>
-                                <exclude>target/**</exclude>
-                                <exclude>**/.gitignore</exclude>
-                                <exclude>**/*.txt</exclude>
-                                <exclude>**/*.groovy</exclude>
-                                <exclude>**/*.sh</exclude>
-                                <exclude>**/*.bat</exclude>
-                                <exclude>**/*.ftl</exclude>
-                                <exclude>**/*.xml</exclude>
-                                <exclude>**/*.properties</exclude>
-                                <exclude>**/*.sample</exclude>
-                                <exclude>**/*.md</exclude>
-                                <exclude>**/*.xsl</exclude>
-                                <exclude>**/*.html</exclude>
-                                <exclude>**/*.css</exclude>
-                                <exclude>**/build-number.txt</exclude>
-
-                                <exclude>**/BndMojo.java</exclude>
-                                <exclude>**/BobberArchetype.java</exclude>
-                                <exclude>**/BobberArchetypeMojo.java</exclude>
-                                <exclude>**/DummySSLServerSocketFactory.java</exclude>
-                                <exclude>**/ConfigurationPatternArchetypeMojo.java</exclude>
-                                <exclude>**/ModuleArchetypeMojo.java</exclude>
-                                <exclude>**/MultipartConfiguration.java</exclude>
-
-                                <exclude>**/ParamReader.java</exclude>
-                                <exclude>**/Part.java</exclude>
-                                <exclude>**/ProjectArchetypeMojo.java</exclude>
-                                <exclude>**/TransportArchetypeMojo.java</exclude>
-                                <exclude>**/XMLStreamReaderToContentHandler.java</exclude>
-                                <exclude>**/__artifactId__IBean.java</exclude>
-                                <exclude>**/__artifactId__IBeanTestCase.java</exclude>
-                            </excludes>
-                            <includes>
-                                <include>**/*.java</include>
-                            </includes>
-                            <mapping>
-                                <java>SLASHSTAR_STYLE</java>
-                            </mapping>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>check</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-enforcer-plugin</artifactId>
-                        <version>1.0.1</version>
-                        <executions>
-                            <execution>
-                                <id>enforce-maven-version</id>
-                                <goals>
-                                    <goal>enforce</goal>
-                                </goals>
-                                <configuration>
-                                    <rules>
-                                        <requireMavenVersion>
-                                            <version>[3.0.0,)</version>
-                                        </requireMavenVersion>
-                                        <requireJavaVersion>
-                                            <version>[1.6.0,)</version>
-                                        </requireJavaVersion>
-                                    </rules>
-                                </configuration>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>
+            <properties>
+                <skipIntegrationTests>true</skipIntegrationTests>
+                <skipDistributions>true</skipDistributions>
+                <skipVerifications>false</skipVerifications>
+            </properties>
         </profile>
         <profile>
             <id>unit</id>
             <!-- will eventually toggle running only @SmallTests -->
+            <properties>
+                <skipIntegrationTests>true</skipIntegrationTests>
+                <skipDistributions>true</skipDistributions>
+                <skipVerifications>true</skipVerifications>
+            </properties>
         </profile>
         <profile>
             <id>functional</id>
             <!-- will eventually toggle running all but @SmallTests -->
+            <properties>
+                <skipIntegrationTests>true</skipIntegrationTests>
+                <skipDistributions>true</skipDistributions>
+                <skipVerifications>true</skipVerifications>
+            </properties>
         </profile>
         <profile>
             <id>integration</id>
             <properties>
                 <skipIntegrationTests>false</skipIntegrationTests>
+                <skipDistributions>true</skipDistributions>
+                <skipVerifications>true</skipVerifications>
             </properties>
         </profile>
         <profile>
             <id>release</id>
             <properties>
+                <skipIntegrationTests>true</skipIntegrationTests>
                 <skipDistributions>false</skipDistributions>
+                <skipVerifications>true</skipVerifications>
             </properties>
             <build>
                 <plugins>
