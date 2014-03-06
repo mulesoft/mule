@@ -144,12 +144,6 @@
 			<artifactId>activemq-core</artifactId>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-db</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
 		<!--Database Drivers -->
 		<dependency>
 			<groupId>org.apache.derby</groupId>
