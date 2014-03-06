@@ -20,6 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.registry.MuleRegistry;
@@ -731,6 +732,25 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         reset(applicationDeploymentListener);
 
         assertNoDeploymentInvoked(applicationDeploymentListener);
+    }
+
+    @Test
+    public void redeployedFailedAppAfterTouched() throws Exception
+    {
+        addExplodedAppFromResource("/dummy-app.zip");
+
+        // Sets a modification time in the future
+        File appFolder = new File(appsDir.getPath(), "dummy-app");
+        File configFile = new File(appFolder, "mule-config.xml");
+        String goodConfigContent = FileUtils.readFileToString(configFile);
+        FileUtils.writeStringToFile(configFile, "you shall not pass");
+
+        deploymentService.start();
+        assertDeploymentFailure(applicationDeploymentListener, "dummy-app");
+        reset(applicationDeploymentListener);
+
+        FileUtils.writeStringToFile(configFile, goodConfigContent);
+        assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
     }
 
     @Test
