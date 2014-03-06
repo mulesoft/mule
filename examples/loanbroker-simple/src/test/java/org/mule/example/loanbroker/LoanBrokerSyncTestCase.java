@@ -15,6 +15,7 @@ import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConstants;
 
@@ -22,11 +23,32 @@ import java.util.Map;
 
 import org.apache.commons.collections.map.SingletonMap;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 
-@Ignore("MULE-7122")
 public class LoanBrokerSyncTestCase extends FunctionalTestCase
 {
+	@Rule
+	public DynamicPort loanBrokerSyncPort = new DynamicPort("loan.broker.sync.port");
+	
+	@Rule
+	public DynamicPort lookupCustomerCreditProfilePort = new DynamicPort("lookup.customer.credit.profile.port");
+	
+	@Rule
+	public DynamicPort bank1Port = new DynamicPort("bank.1.port");
+	
+	@Rule
+	public DynamicPort bank2Port = new DynamicPort("bank.2.port");
+	
+	@Rule
+	public DynamicPort bank3Port = new DynamicPort("bank.3.port");
+	
+	@Rule
+	public DynamicPort bank4Port = new DynamicPort("bank.4.port");
+	
+	@Rule
+	public DynamicPort bank5Port = new DynamicPort("bank.5.port");
+	
     @Override
     protected String getConfigFile()
     {
@@ -41,7 +63,7 @@ public class LoanBrokerSyncTestCase extends FunctionalTestCase
         @SuppressWarnings("unchecked")
         Map<String, Object> props = new SingletonMap("http.method", HttpConstants.METHOD_GET);
 
-        MuleMessage result = client.send("http://localhost:11081?name=Muley&amount=20000&term=48&ssn=1234", null, props);
+        MuleMessage result = client.send("http://localhost:" + loanBrokerSyncPort.getNumber() + "?name=Muley&amount=20000&term=48&ssn=1234", null, props);
         assertNotNull("Result is null", result);
         assertFalse("Result is null", result.getPayload() instanceof NullPayload);
         assertNull(result.getExceptionPayload());
@@ -56,7 +78,7 @@ public class LoanBrokerSyncTestCase extends FunctionalTestCase
         @SuppressWarnings("unchecked")
         Map<String, Object> props = new SingletonMap("http.method", HttpConstants.METHOD_GET);
 
-        MuleMessage result = client.send("http://localhost:11081?amount=1234", null, props);
+        MuleMessage result = client.send("http://localhost:" + loanBrokerSyncPort.getNumber() + "?amount=1234", null, props);
         assertEquals("Error: incomplete request", result.getPayloadAsString());
     }
 
@@ -68,7 +90,7 @@ public class LoanBrokerSyncTestCase extends FunctionalTestCase
         @SuppressWarnings("unchecked")
         Map<String, Object> props = new SingletonMap("http.method", HttpConstants.METHOD_GET);
 
-        MuleMessage result = client.send("http://localhost:11081?name=Muley&term=48&ssn=1234&amount=abcd", null, props);
+        MuleMessage result = client.send("http://localhost:" + loanBrokerSyncPort.getNumber() + "?name=Muley&term=48&ssn=1234&amount=abcd", null, props);
         assertEquals("Error processing loan request", result.getPayloadAsString());
     }
 }
