@@ -135,6 +135,18 @@ public class MuleSharedDomainClassLoader extends GoodCitizenClassLoader implemen
         return resource;
     }
 
+    @Override
+    public URL findArtifactResource(String resource)
+    {
+        URL resourceUrl = super.findResource(resource);
+        if (FileUtils.isInDir(resourceUrl, domainDir))
+        {
+            return resourceUrl;
+        }
+        return null;
+    }
+
+
     private void validateAndGetDomainFolders() throws Exception
     {
         File oldDomainDir = new File(MuleContainerBootstrapUtils.getMuleHome(), OLD_DOMAIN_LIBRARY_FOLDER + File.separator + domain);

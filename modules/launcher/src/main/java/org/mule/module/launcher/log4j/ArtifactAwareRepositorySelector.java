@@ -165,11 +165,11 @@ public class ArtifactAwareRepositorySelector implements RepositorySelector
         // Checks if there's an app-specific logging configuration available,
         // scope the lookup to this classloader only, as getResource() will delegate to parents
         // locate xml config first, fallback to properties format if not found
-        URL appLogConfig = muleCL.findResource("../classes/log4j.xml");
+        URL appLogConfig = muleCL.findArtifactResource("log4j.xml");
 
         if (appLogConfig == null)
         {
-            appLogConfig = muleCL.findResource("../classes/log4j.properties");
+            appLogConfig = muleCL.findArtifactResource("log4j.properties");
         }
 
         if (appLogConfig != null && logger.isInfoEnabled())

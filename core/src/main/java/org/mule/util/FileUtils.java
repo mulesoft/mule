@@ -44,9 +44,10 @@ import org.apache.commons.logging.LogFactory;
 // @ThreadSafe
 public class FileUtils extends org.apache.commons.io.FileUtils
 {
+
     private static final Log logger = LogFactory.getLog(FileUtils.class);
     public static String DEFAULT_ENCODING = "UTF-8";
-    
+
     public static synchronized void copyStreamToFile(InputStream input, File destination) throws IOException
     {
         if (destination.exists() && !destination.canWrite())
@@ -215,6 +216,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
 
     /**
      * Delete a file tree recursively.
+     *
      * @param dir dir to wipe out
      * @return false when the first unsuccessful attempt encountered
      */
@@ -227,10 +229,11 @@ public class FileUtils extends org.apache.commons.io.FileUtils
      * Delete a file tree recursively. This method additionally tries to be
      * gentle with specified top-level dirs. E.g. this is the case when a
      * transaction manager asynchronously handles the recovery log, and the test
-     * wipes out everything, leaving the transaction manager puzzled.  
-     * @param dir dir to wipe out
+     * wipes out everything, leaving the transaction manager puzzled.
+     *
+     * @param dir                  dir to wipe out
      * @param topLevelDirsToIgnore which top-level directories to ignore,
-     *        if null or empty then ignored
+     *                             if null or empty then ignored
      * @return false when the first unsuccessful attempt encountered
      */
     public static boolean deleteTree(File dir, final String[] topLevelDirsToIgnore)
@@ -299,7 +302,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         try
         {
             zip = new ZipFile(archive);
-            for (Enumeration entries = zip.entries(); entries.hasMoreElements();)
+            for (Enumeration entries = zip.entries(); entries.hasMoreElements(); )
             {
                 ZipEntry entry = (ZipEntry) entries.nextElement();
                 File f = FileUtils.newFile(directory, entry.getName());
@@ -397,7 +400,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         {
             throw new MuleRuntimeException(
                     MessageFactory.createStaticMessage("Unable to create a canonical file for parent: "
-                            + parent + " and child: " + child),
+                                                       + parent + " and child: " + child),
                     e);
         }
     }
@@ -422,7 +425,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         {
             throw new MuleRuntimeException(
                     MessageFactory.createStaticMessage("Unable to create a canonical file for parent: "
-                            + parent + " and child: " + child),
+                                                       + parent + " and child: " + child),
                     e);
         }
     }
@@ -448,7 +451,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         else
         {
             extractFileResources(normalizeFilePath(url, DEFAULT_ENCODING),
-                                                   outputDir, resourceName, keepParentDirectory);
+                                 outputDir, resourceName, keepParentDirectory);
         }
     }
 
@@ -515,7 +518,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         InputStream inputStream = null;
         OutputStream outputStream = null;
         int jarResourceNameLenght = jarResource.getName().length();
-        for (; entries.hasMoreElements();)
+        for (; entries.hasMoreElements(); )
         {
             JarEntry entry = (JarEntry) entries.nextElement();
             if (entry.getName().startsWith(jarResource.getName()))
@@ -593,7 +596,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
             return false;
         }
     }
-    
+
     public static boolean renameFileHard(File srcFile, File destFile)
     {
         boolean isRenamed = false;
@@ -684,7 +687,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
             return false;
         }
     }
-    
+
     public static boolean renameFile(File srcFile, File destFile)
     {
         boolean isRenamed = false;
@@ -725,11 +728,11 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         {
             logger.debug("Error renaming file. Source or destination file is null.");
         }
-    
+
         return isRenamed;
     }
-    
-    /** 
+
+    /**
      * Try to move a file by renaming with backup attempt by copying/deleting via NIO.
      * Creates intermidiate directories as required.
      */
@@ -773,12 +776,12 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         return success;
     }
 
-    
+
     /**
      * Copy in file to out file
-     * 
+     * <p/>
      * Don't use java.nio as READ_ONLY memory mapped files cannot be deleted
-     * 
+     *
      * @param in
      * @param out
      */
@@ -805,8 +808,14 @@ public class FileUtils extends org.apache.commons.io.FileUtils
             {
                 try
                 {
-                    if (fis != null) fis.close();
-                    if (fos != null) fos.close();
+                    if (fis != null)
+                    {
+                        fis.close();
+                    }
+                    if (fos != null)
+                    {
+                        fos.close();
+                    }
                 }
                 catch (IOException e)
                 {
@@ -820,25 +829,25 @@ public class FileUtils extends org.apache.commons.io.FileUtils
             throw e;
         }
     }
-    
+
     // Override the following methods to use a new version of doCopyFile(File
     // srcFile, File destFile, boolean preserveFileDate) that uses nio to copy file
 
     /**
      * Copies a file to a new location.
-     * <p>
+     * <p/>
      * This method copies the contents of the specified source file to the specified
      * destination file. The directory holding the destination file is created if it
      * does not exist. If the destination file exists, then this method will
      * overwrite it.
-     * 
-     * @param srcFile an existing file to copy, must not be <code>null</code>
-     * @param destFile the new file, must not be <code>null</code>
+     *
+     * @param srcFile          an existing file to copy, must not be <code>null</code>
+     * @param destFile         the new file, must not be <code>null</code>
      * @param preserveFileDate true if the file date of the copy should be the same
-     *            as the original
+     *                         as the original
      * @throws NullPointerException if source or destination is <code>null</code>
-     * @throws IOException if source or destination is invalid
-     * @throws IOException if an IO error occurs during copying
+     * @throws IOException          if source or destination is invalid
+     * @throws IOException          if an IO error occurs during copying
      * @see #copyFileToDirectory(File, File, boolean)
      */
     public static void copyFile(File srcFile, File destFile, boolean preserveFileDate) throws IOException
@@ -879,9 +888,9 @@ public class FileUtils extends org.apache.commons.io.FileUtils
 
     /**
      * Internal copy file method.
-     * 
-     * @param srcFile the validated source file, must not be <code>null</code>
-     * @param destFile the validated destination file, must not be <code>null</code>
+     *
+     * @param srcFile          the validated source file, must not be <code>null</code>
+     * @param destFile         the validated destination file, must not be <code>null</code>
      * @param preserveFileDate whether to preserve the file date
      * @throws IOException if an error occurs
      */
@@ -922,10 +931,10 @@ public class FileUtils extends org.apache.commons.io.FileUtils
 
     /**
      * Unconditionally close a <code>Channel</code>.
-     * <p>
+     * <p/>
      * Equivalent to {@link Channel#close()}, except any exceptions will be ignored.
      * This is typically used in finally blocks.
-     * 
+     *
      * @param channel the Channel to close, may be null or already closed
      */
     public static void closeQuietly(Channel channel)
@@ -946,6 +955,11 @@ public class FileUtils extends org.apache.commons.io.FileUtils
     public static boolean isFile(URL url)
     {
         return "file".equals(url.getProtocol());
+    }
+
+    public static boolean isInDir(URL url, File dir)
+    {
+        return url != null && dir != null && isFile(url) && dir.equals(new File(url.getFile()).getParentFile());
     }
 
     /**
