@@ -7,6 +7,9 @@
 package org.mule.module.launcher;
 
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
+import org.mule.module.launcher.artifact.HierarchyResourceLocator;
+import org.mule.module.launcher.artifact.ResourceLocator;
+import org.mule.module.launcher.artifact.RootConfResourceLocator;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.SystemUtils;
@@ -33,6 +36,8 @@ public class MuleSharedDomainClassLoader extends GoodCitizenClassLoader implemen
     private File domainDir;
     private File domainLibraryFolder;
 
+    private ResourceLocator resourceLocator;
+
     @SuppressWarnings("unchecked")
     public MuleSharedDomainClassLoader(String domain, ClassLoader parent)
     {
@@ -46,6 +51,8 @@ public class MuleSharedDomainClassLoader extends GoodCitizenClassLoader implemen
             this.domain = domain;
 
             validateAndGetDomainFolders();
+
+            resourceLocator = new HierarchyResourceLocator(domainDir, new RootConfResourceLocator());
 
             addURL(domainLibraryFolder.getParentFile().toURI().toURL());
 
@@ -134,6 +141,13 @@ public class MuleSharedDomainClassLoader extends GoodCitizenClassLoader implemen
         }
         return resource;
     }
+
+    @Override
+    public URL locateResource(String name)
+    {
+        return resourceLocator.locateResource(name);
+    }
+
 
     private void validateAndGetDomainFolders() throws Exception
     {

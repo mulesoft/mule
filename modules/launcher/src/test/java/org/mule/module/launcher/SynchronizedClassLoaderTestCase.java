@@ -8,6 +8,7 @@
 package org.mule.module.launcher;
 
 import static org.junit.Assert.assertFalse;
+import org.mule.module.launcher.artifact.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.MediumTest;
 
@@ -84,7 +85,7 @@ public class SynchronizedClassLoaderTestCase extends AbstractMuleTestCase
         }
     }
 
-    private class TestClassLoader extends ClassLoader
+    private class TestClassLoader extends ClassLoader implements ArtifactClassLoader
     {
 
         @Override
@@ -102,6 +103,36 @@ public class SynchronizedClassLoaderTestCase extends AbstractMuleTestCase
             }
 
             return null;
+        }
+
+        @Override
+        public String getArtifactName()
+        {
+            return "";
+        }
+
+        @Override
+        public ClassLoader getClassLoader()
+        {
+            return this;
+        }
+
+        @Override
+        public void dispose()
+        {
+            // Nothing to do
+        }
+
+        @Override
+        public URL locateResource(String name)
+        {
+            return null;
+        }
+
+        @Override
+        public URL findResource(String name)
+        {
+            return super.findResource(name);
         }
     }
 }

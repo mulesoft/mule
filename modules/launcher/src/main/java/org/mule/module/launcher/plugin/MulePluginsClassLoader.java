@@ -7,23 +7,27 @@
 package org.mule.module.launcher.plugin;
 
 import org.mule.module.launcher.FineGrainedControlClassLoader;
+import org.mule.module.launcher.artifact.ArtifactClassLoader;
 
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 
-public class MulePluginsClassLoader extends FineGrainedControlClassLoader
+public class MulePluginsClassLoader extends FineGrainedControlClassLoader implements ArtifactClassLoader
 {
 
-    public MulePluginsClassLoader(ClassLoader parent, PluginDescriptor... plugins)
+    private final ArtifactClassLoader parent;
+
+    public MulePluginsClassLoader(ArtifactClassLoader parent, PluginDescriptor... plugins)
     {
         this(parent, Arrays.asList(plugins));
     }
 
-    public MulePluginsClassLoader(ClassLoader parent, Collection<PluginDescriptor> plugins)
+    public MulePluginsClassLoader(ArtifactClassLoader parent, Collection<PluginDescriptor> plugins)
     {
-        super(new URL[0], parent);
+        super(new URL[0], parent.getClassLoader());
+        this.parent = parent;
         for (PluginDescriptor plugin : plugins)
         {
             final URL[] pluginUrls = plugin.getClasspath().toURLs();
@@ -35,5 +39,29 @@ public class MulePluginsClassLoader extends FineGrainedControlClassLoader
             final Set<String> override = plugin.getLoaderOverride();
             processOverrides(override);
         }
+    }
+
+    @Override
+    public String getArtifactName()
+    {
+        return parent.getArtifactName();
+    }
+
+    @Override
+    public ClassLoader getClassLoader()
+    {
+        return parent.getClassLoader();
+    }
+
+    @Override
+    public void dispose()
+    {
+        parent.dispose();
+    }
+
+    @Override
+    public URL locateResource(String name)
+    {
+        return parent.locateResource(name);
     }
 }
