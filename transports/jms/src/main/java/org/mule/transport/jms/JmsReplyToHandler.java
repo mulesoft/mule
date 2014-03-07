@@ -17,7 +17,6 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.management.stats.ServiceStatistics;
-import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.DefaultReplyToHandler;
 import org.mule.transport.jms.i18n.JmsMessages;
 import org.mule.transport.jms.transformers.ObjectToJMSMessage;
@@ -106,6 +105,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             //This mimics the OBjectToJmsMessage Transformer behaviour without needing an endpoint
             //TODO clean this up, maybe make the transformer available via a utility class, passing in the Session
             Message replyToMessage = JmsMessageUtils.toMessage(payload, session);
+            connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(), returnMessage);
             toJmsMessage.setJmsProperties(returnMessage, replyToMessage);
 
             processMessage(replyToMessage, event);
