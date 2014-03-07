@@ -14,6 +14,8 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.api.ThreadSafeAccess;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -306,6 +308,24 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
         byte[] serializedEvent = SerializationUtils.serialize(testEvent);
         testEvent  = (MuleEvent)SerializationUtils.deserialize(serializedEvent);
         assertArrayEquals((byte[])testEvent.getMessage().getPayload(), payload.toString().getBytes());
+    }
+
+    @Test
+    public void testFlowVarsShallowCopy() throws Exception
+    {
+        MuleEvent event = getTestEvent("whatever");
+        MuleMessage message = event.getMessage();
+        message.setInvocationProperty("foo", "bar");
+
+        MuleEvent copy = new DefaultMuleEvent((MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy(), event, false);
+        MuleMessage messageCopy = copy.getMessage();
+        messageCopy.setInvocationProperty("foo", "bar2");
+
+        assertEquals("bar", event.getFlowVariable("foo"));
+        assertEquals("bar", message.getInvocationProperty("foo"));
+
+        assertEquals("bar2", copy.getFlowVariable("foo"));
+        assertEquals("bar2", messageCopy.getInvocationProperty("foo"));
     }
 
     private void createAndRegisterTransformersEndpointBuilderService() throws Exception
