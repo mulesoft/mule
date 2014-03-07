@@ -6,7 +6,9 @@
  */
 package org.mule.module.launcher.application;
 
-import java.io.Closeable;
+import org.mule.module.launcher.DisposableClassLoader;
+import org.mule.module.launcher.MuleApplicationClassLoader;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -26,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
  * Defines a classloader that delegates classes and resources resolution to
  * a list of classloaders.
  */
-public class CompositeApplicationClassLoader extends ClassLoader implements ApplicationClassLoader, Closeable
+public class CompositeApplicationClassLoader extends ClassLoader implements ApplicationClassLoader
 {
 
     protected static final Log logger = LogFactory.getLog(CompositeApplicationClassLoader.class);
@@ -239,20 +241,26 @@ public class CompositeApplicationClassLoader extends ClassLoader implements Appl
     }
 
     @Override
-    public void close()
+    public void dispose()
     {
         for (ClassLoader classLoader : classLoaders)
         {
-            if (classLoader instanceof Closeable)
+            if (classLoader instanceof DisposableClassLoader)
             {
-                try
-                {
-                    ((Closeable) classLoader).close();
-                }
-                catch (IOException e)
-                {
-                    // Ignore and continue
-                }
+                ((DisposableClassLoader) classLoader).dispose();
+            }
+        }
+    }
+
+    @Override
+    public void addShutdownListener(ShutdownListener listener)
+    {
+        for (ClassLoader classLoader : classLoaders)
+        {
+            if (classLoader instanceof MuleApplicationClassLoader)
+            {
+                ((ApplicationClassLoader)classLoader).addShutdownListener(listener);
+                return;
             }
         }
     }

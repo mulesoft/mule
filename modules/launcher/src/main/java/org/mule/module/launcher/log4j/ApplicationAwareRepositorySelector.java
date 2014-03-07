@@ -6,8 +6,8 @@
  */
 package org.mule.module.launcher.log4j;
 
-import org.mule.module.launcher.MuleApplicationClassLoader;
 import org.mule.module.launcher.application.ApplicationClassLoader;
+import org.mule.module.launcher.application.ShutdownListener;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.module.reboot.MuleContainerSystemClassLoader;
 
@@ -230,16 +230,16 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
 
         public ConfigWatchDog(final ClassLoader classLoader, String filename, LoggerRepository repository)
         {
-            if (classLoader instanceof MuleApplicationClassLoader)
+            if (classLoader instanceof ApplicationClassLoader)
             {
-                ((MuleApplicationClassLoader) classLoader).addShutdownListener(new MuleApplicationClassLoader.ShutdownListener()
+                ((ApplicationClassLoader) classLoader).addShutdownListener(new ShutdownListener()
                 {
                     @Override
                     public void execute()
                     {
                         final ClassLoader ccl = Thread.currentThread().getContextClassLoader();
                         ApplicationAwareRepositorySelector.this.cache.remove(ccl);
-                        interrupted = true;
+                        ConfigWatchDog.this.interrupt();
                     }
                 });
             }

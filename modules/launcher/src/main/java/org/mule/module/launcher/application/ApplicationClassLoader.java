@@ -6,15 +6,24 @@
  */
 package org.mule.module.launcher.application;
 
+import org.mule.module.launcher.DisposableClassLoader;
+
 import java.net.URL;
 
 /**
  * Identifies a classLoader created for a given Mule application
  */
-public interface ApplicationClassLoader
+public interface ApplicationClassLoader extends DisposableClassLoader
 {
 
     String getAppName();
 
     URL findResource(String s);
+
+    /**
+     * Adds a shutdown listener to the class loader. This listener will be invoked synchronously right
+     * before the class loader is disposed and closed.
+     */
+    void addShutdownListener(ShutdownListener listener);
+
 }
