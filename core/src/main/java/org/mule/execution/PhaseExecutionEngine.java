@@ -91,15 +91,26 @@ public class PhaseExecutionEngine
 
         public void process()
         {
-            for (MessageProcessPhase phase : phaseList)
+            ClassLoader originalClassLoader = null;
+            try
             {
-                if (phase.supportsTemplate(messageProcessTemplate))
+                originalClassLoader = Thread.currentThread().getContextClassLoader();
+                Thread.currentThread().setContextClassLoader(messageProcessContext.getExecutionClassLoader());
+                for (MessageProcessPhase phase : phaseList)
                 {
-                    phase.runPhase(messageProcessTemplate, messageProcessContext, this);
-                    return;
+                    if (phase.supportsTemplate(messageProcessTemplate))
+                    {
+                        phase.runPhase(messageProcessTemplate, messageProcessContext, this);
+                        return;
+                    }
+                    currentPhase++;
                 }
-                currentPhase++;
+            }
+            finally
+            {
+                Thread.currentThread().setContextClassLoader(originalClassLoader);
             }
         }
+
     }
 }
