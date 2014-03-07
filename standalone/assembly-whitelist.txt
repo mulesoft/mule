@@ -129,6 +129,7 @@
 /mule-standalone-${productVersion}/examples/echo/src/main/app
 /mule-standalone-${productVersion}/examples/echo/src/main/app/adding-logging-to-a-flow.xml
 /mule-standalone-${productVersion}/examples/echo/src/main/app/mule-deploy.properties
+/mule-standalone-${productVersion}/examples/echo/src/main/resources
 /mule-standalone-${productVersion}/examples/echo/src/main/resources/mule-app.properties
 /mule-standalone-${productVersion}/examples/echo/src/test
 /mule-standalone-${productVersion}/examples/echo/src/test/java
@@ -285,6 +286,8 @@
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/main/java/org/mule/example/loanbroker/model/CreditProfile.java
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/main/java/org/mule/example/loanbroker/model/Customer.java
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/main/java/org/mule/example/loanbroker/model/LoanQuote.java
+/mule-standalone-${productVersion}/examples/loanbroker-simple/src/main/resources
+/mule-standalone-${productVersion}/examples/loanbroker-simple/src/main/resources/loanbroker-simple.properties
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/test
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/test/java
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/test/java/org
