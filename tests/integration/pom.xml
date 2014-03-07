@@ -213,5 +213,10 @@
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-infrastructure</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 	</dependencies>
 </project>

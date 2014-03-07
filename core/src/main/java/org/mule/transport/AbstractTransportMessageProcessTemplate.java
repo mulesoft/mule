@@ -205,5 +205,11 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
     {
         return getInboundEndpoint().getTransactionConfig();
     }
+
+    @Override
+    public ClassLoader getExecutionClassLoader()
+    {
+        return messageReceiver.getEndpoint().getMuleContext().getExecutionClassLoader();
+    }
 }
 

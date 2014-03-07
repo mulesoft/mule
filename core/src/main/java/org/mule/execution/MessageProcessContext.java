@@ -54,4 +54,8 @@ public interface MessageProcessContext
      */
     TransactionConfig getTransactionConfig();
 
+    /**
+     * @return the class loader to be used for processing the message.
+     */
+    ClassLoader getExecutionClassLoader();
 }
