@@ -108,6 +108,9 @@ public class FlowExecutionListener
         return this;
     }
 
+    /**
+     * @param callback callback to be executed once a notification is received
+     */
     public void addListener(Callback<MuleEvent> callback)
     {
         this.callbacks.add(callback);
