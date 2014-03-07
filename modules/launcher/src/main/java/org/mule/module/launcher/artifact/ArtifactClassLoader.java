@@ -23,6 +23,13 @@ public interface ArtifactClassLoader
     URL findResource(String resource);
 
     /**
+     * Finds an artifact specific resource, looking for it only in the artifact directories but not in all its referenced libraries.
+     * @param resource name of the resource to find.
+     * @return the resource URL, null if it doesn't exists.
+     */
+    URL findArtifactResource(String resource);
+
+    /**
      * ClassLoader is an abstract class. Not an interface.
      * There are parts of the code that requires a ClassLoader and others that requires an ArtifactClassLoader.
      * Ideally I would make ArtifactClassLoader implement ClassLoader interface but there's no such interface.

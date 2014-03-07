@@ -57,6 +57,8 @@ public class MuleApplicationClassLoader extends FineGrainedControlClassLoader im
 
     private String libraryPath;
 
+    private File classesDir;
+
     public MuleApplicationClassLoader(String appName, ClassLoader parentCl)
     {
         this(appName, parentCl, Collections.<String>emptySet());
@@ -71,8 +73,8 @@ public class MuleApplicationClassLoader extends FineGrainedControlClassLoader im
             // get lib dir
             final String muleHome = System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
             String configPath = String.format("%s/apps/%s", muleHome, appName);
-            File parentFile = new File(configPath); 
-            File classesDir = new File(parentFile, PATH_CLASSES);
+            File parentFile = new File(configPath);
+            classesDir = new File(parentFile, PATH_CLASSES);
             addURL(classesDir.toURI().toURL());
 
             File libDir = new File(parentFile, PATH_LIBRARY);
@@ -102,7 +104,7 @@ public class MuleApplicationClassLoader extends FineGrainedControlClassLoader im
         if (dir.exists() && dir.canRead())
         {
             @SuppressWarnings("unchecked")
-            Collection<File> jars = FileUtils.listFiles(dir, new String[]{"jar"}, false);
+            Collection<File> jars = FileUtils.listFiles(dir, new String[] {"jar"}, false);
 
             if (!jars.isEmpty() && logger.isInfoEnabled())
             {
@@ -194,6 +196,17 @@ public class MuleApplicationClassLoader extends FineGrainedControlClassLoader im
     }
 
     @Override
+    public URL findArtifactResource(String resource)
+    {
+        URL resourceUrl = super.findResource(resource);
+        if (FileUtils.isInDir(resourceUrl, classesDir))
+        {
+            return resourceUrl;
+        }
+        return null;
+    }
+
+    @Override
     public ClassLoader getClassLoader()
     {
         return this;
@@ -210,6 +223,7 @@ public class MuleApplicationClassLoader extends FineGrainedControlClassLoader im
      */
     public interface ShutdownListener
     {
+
         void execute();
     }
 
