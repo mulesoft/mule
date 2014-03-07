@@ -739,17 +739,18 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         addExplodedAppFromResource("/dummy-app.zip");
 
-        // Sets a modification time in the future
         File appFolder = new File(appsDir.getPath(), "dummy-app");
+
         File configFile = new File(appFolder, "mule-config.xml");
-        String goodConfigContent = FileUtils.readFileToString(configFile);
         FileUtils.writeStringToFile(configFile, "you shall not pass");
 
         deploymentService.start();
         assertDeploymentFailure(applicationDeploymentListener, "dummy-app");
         reset(applicationDeploymentListener);
 
-        FileUtils.writeStringToFile(configFile, goodConfigContent);
+        URL url = getClass().getResource("/empty-config.xml");
+        FileUtils.copyFile(new File(url.toURI()), configFile);
+
         assertDeploymentSuccess(applicationDeploymentListener, "dummy-app");
     }
 
