@@ -6,6 +6,8 @@
  */
 package org.mule.module.launcher.application;
 
+import org.mule.module.launcher.artifact.ArtifactClassLoader;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -241,6 +243,28 @@ public class CompositeApplicationClassLoader extends ClassLoader implements Appl
             }
         }
 
+        return null;
+    }
+
+    @Override
+    public URL locateResource(String name)
+    {
+        for (ClassLoader classLoader : classLoaders)
+        {
+            if (classLoader instanceof ArtifactClassLoader)
+            {
+                URL resource = ((ArtifactClassLoader) classLoader).locateResource(name);
+                if (resource != null)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug(String.format("Resource '%s' loaded from classLoader '%s", name, classLoader));
+                    }
+
+                    return resource;
+                }
+            }
+        }
         return null;
     }
 

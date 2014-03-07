@@ -8,7 +8,7 @@ package org.mule.module.launcher.artifact;
 
 import java.net.URL;
 
-public interface ArtifactClassLoader
+public interface ArtifactClassLoader extends ResourceLocator
 {
 
     /**

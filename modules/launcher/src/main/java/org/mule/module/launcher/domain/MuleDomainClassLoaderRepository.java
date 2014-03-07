@@ -81,6 +81,12 @@ public class MuleDomainClassLoaderRepository implements DomainClassLoaderReposit
             }
 
             @Override
+            public URL locateResource(String resource)
+            {
+                return classLoader.locateResource(resource);
+            }
+
+            @Override
             public ClassLoader getClassLoader()
             {
                 return classLoader.getClassLoader();

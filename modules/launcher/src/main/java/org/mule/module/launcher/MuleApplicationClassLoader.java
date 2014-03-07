@@ -6,8 +6,11 @@
  */
 package org.mule.module.launcher;
 
+import org.mule.module.launcher.artifact.ResourceLocator;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.launcher.application.ApplicationClassLoader;
+import org.mule.module.launcher.artifact.ArtifactClassLoader;
+import org.mule.module.launcher.artifact.HierarchyResourceLocator;
 import org.mule.util.FileUtils;
 import org.mule.util.SystemUtils;
 
@@ -57,23 +60,27 @@ public class MuleApplicationClassLoader extends FineGrainedControlClassLoader im
 
     private String libraryPath;
 
-    public MuleApplicationClassLoader(String appName, ClassLoader parentCl)
+    private ResourceLocator resourceLocator;
+
+    public MuleApplicationClassLoader(String appName, ArtifactClassLoader parentCl)
     {
         this(appName, parentCl, Collections.<String>emptySet());
     }
 
-    public MuleApplicationClassLoader(String appName, ClassLoader parentCl, Set<String> loaderOverrides)
+    public MuleApplicationClassLoader(String appName, ArtifactClassLoader parentCl, Set<String> loaderOverrides)
     {
-        super(CLASSPATH_EMPTY, parentCl, loaderOverrides);
+        super(CLASSPATH_EMPTY, parentCl.getClassLoader(), loaderOverrides);
         this.appName = appName;
         try
         {
             // get lib dir
             final String muleHome = System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
             String configPath = String.format("%s/apps/%s", muleHome, appName);
-            File parentFile = new File(configPath); 
+            File parentFile = new File(configPath);
             File classesDir = new File(parentFile, PATH_CLASSES);
             addURL(classesDir.toURI().toURL());
+
+            resourceLocator = new HierarchyResourceLocator(classesDir, parentCl);
 
             File libDir = new File(parentFile, PATH_LIBRARY);
             addJars(appName, libDir, true);
@@ -102,7 +109,7 @@ public class MuleApplicationClassLoader extends FineGrainedControlClassLoader im
         if (dir.exists() && dir.canRead())
         {
             @SuppressWarnings("unchecked")
-            Collection<File> jars = FileUtils.listFiles(dir, new String[]{"jar"}, false);
+            Collection<File> jars = FileUtils.listFiles(dir, new String[] {"jar"}, false);
 
             if (!jars.isEmpty() && logger.isInfoEnabled())
             {
@@ -194,6 +201,12 @@ public class MuleApplicationClassLoader extends FineGrainedControlClassLoader im
     }
 
     @Override
+    public URL locateResource(String name)
+    {
+        return resourceLocator.locateResource(name);
+    }
+
+    @Override
     public ClassLoader getClassLoader()
     {
         return this;
@@ -210,6 +223,7 @@ public class MuleApplicationClassLoader extends FineGrainedControlClassLoader im
      */
     public interface ShutdownListener
     {
+
         void execute();
     }
 

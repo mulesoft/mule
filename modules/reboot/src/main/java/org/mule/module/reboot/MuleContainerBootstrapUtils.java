@@ -25,6 +25,7 @@ public final class MuleContainerBootstrapUtils
     private static final String MULE_APPS_FILENAME = "apps";
     private static final String MULE_LIB_FILENAME = "lib/mule";
     private static final String MULE_TMP_FILENAME = "tmp";
+    private static final String MULE_CONF_FILENAME = "conf";
 
     private MuleContainerBootstrapUtils()
     {
@@ -48,6 +49,14 @@ public final class MuleContainerBootstrapUtils
     {
         final String muleHome = System.getProperty("mule.home");
         return muleHome != null ? new File(muleHome) : null;
+    }
+
+    /**
+     * @return null if running embedded, otherwise the conf dir as a File ref
+     */
+    public static File getMuleConfDir()
+    {
+        return isStandalone() ? new File(getMuleHome(), MULE_CONF_FILENAME) : null;
     }
 
     /**

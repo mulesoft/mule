@@ -33,14 +33,14 @@ public class MuleApplicationClassLoaderFactory implements ApplicationClassLoader
     public ArtifactClassLoader create(ApplicationDescriptor descriptor)
     {
         final String domain = descriptor.getDomain();
-        ClassLoader parent;
+        ArtifactClassLoader parent;
         if (domain == null)
         {
-            parent = domainClassLoaderRepository.getDefaultDomainClassLoader().getClassLoader();
+            parent = domainClassLoaderRepository.getDefaultDomainClassLoader();
         }
         else
         {
-            parent = domainClassLoaderRepository.getDomainClassLoader(domain).getClassLoader();
+            parent = domainClassLoaderRepository.getDomainClassLoader(domain);
         }
         final Set<PluginDescriptor> plugins = descriptor.getPlugins();
         if (!plugins.isEmpty())

@@ -9,6 +9,8 @@ package org.mule.module.launcher.log4j;
 import org.mule.module.launcher.MuleApplicationClassLoader;
 import org.mule.module.launcher.application.ApplicationClassLoader;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
+import org.mule.module.launcher.artifact.ResourceLocator;
+import org.mule.module.launcher.artifact.RootConfResourceLocator;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.module.reboot.MuleContainerSystemClassLoader;
 
@@ -32,6 +34,7 @@ import org.apache.log4j.xml.DOMConfigurator;
 
 public class ArtifactAwareRepositorySelector implements RepositorySelector
 {
+
     protected static final String PATTERN_LAYOUT = "%-5p %d [%t] %c: %m%n";
 
     protected static final Integer NO_CCL_CLASSLOADER = 0;
@@ -81,18 +84,14 @@ public class ArtifactAwareRepositorySelector implements RepositorySelector
                 else
                 {
                     // this is not an app init, use the top-level defaults
-                    File defaultSystemLog = new File(MuleContainerBootstrapUtils.getMuleHome(), "conf/log4j.xml");
-                    if (!defaultSystemLog.exists() && !defaultSystemLog.canRead())
-                    {
-                        defaultSystemLog = new File(MuleContainerBootstrapUtils.getMuleHome(), "conf/log4j.properties");
-                    }
-                    configureFrom(defaultSystemLog.toURL(), repository);
+                    URL defaultSystemLog = locateLoggingConfig(new RootConfResourceLocator());
+                    configureFrom(defaultSystemLog, repository);
 
                     // only start a watchdog for the Mule container class loader. Other class loaders
                     // (e.g. Jetty's WebAppClassLoader) should not start a watchdog
                     if (ccl instanceof MuleContainerSystemClassLoader)
                     {
-                        configWatchDog = new ConfigWatchDog(ccl, defaultSystemLog.getAbsolutePath(), repository);
+                        configWatchDog = new ConfigWatchDog(ccl, defaultSystemLog.getFile(), repository);
                         configWatchDog.setName("Mule.system.log4j.config.monitor");
                     }
                 }
@@ -165,18 +164,21 @@ public class ArtifactAwareRepositorySelector implements RepositorySelector
         // Checks if there's an app-specific logging configuration available,
         // scope the lookup to this classloader only, as getResource() will delegate to parents
         // locate xml config first, fallback to properties format if not found
-        URL appLogConfig = muleCL.findResource("log4j.xml");
-
-        if (appLogConfig == null)
-        {
-            appLogConfig = muleCL.findResource("log4j.properties");
-        }
-
+        URL appLogConfig = locateLoggingConfig(muleCL);
         if (appLogConfig != null && logger.isInfoEnabled())
         {
             logger.info(String.format("Found logging config for application '%s' at '%s'", muleCL.getArtifactName(), appLogConfig));
         }
+        return appLogConfig;
+    }
 
+    private URL locateLoggingConfig(ResourceLocator resourceLocator)
+    {
+        URL appLogConfig = resourceLocator.locateResource("log4j.xml");
+        if (appLogConfig == null)
+        {
+            appLogConfig = resourceLocator.locateResource("log4j.properties");
+        }
         return appLogConfig;
     }
 
@@ -194,6 +196,7 @@ public class ArtifactAwareRepositorySelector implements RepositorySelector
 
     protected static class LoggerRepositoryCache
     {
+
         protected ConcurrentMap<Integer, LoggerRepository> repositories = new ConcurrentHashMap<Integer, LoggerRepository>();
 
         public LoggerRepository getLoggerRepository(ClassLoader classLoader)
@@ -221,6 +224,7 @@ public class ArtifactAwareRepositorySelector implements RepositorySelector
     // this is a modified and unified version from log4j to better fit Mule's app lifecycle
     protected class ConfigWatchDog extends Thread
     {
+
         protected LoggerRepository repository;
         protected File file;
         protected long lastModif = 0;
