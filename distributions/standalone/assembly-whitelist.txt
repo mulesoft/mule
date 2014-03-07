@@ -128,6 +128,7 @@
 /mule-standalone-${productVersion}/examples/echo/src/main/app
 /mule-standalone-${productVersion}/examples/echo/src/main/app/adding-logging-to-a-flow.xml
 /mule-standalone-${productVersion}/examples/echo/src/main/app/mule-deploy.properties
+/mule-standalone-${productVersion}/examples/echo/src/main/resources
 /mule-standalone-${productVersion}/examples/echo/src/main/resources/mule-app.properties
 /mule-standalone-${productVersion}/examples/echo/src/test
 /mule-standalone-${productVersion}/examples/echo/src/test/java
@@ -463,7 +464,7 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-tomcat-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-ws-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-xml-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-mvel2-2.1.8.Final-MULE-002-SNAPSHOT.jar
+/mule-standalone-${productVersion}/lib/mule/mule-mvel2-2.1.8.Final-MULE-002.jar
 /mule-standalone-${productVersion}/lib/mule/mule-pattern-core-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-tools-anttasks-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-ajax-${productVersion}.jar
