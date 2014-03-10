@@ -9,10 +9,10 @@ package org.mule.module.launcher.application;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import org.mule.module.launcher.DisposableClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.io.Closeable;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -321,14 +321,14 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
     }
 
     @Test
-    public void closesApplicationClassLoaders() throws Exception
+    public void disposesApplicationClassLoaders() throws Exception
     {
         List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
         CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, classLoaders);
 
-        compositeApplicationClassLoader.close();
-        assertThat(appClassLoader.closed, equalTo(true));
+        compositeApplicationClassLoader.dispose();
+        assertThat(appClassLoader.disposed, equalTo(true));
     }
 
     private List<ClassLoader> getClassLoaders(ClassLoader... expectedClassLoaders)
@@ -340,15 +340,15 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
         return classLoaders;
     }
 
-    public static class TestApplicationClassLoader extends TestClassLoader implements Closeable
+    public static class TestApplicationClassLoader extends TestClassLoader implements DisposableClassLoader
     {
 
-        private boolean closed;
+        private boolean disposed;
 
         @Override
-        public void close()
+        public void dispose()
         {
-            this.closed = true;
+            this.disposed = true;
         }
     }
 

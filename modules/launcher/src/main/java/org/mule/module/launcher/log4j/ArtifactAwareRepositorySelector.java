@@ -6,9 +6,11 @@
  */
 package org.mule.module.launcher.log4j;
 
-import org.mule.module.launcher.MuleApplicationClassLoader;
+import org.mule.api.MuleRuntimeException;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.module.launcher.application.ApplicationClassLoader;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
+import org.mule.module.launcher.artifact.ShutdownListener;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.module.reboot.MuleContainerSystemClassLoader;
 
@@ -217,7 +219,7 @@ public class ArtifactAwareRepositorySelector implements RepositorySelector
         }
     }
 
-    // TODO rewrite using a single-threaded scheduled executor and terminate on undeploy/redeploy
+    // TODO: MULE-7421 rewrite using a single-threaded scheduled executor and terminate on undeploy/redeploy
     // this is a modified and unified version from log4j to better fit Mule's app lifecycle
     protected class ConfigWatchDog extends Thread
     {
@@ -245,19 +247,25 @@ public class ArtifactAwareRepositorySelector implements RepositorySelector
 
         public ConfigWatchDog(final ClassLoader classLoader, String filename, LoggerRepository repository)
         {
-            if (classLoader instanceof MuleApplicationClassLoader)
+            if (classLoader instanceof ArtifactClassLoader)
             {
-                ((MuleApplicationClassLoader) classLoader).addShutdownListener(new MuleApplicationClassLoader.ShutdownListener()
+                ((ArtifactClassLoader) classLoader).addShutdownListener(new ShutdownListener()
                 {
                     @Override
                     public void execute()
                     {
                         final ClassLoader ccl = Thread.currentThread().getContextClassLoader();
                         ArtifactAwareRepositorySelector.this.cache.remove(ccl);
-                        interrupted = true;
+                        ConfigWatchDog.this.interrupt();
                     }
                 });
             }
+            else if (!(classLoader instanceof MuleContainerSystemClassLoader))
+            {
+                throw new MuleRuntimeException(CoreMessages.createStaticMessage("Can't create a ConfigWatchDog thread for " +
+                                           "current class loader of type %s", classLoader.getClass().getName()));
+            }
+
             this.filename = filename;
             this.file = new File(filename);
             this.lastModif = file.lastModified();
