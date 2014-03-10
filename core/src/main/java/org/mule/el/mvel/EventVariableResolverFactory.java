@@ -9,9 +9,8 @@ package org.mule.el.mvel;
 import org.mule.api.MuleEvent;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.mvel2.integration.VariableResolver;
-import org.mule.mvel2.integration.impl.ImmutableDefaultFactory;
 
-public class EventVariableResolverFactory extends ImmutableDefaultFactory
+public class EventVariableResolverFactory extends MessageVariableResolverFactory
 {
 
     private static final long serialVersionUID = -6819292692339684915L;
@@ -21,6 +20,7 @@ public class EventVariableResolverFactory extends ImmutableDefaultFactory
 
     public EventVariableResolverFactory(MuleEvent event)
     {
+        super(event.getMessage());
         this.event = event;
     }
 
@@ -39,6 +39,10 @@ public class EventVariableResolverFactory extends ImmutableDefaultFactory
                 return new MuleImmutableVariableResolver<MuleEvent>(
                     MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE, event, null);
             }
+            else
+            {
+                return super.getVariableResolver(name);
+            }
         }
         return null;
     }
@@ -46,7 +50,8 @@ public class EventVariableResolverFactory extends ImmutableDefaultFactory
     @Override
     public boolean isTarget(String name)
     {
-        return FLOW.equals(name) || MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE.equals(name);
+        return FLOW.equals(name) || MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE.equals(name)
+               || super.isTarget(name);
     }
 
     @Override

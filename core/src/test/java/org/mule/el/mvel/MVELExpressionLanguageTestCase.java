@@ -133,14 +133,14 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     {
         MuleEvent event = createMockEvent();
 
-        // // Literals
-        // assertEquals("hi", evaluate("'hi'", event));
-        // assertEquals(4, evaluate("2*2", event));
-        //
-        // // Static context
-        // assertEquals(Calendar.getInstance().getTimeZone(), evaluate("server.timeZone", event));
-        // assertEquals(MuleManifest.getProductVersion(), evaluate("mule.version", event));
-        // assertEquals(muleContext.getConfiguration().getId(), evaluate("app.name", event));
+        // Literals
+        assertEquals("hi", evaluate("'hi'", event));
+        assertEquals(4, evaluate("2*2", event));
+
+        // Static context
+        assertEquals(Calendar.getInstance().getTimeZone(), evaluate("server.timeZone", event));
+        assertEquals(MuleManifest.getProductVersion(), evaluate("mule.version", event));
+        assertEquals(muleContext.getConfiguration().getId(), evaluate("app.name", event));
 
         // Event context
         assertEquals("myFlow", evaluate("flow.name", event));
@@ -475,7 +475,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
             assertEquals(PropertyAccessException.class, e.getCause().getClass());
         }
     }
-    
+
     @Test
     public void propertyAccessException2() throws InitialisationException
     {
