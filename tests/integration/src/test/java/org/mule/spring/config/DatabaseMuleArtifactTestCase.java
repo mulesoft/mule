@@ -22,9 +22,8 @@ import org.xml.sax.SAXException;
 
 public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFactoryTestCase
 {
-
-    protected static final String TRANSFORMER2 = "<object-to-string-transformer name=\"tx2\" xmlns=\"http://www.mulesoft.org/schema/mule/core\"/>";
     protected static final String TRANSFORMER1 = "<object-to-string-transformer name=\"tx1\" xmlns=\"http://www.mulesoft.org/schema/mule/core\"/>";
+    protected static final String TRANSFORMER2 = "<object-to-string-transformer name=\"tx2\" xmlns=\"http://www.mulesoft.org/schema/mule/core\"/>";
     protected static final String HSQL_DATASOURCE = "<spring:bean xmlns:spring=\"http://www.springframework.org/schema/beans\" class=\"org.apache.commons.dbcp.BasicDataSource\" destroy-method=\"close\" id=\"hsqlDatasource\">"
                                                     + "<spring:property name=\"driverClassName\" value=\"org.hsqldb.jdbcDriver\"/>"
                                                     + "<spring:property name=\"url\" value=\"jdbc:hsqldb:mem:spring-playground\"/>"
@@ -150,25 +149,21 @@ public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFa
     @Test
     public void verifiesHsql() throws SAXException, IOException, MuleArtifactFactoryException
     {
-        String config = HSQL_CONNECTOR;
-        Document document = XMLUnit.buildControlDocument(config);
-        String refDef = HSQL_DATASOURCE;
-        XmlConfigurationCallback callback = new DatabaseConfigurationCallback(Collections.singletonMap("hsqlDatasource", refDef));
+        Document document = XMLUnit.buildControlDocument(HSQL_CONNECTOR);
+        XmlConfigurationCallback callback = new DatabaseConfigurationCallback(Collections.singletonMap("hsqlDatasource", HSQL_DATASOURCE));
         doTest(document, callback);
     }
 
     @Test(expected = MuleArtifactFactoryException.class)
     public void detectsMissingTransformerRef() throws SAXException, IOException, MuleArtifactFactoryException
     {
-        String connector = HSQL_CONNECTOR;
-        String dataSource = HSQL_DATASOURCE;
         String endpoint = "<jdbc:inbound-endpoint queryKey=\"q\" transformer-refs=\"tx1\" exchange-pattern=\"one-way\" queryTimeout=\"-1\" pollingFrequency=\"1000\" connector-ref=\"jdbcConnector\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"><jdbc:query key=\"q\" value=\"select * from dual\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"/></jdbc:inbound-endpoint>";
 
         Document document = XMLUnit.buildControlDocument(endpoint);
 
         Map<String, String> callbackData = new HashMap<String, String>();
-        callbackData.put("jdbcConnector", connector);
-        callbackData.put("hsqlDatasource", dataSource);
+        callbackData.put("jdbcConnector", HSQL_CONNECTOR);
+        callbackData.put("hsqlDatasource", HSQL_DATASOURCE);
 
         doTestMessageProcessorArtifactRetrieval(document, new DatabaseConfigurationCallback(callbackData));
 
@@ -177,17 +172,14 @@ public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFa
     @Test
     public void verifiesOneTransformerRef() throws SAXException, IOException, MuleArtifactFactoryException
     {
-        String connector = HSQL_CONNECTOR;
-        String dataSource = HSQL_DATASOURCE;
         String endpoint = "<jdbc:inbound-endpoint queryKey=\"q\" transformer-refs=\"tx1\" exchange-pattern=\"one-way\" queryTimeout=\"-1\" pollingFrequency=\"1000\" connector-ref=\"jdbcConnector\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"><jdbc:query key=\"q\" value=\"select * from dual\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"/></jdbc:inbound-endpoint>";
-        String transformer1 = TRANSFORMER1;
 
         Document document = XMLUnit.buildControlDocument(endpoint);
 
         Map<String, String> callbackData = new HashMap<String, String>();
-        callbackData.put("jdbcConnector", connector);
-        callbackData.put("hsqlDatasource", dataSource);
-        callbackData.put("tx1", transformer1);
+        callbackData.put("jdbcConnector", HSQL_CONNECTOR);
+        callbackData.put("hsqlDatasource", HSQL_DATASOURCE);
+        callbackData.put("tx1", TRANSFORMER1);
 
         doTestMessageProcessorArtifactRetrieval(document, new DatabaseConfigurationCallback(callbackData));
     }
@@ -195,19 +187,15 @@ public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFa
     @Test
     public void verifiesMultipleTransformerRefWithSpaceToken() throws SAXException, IOException, MuleArtifactFactoryException
     {
-        String connector = HSQL_CONNECTOR;
-        String dataSource = HSQL_DATASOURCE;
         String endpoint = "<jdbc:inbound-endpoint queryKey=\"q\" transformer-refs=\"tx1 tx2\" exchange-pattern=\"one-way\" queryTimeout=\"-1\" pollingFrequency=\"1000\" connector-ref=\"jdbcConnector\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"><jdbc:query key=\"q\" value=\"select * from dual\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"/></jdbc:inbound-endpoint>";
-        String transformer1 = TRANSFORMER1;
-        String transformer2 = TRANSFORMER2;
 
         Document document = XMLUnit.buildControlDocument(endpoint);
 
         Map<String, String> callbackData = new HashMap<String, String>();
-        callbackData.put("jdbcConnector", connector);
-        callbackData.put("hsqlDatasource", dataSource);
-        callbackData.put("tx1", transformer1);
-        callbackData.put("tx2", transformer2);
+        callbackData.put("jdbcConnector", HSQL_CONNECTOR);
+        callbackData.put("hsqlDatasource", HSQL_DATASOURCE);
+        callbackData.put("tx1", TRANSFORMER1);
+        callbackData.put("tx2", TRANSFORMER2);
 
         doTestMessageProcessorArtifactRetrieval(document, new DatabaseConfigurationCallback(callbackData));
     }
@@ -215,19 +203,15 @@ public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFa
     @Test(expected = MuleArtifactFactoryException.class)
     public void detectsTransformerRefInvalidCommaToken() throws SAXException, IOException, MuleArtifactFactoryException
     {
-        String connector = HSQL_CONNECTOR;
-        String dataSource = HSQL_DATASOURCE;
         String endpoint = "<jdbc:inbound-endpoint queryKey=\"q\" transformer-refs=\"tx1, tx2\" exchange-pattern=\"one-way\" queryTimeout=\"-1\" pollingFrequency=\"1000\" connector-ref=\"jdbcConnector\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"><jdbc:query key=\"q\" value=\"select * from dual\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"/></jdbc:inbound-endpoint>";
-        String transformer1 = TRANSFORMER1;
-        String transformer2 = TRANSFORMER2;
 
         Document document = XMLUnit.buildControlDocument(endpoint);
 
         Map<String, String> callbackData = new HashMap<String, String>();
-        callbackData.put("jdbcConnector", connector);
-        callbackData.put("hsqlDatasource", dataSource);
-        callbackData.put("tx1", transformer1);
-        callbackData.put("tx2", transformer2);
+        callbackData.put("jdbcConnector", HSQL_CONNECTOR);
+        callbackData.put("hsqlDatasource", HSQL_DATASOURCE);
+        callbackData.put("tx1", TRANSFORMER1);
+        callbackData.put("tx2", TRANSFORMER2);
 
         doTestMessageProcessorArtifactRetrieval(document, new DatabaseConfigurationCallback(callbackData));
     }
@@ -235,19 +219,15 @@ public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFa
     @Test
     public void verifiesMultipleResponseTransformerRefWithSpaceToken() throws SAXException, IOException, MuleArtifactFactoryException
     {
-        String connector = HSQL_CONNECTOR;
-        String dataSource = HSQL_DATASOURCE;
         String endpoint = "<jdbc:inbound-endpoint queryKey=\"q\" responseTransformer-refs=\"tx1 tx2\" exchange-pattern=\"one-way\" queryTimeout=\"-1\" pollingFrequency=\"1000\" connector-ref=\"jdbcConnector\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"><jdbc:query key=\"q\" value=\"select * from dual\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"/></jdbc:inbound-endpoint>";
-        String transformer1 = TRANSFORMER1;
-        String transformer2 = TRANSFORMER2;
 
         Document document = XMLUnit.buildControlDocument(endpoint);
 
         Map<String, String> callbackData = new HashMap<String, String>();
-        callbackData.put("jdbcConnector", connector);
-        callbackData.put("hsqlDatasource", dataSource);
-        callbackData.put("tx1", transformer1);
-        callbackData.put("tx2", transformer2);
+        callbackData.put("jdbcConnector", HSQL_CONNECTOR);
+        callbackData.put("hsqlDatasource", HSQL_DATASOURCE);
+        callbackData.put("tx1", TRANSFORMER1);
+        callbackData.put("tx2", TRANSFORMER2);
 
         doTestMessageProcessorArtifactRetrieval(document, new DatabaseConfigurationCallback(callbackData));
     }
