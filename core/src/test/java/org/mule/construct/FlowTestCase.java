@@ -9,6 +9,7 @@ package org.mule.construct;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.mule.MessageExchangePattern;
@@ -28,6 +29,8 @@ import org.junit.Test;
 public class FlowTestCase extends AbstractFlowConstuctTestCase
 {
 
+    private static final String FLOW_NAME = "test-flow";
+
     private Flow flow;
     private SensingNullMessageProcessor sensingMessageProcessor;
 
@@ -38,7 +41,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase
 
         sensingMessageProcessor = getSensingNullMessageProcessor();
 
-        flow = new Flow("test-flow", muleContext);
+        flow = new Flow(FLOW_NAME, muleContext);
         flow.setMessageSource(directInboundMessageSource);
 
         List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
@@ -113,6 +116,30 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase
         }
         catch (Exception e)
         {
+        }
+    }
+
+    @Test
+    public void testSequentialStageNames() throws Exception
+    {
+        final int count = 10;
+
+        for (int i = 1; i <= count; i++)
+        {
+            assertTrue(this.flow.getAsyncStageNameSource().getName().endsWith("." + i));
+        }
+    }
+
+    @Test
+    public void testStageNameSourceWithName() throws Exception
+    {
+        final int count = 10;
+        final String stageName = "myStage";
+        final String EXPECTED = String.format("%s.%s", FLOW_NAME, stageName);
+
+        for (int i = 0; i < count; i++)
+        {
+            assertEquals(EXPECTED, this.flow.getAsyncStageNameSource(stageName).getName());
         }
     }
 }

@@ -10,8 +10,8 @@
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd">
 
-    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="Echo.wsdl"
-                        service="EchoService" port="EchoPort" name="configValidCredentialsText">
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Test" wsdlLocation="Test.wsdl"
+                        service="TestService" port="TestPort" name="configValidCredentialsText">
         <ws:security>
             <ws:wss-username-token username="admin" password="${textPasswordPlaceholder}" passwordType="TEXT"
                                    addCreated="true" addNonce="true"/>
@@ -24,8 +24,8 @@
         <ws:consumer  operation="echo" config-ref="configValidCredentialsText" />
     </flow>
 
-    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="Echo.wsdl"
-                        service="EchoService" port="EchoPort" name="configValidCredentialsDigest">
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Test" wsdlLocation="Test.wsdl"
+                        service="TestService" port="TestPort" name="configValidCredentialsDigest">
         <ws:security>
             <ws:wss-username-token username="admin" password="${digestPasswordPlaceholder}" passwordType="DIGEST"
                                    addCreated="true" addNonce="true"/>
@@ -40,8 +40,8 @@
     </flow>
 
 
-    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="Echo.wsdl"
-                        service="EchoService" port="EchoPort" name="configInvalidCredentials">
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Test" wsdlLocation="Test.wsdl"
+                        service="TestService" port="TestPort" name="configInvalidCredentials">
         <ws:security>
             <ws:wss-username-token username="admin" password="invalid" passwordType="TEXT"/>
         </ws:security>
@@ -54,8 +54,8 @@
     </flow>
 
 
-    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Echo" wsdlLocation="Echo.wsdl"
-                        service="EchoService" port="EchoPort" name="configWithoutCredentials" />
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Test" wsdlLocation="Test.wsdl"
+                        service="TestService" port="TestPort" name="configWithoutCredentials" />
 
     <flow name="clientWithoutCredentials">
         <inbound-endpoint address="vm://clientWithoutCredentials" exchange-pattern="request-response"/>
@@ -74,13 +74,13 @@
 
 
     <flow name="server">
-        <inbound-endpoint address="http://localhost:${port}/services/Echo"
+        <inbound-endpoint address="http://localhost:${port}/services/Test"
                           exchange-pattern="request-response">
-            <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.Echo">
+            <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService">
                 <cxf:ws-security ref="inboundConfig"/>
             </cxf:jaxws-service>
         </inbound-endpoint>
-        <component class="org.mule.module.ws.consumer.Echo"/>
+        <component class="org.mule.module.ws.consumer.TestService"/>
     </flow>
 
 </mule>

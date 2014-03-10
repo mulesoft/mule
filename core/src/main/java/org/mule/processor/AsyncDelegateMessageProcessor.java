@@ -22,9 +22,9 @@ import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.api.processor.ProcessingStrategy;
-import org.mule.api.processor.ProcessingStrategy.StageNameSource;
+import org.mule.api.processor.StageNameSource;
+import org.mule.api.processor.StageNameSourceProvider;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.construct.Flow;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.util.NotificationUtils;
 import org.mule.work.AbstractMuleEventWork;
@@ -76,14 +76,18 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         {
             throw new InitialisationException(CoreMessages.objectIsNull("processingStrategy"), this);
         }
+
+        validateFlowConstruct();
+
         StageNameSource nameSource = null;
+
         if (name != null)
         {
-            nameSource = ((Flow) flowConstruct).getAsyncStageNameSource(name);
+            nameSource = ((StageNameSourceProvider) flowConstruct).getAsyncStageNameSource(name);
         }
         else
         {
-            nameSource = ((Flow) flowConstruct).getAsyncStageNameSource();
+            nameSource = ((StageNameSourceProvider) flowConstruct).getAsyncStageNameSource();
         }
 
         MessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(flowConstruct);
@@ -98,6 +102,18 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
             throw new InitialisationException(e, this);
         }
         super.initialise();
+    }
+
+    private void validateFlowConstruct()
+    {
+        if (flowConstruct == null) {
+            throw new IllegalArgumentException("FlowConstruct cannot be null");
+        }
+        else if (!(flowConstruct instanceof StageNameSourceProvider))
+        {
+            throw new IllegalArgumentException(String.format("FlowConstuct must implement the %s interface. However, the type %s does not implement it",
+                                                             StageNameSourceProvider.class.getCanonicalName(), flowConstruct.getClass().getCanonicalName()));
+        }
     }
 
     public MuleEvent process(MuleEvent event) throws MuleException

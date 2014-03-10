@@ -223,6 +223,15 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
                         <xsd:documentation>The encoding to use for the resulting XML/Text.</xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="acceptExternalEntities" type="mule:substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to accept XML documents with references to external files.
+                            Default value is false. Setting this value to true will make your application
+                            vulnerable to XXE attacks. Use with extreme care.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

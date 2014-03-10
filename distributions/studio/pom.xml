@@ -39,6 +39,7 @@
                             <goal>unpack</goal>
                         </goals>
                         <configuration>
+                            <skip>${skipDistributions}</skip>
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>org.mule.distributions</groupId>
@@ -65,6 +66,8 @@
                         <configuration>
                             <source>
                                 import java.util.jar.JarFile
+
+                                if (project.properties.skipDistributions == "true") return
 
                                 log.info '*' * 80
                                 log.info('Removing log4j.properties from jars'.center(80))

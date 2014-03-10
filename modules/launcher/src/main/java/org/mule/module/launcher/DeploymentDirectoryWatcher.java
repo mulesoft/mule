@@ -123,50 +123,62 @@ public class DeploymentDirectoryWatcher implements Runnable
      */
     public void start()
     {
+        deploymentLock.lock();
         deleteAllAnchors();
 
         // mule -app app1:app2:app3 will restrict deployment only to those specified apps
         final Map<String, Object> options = StartupContext.get().getStartupOptions();
         String appString = (String) options.get("app");
 
-        String[] explodedDomains = domainsDir.list(DirectoryFileFilter.DIRECTORY);
-        String[] packagedDomains = domainsDir.list(ZIP_ARTIFACT_FILTER);
-
-        deployPackedDomains(packagedDomains);
-        deployExplodedDomains(explodedDomains);
-
-        if (appString == null)
+        try
         {
-            String[] explodedApps = appsDir.list(DirectoryFileFilter.DIRECTORY);
-            String[] packagedApps = appsDir.list(ZIP_ARTIFACT_FILTER);
 
-            deployPackedApps(packagedApps);
-            deployExplodedApps(explodedApps);
-        }
-        else
-        {
-            String[] apps = appString.split(":");
-            apps = removeDuplicateAppNames(apps);
+            String[] explodedDomains = domainsDir.list(DirectoryFileFilter.DIRECTORY);
+            String[] packagedDomains = domainsDir.list(ZIP_ARTIFACT_FILTER);
 
-            for (String app : apps)
+            deployPackedDomains(packagedDomains);
+            deployExplodedDomains(explodedDomains);
+
+            if (appString == null)
             {
-                try
-                {
-                    File applicationFile = new File(appsDir, app + ZIP_FILE_SUFFIX);
+                String[] explodedApps = appsDir.list(DirectoryFileFilter.DIRECTORY);
+                String[] packagedApps = appsDir.list(ZIP_ARTIFACT_FILTER);
 
-                    if (applicationFile.exists() && applicationFile.isFile())
-                    {
-                        applicationArchiveDeployer.deployPackagedArtifact(app + ZIP_FILE_SUFFIX);
-                    }
-                    else
-                    {
-                        applicationArchiveDeployer.deployExplodedArtifact(app);
-                    }
-                }
-                catch (Exception e)
+                deployPackedApps(packagedApps);
+                deployExplodedApps(explodedApps);
+            }
+            else
+            {
+                String[] apps = appString.split(":");
+                apps = removeDuplicateAppNames(apps);
+
+                for (String app : apps)
                 {
-                    // Ignore and continue
+                    try
+                    {
+                        File applicationFile = new File(appsDir, app + ZIP_FILE_SUFFIX);
+
+                        if (applicationFile.exists() && applicationFile.isFile())
+                        {
+                            applicationArchiveDeployer.deployPackagedArtifact(app + ZIP_FILE_SUFFIX);
+                        }
+                        else
+                        {
+                            applicationArchiveDeployer.deployExplodedArtifact(app);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        // Ignore and continue
+                    }
                 }
+            }
+        }
+        finally
+        {
+            if (deploymentLock.isHeldByCurrentThread())
+            {
+                deploymentLock.unlock();
             }
         }
 

@@ -247,7 +247,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="serviceAddress" type="xsd:string" >
+                <xsd:attribute name="serviceAddress" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
                             Specifies the address of the web service.

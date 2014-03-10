@@ -14,7 +14,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.exception.RollbackSourceCallback;
@@ -23,7 +22,6 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.security.SecurityException;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
-import org.mule.api.util.StreamCloserService;
 import org.mule.config.ExceptionHelper;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.context.notification.SecurityNotification;
@@ -290,11 +288,9 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
         {
             return;
         }
-        if (message != null
-            && muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE) != null)
+        if (message != null)
         {
-            ((StreamCloserService) muleContext.getRegistry().lookupObject(
-                    MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE)).closeStream(message.getPayload());
+            muleContext.getStreamCloserService().closeStream(message.getPayload());
         }
     }
 

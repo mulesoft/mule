@@ -15,6 +15,8 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.Connector;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.module.ws.security.WSSecurity;
+import org.mule.util.Preconditions;
+import org.mule.util.StringUtils;
 
 public class WSConsumerConfig implements MuleContextAware
 {
@@ -39,6 +41,8 @@ public class WSConsumerConfig implements MuleContextAware
      */
     public OutboundEndpoint createOutboundEndpoint() throws MuleException
     {
+        Preconditions.checkState(StringUtils.isNotEmpty(serviceAddress), "No serviceAddress provided in WS consumer config");
+
         EndpointBuilder builder = muleContext.getEndpointFactory().getEndpointBuilder(serviceAddress);
 
         if (connector != null)

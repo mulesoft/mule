@@ -38,4 +38,9 @@ public class DefaultMuleArtifact implements MuleArtifact
         return clazz.isAssignableFrom(object.getClass());
     }
 
+    @Override
+    public String toString()
+    {
+        return object != null ? object.getClass().getName() : "null";
+    }
 }

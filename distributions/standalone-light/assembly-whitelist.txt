@@ -10,7 +10,7 @@
 /mule-standalone-nodocs-${productVersion}/logs
 /mule-standalone-nodocs-${productVersion}/LICENSE.txt
 /mule-standalone-nodocs-${productVersion}/README.txt
-
+/mule-standalone-nodocs-${productVersion}/MIGRATION.txt
 
 #
 # /apps
@@ -125,7 +125,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-tomcat-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-ws-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-xml-${productVersion}.jar
-/mule-standalone-nodocs-${productVersion}/lib/mule/mule-mvel2-2.1.8.Final-MULE-002-SNAPSHOT.jar
+/mule-standalone-nodocs-${productVersion}/lib/mule/mule-mvel2-2.1.9-MULE-001-SNAPSHOT.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-pattern-core-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-tools-anttasks-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-transport-ajax-${productVersion}.jar

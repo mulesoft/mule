@@ -20,14 +20,14 @@ public class SchedulersTest extends AbstractMuleTestCase
     @Test
     public void validatePollSchedulersPredicates()
     {
-        Predicate<String> foo = Schedulers.flowPollingSchedulers("foo");
+        Predicate<String> foo = Schedulers.flowConstructPollingSchedulers("foo");
         assertTrue(foo.evaluate("polling://foo/1234"));
     }
 
     @Test
     public void failingValidatePollSchedulersPredicates()
     {
-        Predicate<String> foo = Schedulers.flowPollingSchedulers("foo");
+        Predicate<String> foo = Schedulers.flowConstructPollingSchedulers("foo");
         assertFalse(foo.evaluate("polling://fooFails/1234"));
     }
 
