@@ -17,12 +17,14 @@ import org.mule.common.config.XmlConfigurationMuleArtifactFactory;
 import org.mule.config.ConfigResource;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.util.IOUtils;
+import org.mule.util.StringUtils;
 
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -41,6 +43,8 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
 
     public static final String BEANS_ELEMENT = "beans";
     public static final String IGNORE_UNRESOLVABLE_ATTR = "ignore-unresolvable";
+    public static final String REFS_SUFFIX = "-refs";
+    public static final String REFS_TOKENS = " \t"; // Space, Tab
     public static final String REF_SUFFIX = "-ref";
     public static final String REF_ATTRIBUTE_NAME = "ref";
     public static final String NAME_ATTRIBUTE_NAME = "name";
@@ -64,6 +68,9 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
 
     protected String getArtifactMuleConfig(String flowName, org.w3c.dom.Element element, final XmlConfigurationCallback callback, boolean embedInFlow) throws MuleArtifactFactoryException
     {
+        Map<String, String> schemaLocations = new HashMap<String, String>();
+        schemaLocations.put("http://www.mulesoft.org/schema/mule/core", "http://www.mulesoft.org/schema/mule/core/current/mule.xsd");
+
         Document document = DocumentHelper.createDocument();
 
         // the rootElement is the root of the document
@@ -98,7 +105,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
 
         // the parentElement is the parent of the element we are adding
         Element parentElement = rootElement;
-        addSchemaLocation(rootElement, element, callback);
+        addSchemaLocation(element, callback, schemaLocations);
         if (embedInFlow)
         {
             // Need to put the message processor in a valid flow. Our default flow is:
@@ -111,13 +118,15 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         {
             parentElement.add(convert(element));
 
-            processGlobalReferences(element, callback, rootElement);
+            processGlobalReferences(element, callback, rootElement, schemaLocations);
 
             // For message sources to work, the flow should be valid, this means needs to have a MP
             if (embedInFlow)
             {
                 parentElement.addElement("logger", "http://www.mulesoft.org/schema/mule/core");
             }
+
+            setSchemaLocation(rootElement, schemaLocations);
 
             return document.asXML();
         }
@@ -128,26 +137,26 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
 
     }
 
-    private void processGlobalReferences(org.w3c.dom.Element element, XmlConfigurationCallback callback, Element rootElement) throws ParserConfigurationException
+    private void processGlobalReferences(org.w3c.dom.Element element, XmlConfigurationCallback callback, Element rootElement, Map<String, String> schemaLocations) throws ParserConfigurationException
     {
-        processGlobalReferencesInAttributes(element, callback, rootElement);
+        processGlobalReferencesInAttributes(element, callback, rootElement, schemaLocations);
 
-        processGlobalReferencesInChildElements(element, callback, rootElement);
+        processGlobalReferencesInChildElements(element, callback, rootElement, schemaLocations);
     }
 
-    private void processGlobalReferencesInChildElements(org.w3c.dom.Element element, XmlConfigurationCallback callback, Element rootElement) throws ParserConfigurationException
+    private void processGlobalReferencesInChildElements(org.w3c.dom.Element element, XmlConfigurationCallback callback, Element rootElement, Map<String, String> schemaLocations) throws ParserConfigurationException
     {
         if (element != null && element.getChildNodes() != null)
         {
             // Look for references in first level of child nodes
             for (int i = 0; i < element.getChildNodes().getLength(); i++)
             {
-                processGlobalReferencesInAttributes(element.getChildNodes().item(i), callback, rootElement);
+                processGlobalReferencesInAttributes(element.getChildNodes().item(i), callback, rootElement, schemaLocations);
             }
         }
     }
 
-    private void processGlobalReferencesInAttributes(Node element, XmlConfigurationCallback callback, Element rootElement) throws ParserConfigurationException
+    private void processGlobalReferencesInAttributes(Node element, XmlConfigurationCallback callback, Element rootElement, Map<String, String> schemaLocations) throws ParserConfigurationException
     {
         if (element != null && element.getAttributes() != null)
         {
@@ -159,14 +168,30 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
                     org.w3c.dom.Element dependentElement = callback.getGlobalElement(element.getAttributes()
                                                                                              .item(i)
                                                                                              .getNodeValue());
-                    addReferencedGlobalElement(callback, rootElement, dependentElement);
+                    addReferencedGlobalElement(callback, rootElement, dependentElement, schemaLocations);
                 }
+                else if (attributeName != null && attributeName.endsWith(REFS_SUFFIX))
+                {
+                    StringTokenizer refs = new StringTokenizer(element.getAttributes().item(i).getNodeValue(), REFS_TOKENS);
+
+                    while(refs.hasMoreTokens())
+                    {
+                        String referenceName = refs.nextToken();
+                        if (StringUtils.isNotBlank(referenceName))
+                        {
+                            org.w3c.dom.Element dependentElement = callback.getGlobalElement(referenceName);
+                            addReferencedGlobalElement(callback, rootElement, dependentElement, schemaLocations);
+                        }
+
+                    }
+                }
+
             }
         }
 
     }
 
-    private void addReferencedGlobalElement(XmlConfigurationCallback callback, Element rootElement, org.w3c.dom.Element dependentElement) throws ParserConfigurationException
+    private void addReferencedGlobalElement(XmlConfigurationCallback callback, Element rootElement, org.w3c.dom.Element dependentElement, Map<String, String> schemaLocations) throws ParserConfigurationException
     {
         if (dependentElement != null)
         {
@@ -177,9 +202,9 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
             else
             {
                 rootElement.add(convert(dependentElement));
-                addSchemaLocation(rootElement, dependentElement, callback);
+                addSchemaLocation(dependentElement, callback, schemaLocations);
             }
-            processGlobalReferences(dependentElement, callback, rootElement);
+            processGlobalReferences(dependentElement, callback, rootElement, schemaLocations);
         }
     }
 
@@ -275,17 +300,28 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         }
     }
 
-    protected void addSchemaLocation(Element rootElement,
-                                     org.w3c.dom.Element element,
-                                     XmlConfigurationCallback callback)
+    protected void addSchemaLocation(org.w3c.dom.Element element, XmlConfigurationCallback callback,
+                                     Map<String, String> schemaLocations)
+    {
+        String key = element.getNamespaceURI();
+        if (key != null && !schemaLocations.containsKey(key))
+        {
+            schemaLocations.put(element.getNamespaceURI(), callback.getSchemaLocation(element.getNamespaceURI()));
+        }
+    }
+
+    protected void setSchemaLocation(Element rootElement, Map<String, String> schemaLocations)
     {
         StringBuffer schemaLocation = new StringBuffer();
-        schemaLocation.append("http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\n");
-        schemaLocation.append(element.getNamespaceURI() + " "
-                              + callback.getSchemaLocation(element.getNamespaceURI()));
+
+        for (String key : schemaLocations.keySet())
+        {
+            schemaLocation.append(key + " " + schemaLocations.get(key) + "\n");
+        }
+
         rootElement.addAttribute(
                 org.dom4j.QName.get("schemaLocation", "xsi", "http://www.w3.org/2001/XMLSchema-instance"),
-                schemaLocation.toString());
+                schemaLocation.toString().trim());
     }
 
     /**
