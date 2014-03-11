@@ -23,4 +23,4 @@ MULE-7103: There is now a new system property 'mule.security.model' that may be 
 MULE-7390: The following transformers no longer support external entities out of the box: xslt-transformer, dom-to-xml-transformer, xml-to-dom-transformer
             dom-to-output-handler-transformer, xquery-transformer. For cases in which external entities processing is needed, the attribute acceptExternalEntities has been added
             as optional (defaults to false). Use this attribute with extreme care in cases in which you trust the source only.
-
+MULE-7425: xpath() MEL function no longer changes the message payload. If you require it to do so then please use it with an expression-transformer
