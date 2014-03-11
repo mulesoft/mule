@@ -9,6 +9,7 @@ package org.mule.transport.servlet;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.transport.AbstractMuleMessageFactory;
+import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
 import java.util.Enumeration;
@@ -130,6 +131,9 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
             // parameters under a well defined key into the message properties as well
             parameterProperties.put(ServletConnector.PARAMETER_MAP_PROPERTY_KEY, parameterMap);
 
+            // make servlet and jetty compatible with http transport
+            parameterProperties.put(HttpConnector.HTTP_QUERY_PARAMS, parameterMap);
+
             message.addInboundProperties(parameterProperties);
         }
     }
@@ -244,10 +248,12 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
 
     protected void copyHeaders(HttpServletRequest request, Map<String, Object> messageProperties)
     {
+        Map<String, Object> headers = new HashMap<String, Object>();
         for (Enumeration<?> e = request.getHeaderNames(); e.hasMoreElements();)
         {
             String key = (String)e.nextElement();
             String realKey = key;
+            Object realValue;
 
             if (key.startsWith(HttpConstants.X_PROPERTY_PREFIX))
             {
@@ -266,7 +272,7 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
                 {
                     value = value + ":" + port;
                 }
-                messageProperties.put(realKey, value);
+                realValue = value;
             }
             else
             {
@@ -274,13 +280,16 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
                 List<?> values = EnumerationUtils.toList(valueEnum);
                 if (values.size() > 1)
                 {
-                    messageProperties.put(realKey, values.toArray());
+                    realValue = values.toArray();
                 }
                 else
                 {
-                    messageProperties.put(realKey, values.get(0));
+                    realValue = values.get(0);
                 }
             }
+            headers.put(realKey, realValue);
         }
+        messageProperties.put(HttpConnector.HTTP_HEADERS, headers);
+        messageProperties.putAll(headers);
     }
 }

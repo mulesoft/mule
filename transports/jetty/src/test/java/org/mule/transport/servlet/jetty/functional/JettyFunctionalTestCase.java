@@ -55,6 +55,9 @@ public class JettyFunctionalTestCase extends FunctionalTestCase
                 assertEquals("/normal", msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
                 assertEquals("/normal", msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY));
                 assertEquals("/normal", msg.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY));
+                assertEquals("http://localhost:" + dynamicPort.getValue() + "/normal", msg.getInboundProperty(HttpConnector.HTTP_CONTEXT_URI_PROPERTY));
+                assertNotNull(msg.getInboundProperty(HttpConnector.HTTP_QUERY_PARAMS));
+                assertNotNull(msg.getInboundProperty(HttpConnector.HTTP_HEADERS));
             }
         };
 
