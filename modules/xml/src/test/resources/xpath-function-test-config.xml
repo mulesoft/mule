@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <flow name="getTitles">
+        <expression-transformer expression="#[xpath('catalog/cd/title')]" />
+    </flow>
+
+    <flow name="getTitlesFromStream">
+        <custom-transformer class="org.mule.module.xml.transformer.XmlToXMLStreamReader" />
+        <expression-component>xpath('catalog/cd/title')</expression-component>
+    </flow>
+
+    <flow name="getTitlesFromFlowVar">
+        <set-variable variableName="titles" value="#[xpath('catalog/cd/title', flowVars['xml'])]" />
+    </flow>
+
+    <flow name="getTitlesFromCustomPayload">
+        <set-variable variableName="titles" value="#[xpath('catalog/cd/title', payload)]" />
+    </flow>
+
+    <flow name="emptyXPathExpression">
+        <expression-component>xpath('')</expression-component>
+    </flow>
+
+    <flow name="noArgsAtAll">
+        <expression-component>xpath()</expression-component>
+    </flow>
+
+
+
+
+</mule>
+
