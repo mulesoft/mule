@@ -8,7 +8,7 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
-    <spring:bean id="objectStore" class="org.mule.util.store.QueuePersistenceObjectStore" />
+    <spring:bean id="objectStore" class="org.mule.util.store.SimpleMemoryObjectStore" />
 
     <vm:endpoint name="dlqChannel" path="dlq" />
 
