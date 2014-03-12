@@ -275,12 +275,17 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     public DefaultMuleEvent(MuleEvent rewriteEvent, FlowConstruct flowConstruct, ReplyToHandler replyToHandler, Object replyToDestination)
     {
         this(rewriteEvent.getMessage(), rewriteEvent, flowConstruct, rewriteEvent.getSession(),
-             rewriteEvent.isSynchronous(), replyToHandler, replyToDestination);
+             rewriteEvent.isSynchronous(), replyToHandler, replyToDestination, true);
     }
 
     public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent, boolean synchronus)
     {
         this(message, rewriteEvent, rewriteEvent.getFlowConstruct(), rewriteEvent.getSession(), synchronus);
+    }
+
+    public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent, boolean synchronus, boolean shareFlowVars)
+    {
+        this(message, rewriteEvent, rewriteEvent.getFlowConstruct(), rewriteEvent.getSession(), synchronus, shareFlowVars);
     }
 
     /**
@@ -300,7 +305,17 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                                MuleSession session,
                                boolean synchronous)
     {
-        this(message, rewriteEvent, flowConstruct, session, synchronous, rewriteEvent.getReplyToHandler(), rewriteEvent.getReplyToDestination());
+        this(message, rewriteEvent, flowConstruct, session, synchronous, rewriteEvent.getReplyToHandler(), rewriteEvent.getReplyToDestination(), true);
+    }
+
+    protected DefaultMuleEvent(MuleMessage message,
+                               MuleEvent rewriteEvent,
+                               FlowConstruct flowConstruct,
+                               MuleSession session,
+                               boolean synchronous,
+                               boolean shareFlowVars)
+    {
+        this(message, rewriteEvent, flowConstruct, session, synchronous, rewriteEvent.getReplyToHandler(), rewriteEvent.getReplyToDestination(), shareFlowVars);
     }
 
     protected DefaultMuleEvent(MuleMessage message,
@@ -309,7 +324,8 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                                MuleSession session,
                                boolean synchronous,
                                ReplyToHandler replyToHandler,
-                               Object replyToDestination)
+                               Object replyToDestination,
+                               boolean shareFlowVars)
     {
         this.id = rewriteEvent.getId();
         this.flowConstruct = flowConstruct;
@@ -324,7 +340,14 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         if (rewriteEvent instanceof DefaultMuleEvent)
         {
             this.processingTime = ((DefaultMuleEvent) rewriteEvent).processingTime;
-            this.flowVariables = ((DefaultMuleEvent) rewriteEvent).flowVariables;
+            if (shareFlowVars)
+            {
+                this.flowVariables = ((DefaultMuleEvent) rewriteEvent).flowVariables;
+            }
+            else
+            {
+                this.flowVariables.putAll(((DefaultMuleEvent) rewriteEvent).flowVariables);
+            }
         }
         else
         {
