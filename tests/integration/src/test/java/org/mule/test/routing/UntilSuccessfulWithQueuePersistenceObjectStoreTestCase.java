@@ -12,6 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
+import org.mule.api.store.ObjectStore;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.FileUtils;
 import org.mule.util.SerializationUtils;
@@ -50,10 +51,9 @@ public class UntilSuccessfulWithQueuePersistenceObjectStoreTestCase extends Func
     @Test
     public void recoversFromPersistedQueue() throws Exception
     {
-        File file = FileUtils.createFile(".mule/queuestore/queuestore/test1.msg");
-        OutputStream os = new FileOutputStream(file);
         MuleEvent event = getTestEvent(TEST_MESSAGE);
-        SerializationUtils.serialize(event, os);
+        ObjectStore os = muleContext.getRegistry().lookupObject("objectStore");
+        os.store("1", event);
 
         muleContext.start();
         LocalMuleClient client = muleContext.getClient();
