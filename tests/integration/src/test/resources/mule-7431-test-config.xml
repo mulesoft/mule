@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:file="http://www.mulesoft.org/schema/mule/file"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:client="http://www.mulesoft.org/schema/mule/client"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:management="http://www.mulesoft.org/schema/mule/management"
+      xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+      xmlns:sxc="http://www.mulesoft.org/schema/mule/sxc"
+      xmlns:mule-xml="http://www.mulesoft.org/schema/mule/xml"
+      xmlns:context="http://www.springframework.org/schema/context"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+		http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+		http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+		http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/current/mule-jdbc.xsd
+		http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+		http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+		http://www.mulesoft.org/schema/mule/client http://www.mulesoft.org/schema/mule/client/current/mule-client.xsd
+		http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+		http://www.mulesoft.org/schema/mule/management http://www.mulesoft.org/schema/mule/management/current/mule-management.xsd
+		http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+		http://www.mulesoft.org/schema/mule/sxc http://www.mulesoft.org/schema/mule/sxc/current/mule-sxc.xsd
+		http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	">
+
+    <custom-transformer class="org.mule.test.integration.exceptions.AlwaysRaiseExceptionTransformer"
+                        name="myTransformer"/>
+    <custom-transformer class="org.mule.test.integration.exceptions.DummyTransformer" name="otherTransformer"/>
+
+    <flow name="main" processingStrategy="synchronous">
+        <vm:inbound-endpoint path="in"/>
+
+        <expression-transformer evaluator="groovy"
+                                expression="message.setCorrelationId(message.getUniqueId()); message.setCorrelationGroupSize(2); return message;"/>
+
+        <request-reply>
+            <processor-chain>
+                <vm:outbound-endpoint path="vm1"/>
+                <vm:outbound-endpoint path="vm2"/>
+            </processor-chain>
+            <vm:inbound-endpoint path="response">
+                <collection-aggregator/>
+            </vm:inbound-endpoint>
+        </request-reply>
+
+        <logger level="INFO" message="### #[payload]"/>
+
+        <transformer ref="otherTransformer"/>
+        <transformer ref="myTransformer"/>
+
+    </flow>
+
+    <flow name="flow1">
+        <vm:inbound-endpoint path="vm1"/>
+
+        <set-payload value="flow1"/>
+    </flow>
+
+    <flow name="flow2">
+        <vm:inbound-endpoint path="vm2"/>
+        <set-payload value="flow2"/>
+    </flow>
+</mule>
