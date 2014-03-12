@@ -51,10 +51,6 @@ class XPathFunction implements ExpressionLanguageFunction
         {
             muleMessage = new DefaultMuleMessage(ctx.getPayload(), muleContext);
         }
-        else
-        {
-            muleMessage.setPayload(ctx.getPayload());
-        }
 
         String evaluator = hasCustomPayload ? NODE_EVALUATOR : BRANCH_EVALUATOR;
 
