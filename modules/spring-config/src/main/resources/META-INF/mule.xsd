@@ -6316,10 +6316,12 @@
         </xsd:annotation>
     </xsd:element>
 
+    <!-- Deprecated -->
     <xsd:element name="all" type="baseMultipleRoutesRoutingMessageProcessorType" substitutionGroup="abstract-routing-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 Sends the same message to multiple message processors or outbound endpoints.
+                @Deprecated since 3.5.0. Use scatter-gather instead
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
