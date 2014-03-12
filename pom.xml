@@ -1471,7 +1471,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.6-MULE-2</version>
+                    <version>2.6-MULE-3</version>
                     <configuration>
                         <argLine>-Xms64m -Xmx512m</argLine>
                         <excludes>
@@ -2037,9 +2037,19 @@
         </profile>
         <profile>
             <id>unit</id>
-            <!-- will eventually toggle running only @SmallTests -->
             <build>
                 <defaultGoal>test</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <includedAnnotations>
+                                <includedAnnotation>org.mule.tck.size.SmallTest</includedAnnotation>
+                            </includedAnnotations>
+                        </configuration>
+                    </plugin>
+                </plugins>
             </build>
             <properties>
                 <skipIntegrationTests>true</skipIntegrationTests>
@@ -2050,10 +2060,20 @@
         </profile>
         <profile>
             <id>functional</id>
-            <!-- will eventually toggle running all but @SmallTests -->
             <build>
                 <defaultGoal>test</defaultGoal>
-            </build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludedAnnotations>
+                                <excludedAnnotation>org.mule.tck.size.SmallTest</excludedAnnotation>
+                            </excludedAnnotations>
+                        </configuration>
+                    </plugin>
+                </plugins>
+             </build>
             <properties>
                 <skipIntegrationTests>true</skipIntegrationTests>
                 <skipDistributions>true</skipDistributions>
@@ -2064,7 +2084,7 @@
         <profile>
             <id>integration</id>
             <build>
-                <defaultGoal>test</defaultGoal>
+                <defaultGoal>verify</defaultGoal>
             </build>
             <properties>
                 <skipIntegrationTests>false</skipIntegrationTests>
