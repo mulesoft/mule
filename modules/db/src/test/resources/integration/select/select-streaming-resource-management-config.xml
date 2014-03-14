@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+            http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+
+    <flow name="selectStreaming">
+        <inbound-endpoint address="vm://selectStreaming" exchange-pattern="request-response"/>
+
+        <db:select config-ref="pooledJdbcConfig" streaming="true">
+            <db:parameterized-query>select * from PLANET order by ID</db:parameterized-query>
+        </db:select>
+
+        <set-variable variableName="records" value="#[new ArrayList()]"/>
+
+        <foreach>
+            <expression-component>flowVars['records'].add(payload)</expression-component>
+        </foreach>
+
+        <set-property propertyName="processedRecords" value="#[records]"/>
+    </flow>
+
+
+    <flow name="selectStreamingError">
+        <inbound-endpoint address="vm://selectStreamingError" exchange-pattern="request-response"/>
+
+        <db:select config-ref="pooledJdbcConfig" streaming="true">
+            <db:parameterized-query>select * from PLANET order by ID</db:parameterized-query>
+        </db:select>
+
+        <test:component throwException="true" exceptionToThrow="java.lang.RuntimeException"
+                        exceptionText="Failing test on purpose"/>
+    </flow>
+</mule>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <flow name="defaultQueryRequestResponse">
+        <inbound-endpoint address="vm://testRequestResponse" exchange-pattern="request-response"/>
+
+        <db:stored-procedure streaming="true">
+            <db:parameterized-query>{ call doubleMyInt(:myInt) }</db:parameterized-query>
+            <db:inout-param name="myInt" value="3"/>
+        </db:stored-procedure>
+
+        <logger level="ERROR" message="Payload before foreach: #[payload]"/>
+
+        <set-variable variableName="results" value="#[new HashMap()]"/>
+
+        <foreach>
+            <logger level="ERROR" message="Sub payload: #[payload]"/>
+            <expression-component>results.put(payload.name, payload.result)</expression-component>
+        </foreach>
+
+        <set-payload value="#[flowVars['results']]"/>
+    </flow>
+</mule>

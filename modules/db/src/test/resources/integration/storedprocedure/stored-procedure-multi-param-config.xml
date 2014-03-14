@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <flow name="multiplyIntsFlow">
+        <inbound-endpoint address="vm://multiplyInts" exchange-pattern="request-response"/>
+
+        <db:stored-procedure config-ref="dbConfig">
+            <db:parameterized-query>{ call multiplyInts(:int1, :int2, :result) }</db:parameterized-query>
+            <db:in-param name="int1" value="3"/>
+            <db:in-param name="int2" value="4"/>
+            <db:out-param name="result"/>
+        </db:stored-procedure>
+    </flow>
+
+    <flow name="concatenateStringsFlow">
+        <inbound-endpoint address="vm://concatenateStrings" exchange-pattern="request-response"/>
+
+        <db:stored-procedure config-ref="dbConfig">
+            <db:parameterized-query>{ call concatenateStrings(:s1, :s2, :result) }</db:parameterized-query>
+            <db:in-param name="s1" value="foo"/>
+            <db:in-param name="s2" value="bar"/>
+            <db:out-param name="result"/>
+        </db:stored-procedure>
+    </flow>
+</mule>

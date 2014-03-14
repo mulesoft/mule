@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <db:template-query name="simple">
+        <db:parameterized-query>select * from PLANET</db:parameterized-query>
+    </db:template-query>
+
+    <db:template-query name="parameterized">
+        <db:parameterized-query>select * from PLANET where ID = :id</db:parameterized-query>
+        <db:in-param name="id" defaultValue="1"/>
+    </db:template-query>
+</mule>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+            http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <flow name="jdbcRollback">
+        <vm:inbound-endpoint path="testRollback" exchange-pattern="request-response">
+            <xa-transaction action="ALWAYS_BEGIN"/>
+        </vm:inbound-endpoint>
+
+        <db:update config-ref="dbConfig">
+            <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
+        </db:update>
+        <test:component throwException="true" exceptionToThrow="java.lang.IllegalStateException"/>
+    </flow>
+
+    <flow name="jdbcCommit">
+        <vm:inbound-endpoint path="testCommit" exchange-pattern="request-response">
+            <xa-transaction action="ALWAYS_BEGIN"/>
+        </vm:inbound-endpoint>
+
+        <db:update config-ref="dbConfig">
+            <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
+        </db:update>
+    </flow>
+
+    <flow name="rollbackWithNonTransactionalMP">
+        <vm:inbound-endpoint path="rollbackWithNonTransactionalMP" exchange-pattern="request-response">
+            <xa-transaction action="ALWAYS_BEGIN"/>
+        </vm:inbound-endpoint>
+
+        <db:update config-ref="dbConfig" transactionalAction="NOT_SUPPORTED">
+            <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
+        </db:update>
+
+        <test:component throwException="true" exceptionToThrow="java.lang.IllegalStateException"/>
+    </flow>
+
+    <flow name="commitWithNonTransactionalMP">
+        <vm:inbound-endpoint path="commitWithNonTransactionalMP" exchange-pattern="request-response">
+            <xa-transaction action="ALWAYS_BEGIN"/>
+        </vm:inbound-endpoint>
+
+        <db:update config-ref="dbConfig" transactionalAction="NOT_SUPPORTED">
+            <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
+        </db:update>
+
+        <test:component throwException="true" exceptionToThrow="java.lang.IllegalStateException"/>
+    </flow>
+</mule>
