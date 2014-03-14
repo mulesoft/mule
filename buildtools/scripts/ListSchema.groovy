@@ -31,11 +31,11 @@
 */
 
 // Schema version
-def version = 3.1
+version = ''
 
 // Provide the location where https://dav.codehaus.org/dist/mule is mounted on your file system
 // as a parameter to the script.
-davfs = "DAVMountPoint"
+davfs = ''
 
 // schema are indexed by the xsd file names (eg mule-foo.xsd is "foo")
 def schemaNames = []
@@ -58,7 +58,8 @@ def otherxsd = /.*(\/|\\)(transports|modules|patterns)(\/|\\)([^\/]+)(\/|\\).*(\
 def parseArguments(def arguments)
 {
     def cliBuilder = new CliBuilder()
-    cliBuilder.d(longOpt: "davmountpoint", args: 1, "mount point of the DAV filesystem")
+    cliBuilder.d(longOpt: "davmountpoint", required: true, args: 1, "mount point of the DAV filesystem or directory where you want to save the schemas")
+    cliBuilder.v(longOpt: "version", required: true, args: 1, "schemas version")
     cliBuilder.h(longOpt: "help", "show usage info")
     cliBuilder.r(longOpt: "root", required: true, args: 1, "start scanning at this root folder")
 
@@ -76,6 +77,8 @@ def parseArguments(def arguments)
         cliBuilder.usage()
         System.exit(0)
     }
+
+    version = options.v
 
     root = options.r
     if (options.d)
@@ -218,7 +221,7 @@ def generateDeployCommand = {
 parseArguments(args)
 scanForSchemaAndInferDestinations()
 checkSchema()
-scanAndCheckConfigs()
+// scanAndCheckConfigs() // This method validate all xml raising too many errors, even when we can safely publish schemas, perhaps we could include this in an other script specific for validating xmls
 //listSchema()
 generateDeployCommand()
 
