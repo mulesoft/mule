@@ -46,6 +46,23 @@
         user="mysql" database="mule" password="secret"/>
 
     <!--
+        NuoDB
+    -->
+
+    <!-- using the default url -->
+    <jdbc:nuodb-data-source name="default-nuodb" database="mule" user="nuodb" password="secret"/>
+
+    <!-- using a custom URL -->
+    <jdbc:nuodb-data-source name="custom-url-nuodb" url="jdbc:com.nuodb://mule-db-host:48004/mule"
+                            user="nuodb" password="secret"/>
+
+    <!-- custom parts of the nuodb url -->
+    <jdbc:nuodb-data-source name="custom-host-nuodb" host="some-other-host"
+                            database="mule" user="nuodb" password="secret"/>
+    <jdbc:nuodb-data-source name="custom-port-nuodb" port="4242"
+                            user="nuodb" database="mule" password="secret"/>
+
+    <!--
         PostgreSQL
     -->
 
