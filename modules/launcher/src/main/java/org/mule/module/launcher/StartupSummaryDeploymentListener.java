@@ -6,6 +6,8 @@
  */
 package org.mule.module.launcher;
 
+import org.mule.util.SimpleLoggingTable;
+
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
