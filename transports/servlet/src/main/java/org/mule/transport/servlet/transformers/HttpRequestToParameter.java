@@ -58,7 +58,7 @@ public class HttpRequestToParameter extends AbstractMessageTransformer
                         reader = new BufferedReader(new InputStreamReader(is));
                     }
                     
-                    StringBuffer buffer = new StringBuffer(8192);
+                    StringBuilder buffer = new StringBuilder(8192);
                     String line = reader.readLine();
                     while (line != null)
                     {

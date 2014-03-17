@@ -924,7 +924,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         @Override
         public synchronized String toString()
         {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             return buf.append(name).append(", (").append(runCount).append(" / ").append(testCount).append(
                     ") tests run, disposePerSuite=").append(disposeManagerPerSuite).toString();
         }

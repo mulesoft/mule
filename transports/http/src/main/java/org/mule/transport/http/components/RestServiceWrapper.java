@@ -175,7 +175,7 @@ public class RestServiceWrapper extends AbstractComponent
             tempUrl = muleContext.getExpressionManager().parse(serviceUrl, event, true);
         }
 
-        StringBuffer urlBuffer = new StringBuffer(tempUrl);
+        StringBuilder urlBuffer = new StringBuilder(tempUrl);
 
         if (GET.equalsIgnoreCase(this.httpMethod) || DELETE.equalsIgnoreCase(this.httpMethod))
         {
@@ -192,7 +192,7 @@ public class RestServiceWrapper extends AbstractComponent
                 event.getMessage().setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, CONTENT_TYPE_VALUE);
             }
 
-            StringBuffer requestBodyBuffer = new StringBuffer();
+            StringBuilder requestBodyBuffer = new StringBuilder();
             setRESTParams(urlBuffer, event.getMessage(), request, requiredParams, false, requestBodyBuffer);
             setRESTParams(urlBuffer, event.getMessage(), request, optionalParams, true, requestBodyBuffer);
             requestBody = requestBodyBuffer.toString();
@@ -249,12 +249,12 @@ public class RestServiceWrapper extends AbstractComponent
     // is a POST and
     // requestBodyBuffer must contain the body of the http method at the end of this
     // function call
-    private void setRESTParams(StringBuffer url,
+    private void setRESTParams(StringBuilder url,
                                MuleMessage msg,
                                Object body,
                                Map args,
                                boolean optional,
-                               StringBuffer requestBodyBuffer)
+                               StringBuilder requestBodyBuffer)
     {
         String sep;
 

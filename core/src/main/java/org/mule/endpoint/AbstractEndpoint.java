@@ -282,7 +282,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint, Disposable,
             Matcher sanitizerMatcher = sanitizerPattern.matcher(uri.getRawUserInfo());
             if (sanitizerMatcher.matches())
             {
-                sanitizedEndPointUri = new StringBuffer(uri.getScheme()).append("://")
+                sanitizedEndPointUri = new StringBuilder(uri.getScheme()).append("://")
                         .append(sanitizerMatcher.group(1))
                         .append(":<password>")
                         .append("@")

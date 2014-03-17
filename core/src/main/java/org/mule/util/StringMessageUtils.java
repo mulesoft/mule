@@ -64,7 +64,7 @@ public final class StringMessageUtils
     public static String getBoilerPlate(List<String> messages, char c, int maxlength)
     {
         int size;
-        StringBuffer buf = new StringBuffer(messages.size() * maxlength);
+        StringBuilder buf = new StringBuilder(messages.size() * maxlength);
         int trimLength = maxlength - (c == ' ' ? 2 : 4);
 
         for (int i = 0; i < messages.size(); i++)

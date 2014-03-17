@@ -312,7 +312,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
 
     protected void setSchemaLocation(Element rootElement, Map<String, String> schemaLocations)
     {
-        StringBuffer schemaLocation = new StringBuffer();
+        StringBuilder schemaLocation = new StringBuilder();
 
         for (String key : schemaLocations.keySet())
         {

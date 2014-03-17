@@ -65,7 +65,7 @@ public class DateUtils extends org.apache.commons.lang.time.DateUtils
         long secs = mills / 1000;
         mills = mills - (secs * 1000);
 
-        StringBuffer bf = new StringBuffer(60);
+        StringBuilder bf = new StringBuilder(60);
         bf.append(days).append(" ").append(CoreMessages.days().getMessage()).append(", ");
         bf.append(hours).append(" ").append(CoreMessages.hours().getMessage()).append(", ");
         bf.append(mins).append(" ").append(CoreMessages.minutes().getMessage()).append(", ");

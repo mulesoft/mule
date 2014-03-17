@@ -23,7 +23,7 @@ public class CallableEntryPointDiscoveryTestCase extends AbstractMuleContextTest
     public void testBadMatch() throws Exception
     {
         CallableEntryPointResolver resolver = new CallableEntryPointResolver();
-        InvocationResult result = resolver.invoke(new WaterMelon(), getTestEventContext(new StringBuffer("foo")));
+        InvocationResult result = resolver.invoke(new WaterMelon(), getTestEventContext(new StringBuilder("foo")));
         assertEquals("Service doesn't implement Callable", result.getState(), InvocationResult.State.NOT_SUPPORTED);
     }
 

@@ -216,7 +216,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
 
         int eventType = next();
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         while (eventType != XMLStreamConstants.END_ELEMENT)
         {
             if (eventType == XMLStreamConstants.CHARACTERS || eventType == XMLStreamConstants.CDATA

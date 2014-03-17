@@ -72,7 +72,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
 
     protected Variant variant;
     protected MVELExpressionLanguage mvel;
-    final String largeExpression = "payload = 'Tom,Fennelly,Male,4,Ireland';StringBuffer sb = new StringBuffer(); fields = payload.split(',\');"
+    final String largeExpression = "payload = 'Tom,Fennelly,Male,4,Ireland';StringBuilder sb = new StringBuilder(); fields = payload.split(',\');"
                                    + "if (fields.length > 4) {"
                                    + "    sb.append('  <Contact>\n');"
                                    + "    sb.append('    <FirstName>').append(fields[0]).append('</FirstName>\n');"

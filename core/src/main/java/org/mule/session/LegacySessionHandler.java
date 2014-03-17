@@ -101,7 +101,7 @@ public class LegacySessionHandler implements SessionHandler
 
     public void storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append(getSessionIDKey()).append("=").append(session.getId());
         for (String key : session.getPropertyNamesAsSet())
         {

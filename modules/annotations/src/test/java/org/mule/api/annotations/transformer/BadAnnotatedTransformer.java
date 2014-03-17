@@ -16,7 +16,7 @@ import org.mule.api.annotations.Transformer;
 public class BadAnnotatedTransformer
 {
     @Transformer(sourceTypes = Object.class)
-    public String transform(StringBuffer object)
+    public String transform(StringBuilder object)
     {
         return object.toString();
     }

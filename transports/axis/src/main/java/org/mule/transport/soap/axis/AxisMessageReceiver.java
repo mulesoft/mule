@@ -161,7 +161,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         if (methods != null)
         {
             Iterator<?> i = methods.keySet().iterator();
-            StringBuffer buf = new StringBuffer(64);
+            StringBuilder buf = new StringBuilder(64);
             while (i.hasNext())
             {
                 String name = (String) i.next();
@@ -204,7 +204,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         else
         {
             String[] methodNamesArray = AxisServiceProxy.getMethodNames(interfaces);
-            StringBuffer buf = new StringBuffer(64);
+            StringBuilder buf = new StringBuilder(64);
             for (int i = 0; i < methodNamesArray.length; i++)
             {
                 buf.append(methodNamesArray[i]).append(",");

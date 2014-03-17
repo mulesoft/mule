@@ -178,7 +178,7 @@ public class AbstractTablePrinter extends PrintWriter
         {
             Iterator it = routed.entrySet().iterator();
 
-            StringBuffer buf = new StringBuffer(40);
+            StringBuilder buf = new StringBuilder(40);
             while (it.hasNext())
             {
                 Map.Entry e = (Map.Entry) it.next();

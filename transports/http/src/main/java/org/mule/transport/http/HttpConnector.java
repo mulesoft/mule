@@ -493,7 +493,7 @@ public class HttpConnector extends TcpConnector
                  && endpoint.getProperty(HttpConstants.HEADER_AUTHORIZATION) == null)
         {
             // Add User Creds
-            StringBuffer header = new StringBuffer(128);
+            StringBuilder header = new StringBuilder(128);
             header.append("Basic ");
             header.append(new String(Base64.encodeBase64(endpoint.getEndpointURI().getUserInfo().getBytes(
                     endpoint.getEncoding()))));

@@ -92,7 +92,7 @@ public class StringToEmailMessage extends AbstractMessageTransformer
 
         if (logger.isDebugEnabled())
         {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             buf.append("Constructing email using:\n");
             buf.append("To: ").append(to);
             buf.append(", From: ").append(from);

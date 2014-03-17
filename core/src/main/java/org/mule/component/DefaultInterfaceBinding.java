@@ -103,7 +103,7 @@ public class DefaultInterfaceBinding implements InterfaceBinding
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         sb.append("DefaultInterfaceBinding");
         sb.append("{method='").append(methodName).append('\'');
         sb.append(", interface=").append(interfaceClass);

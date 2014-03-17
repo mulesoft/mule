@@ -68,7 +68,7 @@ public abstract class AbstractMessageDispatcherFactory implements MessageDispatc
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer(60);
+        final StringBuilder sb = new StringBuilder(60);
         sb.append(ClassUtils.getSimpleName(this.getClass()));
         sb.append("{this=").append(Integer.toHexString(System.identityHashCode(this)));
         sb.append(", createDispatcherPerRequest=").append(this.isCreateDispatcherPerRequest());

@@ -2401,7 +2401,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer(120);
+        final StringBuilder sb = new StringBuilder(120);
         final String nl = System.getProperty("line.separator");
         sb.append(ClassUtils.getSimpleName(this.getClass()));
         // format message for multi-line output, single-line is not readable

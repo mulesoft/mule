@@ -32,7 +32,7 @@ public class RetryForeverPolicyTemplate extends SimpleRetryPolicyTemplate
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         sb.append("RetryForeverPolicy");
         sb.append("{frequency=").append(frequency);
         sb.append('}');

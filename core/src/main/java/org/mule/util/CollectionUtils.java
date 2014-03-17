@@ -113,7 +113,7 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
         int numElements = Math.min(origNumElements, maxElements);
         boolean tooManyElements = (origNumElements > maxElements);
 
-        StringBuffer buf = new StringBuffer(numElements * 32);
+        StringBuilder buf = new StringBuilder(numElements * 32);
         buf.append('[');
 
         if (newline)

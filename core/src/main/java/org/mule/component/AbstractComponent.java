@@ -329,7 +329,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
 
     protected String getName()
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (flowConstruct != null)
         {
             sb.append(flowConstruct.getName());

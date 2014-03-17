@@ -132,7 +132,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
 
         if (logger.isDebugEnabled())
         {
-            StringBuffer msg = new StringBuffer();
+            StringBuilder msg = new StringBuilder();
             msg.append("Email message sent with subject'").append(message.getSubject()).append("' sent- ");
             msg.append(", From: ").append(MailUtils.mailAddressesToString(message.getFrom())).append(" ");
             msg.append(", To: ").append(

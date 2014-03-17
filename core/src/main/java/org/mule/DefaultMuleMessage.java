@@ -994,7 +994,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public String toString()
     {
         assertAccess(READ);
-        StringBuffer buf = new StringBuffer(120);
+        StringBuilder buf = new StringBuilder(120);
         final String nl = System.getProperty("line.separator");
 
         // format message for multi-line output, single-line is not readable

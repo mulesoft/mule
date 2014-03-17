@@ -50,7 +50,7 @@ public class TransformerUtils
 
     public static String toString(List<Transformer> transformers)
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         Iterator<Transformer> transformer = transformers.iterator();
         while (transformer.hasNext())
         {

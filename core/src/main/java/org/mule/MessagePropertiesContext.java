@@ -330,7 +330,7 @@ public class MessagePropertiesContext implements Serializable
     @Override
     public String toString()
     {
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append("Properties{");
         for (Map.Entry<PropertyScope, Map<String, Object>> entry : scopedMap.entrySet())
         {

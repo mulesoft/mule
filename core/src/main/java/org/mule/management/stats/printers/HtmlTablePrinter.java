@@ -100,7 +100,7 @@ public class HtmlTablePrinter extends AbstractTablePrinter
             return "";
         }
 
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("<table>");
         StringTokenizer st = new StringTokenizer(stats, ";");
 

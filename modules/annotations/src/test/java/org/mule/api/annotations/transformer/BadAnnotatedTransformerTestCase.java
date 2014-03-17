@@ -20,7 +20,7 @@ public class BadAnnotatedTransformerTestCase extends AbstractMuleContextTestCase
     @Test
     public void testVoidTransformer() throws Exception
     {
-        Method m = getClass().getDeclaredMethod("voidTransformer", StringBuffer.class);
+        Method m = getClass().getDeclaredMethod("voidTransformer", StringBuilder.class);
         try
         {
             new AnnotatedTransformerProxy(5, getClass(), m, m.getParameterTypes(), null, null);
@@ -50,7 +50,7 @@ public class BadAnnotatedTransformerTestCase extends AbstractMuleContextTestCase
     @Test
     public void testPrivateTransformer() throws Exception
     {
-        Method m = getClass().getDeclaredMethod("privateTransformer", StringBuffer.class);
+        Method m = getClass().getDeclaredMethod("privateTransformer", StringBuilder.class);
         try
         {
             new AnnotatedTransformerProxy(5, getClass(), m, m.getParameterTypes(), null, null);
@@ -65,7 +65,7 @@ public class BadAnnotatedTransformerTestCase extends AbstractMuleContextTestCase
     @Test
     public void testProtectedTransformer() throws Exception
     {
-        Method m = getClass().getDeclaredMethod("protectedTransformer", StringBuffer.class);
+        Method m = getClass().getDeclaredMethod("protectedTransformer", StringBuilder.class);
         try
         {
             new AnnotatedTransformerProxy(5, getClass(), m, m.getParameterTypes(), null, null);
@@ -80,7 +80,7 @@ public class BadAnnotatedTransformerTestCase extends AbstractMuleContextTestCase
     @Test
     public void testPackageTransformer() throws Exception
     {
-        Method m = getClass().getDeclaredMethod("packageTransformer", StringBuffer.class);
+        Method m = getClass().getDeclaredMethod("packageTransformer", StringBuilder.class);
         try
         {
             new AnnotatedTransformerProxy(5, getClass(), m, m.getParameterTypes(), null, null);
@@ -95,7 +95,7 @@ public class BadAnnotatedTransformerTestCase extends AbstractMuleContextTestCase
     @Test
     public void testPublicTransformerObjectReturn() throws Exception
     {
-        Method m = getClass().getDeclaredMethod("publicTransformerObjectReturn", StringBuffer.class);
+        Method m = getClass().getDeclaredMethod("publicTransformerObjectReturn", StringBuilder.class);
         try
         {
             new AnnotatedTransformerProxy(5, getClass(), m, m.getParameterTypes(), null, null);
@@ -125,7 +125,7 @@ public class BadAnnotatedTransformerTestCase extends AbstractMuleContextTestCase
     @Test
     public void testGoodTransformerWithObjectSource() throws Exception
     {
-        Method m = getClass().getDeclaredMethod("goodTransformer", StringBuffer.class);
+        Method m = getClass().getDeclaredMethod("goodTransformer", StringBuilder.class);
         Class c[] = new Class[]{String.class, Object.class};
         try
         {
@@ -153,7 +153,7 @@ public class BadAnnotatedTransformerTestCase extends AbstractMuleContextTestCase
 
     }
 
-    public void voidTransformer(StringBuffer in)
+    public void voidTransformer(StringBuilder in)
     {
         
     }
@@ -163,22 +163,22 @@ public class BadAnnotatedTransformerTestCase extends AbstractMuleContextTestCase
         return "";
     }
 
-    private String privateTransformer(StringBuffer foo)
+    private String privateTransformer(StringBuilder foo)
     {
         return foo.toString();
     }
 
-    protected String protectedTransformer(StringBuffer foo)
+    protected String protectedTransformer(StringBuilder foo)
     {
         return foo.toString();
     }
 
-    String packageTransformer(StringBuffer foo)
+    String packageTransformer(StringBuilder foo)
     {
         return foo.toString();
     }
 
-    public Object publicTransformerObjectReturn(StringBuffer foo)
+    public Object publicTransformerObjectReturn(StringBuilder foo)
     {
         return foo;
     }
@@ -188,7 +188,7 @@ public class BadAnnotatedTransformerTestCase extends AbstractMuleContextTestCase
         return foo.toString();
     }
 
-    public String goodTransformer(StringBuffer foo)
+    public String goodTransformer(StringBuilder foo)
     {
         return foo.toString();
     }

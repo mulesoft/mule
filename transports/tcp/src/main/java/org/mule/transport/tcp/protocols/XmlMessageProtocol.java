@@ -76,7 +76,7 @@ public class XmlMessageProtocol extends AbstractByteProtocol
             // read until xml pattern is seen (and then pushed back) or no more data
             // to read. return all data as message
             byte[] buffer = new byte[READ_BUFFER_SIZE];
-            StringBuffer message = new StringBuffer(READ_BUFFER_SIZE);
+            StringBuilder message = new StringBuilder(READ_BUFFER_SIZE);
             int patternIndex = -1;
             boolean repeat;
             do

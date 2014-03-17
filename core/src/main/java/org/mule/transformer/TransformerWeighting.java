@@ -252,7 +252,7 @@ public class TransformerWeighting implements Comparable
 
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         sb.append("TransformerWeighting");
         sb.append("{inputClass=").append(inputClass);
         sb.append(", inputWeighting=").append(inputWeighting);
