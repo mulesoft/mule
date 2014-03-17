@@ -167,7 +167,7 @@ public class TransportFactory
         }
         if (results.size() > 1)
         {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             for (Connector result : results)
             {
                 buf.append(result.getName()).append(", ");
@@ -200,7 +200,7 @@ public class TransportFactory
         }
         if (results.size() > 1)
         {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             for (Connector result : results)
             {
                 buf.append(result.getName()).append(", ");

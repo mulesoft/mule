@@ -562,7 +562,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
 
         final AtomicBoolean valid = new AtomicBoolean(true);
         final AtomicBoolean match = new AtomicBoolean(false);
-        final StringBuffer message = new StringBuffer();
+        final StringBuilder message = new StringBuilder();
         parser.parse(new TemplateParser.TemplateCallback()
         {
             public Object match(String token)

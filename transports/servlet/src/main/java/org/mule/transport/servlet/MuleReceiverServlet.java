@@ -328,7 +328,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
 
     protected String getRequestUrl(HttpServletRequest httpServletRequest)
     {
-        StringBuffer url = new StringBuffer();
+        StringBuilder url = new StringBuilder();
 
         url.append(httpServletRequest.getScheme());
         url.append("://");

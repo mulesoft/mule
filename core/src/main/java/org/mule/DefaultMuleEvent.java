@@ -616,7 +616,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     @Override
     public String toString()
     {
-        StringBuffer buf = new StringBuffer(64);
+        StringBuilder buf = new StringBuilder(64);
         buf.append("MuleEvent: ").append(getId());
         buf.append(", stop processing=").append(isStopFurtherProcessing());
         buf.append(", ").append(messageSourceURI);

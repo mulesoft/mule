@@ -29,7 +29,7 @@ public class DataGenerator implements Callable
         List<String> ipAddresses = new ArrayList<String>(batchSize);
         for (int i = 0; i < batchSize; i++)
         {
-            String address = new StringBuffer().append(generator.nextInt(255)).append(".")
+            String address = new StringBuilder().append(generator.nextInt(255)).append(".")
                 .append(generator.nextInt(255)).append(".").append(generator.nextInt(255)).
                 append(".").append(generator.nextInt(255)).toString();
             ipAddresses.add(address);

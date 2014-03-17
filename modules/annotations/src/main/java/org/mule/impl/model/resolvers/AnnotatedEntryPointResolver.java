@@ -190,7 +190,7 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         sb.append("AnnotatedEntryPointResolver");
         sb.append(", acceptVoidMethods=").append(isAcceptVoidMethods());
         sb.append('}');

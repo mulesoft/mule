@@ -48,7 +48,7 @@ public class PayloadAnnotationTestCase extends AbstractAnnotatedEntrypointResolv
         try
         {
             invokeResolver("processFailedAutoTransformString", eventContext);
-            fail("There si no transformer registered for converting String to StringBuffer");
+            fail("There si no transformer registered for converting String to StringBuilder");
         }
         catch (Exception e)
         {

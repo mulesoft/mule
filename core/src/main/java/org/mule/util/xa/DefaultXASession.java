@@ -114,7 +114,7 @@ public class DefaultXASession implements XAResource
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug(new StringBuffer(128).append("Thread ").append(Thread.currentThread()).append(
+            logger.debug(new StringBuilder(128).append("Thread ").append(Thread.currentThread()).append(
                 flags == TMNOFLAGS ? " starts" : flags == TMJOIN ? " joins" : " resumes").append(
                 " work on behalf of transaction branch ").append(xid).toString());
         }
@@ -164,7 +164,7 @@ public class DefaultXASession implements XAResource
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug(new StringBuffer(128).append("Thread ").append(Thread.currentThread()).append(
+            logger.debug(new StringBuilder(128).append("Thread ").append(Thread.currentThread()).append(
                 flags == TMSUSPEND ? " suspends" : flags == TMFAIL ? " fails" : " ends").append(
                 " work on behalf of transaction branch ").append(xid).toString());
         }

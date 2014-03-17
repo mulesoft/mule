@@ -109,7 +109,7 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase
                         throw new IllegalStateException("eventThreshold not yet reached?");
                     }
 
-                    StringBuffer newPayload = new StringBuffer(80);
+                    StringBuilder newPayload = new StringBuilder(80);
 
                     try
                     {

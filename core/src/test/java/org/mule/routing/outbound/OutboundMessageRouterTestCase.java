@@ -136,7 +136,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleContextTestCase
         };
 
         filterRouter1.setFilter(new PayloadTypeFilter(Exception.class));
-        filterRouter2.setFilter(new PayloadTypeFilter(StringBuffer.class));
+        filterRouter2.setFilter(new PayloadTypeFilter(StringBuilder.class));
         messageRouter.addRoute(filterRouter1);
         messageRouter.addRoute(filterRouter2);
 
@@ -158,7 +158,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleContextTestCase
         assertEquals(0, count1[0]);
         assertEquals(0, count2[0]);
 
-        event = getTestEvent(new StringBuffer());
+        event = getTestEvent(new StringBuilder());
         messageRouter.process(event);
         assertEquals(1, catchAllCount[0]);
         assertEquals(0, count1[0]);
@@ -175,7 +175,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleContextTestCase
     public void testCorrelation() throws Exception
     {
         FilteringOutboundRouter filterRouter = new FilteringOutboundRouter();
-        MuleMessage message = new DefaultMuleMessage(new StringBuffer(), muleContext);
+        MuleMessage message = new DefaultMuleMessage(new StringBuilder(), muleContext);
         OutboundEndpoint endpoint = getTestOutboundEndpoint("test");
         filterRouter.setMessageProperties(getTestService(), message, endpoint);
         assertNotNull(message.getCorrelationId());

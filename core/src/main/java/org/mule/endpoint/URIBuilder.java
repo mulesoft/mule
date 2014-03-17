@@ -242,7 +242,7 @@ public class URIBuilder implements AnnotatedObject
 
     protected String getEncodedConstructor()
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         appendMeta(buffer);
         OrderedQueryParameters uriQueries = appendAddress(buffer);
         uriQueries.override(queryMap);
@@ -251,7 +251,7 @@ public class URIBuilder implements AnnotatedObject
         return buffer.toString();
     }
 
-    private void appendMeta(StringBuffer buffer)
+    private void appendMeta(StringBuilder buffer)
     {
         if (null != meta)
         {
@@ -260,7 +260,7 @@ public class URIBuilder implements AnnotatedObject
         }
     }
 
-    private OrderedQueryParameters appendAddress(StringBuffer buffer)
+    private OrderedQueryParameters appendAddress(StringBuilder buffer)
     {
         if (null != address)
         {
@@ -301,7 +301,7 @@ public class URIBuilder implements AnnotatedObject
         return map;
     }
 
-    private void constructAddress(StringBuffer buffer)
+    private void constructAddress(StringBuilder buffer)
     {
         buffer.append(protocol);
         buffer.append(DOTS_SLASHES);
@@ -337,7 +337,7 @@ public class URIBuilder implements AnnotatedObject
         }
     }
 
-    private void removeRootTrailingSlash(StringBuffer buffer)
+    private void removeRootTrailingSlash(StringBuilder buffer)
     {
         int lastIndex = buffer.length() - 1;
 
@@ -490,7 +490,7 @@ public class URIBuilder implements AnnotatedObject
         @Override
         public String toString()
         {
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
 
             boolean first = true;
 

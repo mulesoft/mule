@@ -96,7 +96,7 @@ public class MapUtils extends org.apache.commons.collections.MapUtils
             return "{}";
         }
 
-        StringBuffer buf = new StringBuffer(props.size() * 32);
+        StringBuilder buf = new StringBuilder(props.size() * 32);
         buf.append('{');
 
         if (newline)

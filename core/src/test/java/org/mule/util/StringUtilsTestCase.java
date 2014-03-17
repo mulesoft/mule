@@ -43,7 +43,7 @@ public class StringUtilsTestCase extends AbstractMuleTestCase
     public void testSplitAndTrim2()
     {
         String[] inputValues = new String[]{"foo", "bar", "baz", "kaboom"};
-        String inputString = new StringBuffer(40).append(inputValues[0])
+        String inputString = new StringBuilder(40).append(inputValues[0])
             .append(" ,")
             .append(",  ")
             .append(inputValues[1])

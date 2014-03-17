@@ -70,7 +70,7 @@ public class SplitMessage
         @Override
         public String toString()
         {
-            final StringBuffer sb = new StringBuffer();
+            final StringBuilder sb = new StringBuilder();
             sb.append("MessagePart");
             sb.append("{endpoint=").append(endpoint.getName());
             sb.append(", part=").append(part);

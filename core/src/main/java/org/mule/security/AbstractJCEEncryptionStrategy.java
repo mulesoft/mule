@@ -158,7 +158,7 @@ public abstract class AbstractJCEEncryptionStrategy extends AbstractNamedEncrypt
 
     public String toString()
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("Algorithm=").append(algorithm);
         return buf.toString();
     }

@@ -130,7 +130,7 @@ public class MuleObjectStoreManagerIntegrationTestCase extends AbstractMuleConte
     public void storeUsingBigKey() throws Exception
     {
         ListableObjectStore os = objectStoreFactory.createObjectStore("myOs");
-        StringBuffer bigKey = new StringBuffer();
+        StringBuilder bigKey = new StringBuilder();
         for (int i = 0; i < 50; i++)
         {
             bigKey.append("abcdefghijklmnopqrstuvwxyz");

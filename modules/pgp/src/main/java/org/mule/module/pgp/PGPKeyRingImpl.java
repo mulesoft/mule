@@ -91,7 +91,7 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
         
         if (secretKey == null)
         {
-            StringBuffer message = new StringBuffer();
+            StringBuilder message = new StringBuilder();
             message.append('\n');
             Iterator iterator = collection.getKeyRings();
             while (iterator.hasNext())

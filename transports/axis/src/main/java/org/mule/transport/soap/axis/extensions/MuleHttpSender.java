@@ -279,7 +279,7 @@ public class MuleHttpSender extends BasicHandler
         }
         if (userID != null)
         {
-            StringBuffer tmpBuf = new StringBuffer(64);
+            StringBuilder tmpBuf = new StringBuilder(64);
             tmpBuf.append(userID).append(":").append((passwd == null) ? "" : passwd);
             otherHeaders.append(HTTPConstants.HEADER_AUTHORIZATION).append(": Basic ").append(
                 Base64.encode(tmpBuf.toString().getBytes())).append("\r\n");
@@ -302,7 +302,7 @@ public class MuleHttpSender extends BasicHandler
             }
         }
 
-        StringBuffer header2 = new StringBuffer(64);
+        StringBuilder header2 = new StringBuilder(64);
 
         String webMethod = null;
         boolean posting = true;
@@ -487,7 +487,7 @@ public class MuleHttpSender extends BasicHandler
 
         header2.append("\r\n"); // The empty line to start the BODY.
 
-        StringBuffer header = new StringBuffer(128);
+        StringBuilder header = new StringBuilder(128);
 
         // If we're SOAP 1.2, allow the web method to be set from the
         // MessageContext.

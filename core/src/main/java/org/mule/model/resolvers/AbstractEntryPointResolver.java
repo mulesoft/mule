@@ -87,7 +87,7 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver
 
     protected String getCacheKeyForPayload(Object component, Object[] payload)
     {
-        StringBuffer key = new StringBuffer(48);
+        StringBuilder key = new StringBuilder(48);
         for (int i = 0; i < payload.length; i++)
         {
             Object o = payload[i];
@@ -174,7 +174,7 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         sb.append("AbstractEntryPointResolver");
         sb.append(", acceptVoidMethods=").append(acceptVoidMethods);
         sb.append('}');

@@ -115,7 +115,7 @@ public class StringUtils extends org.apache.commons.lang.StringUtils
         }
 
         int numBytes = bytes.length;
-        StringBuffer str = new StringBuffer(numBytes * 2);
+        StringBuilder str = new StringBuilder(numBytes * 2);
 
         String table = (uppercase ? HEX_CHARACTERS_UC : HEX_CHARACTERS);
 

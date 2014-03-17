@@ -56,7 +56,7 @@ public class CheckExclusiveAttribute implements PreProcessor
 
         if (found && foundAttributes.size() > 0)
         {
-            StringBuffer message = new StringBuffer("The attribute '");
+            StringBuilder message = new StringBuilder("The attribute '");
             message.append(attribute);
             message.append("' cannot appear with the attribute");
             if (foundAttributes.size() > 1)

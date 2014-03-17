@@ -165,7 +165,7 @@ public abstract class MuleException extends Exception
         {
             return getMessage();
         }
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         buf.append(SystemUtils.LINE_SEPARATOR).append(StringUtils.repeat('*', 80)).append(
             SystemUtils.LINE_SEPARATOR);
         buf.append("Message               : ").append(message).append(SystemUtils.LINE_SEPARATOR);
@@ -215,7 +215,7 @@ public abstract class MuleException extends Exception
         {
             return getMessage();
         }
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         buf.append(SystemUtils.LINE_SEPARATOR).append(StringUtils.repeat('*', 80)).append(
             SystemUtils.LINE_SEPARATOR);
         buf.append("Message               : ").append(message).append(SystemUtils.LINE_SEPARATOR);
