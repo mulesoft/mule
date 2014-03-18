@@ -16,7 +16,6 @@ import java.util.Map;
 import javax.wsdl.BindingOperation;
 import javax.wsdl.Definition;
 import javax.wsdl.Part;
-import javax.wsdl.extensions.soap.SOAPBody;
 import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
 
@@ -56,16 +55,16 @@ public class RequestBodyGenerator
             return null;
         }
 
-        SOAPBody soapBody = WSDLUtils.getSoapBody(bindingOperation);
+        List<String> soapBodyParts = WSDLUtils.getSoapBodyParts(bindingOperation);
 
-        if (soapBody == null)
+        if (soapBodyParts == null)
         {
             logger.warn("No SOAP body defined in the WSDL for the specified operation, cannot check if the operation " +
                         "requires input parameters. The payload will be used as SOAP body.");
             return null;
         }
 
-        Part part = getSinglePart(soapBody, bindingOperation.getOperation().getInput().getMessage());
+        Part part = getSinglePart(soapBodyParts, bindingOperation.getOperation().getInput().getMessage());
 
         if (part == null || part.getElementName() == null)
         {
@@ -97,9 +96,9 @@ public class RequestBodyGenerator
      * Finds the part of the input message that must be used in the SOAP body, if the operation requires only
      * one part. Otherwise returns null.
      */
-    private Part getSinglePart(SOAPBody soapBody, javax.wsdl.Message inputMessage)
+    private Part getSinglePart(List<String> soapBodyParts, javax.wsdl.Message inputMessage)
     {
-        if (soapBody.getParts() == null || soapBody.getParts().isEmpty())
+        if (soapBodyParts.isEmpty())
         {
             Map parts = inputMessage.getParts();
 
@@ -110,9 +109,9 @@ public class RequestBodyGenerator
         }
         else
         {
-            if (soapBody.getParts().size() == 1)
+            if (soapBodyParts.size() == 1)
             {
-                String partName = (String) soapBody.getParts().get(0);
+                String partName = soapBodyParts.get(0);
                 return inputMessage.getPart(partName);
             }
         }
