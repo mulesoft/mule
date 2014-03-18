@@ -80,13 +80,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <!--
-                        Fork each test in its own VM to minimize side effects e.g.
-                        with registered agents, JMX startup etc.
-                    -->
-                    <forkMode>pertest</forkMode>
-                </configuration>
             </plugin>
         </plugins>
     </build>
