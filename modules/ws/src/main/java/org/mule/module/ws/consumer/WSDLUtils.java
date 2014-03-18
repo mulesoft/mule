@@ -8,6 +8,7 @@ package org.mule.module.ws.consumer;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ import javax.wsdl.extensions.schema.SchemaReference;
 import javax.wsdl.extensions.soap.SOAPBinding;
 import javax.wsdl.extensions.soap.SOAPBody;
 import javax.wsdl.extensions.soap12.SOAP12Binding;
+import javax.wsdl.extensions.soap12.SOAP12Body;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -81,19 +83,35 @@ public class WSDLUtils
 
 
     /**
-     * Retrieves the SOAP body object from a BindingOperation in the WSDL.
+     * Retrieves the list of SOAP body parts of a binding operation, or null if there is no
+     * SOAP body defined.
      */
-    public static SOAPBody getSoapBody(BindingOperation bindingOperation)
+    public static List<String> getSoapBodyParts(BindingOperation bindingOperation)
     {
         List extensions = bindingOperation.getBindingInput().getExtensibilityElements();
+        List<String> result = null;
+        boolean found = false;
+
         for (Object extension : extensions)
         {
             if (extension instanceof SOAPBody)
             {
-                return (SOAPBody) extension;
+                result = ((SOAPBody) extension).getParts();
+                found = true;
+            }
+            if (extension instanceof SOAP12Body)
+            {
+                result = ((SOAP12Body) extension).getParts();
+                found = true;
             }
         }
-        return null;
+
+        if (found && result == null)
+        {
+            result = Collections.emptyList();
+        }
+
+        return result;
     }
 
     /**
