@@ -52,14 +52,14 @@ import java.util.Map;
 public abstract class AbstractQueryMetadataProvider implements QueryMetadataProvider
 {
 
-    protected final QueryResolver queryResolver;
+    protected final Query query;
     protected final DbConfigResolver dbConfigResolver;
     private Map<Integer, MetaDataModel> dbToMetaDataType;
 
-    public AbstractQueryMetadataProvider(DbConfigResolver dbConfigResolver, QueryResolver queryResolver)
+    public AbstractQueryMetadataProvider(DbConfigResolver dbConfigResolver, Query query)
     {
         this.dbConfigResolver = dbConfigResolver;
-        this.queryResolver = queryResolver;
+        this.query = query;
     }
 
     /**
@@ -269,9 +269,6 @@ public abstract class AbstractQueryMetadataProvider implements QueryMetadataProv
     @Override
     public Result<MetaData> getInputMetaData()
     {
-        //TODO(pablo.kraan): I don't like this method call... maybe having a staticResolve() which fails if query is dynamic?
-        Query query = queryResolver.resolve(null, null);
-
         if (query.isDynamic())
         {
             return new DefaultResult<MetaData>(null, Result.Status.FAILURE, "Cannot obtain metadata from a dynamic SQL");
@@ -285,8 +282,6 @@ public abstract class AbstractQueryMetadataProvider implements QueryMetadataProv
     @Override
     public Result<MetaData> getOutputMetaData(MetaData metaData)
     {
-        Query query = queryResolver.resolve(null, null);
-
         if (query.isDynamic())
         {
             Result<MetaData> staticMetadata = getStaticOutputMetadata();

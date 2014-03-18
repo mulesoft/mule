@@ -41,7 +41,7 @@ public class SelectProcessorDefinitionParser extends AbstractResultSetHandlerPro
     {
         BeanDefinitionBuilder metadataProviderBuilder = BeanDefinitionBuilder.genericBeanDefinition(SelectMetadataProvider.class);
         metadataProviderBuilder.addConstructorArgValue(dbConfigResolverFactoryBeanDefinition);
-        metadataProviderBuilder.addConstructorArgValue(queryResolverBean);
+        metadataProviderBuilder.addConstructorArgValue(queryBean);
         metadataProviderBuilder.addConstructorArgValue(streaming);
 
         return metadataProviderBuilder.getBeanDefinition();

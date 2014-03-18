@@ -13,6 +13,7 @@ import org.mule.module.db.domain.transaction.TransactionalAction;
 import org.mule.module.db.domain.type.DbType;
 import org.mule.module.db.domain.type.DbTypeManager;
 import org.mule.module.db.resolver.param.ParamTypeResolver;
+import org.mule.module.db.resolver.param.ParamTypeResolverFactory;
 import org.mule.module.db.resolver.param.QueryParamTypeResolver;
 import org.mule.module.db.resolver.param.StoredProcedureParamTypeResolver;
 import org.mule.module.db.result.resultset.ResultSetHandler;
@@ -31,15 +32,15 @@ public abstract class AbstractDbConnection implements DbConnection
 
     private final TransactionalAction transactionalAction;
     private final DefaultDbConnectionReleaser connectionReleaseListener;
+    private final ParamTypeResolverFactory paramTypeResolverFactory;
     protected final Connection delegate;
-    private DbTypeManager dbTypeManager;
 
-    public AbstractDbConnection(Connection delegate, TransactionalAction transactionalAction, DefaultDbConnectionReleaser connectionReleaseListener, DbTypeManager dbTypeManager)
+    public AbstractDbConnection(Connection delegate, TransactionalAction transactionalAction, DefaultDbConnectionReleaser connectionReleaseListener, ParamTypeResolverFactory paramTypeResolverFactory)
     {
         this.delegate = delegate;
         this.transactionalAction = transactionalAction;
         this.connectionReleaseListener = connectionReleaseListener;
-        this.dbTypeManager = dbTypeManager;
+        this.paramTypeResolverFactory = paramTypeResolverFactory;
     }
 
     @Override
@@ -55,28 +56,11 @@ public abstract class AbstractDbConnection implements DbConnection
     }
 
     @Override
-    public Map<Integer, DbType> getParamTypes(QueryTemplate queryTemplate)
+    public Map<Integer, DbType> getParamTypes(QueryTemplate queryTemplate) throws SQLException
     {
-        ParamTypeResolver paramTypeResolver;
+        ParamTypeResolver paramTypeResolver = paramTypeResolverFactory.create(queryTemplate);
 
-        if (queryTemplate.getType() == QueryType.STORE_PROCEDURE_CALL)
-        {
-            paramTypeResolver = new StoredProcedureParamTypeResolver(dbTypeManager);
-        }
-        else
-        {
-            paramTypeResolver = new QueryParamTypeResolver(dbTypeManager);
-        }
-
-        try
-        {
-            return paramTypeResolver.getParameterTypes(this, queryTemplate);
-        }
-        catch (SQLException e)
-        {
-            //TODO(pablo.kraan): log error and return default types
-            return null;
-        }
+        return paramTypeResolver.getParameterTypes(this, queryTemplate);
     }
 
     @Override

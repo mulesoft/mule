@@ -14,6 +14,7 @@ import org.mule.module.db.domain.database.DbConfig;
 import org.mule.module.db.domain.transaction.DbTransactionManager;
 import org.mule.module.db.domain.transaction.TransactionalAction;
 import org.mule.module.db.domain.type.DbTypeManager;
+import org.mule.module.db.resolver.param.GenericParamTypeResolverFactory;
 
 import java.sql.Connection;
 
@@ -31,6 +32,6 @@ public class OracleDbConnectionFactory extends TransactionalDbConnectionFactory
     @Override
     protected DbConnection doCreateDbConnection(Connection connection, TransactionalAction transactionalAction)
     {
-        return new OracleDbConnection(connection, transactionalAction, new DefaultDbConnectionReleaser(this), dbTypeManager);
+        return new OracleDbConnection(connection, transactionalAction, new DefaultDbConnectionReleaser(this), new GenericParamTypeResolverFactory(dbTypeManager));
     }
 }

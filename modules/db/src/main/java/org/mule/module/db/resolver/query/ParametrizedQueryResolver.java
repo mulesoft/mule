@@ -23,15 +23,22 @@ import org.mule.module.db.domain.type.DbType;
 import org.mule.module.db.domain.type.UnknownDbType;
 import org.mule.module.db.resolver.param.ParamValueResolver;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Resolves a parameterized query evaluating parameter value expression using a given event
  */
 public class ParametrizedQueryResolver implements QueryResolver
 {
+
+    private static final Log logger = LogFactory.getLog(ParametrizedQueryResolver.class);
 
     private final Query query;
     private final ParamValueResolver paramValueResolver;
@@ -56,10 +63,28 @@ public class ParametrizedQueryResolver implements QueryResolver
 
         if (needsParamTypeResolution(queryTemplate.getParams()))
         {
-            queryTemplate = resolveQueryTemplateTypes(connection, queryTemplate);
+            Map<Integer, DbType> paramTypes = getParameterTypes(connection, queryTemplate);
+
+            queryTemplate = resolveQueryTemplate(queryTemplate, paramTypes);
         }
 
         return new Query(queryTemplate, resolvedParams);
+    }
+
+    private Map<Integer, DbType> getParameterTypes(DbConnection connection, QueryTemplate queryTemplate)
+    {
+        Map<Integer, DbType> paramTypes;
+
+        try
+        {
+            paramTypes = connection.getParamTypes(queryTemplate);
+        }
+        catch (SQLException e)
+        {
+            logger.warn("Unable to resolve query parameter types. Using unresolved types", e);
+            paramTypes = extractParamTypesFromQueryTemplate(queryTemplate);
+        }
+        return paramTypes;
     }
 
     private boolean needsParamTypeResolution(List<QueryParam> params)
@@ -75,11 +100,16 @@ public class ParametrizedQueryResolver implements QueryResolver
         return false;
     }
 
-    private QueryTemplate resolveQueryTemplateTypes(DbConnection connection, QueryTemplate queryTemplate)
+    private Map<Integer, DbType> extractParamTypesFromQueryTemplate(QueryTemplate queryTemplate)
     {
-        Map<Integer, DbType> paramTypes = connection.getParamTypes(queryTemplate);
+        Map<Integer, DbType> paramTypes = new HashMap<Integer, DbType>();
 
-        return resolveQueryTemplate(queryTemplate, paramTypes);
+        for (QueryParam queryParam : queryTemplate.getParams())
+        {
+            paramTypes.put(queryParam.getIndex(), queryParam.getType());
+        }
+
+        return paramTypes;
     }
 
     private QueryTemplate resolveQueryTemplate(QueryTemplate queryTemplate, Map<Integer, DbType> paramTypes)

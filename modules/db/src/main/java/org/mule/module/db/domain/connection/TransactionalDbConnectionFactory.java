@@ -9,11 +9,11 @@ package org.mule.module.db.domain.connection;
 
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
-
 import org.mule.module.db.domain.database.DbConfig;
 import org.mule.module.db.domain.transaction.DbTransactionManager;
 import org.mule.module.db.domain.transaction.TransactionalAction;
 import org.mule.module.db.domain.type.DbTypeManager;
+import org.mule.module.db.resolver.param.GenericParamTypeResolverFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -83,7 +83,7 @@ public class TransactionalDbConnectionFactory implements DbConnectionFactory
 
     protected DbConnection doCreateDbConnection(Connection connection, TransactionalAction transactionalAction)
     {
-        return new DefaultDbConnection(connection, transactionalAction, new DefaultDbConnectionReleaser(this), dbTypeManager);
+        return new DefaultDbConnection(connection, transactionalAction, new DefaultDbConnectionReleaser(this), new GenericParamTypeResolverFactory(dbTypeManager));
     }
 
     private Connection getConnectionFromDataSource(DbConfig config)

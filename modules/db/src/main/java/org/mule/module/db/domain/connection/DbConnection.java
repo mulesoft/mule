@@ -15,6 +15,7 @@ import org.mule.module.db.result.statement.StatementResultIterator;
 import org.mule.module.db.result.statement.StatementResultIteratorFactory;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Map;
 
 /**
@@ -45,8 +46,9 @@ public interface DbConnection extends Connection
      *
      * @param queryTemplate query template that needing parameter resolution
      * @return a not null map containing the parameter type for each parameter index
+     * @throws SQLException when there are error processing the query
      */
-    Map<Integer, DbType> getParamTypes(QueryTemplate queryTemplate);
+    Map<Integer, DbType> getParamTypes(QueryTemplate queryTemplate) throws SQLException;
 
     /**
      * Indicates which {@link TransactionalAction} used to create this connection

@@ -15,8 +15,8 @@ import org.mule.common.metadata.DefaultListMetaDataModel;
 import org.mule.common.metadata.DefaultMetaData;
 import org.mule.common.metadata.MetaData;
 import org.mule.common.metadata.MetaDataModel;
+import org.mule.module.db.domain.query.Query;
 import org.mule.module.db.resolver.database.DbConfigResolver;
-import org.mule.module.db.resolver.query.QueryResolver;
 import org.mule.module.db.result.resultset.ResultSetIterator;
 
 import java.sql.PreparedStatement;
@@ -32,9 +32,9 @@ public class SelectMetadataProvider extends AbstractQueryMetadataProvider
 {
     private final boolean streaming;
 
-    public SelectMetadataProvider(DbConfigResolver dbConfigResolver, QueryResolver queryResolver, boolean streaming)
+    public SelectMetadataProvider(DbConfigResolver dbConfigResolver, Query query, boolean streaming)
     {
-        super(dbConfigResolver, queryResolver);
+        super(dbConfigResolver, query);
         this.streaming = streaming;
     }
 

@@ -9,10 +9,10 @@ package org.mule.module.db.vendor.oracle.domain.connection;
 
 import org.mule.module.db.domain.connection.DefaultDbConnection;
 import org.mule.module.db.domain.connection.DefaultDbConnectionReleaser;
-import org.mule.module.db.domain.type.DbTypeManager;
+import org.mule.module.db.domain.transaction.TransactionalAction;
+import org.mule.module.db.resolver.param.ParamTypeResolverFactory;
 import org.mule.module.db.result.resultset.ResultSetHandler;
 import org.mule.module.db.result.statement.StatementResultIteratorFactory;
-import org.mule.module.db.domain.transaction.TransactionalAction;
 import org.mule.module.db.vendor.oracle.result.statement.OracleStatementResultIteratorFactory;
 
 import java.sql.Connection;
@@ -23,9 +23,9 @@ import java.sql.Connection;
 public class OracleDbConnection extends DefaultDbConnection
 {
 
-    public OracleDbConnection(Connection delegate, TransactionalAction transactionalAction, DefaultDbConnectionReleaser connectionReleaseListener, DbTypeManager dbTypeManager)
+    public OracleDbConnection(Connection delegate, TransactionalAction transactionalAction, DefaultDbConnectionReleaser connectionReleaseListener, ParamTypeResolverFactory paramTypeResolverFactory)
     {
-        super(delegate, transactionalAction, connectionReleaseListener, dbTypeManager);
+        super(delegate, transactionalAction, connectionReleaseListener, paramTypeResolverFactory);
     }
 
     @Override

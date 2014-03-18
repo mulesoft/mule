@@ -7,8 +7,6 @@
 
 package org.mule.module.db.config.domain.query;
 
-import org.mule.module.db.config.domain.param.StaticQueryParamResolverFactoryBean;
-import org.mule.module.db.config.resolver.query.QueryResolverFactoryBean;
 import org.mule.module.db.config.domain.param.InOutParamDefinitionDefinitionParser;
 import org.mule.module.db.config.domain.param.InputParamDefinitionDefinitionParser;
 import org.mule.module.db.config.domain.param.InputParamValueBeanDefinitionParser;
@@ -28,7 +26,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
@@ -80,12 +77,13 @@ public class ParameterizedQueryDefinitionParser
         queryBuilder.addConstructorArgValue(paramValues);
         BeanDefinition queryBean = queryBuilder.getBeanDefinition();
 
-        BeanDefinitionBuilder queryResolverFactoryBean = BeanDefinitionBuilder.genericBeanDefinition(QueryResolverFactoryBean.class);
-        queryResolverFactoryBean.addConstructorArgValue(queryBean);
-        queryResolverFactoryBean.addConstructorArgValue(sqlParamResolver);
-        queryResolverFactoryBean.addConstructorArgValue(dbConfigResolver);
+        //BeanDefinitionBuilder queryResolverFactoryBean = BeanDefinitionBuilder.genericBeanDefinition(QueryResolverFactoryBean.class);
+        //queryResolverFactoryBean.addConstructorArgValue(queryBean);
+        //queryResolverFactoryBean.addConstructorArgValue(sqlParamResolver);
+        //queryResolverFactoryBean.addConstructorArgValue(dbConfigResolver);
+        //return queryResolverFactoryBean.getBeanDefinition();
 
-        return queryResolverFactoryBean.getBeanDefinition();
+        return queryBean;
     }
 
     private BeanDefinition parseTemplateQueryRef(Element queryElement, List<Element> paramElements, ParserContext nestedCtx, BeanDefinition sqlParamResolver, BeanDefinition dbConfigResolver)
@@ -100,13 +98,14 @@ public class ParameterizedQueryDefinitionParser
 
         BeanDefinitionBuilder queryBuilder = BeanDefinitionBuilder.genericBeanDefinition(Query.class);
         queryBuilder.addConstructorArgValue(queryTemplateFactoryBean.getBeanDefinition());
-        BeanDefinition queryTemplate = queryBuilder.getBeanDefinition();
+        BeanDefinition queryBean = queryBuilder.getBeanDefinition();
 
-        BeanDefinitionBuilder queryResolverBean = BeanDefinitionBuilder.genericBeanDefinition(QueryResolverFactoryBean.class);
-        queryResolverBean.addConstructorArgValue(queryTemplate);
-        queryResolverBean.addConstructorArgValue(sqlParamResolver);
-        queryResolverBean.addConstructorArgValue(dbConfigResolver);
-        return queryResolverBean.getBeanDefinition();
+        //BeanDefinitionBuilder queryResolverFactoryBean = BeanDefinitionBuilder.genericBeanDefinition(QueryResolverFactoryBean.class);
+        //queryResolverFactoryBean.addConstructorArgValue(queryBean);
+        //queryResolverFactoryBean.addConstructorArgValue(sqlParamResolver);
+        //queryResolverFactoryBean.addConstructorArgValue(dbConfigResolver);
+        //return queryResolverFactoryBean.getBeanDefinition();
+        return queryBean;
     }
 
     private BeanDefinition parseParameterizedQuery(Element queryElement, List<Element> paramElements, ParserContext nestedCtx, BeanDefinition sqlParamResolver, BeanDefinition dbConfigResolver)
@@ -129,11 +128,12 @@ public class ParameterizedQueryDefinitionParser
 
             BeanDefinition queryBean = queryBuilder.getBeanDefinition();
 
-            BeanDefinitionBuilder queryResolverFactoryBean = BeanDefinitionBuilder.genericBeanDefinition(QueryResolverFactoryBean.class);
-            queryResolverFactoryBean.addConstructorArgValue(queryBean);
-            queryResolverFactoryBean.addConstructorArgValue(sqlParamResolver);
-            queryResolverFactoryBean.addConstructorArgValue(dbConfigResolver);
-            return queryResolverFactoryBean.getBeanDefinition();
+            //BeanDefinitionBuilder queryResolverFactoryBean = BeanDefinitionBuilder.genericBeanDefinition(QueryResolverFactoryBean.class);
+            //queryResolverFactoryBean.addConstructorArgValue(queryBean);
+            //queryResolverFactoryBean.addConstructorArgValue(sqlParamResolver);
+            //queryResolverFactoryBean.addConstructorArgValue(dbConfigResolver);
+            //return queryResolverFactoryBean.getBeanDefinition();
+            return queryBean;
         }
         else
         {
@@ -159,11 +159,12 @@ public class ParameterizedQueryDefinitionParser
             }
             BeanDefinition queryBean = queryBuilder.getBeanDefinition();
 
-            BeanDefinitionBuilder queryResolverFactoryBean = BeanDefinitionBuilder.genericBeanDefinition(QueryResolverFactoryBean.class);
-            queryResolverFactoryBean.addConstructorArgValue(queryBean);
-            queryResolverFactoryBean.addConstructorArgValue(sqlParamResolver);
-            queryResolverFactoryBean.addConstructorArgValue(dbConfigResolver);
-            return queryResolverFactoryBean.getBeanDefinition();
+            //BeanDefinitionBuilder queryResolverFactoryBean = BeanDefinitionBuilder.genericBeanDefinition(QueryResolverFactoryBean.class);
+            //queryResolverFactoryBean.addConstructorArgValue(queryBean);
+            //queryResolverFactoryBean.addConstructorArgValue(sqlParamResolver);
+            //queryResolverFactoryBean.addConstructorArgValue(dbConfigResolver);
+            //return queryResolverFactoryBean.getBeanDefinition();
+            return queryBean;
         }
     }
 
@@ -220,19 +221,6 @@ public class ParameterizedQueryDefinitionParser
         }
 
         return params;
-    }
-
-    public BeanDefinition parseOptionalQuery(Element element, ParserContext nestedCtx, BeanDefinition dbConfigResolver)
-    {
-        BeanDefinition result = null;
-        if (!DomUtils.getChildElementsByTagName(element, QUERY_TAG_NAMES).isEmpty())
-        {
-            BeanDefinitionBuilder sqlParamResolverFactory = BeanDefinitionBuilder.genericBeanDefinition(StaticQueryParamResolverFactoryBean.class);
-            AbstractBeanDefinition sqlParamResolver = sqlParamResolverFactory.getBeanDefinition();
-            result = parseQuery(element, nestedCtx, sqlParamResolver, dbConfigResolver);
-        }
-
-        return result;
     }
 
     public BeanDefinition parseQuery(Element element, ParserContext nestedCtx, BeanDefinition sqlParamResolver, BeanDefinition dbConfigResolver)

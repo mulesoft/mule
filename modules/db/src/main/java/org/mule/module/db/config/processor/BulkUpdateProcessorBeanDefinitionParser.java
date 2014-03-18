@@ -8,6 +8,7 @@
 package org.mule.module.db.config.processor;
 
 import org.mule.module.db.config.domain.query.BulkQueryResolverFactoryBean;
+import org.mule.module.db.domain.executor.BulkUpdateExecutorFactory;
 import org.mule.module.db.metadata.BulkUpdateMetadataProvider;
 import org.mule.module.db.parser.SimpleQueryTemplateParser;
 import org.mule.module.db.processor.BulkUpdateMessageProcessor;
@@ -19,7 +20,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class BulkUpdateProcessorBeanDefinitionParser extends AbstractBulkUpdateProcessorBeanDefinitionParser
+public class BulkUpdateProcessorBeanDefinitionParser extends AbstractAdvancedDbProcessorDefinitionParser
 {
 
     @Override
@@ -65,5 +66,15 @@ public class BulkUpdateProcessorBeanDefinitionParser extends AbstractBulkUpdateP
         {
             builder.addConstructorArgValue(new FileBulkQueryResolver(file, new SimpleQueryTemplateParser(), new DefaultFileReader()));
         }
+    }
+
+    @Override
+    protected Object createExecutorFactory(Element element)
+    {
+        BeanDefinitionBuilder executorFactoryBean = BeanDefinitionBuilder.genericBeanDefinition(BulkUpdateExecutorFactory.class);
+
+        executorFactoryBean.addConstructorArgValue(parseStatementFactory(element));
+
+        return executorFactoryBean.getBeanDefinition();
     }
 }

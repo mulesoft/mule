@@ -8,9 +8,9 @@
 package org.mule.module.db.config.processor;
 
 import org.mule.module.db.config.domain.param.DefaultSqlParamResolverFactoryBean;
+import org.mule.module.db.config.resolver.query.QueryResolverFactoryBean;
 
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
@@ -19,6 +19,7 @@ public abstract class AbstractSingleQueryProcessorDefinitionParser extends Abstr
 {
 
     protected BeanDefinition queryResolverBean;
+    protected BeanDefinition queryBean;
 
     @Override
     protected void doParseElement(Element element, ParserContext context, BeanDefinitionBuilder builder)
@@ -31,9 +32,12 @@ public abstract class AbstractSingleQueryProcessorDefinitionParser extends Abstr
 
         String streamingValue = element.getAttribute(STREAMING_ATTRIBUTE);
         processStreamingAttribute(builder, streamingValue);
-        BeanDefinitionBuilder sqlParamResolverFactory = BeanDefinitionBuilder.genericBeanDefinition(DefaultSqlParamResolverFactoryBean.class);
-        AbstractBeanDefinition sqlParamResolver = sqlParamResolverFactory.getBeanDefinition();
-        queryResolverBean = parameterizedQueryDefinitionParser.parseQuery(element, nestedCtx, sqlParamResolver, dbConfigResolverFactoryBeanDefinition);
+        BeanDefinition sqlParamResolver = getParamResolverBeanDefinition();
+
+        queryBean = parameterizedQueryDefinitionParser.parseQuery(element, nestedCtx, sqlParamResolver, dbConfigResolverFactoryBeanDefinition);
+
+        createQueryResolverBeanDefinition(sqlParamResolver);
+
         builder.addConstructorArgValue(queryResolverBean);
 
         parseSourceExpression(element, builder);
@@ -41,6 +45,21 @@ public abstract class AbstractSingleQueryProcessorDefinitionParser extends Abstr
         parseExecutorFactory(element, builder);
         parseTransactionalAction(element, builder);
         parseMetadataProvider(element, builder);
+    }
+
+    protected void createQueryResolverBeanDefinition(BeanDefinition sqlParamResolver)
+    {
+        BeanDefinitionBuilder queryResolverFactoryBean = BeanDefinitionBuilder.genericBeanDefinition(QueryResolverFactoryBean.class);
+        queryResolverFactoryBean.addConstructorArgValue(queryBean);
+        queryResolverFactoryBean.addConstructorArgValue(sqlParamResolver);
+        queryResolverFactoryBean.addConstructorArgValue(dbConfigResolverFactoryBeanDefinition);
+        queryResolverBean = queryResolverFactoryBean.getBeanDefinition();
+    }
+
+    protected BeanDefinition getParamResolverBeanDefinition()
+    {
+        BeanDefinitionBuilder sqlParamResolverFactory = BeanDefinitionBuilder.genericBeanDefinition(DefaultSqlParamResolverFactoryBean.class);
+        return sqlParamResolverFactory.getBeanDefinition();
     }
 
 }
