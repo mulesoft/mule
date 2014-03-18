@@ -42,7 +42,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
 {
 
     public static final String BEANS_ELEMENT = "beans";
-    public static final String IGNORE_UNRESOLVABLE_ATTR = "ignore-unresolvable";
+
     public static final String REFS_SUFFIX = "-refs";
     public static final String REFS_TOKENS = " \t"; // Space, Tab
     public static final String REF_SUFFIX = "-ref";
@@ -77,23 +77,14 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         Element rootElement = document.addElement("mule", "http://www.mulesoft.org/schema/mule/core");
 
         org.w3c.dom.Element[] placeholders = callback.getPropertyPlaceholders();
-        int noIgnoreUnresolvableCount = 0;
+
         for (org.w3c.dom.Element placeholder : placeholders)
         {
             try
             {
-                Element newPlaceHolder = convert(placeholder);
-                String ignoreUnresolvable = newPlaceHolder.attributeValue(IGNORE_UNRESOLVABLE_ATTR);
-                if (!"true".equalsIgnoreCase(ignoreUnresolvable))
-                {
-                    noIgnoreUnresolvableCount++;
-                }
-                // There are more than one property placeholder and configuration is prune to failure
-                if (noIgnoreUnresolvableCount > 1)
-                {
-                    throw new MuleArtifactFactoryException("There are multiple property-placeholder elements with attribute " + IGNORE_UNRESOLVABLE_ATTR + " missing or set to false. It may be not possible to find all property values. Please fix your Mule configuration file.");
-                }
-                rootElement.add(newPlaceHolder);
+                Element newPlaceholder = convert(placeholder);
+                rootElement.add(newPlaceholder);
+                addSchemaLocation(placeholder, callback, schemaLocations);
             }
             catch (ParserConfigurationException e)
             {
@@ -101,7 +92,6 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
             }
 
         }
-
 
         // the parentElement is the parent of the element we are adding
         Element parentElement = rootElement;
