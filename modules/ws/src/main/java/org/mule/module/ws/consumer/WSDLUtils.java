@@ -98,11 +98,13 @@ public class WSDLUtils
             {
                 result = ((SOAPBody) extension).getParts();
                 found = true;
+                break;
             }
             if (extension instanceof SOAP12Body)
             {
                 result = ((SOAP12Body) extension).getParts();
                 found = true;
+                break;
             }
         }
 
