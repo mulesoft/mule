@@ -13,6 +13,7 @@ import org.mule.api.transaction.TransactionException;
 import org.mule.module.db.domain.database.DbConfig;
 import org.mule.module.db.domain.transaction.DbTransactionManager;
 import org.mule.module.db.domain.transaction.TransactionalAction;
+import org.mule.module.db.domain.type.DbTypeManager;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -30,11 +31,13 @@ public class TransactionalDbConnectionFactory implements DbConnectionFactory
 
     protected final DbConfig dbConfig;
     protected final DbTransactionManager dbTransactionManager;
+    protected final DbTypeManager dbTypeManager;
 
-    public TransactionalDbConnectionFactory(DbConfig dbConfig, DbTransactionManager dbTransactionManager)
+    public TransactionalDbConnectionFactory(DbConfig dbConfig, DbTransactionManager dbTransactionManager, DbTypeManager dbTypeManager)
     {
         this.dbConfig = dbConfig;
         this.dbTransactionManager = dbTransactionManager;
+        this.dbTypeManager = dbTypeManager;
     }
 
     @Override
@@ -80,7 +83,7 @@ public class TransactionalDbConnectionFactory implements DbConnectionFactory
 
     protected DbConnection doCreateDbConnection(Connection connection, TransactionalAction transactionalAction)
     {
-        return new DefaultDbConnection(connection, transactionalAction, new DefaultDbConnectionReleaser(this));
+        return new DefaultDbConnection(connection, transactionalAction, new DefaultDbConnectionReleaser(this), dbTypeManager);
     }
 
     private Connection getConnectionFromDataSource(DbConfig config)

@@ -7,12 +7,10 @@
 
 package org.mule.module.db.domain.type;
 
-import org.mule.module.db.domain.connection.DbConnectionFactory;
 import org.mule.module.db.domain.connection.DbConnection;
-import org.mule.module.db.result.row.InsensitiveMapRowHandler;
 import org.mule.module.db.result.resultset.ResultSetIterator;
+import org.mule.module.db.result.row.InsensitiveMapRowHandler;
 import org.mule.module.db.result.statement.StatementStreamingResultSetCloser;
-import org.mule.module.db.domain.transaction.TransactionalAction;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -33,14 +31,8 @@ public class MetadataDbTypeManager implements DbTypeManager
     private final Log logger = LogFactory.getLog(MetadataDbTypeManager.class);
 
     private final Map<String, DbType> typesById = new HashMap<String, DbType>();
-    private final DbConnectionFactory dbConnectionFactory;
     private final Object lock = new Object();
     private boolean initialised;
-
-    public MetadataDbTypeManager(DbConnectionFactory dbConnectionFactory)
-    {
-        this.dbConnectionFactory = dbConnectionFactory;
-    }
 
     protected void registerType(DbType dbType)
     {
@@ -54,7 +46,7 @@ public class MetadataDbTypeManager implements DbTypeManager
     }
 
     @Override
-    public DbType get(int id, String name) throws UnknownDbTypeException
+    public DbType lookup(DbConnection connection, int id, String name) throws UnknownDbTypeException
     {
         if (!initialised)
         {
@@ -62,7 +54,7 @@ public class MetadataDbTypeManager implements DbTypeManager
             {
                 if (!initialised)
                 {
-                    initialise();
+                    initialise(connection);
                     initialised = true;
                 }
 
@@ -84,19 +76,8 @@ public class MetadataDbTypeManager implements DbTypeManager
         }
     }
 
-    protected void initialise()
+    protected void initialise(DbConnection connection)
     {
-        DbConnection connection;
-
-        try
-        {
-            connection = dbConnectionFactory.createConnection(TransactionalAction.NOT_SUPPORTED);
-        }
-        catch (SQLException e)
-        {
-            throw new IllegalStateException("Cannot obtain type information form database");
-        }
-
         try
         {
             DatabaseMetaData metaData = connection.getMetaData();
@@ -119,10 +100,6 @@ public class MetadataDbTypeManager implements DbTypeManager
         catch (SQLException e)
         {
             throw new IllegalStateException("Cannot process metadata information", e);
-        }
-        finally
-        {
-            dbConnectionFactory.releaseConnection(connection);
         }
     }
 }

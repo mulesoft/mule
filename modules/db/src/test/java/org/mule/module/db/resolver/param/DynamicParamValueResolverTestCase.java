@@ -24,11 +24,11 @@ import java.util.List;
 import org.junit.Test;
 
 @SmallTest
-public class DynamicQueryParamResolverTestCase extends AbstractQueryParamResolverTestCase
+public class DynamicParamValueResolverTestCase extends AbstractQueryParamResolverTestCase
 {
 
     private final ExpressionManager expressionManager = mock(ExpressionManager.class);
-    private final DynamicQueryParamResolver paramResolver = new DynamicQueryParamResolver(expressionManager);
+    private final DynamicParamValueResolver paramResolver = new DynamicParamValueResolver(expressionManager);
 
     @Test
     public void resolvesStaticParam() throws Exception

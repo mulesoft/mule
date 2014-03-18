@@ -18,12 +18,12 @@ import java.util.List;
 /**
  * Resolves query parameters evaluating expression using a given event
  */
-public class DynamicQueryParamResolver implements QueryParamResolver
+public class DynamicParamValueResolver implements ParamValueResolver
 {
 
     private final ExpressionManager expressionManager;
 
-    public DynamicQueryParamResolver(ExpressionManager expressionManager)
+    public DynamicParamValueResolver(ExpressionManager expressionManager)
     {
         this.expressionManager = expressionManager;
     }

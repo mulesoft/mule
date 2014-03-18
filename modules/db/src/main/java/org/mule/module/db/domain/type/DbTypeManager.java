@@ -7,6 +7,8 @@
 
 package org.mule.module.db.domain.type;
 
+import org.mule.module.db.domain.connection.DbConnection;
+
 /**
  * Manages types for a database instance
  */
@@ -14,12 +16,13 @@ public interface DbTypeManager
 {
 
     /**
-    * Finds a mapping for a given type ID and name
-    *
+     * Finds a mapping for a given type ID and name
+     *
+     * @param connection connection used to connect to the database if required
      * @param id type ID
      * @param name type name
      * @return a type that corresponds to the given ID
-    * @throws UnknownDbTypeException when there is no managed type with the given ID and name
-    */
-    DbType get(int id, String name) throws UnknownDbTypeException;
+     * @throws UnknownDbTypeException when there is no managed type with the given ID and name
+     */
+    DbType lookup(DbConnection connection, int id, String name) throws UnknownDbTypeException;
 }

@@ -10,26 +10,26 @@ package org.mule.module.db.config.domain.param;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 
-import org.mule.module.db.resolver.param.DynamicQueryParamResolver;
-import org.mule.module.db.resolver.param.QueryParamResolver;
+import org.mule.module.db.resolver.param.DynamicParamValueResolver;
+import org.mule.module.db.resolver.param.ParamValueResolver;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class DefaultSqlParamResolverFactoryBean implements FactoryBean<QueryParamResolver>, MuleContextAware
+public class DefaultSqlParamResolverFactoryBean implements FactoryBean<ParamValueResolver>, MuleContextAware
 {
 
     private MuleContext context;
 
     @Override
-    public QueryParamResolver getObject() throws Exception
+    public ParamValueResolver getObject() throws Exception
     {
-        return new DynamicQueryParamResolver(context.getExpressionManager());
+        return new DynamicParamValueResolver(context.getExpressionManager());
     }
 
     @Override
     public Class<?> getObjectType()
     {
-        return QueryParamResolver.class;
+        return ParamValueResolver.class;
     }
 
     @Override

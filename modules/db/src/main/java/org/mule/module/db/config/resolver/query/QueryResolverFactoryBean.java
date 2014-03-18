@@ -10,15 +10,13 @@ package org.mule.module.db.config.resolver.query;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.module.db.domain.query.Query;
-import org.mule.module.db.domain.query.QueryType;
 import org.mule.module.db.parser.SimpleQueryTemplateParser;
 import org.mule.module.db.resolver.database.DbConfigResolver;
-import org.mule.module.db.resolver.param.QueryParamResolver;
+import org.mule.module.db.resolver.param.ParamValueResolver;
 import org.mule.module.db.resolver.query.DynamicQueryResolver;
 import org.mule.module.db.resolver.query.ParametrizedQueryResolver;
 import org.mule.module.db.resolver.query.QueryResolver;
 import org.mule.module.db.resolver.query.StaticQueryResolver;
-import org.mule.module.db.resolver.query.StoredProcedureQueryResolver;
 
 import org.springframework.beans.factory.FactoryBean;
 
@@ -26,14 +24,14 @@ public class QueryResolverFactoryBean implements FactoryBean<QueryResolver>, Mul
 {
 
     private final Query query;
-    private final QueryParamResolver queryParamResolver;
+    private final ParamValueResolver paramValueResolver;
     private final DbConfigResolver dbConfigResolver;
     private MuleContext muleContext;
 
-    public QueryResolverFactoryBean(Query query, QueryParamResolver queryParamResolver, DbConfigResolver dbConfigResolver)
+    public QueryResolverFactoryBean(Query query, ParamValueResolver paramValueResolver, DbConfigResolver dbConfigResolver)
     {
         this.query = query;
-        this.queryParamResolver = queryParamResolver;
+        this.paramValueResolver = paramValueResolver;
         this.dbConfigResolver = dbConfigResolver;
     }
 
@@ -44,13 +42,9 @@ public class QueryResolverFactoryBean implements FactoryBean<QueryResolver>, Mul
         {
             return new DynamicQueryResolver(query, new SimpleQueryTemplateParser(), muleContext.getExpressionManager());
         }
-        else if (query.getQueryTemplate().getType() == QueryType.STORE_PROCEDURE_CALL)
-        {
-            return new StoredProcedureQueryResolver(query, dbConfigResolver, queryParamResolver);
-        }
         else if (hasParameters(query))
         {
-            return new ParametrizedQueryResolver(query, queryParamResolver);
+            return new ParametrizedQueryResolver(query, paramValueResolver);
         }
         else
         {

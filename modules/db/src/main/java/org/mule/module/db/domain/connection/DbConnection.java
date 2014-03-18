@@ -7,12 +7,15 @@
 
 package org.mule.module.db.domain.connection;
 
+import org.mule.module.db.domain.query.QueryTemplate;
 import org.mule.module.db.domain.transaction.TransactionalAction;
+import org.mule.module.db.domain.type.DbType;
 import org.mule.module.db.result.resultset.ResultSetHandler;
 import org.mule.module.db.result.statement.StatementResultIterator;
 import org.mule.module.db.result.statement.StatementResultIteratorFactory;
 
 import java.sql.Connection;
+import java.util.Map;
 
 /**
  * Wraps a {@link Connection} adding connector's specific functionality
@@ -35,6 +38,15 @@ public interface DbConnection extends Connection
      * @return the {@link StatementResultIterator} for this connection.
      */
     StatementResultIteratorFactory getStatementResultIteratorFactory(ResultSetHandler resultSetHandler);
+
+    /**
+     * Determines actual parameter types for the parameters defined in a
+     * query template.
+     *
+     * @param queryTemplate query template that needing parameter resolution
+     * @return a not null map containing the parameter type for each parameter index
+     */
+    Map<Integer, DbType> getParamTypes(QueryTemplate queryTemplate);
 
     /**
      * Indicates which {@link TransactionalAction} used to create this connection

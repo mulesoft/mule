@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Resolves a query parameters to a static value without using the current event
  */
-public class StaticQueryParamResolver implements QueryParamResolver
+public class StaticParamValueResolver implements ParamValueResolver
 {
 
     @Override

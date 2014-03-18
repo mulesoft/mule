@@ -13,6 +13,7 @@ import org.mule.module.db.domain.connection.TransactionalDbConnectionFactory;
 import org.mule.module.db.domain.database.DbConfig;
 import org.mule.module.db.domain.transaction.DbTransactionManager;
 import org.mule.module.db.domain.transaction.TransactionalAction;
+import org.mule.module.db.domain.type.DbTypeManager;
 
 import java.sql.Connection;
 
@@ -22,14 +23,14 @@ import java.sql.Connection;
 public class OracleDbConnectionFactory extends TransactionalDbConnectionFactory
 {
 
-    public OracleDbConnectionFactory(DbConfig dbConfig, DbTransactionManager dbTransactionManager)
+    public OracleDbConnectionFactory(DbConfig dbConfig, DbTransactionManager dbTransactionManager, DbTypeManager dbTypeManager)
     {
-        super(dbConfig, dbTransactionManager);
+        super(dbConfig, dbTransactionManager, dbTypeManager);
     }
 
     @Override
     protected DbConnection doCreateDbConnection(Connection connection, TransactionalAction transactionalAction)
     {
-        return new OracleDbConnection(connection, transactionalAction, new DefaultDbConnectionReleaser(this));
+        return new OracleDbConnection(connection, transactionalAction, new DefaultDbConnectionReleaser(this), dbTypeManager);
     }
 }

@@ -5,10 +5,14 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.domain.type;
+package org.mule.module.db.resolver.param;
 
 import org.mule.module.db.domain.connection.DbConnection;
 import org.mule.module.db.domain.query.QueryTemplate;
+import org.mule.module.db.domain.type.DbType;
+import org.mule.module.db.domain.type.DbTypeManager;
+import org.mule.module.db.domain.type.ResolvedDbType;
+import org.mule.module.db.domain.type.UnknownDbTypeException;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -22,22 +26,21 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Resolves types using query metadata
+ * Resolves parameter types for stored procedure queries
  */
-public class MetadataTypeResolver implements DbTypeResolver
+public class StoredProcedureParamTypeResolver implements ParamTypeResolver
 {
 
-    private static final Log logger = LogFactory.getLog(MetadataTypeResolver.class);
+    private static final Log logger = LogFactory.getLog(StoredProcedureParamTypeResolver.class);
 
     private final DbTypeManager dbTypeManager;
     private final Pattern storedProcedureMatcher = Pattern.compile("(?msi)(\\{\\s+)?call\\s* \\s*(\\w+)\\(.*");
 
-    public MetadataTypeResolver(DbTypeManager dbTypeManager)
+    public StoredProcedureParamTypeResolver(DbTypeManager dbTypeManager)
     {
         this.dbTypeManager = dbTypeManager;
     }
 
-    @Override
     public Map<Integer, DbType> getParameterTypes(DbConnection connection, QueryTemplate queryTemplate) throws SQLException
     {
         Map<Integer, DbType> paramTypes = new HashMap<Integer, DbType>();
@@ -83,7 +86,7 @@ public class MetadataTypeResolver implements DbTypeResolver
 
         if (!matcher.matches())
         {
-           throw new SQLException("Unable to detect stored procedure name from " + sqlText);
+            throw new SQLException("Unable to detect stored procedure name from " + sqlText);
         }
 
         String storedProcedureName = matcher.group(2);

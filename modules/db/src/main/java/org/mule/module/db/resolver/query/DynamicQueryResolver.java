@@ -9,6 +9,7 @@ package org.mule.module.db.resolver.query;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.expression.ExpressionManager;
+import org.mule.module.db.domain.connection.DbConnection;
 import org.mule.module.db.domain.query.Query;
 import org.mule.module.db.domain.query.QueryParamValue;
 import org.mule.module.db.domain.query.QueryTemplate;
@@ -34,7 +35,7 @@ public class DynamicQueryResolver implements QueryResolver
     }
 
     @Override
-    public Query resolve(MuleEvent muleEvent)
+    public Query resolve(DbConnection connection, MuleEvent muleEvent)
     {
         if (muleEvent == null)
         {

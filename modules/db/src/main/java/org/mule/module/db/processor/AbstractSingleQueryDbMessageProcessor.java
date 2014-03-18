@@ -35,7 +35,7 @@ public abstract class AbstractSingleQueryDbMessageProcessor extends AbstractDbMe
     {
         MuleEvent eventToUse = resolveSource(muleEvent);
 
-        Query resolvedQuery = queryResolver.resolve(eventToUse);
+        Query resolvedQuery = queryResolver.resolve(connection, eventToUse);
 
         validateQueryType(resolvedQuery.getQueryTemplate());
 

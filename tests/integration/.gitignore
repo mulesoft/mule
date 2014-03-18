@@ -18,3 +18,5 @@
 /activemq-data
 /FirstWrite
 /SecondWrite
+/muleEmbeddedDB
+dbname.h2.db

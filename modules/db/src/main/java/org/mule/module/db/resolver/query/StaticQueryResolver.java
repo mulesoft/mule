@@ -8,6 +8,7 @@
 package org.mule.module.db.resolver.query;
 
 import org.mule.api.MuleEvent;
+import org.mule.module.db.domain.connection.DbConnection;
 import org.mule.module.db.domain.query.Query;
 
 /**
@@ -24,7 +25,7 @@ public class StaticQueryResolver implements QueryResolver
     }
 
     @Override
-    public Query resolve(MuleEvent muleEvent) throws QueryResolutionException
+    public Query resolve(DbConnection connection, MuleEvent muleEvent) throws QueryResolutionException
     {
         return query;
     }

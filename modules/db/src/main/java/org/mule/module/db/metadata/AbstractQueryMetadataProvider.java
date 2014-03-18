@@ -269,7 +269,8 @@ public abstract class AbstractQueryMetadataProvider implements QueryMetadataProv
     @Override
     public Result<MetaData> getInputMetaData()
     {
-        Query query = queryResolver.resolve(null);
+        //TODO(pablo.kraan): I don't like this method call... maybe having a staticResolve() which fails if query is dynamic?
+        Query query = queryResolver.resolve(null, null);
 
         if (query.isDynamic())
         {
@@ -284,7 +285,7 @@ public abstract class AbstractQueryMetadataProvider implements QueryMetadataProv
     @Override
     public Result<MetaData> getOutputMetaData(MetaData metaData)
     {
-        Query query = queryResolver.resolve(null);
+        Query query = queryResolver.resolve(null, null);
 
         if (query.isDynamic())
         {

@@ -20,9 +20,7 @@ import org.mule.module.db.domain.connection.DbPoolingProfile;
 import org.mule.module.db.domain.connection.TransactionalDbConnectionFactory;
 import org.mule.module.db.domain.transaction.TransactionCoordinationDbTransactionManager;
 import org.mule.module.db.domain.type.DbTypeManager;
-import org.mule.module.db.domain.type.DbTypeResolver;
 import org.mule.module.db.domain.type.MetadataDbTypeManager;
-import org.mule.module.db.domain.type.MetadataTypeResolver;
 import org.mule.module.db.domain.xa.CompositeDataSourceDecorator;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
@@ -48,8 +46,8 @@ public class GenericDbConfig implements DbConfig, Initialisable
     private DataSource dataSource;
     private final String name;
     private final TransactionalDbConnectionFactory dbConnectionFactory;
-    private final DbTypeResolver dbTypeResolver;
-    private final DbTypeManager metadataDbTypeManager;
+    private final DbTypeManager dbTypeManager;
+
     private final CompositeDataSourceDecorator databaseDecorator = new CompositeDataSourceDecorator();
     private DbPoolingProfile poolingProfile;
     private boolean useXaTransactions;
@@ -60,30 +58,23 @@ public class GenericDbConfig implements DbConfig, Initialisable
     private String driverClassName;
     private MuleContext muleContext;
     private String url;
-
     public GenericDbConfig(DataSource dataSource, String name)
     {
         this.dataSource = dataSource;
         this.name = name;
+        this.dbTypeManager = doCreateTypeManager();
         this.dbConnectionFactory = doCreateConnectionFactory();
-        this.metadataDbTypeManager = doCreateTypeManager();
-        this.dbTypeResolver = doCreateTypeResolver();
     }
 
     private MetadataDbTypeManager doCreateTypeManager()
     {
-        return new MetadataDbTypeManager(dbConnectionFactory);
-    }
-
-    private DbTypeResolver doCreateTypeResolver()
-    {
-        return new MetadataTypeResolver(metadataDbTypeManager);
+        return new MetadataDbTypeManager();
     }
 
     protected TransactionalDbConnectionFactory doCreateConnectionFactory()
     {
         //TODO(pablo.kraan): would be better to inject this
-        return new TransactionalDbConnectionFactory(this, new TransactionCoordinationDbTransactionManager());
+        return new TransactionalDbConnectionFactory(this, new TransactionCoordinationDbTransactionManager(), dbTypeManager);
     }
 
     @Override
@@ -104,10 +95,9 @@ public class GenericDbConfig implements DbConfig, Initialisable
         return dbConnectionFactory;
     }
 
-    @Override
-    public DbTypeResolver getDbTypeResolver()
+    public DbTypeManager getDbTypeManager()
     {
-        return dbTypeResolver;
+        return dbTypeManager;
     }
 
     @Override

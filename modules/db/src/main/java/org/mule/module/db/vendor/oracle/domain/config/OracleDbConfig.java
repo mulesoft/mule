@@ -28,6 +28,6 @@ public class OracleDbConfig extends GenericDbConfig
     @Override
     protected TransactionalDbConnectionFactory doCreateConnectionFactory()
     {
-        return new OracleDbConnectionFactory(this, new TransactionCoordinationDbTransactionManager());
+        return new OracleDbConnectionFactory(this, new TransactionCoordinationDbTransactionManager(), getDbTypeManager());
     }
 }

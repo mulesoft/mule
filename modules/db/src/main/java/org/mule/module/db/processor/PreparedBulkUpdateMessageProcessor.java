@@ -21,8 +21,8 @@ import org.mule.module.db.domain.query.QueryParamValue;
 import org.mule.module.db.domain.query.QueryType;
 import org.mule.module.db.domain.transaction.TransactionalAction;
 import org.mule.module.db.resolver.database.DbConfigResolver;
-import org.mule.module.db.resolver.param.DynamicQueryParamResolver;
-import org.mule.module.db.resolver.param.QueryParamResolver;
+import org.mule.module.db.resolver.param.DynamicParamValueResolver;
+import org.mule.module.db.resolver.param.ParamValueResolver;
 import org.mule.module.db.resolver.query.QueryResolver;
 
 import java.sql.SQLException;
@@ -60,7 +60,7 @@ public class PreparedBulkUpdateMessageProcessor extends AbstractDbMessageProcess
     @Override
     protected Object executeQuery(DbConnection connection, MuleEvent muleEvent) throws SQLException
     {
-        Query query = queryResolver.resolve(muleEvent);
+        Query query = queryResolver.resolve(connection, muleEvent);
 
         validateQueryType(query.getQueryTemplate());
 
@@ -88,7 +88,7 @@ public class PreparedBulkUpdateMessageProcessor extends AbstractDbMessageProcess
             throw new IllegalArgumentException("Bulk mode operations require a collection as payload");
         }
 
-        QueryParamResolver queryParamResolver = new DynamicQueryParamResolver(muleContext.getExpressionManager());
+        ParamValueResolver paramValueResolver = new DynamicParamValueResolver(muleContext.getExpressionManager());
 
         List<List<QueryParamValue>> result = new LinkedList<List<QueryParamValue>>();
         Collection collection = (Collection) payload;
@@ -96,7 +96,7 @@ public class PreparedBulkUpdateMessageProcessor extends AbstractDbMessageProcess
         {
             MuleMessage itemMessage = new DefaultMuleMessage(aCollection, muleContext);
             MuleEvent itemEvent = new DefaultMuleEvent(itemMessage, muleEvent);
-            List<QueryParamValue> queryParamValues = queryParamResolver.resolveParams(itemEvent, query.getParamValues());
+            List<QueryParamValue> queryParamValues = paramValueResolver.resolveParams(itemEvent, query.getParamValues());
             result.add(queryParamValues);
         }
 

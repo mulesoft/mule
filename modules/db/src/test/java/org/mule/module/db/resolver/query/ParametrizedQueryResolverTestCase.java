@@ -13,9 +13,12 @@ import static org.hamcrest.core.IsSame.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import org.mule.module.db.domain.connection.DbConnection;
 import org.mule.module.db.domain.query.Query;
 import org.mule.module.db.domain.query.QueryParamValue;
-import org.mule.module.db.resolver.param.QueryParamResolver;
+import org.mule.module.db.domain.type.DbType;
+import org.mule.module.db.domain.type.UnknownDbType;
+import org.mule.module.db.resolver.param.ParamValueResolver;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Collections;
@@ -27,33 +30,53 @@ import org.junit.Test;
 public class ParametrizedQueryResolverTestCase extends AbstractQueryResolverTestCase
 {
 
+    private final Query resolvedTemplateQuery = createQuery(createQueryTemplate(STATIC_SQL_TEXT, new DbType[] {INTEGER_DB_TYPE}), new Object[] {"foo"});
+    private final Query unresolvedTemplateQuery = createQuery(createQueryTemplate(STATIC_SQL_TEXT, new DbType[] {UnknownDbType.getInstance()}), new Object[] {"foo"});
+
     @Test
     public void returnsOriginalQueryWhenEventIsNull() throws Exception
     {
-        Query query = createSelectQuery(STATIC_SQL_TEXT, null);
+        QueryResolver queryResolver = new ParametrizedQueryResolver(resolvedTemplateQuery, null);
 
-        QueryResolver queryResolver = new ParametrizedQueryResolver(query, null);
+        Query resolvedQuery = queryResolver.resolve(null, null);
 
-        Query resolvedQuery = queryResolver.resolve(null);
-
-        assertThat(query, sameInstance(resolvedQuery));
+        assertThat(resolvedTemplateQuery, sameInstance(resolvedQuery));
     }
 
     @Test
     public void resolvesQuery() throws Exception
     {
-        Query query = createSelectQuery(STATIC_SQL_TEXT, new Object[] {"foo"});
-
-        QueryParamResolver queryParamResolver = mock(QueryParamResolver.class);
-        QueryResolver queryResolver = new ParametrizedQueryResolver(query, queryParamResolver);
+        ParamValueResolver paramValueResolver = mock(ParamValueResolver.class);
+        QueryResolver queryResolver = new ParametrizedQueryResolver(resolvedTemplateQuery, paramValueResolver);
 
         List<QueryParamValue> resolvedParams = Collections.singletonList(new QueryParamValue("param1", "foo"));
-        when(queryParamResolver.resolveParams(muleEvent, query.getParamValues())).thenReturn(resolvedParams);
+        when(paramValueResolver.resolveParams(muleEvent, resolvedTemplateQuery.getParamValues())).thenReturn(resolvedParams);
 
-        Query resolvedQuery = queryResolver.resolve(muleEvent);
+        Query resolvedQuery = queryResolver.resolve(null, muleEvent);
 
-        assertThat(query, not(sameInstance(resolvedQuery)));
-        assertThat(query.getQueryTemplate(), sameInstance(resolvedQuery.getQueryTemplate()));
+        assertThat(resolvedTemplateQuery, not(sameInstance(resolvedQuery)));
+        assertThat(resolvedTemplateQuery.getQueryTemplate(), sameInstance(resolvedQuery.getQueryTemplate()));
+        assertThat(resolvedParams, sameInstance(resolvedQuery.getParamValues()));
+        assertThat((String) resolvedParams.get(0).getValue(), equalTo("foo"));
+    }
+
+    @Test
+    public void resolvesQueryWithUnresolvedTemplate() throws Exception
+    {
+        ParamValueResolver paramValueResolver = mock(ParamValueResolver.class);
+        List<QueryParamValue> resolvedParams = Collections.singletonList(new QueryParamValue("param1", "foo"));
+        when(paramValueResolver.resolveParams(muleEvent, unresolvedTemplateQuery.getParamValues())).thenReturn(resolvedParams);
+
+        QueryResolver queryResolver = new ParametrizedQueryResolver(unresolvedTemplateQuery, paramValueResolver);
+
+        DbConnection connection = mock(DbConnection.class);
+        when(connection.getParamTypes(unresolvedTemplateQuery.getQueryTemplate())).thenReturn(Collections.singletonMap(1, INTEGER_DB_TYPE));
+
+        Query resolvedQuery = queryResolver.resolve(connection, muleEvent);
+
+        assertThat(unresolvedTemplateQuery, not(sameInstance(resolvedQuery)));
+        assertThat(unresolvedTemplateQuery.getQueryTemplate().getSqlText(), equalTo(resolvedQuery.getQueryTemplate().getSqlText()));
+        assertThat(resolvedQuery.getQueryTemplate().getParams().get(0).getType(), equalTo(INTEGER_DB_TYPE));
         assertThat(resolvedParams, sameInstance(resolvedQuery.getParamValues()));
         assertThat((String) resolvedParams.get(0).getValue(), equalTo("foo"));
     }

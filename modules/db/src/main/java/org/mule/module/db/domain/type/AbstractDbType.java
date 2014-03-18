@@ -42,4 +42,10 @@ public abstract class AbstractDbType implements DbType
     {
         statement.registerOutParameter(index, id);
     }
+
+    @Override
+    public String toString()
+    {
+        return name;
+    }
 }

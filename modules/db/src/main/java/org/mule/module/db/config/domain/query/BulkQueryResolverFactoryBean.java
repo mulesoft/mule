@@ -10,10 +10,10 @@ package org.mule.module.db.config.domain.query;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.module.db.parser.SimpleQueryTemplateParser;
+import org.mule.module.db.resolver.param.ParamValueResolver;
 import org.mule.module.db.resolver.query.BulkQueryResolver;
 import org.mule.module.db.resolver.query.StaticBulkQueryResolver;
 import org.mule.module.db.resolver.query.DynamicBulkQueryResolver;
-import org.mule.module.db.resolver.param.QueryParamResolver;
 
 import org.springframework.beans.factory.FactoryBean;
 
@@ -44,7 +44,7 @@ public class BulkQueryResolverFactoryBean implements FactoryBean<BulkQueryResolv
     @Override
     public Class<?> getObjectType()
     {
-        return QueryParamResolver.class;
+        return ParamValueResolver.class;
     }
 
     @Override

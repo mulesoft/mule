@@ -8,6 +8,7 @@
 package org.mule.module.db.resolver.query;
 
 import org.mule.api.MuleEvent;
+import org.mule.module.db.domain.connection.DbConnection;
 import org.mule.module.db.domain.query.Query;
 
 /**
@@ -19,8 +20,10 @@ public interface QueryResolver
     /**
      * Resolves a query in the context of a given Mule event.
      *
+     *
+     * @param connection
      * @param muleEvent used to resolve any Mule expression
      * @return query resolved for the given event, original unresolved query if event is null.
      */
-    Query resolve(MuleEvent muleEvent) throws QueryResolutionException;
+    Query resolve(DbConnection connection, MuleEvent muleEvent) throws QueryResolutionException;
 }

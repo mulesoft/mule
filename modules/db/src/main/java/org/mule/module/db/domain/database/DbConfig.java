@@ -10,7 +10,6 @@ package org.mule.module.db.domain.database;
 import org.mule.common.Testable;
 import org.mule.common.metadata.ConnectorMetaDataEnabled;
 import org.mule.module.db.domain.connection.DbConnectionFactory;
-import org.mule.module.db.domain.type.DbTypeResolver;
 
 import javax.sql.DataSource;
 
@@ -34,9 +33,4 @@ public interface DbConfig extends Testable, ConnectorMetaDataEnabled
      * @return a non null {@link DbConnectionFactory} used to create connections for the database
      */
     DbConnectionFactory getConnectionFactory();
-
-    /**
-     * @return a non null{@link DbTypeResolver} used to resolve data types for the database
-     */
-    DbTypeResolver getDbTypeResolver();
 }

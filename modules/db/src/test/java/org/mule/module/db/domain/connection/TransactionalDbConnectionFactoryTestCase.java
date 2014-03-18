@@ -43,7 +43,7 @@ public class TransactionalDbConnectionFactoryTestCase extends AbstractMuleTestCa
         DbConfig dbConfig = mock(DbConfig.class);
         when(dbConfig.getDataSource()).thenReturn(datasource);
 
-        factory = new TransactionalDbConnectionFactory(dbConfig, dbTransactionManager);
+        factory = new TransactionalDbConnectionFactory(dbConfig, dbTransactionManager, null);
 
         DbConnection connection = factory.createConnection(TransactionalAction.JOIN_IF_POSSIBLE);
         assertEquals(expectedConnection, connection.getDelegate());
@@ -63,7 +63,7 @@ public class TransactionalDbConnectionFactoryTestCase extends AbstractMuleTestCa
         DbConfig dbConfig = mock(DbConfig.class);
         when(dbConfig.getDataSource()).thenReturn(datasource);
 
-        factory = new TransactionalDbConnectionFactory(dbConfig, dbTransactionManager);
+        factory = new TransactionalDbConnectionFactory(dbConfig, dbTransactionManager, null);
 
         DbConnection connection = factory.createConnection(TransactionalAction.JOIN_IF_POSSIBLE);
 
@@ -79,7 +79,7 @@ public class TransactionalDbConnectionFactoryTestCase extends AbstractMuleTestCa
         DbConfig dbConfig = mock(DbConfig.class);
         when(dbConfig.getDataSource()).thenReturn(datasource);
 
-        factory = new TransactionalDbConnectionFactory(dbConfig, dbTransactionManager);
+        factory = new TransactionalDbConnectionFactory(dbConfig, dbTransactionManager, null);
 
         DbConnection connection = factory.createConnection(TransactionalAction.NOT_SUPPORTED);
         assertEquals(expectedConnection, connection.getDelegate());
@@ -94,7 +94,7 @@ public class TransactionalDbConnectionFactoryTestCase extends AbstractMuleTestCa
         DbConfig dbConfig = mock(DbConfig.class);
         when(dbConfig.getDataSource()).thenReturn(datasource);
 
-        factory = new TransactionalDbConnectionFactory(dbConfig, dbTransactionManager);
+        factory = new TransactionalDbConnectionFactory(dbConfig, dbTransactionManager, null);
 
         factory.createConnection(TransactionalAction.ALWAYS_JOIN);
     }
@@ -118,7 +118,7 @@ public class TransactionalDbConnectionFactoryTestCase extends AbstractMuleTestCa
         DbConfig dbConfig = mock(DbConfig.class);
         when(dbConfig.getDataSource()).thenReturn(datasource);
 
-        factory = new TransactionalDbConnectionFactory(dbConfig, dbTransactionManager);
+        factory = new TransactionalDbConnectionFactory(dbConfig, dbTransactionManager, null);
         DbConnection connection = factory.createConnection(transactionalAction);
 
         assertEquals(expectedConnection, connection.getDelegate());
@@ -145,7 +145,7 @@ public class TransactionalDbConnectionFactoryTestCase extends AbstractMuleTestCa
         DbConfig dbConfig = mock(DbConfig.class);
         when(dbConfig.getDataSource()).thenReturn(datasource);
 
-        factory = new TransactionalDbConnectionFactory(dbConfig, dbTransactionManager);
+        factory = new TransactionalDbConnectionFactory(dbConfig, dbTransactionManager, null);
 
         DbConnection connection = factory.createConnection(TransactionalAction.JOIN_IF_POSSIBLE);
 
@@ -160,7 +160,7 @@ public class TransactionalDbConnectionFactoryTestCase extends AbstractMuleTestCa
         DbConnection connection = mock(DbConnection.class);
         when(connection.getTransactionalAction()).thenReturn(TransactionalAction.NOT_SUPPORTED);
 
-        factory = new TransactionalDbConnectionFactory(null, dbTransactionManager);
+        factory = new TransactionalDbConnectionFactory(null, dbTransactionManager, null);
 
         factory.releaseConnection(connection);
         verify(connection, times(1)).commit();
@@ -174,7 +174,7 @@ public class TransactionalDbConnectionFactoryTestCase extends AbstractMuleTestCa
         DbConnection connection = mock(DbConnection.class);
         when(connection.getTransactionalAction()).thenReturn(TransactionalAction.JOIN_IF_POSSIBLE);
 
-        factory = new TransactionalDbConnectionFactory(null, dbTransactionManager);
+        factory = new TransactionalDbConnectionFactory(null, dbTransactionManager, null);
 
         factory.releaseConnection(connection);
         verify(connection, times(1)).commit();
@@ -189,7 +189,7 @@ public class TransactionalDbConnectionFactoryTestCase extends AbstractMuleTestCa
         DbConnection connection = mock(DbConnection.class);
         when(connection.getTransactionalAction()).thenReturn(TransactionalAction.JOIN_IF_POSSIBLE);
 
-        factory = new TransactionalDbConnectionFactory(null, dbTransactionManager);
+        factory = new TransactionalDbConnectionFactory(null, dbTransactionManager, null);
         factory.releaseConnection(connection);
         verify(connection, times(0)).commit();
         verify(connection, times(0)).close();
@@ -203,7 +203,7 @@ public class TransactionalDbConnectionFactoryTestCase extends AbstractMuleTestCa
         DbConnection connection = mock(DbConnection.class);
         when(connection.getTransactionalAction()).thenReturn(TransactionalAction.ALWAYS_JOIN);
 
-        factory = new TransactionalDbConnectionFactory(null, dbTransactionManager);
+        factory = new TransactionalDbConnectionFactory(null, dbTransactionManager, null);
         factory.releaseConnection(connection);
         verify(connection, times(0)).commit();
         verify(connection, times(0)).close();

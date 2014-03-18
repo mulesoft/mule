@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Resolves the values of a template query for a given event
  */
-public interface QueryParamResolver
+public interface ParamValueResolver
 {
 
     /**

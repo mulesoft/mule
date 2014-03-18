@@ -26,14 +26,14 @@ import org.junit.Test;
 public class DynamicQueryResolverTestCase extends AbstractQueryResolverTestCase
 {
 
+    private final Query query = createQuery(createQueryTemplate(DYNAMIC_SQL_TEXT));
+
     @Test
     public void returnsOriginalQueryWhenEventIsNull() throws Exception
     {
-        Query query = createSelectQuery(STATIC_SQL_TEXT, null);
-
         DynamicQueryResolver queryResolver = new DynamicQueryResolver(query, null, null);
 
-        Query resolvedQuery = queryResolver.resolve(null);
+        Query resolvedQuery = queryResolver.resolve(null, null);
 
         assertThat(query, sameInstance(resolvedQuery));
     }
@@ -41,19 +41,17 @@ public class DynamicQueryResolverTestCase extends AbstractQueryResolverTestCase
     @Test
     public void resolvesDynamicQuery() throws Exception
     {
-        Query query = createSelectQuery(DYNAMIC_SQL_TEXT, null);
-
         ExpressionManager expressionManager = mock(ExpressionManager.class);
         String staticSqlText = STATIC_SQL_TEXT;
         when(expressionManager.parse(DYNAMIC_SQL_TEXT, muleEvent)).thenReturn(staticSqlText);
 
-        QueryTemplate expectedQueryTemplate = createSelectQueryTemplate(staticSqlText);
+        QueryTemplate expectedQueryTemplate = createQueryTemplate(staticSqlText);
         QueryTemplateParser queryTemplateParser = mock(QueryTemplateParser.class);
         when(queryTemplateParser.parse(staticSqlText)).thenReturn(expectedQueryTemplate);
 
         DynamicQueryResolver queryResolver = new DynamicQueryResolver(query, queryTemplateParser, expressionManager);
 
-        Query resolvedQuery = queryResolver.resolve(muleEvent);
+        Query resolvedQuery = queryResolver.resolve(null, muleEvent);
 
         assertThat(expectedQueryTemplate, sameInstance(resolvedQuery.getQueryTemplate()));
     }
@@ -61,8 +59,6 @@ public class DynamicQueryResolverTestCase extends AbstractQueryResolverTestCase
     @Test(expected = QueryResolutionException.class)
     public void throwsErrorOnParsingError() throws Exception
     {
-        Query query = createSelectQuery(DYNAMIC_SQL_TEXT, null);
-
         ExpressionManager expressionManager = mock(ExpressionManager.class);
         String staticSqlText = STATIC_SQL_TEXT;
         when(expressionManager.parse(DYNAMIC_SQL_TEXT, muleEvent)).thenReturn(staticSqlText);
@@ -72,19 +68,17 @@ public class DynamicQueryResolverTestCase extends AbstractQueryResolverTestCase
 
         DynamicQueryResolver queryResolver = new DynamicQueryResolver(query, queryTemplateParser, expressionManager);
 
-        queryResolver.resolve(muleEvent);
+        queryResolver.resolve(null, muleEvent);
     }
 
     @Test(expected = QueryResolutionException.class)
     public void throwsErrorOnExpressionEvaluationError() throws Exception
     {
-        Query query = createSelectQuery(DYNAMIC_SQL_TEXT, null);
-
         ExpressionManager expressionManager = mock(ExpressionManager.class);
         when(expressionManager.parse(DYNAMIC_SQL_TEXT, muleEvent)).thenThrow(new ExpressionRuntimeException(CoreMessages.createStaticMessage("Error")));
 
         DynamicQueryResolver queryResolver = new DynamicQueryResolver(query, null, expressionManager);
 
-        queryResolver.resolve(muleEvent);
+        queryResolver.resolve(null, muleEvent);
     }
 }

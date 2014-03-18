@@ -21,11 +21,11 @@ public class StaticQueryResolverTestCase extends AbstractQueryResolverTestCase
     @Test
     public void resolvesStaticQuery() throws Exception
     {
-        Query query = createSelectQuery(STATIC_SQL_TEXT, null);
+        Query query = createQuery(createQueryTemplate(STATIC_SQL_TEXT));
 
         StaticQueryResolver queryResolver = new StaticQueryResolver(query);
 
-        Query resolvedQuery = queryResolver.resolve(muleEvent);
+        Query resolvedQuery = queryResolver.resolve(null, muleEvent);
 
         assertThat(query, equalTo(resolvedQuery));
     }

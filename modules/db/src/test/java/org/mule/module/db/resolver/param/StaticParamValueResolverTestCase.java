@@ -17,10 +17,10 @@ import java.util.List;
 import org.junit.Test;
 
 @SmallTest
-public class StaticQueryParamResolverTestCase extends AbstractQueryParamResolverTestCase
+public class StaticParamValueResolverTestCase extends AbstractQueryParamResolverTestCase
 {
 
-    private final StaticQueryParamResolver paramResolver = new StaticQueryParamResolver();
+    private final StaticParamValueResolver paramResolver = new StaticParamValueResolver();
 
     @Test
     public void resolvesStaticParam() throws Exception

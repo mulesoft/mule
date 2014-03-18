@@ -9,45 +9,73 @@ package org.mule.module.db.resolver.query;
 
 import static org.mockito.Mockito.mock;
 import org.mule.api.MuleEvent;
+import org.mule.module.db.domain.param.DefaultInputQueryParam;
+import org.mule.module.db.domain.param.InputQueryParam;
 import org.mule.module.db.domain.param.QueryParam;
 import org.mule.module.db.domain.query.Query;
 import org.mule.module.db.domain.query.QueryParamValue;
 import org.mule.module.db.domain.query.QueryTemplate;
 import org.mule.module.db.domain.query.QueryType;
+import org.mule.module.db.domain.type.DbType;
+import org.mule.module.db.domain.type.ResolvedDbType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class AbstractQueryResolverTestCase extends AbstractMuleTestCase
 {
+
+    public static final DbType INTEGER_DB_TYPE = new ResolvedDbType(Types.INTEGER, "INTEGER");
 
     public static final String STATIC_SQL_TEXT = "select * from test";
     public static final String DYNAMIC_SQL_TEXT = "select * from #[table]";
 
     protected final MuleEvent muleEvent = mock(MuleEvent.class);
 
-    protected Query createSelectQuery(String staticSqlText, Object... params)
+    protected Query createQuery(QueryTemplate template, Object[] paramValues)
     {
-        QueryTemplate template = createSelectQueryTemplate(staticSqlText);
-        List<QueryParamValue> paramValues = new ArrayList<QueryParamValue>();
+        List<QueryParamValue> queryParamValues = new ArrayList<QueryParamValue>();
 
-        if (params != null)
+        if (paramValues != null)
         {
             int paramIndex = 1;
-            for (Object param : params)
+            for (Object param : paramValues)
             {
                 QueryParamValue paramValue = new QueryParamValue("param" + paramIndex++, param);
-                paramValues.add(paramValue);
+                queryParamValues.add(paramValue);
             }
         }
 
-        return new Query(template, paramValues);
+        return new Query(template, queryParamValues);
     }
 
-    protected QueryTemplate createSelectQueryTemplate(String staticSqlText)
+    protected Query createQuery(QueryTemplate template)
     {
-        return new QueryTemplate(staticSqlText, QueryType.SELECT, Collections.<QueryParam>emptyList());
+        return new Query(template);
     }
+
+    protected QueryTemplate createQueryTemplate(String staticSqlText)
+    {
+        return createQueryTemplate(staticSqlText, new DbType[0]);
+    }
+
+    protected QueryTemplate createQueryTemplate(String staticSqlText, DbType[] paramTypes)
+    {
+
+        List<QueryParam> queryParams = new ArrayList<QueryParam>(paramTypes.length);
+
+        int index = 1;
+        for (DbType paramType : paramTypes)
+        {
+
+            InputQueryParam inputQueryParam = new DefaultInputQueryParam(index, paramType, "param" + index);
+            queryParams.add(inputQueryParam);
+            index++;
+        }
+
+        return new QueryTemplate(staticSqlText, QueryType.SELECT, queryParams);
+    }
+
 }

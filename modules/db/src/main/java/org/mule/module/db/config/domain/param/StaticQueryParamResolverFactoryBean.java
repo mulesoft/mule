@@ -8,24 +8,24 @@
 
 package org.mule.module.db.config.domain.param;
 
-import org.mule.module.db.resolver.param.StaticQueryParamResolver;
-import org.mule.module.db.resolver.param.QueryParamResolver;
+import org.mule.module.db.resolver.param.ParamValueResolver;
+import org.mule.module.db.resolver.param.StaticParamValueResolver;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class StaticQueryParamResolverFactoryBean implements FactoryBean<QueryParamResolver>
+public class StaticQueryParamResolverFactoryBean implements FactoryBean<ParamValueResolver>
 {
 
     @Override
-    public QueryParamResolver getObject() throws Exception
+    public ParamValueResolver getObject() throws Exception
     {
-        return new StaticQueryParamResolver();
+        return new StaticParamValueResolver();
     }
 
     @Override
     public Class<?> getObjectType()
     {
-        return QueryParamResolver.class;
+        return ParamValueResolver.class;
     }
 
     @Override
