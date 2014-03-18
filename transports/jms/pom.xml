@@ -23,7 +23,6 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <forkMode>pertest</forkMode>
                     <includes>
                         <!--
                             This module has some classes which begin with 'Test' and that are
