@@ -96,6 +96,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
     protected synchronized void doStart() throws MuleException
     {
         started = true;
+        this.reconnectWorkManager.startIfNotStarted();
         if (!connected.get())
         {
             try
@@ -141,6 +142,8 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             return;
         }
         reconnecting = true;
+
+        reconnectWorkManager.startIfNotStarted();
         retryTemplate.execute(new RetryCallback()
         {
             @Override
@@ -232,7 +235,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         return !this.isTopic;
     }
 
-    private class SubReceiver implements MessageListener
+    protected class SubReceiver implements MessageListener
     {
         private final Log subLogger = LogFactory.getLog(getClass());
 
