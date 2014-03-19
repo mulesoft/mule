@@ -652,10 +652,20 @@ public class FtpConnector extends AbstractConnector
                 path = path.substring(1);
             }
 
-            if (!client.changeWorkingDirectory(path))
+            //Checking if it is a file or a directory
+            boolean isFile = this.isFile(endpoint, client);
+            if (!isFile && !client.changeWorkingDirectory(path))
             {
                 throw new IOException(MessageFormat.format("Failed to change working directory to {0}. Ftp error: {1}",
                                                            path, client.getReplyCode()));
+            }
+            else if (isFile)
+            {
+                // Changing the working directory to the parent folder, it should be better if
+                // the ftpClient API would provide a way to retrieve the parent folder
+                FTPFile[] listFiles = client.listFiles(path);
+                String directory = path.replaceAll(listFiles[0].getName(), "");
+                client.changeWorkingDirectory(directory);
             }
         }
         return client;
@@ -667,6 +677,14 @@ public class FtpConnector extends AbstractConnector
     protected boolean validateFile(FTPFile file)
     {
         return true;
+    }
+
+    protected boolean isFile(ImmutableEndpoint endpoint, FTPClient client) throws IOException 
+    {
+          //Checking if it is a file or a directory
+          String path = endpoint.getEndpointURI().getPath();
+          FTPFile[] listFiles = client.listFiles(path);
+          return listFiles.length == 1 && listFiles[0].isFile();
     }
 
     public boolean isStreaming()
