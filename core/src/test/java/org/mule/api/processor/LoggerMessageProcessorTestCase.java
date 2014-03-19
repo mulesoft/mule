@@ -15,196 +15,104 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.apache.commons.logging.Log;
-import org.junit.Test;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionManager;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
-public class LoggerMessageProcessorTestCase 
+import org.apache.commons.logging.Log;
+import org.junit.Test;
+import org.mockito.verification.VerificationMode;
+
+public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase 
 {
-
-    @Test
+    
+    @Test  
     public void logNullEvent()
     {
-        // Test with level enabled
-        LoggerMessageProcessor loggerMessageProcessor = buildLoggerMessageProcessorWithLevel("ERROR");
-        loggerMessageProcessor.log(null);
-        verify(loggerMessageProcessor.logger).error(null);
-        // Test with level disabled
-        loggerMessageProcessor.logger = buildMockLogger();
-        when(loggerMessageProcessor.logger.isErrorEnabled()).thenReturn(false);
-        loggerMessageProcessor.log(null);
-        verify(loggerMessageProcessor.logger, never()).error(null); 
-        
-        // Test with level enabled
-        loggerMessageProcessor.setLevel("WARN");
-        loggerMessageProcessor.log(null);
-        verify(loggerMessageProcessor.logger).warn(null);
-        // Test with level disabled
-        loggerMessageProcessor.logger = buildMockLogger();
-        when(loggerMessageProcessor.logger.isWarnEnabled()).thenReturn(false);
-        loggerMessageProcessor.log(null);
-        verify(loggerMessageProcessor.logger, never()).warn(null); 
-
-        // Test with level enabled
-        loggerMessageProcessor.setLevel("INFO");
-        loggerMessageProcessor.log(null);
-        verify(loggerMessageProcessor.logger).info(null);
-        // Test with level disabled
-        loggerMessageProcessor.logger = buildMockLogger();
-        when(loggerMessageProcessor.logger.isInfoEnabled()).thenReturn(false);
-        loggerMessageProcessor.log(null);
-        verify(loggerMessageProcessor.logger, never()).info(null); 
-
-        // Test with level enabled
-        loggerMessageProcessor.setLevel("DEBUG");
-        loggerMessageProcessor.log(null);
-        verify(loggerMessageProcessor.logger).debug(null);
-        // Test with level disabled
-        loggerMessageProcessor.logger = buildMockLogger();
-        when(loggerMessageProcessor.logger.isDebugEnabled()).thenReturn(false);
-        loggerMessageProcessor.log(null);
-        verify(loggerMessageProcessor.logger, never()).debug(null);
-        
-        // Test with level enabled
-        loggerMessageProcessor.setLevel("TRACE");
-        loggerMessageProcessor.log(null);
-        verify(loggerMessageProcessor.logger).trace(null);
-        // Test with level disabled
-        loggerMessageProcessor.logger = buildMockLogger();
-        when(loggerMessageProcessor.logger.isTraceEnabled()).thenReturn(false);
-        loggerMessageProcessor.log(null);
-        verify(loggerMessageProcessor.logger, never()).trace(null);
+        verifyNullEventByLevel("TRACE");
+        verifyNullEventByLevel("DEBUG");
+        verifyNullEventByLevel("INFO");
+        verifyNullEventByLevel("WARN");
+        verifyNullEventByLevel("ERROR");
     }
     
     @Test
-    public void logMuleMessage()
+    public void logMuleEvent()
     {
-        MuleEvent muleEvent = buildMuleEvent();
-
-        // Test with level enabled
-        LoggerMessageProcessor loggerMessageProcessor = buildLoggerMessageProcessorWithLevel("ERROR");
-        loggerMessageProcessor.log(muleEvent);
-        verify(loggerMessageProcessor.logger).error(muleEvent.getMessage());
-        // Test with level disabled
-        loggerMessageProcessor.logger = buildMockLogger();
-        when(loggerMessageProcessor.logger.isErrorEnabled()).thenReturn(false);
-        loggerMessageProcessor.log(muleEvent);
-        verify(loggerMessageProcessor.logger, never()).error(muleEvent.getMessage()); 
-        
-        // Test with level enabled
-        loggerMessageProcessor.setLevel("WARN");
-        loggerMessageProcessor.log(muleEvent);
-        verify(loggerMessageProcessor.logger).warn(muleEvent.getMessage());
-        // Test with level disabled
-        loggerMessageProcessor.logger = buildMockLogger();
-        when(loggerMessageProcessor.logger.isWarnEnabled()).thenReturn(false);
-        loggerMessageProcessor.log(muleEvent);
-        verify(loggerMessageProcessor.logger, never()).warn(muleEvent.getMessage()); 
-
-        // Test with level enabled
-        loggerMessageProcessor.setLevel("INFO");
-        loggerMessageProcessor.log(muleEvent);
-        verify(loggerMessageProcessor.logger).info(muleEvent.getMessage());
-        // Test with level disabled
-        loggerMessageProcessor.logger = buildMockLogger();
-        when(loggerMessageProcessor.logger.isInfoEnabled()).thenReturn(false);
-        loggerMessageProcessor.log(muleEvent);
-        verify(loggerMessageProcessor.logger, never()).info(muleEvent.getMessage()); 
-
-        // Test with level enabled
-        loggerMessageProcessor.setLevel("DEBUG");
-        loggerMessageProcessor.log(muleEvent);
-        verify(loggerMessageProcessor.logger).debug(muleEvent.getMessage());
-        // Test with level disabled
-        loggerMessageProcessor.logger = buildMockLogger();
-        when(loggerMessageProcessor.logger.isDebugEnabled()).thenReturn(false);
-        loggerMessageProcessor.log(muleEvent);
-        verify(loggerMessageProcessor.logger, never()).debug(muleEvent.getMessage());
-        
-        // Test with level enabled
-        loggerMessageProcessor.setLevel("TRACE");
-        loggerMessageProcessor.log(muleEvent);
-        verify(loggerMessageProcessor.logger).trace(muleEvent.getMessage());
-        // Test with level disabled
-        loggerMessageProcessor.logger = buildMockLogger();
-        when(loggerMessageProcessor.logger.isTraceEnabled()).thenReturn(false);
-        loggerMessageProcessor.log(muleEvent);
-        verify(loggerMessageProcessor.logger, never()).trace(muleEvent.getMessage());
+        verifyMuleEventByLevel("TRACE");
+        verifyMuleEventByLevel("DEBUG");
+        verifyMuleEventByLevel("INFO");
+        verifyMuleEventByLevel("WARN");
+        verifyMuleEventByLevel("ERROR");
     }
     
     @Test
-    public void logMessage()
+    public void logWithMessage()
+    {
+        verifyLoggerMessageByLevel("TRACE");
+        verifyLoggerMessageByLevel("DEBUG");
+        verifyLoggerMessageByLevel("INFO");
+        verifyLoggerMessageByLevel("WARN");
+        verifyLoggerMessageByLevel("ERROR");
+    }    
+    
+    // Verifies if the right call to the logger was made depending on the level enabled
+    private void verifyLogCall(LoggerMessageProcessor loggerMessageProcessor, String logLevel, String enabledLevel, MuleEvent muleEvent, Object objectToLog)
+    {
+        when(loggerMessageProcessor.logger.isTraceEnabled()).thenReturn("TRACE".equals(enabledLevel));
+        when(loggerMessageProcessor.logger.isDebugEnabled()).thenReturn("DEBUG".equals(enabledLevel));
+        when(loggerMessageProcessor.logger.isInfoEnabled()).thenReturn("INFO".equals(enabledLevel));
+        when(loggerMessageProcessor.logger.isWarnEnabled()).thenReturn("WARN".equals(enabledLevel));
+        when(loggerMessageProcessor.logger.isErrorEnabled()).thenReturn("ERROR".equals(enabledLevel));
+        loggerMessageProcessor.log(muleEvent);
+        verify(loggerMessageProcessor.logger, times("TRACE".equals(enabledLevel) ? 1 : 0)).trace(objectToLog);
+        verify(loggerMessageProcessor.logger, times("DEBUG".equals(enabledLevel) ? 1 : 0)).debug(objectToLog);
+        verify(loggerMessageProcessor.logger, times("INFO".equals(enabledLevel) ? 1 : 0)).info(objectToLog);
+        verify(loggerMessageProcessor.logger, times("WARN".equals(enabledLevel) ? 1 : 0)).warn(objectToLog);
+        verify(loggerMessageProcessor.logger, times("ERROR".equals(enabledLevel) ? 1 : 0)).error(objectToLog);
+    }
+    
+    // Verifies if the Mule expression is called or not depending on the logging level enabled
+    private void verifyExpressionEvaluation(LoggerMessageProcessor loggerMessageProcessor, String level, String enabledLevel, MuleEvent muleEvent, VerificationMode timesEvaluateExpression)
+    {
+        when(loggerMessageProcessor.logger.isTraceEnabled()).thenReturn("TRACE".equals(enabledLevel));
+        when(loggerMessageProcessor.logger.isDebugEnabled()).thenReturn("DEBUG".equals(enabledLevel));
+        when(loggerMessageProcessor.logger.isInfoEnabled()).thenReturn("INFO".equals(enabledLevel));
+        when(loggerMessageProcessor.logger.isWarnEnabled()).thenReturn("WARN".equals(enabledLevel));
+        when(loggerMessageProcessor.logger.isErrorEnabled()).thenReturn("ERROR".equals(enabledLevel));        
+        loggerMessageProcessor.expressionManager = buildExpressionManager();
+        loggerMessageProcessor.log(muleEvent);
+        verify(loggerMessageProcessor.expressionManager, timesEvaluateExpression).parse("some expression", muleEvent);
+    }
+    
+    // Orchestrates the verifications for a call with a null MuleEvent
+    private void verifyNullEventByLevel(String level)
+    {
+        LoggerMessageProcessor loggerMessageProcessor = buildLoggerMessageProcessorWithLevel(level);
+        verifyLogCall(loggerMessageProcessor, level, level, null, null); // Level is enabled
+        loggerMessageProcessor = buildLoggerMessageProcessorWithLevel(level);
+        verifyLogCall(loggerMessageProcessor, level, "not" + level, null, null); // Level is disabled by prepending it with "not"
+    }
+
+    // Orchestrates the verifications for a call with a MuleEvent
+    private void verifyMuleEventByLevel(String level)
+    {
+        LoggerMessageProcessor loggerMessageProcessor = buildLoggerMessageProcessorWithLevel(level);
+        MuleEvent muleEvent = buildMuleEvent();
+        verifyLogCall(loggerMessageProcessor, level, level, muleEvent, muleEvent.getMessage()); // Level is enabled
+        loggerMessageProcessor = buildLoggerMessageProcessorWithLevel(level);
+        verifyLogCall(loggerMessageProcessor, level, "not" + level, muleEvent, muleEvent.getMessage()); // Level is disabled by prepending it with "not"
+    }
+
+    // Orchestrates the verifications for a call with a 'message' set on the logger
+    private void verifyLoggerMessageByLevel(String level)
     {
         MuleEvent muleEvent = buildMuleEvent();
-        
-        // Test with level enabled
-        LoggerMessageProcessor loggerMessageProcessor = buildLoggerMessageProcessorWithLevel("ERROR");
-        loggerMessageProcessor.setMessage("some expression");
-        loggerMessageProcessor.expressionManager = buildExpressionManager();
-        loggerMessageProcessor.log(muleEvent);
-        verify(loggerMessageProcessor.logger, times(1)).error("text to log");
-        verify(loggerMessageProcessor.expressionManager, times(1)).parse("some expression", muleEvent);
-        // Test with level disabled
-        loggerMessageProcessor.logger = buildMockLogger();
-        when(loggerMessageProcessor.logger.isErrorEnabled()).thenReturn(false);
-        loggerMessageProcessor.expressionManager = buildExpressionManager();
-        loggerMessageProcessor.log(muleEvent);
-        verify(loggerMessageProcessor.logger, never()).error("text to log");
-        verify(loggerMessageProcessor.expressionManager, never()).parse("some expression", muleEvent);
-
-        // Test with level enabled
-        loggerMessageProcessor.setLevel("WARN");
-        loggerMessageProcessor.expressionManager = buildExpressionManager();
-        loggerMessageProcessor.log(muleEvent);
-        verify(loggerMessageProcessor.logger, times(1)).warn("text to log");
-        verify(loggerMessageProcessor.expressionManager, times(1)).parse("some expression", muleEvent);
-        // Test with level disabled
-        loggerMessageProcessor.logger = buildMockLogger();
-        when(loggerMessageProcessor.logger.isWarnEnabled()).thenReturn(false);
-        loggerMessageProcessor.expressionManager = buildExpressionManager();
-        loggerMessageProcessor.log(muleEvent);
-        verify(loggerMessageProcessor.logger, never()).warn("text to log");
-        verify(loggerMessageProcessor.expressionManager, never()).parse("some expression", muleEvent);
-        
-        // Test with level enabled
-        loggerMessageProcessor.setLevel("INFO");
-        loggerMessageProcessor.expressionManager = buildExpressionManager();
-        loggerMessageProcessor.log(muleEvent);
-        verify(loggerMessageProcessor.logger, times(1)).info("text to log");
-        verify(loggerMessageProcessor.expressionManager, times(1)).parse("some expression", muleEvent);
-        // Test with level disabled
-        loggerMessageProcessor.logger = buildMockLogger();
-        when(loggerMessageProcessor.logger.isInfoEnabled()).thenReturn(false);
-        loggerMessageProcessor.expressionManager = buildExpressionManager();
-        loggerMessageProcessor.log(muleEvent);
-        verify(loggerMessageProcessor.logger, never()).info("text to log");
-        verify(loggerMessageProcessor.expressionManager, never()).parse("some expression", muleEvent);
-
-        loggerMessageProcessor.setLevel("DEBUG");
-        loggerMessageProcessor.expressionManager = buildExpressionManager();
-        loggerMessageProcessor.log(muleEvent);
-        verify(loggerMessageProcessor.logger, times(1)).debug("text to log");
-        verify(loggerMessageProcessor.expressionManager, times(1)).parse("some expression", muleEvent);
-        loggerMessageProcessor.logger = buildMockLogger();
-        when(loggerMessageProcessor.logger.isDebugEnabled()).thenReturn(false);
-        loggerMessageProcessor.expressionManager = buildExpressionManager();
-        loggerMessageProcessor.log(muleEvent);
-        verify(loggerMessageProcessor.logger, never()).debug("text to log");
-        verify(loggerMessageProcessor.expressionManager, never()).parse("some expression", muleEvent);
-
-        loggerMessageProcessor.setLevel("TRACE");
-        loggerMessageProcessor.expressionManager = buildExpressionManager();
-        loggerMessageProcessor.log(muleEvent);
-        verify(loggerMessageProcessor.logger, times(1)).trace("text to log");
-        verify(loggerMessageProcessor.expressionManager, times(1)).parse("some expression", muleEvent);
-        loggerMessageProcessor.logger = buildMockLogger();
-        when(loggerMessageProcessor.logger.isTraceEnabled()).thenReturn(false);
-        loggerMessageProcessor.expressionManager = buildExpressionManager();
-        loggerMessageProcessor.log(muleEvent);
-        verify(loggerMessageProcessor.logger, never()).trace("text to log");
-        verify(loggerMessageProcessor.expressionManager, never()).parse("some expression", muleEvent);
+        verifyLogCall(buildLoggerMessageProcessorForExpressionEvaluation(level), level, level, muleEvent, "text to log"); // Level is enabled
+        verifyLogCall(buildLoggerMessageProcessorForExpressionEvaluation(level), level, "not" + level, muleEvent,"text to log"); // Level is disabled by prepending it with "not"
+        verifyExpressionEvaluation(buildLoggerMessageProcessorForExpressionEvaluation(level), level, level, muleEvent, times(1)); // Expression should be evaluated when the level is enabled
+        verifyExpressionEvaluation(buildLoggerMessageProcessorForExpressionEvaluation(level), level, "not"+ level, muleEvent, never()); // Expression should not be evaluated when the level is enabled
     }
     
     private Log buildMockLogger()
@@ -233,6 +141,15 @@ public class LoggerMessageProcessorTestCase
         loggerMessageProcessor.setLevel(level);
         return loggerMessageProcessor;
     }
+    
+    private LoggerMessageProcessor buildLoggerMessageProcessorForExpressionEvaluation(String level)
+    {
+        LoggerMessageProcessor loggerMessageProcessor = buildLoggerMessageProcessorWithLevel(level);
+        loggerMessageProcessor = buildLoggerMessageProcessorWithLevel(level);
+        loggerMessageProcessor.expressionManager = buildExpressionManager();
+        loggerMessageProcessor.setMessage("some expression");        
+        return loggerMessageProcessor; 
+    }    
     
     private MuleEvent buildMuleEvent()
     {
