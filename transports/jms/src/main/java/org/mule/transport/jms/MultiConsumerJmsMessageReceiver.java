@@ -6,6 +6,7 @@
  */
 package org.mule.transport.jms;
 
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
@@ -13,6 +14,8 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.retry.RetryCallback;
+import org.mule.api.retry.RetryContext;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.Connector;
@@ -21,6 +24,7 @@ import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.AbstractReceiverWorker;
 import org.mule.transport.ConnectException;
 import org.mule.transport.jms.filters.JmsSelectorFilter;
+import org.mule.transport.jms.reconnect.ReconnectWorkManager;
 import org.mule.transport.jms.redelivery.RedeliveryHandler;
 import org.mule.util.ClassUtils;
 
@@ -54,6 +58,10 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
     final boolean isTopic;
 
+    private final ReconnectWorkManager reconnectWorkManager;
+    private boolean reconnecting = false;
+    private boolean started = false;
+
     public MultiConsumerJmsMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
             throws CreateException
     {
@@ -81,17 +89,27 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         }
 
         consumers = new CopyOnWriteArrayList();
+        reconnectWorkManager = new ReconnectWorkManager(getEndpoint().getMuleContext());
     }
-        
-    @Override
-    protected void doStart() throws MuleException
+
+    protected synchronized void doStart() throws MuleException
     {
-        logger.debug("doStart()");
-        SubReceiver sub;
-        for (Iterator<SubReceiver> it = consumers.iterator(); it.hasNext();)
+        started = true;
+        this.reconnectWorkManager.startIfNotStarted();
+        if (!connected.get())
         {
-            sub = it.next();
-            sub.doStart();
+            try
+            {
+                connect();
+            }
+            catch (Exception e)
+            {
+                throw new DefaultMuleException(e);
+            }
+        }
+        else
+        {
+            startSubReceivers();
         }
     }
 
@@ -112,23 +130,62 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         }
     }
 
-    @Override
-    protected void doConnect() throws Exception
+    protected synchronized void doConnect() throws Exception
     {
         logger.debug("doConnect()");
+        if (reconnecting)
+        {
+            return;
+        }
+        reconnecting = true;
 
-        if (!consumers.isEmpty())
+        reconnectWorkManager.startIfNotStarted();
+        retryTemplate.execute(new RetryCallback()
         {
-            throw new IllegalStateException("List should be empty, there may be a concurrency issue here (see EE-1275)");
-        }
-        
-        SubReceiver sub;
-        for (int i = 0; i < receiversCount; i++)
-        {
-            sub = new SubReceiver();
-            sub.doConnect();
-            consumers.add(sub);
-        }
+            @Override
+            public void doWork(RetryContext context) throws Exception
+            {
+                try
+                {
+                    logger.debug("doConnect()");
+                    if (!consumers.isEmpty())
+                    {
+                        if (consumers.get(0).connected)
+                        {
+                            context.setOk();
+                            reconnecting = false;
+                            return;
+                        }
+                        throw new IllegalStateException("List should be empty, there may be a concurrency issue here (see EE-1275)");
+                    }
+
+                    SubReceiver sub;
+                    for (int i = 0; i < receiversCount; i++)
+                    {
+                        sub = new SubReceiver();
+                        sub.doConnect();
+                        consumers.add(sub);
+                    }
+                    if (started)
+                    {
+                        startSubReceivers();
+                    }
+                    context.setOk();
+                    logger.info("Endpoint " + endpoint.getEndpointURI() + " has been successfully reconnected.");
+                    reconnecting = false;
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("Fail to connect", e);
+                }
+            }
+
+            @Override
+            public String getWorkDescription()
+            {
+                return getConnectionDescription();
+            }
+        }, reconnectWorkManager);
     }
 
     @Override
@@ -158,13 +215,23 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         logger.debug("doDispose()");
     }
 
+    protected void startSubReceivers() throws MuleException
+    {
+        SubReceiver sub;
+        for (Iterator<SubReceiver> it = consumers.iterator(); it.hasNext(); )
+        {
+            sub = it.next();
+            sub.doStart();
+        }
+    }
+
     @Override
     public boolean shouldConsumeInEveryNode()
     {
         return !this.isTopic;
     }
 
-    private class SubReceiver implements MessageListener
+    protected class SubReceiver implements MessageListener
     {
         private final Log subLogger = LogFactory.getLog(getClass());
 
