@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <flow name="executeDdlCustomTarget">
+        <inbound-endpoint address="vm://executeDdlCustomTarget" exchange-pattern="request-response"/>
+
+        <db:execute-ddl config-ref="dbConfig" target="#[header:OUTBOUND:updateCount]">
+            <db:dynamic-query>CREATE TABLE TestDdl(NAME VARCHAR(255))</db:dynamic-query>
+        </db:execute-ddl>
+    </flow>
+</mule>

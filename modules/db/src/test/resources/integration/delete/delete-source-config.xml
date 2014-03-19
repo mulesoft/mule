@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <flow name="delete">
+        <inbound-endpoint address="vm://delete" exchange-pattern="request-response"/>
+
+        <db:delete config-ref="dbConfig">
+            <db:parameterized-query>DELETE FROM PLANET WHERE name = #[payload]</db:parameterized-query>
+        </db:delete>
+    </flow>
+
+    <flow name="deleteCustomSource">
+        <inbound-endpoint address="vm://deleteCustomSource" exchange-pattern="request-response"/>
+
+        <set-variable variableName="name" value="Venus"/>
+
+        <db:delete config-ref="dbConfig" source="#[name]">
+            <db:parameterized-query>DELETE FROM PLANET WHERE name = #[payload]</db:parameterized-query>
+        </db:delete>
+    </flow>
+</mule>

@@ -25,6 +25,7 @@
         <module>boot</module>
         <module>bpm</module>
         <module>cxf</module>
+        <module>db</module>
         <module>devkit-support</module>
         <module>drools</module>
         <module>launcher</module>

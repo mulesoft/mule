@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <flow name="selectDynamicQuery">
+        <inbound-endpoint address="vm://selectDynamicQuery" exchange-pattern="request-response"/>
+
+        <set-variable variableName="tableName" value="PLANET"/>
+
+        <db:select config-ref="dbConfig">
+            <db:dynamic-query>select * from #[tableName] order by ID</db:dynamic-query>
+        </db:select>
+    </flow>
+</mule>
