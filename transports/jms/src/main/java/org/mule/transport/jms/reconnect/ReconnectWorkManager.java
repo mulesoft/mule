@@ -11,6 +11,10 @@ import org.mule.api.MuleException;
 import org.mule.api.context.WorkManager;
 import org.mule.util.concurrent.ThreadNameHelper;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+
 import javax.resource.spi.work.ExecutionContext;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
@@ -24,16 +28,13 @@ import javax.resource.spi.work.WorkListener;
 public class ReconnectWorkManager implements WorkManager
 {
 
-    private final WorkDelegate workDelegate;
-    private Thread reconnectThread;
+    private ExecutorService executor;
     private boolean isStarted = false;
     private MuleContext muleContext;
 
     public ReconnectWorkManager(MuleContext muleContext)
     {
         this.muleContext = muleContext;
-        this.workDelegate = new WorkDelegate();
-        this.reconnectThread = new Thread(workDelegate, String.format("%s.endpoint.reconnection", ThreadNameHelper.getPrefix(muleContext)));
     }
 
     @Override
@@ -50,8 +51,8 @@ public class ReconnectWorkManager implements WorkManager
 
     public void stop()
     {
-        reconnectThread.interrupt();
         isStarted = false;
+        executor.shutdownNow();
     }
 
     @Override
@@ -60,9 +61,25 @@ public class ReconnectWorkManager implements WorkManager
         throw new UnsupportedOperationException();
     }
 
+    public synchronized void startIfNotStarted() throws MuleException
+    {
+        if (!this.isStarted)
+        {
+            this.start();
+        }
+    }
+
     @Override
     public void start() throws MuleException
     {
+        executor = Executors.newSingleThreadExecutor(new ThreadFactory()
+        {
+            @Override
+            public Thread newThread(Runnable runnable)
+            {
+                return new Thread(runnable, String.format("%s.endpoint.reconnection", ThreadNameHelper.getPrefix(muleContext)));
+            }
+        });
         isStarted = true;
     }
 
@@ -93,8 +110,7 @@ public class ReconnectWorkManager implements WorkManager
     @Override
     public void scheduleWork(Work work) throws WorkException
     {
-        this.workDelegate.setWork(work);
-        this.reconnectThread.start();
+        this.executor.execute(work);
     }
 
     @Override
@@ -103,6 +119,7 @@ public class ReconnectWorkManager implements WorkManager
         throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public static class WorkDelegate implements Work
     {
         private Work work;
