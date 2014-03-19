@@ -9,7 +9,7 @@ package org.mule.module.db.processor;
 
 import org.mule.api.MuleEvent;
 import org.mule.module.db.domain.connection.DbConnection;
-import org.mule.module.db.domain.executor.BulkQueryExecutor;
+import org.mule.module.db.domain.executor.BulkExecutor;
 import org.mule.module.db.domain.executor.BulkQueryExecutorFactory;
 import org.mule.module.db.domain.query.BulkQuery;
 import org.mule.module.db.domain.query.QueryTemplate;
@@ -30,14 +30,14 @@ import java.util.List;
  * Both database and bulk query are resolved, if required, using the {@link org.mule.api.MuleEvent}
  * being processed.
  */
-public class BulkUpdateMessageProcessor extends AbstractDbMessageProcessor
+public class BulkExecuteMessageProcessor extends AbstractDbMessageProcessor
 {
 
     private final BulkQueryResolver bulkQueryResolver;
     private final BulkQueryExecutorFactory bulkUpdateExecutorFactory;
     private final List<QueryType> validQueryTypes;
 
-    public BulkUpdateMessageProcessor(DbConfigResolver dbConfigResolver, BulkQueryResolver bulkQueryResolver, BulkQueryExecutorFactory bulkUpdateExecutorFactory, TransactionalAction transactionalAction)
+    public BulkExecuteMessageProcessor(DbConfigResolver dbConfigResolver, BulkQueryResolver bulkQueryResolver, BulkQueryExecutorFactory bulkUpdateExecutorFactory, TransactionalAction transactionalAction)
     {
         super(dbConfigResolver, transactionalAction);
         this.bulkQueryResolver = bulkQueryResolver;
@@ -68,8 +68,8 @@ public class BulkUpdateMessageProcessor extends AbstractDbMessageProcessor
 
         validateQueryTemplates(bulkQuery.getQueryTemplates());
 
-        BulkQueryExecutor bulkUpdateExecutor = bulkUpdateExecutorFactory.create();
-        return bulkUpdateExecutor.executeBulkQuery(connection, bulkQuery);
+        BulkExecutor bulkUpdateExecutor = bulkUpdateExecutorFactory.create();
+        return bulkUpdateExecutor.execute(connection, bulkQuery);
     }
 
     @Override

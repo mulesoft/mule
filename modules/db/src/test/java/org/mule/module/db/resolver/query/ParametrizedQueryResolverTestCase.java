@@ -34,16 +34,6 @@ public class ParametrizedQueryResolverTestCase extends AbstractQueryResolverTest
     private final Query unresolvedTemplateQuery = createQuery(createQueryTemplate(STATIC_SQL_TEXT, new DbType[] {UnknownDbType.getInstance()}), new Object[] {"foo"});
 
     @Test
-    public void returnsOriginalQueryWhenEventIsNull() throws Exception
-    {
-        QueryResolver queryResolver = new ParametrizedQueryResolver(resolvedTemplateQuery, null);
-
-        Query resolvedQuery = queryResolver.resolve(null, null);
-
-        assertThat(resolvedTemplateQuery, sameInstance(resolvedQuery));
-    }
-
-    @Test
     public void resolvesQuery() throws Exception
     {
         ParamValueResolver paramValueResolver = mock(ParamValueResolver.class);

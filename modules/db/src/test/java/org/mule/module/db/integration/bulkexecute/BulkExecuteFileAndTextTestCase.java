@@ -5,19 +5,19 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.bulkupdate;
+package org.mule.module.db.integration.bulkexecute;
 
 import org.mule.module.db.integration.config.AbstractConfigurationErrorTestCase;
 
 import org.junit.Test;
 
-public class BulkUpdateFileAndTextTestCase extends AbstractConfigurationErrorTestCase
+public class BulkExecuteFileAndTextTestCase extends AbstractConfigurationErrorTestCase
 {
 
     @Override
     protected String getConfigFile()
     {
-        return "integration/bulkupdate/bulk-update-file-and-text-config.xml";
+        return "integration/bulkexecute/bulk-execute-file-and-text-config.xml";
     }
 
     @Test

@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.bulkupdate;
+package org.mule.module.db.integration.bulkexecute;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
@@ -17,10 +17,10 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class BulkUpdateFileTestCase extends AbstractBulkUpdateTestCase
+public class BulkExecuteDefaultTestCase extends AbstractBulkExecuteTestCase
 {
 
-    public BulkUpdateFileTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
+    public BulkExecuteDefaultTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
     {
         super(dataSourceConfigResource, testDatabase);
     }
@@ -34,15 +34,27 @@ public class BulkUpdateFileTestCase extends AbstractBulkUpdateTestCase
     @Override
     protected String[] getFlowConfigurationResources()
     {
-        return new String[] {"integration/bulkupdate/bulk-update-file-config.xml"};
+        return new String[] {"integration/bulkexecute/bulk-execute-default-config.xml"};
     }
 
     @Test
-    public void readQueriesFromFile() throws Exception
+    public void updatesDataRequestResponse() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://bulkUpdateFile", TEST_MESSAGE, null);
+        MuleMessage response = client.send("vm://testRequestResponse", TEST_MESSAGE, null);
 
         assertBulkModeResult(response.getPayload());
     }
+
+    @Test
+    public void testOneWay() throws Exception
+    {
+        LocalMuleClient client = muleContext.getClient();
+
+        client.dispatch("vm://testOneWay", TEST_MESSAGE, null);
+        MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+
+        assertBulkModeResult(response.getPayload());
+    }
+
 }

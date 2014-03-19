@@ -5,15 +5,15 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.bulkupdate;
+package org.mule.module.db.integration.bulkexecute;
 
 import org.mule.module.db.integration.config.AbstractMultipleDatabaseConfigErrorTestCase;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 
-public class BulkUpdateMultipleDatabaseConfigTestCase extends AbstractMultipleDatabaseConfigErrorTestCase
+public class BulkExecuteMultipleDatabaseConfigTestCase extends AbstractMultipleDatabaseConfigErrorTestCase
 {
 
-    public BulkUpdateMultipleDatabaseConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
+    public BulkExecuteMultipleDatabaseConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
     {
         super(dataSourceConfigResource, testDatabase);
     }
@@ -21,6 +21,6 @@ public class BulkUpdateMultipleDatabaseConfigTestCase extends AbstractMultipleDa
     @Override
     protected String[] getFlowConfigurationResources()
     {
-        return new String[] {"integration/bulkupdate/bulk-update-multiple-database-config.xml"};
+        return new String[] {"integration/bulkexecute/bulk-execute-multiple-database-config.xml"};
     }
 }

@@ -28,8 +28,8 @@ import org.mule.module.db.config.domain.param.InOutParamDefinitionDefinitionPars
 import org.mule.module.db.config.domain.param.InputParamValueBeanDefinitionParser;
 import org.mule.module.db.config.domain.param.OutputParamDefinitionDefinitionParser;
 import org.mule.module.db.config.domain.query.QueryTemplateBeanDefinitionParser;
+import org.mule.module.db.config.processor.BulkExecuteProcessorBeanDefinitionParser;
 import org.mule.module.db.config.processor.ExecuteDdlProcessorBeanDefinitionParser;
-import org.mule.module.db.config.processor.BulkUpdateProcessorBeanDefinitionParser;
 import org.mule.module.db.config.processor.DeleteProcessorBeanDefinitionParser;
 import org.mule.module.db.config.processor.InsertProcessorBeanDefinitionParser;
 import org.mule.module.db.config.processor.SelectProcessorDefinitionParser;
@@ -50,9 +50,9 @@ public class DbNamespaceHandler extends NamespaceHandlerSupport
         registerBeanDefinitionParser("execute-ddl", new ExecuteDdlProcessorBeanDefinitionParser());
         registerBeanDefinitionParser("stored-procedure", new StoredProcedureProcessorBeanDefinitionParser());
 
-        BulkUpdateProcessorBeanDefinitionParser bulkUpdateProcessorBeanDefinitionParser = new BulkUpdateProcessorBeanDefinitionParser();
-        bulkUpdateProcessorBeanDefinitionParser.registerPreProcessor(new CheckExclusiveAttributeAndText("file"));
-        registerBeanDefinitionParser("bulk-update", bulkUpdateProcessorBeanDefinitionParser);
+        BulkExecuteProcessorBeanDefinitionParser bulkExecuteProcessorBeanDefinitionParser = new BulkExecuteProcessorBeanDefinitionParser();
+        bulkExecuteProcessorBeanDefinitionParser.registerPreProcessor(new CheckExclusiveAttributeAndText("file"));
+        registerBeanDefinitionParser("bulk-execute", bulkExecuteProcessorBeanDefinitionParser);
 
         registerBeanDefinitionParser("in-param", new InputParamValueBeanDefinitionParser());
         registerBeanDefinitionParser("out-param", new OutputParamDefinitionDefinitionParser());

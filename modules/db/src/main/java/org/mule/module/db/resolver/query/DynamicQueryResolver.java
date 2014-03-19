@@ -37,11 +37,6 @@ public class DynamicQueryResolver implements QueryResolver
     @Override
     public Query resolve(DbConnection connection, MuleEvent muleEvent)
     {
-        if (muleEvent == null)
-        {
-            return query;
-        }
-
         try
         {
             QueryTemplate queryTemplate = query.getQueryTemplate();

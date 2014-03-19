@@ -52,11 +52,6 @@ public class ParametrizedQueryResolver implements QueryResolver
     @Override
     public Query resolve(DbConnection connection, MuleEvent muleEvent)
     {
-        if (muleEvent == null)
-        {
-            return query;
-        }
-
         List<QueryParamValue> resolvedParams = paramValueResolver.resolveParams(muleEvent, query.getParamValues());
 
         QueryTemplate queryTemplate = query.getQueryTemplate();

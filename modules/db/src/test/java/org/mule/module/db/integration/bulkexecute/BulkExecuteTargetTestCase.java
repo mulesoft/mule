@@ -5,8 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.bulkupdate;
+package org.mule.module.db.integration.bulkexecute;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
@@ -17,10 +19,10 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class BulkUpdateDefaultTestCase extends AbstractBulkUpdateTestCase
+public class BulkExecuteTargetTestCase extends AbstractBulkExecuteTestCase
 {
 
-    public BulkUpdateDefaultTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
+    public BulkExecuteTargetTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
     {
         super(dataSourceConfigResource, testDatabase);
     }
@@ -34,27 +36,18 @@ public class BulkUpdateDefaultTestCase extends AbstractBulkUpdateTestCase
     @Override
     protected String[] getFlowConfigurationResources()
     {
-        return new String[] {"integration/bulkupdate/bulk-update-default-config.xml"};
+        return new String[] {"integration/bulkexecute/bulk-execute-target-config.xml"};
     }
 
     @Test
-    public void updatesDataRequestResponse() throws Exception
+    public void usesCustomTarget() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://testRequestResponse", TEST_MESSAGE, null);
+        MuleMessage response = client.send("vm://bulkUpdateCustomTarget", TEST_MESSAGE, null);
 
-        assertBulkModeResult(response.getPayload());
-    }
+        assertThat(response.getPayloadAsString(), equalTo(TEST_MESSAGE));
 
-    @Test
-    public void testOneWay() throws Exception
-    {
-        LocalMuleClient client = muleContext.getClient();
-
-        client.dispatch("vm://testOneWay", TEST_MESSAGE, null);
-        MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
-
-        assertBulkModeResult(response.getPayload());
+        assertBulkModeResult(response.getInboundProperty("updateCounts"));
     }
 
 }

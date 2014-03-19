@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * Executes bulk queries
  */
-public class BulkUpdateExecutor extends AbstractExecutor implements BulkQueryExecutor
+public class BulkUpdateExecutor extends AbstractExecutor implements BulkExecutor
 {
 
     public BulkUpdateExecutor(StatementFactory statementFactory)
@@ -33,7 +33,7 @@ public class BulkUpdateExecutor extends AbstractExecutor implements BulkQueryExe
     }
 
     @Override
-    public Object executeBulkQuery(DbConnection connection, BulkQuery bulkQuery) throws SQLException
+    public Object execute(DbConnection connection, BulkQuery bulkQuery) throws SQLException
     {
         //TODO(pablo.kraan): makes sense to return auto generated keys on a bulkMode operation?
 
@@ -63,7 +63,7 @@ public class BulkUpdateExecutor extends AbstractExecutor implements BulkQueryExe
     }
 
     @Override
-    public Object executePreparedBulkQuery(DbConnection connection, Query query, List<List<QueryParamValue>> paramValues) throws SQLException
+    public Object execute(DbConnection connection, Query query, List<List<QueryParamValue>> paramValues) throws SQLException
     {
         Statement statement = statementFactory.create(connection, query.getQueryTemplate());
 

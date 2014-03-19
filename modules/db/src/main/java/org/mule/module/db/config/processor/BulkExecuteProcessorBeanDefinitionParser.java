@@ -9,9 +9,9 @@ package org.mule.module.db.config.processor;
 
 import org.mule.module.db.config.domain.query.BulkQueryResolverFactoryBean;
 import org.mule.module.db.domain.executor.BulkUpdateExecutorFactory;
-import org.mule.module.db.metadata.BulkUpdateMetadataProvider;
+import org.mule.module.db.metadata.BulkExecuteMetadataProvider;
 import org.mule.module.db.parser.SimpleQueryTemplateParser;
-import org.mule.module.db.processor.BulkUpdateMessageProcessor;
+import org.mule.module.db.processor.BulkExecuteMessageProcessor;
 import org.mule.module.db.util.DefaultFileReader;
 import org.mule.module.db.resolver.query.FileBulkQueryResolver;
 import org.mule.util.StringUtils;
@@ -20,19 +20,19 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class BulkUpdateProcessorBeanDefinitionParser extends AbstractAdvancedDbProcessorDefinitionParser
+public class BulkExecuteProcessorBeanDefinitionParser extends AbstractAdvancedDbProcessorDefinitionParser
 {
 
     @Override
     protected Class<?> getBeanClass(Element element)
     {
-        return BulkUpdateMessageProcessor.class;
+        return BulkExecuteMessageProcessor.class;
     }
 
     @Override
     protected Object getMetadataProvider()
     {
-        BeanDefinitionBuilder metadataProviderBuilder = BeanDefinitionBuilder.genericBeanDefinition(BulkUpdateMetadataProvider.class);
+        BeanDefinitionBuilder metadataProviderBuilder = BeanDefinitionBuilder.genericBeanDefinition(BulkExecuteMetadataProvider.class);
 
         return metadataProviderBuilder.getBeanDefinition();
     }

@@ -5,10 +5,8 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.bulkupdate;
+package org.mule.module.db.integration.bulkexecute;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
@@ -19,10 +17,10 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class BulkUpdateTargetTestCase extends AbstractBulkUpdateTestCase
+public class BulkExecuteSourceTestCase extends AbstractBulkExecuteTestCase
 {
 
-    public BulkUpdateTargetTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
+    public BulkExecuteSourceTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
     {
         super(dataSourceConfigResource, testDatabase);
     }
@@ -36,18 +34,16 @@ public class BulkUpdateTargetTestCase extends AbstractBulkUpdateTestCase
     @Override
     protected String[] getFlowConfigurationResources()
     {
-        return new String[] {"integration/bulkupdate/bulk-update-target-config.xml"};
+        return new String[] {"integration/bulkexecute/bulk-execute-source-config.xml"};
     }
 
     @Test
-    public void usesCustomTarget() throws Exception
+    public void usesCustomSource() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://bulkUpdateCustomTarget", TEST_MESSAGE, null);
 
-        assertThat(response.getPayloadAsString(), equalTo(TEST_MESSAGE));
+        MuleMessage response = client.send("vm://bulkUpdateCustomSource", TEST_MESSAGE, null);
 
-        assertBulkModeResult(response.getInboundProperty("updateCounts"));
+        assertBulkModeResult(response.getPayload());
     }
-
 }

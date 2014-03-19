@@ -5,31 +5,28 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.bulkupdate;
+package org.mule.module.db.integration.bulkexecute;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.common.Result;
-import org.mule.common.metadata.DefaultListMetaDataModel;
 import org.mule.common.metadata.MetaData;
-import org.mule.common.metadata.SimpleMetaDataModel;
-import org.mule.common.metadata.datatype.DataType;
 import org.mule.construct.Flow;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
-import org.mule.module.db.processor.BulkUpdateMessageProcessor;
+import org.mule.module.db.processor.BulkExecuteMessageProcessor;
 
 import java.util.List;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class BulkUpdateOutputMetadataTestCase extends AbstractDbIntegrationTestCase
+public class BulkExecuteInputMetadataTestCase extends AbstractDbIntegrationTestCase
 {
 
-    public BulkUpdateOutputMetadataTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
+    public BulkExecuteInputMetadataTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
     {
         super(dataSourceConfigResource, testDatabase);
     }
@@ -43,20 +40,18 @@ public class BulkUpdateOutputMetadataTestCase extends AbstractDbIntegrationTestC
     @Override
     protected String[] getFlowConfigurationResources()
     {
-        return new String[] {"integration/bulkupdate/bulk-update-metadata-config.xml"};
+        return new String[] {"integration/bulkexecute/bulk-execute-metadata-config.xml"};
     }
 
     @Test
-    public void returnsUpdateCountsMetadata() throws Exception
+    public void returnsNullBulkUpdateInputMetadata() throws Exception
     {
         Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct("bulkUpdateMetadata");
 
         List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
-        BulkUpdateMessageProcessor bulkUpdateMessageProcessor = (BulkUpdateMessageProcessor) messageProcessors.get(0);
-        Result<MetaData> outputMetaData = bulkUpdateMessageProcessor.getOutputMetaData(null);
+        BulkExecuteMessageProcessor queryMessageProcessor = (BulkExecuteMessageProcessor) messageProcessors.get(0);
+        Result<MetaData> inputMetaData = queryMessageProcessor.getInputMetaData();
 
-        DefaultListMetaDataModel listMetaDataModel = (DefaultListMetaDataModel) outputMetaData.get().getPayload();
-        SimpleMetaDataModel elementModel = (SimpleMetaDataModel) listMetaDataModel.getElementModel();
-        assertThat(elementModel.getDataType(), equalTo(DataType.DOUBLE));
+        assertThat(inputMetaData, equalTo(null));
     }
 }

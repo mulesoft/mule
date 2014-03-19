@@ -8,14 +8,14 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <spring:bean id="customStatementFactory"
-                 class="org.mule.module.db.integration.bulkupdate.BulkUpdateCustomStatementFactoryTestCase$TestStatementFactory"/>
+                 class="org.mule.module.db.integration.bulkexecute.BulkExecuteCustomStatementFactoryTestCase$TestStatementFactory"/>
 
     <flow name="bulkUpdateRequestResponse">
         <inbound-endpoint address="vm://testRequestResponse" exchange-pattern="request-response"/>
 
-        <db:bulk-update config-ref="dbConfig" statementFactory-ref="customStatementFactory">
+        <db:bulk-execute config-ref="dbConfig" statementFactory-ref="customStatementFactory">
             update PLANET set NAME='Mercury' where POSITION=0;
             update PLANET set NAME='Mercury' where POSITION=4
-         </db:bulk-update>
+         </db:bulk-execute>
     </flow>
 </mule>

@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.bulkupdate;
+package org.mule.module.db.integration.bulkexecute;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -20,10 +20,10 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractBulkUpdateTestCase extends AbstractDbIntegrationTestCase
+public abstract class AbstractBulkExecuteTestCase extends AbstractDbIntegrationTestCase
 {
 
-    public AbstractBulkUpdateTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
+    public AbstractBulkExecuteTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
     {
         super(dataSourceConfigResource, testDatabase);
     }

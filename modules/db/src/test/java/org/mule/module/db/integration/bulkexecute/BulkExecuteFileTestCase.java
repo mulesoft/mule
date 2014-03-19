@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.bulkupdate;
+package org.mule.module.db.integration.bulkexecute;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
@@ -17,10 +17,10 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class BulkUpdateSourceTestCase extends AbstractBulkUpdateTestCase
+public class BulkExecuteFileTestCase extends AbstractBulkExecuteTestCase
 {
 
-    public BulkUpdateSourceTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
+    public BulkExecuteFileTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
     {
         super(dataSourceConfigResource, testDatabase);
     }
@@ -34,15 +34,14 @@ public class BulkUpdateSourceTestCase extends AbstractBulkUpdateTestCase
     @Override
     protected String[] getFlowConfigurationResources()
     {
-        return new String[] {"integration/bulkupdate/bulk-update-source-config.xml"};
+        return new String[] {"integration/bulkexecute/bulk-execute-file-config.xml"};
     }
 
     @Test
-    public void usesCustomSource() throws Exception
+    public void readQueriesFromFile() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
-
-        MuleMessage response = client.send("vm://bulkUpdateCustomSource", TEST_MESSAGE, null);
+        MuleMessage response = client.send("vm://bulkUpdateFile", TEST_MESSAGE, null);
 
         assertBulkModeResult(response.getPayload());
     }

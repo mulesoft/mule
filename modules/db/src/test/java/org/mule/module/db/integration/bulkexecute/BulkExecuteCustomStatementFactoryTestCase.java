@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.bulkupdate;
+package org.mule.module.db.integration.bulkexecute;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -25,12 +25,12 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class BulkUpdateCustomStatementFactoryTestCase extends AbstractBulkUpdateTestCase
+public class BulkExecuteCustomStatementFactoryTestCase extends AbstractBulkExecuteTestCase
 {
 
     private static boolean factoryInvoked;
 
-    public BulkUpdateCustomStatementFactoryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
+    public BulkExecuteCustomStatementFactoryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
     {
         super(dataSourceConfigResource, testDatabase);
     }
@@ -44,7 +44,7 @@ public class BulkUpdateCustomStatementFactoryTestCase extends AbstractBulkUpdate
     @Override
     protected String[] getFlowConfigurationResources()
     {
-        return new String[] {"integration/bulkupdate/bulk-update-custom-statement-factory-config.xml"};
+        return new String[] {"integration/bulkexecute/bulk-execute-custom-statement-factory-config.xml"};
     }
 
     @Test

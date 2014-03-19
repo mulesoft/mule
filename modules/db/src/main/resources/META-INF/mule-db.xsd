@@ -195,7 +195,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="bulk-update" type="bulkUpdateMessageProcessorType" substitutionGroup="mule:abstract-mixed-content-message-processor">
+    <xsd:element name="bulk-execute" type="bulkUpdateMessageProcessorType" substitutionGroup="mule:abstract-mixed-content-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 Updates data from a database

@@ -5,12 +5,12 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
-    <flow name="bulkUpdateMetadata">
-        <inbound-endpoint address="vm://bulkUpdateMetadata"/>
+    <flow name="bulkUpdateCustomTarget">
+        <inbound-endpoint address="vm://bulkUpdateCustomTarget" exchange-pattern="request-response"/>
 
-        <db:bulk-update config-ref="dbConfig">
+        <db:bulk-execute config-ref="dbConfig" target="#[header:OUTBOUND:updateCounts]">
             update PLANET set NAME='Mercury' where POSITION=0;
             update PLANET set NAME='Mercury' where POSITION=4
-        </db:bulk-update>
+        </db:bulk-execute>
     </flow>
 </mule>

@@ -20,7 +20,7 @@ import org.mule.common.metadata.datatype.DataType;
 /**
  * Provides metadata for bulk queries
  */
-public class BulkUpdateMetadataProvider implements QueryMetadataProvider
+public class BulkExecuteMetadataProvider implements QueryMetadataProvider
 {
 
     @Override

@@ -8,7 +8,7 @@
 package org.mule.module.db.domain.executor;
 
 /**
- * Creates {@link BulkQueryExecutor} instances
+ * Creates {@link BulkExecutor} instances
  */
 public interface BulkQueryExecutorFactory
 {
@@ -16,5 +16,5 @@ public interface BulkQueryExecutorFactory
     /**
      * @return a non null bulk query executor
      */
-    BulkQueryExecutor create();
+    BulkExecutor create();
 }

@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Executes bulk queries against a database
  */
-public interface BulkQueryExecutor
+public interface BulkExecutor
 {
 
     /**
@@ -29,10 +29,10 @@ public interface BulkQueryExecutor
      * @return a non null result of the query execution
      * @throws SQLException if a database access error occurs or this method is called on a closed connection
      */
-    Object executeBulkQuery(DbConnection connection, BulkQuery bulkQuery) throws SQLException;
+    Object execute(DbConnection connection, BulkQuery bulkQuery) throws SQLException;
 
     /**
-     * Executes a single parameterized using a bulk of parameter sets
+     * Executes a parameterized query using a bulk of parameter sets
      *
      * @param connection connection to the database where the query will be executed. Non null
      * @param query parameterized query to executed using the sets of parameters
@@ -40,5 +40,5 @@ public interface BulkQueryExecutor
      * @return a non null result of the query execution
      * @throws SQLException if a database access error occurs or this method is called on a closed connection
      */
-    Object executePreparedBulkQuery(DbConnection connection, Query query, List<List<QueryParamValue>> paramValues) throws SQLException;
+    Object execute(DbConnection connection, Query query, List<List<QueryParamValue>> paramValues) throws SQLException;
 }

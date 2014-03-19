@@ -29,16 +29,6 @@ public class DynamicQueryResolverTestCase extends AbstractQueryResolverTestCase
     private final Query query = createQuery(createQueryTemplate(DYNAMIC_SQL_TEXT));
 
     @Test
-    public void returnsOriginalQueryWhenEventIsNull() throws Exception
-    {
-        DynamicQueryResolver queryResolver = new DynamicQueryResolver(query, null, null);
-
-        Query resolvedQuery = queryResolver.resolve(null, null);
-
-        assertThat(query, sameInstance(resolvedQuery));
-    }
-
-    @Test
     public void resolvesDynamicQuery() throws Exception
     {
         ExpressionManager expressionManager = mock(ExpressionManager.class);

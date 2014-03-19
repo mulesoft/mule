@@ -8,10 +8,10 @@
     <flow name="bulkUpdateOneWay">
         <inbound-endpoint address="vm://testOneWay"/>
 
-        <db:bulk-update config-ref="dbConfig">
+        <db:bulk-execute config-ref="dbConfig">
             update PLANET set NAME='Mercury' where POSITION=0;
             update PLANET set NAME='Mercury' where POSITION=4
-        </db:bulk-update>
+        </db:bulk-execute>
 
         <outbound-endpoint address="vm://testOut"/>
     </flow>
@@ -19,9 +19,9 @@
     <flow name="bulkUpdateRequestResponse">
         <inbound-endpoint address="vm://testRequestResponse" exchange-pattern="request-response"/>
 
-        <db:bulk-update config-ref="dbConfig">
+        <db:bulk-execute config-ref="dbConfig">
             update PLANET set NAME='Mercury' where POSITION=0;
             update PLANET set NAME='Mercury' where POSITION=4
-        </db:bulk-update>
+        </db:bulk-execute>
     </flow>
 </mule>
