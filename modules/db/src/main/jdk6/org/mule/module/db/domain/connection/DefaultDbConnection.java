@@ -8,7 +8,6 @@
 package org.mule.module.db.domain.connection;
 
 import org.mule.module.db.domain.transaction.TransactionalAction;
-import org.mule.module.db.domain.type.DbTypeManager;
 import org.mule.module.db.resolver.param.ParamTypeResolverFactory;
 
 import java.sql.Array;
