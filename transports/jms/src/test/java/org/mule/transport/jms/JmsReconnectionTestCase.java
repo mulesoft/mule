@@ -7,8 +7,10 @@
 package org.mule.transport.jms;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -28,6 +30,8 @@ public class JmsReconnectionTestCase extends FunctionalTestCase
 {
 
     private static final int CONSUMER_COUNT = 4;
+    private static final int TIMEOUT_MILLIS = 5000;
+    private static final String PAYLOAD = "HELLO";
 
     @Rule
     public DynamicPort port = new DynamicPort("port");
@@ -53,7 +57,7 @@ public class JmsReconnectionTestCase extends FunctionalTestCase
     @Override
     protected void doTearDownAfterMuleContextDispose() throws Exception
     {
-        stopBroker();
+        this.stopBroker();
     }
 
     private void startBroker() throws Exception
@@ -80,40 +84,18 @@ public class JmsReconnectionTestCase extends FunctionalTestCase
     @Test
     public void reconnectAllConsumers() throws Exception
     {
-        this.runFlow("put", "start the consumers");
+        this.assertMessageRouted();
+
         final JmsConnector connector = muleContext.getRegistry().lookupObject("activemqconnector");
 
-        PollingProber prober = new PollingProber(5000, 500);
-        prober.check(new Probe()
-        {
-            @Override
-            public boolean isSatisfied()
-            {
-                Collection<MessageReceiver> receivers = connector.getReceivers().values();
-                if (receivers != null && receivers.size() == 1)
-                {
-                    try
-                    {
-                        receiver = (MultiConsumerJmsMessageReceiver) receivers.iterator().next();
-                        assertConsumersCount();
-                    }
-                    catch (AssertionError e)
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
-
-            @Override
-            public String describeFailure()
-            {
-                return "receivers never started";
-            }
-        });
+        Collection<MessageReceiver> receivers = connector.getReceivers().values();
+        assertTrue(receivers != null && receivers.size() == 1);
+        this.receiver = (MultiConsumerJmsMessageReceiver) receivers.iterator().next();
+        assertConsumersCount();
 
         this.stopBroker();
 
+        PollingProber prober = new PollingProber(TIMEOUT_MILLIS, 500);
         prober.check(new Probe()
         {
             @Override
@@ -129,29 +111,7 @@ public class JmsReconnectionTestCase extends FunctionalTestCase
             }
         });
 
-        prober.check(new Probe()
-        {
-            @Override
-            public boolean isSatisfied()
-            {
-                try
-                {
-                    startBroker();
-                    return true;
-                }
-                catch (Exception e)
-                {
-                    return false;
-                }
-            }
-
-            @Override
-            public String describeFailure()
-            {
-                return "could not restart broker";
-            }
-        });
-
+        this.startBroker();
 
         prober.check(new Probe()
         {
@@ -175,6 +135,8 @@ public class JmsReconnectionTestCase extends FunctionalTestCase
                 return "receivers never came back";
             }
         });
+
+        this.assertMessageRouted();
     }
 
     private void assertConsumersCount()
@@ -187,5 +149,11 @@ public class JmsReconnectionTestCase extends FunctionalTestCase
         }
     }
 
-
+    private void assertMessageRouted() throws Exception
+    {
+        this.runFlow("put", PAYLOAD);
+        MuleMessage message = muleContext.getClient().request("vm://out", TIMEOUT_MILLIS);
+        assertNotNull(message);
+        assertEquals(PAYLOAD, message.getPayload());
+    }
 }
