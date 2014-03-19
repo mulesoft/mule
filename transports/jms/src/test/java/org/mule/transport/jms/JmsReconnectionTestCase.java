@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -42,20 +43,21 @@ public class JmsReconnectionTestCase extends FunctionalTestCase
     private Connection connection;
 
     @Override
-    protected String getConfigFile()
+    protected String getConfigResources()
     {
         return "jms-reconnection-config.xml";
     }
 
     @Override
-    protected void doSetUpBeforeMuleContextCreation() throws Exception
+    protected MuleContext createMuleContext() throws Exception
     {
         this.url = "tcp://localhost:" + this.port.getValue();
         this.startBroker();
+        return super.createMuleContext();
     }
 
     @Override
-    protected void doTearDownAfterMuleContextDispose() throws Exception
+    protected void doTearDown() throws Exception
     {
         this.stopBroker();
     }
