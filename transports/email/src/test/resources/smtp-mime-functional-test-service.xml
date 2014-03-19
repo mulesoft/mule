@@ -17,7 +17,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="smtp://localhost:${port1}" exchange-pattern="one-way" disableTransportTransformer="true" />
+                    <smtp:outbound-endpoint address="smtp://localhost:${port1}" to="bob@example.com" />
                 </pass-through-router>
             </outbound>
         </service>

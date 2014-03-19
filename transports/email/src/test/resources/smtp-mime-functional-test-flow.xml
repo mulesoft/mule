@@ -9,11 +9,10 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/smtp http://www.mulesoft.org/schema/mule/smtp/current/mule-smtp.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
-
+    
     <flow name="relay">
         <vm:inbound-endpoint path="send" exchange-pattern="one-way"/>
-        <outbound-endpoint address="smtp://localhost:${port1}" exchange-pattern="one-way"
-                           disableTransportTransformer="true"/>
+        <smtp:outbound-endpoint address="smtp://localhost:${port1}" to="bob@example.com" />
     </flow>
     
 </mule>
