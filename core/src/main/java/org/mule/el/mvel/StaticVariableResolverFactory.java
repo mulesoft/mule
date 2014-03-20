@@ -28,7 +28,6 @@ class StaticVariableResolverFactory extends MVELExpressionLanguageContext
     private static final String REGEX = "regex";
     private static final String DATE_TIME = "dateTime";
 
-    private MuleContext muleContext;
     private FunctionInstance regexFunction;
     private FunctionInstance dateTimeFunction;
 
