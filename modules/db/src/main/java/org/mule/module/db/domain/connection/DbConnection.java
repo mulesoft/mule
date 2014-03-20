@@ -25,13 +25,6 @@ public interface DbConnection extends Connection
 {
 
     /**
-     * Provides access to the JDBC wrapped connection
-     *
-     * @return the wrapped JDBC connection
-     */
-    Connection getDelegate();
-
-    /**
      * Returns the {@link StatementResultIteratorFactory} used to create
      * the {@link StatementResultIterator} for this connection.
      *

@@ -44,12 +44,6 @@ public abstract class AbstractDbConnection implements DbConnection
     }
 
     @Override
-    public Connection getDelegate()
-    {
-        return delegate;
-    }
-
-    @Override
     public StatementResultIteratorFactory getStatementResultIteratorFactory(ResultSetHandler resultSetHandler)
     {
         return new GenericStatementResultIteratorFactory(resultSetHandler);

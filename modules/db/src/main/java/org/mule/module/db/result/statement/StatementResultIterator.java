@@ -77,7 +77,10 @@ public class StatementResultIterator implements Iterator<StatementResult>, Close
             }
             catch (MuleException e)
             {
-                // Ignore: already managed on close method
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Error closing statement result iterator", e);
+                }
             }
         }
 

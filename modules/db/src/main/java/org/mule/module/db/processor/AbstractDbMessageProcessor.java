@@ -10,6 +10,7 @@ package org.mule.module.db.processor;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.DefaultMuleException;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -78,7 +79,7 @@ public abstract class AbstractDbMessageProcessor extends AbstractInterceptingMes
         }
         catch (SQLException e)
         {
-            throw new DefaultMuleException(e);
+            throw new MessagingException(muleEvent, e);
         }
         finally
         {
