@@ -6,6 +6,8 @@
  */
 package org.mule.transport.jms.xa;
 
+import org.mule.util.xa.XaResourceFactoryHolder;
+
 import java.lang.reflect.Proxy;
 
 import javax.jms.Connection;
@@ -26,7 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class ConnectionFactoryWrapper
-        implements ConnectionFactory, QueueConnectionFactory, TopicConnectionFactory
+        implements ConnectionFactory, QueueConnectionFactory, TopicConnectionFactory, XaResourceFactoryHolder
 {
     /**
      * logger used by this class
@@ -103,4 +105,9 @@ public class ConnectionFactoryWrapper
         return proxy;
     }
 
+    @Override
+    public Object getHoldObject()
+    {
+        return factory;
+    }
 }
