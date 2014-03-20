@@ -22,7 +22,6 @@ public class OracleTestDatabase extends AbstractTestDatabase
 
         executeDdl(connection, "CREATE SEQUENCE PLANET_SEQ INCREMENT BY 1 START WITH 1");
 
-        //TODO(pablo.kraan): this sentence can't be executed using the select runner on a prepared statement.
         executeDdl(connection,
                    "CREATE TRIGGER PLANET_TRIGGER\n" +
                    "BEFORE INSERT ON PLANET\n" +

@@ -18,8 +18,6 @@ import java.util.List;
 public class TestDbConfig
 {
 
-    //TODO(pablo.kraan): add system properties to enable/disable each DB vendor tests
-    //TODO(pablo.kraan): add system properties to configure each vendor DB instance
     private static boolean USE_DERBY = true;
     private static boolean USE_MYSQL = false;
     private static boolean USE_ORACLE = false;

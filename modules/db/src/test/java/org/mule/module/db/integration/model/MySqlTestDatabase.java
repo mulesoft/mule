@@ -94,7 +94,6 @@ public class MySqlTestDatabase extends AbstractTestDatabase
     @Override
     public void createStoredProcedureGetSplitRecords(DataSource dataSource) throws SQLException
     {
-        //TODO(pablo.kraan): PROBLEM: need to drop the SP when it already exists, but using thisstatement when there is no SP fails :O
         executeDdl(dataSource, "DROP PROCEDURE IF EXISTS getSplitTestRecords;\n");
         createStoredProcedure(dataSource, SQL_CREATE_SP_GET_SPLIT_RECORDS);
 

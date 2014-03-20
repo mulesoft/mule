@@ -35,8 +35,6 @@ public class BulkUpdateExecutor extends AbstractExecutor implements BulkExecutor
     @Override
     public Object execute(DbConnection connection, BulkQuery bulkQuery) throws SQLException
     {
-        //TODO(pablo.kraan): makes sense to return auto generated keys on a bulkMode operation?
-
         Statement statement = statementFactory.create(connection, bulkQuery.getQueryTemplates().get(0));
 
         try
