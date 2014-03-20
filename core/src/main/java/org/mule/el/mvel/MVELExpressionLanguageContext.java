@@ -95,7 +95,7 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
                     break;
                 }
             }
-            if (nextFactory != null)
+            if (variableResolver == null && nextFactory != null)
             {
                 variableResolver = nextFactory.getVariableResolver(name);
             }

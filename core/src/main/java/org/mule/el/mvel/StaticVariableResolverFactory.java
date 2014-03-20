@@ -16,9 +16,8 @@ import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.ast.FunctionInstance;
 import org.mule.mvel2.integration.VariableResolver;
-import org.mule.mvel2.integration.impl.ImmutableDefaultFactory;
 
-class StaticVariableResolverFactory extends ImmutableDefaultFactory
+class StaticVariableResolverFactory extends MVELExpressionLanguageContext
 {
 
     private static final long serialVersionUID = -1448079302094120410L;
@@ -35,12 +34,11 @@ class StaticVariableResolverFactory extends ImmutableDefaultFactory
 
     public StaticVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext)
     {
-        this.muleContext = muleContext;
+        super(parserConfiguration, muleContext);
         regexFunction = new FunctionInstance(new MVELFunctionAdaptor(REGEX,
             new RegexExpressionLanguageFuntion(), new ParserContext(parserConfiguration)));
         dateTimeFunction = new FunctionInstance(new MVELFunctionAdaptor(DATE_TIME,
             new DateTimeExpressionLanguageFuntion(), new ParserContext(parserConfiguration)));
-
     }
 
     @Override
@@ -74,7 +72,7 @@ class StaticVariableResolverFactory extends ImmutableDefaultFactory
         }
         else
         {
-            return null;
+            return super.getVariableResolver(name);
         }
     }
 
@@ -84,12 +82,6 @@ class StaticVariableResolverFactory extends ImmutableDefaultFactory
         return SERVER.equals(name) || MULE.equals(name) || APP.equals(name) || REGEX.equals(name)
                || DATE_TIME.equals(name)
                || MVELExpressionLanguageContext.MULE_CONTEXT_INTERNAL_VARIABLE.equals(name);
-    }
-
-    @Override
-    public boolean isResolveable(String name)
-    {
-        return isTarget(name);
     }
 
 }
