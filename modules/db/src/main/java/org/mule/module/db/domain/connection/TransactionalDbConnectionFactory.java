@@ -99,10 +99,6 @@ public class TransactionalDbConnectionFactory implements DbConnectionFactory
         }
         catch (Exception e)
         {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Error creating connection from dataSource", e);
-            }
             throw new ConnectionCreationException(e);
         }
     }
@@ -129,11 +125,6 @@ public class TransactionalDbConnectionFactory implements DbConnectionFactory
             }
             catch (TransactionException e)
             {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Error creating connection from transaction", e);
-                }
-
                 if (con != null && !con.isClosed())
                 {
                     con.close();
@@ -191,11 +182,6 @@ public class TransactionalDbConnectionFactory implements DbConnectionFactory
             }
             catch (SQLException e)
             {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Error on commit releasing connection", e);
-                }
-
                 throw new ConnectionCommitException(e);
             }
 
@@ -205,10 +191,6 @@ public class TransactionalDbConnectionFactory implements DbConnectionFactory
             }
             catch (SQLException e)
             {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Error on close releasing connection", e);
-                }
                 throw new ConnectionClosingException(e);
             }
         }
