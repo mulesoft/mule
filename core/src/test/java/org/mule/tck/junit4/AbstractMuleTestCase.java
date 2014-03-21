@@ -424,7 +424,7 @@ public abstract class AbstractMuleTestCase
 
     private static void logThreadsResult(String result)
     {
-        LOGGER.info(String.format("\n%s\n%s\n%s\n", THREAD_RESULT_LINE, result, THREAD_RESULT_LINE));
+        LOGGER.warn(String.format("\n%s\n%s\n%s\n", THREAD_RESULT_LINE, result, THREAD_RESULT_LINE));
     }
 
 }
