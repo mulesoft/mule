@@ -28,7 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class ConnectionFactoryWrapper
-        implements ConnectionFactory, QueueConnectionFactory, TopicConnectionFactory, XaResourceFactoryHolder
+        implements ConnectionFactory, QueueConnectionFactory, TopicConnectionFactory
 {
     /**
      * logger used by this class
@@ -53,7 +53,7 @@ public class ConnectionFactoryWrapper
     {
         XAConnection xac = ((XAConnectionFactory) factory).createXAConnection();
         Connection proxy = (Connection) Proxy.newProxyInstance(Connection.class.getClassLoader(),
-                                                               new Class[]{Connection.class},
+                                                               new Class[]{Connection.class, XaResourceFactoryHolder.class},
                                                                new ConnectionInvocationHandler(xac, sameRMOverrideValue));
         return proxy;
     }
@@ -62,7 +62,7 @@ public class ConnectionFactoryWrapper
     {
         XAConnection xac = ((XAConnectionFactory) factory).createXAConnection(username, password);
         Connection proxy = (Connection) Proxy.newProxyInstance(Connection.class.getClassLoader(),
-                                                               new Class[]{Connection.class},
+                                                               new Class[]{Connection.class, XaResourceFactoryHolder.class},
                                                                new ConnectionInvocationHandler(xac, sameRMOverrideValue));
         return proxy;
     }
@@ -71,7 +71,7 @@ public class ConnectionFactoryWrapper
     {
         XAQueueConnection xaqc = ((XAQueueConnectionFactory) factory).createXAQueueConnection();
         QueueConnection proxy = (QueueConnection) Proxy.newProxyInstance(Connection.class.getClassLoader(),
-                                                                         new Class[]{QueueConnection.class},
+                                                                         new Class[]{QueueConnection.class, XaResourceFactoryHolder.class},
                                                                          new ConnectionInvocationHandler(xaqc, sameRMOverrideValue));
         return proxy;
     }
@@ -81,7 +81,7 @@ public class ConnectionFactoryWrapper
         XAQueueConnection xaqc = ((XAQueueConnectionFactory) factory).createXAQueueConnection(username,
                                                                                               password);
         QueueConnection proxy = (QueueConnection) Proxy.newProxyInstance(Connection.class.getClassLoader(),
-                                                                         new Class[]{QueueConnection.class},
+                                                                         new Class[]{QueueConnection.class, XaResourceFactoryHolder.class},
                                                                          new ConnectionInvocationHandler(xaqc, sameRMOverrideValue));
         return proxy;
     }
@@ -90,7 +90,7 @@ public class ConnectionFactoryWrapper
     {
         XATopicConnection xatc = ((XATopicConnectionFactory) factory).createXATopicConnection();
         TopicConnection proxy = (TopicConnection) Proxy.newProxyInstance(Connection.class.getClassLoader(),
-                                                                         new Class[]{TopicConnection.class},
+                                                                         new Class[]{TopicConnection.class, XaResourceFactoryHolder.class},
                                                                          new ConnectionInvocationHandler(xatc, sameRMOverrideValue));
         return proxy;
     }
@@ -100,14 +100,9 @@ public class ConnectionFactoryWrapper
         XATopicConnection xatc = ((XATopicConnectionFactory) factory).createXATopicConnection(username,
                                                                                               password);
         TopicConnection proxy = (TopicConnection) Proxy.newProxyInstance(Connection.class.getClassLoader(),
-                                                                         new Class[]{TopicConnection.class},
+                                                                         new Class[]{TopicConnection.class, XaResourceFactoryHolder.class},
                                                                          new ConnectionInvocationHandler(xatc, sameRMOverrideValue));
         return proxy;
     }
 
-    @Override
-    public Object getHoldObject()
-    {
-        return factory;
-    }
 }

@@ -96,6 +96,10 @@ public class ConnectionInvocationHandler implements TargetInvocationHandler
                 return ((XATopicConnection) xaConnection).createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
             }
         }
+        else if (method.getName().equals("getHoldObject"))
+        {
+            return xaConnection;
+        }
         else
         {
             return method.invoke(xaConnection, args);
