@@ -8,6 +8,7 @@ package org.mule.module.pgp;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.Provider;
 
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.openpgp.PGPPublicKey;
@@ -21,10 +22,11 @@ public class SignedMessage implements Message
     public SignedMessage(InputStream toBeDecrypted,
                          PGPPublicKey publicKey,
                          PGPSecretKey secretKey,
-                         String password) throws IOException
+                         String password,
+                         Provider provider) throws IOException
     {
         StreamTransformer transformer = new DecryptStreamTransformer(toBeDecrypted, publicKey, secretKey,
-            password);
+            password, provider);
         this.encryptedMessage = new LazyTransformedInputStream(new TransformContinuouslyPolicy(), transformer);
     }
 
