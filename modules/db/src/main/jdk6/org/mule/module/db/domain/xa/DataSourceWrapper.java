@@ -8,6 +8,8 @@
 package org.mule.module.db.domain.xa;
 
 
+import org.mule.util.xa.XaResourceFactoryHolder;
+
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -18,7 +20,7 @@ import javax.sql.XADataSource;
 /**
  * Using for unification XADataSource and DataSource
  */
-public class DataSourceWrapper implements DataSource
+public class DataSourceWrapper implements DataSource, XaResourceFactoryHolder
 {
 
     private final XADataSource xaDataSource;
@@ -84,4 +86,9 @@ public class DataSourceWrapper implements DataSource
         return null;
     }
 
+    @Override
+    public Object getHoldObject()
+    {
+        return xaDataSource;
+    }
 }
