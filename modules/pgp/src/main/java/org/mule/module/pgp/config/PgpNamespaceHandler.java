@@ -27,31 +27,10 @@ public class PgpNamespaceHandler extends NamespaceHandlerSupport
 
     public void init()
     {
-        registerRestrictedBeanDefinitionParser("security-manager", new NamedDefinitionParser(MuleProperties.OBJECT_SECURITY_MANAGER));
-        registerRestrictedBeanDefinitionParser("security-provider", new ChildDefinitionParser("provider", PGPSecurityProvider.class));
-        registerRestrictedBeanDefinitionParser("security-filters", new ParentDefinitionParser());
-        registerRestrictedBeanDefinitionParser("security-filter", new SecurityFilterDefinitionParser(PGPSecurityFilter.class));
-        registerRestrictedBeanDefinitionParser("keybased-encryption-strategy", new ChildDefinitionParser("encryptionStrategy", KeyBasedEncryptionStrategy.class));
+        registerBeanDefinitionParser("security-manager", new NamedDefinitionParser(MuleProperties.OBJECT_SECURITY_MANAGER));
+        registerBeanDefinitionParser("security-provider", new ChildDefinitionParser("provider", PGPSecurityProvider.class));
+        registerBeanDefinitionParser("security-filters", new ParentDefinitionParser());
+        registerBeanDefinitionParser("security-filter", new SecurityFilterDefinitionParser(PGPSecurityFilter.class));
+        registerBeanDefinitionParser("keybased-encryption-strategy", new ChildDefinitionParser("encryptionStrategy", KeyBasedEncryptionStrategy.class));
     }
-
-    private void registerRestrictedBeanDefinitionParser(String id, final BeanDefinitionParser beanDefinitionParser)
-    {
-        registerBeanDefinitionParser(id, new BeanDefinitionParser()
-        {
-            @Override
-            public BeanDefinition parse(Element element, ParserContext parserContext)
-            {
-                if (SecurityUtils.isFipsSecurityModel())
-                {
-                    throw new IllegalStateException(String.format("Cannot use PGP module when using FIPS security model. " +
-                                                                  "Element %s is not allowed.", element.getNodeName()));
-                }
-                else
-                {
-                    return beanDefinitionParser.parse(element, parserContext);
-                }
-            }
-        });
-    }
-
 }
