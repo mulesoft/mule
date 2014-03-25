@@ -48,7 +48,9 @@ public class MuleApplicationClassLoader extends AbstractArtifactClassLoader impl
 
     private String appName;
 
-    private String libraryPath;
+    private File appDir;
+    private File classesDir;
+    private File libDir;
 
     public MuleApplicationClassLoader(String appName, ClassLoader parentCl)
     {
@@ -63,14 +65,13 @@ public class MuleApplicationClassLoader extends AbstractArtifactClassLoader impl
         {
             // get lib dir
             final String muleHome = System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
-            String configPath = String.format("%s/apps/%s", muleHome, appName);
-            File parentFile = new File(configPath); 
-            File classesDir = new File(parentFile, PATH_CLASSES);
+            String appPath = String.format("%s/apps/%s", muleHome, appName);
+            appDir = new File(appPath);
+            classesDir = new File(appDir, PATH_CLASSES);
             addURL(classesDir.toURI().toURL());
 
-            File libDir = new File(parentFile, PATH_LIBRARY);
+            libDir = new File(appDir, PATH_LIBRARY);
             addJars(appName, libDir, true);
-            libraryPath = libDir.getAbsolutePath();
 
             // Add per-app mule modules (if any)
             File libs = new File(muleHome, PATH_LIBRARY);
@@ -177,7 +178,7 @@ public class MuleApplicationClassLoader extends AbstractArtifactClassLoader impl
 
         if (null == parentResolvedPath)
         {
-            final File library = new File(libraryPath, System.mapLibraryName(name));
+            final File library = new File(libDir, System.mapLibraryName(name));
 
             if (library.exists())
             {
@@ -186,5 +187,11 @@ public class MuleApplicationClassLoader extends AbstractArtifactClassLoader impl
         }
 
         return parentResolvedPath;
+    }
+
+    @Override
+    protected String[] getLocalResourceLocations()
+    {
+        return new String[] {classesDir.getAbsolutePath()};
     }
 }
