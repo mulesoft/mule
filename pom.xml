@@ -1601,6 +1601,7 @@
                             <exclude>**/XMLStreamReaderToContentHandler.java</exclude>
                             <exclude>**/__artifactId__IBean.java</exclude>
                             <exclude>**/__artifactId__IBeanTestCase.java</exclude>
+                            <exclude>**/jetty/WebAppDeployer.java</exclude>
                         </excludes>
                         <includes>
                             <include>**/*.java</include>
