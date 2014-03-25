@@ -25,6 +25,7 @@ public final class MuleContainerBootstrapUtils
     private static final String MULE_APPS_FILENAME = "apps";
     private static final String MULE_LIB_FILENAME = "lib/mule";
     private static final String MULE_TMP_FILENAME = "tmp";
+    private static final String MULE_CONF_FILENAME = "conf";
 
     private MuleContainerBootstrapUtils()
     {
@@ -100,6 +101,14 @@ public final class MuleContainerBootstrapUtils
     public static File getMuleDomainsDir()
     {
         return isStandalone() ? new File(getMuleHome(), MULE_DOMAIN_FOLDER) : null;
+    }
+
+    /**
+     * @return null if running embedded, otherwise the conf dir as a File ref
+     */
+    public static File getMuleConfDir()
+    {
+        return isStandalone() ? new File(getMuleHome(), MULE_CONF_FILENAME) : null;
     }
 
     public static class ProxyInfo

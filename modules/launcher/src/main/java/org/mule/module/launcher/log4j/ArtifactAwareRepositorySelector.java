@@ -8,6 +8,8 @@ package org.mule.module.launcher.log4j;
 
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.module.launcher.DirectoryResourceLocator;
+import org.mule.module.launcher.LocalResourceLocator;
 import org.mule.module.launcher.application.ApplicationClassLoader;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
 import org.mule.module.launcher.artifact.ShutdownListener;
@@ -83,18 +85,14 @@ public class ArtifactAwareRepositorySelector implements RepositorySelector
                 else
                 {
                     // this is not an app init, use the top-level defaults
-                    File defaultSystemLog = new File(MuleContainerBootstrapUtils.getMuleHome(), "conf/log4j.xml");
-                    if (!defaultSystemLog.exists() && !defaultSystemLog.canRead())
-                    {
-                        defaultSystemLog = new File(MuleContainerBootstrapUtils.getMuleHome(), "conf/log4j.properties");
-                    }
-                    configureFrom(defaultSystemLog.toURL(), repository);
+                    URL rootLogConfig = getLogConfig(new DirectoryResourceLocator(MuleContainerBootstrapUtils.getMuleConfDir().getAbsolutePath()));
+                    configureFrom(rootLogConfig, repository);
 
                     // only start a watchdog for the Mule container class loader. Other class loaders
                     // (e.g. Jetty's WebAppClassLoader) should not start a watchdog
                     if (ccl instanceof MuleContainerSystemClassLoader)
                     {
-                        configWatchDog = new ConfigWatchDog(ccl, defaultSystemLog.getAbsolutePath(), repository);
+                        configWatchDog = new ConfigWatchDog(ccl, rootLogConfig.getFile(), repository);
                         configWatchDog.setName("Mule.system.log4j.config.monitor");
                     }
                 }
@@ -167,18 +165,24 @@ public class ArtifactAwareRepositorySelector implements RepositorySelector
         // Checks if there's an app-specific logging configuration available,
         // scope the lookup to this classloader only, as getResource() will delegate to parents
         // locate xml config first, fallback to properties format if not found
-        URL appLogConfig = muleCL.findResource("log4j.xml");
-
-        if (appLogConfig == null)
-        {
-            appLogConfig = muleCL.findResource("log4j.properties");
-        }
+        URL appLogConfig = getLogConfig(muleCL);
 
         if (appLogConfig != null && logger.isInfoEnabled())
         {
             logger.info(String.format("Found logging config for application '%s' at '%s'", muleCL.getArtifactName(), appLogConfig));
         }
 
+        return appLogConfig;
+    }
+
+    private URL getLogConfig(LocalResourceLocator localResourceLocator)
+    {
+        URL appLogConfig = localResourceLocator.findLocalResource("log4j.xml");
+
+        if (appLogConfig == null)
+        {
+            appLogConfig = localResourceLocator.findLocalResource("log4j.properties");
+        }
         return appLogConfig;
     }
 
