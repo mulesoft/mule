@@ -8,9 +8,6 @@ package org.mule.module.launcher;
 
 import java.net.URL;
 
-/**
- *
- */
 public interface LocalResourceLocator
 {
 
