@@ -15,8 +15,8 @@ import org.mule.module.db.domain.database.DbConfig;
 public class UnresolvableDbConfigException extends RuntimeException
 {
 
-    public UnresolvableDbConfigException(String s)
+    public UnresolvableDbConfigException(String message)
     {
-        super(s);
+        super(message);
     }
 }

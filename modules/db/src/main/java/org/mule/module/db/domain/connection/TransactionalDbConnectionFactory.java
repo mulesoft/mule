@@ -154,6 +154,10 @@ public class TransactionalDbConnectionFactory implements DbConnectionFactory
         }
         catch (SQLException e)
         {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Error checking for closed connection on releasing connection", e);
+            }
             return;
         }
         final Transaction transaction = dbTransactionManager.getTransaction();

@@ -7,7 +7,6 @@
 
 package org.mule.module.db.domain.connection;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -46,7 +45,8 @@ public class TransactionalDbConnectionFactoryTestCase extends AbstractMuleTestCa
         factory = new TransactionalDbConnectionFactory(dbConfig, dbTransactionManager, null);
 
         DbConnection connection = factory.createConnection(TransactionalAction.JOIN_IF_POSSIBLE);
-        assertEquals(expectedConnection, connection.getDelegate());
+
+        assertWrappedConnection(connection, expectedConnection);
     }
 
     @Test
@@ -67,7 +67,7 @@ public class TransactionalDbConnectionFactoryTestCase extends AbstractMuleTestCa
 
         DbConnection connection = factory.createConnection(TransactionalAction.JOIN_IF_POSSIBLE);
 
-        assertEquals(expectedConnection, connection.getDelegate());
+        assertWrappedConnection(connection, expectedConnection);
     }
 
     @Test
@@ -82,7 +82,8 @@ public class TransactionalDbConnectionFactoryTestCase extends AbstractMuleTestCa
         factory = new TransactionalDbConnectionFactory(dbConfig, dbTransactionManager, null);
 
         DbConnection connection = factory.createConnection(TransactionalAction.NOT_SUPPORTED);
-        assertEquals(expectedConnection, connection.getDelegate());
+
+        assertWrappedConnection(connection, expectedConnection);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -121,7 +122,8 @@ public class TransactionalDbConnectionFactoryTestCase extends AbstractMuleTestCa
         factory = new TransactionalDbConnectionFactory(dbConfig, dbTransactionManager, null);
         DbConnection connection = factory.createConnection(transactionalAction);
 
-        assertEquals(expectedConnection, connection.getDelegate());
+        assertWrappedConnection(connection, expectedConnection);
+
         verify(datasource, times(0)).getConnection();
     }
 
@@ -149,8 +151,9 @@ public class TransactionalDbConnectionFactoryTestCase extends AbstractMuleTestCa
 
         DbConnection connection = factory.createConnection(TransactionalAction.JOIN_IF_POSSIBLE);
 
-        assertEquals(expectedConnection, connection.getDelegate());
-        verify(transaction, times(1)).bindResource(datasource, connection.getDelegate());
+        assertWrappedConnection(connection, expectedConnection);
+
+        verify(transaction, times(1)).bindResource(datasource, expectedConnection);
     }
 
     @Test
@@ -163,6 +166,7 @@ public class TransactionalDbConnectionFactoryTestCase extends AbstractMuleTestCa
         factory = new TransactionalDbConnectionFactory(null, dbTransactionManager, null);
 
         factory.releaseConnection(connection);
+
         verify(connection, times(1)).commit();
         verify(connection, times(1)).close();
     }
@@ -177,6 +181,7 @@ public class TransactionalDbConnectionFactoryTestCase extends AbstractMuleTestCa
         factory = new TransactionalDbConnectionFactory(null, dbTransactionManager, null);
 
         factory.releaseConnection(connection);
+
         verify(connection, times(1)).commit();
         verify(connection, times(1)).close();
     }
@@ -190,7 +195,9 @@ public class TransactionalDbConnectionFactoryTestCase extends AbstractMuleTestCa
         when(connection.getTransactionalAction()).thenReturn(TransactionalAction.JOIN_IF_POSSIBLE);
 
         factory = new TransactionalDbConnectionFactory(null, dbTransactionManager, null);
+
         factory.releaseConnection(connection);
+
         verify(connection, times(0)).commit();
         verify(connection, times(0)).close();
     }
@@ -204,8 +211,18 @@ public class TransactionalDbConnectionFactoryTestCase extends AbstractMuleTestCa
         when(connection.getTransactionalAction()).thenReturn(TransactionalAction.ALWAYS_JOIN);
 
         factory = new TransactionalDbConnectionFactory(null, dbTransactionManager, null);
+
         factory.releaseConnection(connection);
+
         verify(connection, times(0)).commit();
         verify(connection, times(0)).close();
+    }
+
+    private void assertWrappedConnection(DbConnection connection, Connection wrappedConnection) throws SQLException
+    {
+        final String sqlText = "select * from test";
+
+        connection.prepareStatement(sqlText);
+        verify(wrappedConnection).prepareStatement(sqlText);
     }
 }

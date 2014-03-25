@@ -73,7 +73,6 @@ public class GenericDbConfig implements DbConfig, Initialisable
 
     protected TransactionalDbConnectionFactory doCreateConnectionFactory()
     {
-        //TODO(pablo.kraan): would be better to inject this
         return new TransactionalDbConnectionFactory(this, new TransactionCoordinationDbTransactionManager(), dbTypeManager);
     }
 
