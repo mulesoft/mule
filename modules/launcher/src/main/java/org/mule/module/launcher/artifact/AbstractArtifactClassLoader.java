@@ -6,7 +6,9 @@
  */
 package org.mule.module.launcher.artifact;
 
+import org.mule.module.launcher.DirectoryResourceLocator;
 import org.mule.module.launcher.FineGrainedControlClassLoader;
+import org.mule.module.launcher.LocalResourceLocator;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -25,6 +27,8 @@ public abstract class AbstractArtifactClassLoader extends FineGrainedControlClas
     protected Log logger = LogFactory.getLog(getClass());
 
     protected List<ShutdownListener> shutdownListeners = new ArrayList<ShutdownListener>();
+
+    private LocalResourceLocator localResourceLocator;
 
     public AbstractArtifactClassLoader(URL[] urls, ClassLoader parent)
     {
@@ -58,4 +62,25 @@ public abstract class AbstractArtifactClassLoader extends FineGrainedControlClas
         }
         super.dispose();
     }
+
+    public URL findLocalResource(String resourceName)
+    {
+        URL resource = getLocalResourceLocator().findLocalResource(resourceName);
+        if (resource == null && getParent() instanceof LocalResourceLocator)
+        {
+            resource = ((LocalResourceLocator) getParent()).findLocalResource(resourceName);
+        }
+        return resource;
+    }
+
+    private LocalResourceLocator getLocalResourceLocator()
+    {
+        if (localResourceLocator == null)
+        {
+            localResourceLocator = new DirectoryResourceLocator(getLocalResourceLocations());
+        }
+        return localResourceLocator;
+    }
+
+    protected abstract String[] getLocalResourceLocations();
 }

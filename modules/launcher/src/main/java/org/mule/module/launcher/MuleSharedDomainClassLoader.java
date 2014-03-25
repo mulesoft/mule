@@ -157,4 +157,10 @@ public class MuleSharedDomainClassLoader extends AbstractArtifactClassLoader imp
         domainLibraryFolder = new File(newDomainDir, DOMAIN_LIBRARY_FOLDER);
         logger.info(String.format("Using domain dir %s for domain %s", domainDir.getAbsolutePath(), domain));
     }
+
+    @Override
+    protected String[] getLocalResourceLocations()
+    {
+        return new String[] {domainDir.getAbsolutePath(), MuleContainerBootstrapUtils.getMuleConfDir().getAbsolutePath()};
+    }
 }

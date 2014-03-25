@@ -8,6 +8,7 @@ package org.mule.module.launcher.application;
 
 import org.mule.module.launcher.DisposableClassLoader;
 import org.mule.module.launcher.MuleApplicationClassLoader;
+import org.mule.module.launcher.artifact.ArtifactClassLoader;
 import org.mule.module.launcher.artifact.ShutdownListener;
 
 import java.io.IOException;
@@ -244,6 +245,23 @@ public class CompositeApplicationClassLoader extends ClassLoader implements Appl
             }
         }
 
+        return null;
+    }
+
+    @Override
+    public URL findLocalResource(String resourceName)
+    {
+        for (ClassLoader classLoader : classLoaders)
+        {
+            if( classLoader instanceof ArtifactClassLoader )
+            {
+                URL resource = ((ArtifactClassLoader)classLoader).findLocalResource(resourceName);
+                if( resource!=null )
+                {
+                    return resource;
+                }
+            }
+        }
         return null;
     }
 
