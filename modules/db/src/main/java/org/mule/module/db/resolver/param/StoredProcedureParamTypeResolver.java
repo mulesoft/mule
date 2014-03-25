@@ -31,6 +31,10 @@ import org.apache.commons.logging.LogFactory;
 public class StoredProcedureParamTypeResolver implements ParamTypeResolver
 {
 
+    public static final int PARAM_NAME_COLUN_INDEX = 4;
+    public static final int TYPE_ID_COLUMN_INDEX = 6;
+    public static final int TYPE_NAME_COLUMN_INDEX = 7;
+
     private static final Log logger = LogFactory.getLog(StoredProcedureParamTypeResolver.class);
 
     private final DbTypeManager dbTypeManager;
@@ -43,23 +47,39 @@ public class StoredProcedureParamTypeResolver implements ParamTypeResolver
 
     public Map<Integer, DbType> getParameterTypes(DbConnection connection, QueryTemplate queryTemplate) throws SQLException
     {
-        Map<Integer, DbType> paramTypes = new HashMap<Integer, DbType>();
 
         DatabaseMetaData dbMetaData = connection.getMetaData();
 
         String storedProcedureName = getStoredProcedureName(dbMetaData, queryTemplate.getSqlText());
         ResultSet procedureColumns = dbMetaData.getProcedureColumns(connection.getCatalog(), null, storedProcedureName, "%");
 
-        int position =1;
+        try
+        {
+            return getStoredProcedureParamTypes(connection, storedProcedureName, procedureColumns);
+        }
+        finally
+        {
+            if (procedureColumns != null)
+            {
+                procedureColumns.close();
+            }
+        }
+    }
+
+    private Map<Integer, DbType> getStoredProcedureParamTypes(DbConnection connection, String storedProcedureName, ResultSet procedureColumns) throws SQLException
+    {
+        Map<Integer, DbType> paramTypes = new HashMap<Integer, DbType>();
+
+        int position = 1;
+
         while (procedureColumns.next())
         {
-            int typeId= procedureColumns.getInt(6);
-            String typeName = procedureColumns.getString(7);
+            int typeId = procedureColumns.getInt(TYPE_ID_COLUMN_INDEX);
+            String typeName = procedureColumns.getString(TYPE_NAME_COLUMN_INDEX);
 
             if (logger.isDebugEnabled())
             {
-
-                String name = procedureColumns.getString(4);
+                String name = procedureColumns.getString(PARAM_NAME_COLUN_INDEX);
                 logger.debug(String.format("Resolved parameter type: Store procedure: %s Name: %s Index: %s Type ID: %s Type Name: %s", storedProcedureName, name, position, typeId, typeName));
             }
 
