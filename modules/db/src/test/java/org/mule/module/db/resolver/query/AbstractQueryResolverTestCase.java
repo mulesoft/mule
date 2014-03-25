@@ -17,17 +17,13 @@ import org.mule.module.db.domain.query.QueryParamValue;
 import org.mule.module.db.domain.query.QueryTemplate;
 import org.mule.module.db.domain.query.QueryType;
 import org.mule.module.db.domain.type.DbType;
-import org.mule.module.db.domain.type.ResolvedDbType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AbstractQueryResolverTestCase extends AbstractMuleTestCase
 {
-
-    public static final DbType INTEGER_DB_TYPE = new ResolvedDbType(Types.INTEGER, "INTEGER");
 
     public static final String STATIC_SQL_TEXT = "select * from test";
     public static final String DYNAMIC_SQL_TEXT = "select * from #[table]";
