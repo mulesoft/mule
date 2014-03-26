@@ -25,3 +25,4 @@ MULE-7390: The following transformers no longer support external entities out of
             as optional (defaults to false). Use this attribute with extreme care in cases in which you trust the source only.
 MULE-7425: xpath() MEL function no longer changes the message payload when a source is provided. So for example, the expression xpath('catalog/cd/title') may change the message payload, while xpath('catalog/cd/title', flowVars['xml']) will never do
 MULE-7439: org.mule.transport.http.servlet.MuleHttpServletResponse.formatDate now receives a StringBuilder instead of a StringBuffer
+MULE-7463: ObjectStoreManager will now throw IllegalArgumentException is a lower than zero value is provided for maxEntries or entryTTL arguments.
