@@ -27,7 +27,9 @@
         <expression-component>xpath()</expression-component>
     </flow>
 
-
+    <flow name="textNotSeparated">
+        <set-payload value="#[xpath('/*/toAddress/text()')]"/>
+    </flow>
 
 
 </mule>
