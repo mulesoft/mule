@@ -38,60 +38,67 @@ public class XPathFunctionTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        this.payload = IOUtils.getResourceAsString("cd-catalog.xml", this.getClass());
+        payload = IOUtils.getResourceAsString("cd-catalog.xml", getClass());
     }
 
     @Test
     public void getTitles() throws Exception
     {
-        MuleEvent event = this.runFlow("getTitles", this.payload);
-        this.assertTitleElements((List<Element>) event.getMessage().getPayload());
+        MuleEvent event = runFlow("getTitles", payload);
+        assertTitleElements((List<Element>) event.getMessage().getPayload());
     }
 
     @Test
     public void getTitlesFromStream() throws Exception
     {
-        MuleEvent event = this.runFlow("getTitlesFromStream", this.payload);
+        MuleEvent event = runFlow("getTitlesFromStream", payload);
         assertTrue(event.getMessage().getPayload() instanceof Document);
     }
 
     @Test
     public void getTitlesFromFlowVar() throws Exception
     {
-        MuleEvent event = getTestEvent(this.payload);
-        event.setFlowVariable("xml", this.payload);
-        event = ((Flow) this.getFlowConstruct("getTitlesFromFlowVar")).process(event);
+        MuleEvent event = getTestEvent(payload);
+        event.setFlowVariable("xml", payload);
+        event = ((Flow) getFlowConstruct("getTitlesFromFlowVar")).process(event);
 
         List<Element> elements = event.getFlowVariable("titles");
 
-        this.assertTitlesCount(elements);
-        assertSame(this.payload, event.getMessage().getPayload());
+        assertTitlesCount(elements);
+        assertSame(payload, event.getMessage().getPayload());
     }
 
     @Test
     public void getTitlesFromCustomPayload() throws Exception
     {
-        MuleEvent event = this.runFlow("getTitlesFromCustomPayload", this.payload);
+        MuleEvent event = runFlow("getTitlesFromCustomPayload", payload);
         List<Document> documents = event.getFlowVariable("titles");
         assertTitlesCount(documents);
-        assertSame(this.payload, event.getMessage().getPayload());
+        assertSame(payload, event.getMessage().getPayload());
     }
 
     @Test(expected = MessagingException.class)
     public void emptyXPathExpression() throws Exception
     {
-        this.runFlow("emptyXPathExpression", this.payload);
+        runFlow("emptyXPathExpression", payload);
     }
 
     @Test(expected = MessagingException.class)
     public void noArgsAtAll() throws Exception
     {
-        this.runFlow("noArgsAtAll", this.payload);
+        runFlow("noArgsAtAll", payload);
+    }
+
+    @Test
+    public void textNotSeparated() throws Exception
+    {
+        payload = IOUtils.getResourceAsString("sswa2smtp.xml", getClass());
+        runFlow("textNotSeparated", payload);
     }
 
     private void assertTitleElements(List<Element> elements)
     {
-        this.assertTitlesCount(elements);
+        assertTitlesCount(elements);
         for (Element element : elements)
         {
             assertEquals("title", element.getName());
