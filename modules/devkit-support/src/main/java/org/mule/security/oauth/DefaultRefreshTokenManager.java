@@ -7,6 +7,8 @@
 
 package org.mule.security.oauth;
 
+import static org.mule.api.store.ObjectStoreManager.UNBOUNDED;
+
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.store.ObjectStore;
@@ -67,7 +69,7 @@ public class DefaultRefreshTokenManager implements MuleContextAware, RefreshToke
         if (this.refreshedTokens == null)
         {
             ObjectStoreManager osManager = this.muleContext.getObjectStoreManager();
-            this.refreshedTokens = osManager.getObjectStore("RefreshTokenStore", false, ObjectStoreManager.NO_MAX_ENTRIES,
+            this.refreshedTokens = osManager.getObjectStore("RefreshTokenStore", false, UNBOUNDED,
                                                             this.minRefreshInterval, this.minRefreshInterval);
         }
         return this.refreshedTokens;
