@@ -350,7 +350,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
 
         if (!message.getOutboundAttachmentNames().isEmpty())
         {
-            Collection<Attachment> attachments = new HashSet<Attachment>();
+            Collection<Attachment> attachments = new HashSet<Attachment>(message.getOutboundAttachmentNames().size());
 
             for (String outboundAttachmentName : message.getOutboundAttachmentNames())
             {
