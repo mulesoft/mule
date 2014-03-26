@@ -7,9 +7,12 @@
 
 package org.mule.module.ws.consumer;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -20,6 +23,7 @@ import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.builder.ProxyClientMessageProcessorBuilder;
 import org.mule.module.ws.security.SecurityStrategy;
@@ -30,7 +34,9 @@ import org.mule.util.IOUtils;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -46,9 +52,11 @@ import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.slf4j.Logger;
@@ -70,6 +78,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     private String soapAction;
     private String requestBody;
     private SoapVersion soapVersion;
+    private boolean mtomEnabled;
 
     @Override
     public void initialise() throws InitialisationException
@@ -148,7 +157,11 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                         event.getMessage().setPayload(requestBody);
                     }
 
+                    copyAttachmentsRequest(event);
+
                     MuleEvent result =  processNext(event);
+
+                    copyAttachmentsResponse(result);
                     return result;
                 }
                 catch (DispatchException e)
@@ -208,6 +221,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
         ProxyClientMessageProcessorBuilder cxfBuilder = new ProxyClientMessageProcessorBuilder();
         Map<String, Object> configProperties = new HashMap<String, Object>();
 
+        cxfBuilder.setMtomEnabled(mtomEnabled);
         cxfBuilder.setMuleContext(muleContext);
         cxfBuilder.setSoapVersion(soapVersion.getVersion());
 
@@ -326,6 +340,55 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
         return soapAction != null && soapVersion == SoapVersion.SOAP_11;
     }
 
+    /**
+     * Reads outbound attachments from the MuleMessage and sets the CxfConstants.ATTACHMENTS invocation
+     * properties with a set of CXF Attachment objects.
+     */
+    private void copyAttachmentsRequest(MuleEvent event)
+    {
+        MuleMessage message = event.getMessage();
+
+        if (!message.getOutboundAttachmentNames().isEmpty())
+        {
+            Collection<Attachment> attachments = new HashSet<Attachment>(message.getOutboundAttachmentNames().size());
+
+            for (String outboundAttachmentName : message.getOutboundAttachmentNames())
+            {
+                Attachment attachment = new AttachmentImpl(outboundAttachmentName, message.getOutboundAttachment(outboundAttachmentName));
+                attachments.add(attachment);
+            }
+            message.setInvocationProperty(CxfConstants.ATTACHMENTS, attachments);
+        }
+    }
+
+    /**
+     * Takes the set of CXF attachments from the CxfConstants.ATTACHMENTS invocation properties and sets
+     * them as inbound attachments in the Mule Message.
+     */
+    private void copyAttachmentsResponse(MuleEvent event) throws MessagingException
+    {
+        MuleMessage message = event.getMessage();
+
+        if (message.getInvocationProperty(CxfConstants.ATTACHMENTS) != null)
+        {
+            Collection<Attachment> attachments = message.getInvocationProperty(CxfConstants.ATTACHMENTS);
+            for (Attachment attachment : attachments)
+            {
+                try
+                {
+                    ((DefaultMuleMessage)message).addInboundAttachment(attachment.getId(), attachment.getDataHandler());
+                }
+                catch (Exception e)
+                {
+                    throw new MessagingException(CoreMessages.createStaticMessage("Could not set inbound attachment %s",
+                                                                                  attachment.getId()), event, e);
+                }
+            }
+        }
+
+
+    }
+
     @Override
     public void setMuleContext(MuleContext muleContext)
     {
@@ -352,4 +415,13 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
         this.operation = operation;
     }
 
+    public boolean isMtomEnabled()
+    {
+        return mtomEnabled;
+    }
+
+    public void setMtomEnabled(boolean mtomEnabled)
+    {
+        this.mtomEnabled = mtomEnabled;
+    }
 }
