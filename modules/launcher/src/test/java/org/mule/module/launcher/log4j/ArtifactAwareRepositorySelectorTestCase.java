@@ -14,6 +14,7 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,11 +30,24 @@ public class ArtifactAwareRepositorySelectorTestCase extends AbstractMuleTestCas
     public void configWatchdogThreadIsDestroyedWhenClosingClassLoader() throws Exception
     {
         Prober prober = new PollingProber(3000, 100);
-        ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
+        final ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
 
         List<ClassLoader> classLoaders = new ArrayList<ClassLoader>();
         classLoaders.add(currentClassLoader);
-        classLoaders.add(new MuleApplicationClassLoader(TEST_APP_NAME, currentClassLoader));
+        classLoaders.add(new MuleApplicationClassLoader(TEST_APP_NAME, currentClassLoader)
+        {
+            public URL findLocalResource(String resourceName)
+            {
+                // This MuleApplicationClassLoader is created without the filesystem structure required for a mule application
+                // so we have to obtain the log4j.properties resource from the classpath.
+                // This change is related to the new way to search the local resources (MULE-7366)
+                if(resourceName!=null && resourceName.startsWith("log4j"))
+                {
+                    return currentClassLoader.getResource(resourceName);
+                }
+                return super.findLocalResource(resourceName);
+            }
+        });
 
         CompositeApplicationClassLoader compositeClassLoader = new CompositeApplicationClassLoader(TEST_APP_NAME, classLoaders);
 
