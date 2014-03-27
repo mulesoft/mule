@@ -13,10 +13,14 @@ import org.mule.module.xml.util.XMLUtils;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 
+import org.dom4j.io.DocumentResult;
+import org.dom4j.io.SAXContentHandler;
 import org.w3c.dom.Document;
+import org.xml.sax.ContentHandler;
 
 /**
  * <code>XmlToDomDocument</code> transforms a XML String to org.w3c.dom.Document.
@@ -52,6 +56,20 @@ public class XmlToDomDocument extends AbstractXmlTransformer implements Discover
             if (holder == null)
             {
                 holder = getResultHolder(Document.class);
+            }
+
+            Result result = holder.getResult();
+
+            if (result instanceof DocumentResult)
+            {
+                DocumentResult dr = (DocumentResult) holder.getResult();
+                ContentHandler contentHandler = dr.getHandler();
+                if (contentHandler instanceof SAXContentHandler)
+                {
+                    //The following code is used to avoid the splitting
+                    //of text inside DOM elements.
+                    ((SAXContentHandler) contentHandler).setMergeAdjacentText(true);
+                }
             }
 
             Transformer idTransformer = XMLUtils.getTransformer();
