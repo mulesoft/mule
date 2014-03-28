@@ -68,6 +68,7 @@
 
         <!-- Properties that can be used to enable/disable parts of the build via cmd line or profiles -->
         <skipIntegrationTests>false</skipIntegrationTests>
+        <skipSystemTests>true</skipSystemTests>
         <skipPerformanceTests>true</skipPerformanceTests>
         <skipArchetypeTests>true</skipArchetypeTests>
 
@@ -2057,6 +2058,7 @@
                 <skipDistributions>true</skipDistributions>
                 <skipVerifications>false</skipVerifications>
                 <skipInstalls>true</skipInstalls>
+                <skipSystemTests>true</skipSystemTests>
                 <skipTests>true</skipTests>
             </properties>
         </profile>
@@ -2080,6 +2082,7 @@
                 <skipIntegrationTests>true</skipIntegrationTests>
                 <skipDistributions>true</skipDistributions>
                 <skipVerifications>true</skipVerifications>
+                <skipSystemTests>true</skipSystemTests>
                 <skipInstalls>true</skipInstalls>
             </properties>
         </profile>
@@ -2103,6 +2106,7 @@
                 <skipIntegrationTests>true</skipIntegrationTests>
                 <skipDistributions>true</skipDistributions>
                 <skipVerifications>true</skipVerifications>
+                <skipSystemTests>true</skipSystemTests>
                 <skipInstalls>true</skipInstalls>
             </properties>
         </profile>
@@ -2116,7 +2120,22 @@
                 <skipDistributions>true</skipDistributions>
                 <skipVerifications>true</skipVerifications>
                 <skipInstalls>true</skipInstalls>
+                <skipSystemTests>true</skipSystemTests>
                 <skipTests>true</skipTests>
+            </properties>
+        </profile>
+        <profile>
+            <id>system</id>
+            <build>
+                <defaultGoal>verify</defaultGoal>
+            </build>
+            <properties>
+                <skipIntegrationTests>true</skipIntegrationTests>
+                <skipDistributions>true</skipDistributions>
+                <skipVerifications>true</skipVerifications>
+                <skipInstalls>true</skipInstalls>
+                <skipTests>true</skipTests>
+                <skipSystemTests>false</skipSystemTests>
             </properties>
         </profile>
         <profile>
@@ -2127,6 +2146,7 @@
                 <skipVerifications>true</skipVerifications>
                 <skipInstalls>false</skipInstalls>
                 <skipTests>true</skipTests>
+                <skipSystemTests>true</skipSystemTests>
             </properties>
             <build>
                 <defaultGoal>deploy</defaultGoal>
