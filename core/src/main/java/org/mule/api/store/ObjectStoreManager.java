@@ -11,7 +11,7 @@ import java.io.Serializable;
 public interface ObjectStoreManager
 {
 
-    public static final int NO_MAX_ENTRIES = -1;
+    public static final int UNBOUNDED = 0;
 
     /**
      * Return the partition of the default in-memory store with the given name, creating it
