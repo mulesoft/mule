@@ -101,7 +101,7 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
         return new RegisteredMdps(protocol, AddressedEndpointDefinitionParser.META, new String[]{});
     }
 
-    private static class IgnoredDefinitionParser implements BeanDefinitionParser
+    public static class IgnoredDefinitionParser implements BeanDefinitionParser
     {
         public IgnoredDefinitionParser()
         {

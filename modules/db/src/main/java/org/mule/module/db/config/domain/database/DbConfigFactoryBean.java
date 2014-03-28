@@ -15,6 +15,8 @@ import org.mule.module.db.domain.database.DbConfig;
 import org.mule.module.db.domain.database.GenericDbConfig;
 import org.mule.module.db.domain.connection.DbPoolingProfile;
 
+import java.util.Map;
+
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
@@ -34,6 +36,7 @@ public class DbConfigFactoryBean extends AbstractFactoryBean<DbConfig> implement
     private boolean useXaTransactions;
     private DbPoolingProfile poolingProfile;
     private GenericDbConfig dbConfig;
+    private Map<String, String> properties;
 
     @Override
     public Class<?> getObjectType()
@@ -54,6 +57,7 @@ public class DbConfigFactoryBean extends AbstractFactoryBean<DbConfig> implement
         dbConfig.setTransactionIsolation(transactionIsolation);
         dbConfig.setDriverClassName(driverClassName);
         dbConfig.setMuleContext(muleContext);
+
         return dbConfig;
     }
 
@@ -125,6 +129,16 @@ public class DbConfigFactoryBean extends AbstractFactoryBean<DbConfig> implement
     public String getDriverClassName()
     {
         return driverClassName;
+    }
+
+    public Map<String, String> getProperties()
+    {
+        return properties;
+    }
+
+    public void setProperties(Map<String, String> properties)
+    {
+        this.properties = properties;
     }
 
     @Override
