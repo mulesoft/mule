@@ -7,6 +7,7 @@
 
 package org.mule.module.db.config;
 
+import static org.mule.config.spring.handlers.AbstractMuleNamespaceHandler.IgnoredDefinitionParser;
 import static org.mule.module.db.config.domain.database.DbConfigDefinitionParser.DATABASE_ATTRIBUTE;
 import static org.mule.module.db.config.domain.database.DbConfigDefinitionParser.DATA_SOURCE_REF_ATTRIBUTE;
 import static org.mule.module.db.config.domain.database.DbConfigDefinitionParser.DRIVER_ATTRIBUTE;
@@ -16,6 +17,7 @@ import static org.mule.module.db.config.domain.database.DbConfigDefinitionParser
 import static org.mule.module.db.config.domain.database.DbConfigDefinitionParser.TRANSACTION_ISOLATION_ATTRIBUTE;
 import static org.mule.module.db.config.domain.database.DbConfigDefinitionParser.URL_ATTRIBUTE;
 import static org.mule.module.db.config.domain.database.DbConfigDefinitionParser.USE_XA_TRANSACTIONS_ATTRIBUTE;
+
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributeAndText;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.module.db.config.domain.connection.PoolingProfileBeanDefinitionParser;
@@ -29,8 +31,8 @@ import org.mule.module.db.config.domain.param.InputParamValueBeanDefinitionParse
 import org.mule.module.db.config.domain.param.OutputParamDefinitionDefinitionParser;
 import org.mule.module.db.config.domain.query.QueryTemplateBeanDefinitionParser;
 import org.mule.module.db.config.processor.BulkExecuteProcessorBeanDefinitionParser;
-import org.mule.module.db.config.processor.ExecuteDdlProcessorBeanDefinitionParser;
 import org.mule.module.db.config.processor.DeleteProcessorBeanDefinitionParser;
+import org.mule.module.db.config.processor.ExecuteDdlProcessorBeanDefinitionParser;
 import org.mule.module.db.config.processor.InsertProcessorBeanDefinitionParser;
 import org.mule.module.db.config.processor.SelectProcessorDefinitionParser;
 import org.mule.module.db.config.processor.StoredProcedureProcessorBeanDefinitionParser;
@@ -40,6 +42,9 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 public class DbNamespaceHandler extends NamespaceHandlerSupport
 {
+
+    public static final String CONNECTION_PROPERTIES_ELEMENT_NAME = "connection-properties";
+    public static final String PROPERTY_ELEMENT_NAME = "property";
 
     public void init()
     {
@@ -81,5 +86,13 @@ public class DbNamespaceHandler extends NamespaceHandlerSupport
                 new String[] {URL_ATTRIBUTE, LOGIN_TIMEOUT_ATTRIBUTE, TRANSACTION_ISOLATION_ATTRIBUTE, USE_XA_TRANSACTIONS_ATTRIBUTE},
                 new String[] {HOST_ATTRIBUTE, PORT_ATTRIBUTE, DATABASE_ATTRIBUTE, LOGIN_TIMEOUT_ATTRIBUTE, TRANSACTION_ISOLATION_ATTRIBUTE, USE_XA_TRANSACTIONS_ATTRIBUTE},
                 new String[] {DATA_SOURCE_REF_ATTRIBUTE}})));
+
+        registerIgnoredElement(CONNECTION_PROPERTIES_ELEMENT_NAME);
+        registerIgnoredElement(PROPERTY_ELEMENT_NAME);
+    }
+
+    private void registerIgnoredElement(String name)
+    {
+        registerBeanDefinitionParser(name, new IgnoredDefinitionParser());
     }
 }

@@ -11,6 +11,7 @@ import org.mule.util.StringUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Map;
 
 public class MySqlConfigFactoryBean extends DbConfigFactoryBean
 {
@@ -67,39 +68,65 @@ public class MySqlConfigFactoryBean extends DbConfigFactoryBean
             url = buf.toString();
         }
 
-        if (DRIVER_CLASS_NAME.equals(getDriverClassName()))
-        {
-            url = forceParamMetadataGeneration(url);
-        }
-
-        return url;
+        return addProperties(url);
     }
 
-    private String forceParamMetadataGeneration(String url)
+    private String addProperties(String url)
     {
-        StringBuilder buf = new StringBuilder(128);
-        buf.append(url);
-        try
+        Map<String, String> connectionProperties = getConnectionProperties();
+
+        if (DRIVER_CLASS_NAME.equals(getDriverClassName()))
         {
-            URI uri = new URI(url.substring(5));
-            String query = uri.getQuery();
-            if (query == null)
+            connectionProperties.put("generateSimpleParameterMetadata", "true");
+        }
+
+        if (connectionProperties.isEmpty())
+        {
+            return url;
+        }
+
+        StringBuilder effectiveUrl = new StringBuilder(url);
+
+        if (getUri(url).getQuery() == null)
+        {
+            effectiveUrl.append("?");
+        }
+        else
+        {
+            effectiveUrl.append("&");
+        }
+
+        return effectiveUrl.append(buildQueryParams(connectionProperties)).toString();
+    }
+
+    private String buildQueryParams(Map<String, String> connectionProperties)
+    {
+        StringBuilder params = new StringBuilder(128);
+        for (Map.Entry<String, String> entry : connectionProperties.entrySet())
+        {
+            if (params.length() > 0)
             {
-                buf.append("?");
-            }
-            else
-            {
-                buf.append("&");
+                params.append('&');
             }
 
-            buf.append("generateSimpleParameterMetadata=true");
-            url = buf.toString();
+            params.append(entry.getKey())
+                    .append('=')
+                    .append(entry.getValue());
+        }
+
+        return params.toString();
+    }
+
+    private URI getUri(String url)
+    {
+        try
+        {
+            return new URI(url.substring(5));
         }
         catch (URISyntaxException e)
         {
             throw new IllegalArgumentException("Unable to parse database config URL", e);
         }
-        return url;
     }
 
     public String getUrlPrefix()

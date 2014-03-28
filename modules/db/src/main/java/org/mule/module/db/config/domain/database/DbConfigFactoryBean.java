@@ -14,6 +14,9 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.module.db.domain.database.DbConfig;
 import org.mule.module.db.domain.database.GenericDbConfig;
 import org.mule.module.db.domain.connection.DbPoolingProfile;
+import org.mule.util.Preconditions;
+
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -34,6 +37,7 @@ public class DbConfigFactoryBean extends AbstractFactoryBean<DbConfig> implement
     private boolean useXaTransactions;
     private DbPoolingProfile poolingProfile;
     private GenericDbConfig dbConfig;
+    private Map<String, String> connectionProperties;
 
     @Override
     public Class<?> getObjectType()
@@ -44,6 +48,8 @@ public class DbConfigFactoryBean extends AbstractFactoryBean<DbConfig> implement
     @Override
     protected DbConfig createInstance() throws Exception
     {
+        validate();
+
         dbConfig = doCreateDbConfig(dataSource);
         dbConfig.setPoolingProfile(poolingProfile);
         dbConfig.setUseXaTransactions(useXaTransactions);
@@ -54,12 +60,21 @@ public class DbConfigFactoryBean extends AbstractFactoryBean<DbConfig> implement
         dbConfig.setTransactionIsolation(transactionIsolation);
         dbConfig.setDriverClassName(driverClassName);
         dbConfig.setMuleContext(muleContext);
+
         return dbConfig;
     }
 
     protected GenericDbConfig doCreateDbConfig(DataSource datasource)
     {
         return new GenericDbConfig(datasource, name);
+    }
+
+    protected void validate()
+    {
+        if (dataSource != null)
+        {
+            Preconditions.checkState(connectionProperties.isEmpty(), "connection-properties cannot be specified when a DataSource was provided");
+        }
     }
 
     protected String getEffectiveUrl()
@@ -125,6 +140,16 @@ public class DbConfigFactoryBean extends AbstractFactoryBean<DbConfig> implement
     public String getDriverClassName()
     {
         return driverClassName;
+    }
+
+    public Map<String, String> getConnectionProperties()
+    {
+        return connectionProperties;
+    }
+
+    public void setConnectionProperties(Map<String, String> connectionProperties)
+    {
+        this.connectionProperties = connectionProperties;
     }
 
     @Override
