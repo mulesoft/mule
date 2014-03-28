@@ -45,22 +45,41 @@ public abstract class Controller
     protected static final Pattern STATUS_PATTERN = Pattern.compile(STATUS);
     private static final int IS_RUNNING_STATUS_CODE = 0;
 
-    public abstract String setMuleBin();
+    public abstract String getMuleBin();
 
-    public abstract void start(String[] args);
+    public void start(String[] args)
+    {
+        int error = runSync("start", args);
+        if (error != 0)
+        {
+            throw new MuleControllerException("The mule instance couldn't be started");
+        }
+    }
 
-    public abstract void stop(String[] args);
+    public void stop(String[] args)
+    {
+        int error = runSync("stop", args);
+        verify(error == 0, "The mule instance couldn't be stopped");
+        deleteAnchors();
+    }
 
     public abstract int status(String... args);
 
     public abstract int getProcessId();
 
-    public abstract void restart(String[] args);
+    public void restart(String[] args)
+    {
+        int error = runSync("restart", args);
+        if (error != 0)
+        {
+            throw new MuleControllerException("The mule instance couldn't be restarted");
+        }
+    }
 
     protected void initialize(String muleHome)
     {
         this.muleHome = muleHome;
-        this.muleBin = setMuleBin();
+        this.muleBin = getMuleBin();
         this.domainsDir = new File(muleHome + "/domains");
         this.appsDir = new File(muleHome + "/apps/");
         this.libsDir = new File(muleHome + "/lib/user");

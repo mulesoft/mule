@@ -27,27 +27,9 @@ public class UnixController extends Controller
     }
 
     @Override
-    public String setMuleBin()
+    public String getMuleBin()
     {
         return muleHome + "/bin/mule";
-    }
-
-    @Override
-    public void start(String[] args)
-    {
-        int error = runSync("start", args);
-        if (error != 0)
-        {
-            throw new MuleControllerException("The mule instance couldn't be started");
-        }
-    }
-
-    @Override
-    public void stop(String[] args)
-    {
-        int error = runSync("stop", args);
-        verify(error == 0, "The mule instance couldn't be stopped");
-        deleteAnchors();
     }
 
     @Override
@@ -83,14 +65,5 @@ public class UnixController extends Controller
     public int status(String[] args)
     {
         return runSync("status", args);
-    }
-
-    public void restart(String[] args)
-    {
-        int error = runSync("restart", args);
-        if (error != 0)
-        {
-            throw new MuleControllerException("The mule instance couldn't be restarted");
-        }
     }
 }

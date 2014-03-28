@@ -23,7 +23,7 @@ public class WindowsController extends Controller
     }
 
     @Override
-    public String setMuleBin()
+    public String getMuleBin()
     {
         return muleHome + "/bin/mule.bat";
     }
@@ -32,19 +32,13 @@ public class WindowsController extends Controller
     public void start(String[] args)
     {
         install(args);
-        int error = runSync("start", args);
-        if (error != 0)
-        {
-            throw new MuleControllerException("The mule instance couldn't be started");
-        }
+        super.start(args);
     }
 
     @Override
     public void stop(String[] args)
     {
-        int error = runSync("stop", args);
-        verify(error == 0, "The mule instance couldn't be stopped");
-        deleteAnchors();
+        super.stop(args);
         int errorRemove = runSync("remove");
         if (errorRemove!= 0 && errorRemove != 0x424)
         {
@@ -116,11 +110,7 @@ public class WindowsController extends Controller
     public void restart(String[] args)
     {
         install(args);
-        int error = runSync("restart", args);
-        if (error != 0)
-        {
-            throw new MuleControllerException("The mule instance couldn't be restarted");
-        }
+        super.restart(args);
     }
 
     private void install(String... args)
