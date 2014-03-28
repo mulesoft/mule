@@ -13,5 +13,9 @@
         <spring:property name="url" value="jdbc:derby:muleEmbeddedDB;sql.enforce_strict_size=true"/>
     </spring:bean>
 
-    <db:generic-config name="dbConfig" dataSource-ref="jdbcDataSource"/>
+    <db:generic-config name="dbConfig" dataSource-ref="jdbcDataSource">
+        <db:properties>
+            <db:property key="foo" value="bar"/>
+        </db:properties>
+            </db:generic-config>
 </mule>
