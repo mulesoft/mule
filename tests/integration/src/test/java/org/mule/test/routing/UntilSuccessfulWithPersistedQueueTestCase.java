@@ -14,18 +14,12 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.store.ObjectStore;
 import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.util.FileUtils;
-import org.mule.util.SerializationUtils;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 
 import org.junit.Test;
 
-public class UntilSuccessfulWithQueuePersistenceObjectStoreTestCase extends FunctionalTestCase
+public class UntilSuccessfulWithPersistedQueueTestCase extends FunctionalTestCase
 {
-    public UntilSuccessfulWithQueuePersistenceObjectStoreTestCase()
+    public UntilSuccessfulWithPersistedQueueTestCase()
     {
         setStartContext(false);
     }
@@ -33,7 +27,7 @@ public class UntilSuccessfulWithQueuePersistenceObjectStoreTestCase extends Func
     @Override
     protected String getConfigFile()
     {
-        return "until-successful-with-queue-persistence-object-store-config.xml";
+        return "until-successful-with-persisted-queue-config.xml";
     }
 
     @Test
