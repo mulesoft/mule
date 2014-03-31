@@ -30,6 +30,7 @@ public class TestProcess implements CommandServer.CommandListener
     private String instanceId;
     private ServerSocket loggerSocket;
     private CommandServer commandServer;
+    private Thread loggerThread;
 
     public TestProcess(String instanceId, int loggerServerPort, int commandServerPort)
     {
@@ -43,9 +44,10 @@ public class TestProcess implements CommandServer.CommandListener
         try
         {
             logger.info(String.format("# Destroying process for instance %s #", instanceId));
+            loggerThread.interrupt();
             closeQuietly(loggerSocket);
             commandServer.stop();
-            this.process.destroy();
+            process.destroy();
         }
         catch (Exception e)
         {
@@ -104,7 +106,7 @@ public class TestProcess implements CommandServer.CommandListener
         {
             logger.info("Creating logger service on port: " + loggerServerPort);
             loggerSocket = new ServerSocket(loggerServerPort, 0, InetAddress.getByName("localhost"));
-            Thread loggerThread = new Thread(String.format("Process %s logger", instanceId))
+            loggerThread = new Thread(String.format("Process %s logger", instanceId))
             {
                 @Override
                 public void run()
