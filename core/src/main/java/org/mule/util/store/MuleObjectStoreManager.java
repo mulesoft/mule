@@ -20,7 +20,6 @@ import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.store.PartitionableExpirableObjectStore;
 import org.mule.api.store.PartitionableObjectStore;
-import org.mule.util.Preconditions;
 import org.mule.util.concurrent.DaemonThreadFactory;
 
 import java.io.Serializable;
@@ -90,8 +89,15 @@ public class MuleObjectStoreManager
                                                                                               int expirationInterval)
     {
 
-        Preconditions.checkArgument(maxEntries >= UNBOUNDED, String.format("maxEntries cannot be lower than %d", UNBOUNDED));
-        Preconditions.checkArgument(entryTTL >= UNBOUNDED, String.format("entryTTL cannot be lower than %d", UNBOUNDED));
+        if (maxEntries < UNBOUNDED)
+        {
+            maxEntries = UNBOUNDED;
+        }
+
+        if (entryTTL < UNBOUNDED)
+        {
+            entryTTL = UNBOUNDED;
+        }
 
         if (stores.containsKey(name))
         {
