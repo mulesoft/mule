@@ -27,6 +27,7 @@ import org.mule.security.MuleSecurityManager;
 import org.mule.util.DefaultStreamCloserService;
 import org.mule.util.lock.MuleLockFactory;
 import org.mule.util.lock.SingleServerLockProvider;
+import org.mule.util.queue.DelegateQueueManager;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.TransactionalQueueManager;
 import org.mule.util.store.DefaultObjectStoreFactoryBean;
@@ -106,7 +107,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
 
     protected void configureQueueManager(MuleContext muleContext) throws RegistrationException
     {
-        QueueManager queueManager = new TransactionalQueueManager();
+        QueueManager queueManager = new DelegateQueueManager();
         muleContext.getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager);
     }
 

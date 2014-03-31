@@ -7,15 +7,13 @@
 
 package org.mule.util.queue;
 
-import org.mule.api.store.ObjectStoreException;
-
 import java.io.Serializable;
 import java.util.Collection;
 
 /**
- * A QueueInfo delegates the actual work of processing its queue to one of these.
+ * A DefaultQueueStore delegates the actual work of processing its queue to one of these.
  */
-public interface QueueInfoDelegate
+public interface QueueStoreDelegate
 {
     /**
      * append a new member to the end of the queue
@@ -25,7 +23,7 @@ public interface QueueInfoDelegate
     /**
      * Offer to append a new member to the end of the queue
      */
-    boolean offer(Serializable o, int room, long timeout) throws InterruptedException, ObjectStoreException;
+    boolean offer(Serializable o, int room, long timeout) throws InterruptedException;
 
     /**
      * Poll the queue for its first member, and, if there is one, remove and return
@@ -41,7 +39,7 @@ public interface QueueInfoDelegate
     /**
      * Restore a previously removed member to the front of the queue
      */
-    void untake(Serializable item) throws InterruptedException, ObjectStoreException;
+    void untake(Serializable item) throws InterruptedException;
 
     /**
      * Return the size of the queue
@@ -61,4 +59,9 @@ public interface QueueInfoDelegate
      * @return <tt>true</tt> if this queue changed as a result of the call
      */
     boolean addAll(Collection<? extends Serializable> items);
+
+    /**
+     * Deletes the queue and it's content.
+     */
+    void dispose();
 }

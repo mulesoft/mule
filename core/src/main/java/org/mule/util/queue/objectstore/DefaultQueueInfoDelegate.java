@@ -4,15 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.queue;
+package org.mule.util.queue.objectstore;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedList;
 
 /**
- * The default QueueInfoDelegate. This uses a LinkedList to store the members of the queue.
+ * The default QueueStoreDelegate. This uses a LinkedList to store the members of the queue.
+ *
+ * @deprecated this class will be removed in Mule 4.0 in favor of the new queue implementation
  */
+@Deprecated
 public class DefaultQueueInfoDelegate implements TransientQueueInfoDelegate
 {
     protected final int capacity;
@@ -144,7 +147,7 @@ public class DefaultQueueInfoDelegate implements TransientQueueInfoDelegate
             return result;
         }
     }
-    
+
     private void checkInterrupted() throws InterruptedException
     {
         if (Thread.interrupted())

@@ -6,22 +6,29 @@
  */
 package org.mule.util.queue;
 
-import org.mule.api.store.QueueStore;
-import org.mule.util.store.QueueStoreAdapter;
-import org.mule.util.store.QueuePersistenceObjectStore;
+import org.mule.DefaultMuleContext;
+import org.mule.api.config.MuleConfiguration;
 
-import java.io.Serializable;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
+import org.mockito.Mockito;
 
 public class FilePersistenceTestCase extends AbstractTransactionQueueManagerTestCase
 {
+
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
     @Override
     protected TransactionalQueueManager createQueueManager() throws Exception
     {
-        QueueStore<Serializable> store = new QueueStoreAdapter<Serializable>(new QueuePersistenceObjectStore<Serializable>(muleContext));
-
         TransactionalQueueManager mgr = new TransactionalQueueManager();
-
-        mgr.setDefaultQueueConfiguration(new QueueConfiguration(0, store));
+        MuleConfiguration mockConfiguration = Mockito.mock(MuleConfiguration.class);
+        Mockito.when(mockConfiguration.getWorkingDirectory()).thenReturn(temporaryFolder.getRoot().getAbsolutePath());
+        ((DefaultMuleContext)muleContext).setMuleConfiguration(mockConfiguration);
+        mgr.setMuleContext(muleContext);
+        mgr.initialise();
+        mgr.setDefaultQueueConfiguration(new DefaultQueueConfiguration(0, true));
         return mgr;
     }
 

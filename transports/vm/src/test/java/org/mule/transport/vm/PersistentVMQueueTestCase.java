@@ -33,7 +33,6 @@ public class PersistentVMQueueTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "vm/persistent-vmqueue-test-service.xml"},
             {ConfigVariant.FLOW, "vm/persistent-vmqueue-test-flow.xml"}});
     }
 
