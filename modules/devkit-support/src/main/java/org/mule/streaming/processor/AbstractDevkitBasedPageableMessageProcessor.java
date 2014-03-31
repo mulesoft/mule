@@ -22,7 +22,7 @@ import org.mule.streaming.Producer;
 /**
  * Base class for devkit generated pageable message processors. This processor
  * automatically takes care of obtaining a {@link org.mule.streaming.PagingDelegate}
- * and returning a {@link org.mule.streaming.ConsumerIterator.ConsumerIterator}
+ * and returning a {@link org.mule.streaming.ConsumerIterator}
  * accordingly
  */
 public abstract class AbstractDevkitBasedPageableMessageProcessor extends DevkitBasedMessageProcessor
@@ -40,12 +40,11 @@ public abstract class AbstractDevkitBasedPageableMessageProcessor extends Devkit
 
     /**
      * This method sets the message payload to an instance of
-     * {@link org.mule.streaming.ConsumerIterator.ConsumerIterator} configured
+     * {@link org.mule.streaming.ConsumerIterator} configured
      * accordingly to the configured outputUnit and the
      * {@link org.mule.streaming.PagingDelegate} obtained by invoking {@link
-     * org.mule.streaming.processor.AbstractDevkitBasedPageableMessageProcessor.
-     * getPagingDelegate(MuleEvent, PagingConfiguration)}
-     * 
+     * #getPagingDelegate(org.mule.api.MuleEvent, org.mule.streaming.PagingConfiguration)}
+     *
      * @return a {@link MuleEvent}
      * @throws IllegalArgumentException is firstPage is lower than zero or if
      *             lastPage is lower than zero and firstPage or if fetchSize is lower
