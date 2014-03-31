@@ -8,7 +8,7 @@ package org.mule.config.spring.factories;
 
 import org.mule.api.config.MuleProperties;
 
-public class FileQueueStoreFactoryBean extends ObjectStoreFromRegistryFactoryBean
+public class FileQueueStoreFactoryBean extends AbstractQueueStoreFactoryBean
 {
     public FileQueueStoreFactoryBean()
     {

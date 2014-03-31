@@ -73,7 +73,7 @@ public class MuleContextProcessBuilder implements Cloneable, ConfigurableProcess
         MuleContextProcessBuilder clusteredMuleContextProcessBuilder = new MuleContextProcessBuilder(this);
         clusteredMuleContextProcessBuilder.instanceId = String.valueOf(instanceId);
         clusteredMuleContextProcessBuilder.addConfigurationAttribute(MULE_CONTEXT_CONFIGURATION_ID_KEY, getMuleContextConfigurationId());
-        clusteredMuleContextProcessBuilder.addConfigurationAttribute(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, testDirectory.getAbsolutePath() + File.separator + "mule-home-" + clusteredMuleContextProcessBuilder.instanceId);
+        clusteredMuleContextProcessBuilder.addConfigurationAttribute(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, getMuleHomeDirectoryFor(instanceId));
         clusteredMuleContextProcessBuilder.addConfigurationAttribute(LOG_PORT_PROPERTY, freePortFinder.find().toString());
         clusteredMuleContextProcessBuilder.addConfigurationAttribute(COMMAND_PORT_PROPERTY, freePortFinder.find().toString());
         for (ProcessBuilderConfigurer processBuilderConfigurer : processBuilderConfigurers)
@@ -81,6 +81,11 @@ public class MuleContextProcessBuilder implements Cloneable, ConfigurableProcess
             processBuilderConfigurer.configure(clusteredMuleContextProcessBuilder.instanceId, clusteredMuleContextProcessBuilder);
         }
         return clusteredMuleContextProcessBuilder.build();
+    }
+
+    public String getMuleHomeDirectoryFor(int instanceId)
+    {
+        return testDirectory.getAbsolutePath() + File.separator + "mule-home-" + instanceId;
     }
 
     private TestProcess build()

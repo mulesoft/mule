@@ -29,7 +29,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.util.FileUtils;
 import org.mule.util.SerializationUtils;
 import org.mule.util.UUID;
-import org.mule.util.queue.QueueKey;
+import org.mule.util.queue.objectstore.QueueKey;
 
 import java.io.File;
 import java.io.FileOutputStream;

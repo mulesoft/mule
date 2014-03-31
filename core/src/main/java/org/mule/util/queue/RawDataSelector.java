@@ -6,10 +6,16 @@
  */
 package org.mule.util.queue;
 
-
 /**
- * A marker interface for a QueueInfoDelegate that needs to be rebuilt at startup
+ * Callback for defining if a certain operation should be executed over certain serialized data.
  */
-public interface TransientQueueInfoDelegate extends QueueInfoDelegate
+interface RawDataSelector
 {
+
+    /**
+     * @param data serialized form data
+     * @return true if this data should be selected for operation
+     */
+    boolean isSelectedData(byte[] data);
+
 }

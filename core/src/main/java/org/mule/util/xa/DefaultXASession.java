@@ -15,19 +15,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * TODO document
+ * Base class for an XAResource implementation.
+ *
+ * @param <T> type of the {@link org.mule.util.xa.AbstractXaTransactionContext} created for each transaction
  */
-public class DefaultXASession implements XAResource
+public abstract class DefaultXASession<T extends AbstractXaTransactionContext> implements XAResource
 {
 
-    /**
-     * logger used by this class
-     */
     protected transient Log logger = LogFactory.getLog(getClass());
-
-    protected AbstractTransactionContext localContext;
     protected Xid localXid;
-    protected AbstractXAResourceManager resourceManager;
+    protected AbstractXAResourceManager<T> resourceManager;
+    protected T localContext;
 
     public DefaultXASession(AbstractXAResourceManager resourceManager)
     {
@@ -47,55 +45,6 @@ public class DefaultXASession implements XAResource
     }
 
     //
-    // Local transaction implementation
-    //
-    public void begin() throws ResourceManagerException
-    {
-        if (localXid != null)
-        {
-            throw new IllegalStateException(
-                "Cannot start local transaction. An XA transaction is already in progress.");
-        }
-        if (localContext != null)
-        {
-            throw new IllegalStateException(
-                "Cannot start local transaction. A local transaction already in progress.");
-        }
-        localContext = resourceManager.createTransactionContext(this);
-        resourceManager.beginTransaction(localContext);
-    }
-
-    public void commit() throws ResourceManagerException
-    {
-        if (localXid != null)
-        {
-            throw new IllegalStateException(
-                "Cannot commit local transaction as an XA transaction is in progress.");
-        }
-        if (localContext == null)
-        {
-            throw new IllegalStateException("Cannot commit local transaction as no transaction was begun");
-        }
-        resourceManager.commitTransaction(localContext);
-        localContext = null;
-    }
-
-    public void rollback() throws ResourceManagerException
-    {
-        if (localXid != null)
-        {
-            throw new IllegalStateException(
-                "Cannot rollback local transaction as an XA transaction is in progress.");
-        }
-        if (localContext == null)
-        {
-            throw new IllegalStateException("Cannot commit local transaction as no transaction was begun");
-        }
-        resourceManager.rollbackTransaction(localContext);
-        localContext = null;
-    }
-
-    //
     // XAResource implementation
     //
 
@@ -103,11 +52,6 @@ public class DefaultXASession implements XAResource
     {
         return xares instanceof DefaultXASession
                && ((DefaultXASession) xares).getResourceManager().equals(resourceManager);
-    }
-
-    public Xid[] recover(int flag) throws XAException
-    {
-        return null;
     }
 
     public void start(Xid xid, int flags) throws XAException
@@ -136,7 +80,7 @@ public class DefaultXASession implements XAResource
             default :
                 try
                 {
-                    localContext = resourceManager.createTransactionContext(this);
+                    localContext = createTransactionContext(xid);
                     resourceManager.beginTransaction(localContext);
                 }
                 catch (Exception e)
@@ -210,10 +154,15 @@ public class DefaultXASession implements XAResource
         {
             throw new XAException(XAException.XAER_PROTO);
         }
-        AbstractTransactionContext context = resourceManager.getActiveTransactionalResource(xid);
+        T context = resourceManager.getActiveTransactionalResource(xid);
         if (context == null)
         {
-            throw new XAException(XAException.XAER_NOTA);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Commit called without a transaction context");
+            }
+            commitDanglingTransaction(xid, onePhase);
+            return;
         }
         if (logger.isDebugEnabled())
         {
@@ -257,7 +206,12 @@ public class DefaultXASession implements XAResource
         AbstractTransactionContext context = resourceManager.getActiveTransactionalResource(xid);
         if (context == null)
         {
-            throw new XAException(XAException.XAER_NOTA);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Rollback called without a transaction context");
+            }
+            rollbackDandlingTransaction(xid);
+            return;
         }
         if (logger.isDebugEnabled())
         {
@@ -283,7 +237,7 @@ public class DefaultXASession implements XAResource
             throw new XAException(XAException.XAER_PROTO);
         }
 
-        AbstractTransactionContext context = resourceManager.getTransactionalResource(xid);
+        T context = resourceManager.getTransactionalResource(xid);
         if (context == null)
         {
             throw new XAException(XAException.XAER_NOTA);
@@ -334,5 +288,37 @@ public class DefaultXASession implements XAResource
         resourceManager.setDefaultTransactionTimeout(timeout * 1000);
         return false;
     }
+
+    public T getTransactionContext()
+    {
+        return this.localContext;
+    }
+
+    /**
+     * Commits a dangling transaction that can be caused by the failure of one
+     * of the XAResource involved in the transaction or a crash of the transaction manager.
+     *
+     * @param xid transaction identifier
+     * @param onePhase if the commit should be done using only one phase commit
+     * @throws XAException
+     */
+    protected abstract void commitDanglingTransaction(Xid xid, boolean onePhase) throws XAException;
+
+    /**
+     * Commits a dangling transaction that can be caused by the failure of one
+     * of the XAResource involved in the transaction or a crash of the transaction manager.
+     *
+     * @param xid transaction identifier
+     * @throws XAException
+     */
+    protected abstract void rollbackDandlingTransaction(Xid xid) throws XAException;
+
+    /**
+     * Creates a new transaction context with the given transaction identifier
+     *
+     * @param xid transaction identifier
+     * @return the new transaction context
+     */
+    abstract protected T createTransactionContext(Xid xid);
 
 }

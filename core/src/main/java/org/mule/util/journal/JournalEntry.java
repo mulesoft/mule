@@ -4,11 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.queue;
+package org.mule.util.journal;
 
 /**
- * A marker interface for a QueueInfoDelegate that, along with its store, is transactional
+ * Contract for a journal file entry
+ *
+ * @param <T> type of the transaction identifier.
  */
-public interface TransactionalQueueInfoDelegate extends QueueInfoDelegate
+public interface JournalEntry<T>
 {
+
+    /**
+     * @return the transaction identifier
+     */
+    public T getTxId();
+
 }
+

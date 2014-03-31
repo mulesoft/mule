@@ -361,6 +361,7 @@
     <xsd:element name="simple-in-memory-queue-store" type="defaultQueueStoreType" substitutionGroup="abstract-queue-store">
         <xsd:annotation>
             <xsd:documentation>
+                DEPRECATED: simple-in-memory-queue-store is deprecated since Mule 3.5 and will be removed in Mule 4.0. Use default-in-memory-queue-store instead.
                 A simple in-memeory queue store.
             </xsd:documentation>
         </xsd:annotation>
@@ -369,6 +370,7 @@
     <xsd:element name="file-queue-store" type="defaultQueueStoreType" substitutionGroup="abstract-queue-store">
         <xsd:annotation>
             <xsd:documentation>
+                DEPRECATED: file-queue-store is deprecated since Mule 3.5 and will be removed in Mule 4.0. Use default-persistent-queue-store instead.
                 A simple file-based queue store.
             </xsd:documentation>
         </xsd:annotation>

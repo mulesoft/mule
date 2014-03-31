@@ -4,16 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.queue;
+package org.mule.util.queue.objectstore;
 
 import org.mule.api.store.ObjectStoreException;
+import org.mule.util.queue.QueueStoreDelegate;
 
 import java.io.Serializable;
 
 /**
- * A QueueInfoDelegate that can take objects directly from its store
+ * A QueueStoreDelegate that can take objects directly from its store
+ *
+ * @deprecated this class will be removed in Mule 4.0 in favor of the new queue implementation
  */
-public interface TakingQueueInfoDelegate extends QueueInfoDelegate
+@Deprecated
+public interface TakingQueueStoreDelegate extends QueueStoreDelegate
 {
     /**
      * Poll the queue for its first member, and, if there is one, remove and return the corresponding object
