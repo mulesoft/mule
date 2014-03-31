@@ -17,6 +17,9 @@ import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
+import org.mule.api.processor.DynamicPipeline;
+import org.mule.api.processor.DynamicPipelineBuilder;
+import org.mule.api.processor.DynamicPipelineException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.processor.NamedStageNameSource;
@@ -46,10 +49,11 @@ import org.mule.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
  * transactions message processing in another thread asynchronously.</li>
  * </ul>
  */
-public class Flow extends AbstractPipeline implements MessageProcessor, StageNameSourceProvider
+public class Flow extends AbstractPipeline implements MessageProcessor, StageNameSourceProvider, DynamicPipeline
 {
     private int stageCount = 0;
     private final StageNameSource sequentialStageNameSource;
+    private DynamicPipelineMessageProcessor dynamicPipelineMessageProcessor;
 
     public Flow(String name, MuleContext muleContext)
     {
@@ -76,6 +80,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
                 public MuleEvent process() throws Exception
                 {
                     MuleEvent result = pipeline.process(newEvent);
+
                     if (result != null && !VoidMuleEvent.getInstance().equals(result))
                     {
                         result.getMessage().release();
@@ -83,6 +88,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
                     return result;
                 }
             });
+
             if (result != null && !VoidMuleEvent.getInstance().equals(result))
             {
                 result = new DefaultMuleEvent(result, event.getFlowConstruct(), replyToHandler, replyToDestination);
@@ -112,6 +118,9 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
         builder.chain(new ProcessIfPipelineStartedMessageProcessor());
         builder.chain(new ProcessingTimeInterceptor());
         builder.chain(new FlowConstructStatisticsMessageProcessor());
+
+        dynamicPipelineMessageProcessor = new DynamicPipelineMessageProcessor(this);
+        builder.chain(dynamicPipelineMessageProcessor);
     }
 
     @Override
@@ -184,4 +193,9 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
         return new NamedStageNameSource(this.name, asyncName);
     }
 
+    @Override
+    public DynamicPipelineBuilder dynamicPipeline(String id) throws DynamicPipelineException
+    {
+        return dynamicPipelineMessageProcessor.dynamicPipeline(id);
+    }
 }

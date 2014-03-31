@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+                          http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <flow name="dynamicFlow">
+        <vm:inbound-endpoint path="dynamic" exchange-pattern="request-response"/>
+        <append-string-transformer message="(static)" />
+    </flow>
+
+    <flow name="dynamicComponentFlow">
+        <vm:inbound-endpoint path="dynamicComponent" exchange-pattern="request-response"/>
+        <append-string-transformer message="(static)" />
+        <component>
+            <singleton-object class="org.mule.test.construct.DynamicFlowTestCase$Component"/>
+        </component>
+    </flow>
+
+    <flow name="exceptionFlow">
+        <vm:inbound-endpoint path="exception" exchange-pattern="request-response"/>
+        <append-string-transformer message="(fail)" />
+        <catch-exception-strategy>
+            <append-string-transformer message="(handled)" />
+        </catch-exception-strategy>
+    </flow>
+
+</mule>
