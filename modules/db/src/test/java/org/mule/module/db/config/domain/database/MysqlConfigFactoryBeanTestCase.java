@@ -89,7 +89,7 @@ public class MysqlConfigFactoryBeanTestCase extends AbstractMuleTestCase
     {
         factory.setDatabase(DATABASE);
         factory.setHost(HOST);
-        factory.setPort(3036);
+        factory.setPort(PORT);
 
         properties.put(USER_PROPERTY, USER_VALUE);
         properties.put(PASSWORD_PROPERTY, PASSWORD_VALUE);
