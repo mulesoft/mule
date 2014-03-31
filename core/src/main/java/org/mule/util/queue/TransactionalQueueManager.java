@@ -7,49 +7,34 @@
 
 package org.mule.util.queue;
 
-import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.store.ListableObjectStore;
-import org.mule.api.store.ObjectStore;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.api.store.QueueStore;
-import org.mule.util.UUID;
-import org.mule.util.xa.AbstractTransactionContext;
-import org.mule.util.xa.AbstractXAResourceManager;
-import org.mule.util.xa.ResourceManagerException;
-import org.mule.util.xa.ResourceManagerSystemException;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.util.journal.queue.LocalTxQueueTransactionJournal;
+import org.mule.util.journal.queue.LocalTxQueueTransactionRecoverer;
+import org.mule.util.journal.queue.XaTxQueueTransactionJournal;
+import org.mule.util.xa.XaTransactionRecoverer;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import javax.transaction.xa.XAResource;
+import java.util.TreeSet;
 
 /**
  * The Transactional Queue Manager is responsible for creating and Managing
  * transactional Queues. Queues can also be persistent by setting a persistence
- * strategy on the manager. Default straties are provided for Memory, Jounaling,
- * Cache and File.
+ * configuration for the queue.
  */
-public class TransactionalQueueManager extends AbstractXAResourceManager
-    implements QueueManager, MuleContextAware
+public class TransactionalQueueManager extends AbstractQueueManager
 {
-    private final Map<String, QueueInfo> queues = new HashMap<String, QueueInfo>();
 
-    private QueueConfiguration defaultQueueConfiguration;
-    private MuleContext muleContext;
-    private final Set<QueueStore> queueObjectStores = new HashSet<QueueStore>();
-    private final Set<ListableObjectStore> listableObjectStores = new HashSet<ListableObjectStore>();
-    private final ReadWriteLock queuesLock = new ReentrantReadWriteLock();
+    private LocalTxQueueTransactionJournal localTxTransactionJournal;
+    private LocalTxQueueTransactionRecoverer localTxQueueTransactionRecoverer;
+    private XaTxQueueTransactionJournal xaTransactionJournal;
+    private XaTransactionRecoverer xaTransactionRecoverer;
+    private QueueXaResourceManager queueXaResourceManager = new QueueXaResourceManager();
+    //Due to current VMConnector and TransactionQueueManager relationship we must close all the recovered queues
+    //since queue configuration is applied after recovery and not taking into consideration once queues are created
+    //for recovery. See https://www.mulesoft.org/jira/browse/MULE-7420
+    private Set<String> queuesAccessedForRecovery = new TreeSet<String>();
 
     /**
      * {@inheritDoc}
@@ -59,279 +44,61 @@ public class TransactionalQueueManager extends AbstractXAResourceManager
     @Override
     public synchronized QueueSession getQueueSession()
     {
-        return new TransactionalQueueSession(this, this);
+        return new TransactionalQueueSession(this, queueXaResourceManager, queueXaResourceManager, xaTransactionRecoverer, localTxTransactionJournal,getMuleContext());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    protected DefaultQueueStore createQueueStore(String name, QueueConfiguration config)
+    {
+        return new DefaultQueueStore(name, getMuleContext(), config);
+    }
+
     @Override
-    public synchronized void setDefaultQueueConfiguration(QueueConfiguration config)
+    protected void doDispose()
     {
-        this.defaultQueueConfiguration = config;
-        addStore(config.objectStore);
+        localTxTransactionJournal.clear();
+        localTxTransactionJournal.close();
+        xaTransactionJournal.clear();
+        xaTransactionJournal.close();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public synchronized void setQueueConfiguration(String queueName, QueueConfiguration config)
+    public void initialise() throws InitialisationException
     {
-        getQueue(queueName, config).setConfig(config);
-        addStore(config.objectStore);
+        String workingDirectory = getMuleContext().getConfiguration().getWorkingDirectory();
+        localTxTransactionJournal = new LocalTxQueueTransactionJournal(workingDirectory + File.separator + "queue-tx-log", getMuleContext());
+        localTxQueueTransactionRecoverer = new LocalTxQueueTransactionRecoverer(localTxTransactionJournal, this);
+        xaTransactionJournal = new XaTxQueueTransactionJournal(workingDirectory + File.separator + "queue-xa-tx-log", getMuleContext());
+        xaTransactionRecoverer = new XaTransactionRecoverer(xaTransactionJournal, this);
     }
 
-    protected void disposeQueue(Queue queue) throws MuleException, InterruptedException
+    public XaTxQueueTransactionJournal getXaTransactionJournal()
     {
-        if (queue == null)
-        {
-            throw new IllegalArgumentException("Queue to be disposed cannot be null");
-        }
-
-        final String queueName = queue.getName();
-        Lock lock = this.queuesLock.writeLock();
-        lock.lock();
-        try
-        {
-            if (!this.queues.containsKey(queueName))
-            {
-                throw new IllegalArgumentException(String.format("There's no queue for name %s", queueName));
-            }
-
-            this.queues.remove(queueName);
-        }
-        finally
-        {
-            lock.unlock();
-        }
-
-        queue.clear();
-
-        if (queue instanceof Stoppable)
-        {
-            ((Stoppable) queue).stop();
-        }
-
-        if (queue instanceof Disposable)
-        {
-            ((Disposable) queue).dispose();
-        }
+        return xaTransactionJournal;
     }
 
-    protected QueueInfo getQueue(String name)
+    @Override
+    public RecoverableQueueStore getRecoveryQueue(String queueName)
     {
-        return getQueue(name, defaultQueueConfiguration);
+        queuesAccessedForRecovery.add(queueName);
+        return createQueueStore(queueName, new DefaultQueueConfiguration(0, true));
     }
 
-    protected QueueInfo getQueue(String name, QueueConfiguration config)
+    @Override
+    public void start() throws MuleException
     {
-        Lock lock = this.queuesLock.writeLock();
-        lock.lock();
-        try
+        queueXaResourceManager.start();
+        localTxQueueTransactionRecoverer.recover();
+        for (String queueName : queuesAccessedForRecovery)
         {
-            QueueInfo q = queues.get(name);
-            if (q == null)
-            {
-                q = new QueueInfo(name, muleContext, config);
-                queues.put(name, q);
-            }
-
-            return q;
-        }
-        finally
-        {
-            lock.unlock();
-        }
-    }
-
-    public QueueInfo getQueueInfo(String name)
-    {
-        Lock lock = this.queuesLock.readLock();
-        lock.lock();
-        try
-        {
-            QueueInfo q = queues.get(name);
-            return q == null ? q : new QueueInfo(q);
-        }
-        finally
-        {
-            lock.unlock();
+            getQueue(queueName).close();
+            clearQueueConfiguration(queueName);
         }
     }
 
     @Override
-    protected void doStart() throws ResourceManagerSystemException
+    public void stop() throws MuleException
     {
-        findAllListableObjectStores();
-        for (ListableObjectStore store : listableObjectStores)
-        {
-            try
-            {
-                store.open();
-            }
-            catch (ObjectStoreException e)
-            {
-                throw new ResourceManagerSystemException(e);
-            }
-        }
+        queueXaResourceManager.stop();
     }
 
-    @Override
-    protected boolean shutdown(int mode, long timeoutMSecs)
-    {
-        // Clear queues on shutdown to avoid duplicate entries on warm restarts
-        // (MULE-3678)
-        Lock lock = this.queuesLock.writeLock();
-        lock.lock();
-        try
-        {
-            queues.clear();
-        }
-        finally
-        {
-            lock.unlock();
-        }
-        return super.shutdown(mode, timeoutMSecs);
-    }
-
-    @Override
-    protected void recover() throws ResourceManagerSystemException
-    {
-        findAllQueueStores();
-        for (QueueStore store : queueObjectStores)
-        {
-            if (!store.isPersistent())
-            {
-                continue;
-            }
-
-            try
-            {
-                List<Serializable> keys = store.allKeys();
-                for (Serializable key : keys)
-                {
-                    // It may contain events that aren't part of a queue MULE-6007
-                    if (key instanceof QueueKey)
-                    {
-                        QueueKey queueKey = (QueueKey) key;
-                        QueueInfo queue = getQueue(queueKey.queueName);
-                        if (queue.isQueueTransient())
-                        {
-                            queue.putNow(queueKey.id);
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                throw new ResourceManagerSystemException(e);
-            }
-        }
-    }
-
-    @Override
-    protected AbstractTransactionContext createTransactionContext(Object session)
-    {
-        return new QueueTransactionContext(this);
-    }
-
-    @Override
-    protected void doBegin(AbstractTransactionContext context)
-    {
-        // Nothing special to do
-    }
-
-    @Override
-    protected int doPrepare(AbstractTransactionContext context)
-    {
-        return XAResource.XA_OK;
-    }
-
-    @Override
-    protected void doCommit(AbstractTransactionContext context) throws ResourceManagerException
-    {
-        context.doCommit();
-    }
-
-    protected Serializable doStore(QueueInfo queue, Serializable object) throws ObjectStoreException
-    {
-        ObjectStore<Serializable> store = queue.getStore();
-
-        String id = muleContext == null ? UUID.getUUID() : muleContext.getUniqueIdString();
-        Serializable key = new QueueKey(queue.getName(), id);
-        store.store(key, object);
-        return id;
-    }
-
-    protected void doClear(QueueInfo queue) throws ObjectStoreException, InterruptedException
-    {
-        queue.clear();
-    }
-
-    protected void doRemove(QueueInfo queue, Serializable id) throws ObjectStoreException
-    {
-        ObjectStore<Serializable> store = queue.getStore();
-
-        Serializable key = new QueueKey(queue.getName(), id);
-        store.remove(key);
-    }
-
-    protected Serializable doLoad(QueueInfo queue, Serializable id) throws ObjectStoreException
-    {
-        ObjectStore<Serializable> store = queue.getStore();
-
-        Serializable key = new QueueKey(queue.getName(), id);
-        return store.retrieve(key);
-    }
-
-    @Override
-    protected void doRollback(AbstractTransactionContext context) throws ResourceManagerException
-    {
-        context.doRollback();
-    }
-
-    protected void findAllListableObjectStores()
-    {
-        if (muleContext != null)
-        {
-            for (ListableObjectStore store : muleContext.getRegistry()
-                .lookupByType(ListableObjectStore.class)
-                .values())
-            {
-                addStore(store);
-            }
-        }
-    }
-
-    protected synchronized void findAllQueueStores()
-    {
-        if (muleContext != null)
-        {
-            for (QueueStore store : muleContext.getRegistry().lookupByType(QueueStore.class).values())
-            {
-                addStore(store);
-            }
-        }
-    }
-
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-    }
-
-    public MuleContext getMuleContext()
-    {
-        return muleContext;
-    }
-
-    private void addStore(ListableObjectStore<?> store)
-    {
-        if (store instanceof QueueStore)
-        {
-            queueObjectStores.add((QueueStore) store);
-        }
-        listableObjectStores.add(store);
-    }
 }

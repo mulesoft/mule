@@ -11,14 +11,13 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectDoesNotExistException;
-import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.FileUtils;
 import org.mule.util.SerializationUtils;
-import org.mule.util.queue.QueueKey;
+import org.mule.util.queue.objectstore.QueueKey;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,6 +45,11 @@ import org.apache.commons.lang.SerializationException;
  * > Java serialization</a> to implement persistence.
  * </p>
  */
+
+/**
+ * @deprecated this class will be removed in Mule 4.0 in favor of the new queue implementation
+ */
+@Deprecated
 public class QueuePersistenceObjectStore<T extends Serializable> extends AbstractObjectStore<T>
     implements ListableObjectStore<T>, MuleContextAware
 {

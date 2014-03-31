@@ -6,248 +6,145 @@
  */
 package org.mule.util.queue;
 
-import org.mule.api.MuleException;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.util.store.DeserializationPostInitialisable;
-import org.mule.util.xa.AbstractXAResourceManager;
-import org.mule.util.xa.DefaultXASession;
+import org.mule.api.MuleContext;
+import org.mule.util.journal.queue.LocalTxQueueTransactionJournal;
+import org.mule.util.xa.AbstractResourceManager;
+import org.mule.util.xa.AbstractTransactionContext;
+import org.mule.util.xa.ResourceManagerException;
+import org.mule.util.xa.XaTransactionRecoverer;
 
-import java.io.Serializable;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.transaction.xa.XAException;
+import javax.transaction.xa.XAResource;
+import javax.transaction.xa.Xid;
 
 /**
- * A Queue session that is used to manage the transaction context of a Queue
+ * A Queue session that is used to manage the transaction context of a Queue.
+ * <p/>
+ * This QueueSession can be used for local and xa transactions
  */
-class TransactionalQueueSession extends DefaultXASession implements QueueSession
+public class TransactionalQueueSession extends AbstractQueueSession implements QueueSession
 {
-    private Log logger = LogFactory.getLog(TransactionalQueueSession.class);
 
-    protected TransactionalQueueManager queueManager;
+    private final QueueXaResource queueXaResource;
+    private final AbstractResourceManager resourceManager;
+    private final LocalTxQueueTransactionJournal localTxTransactionJournal;
+    private LocalQueueTransactionContext singleResourceTxContext;
 
-    public TransactionalQueueSession(AbstractXAResourceManager resourceManager,
-                                     TransactionalQueueManager queueManager)
+    public TransactionalQueueSession(QueueProvider queueProvider,
+                                     QueueXaResourceManager xaResourceManager,
+                                     AbstractResourceManager resourceManager,
+                                     XaTransactionRecoverer xaTransactionRecoverer,
+                                     LocalTxQueueTransactionJournal localTxTransactionJournal,
+                                     MuleContext muleContext)
     {
-        super(resourceManager);
-        this.queueManager = queueManager;
+        super(queueProvider, muleContext);
+        this.localTxTransactionJournal = localTxTransactionJournal;
+        this.resourceManager = resourceManager;
+        this.queueXaResource = new QueueXaResource(xaResourceManager, xaTransactionRecoverer, getQueueProvider());
+    }
+
+    protected QueueTransactionContext getTransactionalContext()
+    {
+        if (singleResourceTxContext != null)
+        {
+            return singleResourceTxContext;
+        }
+        else
+        {
+            return queueXaResource.getTransactionContext();
+        }
+    }
+
+    // Local transaction implementation
+    public void begin() throws ResourceManagerException
+    {
+        if (getTransactionalContext() != null)
+        {
+            throw new IllegalStateException(
+                    "Cannot start local transaction. A local transaction already in progress.");
+        }
+        singleResourceTxContext = new LocalTxQueueTransactionContext(localTxTransactionJournal, getQueueProvider());
+        resourceManager.beginTransaction((AbstractTransactionContext) singleResourceTxContext);
+    }
+
+    public void commit() throws ResourceManagerException
+    {
+        if (singleResourceTxContext == null)
+        {
+            throw new IllegalStateException("Cannot commit local transaction as no transaction was begun");
+        }
+        resourceManager.commitTransaction((AbstractTransactionContext) singleResourceTxContext);
+        singleResourceTxContext = null;
+    }
+
+    public void rollback() throws ResourceManagerException
+    {
+        if (singleResourceTxContext == null)
+        {
+            throw new IllegalStateException("Cannot commit local transaction as no transaction was begun");
+        }
+        resourceManager.rollbackTransaction((AbstractTransactionContext) singleResourceTxContext);
+        singleResourceTxContext = null;
+    }
+
+    // XA transaction delegation to QueueXaResource
+    @Override
+    public boolean isSameRM(XAResource xares) throws XAException
+    {
+        return queueXaResource.isSameRM(xares);
     }
 
     @Override
-    public Queue getQueue(String name)
+    public void start(Xid xid, int flags) throws XAException
     {
-        QueueInfo queue = queueManager.getQueue(name);
-        return new QueueImpl(queue);
+        queueXaResource.start(xid, flags);
     }
 
-    protected class QueueImpl implements Queue
+    @Override
+    public void end(Xid xid, int flags) throws XAException
     {
-        protected QueueInfo queue;
+        queueXaResource.end(xid, flags);
+    }
 
-        public QueueImpl(QueueInfo queue)
-        {
-            this.queue = queue;
-        }
+    @Override
+    public void commit(Xid xid, boolean onePhase) throws XAException
+    {
+        queueXaResource.commit(xid, onePhase);
+    }
 
-        @Override
-        public void put(Serializable item) throws InterruptedException, ObjectStoreException
-        {
-            offer(item, Long.MAX_VALUE);
-        }
+    @Override
+    public void rollback(Xid xid) throws XAException
+    {
+        queueXaResource.rollback(xid);
+    }
 
-        @Override
-        public void clear() throws InterruptedException
-        {
-            if (localContext != null && !queue.isQueueTransactional())
-            {
-                ((QueueTransactionContext) localContext).clear(queue);
-            }
-            else
-            {
-                try
-                {
-                    queueManager.doClear(queue);
-                }
-                catch (ObjectStoreException e)
-                {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
+    @Override
+    public int prepare(Xid xid) throws XAException
+    {
+        return queueXaResource.prepare(xid);
+    }
 
-        @Override
-        public boolean offer(Serializable item, long timeout)
-            throws InterruptedException, ObjectStoreException
-        {
-            if (localContext != null && !queue.isQueueTransactional())
-            {
-                return ((QueueTransactionContext) localContext).offer(queue, item, timeout);
-            }
-            else
-            {
-                try
-                {
-                    Serializable id = queueManager.doStore(queue, item);
-                    try
-                    {
-                        if (!queue.offer(id, 0, timeout))
-                        {
-                            queueManager.doRemove(queue, id);
-                            return false;
-                        }
-                        else
-                        {
-                            return true;
-                        }
-                    }
-                    catch (InterruptedException e)
-                    {
-                        queueManager.doRemove(queue, id);
-                        throw e;
-                    }
-                }
-                catch (ObjectStoreException e)
-                {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
+    @Override
+    public void forget(Xid xid) throws XAException
+    {
+        queueXaResource.forget(xid);
+    }
 
-        @Override
-        public Serializable take() throws InterruptedException
-        {
-            return poll(Long.MAX_VALUE);
-        }
+    @Override
+    public int getTransactionTimeout() throws XAException
+    {
+        return queueXaResource.getTransactionTimeout();
+    }
 
-        @Override
-        public void untake(Serializable item) throws InterruptedException, ObjectStoreException
-        {
-            if (localContext != null && !queue.isQueueTransactional())
-            {
-                ((QueueTransactionContext) localContext).untake(queue, item);
-            }
-            else
-            {
-                Serializable id = queueManager.doStore(queue, item);
-                queue.untake(id);
-            }
-        }
+    @Override
+    public boolean setTransactionTimeout(int timeout) throws XAException
+    {
+        return queueXaResource.setTransactionTimeout(timeout);
+    }
 
-        @Override
-        public Serializable poll(long timeout) throws InterruptedException
-        {
-            try
-            {
-                if (localContext != null && !queue.isQueueTransactional())
-                {
-                    Serializable item = ((QueueTransactionContext) localContext).poll(queue, timeout);
-                    return postProcessIfNeeded(item);
-                }
-                else if (queue.canTakeFromStore())
-                {
-                    Serializable item = queue.takeNextItemFromStore(timeout);
-                    return postProcessIfNeeded(item);
-                }
-                else
-                {
-                    Serializable id = queue.poll(timeout);
-                    if (id != null)
-                    {
-                        Serializable item = queueManager.doLoad(queue, id);
-                        if (item != null)
-                        {
-                            queueManager.doRemove(queue, id);
-                        }
-                        return postProcessIfNeeded(item);
-                    }
-                    return null;
-                }
-            }
-            catch (InterruptedException iex)
-            {
-                if (!queueManager.getMuleContext().isStopping())
-                {
-                    throw iex;
-                }
-                // if stopping, ignore
-                return null;
-            }
-            catch (ObjectStoreException e)
-            {
-                throw new RuntimeException(e);
-            }
-        }
-
-        @Override
-        public Serializable peek() throws InterruptedException
-        {
-            try
-            {
-                if (localContext != null && !queue.isQueueTransactional())
-                {
-                    Serializable item = ((QueueTransactionContext) localContext).peek(queue);
-                    return postProcessIfNeeded(item);
-                }
-                else
-                {
-                    Serializable id = queue.peek();
-                    if (id != null)
-                    {
-                        Serializable item = queueManager.doLoad(queue, id);
-                        return postProcessIfNeeded(item);
-                    }
-                    return null;
-                }
-            }
-            catch (ObjectStoreException e)
-            {
-                throw new RuntimeException(e);
-            }
-        }
-        
-        @Override
-        public void dispose() throws MuleException, InterruptedException
-        {
-            queueManager.disposeQueue(this);
-        }
-
-        @Override
-        public int size()
-        {
-            if (localContext != null && !queue.isQueueTransactional())
-            {
-                return ((QueueTransactionContext) localContext).size(queue);
-            }
-            else
-            {
-                return queue.getSize();
-            }
-        }
-
-        @Override
-        public String getName()
-        {
-            return queue.getName();
-        }
-
-        /**
-         * Note -- this must handle null items
-         */
-        private Serializable postProcessIfNeeded(Serializable item)
-        {
-            try
-            {
-                if (item instanceof DeserializationPostInitialisable)
-                {
-                    DeserializationPostInitialisable.Implementation.init(item, queueManager.getMuleContext());
-                }
-                return item;
-            }
-            catch (Exception e)
-            {
-                logger.warn("Unable to deserialize message", e);
-                return null;
-            }
-        }
+    @Override
+    public Xid[] recover(int i) throws XAException
+    {
+        return queueXaResource.recover(i);
     }
 }

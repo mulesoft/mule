@@ -130,14 +130,7 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
             sedaStageInterceptingMessageProcessor.process(event);
         }
 
-        ArgumentMatcher<MuleEvent> notSameEvent = new ArgumentMatcher<MuleEvent>()
-        {
-            @Override
-            public boolean matches(Object argument)
-            {
-                return !argument.equals(event);
-            }
-        };
+        ArgumentMatcher<MuleEvent> notSameEvent = createNotSameEventArgumentMatcher(event);
 
         // Two events are processed
         verify(mockListener, timeout(RECEIVE_TIMEOUT).times(2)).process(argThat(notSameEvent));
@@ -183,14 +176,7 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
 
         assertTrue(latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
 
-        ArgumentMatcher<MuleEvent> notSameEvent = new ArgumentMatcher<MuleEvent>()
-        {
-            @Override
-            public boolean matches(Object argument)
-            {
-                return !argument.equals(event);
-            }
-        };
+        ArgumentMatcher<MuleEvent> notSameEvent = createNotSameEventArgumentMatcher(event);
 
         // One event get processed but then throws an exception
         verify(mockListener, timeout(RECEIVE_TIMEOUT).times(1)).process(argThat(notSameEvent));
@@ -199,6 +185,18 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
         verify(exceptionHandler, timeout(RECEIVE_TIMEOUT).times(1)).handleException((Exception)any(),
             argThat(notSameEvent));
 
+    }
+
+    private ArgumentMatcher<MuleEvent> createNotSameEventArgumentMatcher(final MuleEvent event)
+    {
+        return new ArgumentMatcher<MuleEvent>()
+        {
+            @Override
+            public boolean matches(Object argument)
+            {
+                return argument != event;
+            }
+        };
     }
 
     @Test(expected = MessagingException.class)

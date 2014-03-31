@@ -49,14 +49,14 @@ public class QueueManagerLifecycleOrderTestCase
     private class RecordingTQM extends TransactionalQueueManager
     {
         @Override
-        public void start() throws ResourceManagerSystemException
+        public void start() throws MuleException
         {
             startStopOrder.add(this);
             super.start();
         }
 
         @Override
-        public void stop() throws ResourceManagerSystemException
+        public void stop() throws MuleException
         {
             startStopOrder.add(this);
             super.stop();
