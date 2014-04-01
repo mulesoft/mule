@@ -65,11 +65,9 @@ public abstract class DevkitBasedMessageProcessor extends ExpressionEvaluatorSup
     /**
      * This final process implementation shields actual processing into abstract
      * method {@link
-     * org.mule.security.oauth.processor.AbstractDevkitBasedMessageProcessor.
-     * doProcess(MuleEvent)} Afterwards, it performs payload transformation by
+     * #doProcess(org.mule.api.MuleEvent)}. Afterwards, it performs payload transformation by
      * invoking {@link
-     * org.mule.security.oauth.processor.AbstractDevkitBasedMessageProcessor.
-     * overwritePayload(MuleEvent, Object)} In case the processing throws
+     * #overwritePayload(org.mule.api.MuleEvent, Object)} In case the processing throws
      * {@link org.mule.common.security.oauth.exception.NotAuthorizedException}, the
      * module object is casted to {@link org.mule.security.oauth.OAuthAdapter} and
      * exception handling is delegated into its
