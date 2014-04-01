@@ -24,7 +24,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.retry.RetryPolicyExhaustedException;
 import org.mule.util.concurrent.ThreadNameHelper;
-import org.mule.util.queue.QueueKey;
+import org.mule.util.queue.objectstore.QueueKey;
 import org.mule.util.store.QueuePersistenceObjectStore;
 
 import java.io.NotSerializableException;

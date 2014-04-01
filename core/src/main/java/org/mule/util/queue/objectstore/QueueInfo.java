@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.queue;
+package org.mule.util.queue.objectstore;
 
 import org.mule.api.MuleContext;
 import org.mule.api.store.ListableObjectStore;
@@ -17,7 +17,10 @@ import java.util.Map;
 
 /**
  * Stores information about a Queue
+ *
+ * @deprecated this class will be removed in Mule 4.0 in favor of the new queue implementation
  */
+@Deprecated
 public class QueueInfo
 {
     private QueueConfiguration config;
@@ -61,7 +64,7 @@ public class QueueInfo
             QueueInfoDelegate newDelegate = factory != null
                                                            ? factory.createDelegate(this, muleContext)
                                                            : new DefaultQueueInfoDelegate(capacity);
-            delegateCanTake = newDelegate instanceof TakingQueueInfoDelegate;
+            delegateCanTake = newDelegate instanceof TakingQueueStoreDelegate;
             if (delegate != null && delegate instanceof DefaultQueueInfoDelegate)
             {
                 newDelegate.addAll(((DefaultQueueInfoDelegate) delegate).list);
@@ -148,7 +151,7 @@ public class QueueInfo
     {
         if (canTakeFromStore())
         {
-            return ((TakingQueueInfoDelegate) delegate).takeFromObjectStore(timeout);
+            return ((TakingQueueStoreDelegate) delegate).takeFromObjectStore(timeout);
         }
 
         throw new UnsupportedOperationException("Method 'takeNextItemFromStore' is not supported for queue "
@@ -159,7 +162,7 @@ public class QueueInfo
     {
         if (canTakeFromStore())
         {
-            ((TakingQueueInfoDelegate) delegate).writeToObjectStore(data);
+            ((TakingQueueStoreDelegate) delegate).writeToObjectStore(data);
             return;
         }
 
@@ -174,7 +177,7 @@ public class QueueInfo
 
     public boolean isQueueTransactional()
     {
-        return delegate instanceof TransactionalQueueInfoDelegate;
+        return delegate instanceof TransactionalQueueStoreDelegate;
     }
 
     /**

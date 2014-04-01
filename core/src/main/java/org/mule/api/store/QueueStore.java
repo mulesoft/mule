@@ -10,7 +10,10 @@ import java.io.Serializable;
 
 /**
  * Defines a <{@link ListableObjectStore} to store data for event queues.
+ *
+ * @deprecated this class will be removed in Mule 4.0 in favor of the new queue implementation
  */
+@Deprecated
 public interface QueueStore<T extends Serializable> extends ListableObjectStore<T>
 {
 }

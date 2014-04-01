@@ -152,26 +152,6 @@ public abstract class AbstractResourceManager
         defaultTimeout = timeout;
     }
 
-    /**
-     * Starts a new transaction and associates it with the current thread. All
-     * subsequent changes in the same thread made to the map are invisible from other
-     * threads until {@link #commitTransaction(AbstractTransactionContext)} is called. Use
-     * {@link #rollbackTransaction(AbstractTransactionContext)} to discard your changes. After
-     * calling either method there will be no transaction associated to the current thread any
-     * longer. <br>
-     * <br>
-     * <em>Caution:</em> Be careful to finally call one of those methods, as
-     * otherwise the transaction will lurk around for ever.
-     *
-     * @see #prepareTransaction(AbstractTransactionContext)
-     * @see #commitTransaction(AbstractTransactionContext)
-     * @see #rollbackTransaction(AbstractTransactionContext)
-     */
-    public AbstractTransactionContext startTransaction(Object session) throws ResourceManagerException
-    {
-        return createTransactionContext(session);
-    }
-
     public void beginTransaction(AbstractTransactionContext context) throws ResourceManagerException
     {
         // can only start a new transaction when not already stopping
@@ -191,26 +171,6 @@ public abstract class AbstractResourceManager
             }
         }
         globalTransactions.add(context);
-    }
-
-    public int prepareTransaction(AbstractTransactionContext context) throws ResourceManagerException
-    {
-        assureReady();
-        synchronized (context)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Preparing transaction " + context);
-            }
-            context.status = Status.STATUS_PREPARING;
-            int status = doPrepare(context);
-            context.status = Status.STATUS_PREPARED;
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Prepared transaction " + context);
-            }
-            return status;
-        }
     }
 
     public void rollbackTransaction(AbstractTransactionContext context) throws ResourceManagerException
@@ -316,11 +276,7 @@ public abstract class AbstractResourceManager
         }
     }
 
-    protected abstract AbstractTransactionContext createTransactionContext(Object session);
-
     protected abstract void doBegin(AbstractTransactionContext context);
-
-    protected abstract int doPrepare(AbstractTransactionContext context) throws ResourceManagerException;
 
     protected abstract void doCommit(AbstractTransactionContext context) throws ResourceManagerException;
 

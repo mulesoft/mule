@@ -10,7 +10,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectStoreException;
-import org.mule.util.queue.QueueKey;
+import org.mule.util.queue.objectstore.QueueKey;
 
 import java.io.Serializable;
 import java.util.ArrayList;

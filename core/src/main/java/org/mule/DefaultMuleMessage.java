@@ -2017,4 +2017,19 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         properties.invocationMap = invocationProperties;
     }
 
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (!(obj instanceof DefaultMuleMessage))
+        {
+            return false;
+        }
+        return this.id.equals(((DefaultMuleMessage)obj).id);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return id.hashCode();
+    }
 }

@@ -8,6 +8,7 @@ package org.mule.session;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -113,7 +114,6 @@ public class InvocationPropertiesTestCase extends AbstractMuleContextTestCase
 
         // Event is copied, but session isn't
         assertNotSame(asyncEvent, event);
-        assertFalse(asyncEvent.equals(event));
         assertNotSame(asyncEvent.getSession(), event.getSession());
 
         // Session properties available before async are available after too
@@ -144,9 +144,9 @@ public class InvocationPropertiesTestCase extends AbstractMuleContextTestCase
 
         // Event and session are both copied
         assertNotSame(deserializedEvent, event);
-        assertFalse(deserializedEvent.equals(event));
+        assertNotSame(deserializedEvent, event);
         assertNotSame(deserializedEvent.getSession(), event.getSession());
-        assertFalse(deserializedEvent.getSession().equals(event.getSession()));
+        assertNotSame(deserializedEvent.getSession(), event.getSession());
 
         // Session properties available before serialization are available after too
         assertEquals("value", deserializedEvent.getMessage().getInvocationProperty("key"));

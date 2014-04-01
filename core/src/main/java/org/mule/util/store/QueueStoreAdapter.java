@@ -17,7 +17,10 @@ import java.util.List;
 
 /**
  * Adapts a {@link ListableObjectStore} to make it useful to store event queues.
+ *
+ * @deprecated this class will be removed in Mule 4.0 in favor of the new queue implementation
  */
+@Deprecated
 public class QueueStoreAdapter<T extends Serializable> implements QueueStore<T>, MuleContextAware
 {
 
