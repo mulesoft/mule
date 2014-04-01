@@ -6,6 +6,9 @@
  */
 package org.mule.tck.probe;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Base implementation of {@link org.mule.tck.probe.Probe}
  * for cases in which the {@link #isSatisfied()} method can throw
@@ -17,6 +20,8 @@ package org.mule.tck.probe;
  */
 public abstract class JUnitProbe implements Probe
 {
+
+    private static final Logger logger = LoggerFactory.getLogger(JUnitProbe.class);
 
     /**
      * Invokes {@link #test()} and returns its outcome, provided that it didn't
@@ -32,12 +37,19 @@ public abstract class JUnitProbe implements Probe
         }
         catch (Exception e)
         {
+            log(e);
             return false;
         }
         catch (AssertionError e)
         {
+            log(e);
             return false;
         }
+    }
+
+    private void log(Throwable e)
+    {
+        logger.error("Probing failed with exception", e);
     }
 
     /**
