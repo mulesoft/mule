@@ -7,16 +7,28 @@
 
 package org.mule.module.db.config.domain.database;
 
+import static org.mule.module.db.config.DbNamespaceHandler.CONNECTION_PROPERTIES_ELEMENT_NAME;
+import static org.mule.module.db.config.DbNamespaceHandler.PROPERTY_ELEMENT_NAME;
+
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 
 import java.sql.Connection;
+import java.util.LinkedHashMap;
 import java.util.Map;
+
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.util.xml.DomUtils;
+import org.w3c.dom.Element;
 
 public class DbConfigDefinitionParser extends MuleOrphanDefinitionParser
 {
 
     private static final Map<String, Integer> TRANSACTION_ISOLATION_MAPPING;
+
+    private static final String KEY_ATTRIBUTE_NAME = "key";
+    private static final String VALUE_ATTRIBUTE_NAME = "value";
 
     static
     {
@@ -44,8 +56,28 @@ public class DbConfigDefinitionParser extends MuleOrphanDefinitionParser
         super(poolFactoryClass, true);
 
         addMapping(TRANSACTION_ISOLATION_ATTRIBUTE, TRANSACTION_ISOLATION_MAPPING);
-
+        addIgnored("properties");
         registerPreProcessor(exclusiveAttributes);
+    }
+
+    @Override
+    protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder)
+    {
+        super.doParse(element, context, builder);
+        Map<String, String> propertiesMap = new LinkedHashMap<String, String>();
+
+        Element properties = DomUtils.getChildElementByTagName(element, CONNECTION_PROPERTIES_ELEMENT_NAME);
+
+        if (properties != null)
+        {
+            for (Element property : DomUtils.getChildElementsByTagName(properties, PROPERTY_ELEMENT_NAME))
+            {
+                propertiesMap.put(property.getAttribute(KEY_ATTRIBUTE_NAME), property.getAttribute(VALUE_ATTRIBUTE_NAME));
+            }
+
+        }
+
+        builder.addPropertyValue("connectionProperties", propertiesMap);
     }
 
 }

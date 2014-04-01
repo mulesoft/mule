@@ -478,6 +478,7 @@
             <xsd:extension base="mule:abstractExtensionType">
                 <xsd:sequence>
                     <xsd:element ref="pooling-profile"  minOccurs="0" maxOccurs="1"/>
+                    <xsd:element ref="connection-connectionProperties" minOccurs="0" maxOccurs="1" />
                 </xsd:sequence>
                 <xsd:attribute name="name" type="mule:substitutableName" use="required">
                     <xsd:annotation>
@@ -541,6 +542,33 @@
                         </xsd:restriction>
                     </xsd:simpleType>
                 </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="connection-connectionProperties" type="connectionPropertiesType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Allows to specify a list of custom key-value connectionProperties for the config
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="connectionPropertiesType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:annotatedType">
+                <xsd:sequence>
+                    <xsd:element name="property" type="propertyType" minOccurs="1" maxOccurs="unbounded" />
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="propertyType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:annotatedType">
+                <xsd:attribute name="key" type="xsd:string" use="required" />
+                <xsd:attribute name="value" type="xsd:string" use="required" />
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
