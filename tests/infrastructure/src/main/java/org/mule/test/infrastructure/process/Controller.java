@@ -24,9 +24,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 
-/**
- *
- */
 public abstract class Controller
 {
     protected String muleHome;
@@ -34,7 +31,8 @@ public abstract class Controller
     protected File domainsDir;
     protected File appsDir;
     protected File libsDir;
-    public static final int TIMEOUT = 30000;
+    protected int timeout;
+    private static final int DEFAULT_TIMEOUT = 30000;
     private static final String MULE_HOME_VARIABLE = "MULE_HOME";
     protected static final String ANCHOR_SUFFIX = "-anchor.txt";
     private static final String DOMAIN_DEPLOY_ERROR = "Error deploying domain %s.";
@@ -44,6 +42,16 @@ public abstract class Controller
     protected static final String STATUS = "Mule Enterprise Edition is running \\(([0-9]+)\\)\\.";
     protected static final Pattern STATUS_PATTERN = Pattern.compile(STATUS);
     private static final int IS_RUNNING_STATUS_CODE = 0;
+
+    public Controller(String muleHome, int timeout)
+    {
+        this.muleHome = muleHome;
+        this.muleBin = getMuleBin();
+        this.domainsDir = new File(muleHome + "/domains");
+        this.appsDir = new File(muleHome + "/apps/");
+        this.libsDir = new File(muleHome + "/lib/user");
+        this.timeout = timeout != 0? timeout : DEFAULT_TIMEOUT;
+    }
 
     public abstract String getMuleBin();
 
@@ -76,19 +84,10 @@ public abstract class Controller
         }
     }
 
-    protected void initialize(String muleHome)
-    {
-        this.muleHome = muleHome;
-        this.muleBin = getMuleBin();
-        this.domainsDir = new File(muleHome + "/domains");
-        this.appsDir = new File(muleHome + "/apps/");
-        this.libsDir = new File(muleHome + "/lib/user");
-    }
-
     protected int runSync(String command, String... args)
     {
         Map<Object, Object> newEnv = copyEnvironmentVariables();
-        return executeSyncCommand(command, args, newEnv, TIMEOUT);
+        return executeSyncCommand(command, args, newEnv, timeout);
     }
 
     private int executeSyncCommand(String command, String[] args, Map<Object, Object> newEnv, long timeout)

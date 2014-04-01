@@ -17,9 +17,9 @@ public class WindowsController extends Controller
     protected static final String PID_WINDOWS = "(\\s)*PID (\\s)+ :(\\s)*([0-9])+";
     protected static final Pattern PID_PATTERN_WINDOWS = Pattern.compile(PID_WINDOWS);
 
-    public WindowsController(String muleHome)
+    public WindowsController(String muleHome, int timeout)
     {
-        initialize(muleHome);
+        super(muleHome, timeout);
     }
 
     @Override
