@@ -17,7 +17,12 @@ public class MuleProcessController
 
     public MuleProcessController(String muleHome)
     {
-        this.controller = SystemUtils.IS_OS_WINDOWS ? new WindowsController(muleHome) : new UnixController(muleHome);
+        this(muleHome, 0);
+    }
+
+    public MuleProcessController(String muleHome, int timeout)
+    {
+        this.controller = SystemUtils.IS_OS_WINDOWS ? new WindowsController(muleHome, timeout) : new UnixController(muleHome, timeout);
     }
 
     public boolean isRunning()

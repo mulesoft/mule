@@ -21,9 +21,10 @@ import org.apache.commons.exec.PumpStreamHandler;
  */
 public class UnixController extends Controller
 {
-    public UnixController(String muleHome)
+
+    public UnixController(String muleHome, int timeout)
     {
-        initialize(muleHome);
+        super(muleHome, timeout);
     }
 
     @Override
@@ -37,7 +38,7 @@ public class UnixController extends Controller
     {
         Map<Object, Object> newEnv = this.copyEnvironmentVariables();
         DefaultExecutor executor = new DefaultExecutor();
-        ExecuteWatchdog watchdog = new ExecuteWatchdog((long) TIMEOUT);
+        ExecuteWatchdog watchdog = new ExecuteWatchdog((long) timeout);
         executor.setWatchdog(watchdog);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
