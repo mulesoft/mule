@@ -26,3 +26,4 @@ MULE-7390: The following transformers no longer support external entities out of
 MULE-7425: xpath() MEL function no longer changes the message payload when a source is provided. So for example, the expression xpath('catalog/cd/title') may change the message payload, while xpath('catalog/cd/title', flowVars['xml']) will never do
 MULE-7439: org.mule.transport.http.servlet.MuleHttpServletResponse.formatDate now receives a StringBuilder instead of a StringBuffer
 MULE-7428: Mule queues underlying implementation has changed. To get previous behaviour you can set system property mule.queue.objectstoremode=true. Old classes were deprecated and moved to package org.mule.util.queue.objectstore
+MULE-7362: MEL expressions now propagate nulls instead of raising an exception. For example a.b.c would previously raise a NPE if a.b was null. It will return null now.
