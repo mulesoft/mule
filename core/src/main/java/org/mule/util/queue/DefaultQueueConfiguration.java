@@ -14,8 +14,7 @@ public class DefaultQueueConfiguration implements QueueConfiguration
 
     public DefaultQueueConfiguration()
     {
-        this.capacity = QueueConfiguration.MAXIMUM_CAPACITY;
-        this.persistent = false;
+        this(QueueConfiguration.MAXIMUM_CAPACITY, false);
     }
 
     public DefaultQueueConfiguration(int capacity, boolean isPersistent)
@@ -39,10 +38,8 @@ public class DefaultQueueConfiguration implements QueueConfiguration
     @Override
     public String toString()
     {
-        return "DefaultQueueConfiguration{" +
-               "persistent=" + persistent +
-               ", capacity=" + capacity +
-               '}';
+        return String.format("DefaultQueueConfiguration{" +
+               "persistent=%s, capacity=%s}", persistent, capacity);
     }
 
     @Override

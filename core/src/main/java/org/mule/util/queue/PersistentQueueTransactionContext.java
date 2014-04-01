@@ -12,10 +12,6 @@ import org.mule.util.xa.ResourceManagerException;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.apache.commons.collections.Closure;
-import org.apache.commons.collections.CollectionUtils;
 
 /**
  * {@link LocalQueueTransactionContext} implementation for a persistent queue.
@@ -86,20 +82,16 @@ public class PersistentQueueTransactionContext implements LocalQueueTransactionC
 
     public int size(final QueueStore queue)
     {
-        final AtomicInteger addSize = new AtomicInteger(0);
-        CollectionUtils.forAllDo(this.transactionJournal.logEntriesForTx(txId), new Closure()
+        int numberOfElementsAdded = 0;
+        Collection<LocalQueueTxJournalEntry> logEntries = this.transactionJournal.getLogEntriesForTx(txId);
+        for (LocalQueueTxJournalEntry logEntry : logEntries)
         {
-            @Override
-            public void execute(Object value)
+            if (logEntry.getQueueName().equals(queue.getName()) && (logEntry.isAdd() ||  logEntry.isAddFirst()))
             {
-                LocalQueueTxJournalEntry localTxJournalEntry = (LocalQueueTxJournalEntry) value;
-                if (localTxJournalEntry.getQueueName().equals(queue.getName()) && (localTxJournalEntry.isAdd() ||  localTxJournalEntry.isAddFirst()))
-                {
-                    addSize.incrementAndGet();
-                }
+                numberOfElementsAdded++;
             }
-        });
-        return queue.getSize() + addSize.get();
+        }
+        return queue.getSize() + numberOfElementsAdded;
     }
 
     @Override
@@ -107,7 +99,7 @@ public class PersistentQueueTransactionContext implements LocalQueueTransactionC
     {
         try
         {
-            Collection<LocalQueueTxJournalEntry> logEntries = this.transactionJournal.logEntriesForTx(txId);
+            Collection<LocalQueueTxJournalEntry> logEntries = this.transactionJournal.getLogEntriesForTx(txId);
             for (LocalQueueTxJournalEntry entry : logEntries)
             {
                 if (entry.isAdd())
@@ -130,7 +122,7 @@ public class PersistentQueueTransactionContext implements LocalQueueTransactionC
     @Override
     public void doRollback() throws ResourceManagerException
     {
-        Collection<LocalQueueTxJournalEntry> logEntries = this.transactionJournal.logEntriesForTx(txId);
+        Collection<LocalQueueTxJournalEntry> logEntries = this.transactionJournal.getLogEntriesForTx(txId);
         for (LocalQueueTxJournalEntry entry : logEntries)
         {
             if (entry.isRemove())

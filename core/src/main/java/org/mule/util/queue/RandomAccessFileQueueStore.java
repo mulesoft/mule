@@ -288,18 +288,6 @@ class RandomAccessFileQueueStore
                 queueFile.seek(queueFile.length());
             }
             long filePointer = queueFile.getFilePointer();
-            //1
-            //queueFile.writeBoolean(!REMOVED);
-            //queueFile.writeInt(data.length);
-            //queueFile.write(data);
-            //2
-            //ByteArrayOutputStream out = new ByteArrayOutputStream(1 + data.length);
-            //DataOutputStream byteArrayOutputStream = new DataOutputStream(out);
-            //byteArrayOutputStream.writeBoolean(!REMOVED);
-            //byteArrayOutputStream.writeInt(data.length);
-            //byteArrayOutputStream.write(data);
-            //queueFile.write(out.toByteArray());
-            //3
             int totalBytesRequired = 5 + data.length;
             ByteBuffer byteBuffer = ByteBuffer.allocate(totalBytesRequired);
             byteBuffer.put(NOT_REMOVED);

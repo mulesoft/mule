@@ -37,7 +37,6 @@ public class DefaultQueueStore implements RecoverableQueueStore
 
     private void setConfigAndDelegate(QueueConfiguration newConfig)
     {
-        //PLG: Review changes made for batch and apply them here
         if (delegate != null)
         {
             return;
@@ -154,5 +153,11 @@ public class DefaultQueueStore implements RecoverableQueueStore
         {
             throw new NotImplementedException(String.format("Queue of type %s does not support close", delegate.getClass().getCanonicalName()));
         }
+    }
+
+    @Override
+    public boolean isPersistent()
+    {
+        return config.isPersistent();
     }
 }

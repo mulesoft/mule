@@ -39,4 +39,5 @@ public interface QueueStore
 
     void close();
 
+    boolean isPersistent();
 }

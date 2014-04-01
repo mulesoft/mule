@@ -78,7 +78,7 @@ public class PersistentXaTransactionContext implements XaQueueTransactionContext
     public int size(QueueStore queue)
     {
         final AtomicInteger addSize = new AtomicInteger(0);
-        CollectionUtils.forAllDo(this.transactionJournal.logEntriesForTx(xid), new Closure()
+        CollectionUtils.forAllDo(this.transactionJournal.getLogEntriesForTx(xid), new Closure()
         {
             @Override
             public void execute(Object value)
@@ -97,7 +97,7 @@ public class PersistentXaTransactionContext implements XaQueueTransactionContext
     {
         try
         {
-            Collection<XaQueueTxJournalEntry> logEntries = this.transactionJournal.logEntriesForTx(xid);
+            Collection<XaQueueTxJournalEntry> logEntries = this.transactionJournal.getLogEntriesForTx(xid);
             for (XaQueueTxJournalEntry entry : logEntries)
             {
                 if (entry.isAdd())
@@ -120,7 +120,7 @@ public class PersistentXaTransactionContext implements XaQueueTransactionContext
     @Override
     public void doRollback() throws ResourceManagerException
     {
-        Collection<XaQueueTxJournalEntry> logEntries = this.transactionJournal.logEntriesForTx(xid);
+        Collection<XaQueueTxJournalEntry> logEntries = this.transactionJournal.getLogEntriesForTx(xid);
         for (XaQueueTxJournalEntry entry : logEntries)
         {
             if (entry.isRemove())

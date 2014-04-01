@@ -35,6 +35,12 @@ import org.apache.commons.logging.LogFactory;
 class TransactionJournalFile<T, K extends JournalEntry<T>>
 {
 
+    /**
+     * Defines the minimum number of entries in the log that are required
+     * to clear the log file once there are no more transactions pending.
+     */
+    private static final int MINIMUM_ENTRIES_TO_CLEAR_FILE = 10000;
+
     protected transient Log logger = LogFactory.getLog(getClass());
 
     private final File journalFile;
@@ -87,7 +93,7 @@ class TransactionJournalFile<T, K extends JournalEntry<T>>
         }
         if (this.entries.isEmpty())
         {
-            if (journalOperations > 50000)
+            if (journalOperations > MINIMUM_ENTRIES_TO_CLEAR_FILE)
             {
                 clear();
                 journalOperations = 0;
@@ -120,7 +126,7 @@ class TransactionJournalFile<T, K extends JournalEntry<T>>
      * @param txId transaction identifier
      * @return journal entries for txId
      */
-    public synchronized Collection<K> logEntries(T txId)
+    public synchronized Collection<K> getLogEntries(T txId)
     {
         return entries.get(txId);
     }
@@ -128,7 +134,7 @@ class TransactionJournalFile<T, K extends JournalEntry<T>>
     /**
      * @return all journal entries entries
      */
-    public synchronized Multimap<T, K> allLogEntries()
+    public synchronized Multimap<T, K> getAllLogEntries()
     {
         return entries;
     }

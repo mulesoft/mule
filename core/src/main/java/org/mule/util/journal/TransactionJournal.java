@@ -36,7 +36,14 @@ public class TransactionJournal<T, K extends JournalEntry<T>>
     private transient Log logger = LogFactory.getLog(getClass());
 
     private final TransactionCompletePredicate transactionCompletePredicate;
+
+    /**
+     * Log file in which we are currently writing new entries.
+     */
     private TransactionJournalFile<T, K> currentLogFile;
+    /**
+     * Log file which has old entries and will be cleared as soon as all the transaction in it are resolved.
+     */
     private TransactionJournalFile<T, K> notCurrentLogFile;
 
     /**
@@ -90,24 +97,24 @@ public class TransactionJournal<T, K extends JournalEntry<T>>
      * @param txId transaction identifier
      * @return all the transaction entries for a certain transaction identifier
      */
-    public Collection<K> logEntriesForTx(T txId)
+    public Collection<K> getLogEntriesForTx(T txId)
     {
         TransactionJournalFile logFile = determineLogFile(txId);
         if (!logFile.containsTx(txId))
         {
             return Collections.emptyList();
         }
-        return logFile.logEntries(txId);
+        return logFile.getLogEntries(txId);
     }
 
     /**
      * @return all the transactional entries from the journal
      */
-    public Multimap<T, K> allLogEntries()
+    public Multimap<T, K> getAllLogEntries()
     {
         LinkedHashMultimap<T, K> logEntries = LinkedHashMultimap.create();
-        logEntries.putAll(currentLogFile.allLogEntries());
-        logEntries.putAll(notCurrentLogFile.allLogEntries());
+        logEntries.putAll(currentLogFile.getAllLogEntries());
+        logEntries.putAll(notCurrentLogFile.getAllLogEntries());
         return logEntries;
     }
 

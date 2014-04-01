@@ -58,9 +58,9 @@ public class XaTxQueueTransactionJournal extends AbstractQueueTransactionJournal
     }
 
     @Override
-    public Collection<XaQueueTxJournalEntry> logEntriesForTx(Xid txId)
+    public Collection<XaQueueTxJournalEntry> getLogEntriesForTx(Xid txId)
     {
-        return super.logEntriesForTx(new MuleXid(txId));
+        return super.getLogEntriesForTx(new MuleXid(txId));
     }
 
 

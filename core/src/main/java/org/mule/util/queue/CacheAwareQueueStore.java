@@ -92,6 +92,12 @@ class CacheAwareQueueStore implements QueueStore
         queueStoreCacheListener.closeQueueStore(queueStore);
     }
 
+    @Override
+    public boolean isPersistent()
+    {
+        return queueStore.isPersistent();
+    }
+
     QueueStore getDelegate()
     {
         return queueStore;

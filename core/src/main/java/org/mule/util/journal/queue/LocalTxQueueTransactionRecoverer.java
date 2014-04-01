@@ -53,7 +53,7 @@ public class LocalTxQueueTransactionRecoverer
         {
             logger.debug("Executing transaction recovery");
         }
-        Multimap<Integer,LocalQueueTxJournalEntry> allEntries = this.localTxQueueTransactionJournal.allLogEntries();
+        Multimap<Integer,LocalQueueTxJournalEntry> allEntries = this.localTxQueueTransactionJournal.getAllLogEntries();
         if (logger.isDebugEnabled())
         {
             logger.debug("Found " + allEntries.size() + " txs to recover");

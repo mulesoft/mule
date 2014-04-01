@@ -121,14 +121,14 @@ public abstract class AbstractQueueTransactionJournal<T, K extends JournalEntry<
         logFile.clear();
     }
 
-    public Multimap<T, K> allLogEntries()
+    public Multimap<T, K> getAllLogEntries()
     {
-        return logFile.allLogEntries();
+        return logFile.getAllLogEntries();
     }
 
-    public Collection<K> logEntriesForTx(T txId)
+    public Collection<K> getLogEntriesForTx(T txId)
     {
-        return logFile.logEntriesForTx(txId);
+        return logFile.getLogEntriesForTx(txId);
     }
 
     protected TransactionJournal<T, K> getJournal()

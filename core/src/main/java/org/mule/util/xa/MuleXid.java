@@ -59,10 +59,6 @@ public class MuleXid implements Xid, Comparable<Xid>
     @Override
     public boolean equals(Object obj)
     {
-        if (obj == null)
-        {
-            return false;
-        }
         if (!(obj instanceof Xid))
         {
             return false;

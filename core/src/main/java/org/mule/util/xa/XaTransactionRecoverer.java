@@ -55,7 +55,7 @@ public class XaTransactionRecoverer
         //For XAResource.TMSTARTRSCAN and XAResource.TMNOFLAGS (only possible values despite XAResource.TMENDRSCAN we returns
         //the set of Xid to recover (no commit, no rollback) and bitronix will commit, rollback for Xid that are
         //dangling transactions and will do nothing for those that are currently being executed.
-        Multimap<Xid,XaQueueTxJournalEntry> xidXaJournalEntryMultimap = xaTxQueueTransactionJournal.allLogEntries();
+        Multimap<Xid,XaQueueTxJournalEntry> xidXaJournalEntryMultimap = xaTxQueueTransactionJournal.getAllLogEntries();
         if (logger.isDebugEnabled())
         {
             logger.debug("Executing XA recover");

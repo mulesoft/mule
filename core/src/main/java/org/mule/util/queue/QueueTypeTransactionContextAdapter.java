@@ -83,7 +83,7 @@ public class QueueTypeTransactionContextAdapter<T extends QueueTransactionContex
         //We don't know the type of Connector queue config until a queue is used. We need to fix this in Mule 4.0. See MULE-7420
         if (transactionContext == null)
         {
-            if (queue instanceof RecoverableQueueStore)
+            if (queue.isPersistent())
             {
                 //Only makes sense to create a use a transaction journal for RecoverableQueueStore
                 transactionContext = queueTransactionContextFactory.createPersistentTransactionContext();

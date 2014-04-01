@@ -99,7 +99,7 @@ public class QueueProfile
         {
             ((MuleContextAware) objectStore).setMuleContext(context);
         }
-        if (DelegateQueueManager.isOldModeEnable())
+        if (DelegateQueueManager.isOldModeEnabled())
         {
             return new org.mule.util.queue.objectstore.QueueConfiguration(context, maxOutstandingMessages, objectStore);
         }

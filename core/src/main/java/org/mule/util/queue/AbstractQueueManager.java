@@ -15,9 +15,7 @@ import org.mule.config.i18n.CoreMessages;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,7 +30,7 @@ public abstract class AbstractQueueManager implements QueueManager, QueueProvide
 
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    private final ReadWriteLock queuesLock = new ReentrantReadWriteLock();
+    private final ReentrantLock queuesLock = new ReentrantLock();
     private final Map<String, CacheAwareQueueStore> queues = new HashMap<String, CacheAwareQueueStore>();
     private final Map<String, QueueConfiguration> queueConfigurations = new HashMap<String, QueueConfiguration>();
     private QueueConfiguration defaultQueueConfiguration = new DefaultQueueConfiguration();
@@ -71,22 +69,26 @@ public abstract class AbstractQueueManager implements QueueManager, QueueProvide
 
     private QueueStore getQueue(String name, QueueConfiguration config)
     {
-        Lock lock = this.queuesLock.writeLock();
-        lock.lock();
+        CacheAwareQueueStore queueStore = queues.get(name);
+        if (queueStore != null)
+        {
+            return queueStore;
+        }
+        queuesLock.lock();
         try
         {
-            CacheAwareQueueStore q = queues.get(name);
-            if (q == null)
+            queueStore = queues.get(name);
+            if (queueStore == null)
             {
-                q = new CacheAwareQueueStore(createQueueStore(name, config), this);
-                queues.put(name, q);
+                queueStore = new CacheAwareQueueStore(createQueueStore(name, config), this);
+                queues.put(name, queueStore);
             }
 
-            return q;
+            return queueStore;
         }
         finally
         {
-            lock.unlock();
+            queuesLock.unlock();
         }
     }
 
@@ -104,8 +106,7 @@ public abstract class AbstractQueueManager implements QueueManager, QueueProvide
     @Override
     public final void dispose()
     {
-        Lock lock = queuesLock.writeLock();
-        lock.lock();
+        queuesLock.lock();
         try
         {
             for (CacheAwareQueueStore queueInfo : queues.values())
@@ -115,7 +116,7 @@ public abstract class AbstractQueueManager implements QueueManager, QueueProvide
         }
         finally
         {
-            lock.unlock();
+            queuesLock.unlock();
         }
         doDispose();
     }
@@ -141,8 +142,7 @@ public abstract class AbstractQueueManager implements QueueManager, QueueProvide
                 throw new IllegalArgumentException("Queue to be disposed cannot be null");
             }
             final String queueName = queueStore.getName();
-            Lock lock = this.queuesLock.writeLock();
-            lock.lock();
+            queuesLock.lock();
             try
             {
                 if (!this.queues.containsKey(queueName))
@@ -153,7 +153,7 @@ public abstract class AbstractQueueManager implements QueueManager, QueueProvide
             }
             finally
             {
-                lock.unlock();
+                queuesLock.unlock();
             }
         }
         catch (Exception e)

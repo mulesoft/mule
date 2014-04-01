@@ -20,21 +20,21 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Delegates every call to the real QueueManager.
  *
- * If there's a system property with mule.queue.oldmode=true then the old version of
+ * If there's a system property with mule.queue.objectstoremode=true then the old version of
  * the QueueManager will be used. This is to maintain backward compatibility in case a
  * customer is relaying on ObjectStore for queue store customization.
  */
 public class DelegateQueueManager implements QueueManager, Lifecycle, MuleContextAware
 {
 
-    public static final String MULE_QUEUE_OLD_MODE_KEY = "mule.queue.oldmode";
+    public static final String MULE_QUEUE_OLD_MODE_KEY = "mule.queue.objectstoremode";
 
     protected final Log logger = LogFactory.getLog(this.getClass());
     private QueueManager delegate;
 
     public DelegateQueueManager()
     {
-        if (isOldModeEnable())
+        if (isOldModeEnabled())
         {
             logger.info("Using old QueueManager implementation");
             delegate = new org.mule.util.queue.objectstore.TransactionalQueueManager();
@@ -102,7 +102,7 @@ public class DelegateQueueManager implements QueueManager, Lifecycle, MuleContex
         }
     }
 
-    public static boolean isOldModeEnable()
+    public static boolean isOldModeEnabled()
     {
         return Boolean.getBoolean(MULE_QUEUE_OLD_MODE_KEY);
     }

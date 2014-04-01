@@ -2020,10 +2020,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     @Override
     public boolean equals(Object obj)
     {
-        if (obj == null)
-        {
-            return false;
-        }
         if (!(obj instanceof DefaultMuleMessage))
         {
             return false;

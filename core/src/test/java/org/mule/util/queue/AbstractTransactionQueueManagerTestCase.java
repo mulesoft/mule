@@ -313,12 +313,6 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         mgr.stop();
     }
 
-    @Override
-    public int getTestTimeoutSecs()
-    {
-        return 900000;
-    }
-
     @Test
     public void testTakePutOverCapacity() throws Exception
     {

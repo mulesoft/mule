@@ -103,7 +103,7 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
             return null;
         }
         Lock lock = filesLock.readLock();
-        lock.tryLock();
+        lock.lock();
         byte[] bytes;
         try
         {

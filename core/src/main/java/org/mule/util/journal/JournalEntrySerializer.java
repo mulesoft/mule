@@ -17,7 +17,7 @@ public interface JournalEntrySerializer<T, K extends JournalEntry<T>>
 {
 
     /**
-     * @param inputStream output stream with the serialized log entry.
+     * @param inputStream input stream with the serialized log entry.
      * @return a JournalEntry instance from the ouput stream
      */
     K deserialize(DataInputStream inputStream) throws IOException;
