@@ -8,10 +8,14 @@
 package org.mule.util.queue;
 
 import org.mule.api.MuleException;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.store.ListableObjectStore;
+import org.mule.api.store.ObjectStoreException;
 import org.mule.util.journal.queue.LocalTxQueueTransactionJournal;
 import org.mule.util.journal.queue.LocalTxQueueTransactionRecoverer;
 import org.mule.util.journal.queue.XaTxQueueTransactionJournal;
+import org.mule.util.xa.ResourceManagerSystemException;
 import org.mule.util.xa.XaTransactionRecoverer;
 
 import java.io.File;
@@ -92,6 +96,29 @@ public class TransactionalQueueManager extends AbstractQueueManager
         {
             getQueue(queueName).close();
             clearQueueConfiguration(queueName);
+        }
+
+        //Need to do this in order to open all ListableObjectStore. See MULE-7486
+        openAllListableObjectStores();
+    }
+
+    private void openAllListableObjectStores()
+    {
+        if (getMuleContext() != null)
+        {
+            for (ListableObjectStore store : getMuleContext().getRegistry()
+                    .lookupByType(ListableObjectStore.class)
+                    .values())
+            {
+                try
+                {
+                    store.open();
+                }
+                catch (ObjectStoreException e)
+                {
+                    throw new MuleRuntimeException(e);
+                }
+            }
         }
     }
 
