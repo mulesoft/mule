@@ -12,7 +12,7 @@ import org.mule.api.MuleMessage;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
 
-public class VariableVariableResolverFactory extends MVELExpressionLanguageContext
+class VariableVariableResolverFactory extends MVELExpressionLanguageContext
 {
 
     private static final long serialVersionUID = -4433478558175131280L;
@@ -60,13 +60,9 @@ public class VariableVariableResolverFactory extends MVELExpressionLanguageConte
         {
             return new SessionVariableVariableResolver(name);
         }
-        else if (nextFactory.isResolveable(name))
-        {
-            return nextFactory.getVariableResolver(name);
-        }
         else
         {
-            return null;
+            return super.getNextVariableResolver(name);
         }
     }
 

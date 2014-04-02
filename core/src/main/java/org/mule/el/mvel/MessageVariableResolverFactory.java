@@ -6,17 +6,19 @@
  */
 package org.mule.el.mvel;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.el.VariableAssignmentCallback;
 import org.mule.api.transport.PropertyScope;
 import org.mule.el.context.MessageContext;
 import org.mule.el.context.MessagePropertyMapContext;
+import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
-import org.mule.mvel2.integration.impl.ImmutableDefaultFactory;
+import org.mule.mvel2.integration.VariableResolverFactory;
 
 import java.util.Map;
 
-class MessageVariableResolverFactory extends ImmutableDefaultFactory
+class MessageVariableResolverFactory extends MVELExpressionLanguageContext
 {
 
     private static final long serialVersionUID = -6819292692339684915L;
@@ -28,6 +30,24 @@ class MessageVariableResolverFactory extends ImmutableDefaultFactory
     private final String SESSION_VARS = "sessionVars";
 
     private MuleMessage muleMessage;
+
+    public MessageVariableResolverFactory(final ParserConfiguration parserConfiguration,
+                                          final MuleContext muleContext,
+                                          final MuleMessage message)
+    {
+        super(parserConfiguration, muleContext);
+        this.muleMessage = message;
+    }
+
+    public MessageVariableResolverFactory(final ParserConfiguration parserConfiguration,
+                                          final MuleContext muleContext,
+                                          final MuleMessage message,
+                                          final VariableResolverFactory next)
+    {
+        super(parserConfiguration, muleContext);
+        this.muleMessage = message;
+        this.nextFactory = next;
+    }
 
     @Override
     public boolean isTarget(String name)
@@ -87,17 +107,7 @@ class MessageVariableResolverFactory extends ImmutableDefaultFactory
                     MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE, muleMessage, null);
             }
         }
-        return null;
+        return super.getNextVariableResolver(name);
     }
 
-    @Override
-    public boolean isResolveable(String name)
-    {
-        return isTarget(name);
-    }
-
-    public MessageVariableResolverFactory(MuleMessage message)
-    {
-        this.muleMessage = message;
-    }
 }

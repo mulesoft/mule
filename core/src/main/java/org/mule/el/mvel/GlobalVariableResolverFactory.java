@@ -11,13 +11,12 @@ import org.mule.api.el.ExpressionLanguageExtension;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ast.Function;
 import org.mule.mvel2.ast.FunctionInstance;
-import org.mule.mvel2.integration.VariableResolver;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class GlobalVariableResolverFactory extends MVELExpressionLanguageContext
+class GlobalVariableResolverFactory extends MVELExpressionLanguageContext
 {
     private static final long serialVersionUID = -6819292692339684915L;
 
@@ -55,16 +54,4 @@ public class GlobalVariableResolverFactory extends MVELExpressionLanguageContext
         return hasTarget && super.isTarget(name);
     }
 
-    @Override
-    public VariableResolver getVariableResolver(String name)
-    {
-        if (hasTarget)
-        {
-            return super.getVariableResolver(name);
-        }
-        else
-        {
-            return null;
-        }
-    }
 }

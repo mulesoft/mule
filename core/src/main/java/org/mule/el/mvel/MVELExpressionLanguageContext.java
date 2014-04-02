@@ -20,8 +20,6 @@ import org.mule.mvel2.integration.VariableResolverFactory;
 import org.mule.mvel2.integration.impl.BaseVariableResolverFactory;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     implements ExpressionLanguageContext
@@ -34,7 +32,6 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
 
     protected ParserConfiguration parserConfiguration;
     protected MuleContext muleContext;
-    protected List<VariableResolverFactory> children = new ArrayList<VariableResolverFactory>(8);
 
     public MVELExpressionLanguageContext(ParserConfiguration parserConfiguration, MuleContext muleContext)
     {
@@ -53,21 +50,7 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     @Override
     public boolean isTarget(String name)
     {
-        if (variableResolvers.containsKey(name))
-        {
-            return true;
-        }
-        else
-        {
-            for (VariableResolverFactory child : children)
-            {
-                if (child.isResolveable(name))
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return variableResolvers.containsKey(name);
     }
 
     @Override
@@ -87,18 +70,7 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
         VariableResolver variableResolver = variableResolvers.get(name);
         if (variableResolver == null)
         {
-            for (VariableResolverFactory child : children)
-            {
-                if (child.isResolveable(name))
-                {
-                    variableResolver = child.getVariableResolver(name);
-                    break;
-                }
-            }
-            if (variableResolver == null && nextFactory != null)
-            {
-                variableResolver = nextFactory.getVariableResolver(name);
-            }
+            variableResolver = getNextVariableResolver(name);
         }
         // In order to allow aliases to use message context without requiring the creating of a
         // GlobalVariableResolver for each expression evaluation, we create a new resolver on the fly with
@@ -109,6 +81,15 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
                 this);
         }
         return variableResolver;
+    }
+
+    protected VariableResolver getNextVariableResolver(String name)
+    {
+        if (nextFactory != null)
+        {
+            return nextFactory.getVariableResolver(name);
+        }
+        return null;
     }
 
     @Override
@@ -273,10 +254,5 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     {
         addFinalVariable(name, value);
     }
-
-    public void addChildContext(VariableResolverFactory child)
-    {
-        children.add(child);
-    };
 
 }
