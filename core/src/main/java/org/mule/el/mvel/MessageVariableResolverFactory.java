@@ -18,7 +18,7 @@ import org.mule.mvel2.integration.VariableResolverFactory;
 
 import java.util.Map;
 
-class MessageVariableResolverFactory extends MVELExpressionLanguageContext
+public class MessageVariableResolverFactory extends MuleBaseVariableResolverFactory
 {
 
     private static final long serialVersionUID = -6819292692339684915L;
@@ -35,18 +35,23 @@ class MessageVariableResolverFactory extends MVELExpressionLanguageContext
                                           final MuleContext muleContext,
                                           final MuleMessage message)
     {
-        super(parserConfiguration, muleContext);
         this.muleMessage = message;
     }
 
+    /**
+     * Convenience constructor to allow for more concise creation of VariableResolverFactory chains without
+     * and performance overhead incurred by using a builder.
+     * 
+     * @param delegate
+     * @param next
+     */
     public MessageVariableResolverFactory(final ParserConfiguration parserConfiguration,
                                           final MuleContext muleContext,
                                           final MuleMessage message,
                                           final VariableResolverFactory next)
     {
-        super(parserConfiguration, muleContext);
-        this.muleMessage = message;
-        this.nextFactory = next;
+        this(parserConfiguration, muleContext, message);
+        setNextFactory(next);
     }
 
     @Override
@@ -107,7 +112,7 @@ class MessageVariableResolverFactory extends MVELExpressionLanguageContext
                     MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE, muleMessage, null);
             }
         }
-        return super.getNextVariableResolver(name);
+        return super.getNextFactoryVariableResolver(name);
     }
 
 }

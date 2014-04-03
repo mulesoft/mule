@@ -23,6 +23,7 @@ import org.mule.mvel2.ast.Function;
 import org.mule.mvel2.compiler.ExpressionCompiler;
 import org.mule.mvel2.integration.VariableResolverFactory;
 import org.mule.mvel2.integration.impl.CachedMapVariableResolverFactory;
+import org.mule.mvel2.integration.impl.ImmutableDefaultFactory;
 import org.mule.mvel2.util.CompilerTools;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
@@ -328,14 +329,21 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         }
         else
         {
-            return null;
+            return new ImmutableDefaultFactory();
         }
     }
 
     @Deprecated
     protected VariableResolverFactory createVariableVariableResolverFactory(MuleMessage message)
     {
-        return new VariableVariableResolverFactory(parserConfiguration, muleContext, message);
+        if (autoResolveVariables)
+        {
+            return new VariableVariableResolverFactory(parserConfiguration, muleContext, message);
+        }
+        else
+        {
+            return new ImmutableDefaultFactory();
+        }
     }
 
     protected Map<String, String> getAliases()

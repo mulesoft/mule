@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-class GlobalVariableResolverFactory extends MVELExpressionLanguageContext
+public class GlobalVariableResolverFactory extends MVELExpressionLanguageContext
 {
     private static final long serialVersionUID = -6819292692339684915L;
 

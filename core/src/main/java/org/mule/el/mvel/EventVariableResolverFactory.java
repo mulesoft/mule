@@ -13,7 +13,7 @@ import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.VariableResolverFactory;
 
-class EventVariableResolverFactory extends MessageVariableResolverFactory
+public class EventVariableResolverFactory extends MessageVariableResolverFactory
 {
 
     private static final long serialVersionUID = -6819292692339684915L;
@@ -29,15 +29,22 @@ class EventVariableResolverFactory extends MessageVariableResolverFactory
         this.event = event;
     }
 
+    /**
+     * Convenience constructor to allow for more concise creation of VariableResolverFactory chains without
+     * and performance overhead incurred by using a builder.
+     * 
+     * @param delegate
+     * @param next
+     */
     public EventVariableResolverFactory(ParserConfiguration parserConfiguration,
                                         MuleContext muleContext,
-                                        MuleEvent event, VariableResolverFactory next)
+                                        MuleEvent event,
+                                        VariableResolverFactory next)
     {
-        super(parserConfiguration, muleContext, event.getMessage(), next);
-        this.event = event;
+        this(parserConfiguration, muleContext, event);
+        setNextFactory(next);
     }
 
-    
     @Override
     public VariableResolver getVariableResolver(String name)
     {

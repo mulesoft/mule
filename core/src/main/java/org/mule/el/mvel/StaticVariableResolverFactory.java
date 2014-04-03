@@ -13,9 +13,8 @@ import org.mule.el.context.ServerContext;
 import org.mule.el.function.DateTimeExpressionLanguageFuntion;
 import org.mule.el.function.RegexExpressionLanguageFuntion;
 import org.mule.mvel2.ParserConfiguration;
-import org.mule.mvel2.integration.VariableResolver;
 
-class StaticVariableResolverFactory extends MVELExpressionLanguageContext
+public class StaticVariableResolverFactory extends MVELExpressionLanguageContext
 {
 
     private static final long serialVersionUID = -6819292692339684915L;
@@ -23,21 +22,12 @@ class StaticVariableResolverFactory extends MVELExpressionLanguageContext
     public StaticVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext)
     {
         super(parserConfiguration, muleContext);
-        addVariable("server", new ServerContext());
-        addVariable("mule", new MuleInstanceContext(muleContext));
-        addVariable("app", new AppContext(muleContext));
+        addFinalVariable("server", new ServerContext());
+        addFinalVariable("mule", new MuleInstanceContext(muleContext));
+        addFinalVariable("app", new AppContext(muleContext));
+        addFinalVariable(MVELExpressionLanguageContext.MULE_CONTEXT_INTERNAL_VARIABLE, muleContext);
         declareFunction("regex", new RegexExpressionLanguageFuntion());
         declareFunction("dateTime", new DateTimeExpressionLanguageFuntion());
-    }
-
-    public VariableResolver getVariableResolver(String name)
-    {
-        VariableResolver variableResolver = variableResolvers.get(name);
-        if (variableResolver == null)
-        {
-            variableResolver = getNextVariableResolver(name);
-        }
-        return variableResolver;
     }
 
 }

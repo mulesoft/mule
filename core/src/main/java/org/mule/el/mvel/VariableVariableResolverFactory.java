@@ -12,7 +12,7 @@ import org.mule.api.MuleMessage;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
 
-class VariableVariableResolverFactory extends MVELExpressionLanguageContext
+public class VariableVariableResolverFactory extends MuleBaseVariableResolverFactory
 {
 
     private static final long serialVersionUID = -4433478558175131280L;
@@ -23,7 +23,6 @@ class VariableVariableResolverFactory extends MVELExpressionLanguageContext
                                            MuleContext muleContext,
                                            MuleEvent event)
     {
-        super(parserConfiguration, muleContext);
         this.message = event.getMessage();
     }
 
@@ -32,11 +31,11 @@ class VariableVariableResolverFactory extends MVELExpressionLanguageContext
                                            MuleContext muleContext,
                                            MuleMessage message)
     {
-        super(parserConfiguration, muleContext);
         this.message = message;
     }
 
     @SuppressWarnings("deprecation")
+    @Override
     public boolean isTarget(String name)
     {
         if (message == null)
@@ -62,7 +61,7 @@ class VariableVariableResolverFactory extends MVELExpressionLanguageContext
         }
         else
         {
-            return super.getNextVariableResolver(name);
+            return super.getNextFactoryVariableResolver(name);
         }
     }
 

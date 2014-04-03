@@ -62,92 +62,92 @@ import java.util.TimeZone;
 public class ServerContext
 {
 
-    public static String getHost() throws UnknownHostException
+    public String getHost() throws UnknownHostException
     {
         return InetAddress.getLocalHost().getCanonicalHostName();
     }
 
-    public static String getIp() throws UnknownHostException
+    public String getIp() throws UnknownHostException
     {
         return InetAddress.getLocalHost().getHostAddress();
     }
 
-    public static TimeZone getTimeZone()
+    public TimeZone getTimeZone()
     {
         return Calendar.getInstance().getTimeZone();
     }
 
-    public static Locale getLocale()
+    public Locale getLocale()
     {
         return Locale.getDefault();
     }
 
-    public static String getTmpDir()
+    public String getTmpDir()
     {
         return System.getProperty("java.io.tmpdir");
     }
 
-    public static String getFileSeparator()
+    public String getFileSeparator()
     {
         return System.getProperty("file.separator");
     }
 
-    public static Map<String, String> getEnv()
+    public Map<String, String> getEnv()
     {
         return System.getenv();
     }
 
-    public static Properties getSystemProperties()
+    public Properties getSystemProperties()
     {
         return System.getProperties();
     }
 
-    public static String getOsName()
+    public String getOsName()
     {
         return System.getProperty("os.name");
     }
 
-    public static String getOsArch()
+    public String getOsArch()
     {
         return System.getProperty("os.arch");
     }
 
-    public static String getOsVersion()
+    public String getOsVersion()
     {
         return System.getProperty("os.version");
     }
 
-    public static String getJavaVersion()
+    public String getJavaVersion()
     {
         return System.getProperty("java.version");
     }
 
-    public static String getJavaVendor()
+    public String getJavaVendor()
     {
         return System.getProperty("java.vendor");
     }
 
-    public static String getUserName()
+    public String getUserName()
     {
         return System.getProperty("user.name");
     }
 
-    public static String getUserHome()
+    public String getUserHome()
     {
         return System.getProperty("user.home");
     }
 
-    public static String getUserDir()
+    public String getUserDir()
     {
         return System.getProperty("user.dir");
     }
 
-    public static DateTime getDateTime()
+    public DateTime getDateTime()
     {
         return new DateTime();
     }
 
-    public static long nanoTime()
+    public long nanoTime()
     {
         return System.nanoTime();
     }
