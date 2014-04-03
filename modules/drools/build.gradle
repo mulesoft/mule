@@ -1,0 +1,20 @@
+group = 'org.mule.modules'
+archivesBaseName = 'mule-module-drools'
+description = 'Classes which allow Mule to integrate with Drools via the BPM Module.'
+
+configurations {
+    all*.exclude group:'janino'
+    all*.exclude group:'org.eclipse.jdt'
+}
+
+dependencies {
+    compile project(':module-bpm'),
+        "org.drools:drools-core:5.0.1"
+
+    runtime "org.drools:drools-compiler:5.0.1",
+        "org.apache.tomcat:jasper-jdt:6.0.29"
+
+    testCompile project(":test-functional"),
+        project(":transport-vm")
+}
+

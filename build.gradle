@@ -1,0 +1,69 @@
+apply from: 'gradle/dependencies.gradle'
+
+project.ext {
+    modules = rootProject.subprojects.findAll { pr -> pr.path.startsWith(':module') }
+    transports = rootProject.subprojects.findAll { pr -> pr.path.startsWith(':transport') }
+}
+
+allprojects {
+    apply plugin: 'maven'
+
+    group = 'org.mule'
+    version = '4.0-SNAPSHOT'
+
+    repositories {
+        mavenLocal()
+        maven { url "https://repository.mulesoft.org/nexus/content/repositories/public/" }
+        maven { url "http://xqj.net/maven" }
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+
+    javadoc {
+        options.charSet = 'ISO-8859-1'
+    }
+
+    sourceCompatibility = jdkVersion
+    targetCompatibility = jdkVersion
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'ISO-8859-1'
+//        options.incremental = true
+    }
+    tasks.withType(Javadoc) {
+        options.encoding = 'ISO-8859-1'
+    }
+
+    dependencies {
+        testCompile libraries.tests
+    }
+
+    apply from: "$rootDir/gradle/publish.gradle"
+}
+
+apply from: 'gradle/testExport.gradle'
+apply from: 'gradle/resolution.gradle'
+apply from: 'gradle/distribution.gradle'
+apply from: 'gradle/ci.gradle'
+
+// Distributions: built directly from the top level project
+apply from: 'gradle/verifyContents.gradle'
+
+
+task distribution {
+    dependsOn distVerify
+    dependsOn distZip
+    dependsOn distTar
+}
+
+task uploadDistribution {
+    dependsOn distVerify
+    dependsOn uploadArchives
+}
+
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.2.1'
+}

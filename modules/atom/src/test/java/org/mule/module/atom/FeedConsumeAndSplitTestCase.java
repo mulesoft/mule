@@ -13,6 +13,7 @@ import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class FeedConsumeAndSplitTestCase extends FunctionalTestCase
@@ -32,6 +33,7 @@ public class FeedConsumeAndSplitTestCase extends FunctionalTestCase
         comp.setEventCallback(counter);
     }
 
+    @Ignore("MULE-6926: flaky test")
     @Test
     public void testConsume() throws Exception
     {

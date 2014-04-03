@@ -9,6 +9,7 @@ package org.mule;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.mule.config.MuleManifest;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.ClassUtils;
 import org.mule.util.FilenameUtils;
@@ -110,7 +111,8 @@ public class MuleServerTestCase extends AbstractMuleTestCase
     	String javaVersion = System.setProperty("java.version", "1.5.0_12");
     	try
     	{
-	    	try
+            MuleManifest.initializeManifest(ClassUtils.getResource("test-manifest.mf", getClass()));
+            try
 	    	{
 	    		JdkVersionUtils.validateJdk();
 	    		fail("Test is invalid because the Jdk version or vendor is supposed to now be invalid");

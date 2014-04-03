@@ -1,0 +1,18 @@
+group = 'org.mule.modules'
+archivesBaseName = 'mule-module-oauth'
+description = 'Mule OAuth module'
+
+dependencies {
+    compile project(':core'),
+            project(':module-spring-config'),
+            project(':transport-ssl'),
+            project(':transport-http'),
+            project(':module-json')
+
+    testCompile project(":test-functional"),
+        "com.github.tomakehurst:wiremock:1.48",
+            "org.apache.httpcomponents:httpcore:4.3.2",
+            "org.apache.httpcomponents:httpclient:4.3.5",
+            "org.apache.httpcomponents:fluent-hc:4.3.5"
+}
+

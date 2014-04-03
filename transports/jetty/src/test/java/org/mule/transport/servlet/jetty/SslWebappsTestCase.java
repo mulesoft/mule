@@ -25,6 +25,7 @@ public class SslWebappsTestCase extends AbstractWebappsTestCase
     @Test
     public void webappShouldBeDeployed() throws Exception
     {
+        System.out.println(baseDirProperty.getValue());
         sendRequestAndAssertCorrectResponse(String.format("https://localhost:%d/%s", httpPort.getNumber(), WEBAPP_TEST_URL));
     }
 }

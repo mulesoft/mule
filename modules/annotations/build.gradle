@@ -1,0 +1,13 @@
+group = 'org.mule.modules'
+archivesBaseName = 'mule-module-annotations'
+description = 'Annotations for configuring Mule at various levels'
+
+
+dependencies {
+    compile project(':core'),
+        'cglib:cglib-nodep:2.2'
+
+    testCompile project(path: ':core', configuration: 'testFixtures')
+}
+
+exportTests = true

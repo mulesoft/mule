@@ -1,0 +1,16 @@
+group = 'org.mule.modules'
+archivesBaseName = 'mule-module-jbpm'
+description = 'Classes which allow Mule to integrate with JBoss jBPM via the BPM Module.'
+
+dependencies {
+    compile project(':module-bpm'),
+        "org.jbpm.jbpm4:jbpm-jpdl:4.4",
+        "org.jbpm.jbpm4:jbpm-pvm:4.4",
+        "org.hibernate:hibernate-core:3.6.0.Final"
+
+    testCompile project(":test-functional"),
+        project(":transport-vm")
+
+    testRuntime "javax.mail:mail:1.4.3",
+        "org.apache.derby:derby:10.9.1.0"
+}

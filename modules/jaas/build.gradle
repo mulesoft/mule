@@ -1,0 +1,11 @@
+group = 'org.mule.modules'
+archivesBaseName = 'mule-module-jaas'
+description = 'Mule Jaas Support exposes Jaas Authentication providers and Method interceptors to authentication event traffic via endpoints.'
+
+dependencies {
+    compile project(':core'),
+        project(':module-spring-config')
+
+    testCompile project(":test-functional"),
+        project(":transport-vm")
+}

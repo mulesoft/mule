@@ -1,0 +1,14 @@
+group = 'org.mule.modules'
+archivesBaseName = 'mule-module-builders'
+description = 'Standard configuration builders for Mule'
+
+dependencies {
+    compile project(':core'),
+        project(':module-spring-config'),
+        "org.springframework:spring-context:${versions.spring}",
+        "org.springframework:spring-web:${versions.spring}",
+        "org.apache.geronimo.specs:geronimo-servlet_3.0_spec:1.0"
+
+    testCompile project(path: ':core', configuration: 'testFixtures')
+}
+

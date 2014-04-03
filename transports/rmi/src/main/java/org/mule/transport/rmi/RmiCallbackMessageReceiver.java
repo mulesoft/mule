@@ -51,11 +51,8 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
         super(connector, flowConstruct, endpoint);
         this.connector = (RmiConnector) connector;
 
+        this.connector.initSecurity();
         logger.debug("Initializing with endpoint " + endpoint);
-
-        String rmiPolicyPath = this.connector.getSecurityPolicy();
-
-        System.setProperty("java.security.policy", rmiPolicyPath);
 
         EndpointURI endpointUri = endpoint.getEndpointURI();
 

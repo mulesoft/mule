@@ -33,6 +33,8 @@ public class MtomClientTestCase extends FunctionalTestCase
     {
         final EmployeeDirectoryImpl svc = (EmployeeDirectoryImpl) getComponent("employeeDirectoryService");
 
+        muleContext.getClient().dispatch("vm://in", "", null);
+
         Prober prober = new PollingProber(6000, 500);
         prober.check(new Probe()
         {

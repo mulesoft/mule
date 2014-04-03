@@ -1,0 +1,26 @@
+group = 'org.mule.tests'
+archivesBaseName = 'mule-tests-functional'
+description = 'Mule functional test framework (TCK)'
+
+dependencies {
+    compile project(':core'),
+        project(path: ':core', configuration: 'testFixtures'),
+        project(':module-spring-config'),
+        "org.springframework:spring-context:${versions.spring}",
+        "org.springframework:spring-beans:${versions.spring}",
+        "commons-net:commons-net:2.2",
+        "org.apache.ftpserver:ftpserver-core:1.0.2",
+        "org.apache.ftpserver:ftplet-api:1.0.2",
+        "org.apache.sshd:sshd-core:0.6.0",
+        "org.bouncycastle:bcprov-jdk16:1.46",
+        "commons-dbutils:commons-dbutils:1.2",
+        configurations.testCompile.allDependencies
+
+
+    testCompile "org.aspectj:aspectjrt:1.7.3",
+            "org.aspectj:aspectjweaver:1.7.3"
+
+}
+
+
+

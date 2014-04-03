@@ -1,0 +1,10 @@
+group = 'org.mule.transports'
+archivesBaseName = 'mule-transport-vm'
+description = 'A Mule transport that enables event sending and receiving over VM or embedded memory queues.'
+
+dependencies {
+    compile project(':module-xml')
+
+    testCompile project(':test-functional'),
+        project(':module-jboss-transactions')
+}

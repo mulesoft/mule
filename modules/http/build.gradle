@@ -1,0 +1,28 @@
+group = 'org.mule.modules'
+archivesBaseName = 'mule-module-http'
+description = 'Provides components for exposing and consuming HTTP services'
+
+configurations {
+    all*.exclude group:'io.netty'
+}
+
+dependencies {
+    compile project(':core'),
+            project(':module-spring-config'),
+            project(':transport-ssl'),
+            project(':transport-tcp'),
+            "org.apache.geronimo.specs:geronimo-servlet_3.0_spec:1.0",
+            "org.glassfish.grizzly:grizzly-framework:2.3.16",
+            "org.glassfish.grizzly:grizzly-http-server:2.3.16",
+            "org.glassfish.grizzly:grizzly-websockets:2.3.16",
+            "javax.mail:mail:1.4.3",
+            "com.ning:async-http-client:1.8.14"
+
+    testCompile project(":test-functional"),
+                project(":module-client"),
+                project(":transport-vm"),
+                "org.eclipse.jetty:jetty-server:9.0.7.v20131107",
+                "org.eclipse.jetty:jetty-servlet:9.0.7.v20131107",
+                "org.apache.httpcomponents:httpmime:4.3.3",
+                "org.apache.httpcomponents:fluent-hc:4.3.5"
+}

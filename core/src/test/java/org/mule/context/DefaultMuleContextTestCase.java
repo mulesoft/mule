@@ -26,6 +26,7 @@ import org.mule.config.ExceptionHelper;
 import org.mule.registry.MuleRegistryHelper;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.transport.PollingController;
+import org.mule.util.IOUtils;
 import org.mule.util.SpiUtils;
 import org.mule.util.store.MuleObjectStoreManager;
 
@@ -53,13 +54,15 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase
     @Test
     public void testClearExceptionHelperCacheForAppWhenDispose() throws Exception
     {
-        URL baseUrl = DefaultMuleContextTestCase.class.getClassLoader().getResource(".");
-        File file = new File(baseUrl.getFile() + SpiUtils.SERVICE_ROOT + ServiceType.EXCEPTION.getPath()+ "/" + TEST_PROTOCOL + "-exception-mappings.properties");
+        String resourcePath = SpiUtils.SERVICE_ROOT + ServiceType.EXCEPTION.getPath()+ "/" + TEST_PROTOCOL + "-exception-mappings.properties";
+        URL resource = IOUtils.getResourceAsUrl(resourcePath, this.getClass());
+        File file = new File(resource.getPath());
+
         createExceptionMappingFile(file, INITIAL_VALUE);
 
         MuleContext ctx = new DefaultMuleContextFactory().createMuleContext();
         String value = ExceptionHelper.getErrorMapping(TEST_PROTOCOL, IllegalArgumentException.class, ctx);
-        assertThat(value,is(INITIAL_VALUE));
+        assertThat(value, is(INITIAL_VALUE));
         ctx.dispose();
 
         createExceptionMappingFile(file, VALUE_AFTER_REDEPLOY);

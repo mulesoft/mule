@@ -205,7 +205,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
                                                  InboundEndpoint endpoint) throws MuleException
     {
 
-        MessageReceiver mr = createMessageReceiver(connector, flowConstruct, endpoint, null);
+        MessageReceiver mr = createMessageReceiver(connector, flowConstruct, endpoint, new Object[] {});
         return mr;
     }
 

@@ -1,0 +1,39 @@
+group = 'org.mule.modules'
+archivesBaseName = 'mule-module-jbossts'
+description = 'JBoss Transactions Integration'
+
+
+
+dependencies {
+
+    compile project(':core'),
+        project(':module-spring-config'),
+        "org.springframework:spring-context:${versions.spring}",
+        "org.springframework:spring-web:${versions.spring}"
+
+    compile ("org.jboss.jbossts:jbossjta:4.15.0.Final") {
+        exclude group: 'commons-httpclient'
+        exclude group: 'emma'
+        exclude group: 'org.hornetq'
+        exclude group: 'org.jboss.netty'
+        exclude group: 'org.jboss.spec.javax.transaction'
+        exclude group: 'org.jboss.integration'
+        exclude group: 'org.jboss.ironjacamar'
+        exclude group: 'tanukisoft'
+        exclude group: 'jacorb'
+        exclude group: 'org.jboss.jbossas'
+        exclude group: 'org.jboss.spec.javax.ejb'
+        exclude group: 'org.jboss.spec.javax.servlet'
+        exclude group: 'org.jboss.ws'
+        exclude group: 'org.hibernate.javax.persistence'
+        exclude group: 'org.jboss.remoting'
+        exclude group: 'org.jboss.logging', module: 'jboss-logging-generator'
+        exclude group: 'org.jboss.logging', module: 'jboss-logging-processor'
+        exclude group: 'org.jboss.logmanager'
+    }
+
+    testCompile project(':test-functional')
+}
+
+
+

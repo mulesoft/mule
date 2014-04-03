@@ -1,0 +1,31 @@
+group = 'org.mule.modules'
+archivesBaseName = 'mule-module-atom'
+description = 'Mule ATOM Endpoints and Serivce Component'
+
+ext {
+    abderaVersion='0.4.0-incubating'
+}
+
+dependencies {
+    compile project(':core'),
+        project(':transport-http'),
+        project(':transport-quartz'),
+        project(':module-spring-config'),
+        'org.codehaus.woodstox:woodstox-core-asl:4.1.4',
+        "org.apache.abdera:abdera-client:$abderaVersion",
+        "org.apache.abdera:abdera-spring:$abderaVersion"
+
+    testCompile project(':test-functional'),
+        project(':transport-vm'),
+        project(':transport-file'),
+        libraries.activeMQ,
+        'pdfbox:pdfbox:0.7.3',
+        "org.apache.abdera:abdera-jcr:$abderaVersion",
+        "org.apache.abdera:abdera-server:$abderaVersion"
+
+
+
+}
+
+
+

@@ -1,0 +1,98 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+// Dependencies that got relocated to a different group
+allprojects {
+    dependencies {
+        modules {
+            module("com.google.collections:google-collections") {
+                replacedBy("com.google.guava:guava")
+            }
+            module("javax.servlet:servlet-api") {
+                replacedBy("org.apache.geronimo.specs:geronimo-servlet_3.0_spec")
+            }
+            module("org.apache.tomcat:servlet-api") {
+                replacedBy("org.apache.geronimo.specs:geronimo-servlet_3.0_spec")
+            }
+            module("org.mortbay.jetty:servlet-api") {
+                replacedBy("org.apache.geronimo.specs:geronimo-servlet_3.0_spec")
+            }
+            module("javax.inject:javax.inject") {
+                replacedBy("org.glassfish.hk2.external:javax.inject")
+            }
+            module("jdom:jdom") {
+                replacedBy("org.jdom:jdom")
+            }
+            module("xalan:serializer") {
+                replacedBy("xerces:xml-serializer")
+            }
+            // TODO: This should be the opposite. Placed there to honor current whitelist
+            // probably to be replaced by javax.el:javax.el-api
+            module("juel:juel-api") {
+                replacedBy("org.apache.tomcat:el-api")
+            }
+        }
+    }
+    configurations {
+        all {
+            resolutionStrategy {
+                force 'xalan:xalan:2.7.2'
+                force 'org.glassfish.grizzly:grizzly-framework:2.3.16'
+                force 'org.glassfish.grizzly:grizzly-http-server:2.3.16'
+                force 'commons-codec:commons-codec:1.9'
+                force 'commons-lang:commons-lang:2.4'
+                force 'org.antlr:antlr:3.1.1'
+                force 'xpp3:xpp3_min:1.1.3.4.O'
+                force 'jboss:javassist:3.7ga'
+                force 'com.sun.xml.bind:jaxb-impl:2.1.9'
+                force 'com.sun.xml.bind:jaxb-xjc:2.1.9'
+                force 'xerces:xercesImpl:2.9.1'
+
+
+                eachDependency { details ->
+                    if (details.requested.group == 'org.springframework')
+                    {
+                        details.useVersion versions.spring
+                    }
+                    // TODO: we should actually let org.assist win, and replace javassist and jboss with the newer version
+                    if (details.requested.group == 'org.javassist')
+                    {
+                        details.useTarget group: 'jboss', name: 'javassist', version: "3.7.ga"
+                    }
+                    if (details.requested.group == 'javassist')
+                    {
+                        details.useTarget group: 'jboss', name: 'javassist', version: "3.7.ga"
+                    }
+
+                    // TODO: upgrade to latest antlr 3
+                    if (details.requested.group == 'antlr')
+                    {
+                        details.useTarget group: 'org.antlr', name: 'antlr', version: "3.1.1"
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Dependencies not used or provided though a different dependency
+subprojects {
+    configurations {
+        all*.exclude module: 'slf4j-jdk14'
+        all*.exclude group:'org.eclipse.jetty.orbit'
+        all*.exclude group:'commons-logging'
+
+        // Bundled with the JDK
+        all*.exclude module:'geronimo-activation_1.0.2_spec'
+        all*.exclude group:'javax.activation'
+
+        all*.exclude group:'xom'
+        all*.exclude group:'com.google.code.findbugs', module: 'jsr305'
+        all*.exclude group:'org.codehaus.woodstox', module: 'wstx-asl'
+        all*.exclude group:'org.glassfish.hk2.external', module: 'aopalliance-repackaged'
+    }
+}

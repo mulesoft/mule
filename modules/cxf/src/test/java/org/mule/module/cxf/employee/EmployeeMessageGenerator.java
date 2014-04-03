@@ -6,14 +6,17 @@
  */
 package org.mule.module.cxf.employee;
 
+import org.mule.api.MuleEventContext;
+import org.mule.api.lifecycle.Callable;
 import org.mule.example.employee.Employee;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 
-public class EmployeeMessageGenerator
+public class EmployeeMessageGenerator implements Callable
 {
-    public Employee submitEmployee() throws Exception
+    @Override
+    public Object onCall(MuleEventContext eventContext) throws Exception
     {
         Employee employee = new Employee();
         employee.setName("Albert Einstein");

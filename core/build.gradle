@@ -1,0 +1,25 @@
+group = 'org.mule'
+archivesBaseName = 'mule-core'
+description = 'Mule server and core classes.'
+
+dependencies {
+    compile libraries.commons_beanutils,
+            libraries.commons_cli,
+            libraries.commons_collections,
+            libraries.commons_io,
+            libraries.commons_lang,
+            libraries.commons_pool,
+            'org.apache.geronimo.specs:geronimo-jta_1.1_spec:1.1.1',
+            'org.apache.geronimo.specs:geronimo-j2ee-connector_1.5_spec:1.1',
+            libraries.asm,
+            libraries.mule_mvel,
+            'org.jgrapht:jgrapht-jdk1.5:0.7.3',
+            libraries.mule_common,
+            libraries.guava,
+            "com.github.stephenc.eaio-uuid:uuid:3.4.0",
+            "com.lmax:disruptor:3.3.0",
+            libraries.logging
+}
+
+exportTests = true
+

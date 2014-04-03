@@ -32,7 +32,6 @@ public class ServletHttpFilterFunctionalTestCase extends HttpFilterFunctionalTes
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-                {"org/mule/test/integration/security/servlet-http-filter-test-service.xml"},
                 {"org/mule/test/integration/security/servlet-http-filter-test-flow.xml"}
         });
     }

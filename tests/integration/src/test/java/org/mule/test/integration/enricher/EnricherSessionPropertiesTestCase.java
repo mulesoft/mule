@@ -16,6 +16,7 @@ import org.mule.api.client.LocalMuleClient;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.hamcrest.core.IsNull;
 import org.junit.Rule;
@@ -26,6 +27,9 @@ public class EnricherSessionPropertiesTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
+    @Rule
+    public SystemProperty propagateSession = new SystemProperty("mule.enricher.propagateSession", "true");
+
     @Override
     protected String getConfigFile()
     {
@@ -35,7 +39,6 @@ public class EnricherSessionPropertiesTestCase extends FunctionalTestCase
     @Test
     public void testCallingFlowUsingFlowRefInsideEnricher() throws Exception
     {
-        System.setProperty("mule.enricher.propagateSession", "true");
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in", "some message", null, 3000);
         assertThat(response, IsNull.<Object> notNullValue());

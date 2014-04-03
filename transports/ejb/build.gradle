@@ -1,0 +1,18 @@
+group = 'org.mule.transports'
+archivesBaseName = 'mule-transport-ejb'
+description = 'A Mule transport for Ejb Connectivity that allows you to invoke an ejb object using an endpoint.'
+
+
+dependencies {
+    compile project(':transport-rmi'),
+        "org.apache.geronimo.specs:geronimo-ejb_2.1_spec:1.1"
+
+
+    testCompile project(':test-functional'),
+        project(':transport-vm'),
+        project(path: ':transport-rmi', configuration: 'testFixtures')
+
+}
+
+
+

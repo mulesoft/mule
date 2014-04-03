@@ -1,0 +1,28 @@
+group = 'org.mule.modules'
+archivesBaseName = 'mule-module-spring-security'
+description = 'Mule Spring Security support exposes Spring Security Authentication providers\n' +
+        '   and Method interceptors to authenticate event traffic via endpoints and provide method level\n' +
+        '   authorization on components.'
+
+ext {
+    springSecurityVersion='3.1.0.RELEASE'
+}
+
+dependencies {
+    compile project(':core'),
+        project(":transport-http"),
+        "org.springframework.security:spring-security-core:$springSecurityVersion",
+        "org.springframework.security:spring-security-config:$springSecurityVersion",
+        "org.springframework.security:spring-security-web:$springSecurityVersion",
+        "org.springframework.security:spring-security-ldap:$springSecurityVersion"
+
+    testCompile project(':test-functional'),
+            "org.springframework:spring-aop:${versions.spring}",
+            project(":transport-vm")
+
+}
+
+// Only required for Integration project
+exportTests = true
+
+

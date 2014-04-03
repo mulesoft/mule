@@ -28,7 +28,7 @@ import javax.mail.internet.MimeMessage;
 import org.junit.Before;
 import org.junit.Test;
 
-public class AbstractImapRetrieveMessagesTestCase extends AbstractEmailFunctionalTestCase
+public abstract class AbstractImapRetrieveMessagesTestCase extends AbstractEmailFunctionalTestCase
 {
 
     private static final int NUMBER_OF_MESSAGES = 10;

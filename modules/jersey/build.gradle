@@ -1,0 +1,25 @@
+group = 'org.mule.modules'
+archivesBaseName = 'mule-module-jersey'
+description = 'A module for Jersey, the JAX-RS RI.'
+
+dependencies {
+    compile project(':module-spring-config'),
+        project(":transport-http"),
+        project(":transport-servlet"),
+        project(":transport-vm"),
+
+
+        "org.glassfish.jersey.core:jersey-common:2.11",
+        "org.glassfish.jersey.core:jersey-server:2.11",
+        "org.glassfish.jersey.media:jersey-media-json-jackson1:2.11",
+        "org.glassfish.jersey.media:jersey-media-json-jettison:2.11"
+
+//        "org.codehaus.jackson:jackson-core-asl:$jacksonVersion",
+//        "org.codehaus.jackson:jackson-jaxrs:$jacksonVersion"
+
+
+    testCompile project(":test-functional"),
+        project(":transport-vm"),
+        project(":transport-jetty")
+
+}

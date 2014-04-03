@@ -1,0 +1,12 @@
+group = 'org.mule.modules'
+archivesBaseName = 'mule-module-schedulers'
+description = 'Schedulers for poll'
+
+dependencies {
+    compile project(':module-spring-config'),
+        "org.quartz-scheduler:quartz:1.8.5"
+
+    testCompile project(":test-functional"),
+        project(":transport-vm")
+}
+

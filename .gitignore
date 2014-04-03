@@ -2,6 +2,9 @@
 # Maven
 target/
 
+# Gradle
+build/
+.gradle/
 
 # Eclipse files
 .classpath

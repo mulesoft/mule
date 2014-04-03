@@ -1,0 +1,12 @@
+group = 'org.mule.modules'
+archivesBaseName = 'mule-module-bpm'
+description = 'Allows Mule events to initiate and/or advance processes in an external or embedded Business Process Management System (BPMS). It also allows executing processes to generate Mule events.'
+
+dependencies {
+    compile project(':module-spring-config')
+
+    testCompile project(':test-functional')
+}
+
+
+

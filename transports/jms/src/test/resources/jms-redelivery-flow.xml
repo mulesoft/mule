@@ -22,7 +22,7 @@
         <default-exception-strategy>
             <commit-transaction exception-pattern="org.mule.transport.jms.redelivery.MessageRedeliveredException"/>
             <choice>
-                <when evaluator="groovy" expression='payload.getException().getClass().getName().equals("org.mule.transport.jms.redelivery.MessageRedeliveredException")'>
+                <when expression='payload.getException().getClass().getName().equals("org.mule.transport.jms.redelivery.MessageRedeliveredException")'>
                     <jms:outbound-endpoint queue="dead.letter" connector-ref="jmsConnectorLimitedRedelivery">
                         <jms:transaction action="ALWAYS_JOIN" />
                     </jms:outbound-endpoint>

@@ -19,12 +19,6 @@ import org.junit.Test;
 public class MethodRequestMatcherTestCase extends AbstractMuleTestCase
 {
 
-    @Test(expected =  IllegalArgumentException.class)
-    public void doNotAcceptsNull()
-    {
-        new MethodRequestMatcher(null);
-    }
-
     @Test
     public void onlyAcceptsOneMethod()
     {

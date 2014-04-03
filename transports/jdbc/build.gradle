@@ -1,0 +1,18 @@
+group = 'org.mule.transports'
+archivesBaseName = 'mule-transport-jdbc'
+description = 'A Mule transport for JDBC connectivity.'
+
+dependencies {
+    compile project(':module-spring-config'),
+            project(":module-jboss-transactions"),
+            "com.experlog:xapool:1.5.0",
+            "commons-dbutils:commons-dbutils:1.2"
+
+    testCompile project(':test-functional'),
+            "commons-dbutils:commons-dbutils:1.2",
+            project(":transport-vm"),
+            project(":test-functional"),
+            "org.apache.derby:derby:10.9.1.0",
+            "hsqldb:hsqldb:1.8.0.7",
+            "commons-dbcp:commons-dbcp:1.4"
+}

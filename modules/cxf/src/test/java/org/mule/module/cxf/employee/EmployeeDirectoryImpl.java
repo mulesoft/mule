@@ -20,7 +20,7 @@ import javax.jws.WebService;
 public class EmployeeDirectoryImpl implements EmployeeDirectory
 {
 
-    private int invocationCount;
+    private volatile int invocationCount;
     private List<Employee> employees = new ArrayList<Employee>();
 
     public List<Employee> getEmployees()

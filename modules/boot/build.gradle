@@ -1,0 +1,18 @@
+group = 'org.mule.modules'
+archivesBaseName = 'mule-module-boot'
+description = 'Classes used to boot up the Mule server'
+
+
+dependencies {
+    compile project(':core'),
+        'tanukisoft:wrapper:3.2.3',
+        "commons-cli:commons-cli:1.2"
+
+    testCompile project(':test-functional')
+
+
+
+}
+
+
+

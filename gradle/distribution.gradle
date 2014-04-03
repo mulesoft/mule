@@ -1,0 +1,131 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+apply plugin: 'distribution'
+apply plugin: 'maven'
+
+ext {
+    // TODO: Move to a top level folder when maven builds are deleted
+    distributionSrc="distributions/standalone/src/main/resources"
+}
+
+task assembleSource(type: Zip) {
+    from subprojects.collect { project -> project.sourceSets.main.allSource }
+    destinationDir = buildDir
+    baseName="mule"
+    classifier="src"
+}
+
+configurations {
+    allMule
+
+    endorsed { transitive = false }
+
+    libUser
+
+    libBoot
+    // TODO: boot projects should not depend on core. Remove this rule once it's fixed
+    libBoot.exclude module:'core'
+
+    extra
+
+}
+
+dependencies {
+    allMule project(':core')
+    allMule project(path: ':core', configuration: 'testFixtures')
+    allMule rootProject.subprojects.findAll { pr -> pr.name.startsWith('module') } //.map { pr -> pr.configurations.default }
+    allMule rootProject.subprojects.findAll { pr -> pr.name.startsWith('transport') }
+
+    libBoot project(':module-boot')
+    libBoot project(':module-reboot')
+
+    libUser project(':test-functional')
+
+    endorsed "xalan:xalan:2.7.2"
+    endorsed "xerces:xercesImpl:2.9.1"
+    endorsed "xml-apis:xml-apis:1.3.04"
+    endorsed "xerces:xml-serializer:2.7.1"
+
+    // Jars that are no longer real dependencies but were in the distribution
+    extra "org.apache.ant:ant:1.7.0"
+    extra "org.apache.ant:ant-launcher:1.7.0"
+    extra "org.aspectj:aspectjrt:1.7.3"
+    extra "org.aspectj:aspectjweaver:1.7.3"
+    extra 'org.hamcrest:hamcrest-library:1.3'
+}
+
+distributions {
+    main {
+        baseName = 'standalone'
+        contents {
+            def muleMask = ["mule*.jar"]
+            def userMask = ["junit*.jar", "xmlunit*.jar", "mule-tests-functional*.jar"]
+            def endorsedMask = ["xalan*.jar", "xml-apis*.jar", "xercesImpl*.jar", "xml-serializer*.jar"]
+            def bootMask = ["disruptor*.jar", "log4j*.jar", "jcl-over-slf4j*.jar", "slf4j-api*.jar"]
+
+            into('') {
+                from distributionSrc
+                exclude { details -> details.file.name.equals('IGNORE') }
+            }
+            into('lib/boot') {
+                from configurations.libBoot
+            }
+            into('lib/boot') {
+                from configurations.allMule
+                include bootMask
+            }
+
+            into('lib/mule') {
+                from configurations.allMule - configurations.libBoot
+                include muleMask
+                exclude userMask
+                exclude endorsedMask
+            }
+            into('lib/user') {
+                from configurations.libUser
+                include userMask
+            }
+            into('lib/endorsed') {
+                from configurations.endorsed
+            }
+
+            into('lib/opt') {
+                from configurations.allMule - configurations.libBoot
+                exclude userMask
+                exclude muleMask
+                exclude bootMask
+                exclude endorsedMask
+                exclude "objenesis-*.jar"  // TODO: remove once test jars are moved out of the distribution
+                exclude "mockito-core-*.jar" // TODO: remove once test jars are moved out of the distribution
+                exclude "multithreadedtc-*.jar" // TODO: remove once test jars are moved out of the distribution
+                exclude "yjp-controller-api-redist-*jar" // TODO: remove once Yourkit element is removed from the  management module
+                exclude "serializer-*.jar" // TODO: remove once xalan is not brought as a transitive dependency (cxf upgrade)
+            }
+
+            into('lib/opt') {
+                from configurations.extra
+            }
+
+            into('src') {
+                from assembleSource
+            }
+
+
+        }
+    }
+}
+
+configurations {
+    archives
+}
+
+artifacts {
+    archives distZip
+    archives distTar
+}
+
+apply from: 'gradle/publish.gradle'

@@ -1,0 +1,12 @@
+group = 'org.mule.transports'
+archivesBaseName = 'mule-transport-servlet'
+description = 'A Mule transport for Servlet containers.'
+
+dependencies {
+    compile project(':transport-http')
+
+    testCompile project(':test-functional'),
+        project(':transport-vm')
+}
+
+exportTests = true

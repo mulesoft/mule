@@ -1,0 +1,21 @@
+group = 'org.mule.modules'
+archivesBaseName = 'mule-module-db'
+description = 'Mule Database Connector'
+
+dependencies {
+    compile project(':core'),
+        project(':module-spring-config'),
+        project(":module-jboss-transactions"),
+        "c3p0:c3p0:0.9.1.2",
+        "com.experlog:xapool:1.5.0",
+        libraries.mule_common
+
+
+        testCompile project(path: ':core', configuration: 'testFixtures'),
+        "xalan:xalan:2.7.1",
+        "commons-dbutils:commons-dbutils:1.2",
+        project(":transport-vm"),
+        project(":test-functional"),
+        "org.apache.derby:derby:10.9.1.0",
+        "mysql:mysql-connector-java:5.1.26"
+}

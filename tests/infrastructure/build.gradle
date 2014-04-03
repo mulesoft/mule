@@ -1,0 +1,11 @@
+group = 'org.mule.tests'
+archivesBaseName = 'mule-tests-infrastructure'
+description = 'Tests infrastructure library for creating mule automated test cases.'
+
+dependencies {
+    compile project(':core'),
+        project(':module-launcher'),
+        project(':test-functional'),
+        "org.apache.commons:commons-exec:1.1",
+        configurations.testCompile.allDependencies
+}

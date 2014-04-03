@@ -120,8 +120,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         super.doSetUp();
         // set up some mule home structure
-        final String tmpDir = System.getProperty("java.io.tmpdir");
-        muleHome = new File(tmpDir, getClass().getSimpleName() + System.currentTimeMillis());
+        muleHome = getWorkingDirectory();
         appsDir = new File(muleHome, "apps");
         appsDir.mkdirs();
         domainsDir = new File(muleHome, "domains");
@@ -140,8 +139,6 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Override
     protected void doTearDown() throws Exception
     {
-        // comment out the deletion to analyze results after test is done
-        FileUtils.deleteTree(muleHome);
         if (deploymentService != null)
         {
             deploymentService.stop();

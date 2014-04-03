@@ -113,6 +113,7 @@ public class MuleManifest
         {
             manifest = new Manifest();
 
+
             InputStream is = null;
             try
             {
@@ -137,6 +138,25 @@ public class MuleManifest
             }
         }
         return manifest;
+    }
+
+    /**
+     * To be used only for testing, to provide a custom manifest
+     */
+    public static synchronized void initializeManifest(URL manifestUrl)
+    {
+        manifest = new Manifest();
+
+        try(InputStream is = manifestUrl.openStream())
+        {
+            manifest.read(is);
+        }
+        catch (IOException e)
+        {
+            logger.warn("Failed to read manifest Info, Manifest information will not display correctly: "
+                        + e.getMessage());
+        }
+
     }
 
     protected static String getManifestProperty(String name)
@@ -190,12 +210,13 @@ public class MuleManifest
         {
             String pathSeparator = System.getProperty("file.separator");
             String testManifestPath = "core" + pathSeparator + "target" + pathSeparator + "test-classes";
+            String testManifestPath2 = "core" + pathSeparator + "build" + pathSeparator + "resources" + pathSeparator + "test";
             Enumeration<URL> e = MuleConfiguration.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
             while (e.hasMoreElements())
             {
                 URL url = e.nextElement();
-                if ((url.toExternalForm().indexOf(testManifestPath) > -1 && url.toExternalForm().indexOf("tests.jar") < 0)
-                    || url.toExternalForm().matches(".*mule.*-.*-embedded.*\\.jar.*"))
+                if (((url.toExternalForm().contains(testManifestPath) || url.toExternalForm().contains(testManifestPath2))
+                        && !url.toExternalForm().contains("tests.jar")))
                 {
                     return url;
                 }

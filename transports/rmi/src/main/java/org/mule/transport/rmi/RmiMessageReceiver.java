@@ -61,13 +61,7 @@ public class RmiMessageReceiver extends AbstractPollingMessageReceiver
     @Override
     protected void doConnect() throws Exception
     {
-        System.setProperty("java.security.policy", connector.getSecurityPolicy());
-
-        // Set security manager
-        if (System.getSecurityManager() == null)
-        {
-            System.setSecurityManager(new RMISecurityManager());
-        }        
+        connector.initSecurity();
 
         // Get methodName
         String methodName = MapUtils.getString(endpoint.getEndpointURI().getParams(),

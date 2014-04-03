@@ -19,20 +19,13 @@
       Show how to use MTOM with CXF and Mule.
     </description>
 
-    <quartz:endpoint name="quartz.in" 
-                     jobName="eventTimer" 
-                     repeatInterval="1000" 
-                     repeatCount="0" 
-                     startDelay="1000">
-        <quartz:event-generator-job/>
-    </quartz:endpoint>
-
 
     <!-- A service which is triggered by quartz. -->
     <flow name="addEmployee">
-        <inbound-endpoint ref="quartz.in"/>
+        <vm:inbound-endpoint address="vm://in"/>
         <component class="org.mule.module.cxf.employee.EmployeeMessageGenerator">
         </component>
+        <logger message="Generating call..." />
         <outbound-endpoint name="outboundEmployeeDirectoryEndpoint" address="http://localhost:${port1}/services/employeeDirectory"
             exchange-pattern="request-response">
             <cxf:jaxws-client clientClass="org.mule.example.employee.EmployeeDirectory_Service"
@@ -51,6 +44,7 @@
             <cxf:jaxws-service serviceClass="org.mule.module.cxf.employee.EmployeeDirectoryImpl"
                                mtomEnabled="true"/>
         </inbound-endpoint>
+        <logger message="Received call..." />
         <component>
             <singleton-object class="org.mule.module.cxf.employee.EmployeeDirectoryImpl"/>
         </component>

@@ -21,7 +21,7 @@
             </message-properties-transformer>
         </vm:inbound-endpoint>
         <smtp:outbound-endpoint host="#[header:OUTBOUND:host]" port="${port1}" to="#[header:OUTBOUND:to]"
-                                subject="#[groovy:payload]"/>
+                                subject="#[payload]"/>
     </flow>
     
 </mule>

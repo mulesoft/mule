@@ -1,0 +1,10 @@
+group = 'org.mule.modules'
+archivesBaseName = 'mule-module-reboot'
+description = 'Mule 3 Container.'
+
+
+dependencies {
+    compile project(':core'),
+        "tanukisoft:wrapper:3.2.3"
+}
+

@@ -1,0 +1,73 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+ext {
+    versions = [:]
+    libraries = [:]
+}
+
+/* Dependency versions.
+ * Only add versions that need to be referenced by plugins or tasks
+ * If versions are only used in dependencies, define the dependency set below directly.
+ */
+versions += [
+    spring: '3.2.10.RELEASE',
+    jetty: '9.0.7.v20131107'
+]
+
+versions += [
+    muleCommon: '3.7.0-M1-SNAPSHOT',
+    muleMvel: '2.1.9-MULE-005'
+]
+
+/*
+ * Shared dependencies.
+ * This map defines a set of dependencies that can be resued in subprojects.
+ * Note that it's not necessary to define every dependency here. This placeholder is for dependencies that
+ * need to be version locked in every subproject.
+ */
+libraries += [
+    asm: [ 'asm:asm:3.1',
+           'asm:asm-commons:3.1'],
+
+    commons_cli: 'commons-cli:commons-cli:1.2',
+    commons_collections: 'commons-collections:commons-collections:3.2.1',
+    commons_io: 'commons-io:commons-io:2.4',
+    commons_lang: 'commons-lang:commons-lang:2.4',
+    commons_pool: 'commons-pool:commons-pool:1.6',
+    commons_beanutils: 'commons-beanutils:commons-beanutils:1.9.2',
+
+    guava: 'com.google.guava:guava:18.0',
+
+    activeMQ: 'org.apache.activemq:activemq-core:5.5.0',
+
+
+    logging: [
+        "org.slf4j:slf4j-api:1.7.7",
+        "org.slf4j:jcl-over-slf4j:1.7.7",
+        'org.apache.logging.log4j:log4j-api:2.1',
+        'org.apache.logging.log4j:log4j-1.2-api:2.1',
+        'org.apache.logging.log4j:log4j-core:2.1',
+        'org.apache.logging.log4j:log4j-jcl:2.1',
+        'org.apache.logging.log4j:log4j-slf4j-impl:2.1',
+        'org.apache.logging.log4j:log4j-jul:2.1'
+    ],
+
+    tests: [
+        'junit:junit:4.11',
+        'org.hamcrest:hamcrest-library:1.3',
+        'org.hamcrest:hamcrest-core:1.3',
+        'com.googlecode.multithreadedtc:multithreadedtc:1.01',
+        'org.mockito:mockito-core:1.9.0',
+        'xmlunit:xmlunit:1.5',
+    ],
+]
+
+libraries += [
+    mule_common: "org.mule.common:mule-common:${versions.muleCommon}",
+    mule_mvel: "org.mule.mvel:mule-mvel2:${versions.muleMvel}"
+]

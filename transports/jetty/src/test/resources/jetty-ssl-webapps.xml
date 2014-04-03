@@ -10,6 +10,6 @@
         <jetty:tls-client path="clientKeystore" storePassword="mulepassword"/>
         <jetty:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="storepassword"/>
         <jetty:tls-server path="trustStore" storePassword="mulepassword"/>
-        <jetty:webapps directory="${baseDir}target/webapps" host="localhost" port="${port}"/>
+        <jetty:webapps directory="${workingDirectory}" host="localhost" port="${port}"/>
     </jetty:connector>
 </mule>
