@@ -38,7 +38,7 @@ public class UnixController extends Controller
     {
         Map<Object, Object> newEnv = this.copyEnvironmentVariables();
         DefaultExecutor executor = new DefaultExecutor();
-        ExecuteWatchdog watchdog = new ExecuteWatchdog((long) timeout);
+        ExecuteWatchdog watchdog = new ExecuteWatchdog(timeout);
         executor.setWatchdog(watchdog);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);

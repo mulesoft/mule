@@ -26,12 +26,7 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 
 public abstract class Controller
 {
-    protected String muleHome;
-    protected String muleBin;
-    protected File domainsDir;
-    protected File appsDir;
-    protected File libsDir;
-    protected int timeout;
+
     private static final int DEFAULT_TIMEOUT = 30000;
     private static final String MULE_HOME_VARIABLE = "MULE_HOME";
     protected static final String ANCHOR_SUFFIX = "-anchor.txt";
@@ -42,6 +37,12 @@ public abstract class Controller
     protected static final String STATUS = "Mule Enterprise Edition is running \\(([0-9]+)\\)\\.";
     protected static final Pattern STATUS_PATTERN = Pattern.compile(STATUS);
     private static final int IS_RUNNING_STATUS_CODE = 0;
+    protected String muleHome;
+    protected String muleBin;
+    protected File domainsDir;
+    protected File appsDir;
+    protected File libsDir;
+    protected int timeout;
 
     public Controller(String muleHome, int timeout)
     {
@@ -50,7 +51,7 @@ public abstract class Controller
         this.domainsDir = new File(muleHome + "/domains");
         this.appsDir = new File(muleHome + "/apps/");
         this.libsDir = new File(muleHome + "/lib/user");
-        this.timeout = timeout != 0? timeout : DEFAULT_TIMEOUT;
+        this.timeout = timeout != 0 ? timeout : DEFAULT_TIMEOUT;
     }
 
     public abstract String getMuleBin();
@@ -90,7 +91,7 @@ public abstract class Controller
         return executeSyncCommand(command, args, newEnv, timeout);
     }
 
-    private int executeSyncCommand(String command, String[] args, Map<Object, Object> newEnv, long timeout)
+    private int executeSyncCommand(String command, String[] args, Map<Object, Object> newEnv, int timeout)
             throws MuleControllerException
     {
         CommandLine commandLine = new CommandLine(muleBin);
