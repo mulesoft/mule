@@ -17,10 +17,10 @@ import org.mule.module.db.domain.query.QueryTemplate;
 import org.mule.module.db.domain.query.QueryType;
 import org.mule.module.db.domain.type.DbType;
 import org.mule.module.db.domain.type.DbTypeManager;
+import org.mule.module.db.domain.type.JdbcTypes;
 import org.mule.module.db.domain.type.UnknownDbType;
 import org.mule.module.db.test.util.DbConnectionBuilder;
 import org.mule.module.db.test.util.DbTypeManagerBuilder;
-import org.mule.module.db.test.util.DbTypes;
 import org.mule.module.db.test.util.ParameterMetaDataBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -41,7 +41,7 @@ public class QueryParamTypeResolverTestCase extends AbstractMuleTestCase
     {
         final String sqlText = "select * from test where id = ?";
 
-        ParameterMetaData parameterMetaData = new ParameterMetaDataBuilder().withParameter(1, DbTypes.INTEGER_DB_TYPE).build();
+        ParameterMetaData parameterMetaData = new ParameterMetaDataBuilder().withParameter(1, JdbcTypes.INTEGER_DB_TYPE).build();
 
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
         when(preparedStatement.getParameterMetaData()).thenReturn(parameterMetaData);
@@ -50,13 +50,13 @@ public class QueryParamTypeResolverTestCase extends AbstractMuleTestCase
 
         QueryTemplate queryTemplate = new QueryTemplate(sqlText, QueryType.SELECT, Collections.<org.mule.module.db.domain.param.QueryParam>singletonList(new DefaultInputQueryParam(1, UnknownDbType.getInstance(), "7", "param1")));
 
-        DbTypeManager dbTypeManager = new DbTypeManagerBuilder().on(connection).managing(DbTypes.INTEGER_DB_TYPE).build();
+        DbTypeManager dbTypeManager = new DbTypeManagerBuilder().on(connection).managing(JdbcTypes.INTEGER_DB_TYPE).build();
 
         QueryParamTypeResolver paramTypeResolver = new QueryParamTypeResolver(dbTypeManager);
 
         Map<Integer, DbType> parameterTypes = paramTypeResolver.getParameterTypes(connection, queryTemplate);
 
         assertThat(parameterTypes.size(), equalTo(1));
-        assertThat(parameterTypes.get(1), equalTo(DbTypes.INTEGER_DB_TYPE));
+        assertThat(parameterTypes.get(1), equalTo(JdbcTypes.INTEGER_DB_TYPE));
     }
 }

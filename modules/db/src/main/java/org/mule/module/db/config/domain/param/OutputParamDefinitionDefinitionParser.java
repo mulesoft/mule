@@ -29,7 +29,7 @@ public class OutputParamDefinitionDefinitionParser extends AbstractParamDefiniti
         builder.setScope(BeanDefinition.SCOPE_SINGLETON);
 
         builder.addConstructorArgValue(getListElementIndex(element));
-        builder.addConstructorArgValue(getType());
+        builder.addConstructorArgValue(getType(element));
         builder.addConstructorArgValue(getName(element));
     }
 
