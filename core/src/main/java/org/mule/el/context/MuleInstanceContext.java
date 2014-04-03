@@ -27,7 +27,7 @@ public class MuleInstanceContext
         this.muleContext = muleContext;
     }
 
-    public static String getVersion()
+    public String getVersion()
     {
         return MuleManifest.getProductVersion();
     }

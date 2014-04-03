@@ -8,7 +8,6 @@ package org.mule.el.datetime;
 
 import org.mule.api.el.datetime.Date;
 import org.mule.api.el.datetime.Time;
-import org.mule.el.context.ServerContext;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -43,19 +42,19 @@ public class DateTime extends AbstractInstant implements Date, Time, Serializabl
 
     public DateTime(Calendar calendar)
     {
-        this(calendar, ServerContext.getLocale());
+        this(calendar, Locale.getDefault());
     }
 
     public DateTime(java.util.Date date)
     {
-        this(Calendar.getInstance(ServerContext.getTimeZone(), ServerContext.getLocale()),
-            ServerContext.getLocale());
+        this(Calendar.getInstance(Calendar.getInstance().getTimeZone(), Locale.getDefault()),
+            Locale.getDefault());
         this.calendar.setTime(date);
     }
 
     public DateTime(XMLGregorianCalendar xmlCalendar)
     {
-        this(xmlCalendar.toGregorianCalendar(), ServerContext.getLocale());
+        this(xmlCalendar.toGregorianCalendar(), Locale.getDefault());
     }
 
     public DateTime(String iso8601String)
@@ -65,8 +64,7 @@ public class DateTime extends AbstractInstant implements Date, Time, Serializabl
 
     public DateTime(String dateString, String format) throws ParseException
     {
-        this(Calendar.getInstance(TimeZone.getTimeZone("UTC"), ServerContext.getLocale()),
-            ServerContext.getLocale());
+        this(Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.getDefault()), Locale.getDefault());
         SimpleDateFormat dateFormat = new SimpleDateFormat(format);
         dateFormat.setCalendar(this.calendar);
         dateFormat.parse(dateString);
@@ -412,7 +410,7 @@ public class DateTime extends AbstractInstant implements Date, Time, Serializabl
         }
 
     }
-    
+
     private void writeObject(ObjectOutputStream out) throws Exception
     {
         out.defaultWriteObject();
@@ -426,6 +424,5 @@ public class DateTime extends AbstractInstant implements Date, Time, Serializabl
         this.calendar = (Calendar) in.readObject();
         this.locale = (Locale) in.readObject();
     }
-
 
 }

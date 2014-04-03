@@ -16,14 +16,10 @@ import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.ast.FunctionInstance;
 import org.mule.mvel2.integration.VariableResolver;
-import org.mule.mvel2.integration.VariableResolverFactory;
-import org.mule.mvel2.integration.impl.BaseVariableResolverFactory;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
-public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
+public class MVELExpressionLanguageContext extends MuleBaseVariableResolverFactory
     implements ExpressionLanguageContext
 {
 
@@ -34,7 +30,6 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
 
     protected ParserConfiguration parserConfiguration;
     protected MuleContext muleContext;
-    protected List<VariableResolverFactory> children = new ArrayList<VariableResolverFactory>(8);
 
     public MVELExpressionLanguageContext(ParserConfiguration parserConfiguration, MuleContext muleContext)
     {
@@ -51,55 +46,9 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     }
 
     @Override
-    public boolean isTarget(String name)
-    {
-        if (variableResolvers.containsKey(name))
-        {
-            return true;
-        }
-        else
-        {
-            for (VariableResolverFactory child : children)
-            {
-                if (child.isResolveable(name))
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean isResolveable(String name)
-    {
-        return isTarget(name) || isNextResolveable(name);
-    }
-
-    @Override
-    public VariableResolver createVariable(String name, Object value)
-    {
-        return createVariable(name, value, null);
-    }
-
     public VariableResolver getVariableResolver(String name)
     {
-        VariableResolver variableResolver = variableResolvers.get(name);
-        if (variableResolver == null)
-        {
-            for (VariableResolverFactory child : children)
-            {
-                if (child.isResolveable(name))
-                {
-                    variableResolver = child.getVariableResolver(name);
-                    break;
-                }
-            }
-            if (variableResolver == null && nextFactory != null)
-            {
-                variableResolver = nextFactory.getVariableResolver(name);
-            }
-        }
+        VariableResolver variableResolver = super.getVariableResolver(name);
         // In order to allow aliases to use message context without requiring the creating of a
         // GlobalVariableResolver for each expression evaluation, we create a new resolver on the fly with
         // current context instead.
@@ -109,22 +58,6 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
                 this);
         }
         return variableResolver;
-    }
-
-    @Override
-    public VariableResolver createVariable(String name, Object value, Class<?> type)
-    {
-        VariableResolver vr = getVariableResolver(name);
-
-        if (vr != null)
-        {
-            vr.setValue(value);
-        }
-        else
-        {
-            addResolver(name, vr = new MuleVariableResolver(name, value, type, null));
-        }
-        return vr;
     }
 
     /*
@@ -181,15 +114,6 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
         return (T) getVariable(name);
     }
 
-    /*
-     * Use an internal VariableResolverFactory in order to use chain resolution while ensuring custom
-     * variables from extension aren't given precedence
-     */
-    protected void addResolver(String name, VariableResolver vr)
-    {
-        variableResolvers.put(name, vr);
-    }
-
     @Override
     public void addAlias(String alias, String expression)
     {
@@ -237,46 +161,9 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     }
 
     @Override
-    public void appendFactory(VariableResolverFactory resolverFactory)
-    {
-        if (nextFactory == null)
-        {
-            setNextFactory(resolverFactory);
-        }
-        else
-        {
-            VariableResolverFactory vrf = nextFactory;
-            while (vrf.getNextFactory() != null)
-            {
-                vrf = vrf.getNextFactory();
-            }
-            vrf.setNextFactory(resolverFactory);
-        }
-    }
-
-    public void insertFactory(VariableResolverFactory resolverFactory)
-    {
-        if (nextFactory == null)
-        {
-            nextFactory = resolverFactory;
-        }
-        else
-        {
-            VariableResolverFactory currentNext = nextFactory;
-            nextFactory = resolverFactory;
-            resolverFactory.setNextFactory(currentNext);
-        }
-    }
-
-    @Override
     public <T> void addPrivateVariable(String name, T value)
     {
         addFinalVariable(name, value);
     }
-
-    public void addChildContext(VariableResolverFactory child)
-    {
-        children.add(child);
-    };
 
 }
