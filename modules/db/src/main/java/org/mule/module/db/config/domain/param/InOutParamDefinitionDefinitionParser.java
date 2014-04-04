@@ -30,7 +30,7 @@ public class InOutParamDefinitionDefinitionParser extends AbstractParamDefinitio
         builder.setScope(BeanDefinition.SCOPE_SINGLETON);
 
         builder.addConstructorArgValue(getListElementIndex(element));
-        builder.addConstructorArgValue(getType());
+        builder.addConstructorArgValue(getType(element));
         builder.addConstructorArgValue(getName(element));
         builder.addConstructorArgValue(getValue(element));
     }

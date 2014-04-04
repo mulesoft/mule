@@ -17,9 +17,9 @@ import org.mule.module.db.domain.connection.DbConnection;
 import org.mule.module.db.domain.query.Query;
 import org.mule.module.db.domain.query.QueryParamValue;
 import org.mule.module.db.domain.type.DbType;
+import org.mule.module.db.domain.type.JdbcTypes;
 import org.mule.module.db.domain.type.UnknownDbType;
 import org.mule.module.db.resolver.param.ParamValueResolver;
-import org.mule.module.db.test.util.DbTypes;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Collections;
@@ -31,7 +31,7 @@ import org.junit.Test;
 public class ParametrizedQueryResolverTestCase extends AbstractQueryResolverTestCase
 {
 
-    private final Query resolvedTemplateQuery = createQuery(createQueryTemplate(STATIC_SQL_TEXT, new DbType[] {DbTypes.INTEGER_DB_TYPE}), new Object[] {"foo"});
+    private final Query resolvedTemplateQuery = createQuery(createQueryTemplate(STATIC_SQL_TEXT, new DbType[] {JdbcTypes.INTEGER_DB_TYPE}), new Object[] {"foo"});
     private final Query unresolvedTemplateQuery = createQuery(createQueryTemplate(STATIC_SQL_TEXT, new DbType[] {UnknownDbType.getInstance()}), new Object[] {"foo"});
 
     @Test
@@ -61,13 +61,13 @@ public class ParametrizedQueryResolverTestCase extends AbstractQueryResolverTest
         QueryResolver queryResolver = new ParametrizedQueryResolver(unresolvedTemplateQuery, paramValueResolver);
 
         DbConnection connection = mock(DbConnection.class);
-        when(connection.getParamTypes(unresolvedTemplateQuery.getQueryTemplate())).thenReturn(Collections.singletonMap(1, DbTypes.INTEGER_DB_TYPE));
+        when(connection.getParamTypes(unresolvedTemplateQuery.getQueryTemplate())).thenReturn(Collections.singletonMap(1, JdbcTypes.INTEGER_DB_TYPE));
 
         Query resolvedQuery = queryResolver.resolve(connection, muleEvent);
 
         assertThat(unresolvedTemplateQuery, not(sameInstance(resolvedQuery)));
         assertThat(unresolvedTemplateQuery.getQueryTemplate().getSqlText(), equalTo(resolvedQuery.getQueryTemplate().getSqlText()));
-        assertThat(resolvedQuery.getQueryTemplate().getParams().get(0).getType(), equalTo(DbTypes.INTEGER_DB_TYPE));
+        assertThat(resolvedQuery.getQueryTemplate().getParams().get(0).getType(), equalTo(JdbcTypes.INTEGER_DB_TYPE));
         assertThat(resolvedParams, sameInstance(resolvedQuery.getParamValues()));
         assertThat((String) resolvedParams.get(0).getValue(), equalTo("foo"));
     }

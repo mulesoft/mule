@@ -15,11 +15,12 @@ import org.mule.module.db.domain.query.QueryTemplate;
 import org.mule.module.db.domain.query.QueryType;
 import org.mule.module.db.domain.type.DbType;
 import org.mule.module.db.domain.type.DbTypeManager;
+import org.mule.module.db.domain.type.JdbcTypes;
 import org.mule.module.db.domain.type.UnknownDbType;
 import org.mule.module.db.test.util.DatabaseMetaDataBuilder;
 import org.mule.module.db.test.util.DbConnectionBuilder;
 import org.mule.module.db.test.util.DbTypeManagerBuilder;
-import org.mule.module.db.test.util.DbTypes;
+import org.mule.module.db.test.util.TestDbTypeMetadata;
 import org.mule.module.db.test.util.StoredProcedureColumnTypesBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -43,7 +44,7 @@ public class StoredProcedureParamTypeResolverTestCase extends AbstractMuleTestCa
     {
         final String catalog = "test";
 
-        ResultSet procedureColumns = new StoredProcedureColumnTypesBuilder().with(DbTypes.INTEGER_DB_TYPE_METADATA).build();
+        ResultSet procedureColumns = new StoredProcedureColumnTypesBuilder().with(TestDbTypeMetadata.INTEGER_DB_TYPE_METADATA).build();
         DatabaseMetaData databaseMetaData = new DatabaseMetaDataBuilder().returningStoredProcedureColumns(catalog, "testStoredProcedure", procedureColumns).build();
 
         final String sqlText = "call testStoredProcedure(?)";
@@ -52,14 +53,14 @@ public class StoredProcedureParamTypeResolverTestCase extends AbstractMuleTestCa
 
         QueryTemplate queryTemplate = new QueryTemplate(sqlText, QueryType.STORE_PROCEDURE_CALL, Collections.<org.mule.module.db.domain.param.QueryParam>singletonList(new DefaultInputQueryParam(1, UnknownDbType.getInstance(), "7", TYPE_COLUMN)));
 
-        DbTypeManager dbTypeManager = new DbTypeManagerBuilder().on(connection).managing(DbTypes.INTEGER_DB_TYPE).build();
+        DbTypeManager dbTypeManager = new DbTypeManagerBuilder().on(connection).managing(JdbcTypes.INTEGER_DB_TYPE).build();
 
         StoredProcedureParamTypeResolver paramTypeResolver = new StoredProcedureParamTypeResolver(dbTypeManager);
 
         Map<Integer, DbType> parameterTypes = paramTypeResolver.getParameterTypes(connection, queryTemplate);
 
         assertThat(parameterTypes.size(), equalTo(1));
-        assertThat(parameterTypes.get(1), equalTo(DbTypes.INTEGER_DB_TYPE));
+        assertThat(parameterTypes.get(1), equalTo(JdbcTypes.INTEGER_DB_TYPE));
     }
 
 }
