@@ -48,7 +48,7 @@ public class JdbcReconnectionTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigFile()
+    protected String getConfigResources()
     {
         return configFile;
     }
