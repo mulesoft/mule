@@ -20,7 +20,7 @@ import org.junit.Test;
 
 public class FileEncryptionTestCase extends FunctionalTestCase
 {
-    public static final String TEST_FOLDER = ".mule/testData";
+    public String testFolder;
 
     private Prober prober = new PollingProber(30000, 100);
 
@@ -33,6 +33,12 @@ public class FileEncryptionTestCase extends FunctionalTestCase
     protected String getConfigFile()
     {
         return "file-encryption-config.xml";
+    }
+
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        testFolder = String.format("%s%s%s", getWorkingDirectory().getAbsoluteFile(), File.separator, "testData");
     }
 
     private File createTestFile(String folder) throws IOException
@@ -52,7 +58,7 @@ public class FileEncryptionTestCase extends FunctionalTestCase
     @Test
     public void testName() throws Exception
     {
-        final File target = createTestFile(TEST_FOLDER);
+        final File target = createTestFile(testFolder);
 
         // Starts file endpoint polling
         muleContext.start();

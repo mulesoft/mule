@@ -67,7 +67,7 @@ public class FileFunctionalTestCase extends AbstractFileFunctionalTestCase
     @Test
     public void testRecursive() throws Exception
     {
-        File directory = new File("./.mule/in");
+        File directory = getFileInsideWorkingDirectory("in");
         File subDirectory = new File(directory.getAbsolutePath() + "/sub");
         boolean success = subDirectory.mkdir();
         assertTrue(success);

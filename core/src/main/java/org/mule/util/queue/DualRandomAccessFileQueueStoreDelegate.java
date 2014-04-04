@@ -55,8 +55,8 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
         {
             Preconditions.checkState(queuesDirectory.mkdirs(), "Could not create queue store directory " + queuesDirectory.getAbsolutePath());
         }
-        File queueStoreFile1 = new File(queuesDirectory, queueName + "-1");
-        File queueStoreFile2 = new File(queuesDirectory, queueName + "-2");
+        File queueStoreFile1 = getFirstQueueFile(queueName, workingDirectory);
+        File queueStoreFile2 = getSecondQueueFile(queueName, workingDirectory);
         randomAccessFileQueueStore1 = new RandomAccessFileQueueStore(queueStoreFile1);
         randomAccessFileQueueStore2 = new RandomAccessFileQueueStore(queueStoreFile2);
         writeFile = randomAccessFileQueueStore1;
@@ -66,6 +66,22 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
             logger.debug(String.format("Queue %s has %s messages", queueName, getSize()));
         }
         filesLock = new ReentrantReadWriteLock();
+    }
+
+
+    public static File getFirstQueueFile(String queueName, String workingDirectory)
+    {
+        return getQueueFile(queueName, workingDirectory, "-1");
+    }
+
+    public static File getSecondQueueFile(String queueName, String workingDirectory)
+    {
+        return getQueueFile(queueName, workingDirectory, "-2");
+    }
+
+    private static File getQueueFile(String queueName, String workingDirectory, String suffix)
+    {
+        return new File(new File(workingDirectory + File.separator + QUEUE_STORE_DIRECTORY), queueName + suffix);
     }
 
     @Override

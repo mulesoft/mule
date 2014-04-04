@@ -49,7 +49,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
             tempDir.mkdirs();
         }
 
-        validMessage = File.createTempFile("simple", ".mule", tempDir);
+        validMessage = File.createTempFile("simple", "test", tempDir);
         assertNotNull(validMessage);
         FileUtils.writeStringToFile(validMessage, VALID_MESSAGE);
     }

@@ -13,7 +13,7 @@
                     streaming="true"/>
 
     <flow name="fileTest" processingStrategy="synchronous">
-        <file:inbound-endpoint connector-ref="fileConnector" path=".mule/testData1"/>
+        <file:inbound-endpoint connector-ref="fileConnector" path="${workingDirectory}/testData1"/>
 
         <test:component throwException="true"/>
 
@@ -22,7 +22,7 @@
     </flow>
 
     <flow name="fileTestWithTransformation" processingStrategy="synchronous">
-        <file:inbound-endpoint connector-ref="fileConnector" path=".mule/testData2">
+        <file:inbound-endpoint connector-ref="fileConnector" path="${workingDirectory}/testData2">
             <file:file-to-string-transformer/>
         </file:inbound-endpoint>
 

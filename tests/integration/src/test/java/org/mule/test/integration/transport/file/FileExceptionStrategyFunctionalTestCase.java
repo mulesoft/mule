@@ -37,11 +37,11 @@ public class FileExceptionStrategyFunctionalTestCase extends AbstractServiceAndF
     @Test
     public void testExceptionInTransformer() throws Exception
     {
-        File f = FileUtils.newFile("./.mule/in/test.txt");
+        File f = FileUtils.newFile(getFileInsideWorkingDirectory("in/test.txt").getAbsolutePath());
         f.createNewFile();
 
         // try a couple of times with backoff strategy, then fail
-        File errorFile = FileUtils.newFile("./.mule/errors/test-0.out");
+        File errorFile = FileUtils.newFile(getFileInsideWorkingDirectory("errors/test-0.out").getAbsolutePath());
         boolean testSucceded = false;
         int timesTried = 0;
         while (timesTried <= 3)

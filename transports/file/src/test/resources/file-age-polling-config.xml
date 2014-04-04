@@ -17,7 +17,7 @@
     </file:connector>
 
     <flow name="test">
-        <file:inbound-endpoint path="./.mule/in"/>
+        <file:inbound-endpoint path="${workingDirectory}/in"/>
 
         <vm:outbound-endpoint path="testOut"/>
     </flow>

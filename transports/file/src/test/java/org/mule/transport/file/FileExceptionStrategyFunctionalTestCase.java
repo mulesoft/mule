@@ -36,7 +36,8 @@ import org.junit.Test;
 public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
 {
     public static final String TEST_MESSAGE = "Test file contents";
-    public static final String WORKING_DIRECTORY = ".mule/temp/work-directory/";
+
+    public static final String WORKING_DIRECTORY_FOLDER = "temp/work-directory/";
 
     private Latch latch = new Latch();
     protected File inputDir;
@@ -54,11 +55,11 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
     public void testMoveFile() throws Exception
     {
         attacheLatchCountdownProcessor("moveFile");
-        inputDir = new File(".mule/temp/input-move-file");
+        inputDir = getFileInsideWorkingDirectory("temp/input-move-file");
         inputFile = createDataFile(inputDir, "test1.txt");
         latch.await(2000l, MILLISECONDS);
         flow.stop();
-        File outputFile = new File(".mule/temp/output-directory/" + inputFile.getName());
+        File outputFile = getFileInsideWorkingDirectory("temp/output-directory/" + inputFile.getName());
         assertThat(inputFile.exists(), is(false));
         assertThat(outputFile.exists(), is(true));
     }
@@ -67,12 +68,12 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
     public void testMoveFileWithWorDir() throws Exception
     {
         attacheLatchCountdownProcessor("moveFileWithWorkDir");
-        inputDir = new File(".mule/temp/input-move-file-wd");
+        inputDir = getFileInsideWorkingDirectory("temp/input-move-file-wd");
         inputFile = createDataFile(inputDir, "test1.txt");
         latch.await(2000l, MILLISECONDS);
         flow.stop();
-        File outputFile = new File(".mule/temp/output-directory/" + inputFile.getName());
-        File workDirFile = new File(WORKING_DIRECTORY + inputFile.getName());
+        File outputFile = getFileInsideWorkingDirectory("temp/output-directory/" + inputFile.getName());
+        File workDirFile = getFileInsideWorkingDirectory(WORKING_DIRECTORY_FOLDER + File.separator + inputFile.getName());
         assertThat(inputFile.exists(), is(false));
         assertThat(outputFile.exists(), is(true));
         assertThat(workDirFile.exists(), is(false));
@@ -83,11 +84,11 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
     public void testCopyFile() throws Exception
     {
         attacheLatchCountdownProcessor("copyFile");
-        inputDir = new File(".mule/temp/input-copy-file");
+        inputDir = getFileInsideWorkingDirectory("temp/input-copy-file");
         inputFile = createDataFile(inputDir, "test1.txt");
         latch.await(2000l, MILLISECONDS);
         flow.stop();
-        File outputFile = new File(".mule/temp/output-directory/" + inputFile.getName());
+        File outputFile = getFileInsideWorkingDirectory("temp/output-directory/" + inputFile.getName());
         assertThat(inputFile.exists(), is(false));
         assertThat(outputFile.exists(), is(false));
     }
@@ -97,12 +98,12 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
     public void testCopyFileWithWorkDir() throws Exception
     {
         attacheLatchCountdownProcessor("copyFileWithWorkDir");
-        inputDir = new File(".mule/temp/input-copy-file-with-work-directory");
+        inputDir = getFileInsideWorkingDirectory("temp/input-copy-file-with-work-directory");
         inputFile = createDataFile(inputDir, "test1.txt");
         latch.await(2000l, MILLISECONDS);
         flow.stop();
-        File outputFile = new File(".mule/temp/output-directory/" + inputFile.getName());
-        File workDirFile = new File(WORKING_DIRECTORY + inputFile.getName());
+        File outputFile = getFileInsideWorkingDirectory("temp/output-directory/" + inputFile.getName());
+        File workDirFile = getFileInsideWorkingDirectory(WORKING_DIRECTORY_FOLDER + File.separator + inputFile.getName());
         assertThat(inputFile.exists(), is(false));
         assertThat(outputFile.exists(), is(false));
         assertThat(workDirFile.exists(), is(false));
@@ -111,7 +112,7 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testConsumeFileWithExAndCatch() throws Exception
     {
-        inputDir = new File(".mule/temp/input-streaming-catch");
+        inputDir = getFileInsideWorkingDirectory("temp/input-streaming-catch");
         inputFile = createDataFile(inputDir, "test1.txt");
         pollingProber.check(new Probe()
         {
@@ -143,7 +144,7 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
                 throw new RuntimeException();
             }
         });
-        inputDir = new File(".mule/temp/input-streaming-rollback");
+        inputDir = getFileInsideWorkingDirectory("temp/input-streaming-rollback");
         inputFile = createDataFile(inputDir, "test1.txt");
 
         if (!countDownLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS))
@@ -166,7 +167,7 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
                 throw new RuntimeException();
             }
         });
-        inputDir = new File(".mule/temp/input-streaming-rollback-with-redelivery");
+        inputDir = getFileInsideWorkingDirectory("temp/input-streaming-rollback-with-redelivery");
         inputFile = createDataFile(inputDir, "test1.txt");
         if (!countDownLatch.await(100000, TimeUnit.MILLISECONDS))
         {
@@ -191,7 +192,7 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testConsumeFileWithAsynchronousProcessingStrategy() throws Exception
     {
-        inputDir = new File(".mule/temp/input-streaming-and-async-processing-strategy");
+        inputDir = getFileInsideWorkingDirectory("temp/input-streaming-and-async-processing-strategy");
         inputFile = createDataFile(inputDir, "test1.txt");
         BeforeCloseStream.releaseLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
         assertThat(inputFile.exists(),is(true));
@@ -231,13 +232,8 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
     @Before
     public void doSetUp()
     {
-        FileUtils.deleteTree(new File("./mule/temp"));
-    }
-
-    @After
-    public void tearDown()
-    {
-        FileUtils.deleteTree(new File("./mule/temp"));
+        FileUtils.deleteTree(getFileInsideWorkingDirectory("temp"));
+        getFileInsideWorkingDirectory(WORKING_DIRECTORY_FOLDER).mkdirs();
     }
 
     protected File createDataFile(File folder, final String testMessage) throws Exception
@@ -247,10 +243,10 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
 
     protected File createDataFile(File folder, final String testMessage, String encoding) throws Exception
     {
+        folder.mkdirs();
         File target = File.createTempFile("data", ".txt", folder);
         target.deleteOnExit();
         FileUtils.writeStringToFile(target, testMessage, encoding);
-
         return target;
     }
 

@@ -41,7 +41,7 @@ public class FileAgeAndPollingFrequencyInteractionTestCase extends FunctionalTes
     @Test
     public void processesFileOnNextPollWhenFileIsOldEnough() throws Exception
     {
-        File tmpDir = FileUtils.openDirectory(".mule/in");
+        File tmpDir = FileUtils.openDirectory(getFileInsideWorkingDirectory("in").getAbsolutePath());
         dataFile = createDataFile(tmpDir, TEST_MESSAGE, "UTF-8");
 
         muleContext.start();

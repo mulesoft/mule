@@ -9,38 +9,38 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
 
-    <file:connector name="fileConnector" streaming="false" workDirectory=".mule/tmp" pollingFrequency="50"/>
+    <file:connector name="fileConnector" streaming="false" workDirectory="${workingDirectory}/tmp" pollingFrequency="50"/>
     
     <model>
         <service name="NoException">
             <inbound>
-                <file:inbound-endpoint path=".mule/noException" />
+                <file:inbound-endpoint path="${workingDirectory}/noException" />
             </inbound>
             <test:component />
         </service>
         <service name="TransformerException">
             <inbound>
-                <file:inbound-endpoint path=".mule/transformerException" />
+                <file:inbound-endpoint path="${workingDirectory}/transformerException" />
                 <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer" />
             </inbound>
             <test:component />
         </service>
         <service name="RouterException">
             <inbound>
-                <file:inbound-endpoint path=".mule/routerException" />
+                <file:inbound-endpoint path="${workingDirectory}/routerException" />
                 <custom-inbound-router class="org.mule.tck.testmodels.mule.FailingRouter" />
             </inbound>
             <test:component />
         </service>
         <service name="ComponentException">
             <inbound>
-                <file:inbound-endpoint path=".mule/componentException" />
+                <file:inbound-endpoint path="${workingDirectory}/componentException" />
             </inbound>
             <test:component throwException="true" />
         </service>
         <service name="CatchExceptionStrategy">
             <inbound>
-                <file:inbound-endpoint path=".mule/exceptionHandled" />
+                <file:inbound-endpoint path="${workingDirectory}/exceptionHandled" />
             </inbound>
             <test:component throwException="true"/>
             <catch-exception-strategy/>
@@ -48,7 +48,7 @@
         </service>
         <service name="DefaultExceptionStrategyCommit" >
             <inbound>
-                <file:inbound-endpoint path=".mule/commitOnException" />
+                <file:inbound-endpoint path="${workingDirectory}/commitOnException" />
             </inbound>
             <test:component throwException="true"/>
             <default-exception-strategy>
@@ -58,7 +58,7 @@
         </service>
         <service name="RollbackExceptionStrategyCommit" >
             <inbound>
-                <file:inbound-endpoint path=".mule/rollbackOnException"/>
+                <file:inbound-endpoint path="${workingDirectory}/rollbackOnException"/>
             </inbound>
             <test:component throwException="true"/>
             <rollback-exception-strategy maxRedeliveryAttempts="2"/>
