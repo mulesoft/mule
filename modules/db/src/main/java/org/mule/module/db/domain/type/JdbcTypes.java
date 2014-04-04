@@ -56,37 +56,9 @@ public class JdbcTypes
     public static final DbType NCLOB_DB_TYPE = new ResolvedDbType(Types.NCLOB, "NCLOB");
     public static final DbType SQLXML_DB_TYPE = new ResolvedDbType(Types.SQLXML, "SQLXML");
 
-    private static  Map<String, DbType> types;
+    private static final Map<String, DbType> types;
 
-    public static DbType lookup(String name)
-    {
-        checkInitialized();
-
-        return types.get(name);
-    }
-
-    private static void checkInitialized()
-    {
-        if (types == null)
-        {
-            synchronized (JdbcTypes.class)
-            {
-                if (types == null)
-                {
-                    initialize();
-                }
-            }
-        }
-    }
-
-    public static Collection<DbType> list()
-    {
-        checkInitialized();
-
-        return types.values();
-    }
-
-    private static void initialize()
+    static
     {
         types = new HashMap<String, DbType>();
 
@@ -109,5 +81,15 @@ public class JdbcTypes
                 throw new IllegalStateException("Unable to initialize JDBC types", e);
             }
         }
+    }
+
+    public static DbType lookup(String name)
+    {
+        return types.get(name);
+    }
+
+    public static Collection<DbType> list()
+    {
+        return types.values();
     }
 }

@@ -52,7 +52,7 @@ public class SchemaParamTypeTestCase  extends AbstractParamTypeTestCase
 
             Document doc = parseSchema("/META-INF/mule-db.xsd");
 
-            Element jdbcTypes = findSimpleType(doc, "JdbcTypes");
+            Element jdbcTypes = findSimpleType(doc, "JdbcDataTypes");
 
             NodeList childNodes = jdbcTypes.getElementsByTagName("xsd:restriction");
             Element type = (Element) childNodes.item(0);

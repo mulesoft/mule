@@ -421,9 +421,6 @@
     </xsd:complexType>
 
     <xsd:complexType name="TemplateInputParamType">
-        <xsd:sequence>
-            <xsd:element ref="jdbc-type"  minOccurs="0" maxOccurs="1"/>
-        </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" use="required">
             <xsd:annotation>
                 <xsd:documentation>
@@ -435,6 +432,13 @@
             <xsd:annotation>
                 <xsd:documentation>
                     The value for the parameter
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="type" type="ExtendedJdbcDataTypes" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Parameter type name
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -457,25 +461,16 @@
         </xsd:attribute>
     </xsd:complexType>
 
-    <xsd:element name="jdbc-type" type="jdbcDbType">
+    <xsd:simpleType name="ExtendedJdbcDataTypes">
         <xsd:annotation>
             <xsd:documentation>
-                Provides a way to define JDBC types for parameters
+                Data types for fields and parameters
             </xsd:documentation>
         </xsd:annotation>
-    </xsd:element>
+        <xsd:union memberTypes="JdbcDataTypes xsd:string"/>
+    </xsd:simpleType>
 
-    <xsd:complexType name="jdbcDbType">
-        <xsd:attribute name="type" type="JdbcTypes">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The JDBC type as defined in java.sql.Types
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-    </xsd:complexType>
-
-    <xsd:simpleType name="JdbcTypes">
+    <xsd:simpleType name="JdbcDataTypes">
         <xsd:restriction base="xsd:NMTOKEN">
             <xsd:enumeration value="BIT"/>
             <xsd:enumeration value="TINYINT"/>

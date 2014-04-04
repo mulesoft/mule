@@ -11,9 +11,7 @@
             SELECT FROM PLANET WHERE ID = :id
         </db:parameterized-query>
 
-        <db:in-param name="id" defaultValue="1">
             <!-- Uses a placeholder expression that will be replaced before parsing the XML -->
-            <db:jdbc-type type="${typeName}"/>
-        </db:in-param>
+        <db:in-param name="id" defaultValue="1" type="${typeName}"/>
     </db:template-query>
 </mule>
