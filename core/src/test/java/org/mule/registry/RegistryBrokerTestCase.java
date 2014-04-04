@@ -6,15 +6,20 @@
  */
 package org.mule.registry;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.registry.RegistryBroker;
 import org.mule.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 
-import org.junit.Test;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 public class RegistryBrokerTestCase extends AbstractMuleContextTestCase
 {
@@ -107,6 +112,47 @@ public class RegistryBrokerTestCase extends AbstractMuleContextTestCase
         {
             super.doStop();
             tracker += name + "-stop ";
+        }
+    }
+
+    @Test
+    public void testConcurrentRegistryAddRemove() throws Exception
+    {
+        final RegistryBroker broker = new DefaultRegistryBroker(muleContext);
+
+        final int N = 50;
+        final CountDownLatch start = new CountDownLatch(1);
+        final CountDownLatch end = new CountDownLatch(N);
+        final AtomicInteger errors = new AtomicInteger(0);
+        for (int i = 0; i < N; i++)
+        {
+            new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        start.await();
+                        broker.addRegistry(new TransientRegistry(muleContext));
+                        broker.lookupByType(Object.class);
+                    }
+                    catch (Exception e)
+                    {
+                        errors.incrementAndGet();
+                    }
+                    finally
+                    {
+                        end.countDown();
+                    }
+                }
+            }, "thread-eval-" + i).start();
+        }
+        start.countDown();
+        end.await();
+        if (errors.get() > 0)
+        {
+            fail();
         }
     }
 
