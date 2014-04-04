@@ -35,6 +35,12 @@
                     <snapshotRepositoryId>mule-dist-snapshots</snapshotRepositoryId>
                 </configuration>
             </plugin>
+            <plugin>
+                <artifactId>maven-install-plugin</artifactId>
+                <configuration>
+                    <skip>${skipDistributions}</skip>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
