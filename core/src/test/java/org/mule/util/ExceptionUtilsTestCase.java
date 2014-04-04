@@ -84,7 +84,7 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase
     {
         final String mainMessage = "main message 112312 [][] ''' ... sdfsd blah";
         final String causeMessage = "cause message 2342998n  fwefoskjdcas  sdcasdhfsadjgsadkgasd \t\nsdfsllki";
-        final String lineSeparator = System.lineSeparator();
+        final String lineSeparator = System.getProperty("line.separator");
 
         Exception e = new RuntimeException(mainMessage, new RuntimeException(causeMessage));
         String withoutMessage = getFullStackTraceWithoutMessages(e);
