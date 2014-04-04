@@ -23,8 +23,8 @@ import org.junit.Test;
 
 public class FileAutoDeleteOnExceptionTestCase extends FunctionalTestCase
 {
-    public static final String TEST_FOLDER1 = ".mule/testData1";
-    public static final String TEST_FOLDER2 = ".mule/testData2";
+    public String testFolder1;
+    public String testFolder2;
 
     private Prober prober;
 
@@ -43,6 +43,8 @@ public class FileAutoDeleteOnExceptionTestCase extends FunctionalTestCase
     public void setUp() throws IOException
     {
         prober = new PollingProber(10000, 100);
+        testFolder1 = getFileInsideWorkingDirectory("testData1").getAbsolutePath();
+        testFolder2 = getFileInsideWorkingDirectory("testData2").getAbsolutePath();
     }
 
     private File createTestFile(String folder) throws IOException
@@ -60,7 +62,7 @@ public class FileAutoDeleteOnExceptionTestCase extends FunctionalTestCase
     @Test
     public void testDoesNotAutoDeleteFileOnException() throws Exception
     {
-        File target = createTestFile(TEST_FOLDER1);
+        File target = createTestFile(testFolder1);
         // Starts file endpoint polling
         muleContext.start();
 
@@ -75,7 +77,7 @@ public class FileAutoDeleteOnExceptionTestCase extends FunctionalTestCase
     @Test
     public void testAutoDeletesFileOnExceptionIfFileWasTransformed() throws Exception
     {
-        File target = createTestFile(TEST_FOLDER2);
+        File target = createTestFile(testFolder2);
 
         // Starts file endpoint polling
         muleContext.start();

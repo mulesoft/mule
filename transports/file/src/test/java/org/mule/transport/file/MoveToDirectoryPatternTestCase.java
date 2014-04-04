@@ -29,7 +29,7 @@ public class MoveToDirectoryPatternTestCase extends FunctionalTestCase
     protected void doTearDown() throws Exception
     {
         // clean out the directory tree that's used as basis for this test
-        File outputDir = new File(".mule");
+        File outputDir = getWorkingDirectory();
         assertTrue(FileUtils.deleteTree(outputDir));
 
         super.doTearDown();
@@ -47,7 +47,7 @@ public class MoveToDirectoryPatternTestCase extends FunctionalTestCase
 
     private void writeTestMessageToInputDirectory() throws IOException
     {
-        File outFile = new File(".mule/files", TEST_FILENAME);
+        File outFile = new File(getFileInsideWorkingDirectory("files"), TEST_FILENAME);
         FileOutputStream out = new FileOutputStream(outFile);
         out.write(TEST_MESSAGE.getBytes());
         out.close();

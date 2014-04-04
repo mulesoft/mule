@@ -9,7 +9,7 @@
           http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
     <flow name="main">
-        <file:inbound-endpoint path=".mule"/>
+        <file:inbound-endpoint path="${workingDirectory}"/>
 
         <file:filename-wildcard-filter pattern="*.txt"/>
 

@@ -39,7 +39,7 @@ public class FileNameFilterTestCase extends AbstractFileFunctionalTestCase
     @Test
     public void filtersFile() throws Exception
     {
-        File folder = createFolder(".mule");
+        File folder = createFolder(getWorkingDirectory().getAbsolutePath());
         createDataFile(folder, TEST_MESSAGE);
 
         LocalMuleClient client = muleContext.getClient();

@@ -19,7 +19,7 @@
 
     <file:file-to-string-transformer name="FileToString"/>
 
-    <file:endpoint path="./.mule/in" name="get" connector-ref="recursiveConnector"/>
+    <file:endpoint path="${workingDirectory}/in" name="get" connector-ref="recursiveConnector"/>
 
     <file:endpoint path="test" name="send" connector-ref="sendConnector"/>
 

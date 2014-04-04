@@ -13,30 +13,36 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.FileUtils;
+import org.mule.util.queue.DualRandomAccessFileQueueStoreDelegate;
+
+import java.io.File;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class PersistentUnhealthyMessageTestCase extends FunctionalTestCase
 {
+
+    public static final String OUTPUT_QUEUE_NAME = "flowOut";
+
     @Override
     protected String getConfigFile()
     {
+        setStartContext(false);
         return "vm/persistent-vmqueue-test.xml";
-    }
-
-    @BeforeClass
-    public static void populateUnhealthyFiles() throws Exception
-    {
-        FileUtils.createFile(".mule/queuestore/flowOut/0-000-out-01.msg");
     }
 
     @Test
     public void testUnhealthyMessageIgnored() throws Exception
     {
+        File firstQueueFile = DualRandomAccessFileQueueStoreDelegate.getFirstQueueFile(OUTPUT_QUEUE_NAME, getWorkingDirectory().getAbsolutePath());
+        FileUtils.createFile(firstQueueFile.getAbsolutePath());
+
+        muleContext.start();
+
         MuleClient client = muleContext.getClient();
         client.dispatch("vm://flowIn", "echo", null);
-        MuleMessage result = client.request("vm://flowOut", RECEIVE_TIMEOUT);
+        MuleMessage result = client.request("vm://" + OUTPUT_QUEUE_NAME, RECEIVE_TIMEOUT);
         assertNotNull(result);
         assertEquals("echo", result.getPayload());
     }
