@@ -72,6 +72,7 @@
         <skipIntegrationTests>false</skipIntegrationTests>
         <skipPerformanceTests>true</skipPerformanceTests>
         <skipArchetypeTests>true</skipArchetypeTests>
+        <skipPatternTests>false</skipPatternTests>
 
         <skipDistributions>true</skipDistributions>
         <skipVerifications>false</skipVerifications>
@@ -2104,6 +2105,8 @@
                 <skipVerifications>true</skipVerifications>
                 <skipInstalls>true</skipInstalls>
                 <!-- This version of Mule doesn't split tests into unit and functional -->
+                <!-- But we need to run at least a test in order to pass CI builds, so we enable a simple suite always -->
+                <skipPatternTests>false</skipPatternTests>
                 <skipTests>true</skipTests>
             </properties>
         </profile>
@@ -2117,6 +2120,7 @@
                 <skipDistributions>true</skipDistributions>
                 <skipVerifications>true</skipVerifications>
                 <skipInstalls>true</skipInstalls>
+                <skipPatternTests>true</skipPatternTests>
             </properties>
         </profile>
         <profile>
@@ -2129,6 +2133,7 @@
                 <skipDistributions>true</skipDistributions>
                 <skipVerifications>true</skipVerifications>
                 <skipInstalls>true</skipInstalls>
+                <skipPatternTests>true</skipPatternTests>
                 <skipTests>true</skipTests>
             </properties>
         </profile>
@@ -2141,6 +2146,7 @@
                 <skipVerifications>true</skipVerifications>
                 <skipInstalls>false</skipInstalls>
                 <skipTests>true</skipTests>
+                <skipPatternTests>true</skipPatternTests>
             </properties>
             <build>
                 <defaultGoal>deploy</defaultGoal>
