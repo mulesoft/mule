@@ -15,6 +15,7 @@
 
     <properties>
         <licensePath>../../LICENSE_HEADER.txt</licensePath>
+        <skipTests>${skipPatternTests}</skipTests>
     </properties>
 
 
