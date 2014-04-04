@@ -44,13 +44,6 @@ public class FileNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.FLOW, "file-namespace-config-flow.xml"}});
     }
 
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        assertTrue(FileUtils.deleteTree(getWorkingDirectory()));
-        super.doTearDown();
-    }
-
     @Test
     public void testConfig() throws Exception
     {

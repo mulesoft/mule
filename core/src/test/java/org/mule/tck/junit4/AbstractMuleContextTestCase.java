@@ -134,7 +134,6 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     @Before
     public final void setUpMuleContext() throws Exception
     {
-        workingDirectory = new TemporaryFolder();
         workingDirectory.create();
         String workingDirectoryOldValue = System.setProperty(WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY, workingDirectory.getRoot().getAbsolutePath());
         try

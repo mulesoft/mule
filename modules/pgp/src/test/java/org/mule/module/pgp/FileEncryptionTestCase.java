@@ -38,7 +38,7 @@ public class FileEncryptionTestCase extends FunctionalTestCase
     @Override
     protected void doSetUp() throws Exception
     {
-        testFolder = String.format("%s%s%s", getWorkingDirectory().getAbsoluteFile(), File.separator, "testData");
+        testFolder = getFileInsideWorkingDirectory("testData").getAbsolutePath();
     }
 
     private File createTestFile(String folder) throws IOException

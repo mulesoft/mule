@@ -29,7 +29,6 @@ import java.io.File;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,7 +36,7 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
 {
     public static final String TEST_MESSAGE = "Test file contents";
 
-    public static final String WORKING_DIRECTORY_FOLDER = "temp/work-directory/";
+    public static final String FILE_WORKING_DIRECTORY_FOLDER = "temp/work-directory/";
 
     private Latch latch = new Latch();
     protected File inputDir;
@@ -73,7 +72,7 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
         latch.await(2000l, MILLISECONDS);
         flow.stop();
         File outputFile = getFileInsideWorkingDirectory("temp/output-directory/" + inputFile.getName());
-        File workDirFile = getFileInsideWorkingDirectory(WORKING_DIRECTORY_FOLDER + File.separator + inputFile.getName());
+        File workDirFile = getFileInsideWorkingDirectory(FILE_WORKING_DIRECTORY_FOLDER + File.separator + inputFile.getName());
         assertThat(inputFile.exists(), is(false));
         assertThat(outputFile.exists(), is(true));
         assertThat(workDirFile.exists(), is(false));
@@ -103,7 +102,7 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
         latch.await(2000l, MILLISECONDS);
         flow.stop();
         File outputFile = getFileInsideWorkingDirectory("temp/output-directory/" + inputFile.getName());
-        File workDirFile = getFileInsideWorkingDirectory(WORKING_DIRECTORY_FOLDER + File.separator + inputFile.getName());
+        File workDirFile = getFileInsideWorkingDirectory(FILE_WORKING_DIRECTORY_FOLDER + File.separator + inputFile.getName());
         assertThat(inputFile.exists(), is(false));
         assertThat(outputFile.exists(), is(false));
         assertThat(workDirFile.exists(), is(false));
@@ -232,8 +231,7 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
     @Before
     public void doSetUp()
     {
-        FileUtils.deleteTree(getFileInsideWorkingDirectory("temp"));
-        getFileInsideWorkingDirectory(WORKING_DIRECTORY_FOLDER).mkdirs();
+        getFileInsideWorkingDirectory(FILE_WORKING_DIRECTORY_FOLDER).mkdirs();
     }
 
     protected File createDataFile(File folder, final String testMessage) throws Exception
