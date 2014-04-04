@@ -35,7 +35,7 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
      *
      * @param throwable the throwable to inspect, may be null
      * @param type the type to search for, subclasses match, null returns null
-     * @return the throwablethat is closest to the root in the throwable chain that
+     * @return the throwable that is closest to the root in the throwable chain that
      *         matches the type or subclass of that type.
      */
     @SuppressWarnings("unchecked")
@@ -57,4 +57,26 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
         }
         return null;
     }
+
+    /**
+     * Similar to {@link #getFullStackTrace(Throwable)} but removing the exception and causes
+     * messages. This is useful to determine if two exceptions have matching stack traces regardless of
+     * the messages which may contain invokation specific data
+     *
+     * @param throwable the throwable to inspect, may be <code>null</code>
+     * @return the stack trace as a string, with the messages stripped out. Empty string if throwable was <code>null</code>
+     */
+    public static String getFullStackTraceWithoutMessages(Throwable throwable)
+    {
+        final String newLine = System.lineSeparator();
+        StringBuilder builder = new StringBuilder();
+
+        for (String frame : getStackFrames(throwable))
+        {
+            builder.append(frame.replaceAll(":\\s+([\\w\\s]*.*)", "").trim()).append(newLine);
+        }
+
+        return builder.toString();
+    }
+
 }
