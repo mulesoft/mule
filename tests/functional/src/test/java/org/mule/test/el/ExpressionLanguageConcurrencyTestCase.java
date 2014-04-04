@@ -44,6 +44,8 @@ public class ExpressionLanguageConcurrencyTestCase extends FunctionalTestCase
                     }
                     catch (Exception e)
                     {
+                        // A NullPointerException is thrown when a lookup is performed when a registry is
+                        // added or removed concurrently
                         errors.incrementAndGet();
                     }
                     finally
