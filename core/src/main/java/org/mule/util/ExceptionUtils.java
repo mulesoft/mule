@@ -68,7 +68,7 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
      */
     public static String getFullStackTraceWithoutMessages(Throwable throwable)
     {
-        final String newLine = System.lineSeparator();
+        final String newLine = System.getProperty("line.separator");
         StringBuilder builder = new StringBuilder();
 
         for (String frame : getStackFrames(throwable))
