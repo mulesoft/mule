@@ -14,9 +14,9 @@
     </spring:bean>
 
     <db:derby-config name="beanJdbcConfig" dataSource-ref="jdbcDataSource">
-        <db:connection-connectionProperties>
+        <db:connection-properties>
             <db:property key="foo" value="bar"/>
-        </db:connection-connectionProperties>
+        </db:connection-properties>
     </db:derby-config>
 
 </mule>

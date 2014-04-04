@@ -478,7 +478,7 @@
             <xsd:extension base="mule:abstractExtensionType">
                 <xsd:sequence>
                     <xsd:element ref="pooling-profile"  minOccurs="0" maxOccurs="1"/>
-                    <xsd:element ref="connection-connectionProperties" minOccurs="0" maxOccurs="1" />
+                    <xsd:element ref="connection-properties" minOccurs="0" maxOccurs="1" />
                 </xsd:sequence>
                 <xsd:attribute name="name" type="mule:substitutableName" use="required">
                     <xsd:annotation>
@@ -546,7 +546,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="connection-connectionProperties" type="connectionPropertiesType">
+    <xsd:element name="connection-properties" type="connectionPropertiesType">
         <xsd:annotation>
             <xsd:documentation>
                 Allows to specify a list of custom key-value connectionProperties for the config
