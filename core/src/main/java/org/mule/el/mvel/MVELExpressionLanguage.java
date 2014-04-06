@@ -329,7 +329,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         }
         else
         {
-            return new ImmutableDefaultFactory();
+            return new NullVariableResolverFactory();
         }
     }
 
@@ -342,7 +342,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         }
         else
         {
-            return new ImmutableDefaultFactory();
+            return new NullVariableResolverFactory();
         }
     }
 
