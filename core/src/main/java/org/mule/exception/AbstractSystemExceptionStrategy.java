@@ -16,6 +16,9 @@ import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectException;
 
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
+
 /**
  * Fire a notification, log exception, clean up transaction if any, and trigger reconnection strategy 
  * if this is a <code>ConnectException</code>.
@@ -75,7 +78,7 @@ public class AbstractSystemExceptionStrategy extends AbstractExceptionListener i
     
     protected void handleReconnection(ConnectException ex)
     {
-        AbstractConnector connector = (AbstractConnector) ex.getFailed();
+        final AbstractConnector connector = (AbstractConnector) ex.getFailed();
 
         // Make sure the connector is not already being reconnected by another receiver thread.
         if (connector.isConnecting())
@@ -100,14 +103,34 @@ public class AbstractSystemExceptionStrategy extends AbstractExceptionListener i
         // Reconnect (retry policy will go into effect here if configured)
         try
         {
-            logger.debug("Reconnecting " + connector.getName());
-            connector.connect();
-            connector.start();
+            connector.getMuleContext().getWorkManager().scheduleWork(new Work()
+            {
+                @Override
+                public void release()
+                {
+                }
+
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        logger.debug("Reconnecting " + connector.getName());
+                        connector.connect();
+                        connector.start();
+                    }
+                    catch (Exception e)
+                    {
+                        logger.error(e.getMessage());
+                    }
+                }
+            });
         }
-        catch (Exception e2)
+        catch (WorkException e)
         {
-            logger.error(e2.getMessage());
+            logger.error(e.getMessage());
         }
+
     }
 }
 
