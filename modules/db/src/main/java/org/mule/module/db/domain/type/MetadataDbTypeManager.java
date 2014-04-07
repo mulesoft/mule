@@ -76,6 +76,12 @@ public class MetadataDbTypeManager implements DbTypeManager
         }
     }
 
+    @Override
+    public DbType lookup(DbConnection connection, String name) throws UnknownDbTypeException
+    {
+        throw new UnknownDbTypeException(name);
+    }
+
     protected void initialise(DbConnection connection)
     {
         try

@@ -10,6 +10,7 @@ package org.mule.module.db.resolver.param;
 import org.mule.module.db.domain.connection.DbConnection;
 import org.mule.module.db.domain.query.QueryTemplate;
 import org.mule.module.db.domain.type.DbType;
+import org.mule.module.db.domain.type.UnknownDbTypeException;
 
 import java.sql.SQLException;
 import java.util.Map;
@@ -26,8 +27,8 @@ public interface ParamTypeResolver
      * @param connection database connection to resolve against to
      * @param queryTemplate query template containing UNKNOWN parameter types
      * @return a map containing the actual type for each parameter index
-     * @throws SQLException if this method is invoked on a closed connection or if there is
-     * an error processing the query template
+     * @throws SQLException if this method is invoked on a closed connection
+     * @throws UnknownDbTypeException when an invalid data type is used
      */
     Map<Integer, DbType> getParameterTypes(DbConnection connection, QueryTemplate queryTemplate) throws SQLException;
 }

@@ -9,9 +9,8 @@ package org.mule.module.db.domain.type;
 
 import java.lang.reflect.Field;
 import java.sql.Types;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *  Defines {@link DbType} for JDBC types defined in {@link java.sql.Types}
@@ -56,11 +55,11 @@ public class JdbcTypes
     public static final DbType NCLOB_DB_TYPE = new ResolvedDbType(Types.NCLOB, "NCLOB");
     public static final DbType SQLXML_DB_TYPE = new ResolvedDbType(Types.SQLXML, "SQLXML");
 
-    private static final Map<String, DbType> types;
+    public static final List<DbType> types;
 
     static
     {
-        types = new HashMap<String, DbType>();
+        types = new ArrayList<DbType>();
 
         Field[] fields = JdbcTypes.class.getDeclaredFields();
 
@@ -73,7 +72,7 @@ public class JdbcTypes
                 if (value instanceof DbType)
                 {
                     DbType dbType = (DbType) value;
-                    types.put(dbType.getName(), (DbType) value);
+                    types.add(dbType);
                 }
             }
             catch (IllegalAccessException e)
@@ -81,15 +80,5 @@ public class JdbcTypes
                 throw new IllegalStateException("Unable to initialize JDBC types", e);
             }
         }
-    }
-
-    public static DbType lookup(String name)
-    {
-        return types.get(name);
-    }
-
-    public static Collection<DbType> list()
-    {
-        return types.values();
     }
 }

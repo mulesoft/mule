@@ -380,6 +380,13 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="type" type="ExtendedJdbcDataTypes" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Parameter type name
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
 
     <xsd:complexType name="InOutParamDefinitionType">
@@ -394,6 +401,13 @@
             <xsd:annotation>
                 <xsd:documentation>
                     The value for the parameter
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="type" type="ExtendedJdbcDataTypes" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Parameter type name
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -415,6 +429,13 @@
             <xsd:annotation>
                 <xsd:documentation>
                     The value for the parameter
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="type" type="ExtendedJdbcDataTypes" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Parameter type name
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -553,6 +574,7 @@
                 <xsd:sequence>
                     <xsd:element ref="pooling-profile"  minOccurs="0" maxOccurs="1"/>
                     <xsd:element ref="connection-properties" minOccurs="0" maxOccurs="1" />
+                    <xsd:element ref="data-types" minOccurs="0" maxOccurs="1" />
                 </xsd:sequence>
                 <xsd:attribute name="name" type="mule:substitutableName" use="required">
                     <xsd:annotation>
@@ -643,6 +665,45 @@
             <xsd:extension base="mule:annotatedType">
                 <xsd:attribute name="key" type="xsd:string" use="required" />
                 <xsd:attribute name="value" type="xsd:string" use="required" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="data-types" type="CustomDataTypes">
+        <xsd:annotation>
+            <xsd:documentation>
+                Allows to specify non standard data types
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="CustomDataTypes">
+        <xsd:complexContent>
+            <xsd:extension base="mule:annotatedType">
+                <xsd:sequence>
+                    <xsd:element name="data-type" type="CustomDataType" minOccurs="1" maxOccurs="unbounded" />
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="CustomDataType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:annotatedType">
+                <xsd:attribute name="name" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Name of the type used by the JDBC driver.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="id" type="xsd:int" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Type identifier used by the JDBC driver.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
