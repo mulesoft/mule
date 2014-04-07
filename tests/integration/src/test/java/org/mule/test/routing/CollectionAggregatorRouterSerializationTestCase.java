@@ -8,15 +8,12 @@ package org.mule.test.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.client.MuleClient;
-import org.mule.api.store.ObjectStore;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.routing.EventGroup;
 import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.util.store.DefaultObjectStoreFactoryBean;
-import org.mule.util.store.MuleDefaultObjectStoreFactory;
 import org.mule.util.store.SimpleMemoryObjectStore;
 
 import java.io.Serializable;
@@ -29,17 +26,6 @@ import org.junit.Test;
 
 public class CollectionAggregatorRouterSerializationTestCase extends FunctionalTestCase
 {
-    static
-    {
-        DefaultObjectStoreFactoryBean.setDelegate(new MuleDefaultObjectStoreFactory()
-        {
-            @Override
-            public ObjectStore<Serializable> createDefaultInMemoryObjectStore()
-            {
-                return new EventGroupSerializerObjectStore();
-            }
-        });
-    }
 
     @Override
     protected String getConfigFile()
@@ -50,6 +36,8 @@ public class CollectionAggregatorRouterSerializationTestCase extends FunctionalT
     @Test
     public void eventGroupDeserialization() throws Exception
     {
+        muleContext.getRegistry().registerObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME,
+                                                 new EventGroupSerializerObjectStore<Serializable>());
         MuleClient client = muleContext.getClient();
         List<String> list = Arrays.asList("first", "second");
         client.dispatch("vm://splitter", list, null);
@@ -58,7 +46,7 @@ public class CollectionAggregatorRouterSerializationTestCase extends FunctionalT
         assertEquals(list.size(), request.size());
     }
 
-    private static class EventGroupSerializerObjectStore<T extends Serializable> extends SimpleMemoryObjectStore<Serializable>
+    private class EventGroupSerializerObjectStore<T extends Serializable> extends SimpleMemoryObjectStore<Serializable>
     {
         @Override
         protected void doStore(Serializable key, Serializable value) throws ObjectStoreException
