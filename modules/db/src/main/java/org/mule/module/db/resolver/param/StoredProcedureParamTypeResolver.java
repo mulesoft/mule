@@ -37,17 +37,17 @@ public class StoredProcedureParamTypeResolver implements ParamTypeResolver
 
     private static final Log logger = LogFactory.getLog(StoredProcedureParamTypeResolver.class);
 
-    private final DbTypeManager dbTypeManager;
     private final Pattern storedProcedureMatcher = Pattern.compile("(?msi)(\\{\\s+)?call\\s* \\s*(\\w+)\\(.*");
+    private final DbTypeManager dbTypeManager;
 
     public StoredProcedureParamTypeResolver(DbTypeManager dbTypeManager)
     {
         this.dbTypeManager = dbTypeManager;
     }
 
+    @Override
     public Map<Integer, DbType> getParameterTypes(DbConnection connection, QueryTemplate queryTemplate) throws SQLException
     {
-
         DatabaseMetaData dbMetaData = connection.getMetaData();
 
         String storedProcedureName = getStoredProcedureName(dbMetaData, queryTemplate.getSqlText());

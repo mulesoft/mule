@@ -26,13 +26,17 @@ public class GenericParamTypeResolverFactory implements ParamTypeResolverFactory
 
     public ParamTypeResolver create(QueryTemplate queryTemplate)
     {
+        ParamTypeResolver metadataParamTypeResolver;
+
         if (queryTemplate.getType() == QueryType.STORE_PROCEDURE_CALL)
         {
-            return new StoredProcedureParamTypeResolver(dbTypeManager);
+            metadataParamTypeResolver = new StoredProcedureParamTypeResolver(dbTypeManager);
         }
         else
         {
-            return new QueryParamTypeResolver(dbTypeManager);
+            metadataParamTypeResolver = new QueryParamTypeResolver(dbTypeManager);
         }
+
+        return new DefaultParamTypeResolver(dbTypeManager, metadataParamTypeResolver);
     }
 }

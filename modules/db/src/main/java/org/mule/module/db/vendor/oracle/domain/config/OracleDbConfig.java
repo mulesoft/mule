@@ -7,9 +7,10 @@
 
 package org.mule.module.db.vendor.oracle.domain.config;
 
-import org.mule.module.db.domain.database.GenericDbConfig;
 import org.mule.module.db.domain.connection.TransactionalDbConnectionFactory;
+import org.mule.module.db.domain.database.GenericDbConfig;
 import org.mule.module.db.domain.transaction.TransactionCoordinationDbTransactionManager;
+import org.mule.module.db.domain.type.DbTypeManager;
 import org.mule.module.db.vendor.oracle.domain.connection.OracleDbConnectionFactory;
 
 import javax.sql.DataSource;
@@ -20,9 +21,9 @@ import javax.sql.DataSource;
 public class OracleDbConfig extends GenericDbConfig
 {
 
-    public OracleDbConfig(DataSource dataSource, String name)
+    public OracleDbConfig(DataSource dataSource, String name, DbTypeManager dbTypeManager)
     {
-        super(dataSource, name);
+        super(dataSource, name, dbTypeManager);
     }
 
     @Override

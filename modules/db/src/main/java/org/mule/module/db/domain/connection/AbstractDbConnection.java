@@ -8,14 +8,10 @@
 package org.mule.module.db.domain.connection;
 
 import org.mule.module.db.domain.query.QueryTemplate;
-import org.mule.module.db.domain.query.QueryType;
 import org.mule.module.db.domain.transaction.TransactionalAction;
 import org.mule.module.db.domain.type.DbType;
-import org.mule.module.db.domain.type.DbTypeManager;
 import org.mule.module.db.resolver.param.ParamTypeResolver;
 import org.mule.module.db.resolver.param.ParamTypeResolverFactory;
-import org.mule.module.db.resolver.param.QueryParamTypeResolver;
-import org.mule.module.db.resolver.param.StoredProcedureParamTypeResolver;
 import org.mule.module.db.result.resultset.ResultSetHandler;
 import org.mule.module.db.result.statement.GenericStatementResultIteratorFactory;
 import org.mule.module.db.result.statement.StatementResultIteratorFactory;

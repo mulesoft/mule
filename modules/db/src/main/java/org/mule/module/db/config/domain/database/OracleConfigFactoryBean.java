@@ -8,6 +8,7 @@
 package org.mule.module.db.config.domain.database;
 
 import org.mule.module.db.domain.database.GenericDbConfig;
+import org.mule.module.db.domain.type.DbTypeManager;
 import org.mule.module.db.vendor.oracle.domain.config.OracleDbConfig;
 
 import javax.sql.DataSource;
@@ -30,8 +31,8 @@ public class OracleConfigFactoryBean extends DbConfigFactoryBean
     }
 
     @Override
-    protected GenericDbConfig doCreateDbConfig(DataSource datasource)
+    protected GenericDbConfig doCreateDbConfig(DataSource datasource, DbTypeManager dbTypeManager)
     {
-        return new OracleDbConfig(datasource, getName());
+        return new OracleDbConfig(datasource, getName(), dbTypeManager);
     }
 }

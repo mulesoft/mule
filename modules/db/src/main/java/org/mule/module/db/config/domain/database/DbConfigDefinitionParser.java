@@ -7,14 +7,15 @@
 
 package org.mule.module.db.config.domain.database;
 
-import static org.mule.module.db.config.DbNamespaceHandler.CONNECTION_PROPERTIES_ELEMENT_NAME;
-import static org.mule.module.db.config.DbNamespaceHandler.PROPERTY_ELEMENT_NAME;
-
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
+import org.mule.module.db.domain.type.DbType;
+import org.mule.module.db.domain.type.ResolvedDbType;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -24,6 +25,11 @@ import org.w3c.dom.Element;
 
 public class DbConfigDefinitionParser extends MuleOrphanDefinitionParser
 {
+    public static final String CONNECTION_PROPERTIES_ELEMENT_NAME = "connection-properties";
+    public static final String PROPERTY_ELEMENT_NAME = "property";
+    public static final String DATA_TYPES_ELEMENT = "data-types";
+    public static final String DATA_TYPE_ELEMENT = "data-type";
+    public static final String TYPE_ID_ATTRIBUTE = "id";
 
     private static final Map<String, Integer> TRANSACTION_ISOLATION_MAPPING;
 
@@ -50,13 +56,15 @@ public class DbConfigDefinitionParser extends MuleOrphanDefinitionParser
     public static final String LOGIN_TIMEOUT_ATTRIBUTE = "connectionTimeout";
     public static final String DATA_SOURCE_REF_ATTRIBUTE = "dataSource-ref";
     public static final String USE_XA_TRANSACTIONS_ATTRIBUTE = "useXaTransactions";
+    public static final String TYPE_NAME_ATTIRBUTE = "name";
 
     public DbConfigDefinitionParser(Class<? extends DbConfigFactoryBean> poolFactoryClass, CheckExclusiveAttributes exclusiveAttributes)
     {
         super(poolFactoryClass, true);
 
         addMapping(TRANSACTION_ISOLATION_ATTRIBUTE, TRANSACTION_ISOLATION_MAPPING);
-        addIgnored("properties");
+        addIgnored(CONNECTION_PROPERTIES_ELEMENT_NAME);
+        addIgnored(DATA_TYPES_ELEMENT);
         registerPreProcessor(exclusiveAttributes);
     }
 
@@ -64,6 +72,32 @@ public class DbConfigDefinitionParser extends MuleOrphanDefinitionParser
     protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder)
     {
         super.doParse(element, context, builder);
+
+        parseConnectionProperties(element, builder);
+        parseCustomDataTypes(element, builder);
+    }
+
+    private void parseCustomDataTypes(Element element, BeanDefinitionBuilder builder)
+    {
+        List<DbType> vendorDbTypes = new ArrayList<DbType>();
+
+        Element vendorTypes = DomUtils.getChildElementByTagName(element, DATA_TYPES_ELEMENT);
+
+        if (vendorTypes != null)
+        {
+            for (Element dataType : DomUtils.getChildElementsByTagName(vendorTypes, DATA_TYPE_ELEMENT))
+            {
+                String name = dataType.getAttribute(TYPE_NAME_ATTIRBUTE);
+                int id = Integer.valueOf(dataType.getAttribute(TYPE_ID_ATTRIBUTE));
+                vendorDbTypes.add(new ResolvedDbType(id, name));
+            }
+        }
+
+        builder.addPropertyValue("customDataTypes", vendorDbTypes);
+    }
+
+    private void parseConnectionProperties(Element element, BeanDefinitionBuilder builder)
+    {
         Map<String, String> propertiesMap = new LinkedHashMap<String, String>();
 
         Element properties = DomUtils.getChildElementByTagName(element, CONNECTION_PROPERTIES_ELEMENT_NAME);

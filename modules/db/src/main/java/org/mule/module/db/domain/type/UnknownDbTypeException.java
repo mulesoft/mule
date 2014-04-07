@@ -24,4 +24,8 @@ public class UnknownDbTypeException extends RuntimeException
         super(String.format("Unable to find a mapping for type ID: %s Name: %s", typeId, name));
     }
 
+    public UnknownDbTypeException(String name)
+    {
+        super(String.format("Unable to find a mapping for type: %s", name));
+    }
 }

@@ -10,7 +10,7 @@ package org.mule.module.db.config.domain.param;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.module.db.domain.type.DbType;
-import org.mule.module.db.domain.type.JdbcTypes;
+import org.mule.module.db.domain.type.DynamicDbType;
 import org.mule.module.db.domain.type.UnknownDbType;
 
 import org.springframework.beans.factory.BeanDefinitionStoreException;
@@ -83,14 +83,7 @@ public abstract class AbstractParamDefinitionDefinitionParser extends AbstractMu
         {
             String type = element.getAttribute(TYPE_ATTRIBUTE);
 
-            DbType dbType = JdbcTypes.lookup(type);
-
-            if (dbType == null)
-            {
-                throw new IllegalArgumentException("Undefined type:" + type);
-            }
-
-            return dbType;
+            return new DynamicDbType(type);
         }
         else
         {

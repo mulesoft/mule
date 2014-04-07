@@ -43,9 +43,6 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 public class DbNamespaceHandler extends NamespaceHandlerSupport
 {
 
-    public static final String CONNECTION_PROPERTIES_ELEMENT_NAME = "connection-properties";
-    public static final String PROPERTY_ELEMENT_NAME = "property";
-
     public void init()
     {
         registerBeanDefinitionParser("select", new SelectProcessorDefinitionParser());
@@ -87,8 +84,10 @@ public class DbNamespaceHandler extends NamespaceHandlerSupport
                 new String[] {HOST_ATTRIBUTE, PORT_ATTRIBUTE, DATABASE_ATTRIBUTE, LOGIN_TIMEOUT_ATTRIBUTE, TRANSACTION_ISOLATION_ATTRIBUTE, USE_XA_TRANSACTIONS_ATTRIBUTE},
                 new String[] {DATA_SOURCE_REF_ATTRIBUTE}})));
 
-        registerIgnoredElement(CONNECTION_PROPERTIES_ELEMENT_NAME);
-        registerIgnoredElement(PROPERTY_ELEMENT_NAME);
+        registerIgnoredElement(DbConfigDefinitionParser.CONNECTION_PROPERTIES_ELEMENT_NAME);
+        registerIgnoredElement(DbConfigDefinitionParser.PROPERTY_ELEMENT_NAME);
+        registerIgnoredElement(DbConfigDefinitionParser.DATA_TYPES_ELEMENT);
+        registerIgnoredElement(DbConfigDefinitionParser.DATA_TYPE_ELEMENT);
     }
 
     private void registerIgnoredElement(String name)

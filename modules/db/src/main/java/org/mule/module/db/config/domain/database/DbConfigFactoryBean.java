@@ -11,11 +11,20 @@ import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.module.db.domain.connection.DbPoolingProfile;
 import org.mule.module.db.domain.database.DbConfig;
 import org.mule.module.db.domain.database.GenericDbConfig;
-import org.mule.module.db.domain.connection.DbPoolingProfile;
+import org.mule.module.db.domain.type.CompositeDbTypeManager;
+import org.mule.module.db.domain.type.DbType;
+import org.mule.module.db.domain.type.DbTypeManager;
+import org.mule.module.db.domain.type.JdbcTypes;
+import org.mule.module.db.domain.type.MetadataDbTypeManager;
+import org.mule.module.db.domain.type.StaticDbTypeManager;
 import org.mule.util.Preconditions;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -38,6 +47,7 @@ public class DbConfigFactoryBean extends AbstractFactoryBean<DbConfig> implement
     private DbPoolingProfile poolingProfile;
     private GenericDbConfig dbConfig;
     private Map<String, String> connectionProperties;
+    private List<DbType> customDataTypes;
 
     @Override
     public Class<?> getObjectType()
@@ -50,7 +60,8 @@ public class DbConfigFactoryBean extends AbstractFactoryBean<DbConfig> implement
     {
         validate();
 
-        dbConfig = doCreateDbConfig(dataSource);
+        DbTypeManager dbTypeManager = doCreateTypeManager();
+        dbConfig = doCreateDbConfig(dataSource, dbTypeManager);
         dbConfig.setPoolingProfile(poolingProfile);
         dbConfig.setUseXaTransactions(useXaTransactions);
         dbConfig.setUrl(getEffectiveUrl());
@@ -64,9 +75,36 @@ public class DbConfigFactoryBean extends AbstractFactoryBean<DbConfig> implement
         return dbConfig;
     }
 
-    protected GenericDbConfig doCreateDbConfig(DataSource datasource)
+    protected DbTypeManager doCreateTypeManager()
     {
-        return new GenericDbConfig(datasource, name);
+        List<DbTypeManager> typeManagers = new ArrayList<DbTypeManager>();
+
+        typeManagers.add(new MetadataDbTypeManager());
+
+        if (customDataTypes.size() > 0)
+        {
+            typeManagers.add(new StaticDbTypeManager(customDataTypes));
+        }
+        List<DbType> vendorDataTypes = getVendorDataTypes();
+
+        if (vendorDataTypes.size() > 0)
+        {
+            typeManagers.add(new StaticDbTypeManager(vendorDataTypes));
+        }
+
+        typeManagers.add(new StaticDbTypeManager(JdbcTypes.types));
+
+        return new CompositeDbTypeManager(typeManagers);
+    }
+
+    protected List<DbType> getVendorDataTypes()
+    {
+        return Collections.EMPTY_LIST;
+    }
+
+    protected GenericDbConfig doCreateDbConfig(DataSource datasource, DbTypeManager dbTypeManager)
+    {
+        return new GenericDbConfig(datasource, name, dbTypeManager);
     }
 
     protected void validate()
@@ -172,5 +210,15 @@ public class DbConfigFactoryBean extends AbstractFactoryBean<DbConfig> implement
     public void initialise() throws InitialisationException
     {
         dbConfig.initialise();
+    }
+
+    public List<DbType> getCustomDataTypes()
+    {
+        return customDataTypes;
+    }
+
+    public void setCustomDataTypes(List<DbType> customDataTypes)
+    {
+        this.customDataTypes = customDataTypes;
     }
 }

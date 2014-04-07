@@ -20,7 +20,6 @@ import org.mule.module.db.domain.connection.DbPoolingProfile;
 import org.mule.module.db.domain.connection.TransactionalDbConnectionFactory;
 import org.mule.module.db.domain.transaction.TransactionCoordinationDbTransactionManager;
 import org.mule.module.db.domain.type.DbTypeManager;
-import org.mule.module.db.domain.type.MetadataDbTypeManager;
 import org.mule.module.db.domain.xa.CompositeDataSourceDecorator;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
@@ -58,17 +57,13 @@ public class GenericDbConfig implements DbConfig, Initialisable
     private String driverClassName;
     private MuleContext muleContext;
     private String url;
-    public GenericDbConfig(DataSource dataSource, String name)
+
+    public GenericDbConfig(DataSource dataSource, String name, DbTypeManager dbTypeManager)
     {
         this.dataSource = dataSource;
         this.name = name;
-        this.dbTypeManager = doCreateTypeManager();
+        this.dbTypeManager = dbTypeManager;
         this.dbConnectionFactory = doCreateConnectionFactory();
-    }
-
-    private MetadataDbTypeManager doCreateTypeManager()
-    {
-        return new MetadataDbTypeManager();
     }
 
     protected TransactionalDbConnectionFactory doCreateConnectionFactory()

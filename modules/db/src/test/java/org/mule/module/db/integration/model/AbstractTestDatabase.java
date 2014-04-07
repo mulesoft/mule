@@ -89,20 +89,30 @@ public abstract class AbstractTestDatabase implements TestDatabase
     public void createDefaultDatabaseConfig(DataSource dataSource) throws SQLException
     {
         Connection connection = dataSource.getConnection();
-        connection.setAutoCommit(false);
-
         try
         {
-            deleteDefaultTestTable(connection);
+            connection.setAutoCommit(false);
+
+            try
+            {
+                deleteDefaultTestTable(connection);
+            }
+            catch (Exception e)
+            {
+                createDefaultTestTable(connection);
+            }
+
+            populateDefaultTestTable(connection, DEFAULT_TEST_VALUES);
+
+            connection.commit();
         }
-        catch (Exception e)
+        finally
         {
-            createDefaultTestTable(connection);
+            if (connection != null)
+            {
+                connection.close();
+            }
         }
-
-        populateDefaultTestTable(connection, DEFAULT_TEST_VALUES);
-
-        connection.commit();
     }
 
     public void createStoredProcedure(DataSource dataSource, String sql) throws SQLException

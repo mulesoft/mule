@@ -32,6 +32,7 @@ public class QueryParamTypeResolver implements ParamTypeResolver
         this.dbTypeManager = dbTypeManager;
     }
 
+    @Override
     public Map<Integer, DbType> getParameterTypes(DbConnection connection, QueryTemplate queryTemplate) throws SQLException
     {
         Map<Integer, DbType> paramTypes = new HashMap<Integer, DbType>();
