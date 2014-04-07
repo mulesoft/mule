@@ -287,6 +287,7 @@
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/main/java/org/mule/example/loanbroker/model/Customer.java
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/main/java/org/mule/example/loanbroker/model/LoanQuote.java
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/main/resources
+/mule-standalone-${productVersion}/examples/loanbroker-simple/src/main/resources/log4j.properties
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/main/resources/loanbroker-simple.properties
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/test
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/test/java
@@ -295,6 +296,8 @@
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/test/java/org/mule/example
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/test/java/org/mule/example/loanbroker
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/test/java/org/mule/example/loanbroker/LoanBrokerSyncTestCase.java
+/mule-standalone-${productVersion}/examples/loanbroker-simple/src/test/resources
+/mule-standalone-${productVersion}/examples/loanbroker-simple/src/test/resources/log4j.properties
 
 #
 # /examples/scripting
