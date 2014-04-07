@@ -19,10 +19,13 @@ import org.mule.module.reboot.MuleContainerSystemClassLoader;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.apache.log4j.Appender;
 import org.apache.log4j.DailyRollingFileAppender;
+import org.apache.log4j.FileAppender;
 import org.apache.log4j.Hierarchy;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -85,15 +88,22 @@ public class ArtifactAwareRepositorySelector implements RepositorySelector
                 else
                 {
                     // this is not an app init, use the top-level defaults
-                    URL rootLogConfig = getLogConfig(new DirectoryResourceLocator(MuleContainerBootstrapUtils.getMuleConfDir().getAbsolutePath()));
-                    configureFrom(rootLogConfig, repository);
-
-                    // only start a watchdog for the Mule container class loader. Other class loaders
-                    // (e.g. Jetty's WebAppClassLoader) should not start a watchdog
-                    if (ccl instanceof MuleContainerSystemClassLoader)
+                    if (MuleContainerBootstrapUtils.getMuleConfDir() != null)
                     {
-                        configWatchDog = new ConfigWatchDog(ccl, rootLogConfig.getFile(), repository);
-                        configWatchDog.setName("Mule.system.log4j.config.monitor");
+                        URL rootLogConfig = getLogConfig(new DirectoryResourceLocator(MuleContainerBootstrapUtils.getMuleConfDir().getAbsolutePath()));
+                        configureFrom(rootLogConfig, repository);
+
+                        // only start a watchdog for the Mule container class loader. Other class loaders
+                        // (e.g. Jetty's WebAppClassLoader) should not start a watchdog
+                        if (ccl instanceof MuleContainerSystemClassLoader)
+                        {
+                            configWatchDog = new ConfigWatchDog(ccl, rootLogConfig.getFile(), repository);
+                            configWatchDog.setName("Mule.system.log4j.config.monitor");
+                        }
+                    }
+                    else
+                    {
+                        addDefaultAppenderToRootLogger(root, "mule-main.log", null);
                     }
                 }
 
@@ -131,14 +141,7 @@ public class ArtifactAwareRepositorySelector implements RepositorySelector
         final String artifactName = artifactClassLoader.getArtifactName();
         if (artifactLogConfig == null)
         {
-            // fallback to defaults
-            String logName = String.format(logFileNameTemplate, artifactName);
-            File logDir = new File(MuleContainerBootstrapUtils.getMuleHome(), "logs");
-            File logFile = new File(logDir, logName);
-            DailyRollingFileAppender fileAppender = new DailyRollingFileAppender(new PatternLayout(PATTERN_LAYOUT), logFile.getAbsolutePath(), "'.'yyyy-MM-dd");
-            fileAppender.setAppend(true);
-            fileAppender.activateOptions();
-            root.addAppender(fileAppender);
+            addDefaultAppenderToRootLogger(root, logFileNameTemplate, artifactName);
         }
         else
         {
@@ -156,8 +159,45 @@ public class ArtifactAwareRepositorySelector implements RepositorySelector
                     logger.info(String.format("Logging config %s is not an external file, will not be monitored for changes", artifactLogConfig));
                 }
             }
+
+            // If the artifact logging is configured using the global config file and there is no file appender for the artifact, then configure a default one
+            if (MuleContainerBootstrapUtils.getMuleConfDir() != null && artifactLogConfig.toExternalForm().contains(MuleContainerBootstrapUtils.getMuleConfDir().getAbsolutePath()))
+            {
+                if (!loggerHasFileAppender(root, artifactName))
+                {
+                    addDefaultAppenderToRootLogger(root, logFileNameTemplate, artifactName);
+                }
+            }
         }
         return configWatchDog;
+    }
+
+    private boolean loggerHasFileAppender(RootLogger root, String artifactName)
+    {
+        Enumeration appenders = root.getAllAppenders();
+        while (appenders.hasMoreElements())
+        {
+            Appender appender = (Appender) appenders.nextElement();
+            if (appender instanceof FileAppender)
+            {
+                if (((FileAppender) appender).getFile().contains(artifactName))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void addDefaultAppenderToRootLogger(RootLogger root, String logFileNameTemplate, String artifactName) throws IOException
+    {
+        String logName = String.format(logFileNameTemplate, (artifactName != null ? artifactName : ""));
+        File logDir = new File(MuleContainerBootstrapUtils.getMuleHome(), "logs");
+        File logFile = new File(logDir, logName);
+        DailyRollingFileAppender fileAppender = new DailyRollingFileAppender(new PatternLayout(PATTERN_LAYOUT), logFile.getAbsolutePath(), "'.'yyyy-MM-dd");
+        fileAppender.setAppend(true);
+        fileAppender.activateOptions();
+        root.addAppender(fileAppender);
     }
 
     private URL getArtifactLoggingConfig(ArtifactClassLoader muleCL)
