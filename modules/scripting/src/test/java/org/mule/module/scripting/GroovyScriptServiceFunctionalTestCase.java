@@ -28,6 +28,7 @@ public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase
         assertEquals("Important Message Received", response.getPayloadAsString());
     }
 
+    @Ignore("MULE-6926: flaky test")
     @Test
     public void testFileBasedScript() throws Exception
     {
