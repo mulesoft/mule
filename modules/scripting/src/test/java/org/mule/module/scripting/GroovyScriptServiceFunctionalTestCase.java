@@ -13,6 +13,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase
@@ -47,6 +48,7 @@ public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase
         assertEquals("Important Message Received", response.getPayloadAsString());
     }
 
+    @Ignore("MULE-6926: flaky test")
     @Test
     public void testScriptVariables() throws Exception
     {
