@@ -11,12 +11,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.concurrent.Latch;
 
 import java.io.Serializable;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,6 +27,7 @@ import org.junit.Test;
 public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMuleContextTestCase
 {
 
+    public static final int THREAD_EXECUTION_TIMEOUT = 2000;
     /**
      * logger used by this class
      */
@@ -627,24 +630,32 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
             assertEquals("Queue size", 0, q.size());
             assertEquals("Queue content", "String1", o);
 
-            new Thread(new Runnable()
+            final Latch putExecutionLatch = new Latch();
+            Thread putExecutionThread = new Thread(new Runnable()
             {
                 public void run()
                 {
                     try
                     {
-                        Thread.sleep(500);
                         QueueSession s = mgr.getQueueSession();
                         Queue q = s.getQueue("queue1");
+                        putExecutionLatch.release();
                         q.put("String1");
                     }
                     catch (Exception e)
                     {
-                        e.printStackTrace();
+                        //unlikely to happen. But if it does lets show it in the test logs.
+                        logger.warn(e);
                     }
                 }
-            }).start();
-            o = q.poll(1000);
+            });
+            putExecutionThread.start();
+            if (!putExecutionLatch.await(THREAD_EXECUTION_TIMEOUT, TimeUnit.MILLISECONDS))
+            {
+                fail("Thread executing put over queue was not executed");
+            }
+            o = q.poll(RECEIVE_TIMEOUT);
+            putExecutionThread.join(THREAD_EXECUTION_TIMEOUT);
             assertEquals("Queue size", q.size(), 0);
             assertEquals("Queue content", "String1", o);
 
@@ -707,24 +718,32 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
             assertFalse(q.offer("String2", 1000));
             assertEquals("Queue size", 1, q.size());
 
-            new Thread(new Runnable()
+            final Latch takeExecutionLatch = new Latch();
+            final Thread takeExecutionThread = new Thread(new Runnable()
             {
                 public void run()
                 {
                     try
                     {
-                        Thread.sleep(500);
+                        takeExecutionLatch.release();
                         QueueSession s = mgr.getQueueSession();
                         Queue q = s.getQueue("queue1");
                         assertEquals("Queue content", "String1", q.take());
                     }
                     catch (Exception e)
                     {
-                        e.printStackTrace();
+                        //unlikely to happen. But if it does lets show it in the test logs.
+                        logger.warn(e);
                     }
                 }
-            }).start();
+            });
+            takeExecutionThread.start();
+            if (!takeExecutionLatch.await(THREAD_EXECUTION_TIMEOUT, TimeUnit.MILLISECONDS))
+            {
+                fail("Thread executing put over queue was not executed");
+            }
             assertTrue(q.offer("String2", 1000));
+            takeExecutionThread.join(THREAD_EXECUTION_TIMEOUT);
             assertEquals("Queue size", 1, q.size());
 
         }
