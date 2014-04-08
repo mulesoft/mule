@@ -7,32 +7,32 @@
 
 package org.mule.module.db.config.domain.database;
 
-import org.mule.module.db.domain.database.GenericDbConfig;
-import org.mule.module.db.domain.type.DbTypeManager;
-import org.mule.module.db.vendor.oracle.domain.config.OracleDbConfig;
+import org.mule.module.db.domain.type.DbType;
+import org.mule.module.db.domain.type.ResolvedDbType;
 
-import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.List;
 
-public class OracleConfigFactoryBean extends DbConfigFactoryBean
+public class OracleConfigFactoryBean extends AbstractVendorConfigFactoryBean
 {
 
     private static final String DRIVER_CLASS_NAME = "oracle.jdbc.driver.OracleDriver";
+    private static final String ORACLE_URL_PREFIX = "jdbc:oracle:thin:@";
+    public static final int CURSOR_TYPE_ID = -10;
+    public static final String CURSOR_TYPE_NAME = "CURSOR";
 
     protected OracleConfigFactoryBean()
     {
-        super();
+        super(ORACLE_URL_PREFIX);
         setDriverClassName(DRIVER_CLASS_NAME);
     }
 
     @Override
-    public Class<?> getObjectType()
+    protected List<DbType> getVendorDataTypes()
     {
-        return OracleDbConfig.class;
-    }
+        List<DbType> dbTypes = new ArrayList<DbType>();
+        dbTypes.add(new ResolvedDbType(CURSOR_TYPE_ID, CURSOR_TYPE_NAME));
 
-    @Override
-    protected GenericDbConfig doCreateDbConfig(DataSource datasource, DbTypeManager dbTypeManager)
-    {
-        return new OracleDbConfig(datasource, getName(), dbTypeManager);
+        return dbTypes;
     }
 }

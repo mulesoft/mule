@@ -73,12 +73,17 @@ public class DbNamespaceHandler extends NamespaceHandlerSupport
         registerBeanDefinitionParser("generic-config", new DbConfigDefinitionParser(DbConfigFactoryBean.class, new CheckExclusiveAttributes(new String[][] {
                 new String[] {DRIVER_ATTRIBUTE, URL_ATTRIBUTE, LOGIN_TIMEOUT_ATTRIBUTE, TRANSACTION_ISOLATION_ATTRIBUTE, USE_XA_TRANSACTIONS_ATTRIBUTE},
                 new String[] {DATA_SOURCE_REF_ATTRIBUTE}})));
+
         registerBeanDefinitionParser("derby-config", new DbConfigDefinitionParser(DerbyConfigFactoryBean.class, new CheckExclusiveAttributes(new String[][] {
                 new String[] {URL_ATTRIBUTE, LOGIN_TIMEOUT_ATTRIBUTE, TRANSACTION_ISOLATION_ATTRIBUTE, USE_XA_TRANSACTIONS_ATTRIBUTE},
                 new String[] {DATA_SOURCE_REF_ATTRIBUTE}})));
-        registerBeanDefinitionParser("oracle-config", new DbConfigDefinitionParser(OracleConfigFactoryBean.class, new CheckExclusiveAttributes(new String[][] {
+
+        DbConfigDefinitionParser oracleDbConfigFactoryBean = new DbConfigDefinitionParser(OracleConfigFactoryBean.class, new CheckExclusiveAttributes(new String[][] {
                 new String[] {URL_ATTRIBUTE, LOGIN_TIMEOUT_ATTRIBUTE, TRANSACTION_ISOLATION_ATTRIBUTE, USE_XA_TRANSACTIONS_ATTRIBUTE},
-                new String[] {DATA_SOURCE_REF_ATTRIBUTE}})));
+                new String[] {DATA_SOURCE_REF_ATTRIBUTE}}));
+        oracleDbConfigFactoryBean.addAlias("instance", "database");
+        registerBeanDefinitionParser("oracle-config", oracleDbConfigFactoryBean);
+
         registerBeanDefinitionParser("mysql-config", new DbConfigDefinitionParser(MySqlConfigFactoryBean.class, new CheckExclusiveAttributes(new String[][] {
                 new String[] {URL_ATTRIBUTE, LOGIN_TIMEOUT_ATTRIBUTE, TRANSACTION_ISOLATION_ATTRIBUTE, USE_XA_TRANSACTIONS_ATTRIBUTE},
                 new String[] {HOST_ATTRIBUTE, PORT_ATTRIBUTE, DATABASE_ATTRIBUTE, LOGIN_TIMEOUT_ATTRIBUTE, TRANSACTION_ISOLATION_ATTRIBUTE, USE_XA_TRANSACTIONS_ATTRIBUTE},

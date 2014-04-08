@@ -19,8 +19,8 @@ import org.mule.common.metadata.MetaDataModel;
 import org.mule.common.metadata.datatype.DataType;
 import org.mule.construct.Flow;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.processor.AbstractSingleQueryDbMessageProcessor;
 import org.mule.module.db.result.resultset.ResultSetIterator;
 
@@ -76,9 +76,9 @@ public class SelectOutputMetadataTestCase extends AbstractDbIntegrationTestCase
 
         assertThat(mapDataModel.getKeys().size(), equalTo(3));
         MetaDataModel id = mapDataModel.getValueMetaDataModel("ID");
-        assertThat(id.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(id.getDataType(), equalTo(testDatabase.getIdFieldOutputMetaDataType()));
         MetaDataModel type = mapDataModel.getValueMetaDataModel("POSITION");
-        assertThat(type.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(type.getDataType(), equalTo(testDatabase.getPositionFieldOutputMetaDataType()));
         MetaDataModel data = mapDataModel.getValueMetaDataModel("NAME");
         assertThat(data.getDataType(), equalTo(DataType.STRING));
     }

@@ -20,12 +20,12 @@ import org.mule.module.db.domain.connection.DbConnection;
 import org.mule.module.db.domain.query.QueryTemplate;
 import org.mule.module.db.domain.statement.QueryStatementFactory;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
+import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.matcher.SupportsReturningStoredProcedureResultsWithoutParameters;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.DerbyTestDatabase;
 import org.mule.module.db.integration.model.Field;
 import org.mule.module.db.integration.model.Record;
-import org.mule.module.db.integration.TestDbConfig;
-import org.mule.module.db.integration.matcher.SupportsStoredFunctionsUsingCallSyntax;
 
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -78,7 +78,7 @@ public class StoredProcedureCustomStatementFactoryTestCase extends AbstractDbInt
     @Before
     public void setupStoredProcedure() throws Exception
     {
-        assumeThat(getDefaultDataSource(), new SupportsStoredFunctionsUsingCallSyntax());
+        assumeThat(getDefaultDataSource(), new SupportsReturningStoredProcedureResultsWithoutParameters());
         testDatabase.createStoredProcedureUpdateTestType1(getDefaultDataSource());
     }
 

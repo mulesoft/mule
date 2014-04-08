@@ -7,53 +7,18 @@
 
 package org.mule.module.db.integration.matcher;
 
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-
-import javax.sql.DataSource;
+import java.sql.SQLException;
 
 import org.hamcrest.Description;
-import org.junit.internal.matchers.TypeSafeMatcher;
 
-public class SupportsStoredFunctionsUsingCallSyntax extends TypeSafeMatcher<DataSource>
+public class SupportsStoredFunctionsUsingCallSyntax extends AbstractDataSourceFeatureMatcher
 {
 
     @Override
-    public boolean matchesSafely(DataSource dataSource)
+    protected boolean supportsFeature(DatabaseMetaData metaData) throws SQLException
     {
-        boolean supportFeature = false;
-
-        Connection connection = null;
-        try
-        {
-            try
-            {
-                connection = dataSource.getConnection();
-                DatabaseMetaData metaData;
-                metaData = connection.getMetaData();
-                try
-                {
-                    supportFeature = metaData.supportsStoredFunctionsUsingCallSyntax();
-                }
-                catch (Throwable t)
-                {
-                    // Ignore
-                }
-            }
-            finally
-            {
-                if (connection != null)
-                {
-                    connection.close();
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            // Ignore
-        }
-
-        return supportFeature;
+        return metaData.supportsStoredFunctionsUsingCallSyntax();
     }
 
     @Override

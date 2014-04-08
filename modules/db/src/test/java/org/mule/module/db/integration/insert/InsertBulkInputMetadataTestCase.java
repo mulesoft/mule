@@ -13,9 +13,9 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.common.Result;
 import org.mule.common.metadata.MetaData;
 import org.mule.construct.Flow;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.delete.AbstractBulkUpdateInputMetadataTestCase;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.processor.AbstractDbMessageProcessor;
 
 import java.util.List;
@@ -34,7 +34,7 @@ public class InsertBulkInputMetadataTestCase extends AbstractBulkUpdateInputMeta
     @Parameterized.Parameters
     public static List<Object[]> parameters()
     {
-        return TestDbConfig.getResources();
+        return TestDbConfig.getDerbyResource();
     }
 
     @Override
