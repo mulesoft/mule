@@ -6,7 +6,7 @@
  */
 package org.mule.module.launcher;
 
-import static org.mule.module.launcher.ArchiveDeployer.ZIP_FILE_SUFFIX;
+import static org.mule.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationClassLoaderFactory;
@@ -58,7 +58,7 @@ public class MuleDeploymentService implements DeploymentService
     private final CompositeDeploymentListener domainDeploymentListener = new CompositeDeploymentListener();
     private final ArchiveDeployer<Domain> domainDeployer;
     private final DeploymentDirectoryWatcher deploymentDirectoryWatcher;
-    private ArchiveDeployer<Application> applicationDeployer;
+    private DefaultArchiveDeployer<Application> applicationDeployer;
 
     public MuleDeploymentService(PluginClassLoaderManager pluginClassLoaderManager)
     {
@@ -72,12 +72,12 @@ public class MuleDeploymentService implements DeploymentService
         DefaultApplicationFactory applicationFactory = new DefaultApplicationFactory(applicationClassLoaderFactory, domainFactory);
         applicationFactory.setDeploymentListener(applicationDeploymentListener);
 
-        DefaultArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<Application>();
-        DefaultArtifactDeployer<Domain> domainMuleDeployer = new DefaultArtifactDeployer<Domain>();
+        ArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<Application>();
+        ArtifactDeployer<Domain> domainMuleDeployer = new DefaultArtifactDeployer<Domain>();
 
-        this.applicationDeployer = new ArchiveDeployer(applicationMuleDeployer, applicationFactory, applications, deploymentLock);
+        this.applicationDeployer = new DefaultArchiveDeployer(applicationMuleDeployer, applicationFactory, applications, deploymentLock);
         this.applicationDeployer.setDeploymentListener(applicationDeploymentListener);
-        this.domainDeployer = new ArchiveDeployer(domainMuleDeployer, domainFactory, domains, deploymentLock);
+        this.domainDeployer = new DomainBundleArchiveDeployer(new DefaultArchiveDeployer(domainMuleDeployer, domainFactory, domains, deploymentLock));
         this.domainDeployer.setDeploymentListener(domainDeploymentListener);
         this.deploymentDirectoryWatcher = new DeploymentDirectoryWatcher(domainDeployer, applicationDeployer, domains, applications, deploymentLock);
     }
