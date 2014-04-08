@@ -543,13 +543,16 @@ public class DefaultMuleContext implements MuleContext
 
     public QueueManager getQueueManager()
     {
-        queueManager = registryBroker.lookupObject(MuleProperties.OBJECT_QUEUE_MANAGER);
         if (queueManager == null)
         {
-            Collection<QueueManager> temp = registryBroker.lookupObjects(QueueManager.class);
-            if (temp.size() > 0)
+            queueManager = registryBroker.lookupObject(MuleProperties.OBJECT_QUEUE_MANAGER);
+            if (queueManager == null)
             {
-                queueManager = temp.iterator().next();
+                Collection<QueueManager> temp = registryBroker.lookupObjects(QueueManager.class);
+                if (temp.size() > 0)
+                {
+                    queueManager = temp.iterator().next();
+                }
             }
         }
         return queueManager;
