@@ -81,8 +81,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      * The default UUID for the message. If the underlying transport has the notion of a
      * message id, this uuid will be ignored
      */
-    private String id = UUID.getUUID();
-    private String rootId = id;
+    private String id;
+    private String rootId;
 
     private transient Object payload;
     private transient Object originalPayload;
@@ -158,6 +158,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                               Map<String, Object> outboundProperties, Map<String, DataHandler> attachments,
                               MuleContext muleContext)
     {
+        id =  UUID.getUUID();
+        rootId = id;
+        
         setMuleContext(muleContext);
 
         if (message instanceof MuleMessage)
