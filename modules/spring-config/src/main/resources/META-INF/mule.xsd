@@ -1314,6 +1314,13 @@
                             </xsd:complexContent>
                         </xsd:complexType>
                     </xsd:element>
+                    <xsd:element ref="abstract-configuration-extension" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Mule application configuration extensions. Extensions can be defined as child of the configuration elements and then accessed by each module that defines it.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="defaultResponseTimeout" type="xsd:string" default="10000">
                     <xsd:annotation>
@@ -1365,6 +1372,19 @@
                     </xsd:annotation>
                 </xsd:attribute>
             </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-configuration-extension" abstract="true" type="abstractConfigurationExtensionType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for arbitrary extensions as children of the 'configuration' element. Other transports and modules can extend this if they need to add elements to the configuration.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractConfigurationExtensionType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType"/>
         </xsd:complexContent>
     </xsd:complexType>
 

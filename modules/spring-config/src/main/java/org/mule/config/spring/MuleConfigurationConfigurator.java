@@ -17,6 +17,8 @@ import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.SmartFactoryBean;
@@ -66,6 +68,7 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
             defaultConfig.setFlowEndingWithOneWayEndpointReturnsNull(config.isFlowEndingWithOneWayEndpointReturnsNull());
             defaultConfig.setDefaultExceptionStrategyName(config.getDefaultExceptionStrategyName());
             defaultConfig.setEnricherPropagatesSessionVariableChanges(config.isEnricherPropagatesSessionVariableChanges());
+            defaultConfig.setExtensions(config.getExtensions());
             validateDefaultExceptionStrategy();
             return configuration;
         }
@@ -147,6 +150,11 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
     public void setEnricherPropagatesSessionVariableChanges(boolean enricherPropagatesSessionVariableChanges)
     {
         config.setEnricherPropagatesSessionVariableChanges(enricherPropagatesSessionVariableChanges);
+    }
+
+    public void setExtensions(List<Object> extensions)
+    {
+        config.setExtensions(extensions);
     }
 
 }

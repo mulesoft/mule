@@ -166,6 +166,8 @@ public class DefaultMuleContext implements MuleContext
 
     private final Latch startLatch = new Latch();
 
+    private QueueManager queueManager;
+
     /**
      * @deprecated Use empty constructor instead and use setter for dependencies.
      */
@@ -541,7 +543,7 @@ public class DefaultMuleContext implements MuleContext
 
     public QueueManager getQueueManager()
     {
-        QueueManager queueManager = (QueueManager) registryBroker.lookupObject(MuleProperties.OBJECT_QUEUE_MANAGER);
+        queueManager = registryBroker.lookupObject(MuleProperties.OBJECT_QUEUE_MANAGER);
         if (queueManager == null)
         {
             Collection<QueueManager> temp = registryBroker.lookupObjects(QueueManager.class);
@@ -589,8 +591,8 @@ public class DefaultMuleContext implements MuleContext
 
     public void setQueueManager(QueueManager queueManager) throws RegistrationException
     {
-        checkLifecycleForPropertySet(MuleProperties.OBJECT_QUEUE_MANAGER, Initialisable.PHASE_NAME);
         registryBroker.registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager);
+        this.queueManager = queueManager;
     }
 
     /**

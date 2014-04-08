@@ -85,4 +85,11 @@ public interface MuleConfiguration
     boolean isEnricherPropagatesSessionVariableChanges();
 
     boolean isDisableTimeouts();
+
+    /**
+     * @param extensionType class instance of the extension type
+     * @param <T> type of the extension
+     * @return extension configured of type extensionType, if there's no such extension then null.
+     */
+    <T> T getExtension(final Class<T> extensionType);
 }
