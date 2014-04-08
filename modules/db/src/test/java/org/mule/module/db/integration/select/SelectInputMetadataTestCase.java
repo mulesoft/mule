@@ -17,8 +17,8 @@ import org.mule.common.metadata.MetaDataModel;
 import org.mule.common.metadata.datatype.DataType;
 import org.mule.construct.Flow;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.processor.AbstractSingleQueryDbMessageProcessor;
 
 import java.util.List;
@@ -92,7 +92,7 @@ public class SelectInputMetadataTestCase extends AbstractDbIntegrationTestCase
         DefinedMapMetaDataModel mapDataModel = (DefinedMapMetaDataModel) inputMetaData.get().getPayload();
         assertThat(mapDataModel.getKeys().size(), equalTo(2));
         MetaDataModel id = mapDataModel.getValueMetaDataModel("id");
-        assertThat(id.getDataType(), equalTo(testDatabase.getIdFieldDataType()));
+        assertThat(id.getDataType(), equalTo(testDatabase.getIdFieldInputMetaDataType()));
         MetaDataModel data = mapDataModel.getValueMetaDataModel("name");
         assertThat(data.getDataType(), equalTo(DataType.STRING));
     }

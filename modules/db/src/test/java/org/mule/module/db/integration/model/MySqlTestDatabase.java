@@ -141,7 +141,7 @@ public class MySqlTestDatabase extends AbstractTestDatabase
     }
 
     @Override
-    public DataType getIdFieldDataType()
+    public DataType getIdFieldInputMetaDataType()
     {
         return DataType.STRING;
     }

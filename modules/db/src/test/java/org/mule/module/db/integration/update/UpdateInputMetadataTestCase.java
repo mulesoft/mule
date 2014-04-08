@@ -13,9 +13,9 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.common.Result;
 import org.mule.common.metadata.MetaData;
 import org.mule.construct.Flow;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.delete.AbstractUpdateInputMetadataTestCase;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.processor.AbstractSingleQueryDbMessageProcessor;
 
 import java.util.List;

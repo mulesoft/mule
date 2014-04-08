@@ -25,7 +25,6 @@ import org.mule.module.db.domain.param.InputQueryParam;
 import org.mule.module.db.domain.query.Query;
 import org.mule.module.db.domain.transaction.TransactionalAction;
 import org.mule.module.db.resolver.database.DbConfigResolver;
-import org.mule.module.db.resolver.query.QueryResolver;
 
 import java.net.URL;
 import java.sql.Blob;
@@ -105,35 +104,47 @@ public abstract class AbstractQueryMetadataProvider implements QueryMetadataProv
             fieldNames.add(field);
         }
 
-        ParameterMetaData parameterMetaData;
         try
         {
-            parameterMetaData = statement.getParameterMetaData();
+            return getInputMetadataUsingStatementMetadata(statement, fieldNames);
         }
         catch (SQLException e)
         {
-            return new DefaultResult<MetaData>(null, Result.Status.FAILURE, "Driver did not return metadata for the provided SQL");
+            return getStaticInputMetadata(fieldNames);
         }
+    }
 
-        try
+    private Result<MetaData> getStaticInputMetadata(List<String> fieldNames)
+    {
+        Map<String, MetaDataModel> recordModels = new HashMap<String, MetaDataModel>();
+
+        for (String fieldName : fieldNames)
         {
-            Map<String, MetaDataModel> recordModels = new HashMap<String, MetaDataModel>();
-            int i = 1;
-            for (String fieldName : fieldNames)
-            {
-                int dataType = parameterMetaData.getParameterType(i++);
-                recordModels.put(fieldName, getDataTypeMetadataModel(dataType));
-            }
-
-            DefaultDefinedMapMetaDataModel recordModel = new DefaultDefinedMapMetaDataModel(recordModels);
-            DefaultMetaData defaultMetaData = new DefaultMetaData(recordModel);
-
-            return new DefaultResult<MetaData>(defaultMetaData);
+            recordModels.put(fieldName, getDataTypeMetadataModel(Types.VARCHAR));
         }
-        catch (SQLException e)
+
+        DefaultDefinedMapMetaDataModel recordModel = new DefaultDefinedMapMetaDataModel(recordModels);
+        DefaultMetaData defaultMetaData = new DefaultMetaData(recordModel);
+
+        return new DefaultResult<MetaData>(defaultMetaData);
+    }
+
+    private Result<MetaData> getInputMetadataUsingStatementMetadata(PreparedStatement statement, List<String> fieldNames) throws SQLException
+    {
+        ParameterMetaData parameterMetaData = statement.getParameterMetaData();
+
+        Map<String, MetaDataModel> recordModels = new HashMap<String, MetaDataModel>();
+        int i = 1;
+        for (String fieldName : fieldNames)
         {
-            return new DefaultResult<MetaData>(null, Result.Status.FAILURE, e.getMessage(), FailureType.UNSPECIFIED, e);
+            int dataType = parameterMetaData.getParameterType(i++);
+            recordModels.put(fieldName, getDataTypeMetadataModel(dataType));
         }
+
+        DefaultDefinedMapMetaDataModel recordModel = new DefaultDefinedMapMetaDataModel(recordModels);
+        DefaultMetaData defaultMetaData = new DefaultMetaData(recordModel);
+
+        return new DefaultResult<MetaData>(defaultMetaData);
     }
 
     private String getReferencedField(InputQueryParam inputParam)

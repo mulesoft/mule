@@ -7,8 +7,11 @@
 
 package org.mule.module.db.integration.insert;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.core.AnyOf.anyOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
@@ -18,6 +21,7 @@ import org.mule.module.db.integration.TestDbConfig;
 import org.mule.transport.NullPayload;
 
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,8 +75,8 @@ public class InsertBulkTestCase extends AbstractDbIntegrationTestCase
         assertTrue(payload instanceof int[]);
         int[] counters = (int[]) payload;
         assertEquals(2, counters.length);
-        assertEquals(1, counters[0]);
-        assertEquals(1, counters[1]);
+        assertThat(counters[0], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));
+        assertThat(counters[1], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));
 
         assertRecordsFromQuery("Pluto", "Saturn");
     }

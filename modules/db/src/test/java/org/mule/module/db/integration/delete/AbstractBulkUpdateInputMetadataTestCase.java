@@ -43,7 +43,7 @@ public abstract class AbstractBulkUpdateInputMetadataTestCase extends AbstractDb
         DefinedMapMetaDataModel mapDataModel = (DefinedMapMetaDataModel) listMetaDataModel.getElementModel();
         assertThat(mapDataModel.getKeys().size(), equalTo(2));
         MetaDataModel id = mapDataModel.getValueMetaDataModel("position");
-        assertThat(id.getDataType(), equalTo(testDatabase.getIdFieldDataType()));
+        assertThat(id.getDataType(), equalTo(testDatabase.getIdFieldInputMetaDataType()));
         MetaDataModel data = mapDataModel.getValueMetaDataModel("name");
         assertThat(data.getDataType(), equalTo(DataType.STRING));
     }

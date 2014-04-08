@@ -798,8 +798,35 @@
     <xsd:element name="derby-config" type="abstractOptionalUserAndPasswordDatabaseConfigType"
                  substitutionGroup="abstract-config"/>
 
-    <xsd:element name="oracle-config" type="abstractMandatoryUserAndPasswordDatabaseConfigType"
-                 substitutionGroup="abstract-config"/>
+    <xsd:element name="oracle-config" type="oracleDatabaseConfigType" substitutionGroup="abstract-config"/>
+
+    <xsd:complexType name="oracleDatabaseConfigType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMandatoryUserAndPasswordDatabaseConfigType">
+                <xsd:attribute name="host" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Allows to configure just the host part of the JDBC URL (and leave the rest of the default JDBC URL untouched).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="port" type="xsd:int" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Allows to configure just the port part of the JDBC URL (and leave the rest of the default JDBC URL untouched).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="instance" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Allows to configure just the instance part of the JDBC URL (and leave the rest of the default JDBC URL untouched).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:element name="mysql-config" type="mySqlDatabaseConfigType" substitutionGroup="abstract-config"/>
 

@@ -13,9 +13,9 @@ import static org.mule.module.db.integration.TestRecordUtil.getAllRecords;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
-import org.mule.module.db.integration.matcher.SupportsStoredFunctionsUsingCallSyntax;
+import org.mule.module.db.integration.matcher.SupportsReturningStoredProcedureResultsWithoutParameters;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
 
@@ -56,7 +56,7 @@ public class SelectStoredProcedureTestCase extends AbstractDbIntegrationTestCase
     @Before
     public void setupStoredProcedure() throws Exception
     {
-        assumeThat(getDefaultDataSource(), new SupportsStoredFunctionsUsingCallSyntax());
+        assumeThat(getDefaultDataSource(), new SupportsReturningStoredProcedureResultsWithoutParameters());
         testDatabase.createStoredProcedureGetRecords(getDefaultDataSource());
     }
 }

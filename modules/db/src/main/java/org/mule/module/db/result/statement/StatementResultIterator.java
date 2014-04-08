@@ -245,8 +245,13 @@ public class StatementResultIterator implements Iterator<StatementResult>, Close
         }
     }
 
-    protected StatementResult doProcessOutputParam(OutputQueryParam outputSqlParam, Object paramValue)
+    protected StatementResult doProcessOutputParam(OutputQueryParam outputSqlParam, Object paramValue) throws SQLException
     {
+        if (paramValue instanceof ResultSet)
+        {
+            paramValue = resultSetHandler.processResultSet(connection, (ResultSet) paramValue);
+        }
+
         return new OutputParamResult(outputSqlParam.getName(), paramValue);
     }
 

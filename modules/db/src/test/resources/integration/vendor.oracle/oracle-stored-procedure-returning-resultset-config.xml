@@ -5,6 +5,12 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
-    <db:oracle-config name="dbConfig" host="172.16.28.128" port="1521" instance="XE" user="pocholo"
-                      password="password"/>
+    <flow name="defaultQueryRequestResponse">
+        <inbound-endpoint address="vm://testRequestResponse" exchange-pattern="request-response"/>
+
+        <db:stored-procedure config-ref="dbConfig">
+            <db:parameterized-query>{ call getTestRecords(:resultSet1) }</db:parameterized-query>
+            <db:out-param name="resultSet1" type="CURSOR"/>
+        </db:stored-procedure>
+    </flow>
 </mule>

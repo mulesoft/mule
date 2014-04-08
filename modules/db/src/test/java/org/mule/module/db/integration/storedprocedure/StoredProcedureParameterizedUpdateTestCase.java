@@ -7,35 +7,28 @@
 
 package org.mule.module.db.integration.storedprocedure;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
-import static org.mule.module.db.integration.DbTestUtil.selectData;
-import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
-import org.mule.module.db.integration.model.DerbyTestDatabase;
-import org.mule.module.db.integration.model.Field;
-import org.mule.module.db.integration.model.Record;
 import org.mule.module.db.integration.TestDbConfig;
-import org.mule.module.db.integration.matcher.SupportsStoredFunctionsUsingCallSyntax;
+import org.mule.module.db.integration.matcher.SupportsReturningStoredProcedureResultsWithoutParameters;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
-import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class StoredProcedureParameterizedUpdateTestCase extends AbstractDbIntegrationTestCase
+public class StoredProcedureParameterizedUpdateTestCase extends AbstractStoredProcedureParameterizedUpdateTestCase
 {
 
     public StoredProcedureParameterizedUpdateTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
     {
         super(dataSourceConfigResource, testDatabase);
+    }
+
+    @Override
+    public void setupStoredProcedure() throws Exception
+    {
+        assumeThat(getDefaultDataSource(), new SupportsReturningStoredProcedureResultsWithoutParameters());
+        super.setupStoredProcedure();
     }
 
     @Parameterized.Parameters
@@ -50,26 +43,4 @@ public class StoredProcedureParameterizedUpdateTestCase extends AbstractDbIntegr
         return new String[] {"integration/storedprocedure/stored-procedure-parameterized-update-config.xml"};
     }
 
-    @Test
-    public void testRequestResponse() throws Exception
-    {
-        LocalMuleClient client = muleContext.getClient();
-
-        MuleMessage response = client.send("vm://testRequestResponse", "foo", null);
-        assertThat(response.getPayload(), is(Map.class));
-        Map payload = (Map) response.getPayload();
-        assertThat(payload.size(), equalTo(1));
-        int expectedUpdateCount = testDatabase instanceof DerbyTestDatabase ? 0 : 1;
-        assertThat((Integer) payload.get("updateCount1"), equalTo(expectedUpdateCount));
-
-        List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
-        assertRecords(result, new Record(new Field("NAME", "foo"), new Field("POSITION", 4)));
-    }
-
-    @Before
-    public void setupStoredProcedure() throws Exception
-    {
-        assumeThat(getDefaultDataSource(), new SupportsStoredFunctionsUsingCallSyntax());
-        testDatabase.createStoredProcedureParameterizedUpdateTestType1(getDefaultDataSource());
-    }
 }

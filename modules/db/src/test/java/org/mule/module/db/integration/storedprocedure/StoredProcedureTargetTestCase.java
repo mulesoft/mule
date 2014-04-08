@@ -15,11 +15,11 @@ import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
+import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.matcher.SupportsReturningStoredProcedureResultsWithoutParameters;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.Field;
 import org.mule.module.db.integration.model.Record;
-import org.mule.module.db.integration.TestDbConfig;
-import org.mule.module.db.integration.matcher.SupportsStoredFunctionsUsingCallSyntax;
 import org.mule.module.db.result.statement.StatementResultIterator;
 
 import java.sql.SQLException;
@@ -42,7 +42,7 @@ public class StoredProcedureTargetTestCase extends AbstractDbIntegrationTestCase
     @Parameterized.Parameters
     public static List<Object[]> parameters()
     {
-        return TestDbConfig.getResources();
+        return TestDbConfig.getDerbyResource();
     }
 
     @Override
@@ -71,7 +71,7 @@ public class StoredProcedureTargetTestCase extends AbstractDbIntegrationTestCase
     @Before
     public void setupStoredProcedure() throws Exception
     {
-        assumeThat(getDefaultDataSource(), new SupportsStoredFunctionsUsingCallSyntax());
+        assumeThat(getDefaultDataSource(), new SupportsReturningStoredProcedureResultsWithoutParameters());
         testDatabase.createStoredProcedureUpdateTestType1(getDefaultDataSource());
     }
 
