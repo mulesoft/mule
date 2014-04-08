@@ -99,6 +99,12 @@ public class DefaultMuleApplication implements Application
         return descriptor;
     }
 
+    @Override
+    public Domain getDomain()
+    {
+        return domain;
+    }
+
     public void setAppName(String appName)
     {
         this.descriptor.setAppName(appName);

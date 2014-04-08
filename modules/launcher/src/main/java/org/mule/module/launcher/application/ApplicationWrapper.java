@@ -8,6 +8,7 @@ package org.mule.module.launcher.application;
 
 import org.mule.module.launcher.artifact.ArtifactWrapper;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
+import org.mule.module.launcher.domain.Domain;
 
 import java.io.IOException;
 
@@ -33,6 +34,12 @@ public class ApplicationWrapper extends ArtifactWrapper<Application> implements 
     public ApplicationDescriptor getDescriptor()
     {
         return getDelegate().getDescriptor();
+    }
+
+    @Override
+    public Domain getDomain()
+    {
+        return getDelegate().getDomain();
     }
 
     @Override

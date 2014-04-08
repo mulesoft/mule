@@ -6,8 +6,8 @@
  */
 package org.mule.module.launcher;
 
-import static org.mule.module.launcher.ArchiveDeployer.ARTIFACT_NAME_PROPERTY;
-import static org.mule.module.launcher.ArchiveDeployer.ZIP_FILE_SUFFIX;
+import static org.mule.module.launcher.DefaultArchiveDeployer.ARTIFACT_NAME_PROPERTY;
+import static org.mule.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 import static org.mule.util.SplashScreen.miniSplash;
 
 import org.mule.config.StartupContext;
@@ -78,8 +78,8 @@ public class DeploymentDirectoryWatcher implements Runnable
 
     public DeploymentDirectoryWatcher(final ArchiveDeployer<Domain> domainArchiveDeployer, final ArchiveDeployer<Application> applicationArchiveDeployer, ObservableList<Domain> domains, ObservableList<Application> applications, final ReentrantLock deploymentLock)
     {
-        this.appsDir = applicationArchiveDeployer.getArtifactFactory().getArtifactDir();
-        this.domainsDir = domainArchiveDeployer.getArtifactFactory().getArtifactDir();
+        this.appsDir = applicationArchiveDeployer.getDeploymentDirectory();
+        this.domainsDir = domainArchiveDeployer.getDeploymentDirectory();
         this.deploymentLock = deploymentLock;
         this.domainArchiveDeployer = domainArchiveDeployer;
         this.applicationArchiveDeployer = applicationArchiveDeployer;
