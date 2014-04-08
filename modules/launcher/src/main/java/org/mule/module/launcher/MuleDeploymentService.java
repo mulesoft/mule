@@ -86,9 +86,10 @@ public class MuleDeploymentService implements DeploymentService
     public void start()
     {
         DeploymentStatusTracker deploymentStatusTracker = new DeploymentStatusTracker();
-        addDeploymentListener(deploymentStatusTracker);
+        addDeploymentListener(deploymentStatusTracker.getApplicationDeploymentStatusTracker());
+        addDomainDeploymentListener(deploymentStatusTracker.getDomainDeploymentStatusTracker());
 
-        StartupSummaryDeploymentListener summaryDeploymentListener = new StartupSummaryDeploymentListener(deploymentStatusTracker);
+        StartupSummaryDeploymentListener summaryDeploymentListener = new StartupSummaryDeploymentListener(deploymentStatusTracker, this);
         addStartupListener(summaryDeploymentListener);
 
         deploymentDirectoryWatcher.start();

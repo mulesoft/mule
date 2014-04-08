@@ -6,7 +6,11 @@
  */
 package org.mule.module.launcher;
 
+import org.mule.module.launcher.application.Application;
 import org.mule.util.SimpleLoggingTable;
+
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Multimap;
 
 import java.util.Map;
 
@@ -18,13 +22,24 @@ import org.apache.commons.logging.LogFactory;
  */
 public class StartupSummaryDeploymentListener implements StartupListener
 {
+
     protected transient final Log logger = LogFactory.getLog(getClass());
+
+    private static final String APPLICATION_LABEL = "APPLICATION";
+    private static final String DOMAIN_OWNER_LABEL = "DOMAIN";
+    private static final String STATUS_LABEL = "STATUS";
+    private static final int ARTIFACT_NAME_LABEL_LENGTH = 45;
+    private static final int STATUS_LABEL_LENGTH = 18;
+    private static final int DOMAIN_OWNER_LABEL_LENGTH = 30;
+
+    private final DeploymentService deploymentService;
 
     protected DeploymentStatusTracker tracker;
 
-    public StartupSummaryDeploymentListener(DeploymentStatusTracker tracker)
+    public StartupSummaryDeploymentListener(DeploymentStatusTracker tracker, DeploymentService deploymentService)
     {
         this.tracker = tracker;
+        this.deploymentService = deploymentService;
     }
 
     public void onAfterStartup()
@@ -34,24 +49,52 @@ public class StartupSummaryDeploymentListener implements StartupListener
             return;
         }
 
-        Map<String, DeploymentStatusTracker.DeploymentState> applicationStates = tracker.getDeploymentStates();
+        Multimap<String, String> applicationsPerDomain = LinkedListMultimap.create();
 
-        if (applicationStates.isEmpty())
+        Map<String, ArtifactDeploymentStatusTracker.DeploymentState> domainDeploymentState = tracker.getDomainDeploymentStatusTracker().getDeploymentStates();
+
+        SimpleLoggingTable domainTable = new SimpleLoggingTable();
+        domainTable.addColumn(DOMAIN_OWNER_LABEL, ARTIFACT_NAME_LABEL_LENGTH);
+        domainTable.addColumn(STATUS_LABEL, STATUS_LABEL_LENGTH);
+
+        for (String domain : domainDeploymentState.keySet())
         {
-            return;
+            String[] data = new String[] {domain, domainDeploymentState.get(domain).toString()};
+            domainTable.addDataRow(data);
         }
 
-        SimpleLoggingTable applicationTable = new SimpleLoggingTable();
-        applicationTable.addColumn("APPLICATION", 45);
-        applicationTable.addColumn("STATUS", 18);
+        Map<String, ArtifactDeploymentStatusTracker.DeploymentState> applicationStates = tracker.getApplicationDeploymentStatusTracker().getDeploymentStates();
 
-        for (String app : applicationStates.keySet())
+        for (String applicationName : applicationStates.keySet())
         {
-            String[] data = new String[] {app, applicationStates.get(app).toString()};
-            applicationTable.addDataRow(data);
+            Application application = deploymentService.findApplication(applicationName);
+            applicationsPerDomain.put(application.getDomain().getArtifactName(), applicationName);
         }
 
-        String message = String.format("%n%n%s", applicationTable);
+        String message;
+
+        if (!applicationsPerDomain.isEmpty())
+        {
+            SimpleLoggingTable applicationTable = new SimpleLoggingTable();
+            applicationTable.addColumn(APPLICATION_LABEL, ARTIFACT_NAME_LABEL_LENGTH);
+            applicationTable.addColumn(DOMAIN_OWNER_LABEL, DOMAIN_OWNER_LABEL_LENGTH);
+            applicationTable.addColumn(STATUS_LABEL, STATUS_LABEL_LENGTH);
+
+            for (String domainName : applicationsPerDomain.keySet())
+            {
+                for (String app : applicationsPerDomain.get(domainName))
+                {
+                    String[] data = new String[] {app, domainName, applicationStates.get(app).toString()};
+                    applicationTable.addDataRow(data);
+                }
+            }
+
+            message = String.format("%n%s%n%s", domainTable, applicationTable);
+        }
+        else
+        {
+            message = String.format("%n%s", domainTable);
+        }
 
         logger.info(message);
     }
