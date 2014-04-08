@@ -24,11 +24,15 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -168,6 +172,11 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
      * Global exception strategy name to be used as default exception strategy for flows and services
      */
     private String defaultExceptionStrategyName;
+
+    /**
+     * List of extensions defined in the configuration element at the application.
+     */
+    private List<Object> extensions;
 
     public DefaultMuleConfiguration()
     {
@@ -712,6 +721,32 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     public boolean isDisableTimeouts()
     {
         return disableTimeouts;
+    }
+
+    public void setExtensions(List<Object> extensions)
+    {
+        this.extensions = extensions;
+    }
+
+    public <T> T getExtension(final Class<T> extensionType)
+    {
+        return (T) CollectionUtils.find(extensions, new Predicate()
+        {
+            @Override
+            public boolean evaluate(Object object)
+            {
+                return extensionType.isAssignableFrom(object.getClass());
+            }
+        });
+    }
+
+    public List<Object> getExtensions()
+    {
+        if (extensions == null)
+        {
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableList(extensions);
     }
 
     @Override
