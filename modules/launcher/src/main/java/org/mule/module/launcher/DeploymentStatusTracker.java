@@ -6,46 +6,22 @@
  */
 package org.mule.module.launcher;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
- * Keeps track of the deployment status of all applications in the Mule instance.
+ * Keeps track of the deployment status of all artifact in the Mule instance.
  */
 public class DeploymentStatusTracker extends AbstractDeploymentListener
 {
 
-    public static enum DeploymentState
+    private ArtifactDeploymentStatusTracker applicationDeploymentStatusTracker = new ArtifactDeploymentStatusTracker();
+    private ArtifactDeploymentStatusTracker domainDeploymentStatusTracker = new ArtifactDeploymentStatusTracker();
+
+    public ArtifactDeploymentStatusTracker getApplicationDeploymentStatusTracker()
     {
-        // The deployment is in progress
-        DEPLOYING,
-        // The deployment was finished with a failure
-        FAILED,
-        // The deployment was successfully finished
-        DEPLOYED
+        return applicationDeploymentStatusTracker;
     }
 
-    protected Map<String, DeploymentState> deploymentStates = new ConcurrentHashMap<String, DeploymentState>();
-
-    public Map<String, DeploymentState> getDeploymentStates()
+    public ArtifactDeploymentStatusTracker getDomainDeploymentStatusTracker()
     {
-        return Collections.unmodifiableMap(deploymentStates);
+        return domainDeploymentStatusTracker;
     }
-
-    public void onDeploymentStart(String artifactName)
-    {
-        deploymentStates.put(artifactName, DeploymentState.DEPLOYING);
-    }
-
-    public void onDeploymentSuccess(String appName)
-    {
-        deploymentStates.put(appName, DeploymentState.DEPLOYED);
-    }
-
-    public void onDeploymentFailure(String artifactName, Throwable failureCause)
-    {
-        deploymentStates.put(artifactName, DeploymentState.FAILED);
-    }
-
 }
