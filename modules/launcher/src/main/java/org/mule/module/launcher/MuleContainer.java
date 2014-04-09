@@ -141,11 +141,7 @@ public class MuleContainer
         {
             registerShutdownHook();
         }
-
-        final MuleContainerStartupSplashScreen splashScreen = new MuleContainerStartupSplashScreen();
-        splashScreen.doBody();
-        logger.info(splashScreen.toString());
-
+        showSplashScreen();
         try
         {
             coreExtensionManager.setDeploymentService(deploymentService);
@@ -159,6 +155,13 @@ public class MuleContainer
         {
             shutdown(e);
         }
+    }
+
+    protected void showSplashScreen()
+    {
+        final MuleContainerStartupSplashScreen splashScreen = new MuleContainerStartupSplashScreen();
+        splashScreen.doBody();
+        logger.info(splashScreen.toString());
     }
 
     /**
