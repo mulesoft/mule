@@ -38,9 +38,9 @@ public class ArtifactDeploymentStatusTracker  extends AbstractDeploymentListener
         deploymentStates.put(artifactName, DeploymentState.DEPLOYING);
     }
 
-    public void onDeploymentSuccess(String appName)
+    public void onDeploymentSuccess(String artifactName)
     {
-        deploymentStates.put(appName, DeploymentState.DEPLOYED);
+        deploymentStates.put(artifactName, DeploymentState.DEPLOYED);
     }
 
     public void onDeploymentFailure(String artifactName, Throwable failureCause)
