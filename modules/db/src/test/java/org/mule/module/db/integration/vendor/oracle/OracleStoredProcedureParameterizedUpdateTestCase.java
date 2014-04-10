@@ -32,6 +32,6 @@ public class OracleStoredProcedureParameterizedUpdateTestCase extends AbstractSt
     @Override
     protected String[] getFlowConfigurationResources()
     {
-        return new String[] {"integration/vendor.oracle/oracle-stored-procedure-parameterized-update-config.xml"};
+        return new String[] {"integration/vendor/oracle/oracle-stored-procedure-parameterized-update-config.xml"};
     }
 }

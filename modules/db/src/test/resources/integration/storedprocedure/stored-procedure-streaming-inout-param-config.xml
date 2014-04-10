@@ -12,16 +12,5 @@
             <db:parameterized-query>{ call doubleMyInt(:myInt) }</db:parameterized-query>
             <db:inout-param name="myInt" value="3"/>
         </db:stored-procedure>
-
-        <logger level="ERROR" message="Payload before foreach: #[payload]"/>
-
-        <set-variable variableName="results" value="#[new HashMap()]"/>
-
-        <foreach>
-            <logger level="ERROR" message="Sub payload: #[payload]"/>
-            <expression-component>results.put(payload.name, payload.result)</expression-component>
-        </foreach>
-
-        <set-payload value="#[flowVars['results']]"/>
     </flow>
 </mule>

@@ -9,16 +9,16 @@ package org.mule.module.db.integration.vendor.oracle;
 
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
-import org.mule.module.db.integration.storedprocedure.AbstractStoredProcedureUpdateTestCase;
+import org.mule.module.db.integration.storedprocedure.AbstractStoredProcedureReturningResultsetsTestCase;
 
 import java.util.List;
 
 import org.junit.runners.Parameterized;
 
-public class OracleStoredProcedureUpdateTestCase extends AbstractStoredProcedureUpdateTestCase
+public class OracleStoredProcedureReturningStreamingResultsetsTestCase extends AbstractStoredProcedureReturningResultsetsTestCase
 {
 
-    public OracleStoredProcedureUpdateTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
+    public OracleStoredProcedureReturningStreamingResultsetsTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
     {
         super(dataSourceConfigResource, testDatabase);
     }
@@ -29,9 +29,10 @@ public class OracleStoredProcedureUpdateTestCase extends AbstractStoredProcedure
         return TestDbConfig.getOracleResource();
     }
 
+
     @Override
     protected String[] getFlowConfigurationResources()
     {
-        return new String[] {"integration/vendor/oracle/oracle-stored-procedure-update-config.xml"};
+        return new String[] {"integration/vendor/oracle/oracle-stored-procedure-returning-resultsets-config.xml"};
     }
 }

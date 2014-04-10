@@ -10,8 +10,8 @@ package org.mule.module.db.config.processor;
 import org.mule.module.db.domain.executor.StoredProcedureExecutorFactory;
 import org.mule.module.db.metadata.NullMetadataProvider;
 import org.mule.module.db.processor.StoredProcedureMessageProcessor;
-import org.mule.module.db.result.statement.IteratorStatementResultHandler;
-import org.mule.module.db.result.statement.MapStatementResultHandler;
+import org.mule.module.db.result.statement.EagerStatementResultHandler;
+import org.mule.module.db.result.statement.StreamingStatementResultHandler;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -45,11 +45,11 @@ public class StoredProcedureProcessorBeanDefinitionParser extends AbstractResult
         BeanDefinitionBuilder statementResultHandlerBean;
         if (streaming)
         {
-            statementResultHandlerBean = BeanDefinitionBuilder.genericBeanDefinition(IteratorStatementResultHandler.class);
+            statementResultHandlerBean = BeanDefinitionBuilder.genericBeanDefinition(StreamingStatementResultHandler.class);
         }
         else
         {
-            statementResultHandlerBean = BeanDefinitionBuilder.genericBeanDefinition(MapStatementResultHandler.class);
+            statementResultHandlerBean = BeanDefinitionBuilder.genericBeanDefinition(EagerStatementResultHandler.class);
         }
         statementResultHandlerBean.addConstructorArgValue(resultSetHandler);
 
