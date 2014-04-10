@@ -33,6 +33,6 @@ public class OracleStoredProcedureReturningResultsetsTestCase extends AbstractSt
     @Override
     protected String[] getFlowConfigurationResources()
     {
-        return new String[] {"integration/vendor.oracle/oracle-stored-procedure-returning-resultsets-config.xml"};
+        return new String[] {"integration/vendor/oracle/oracle-stored-procedure-returning-resultsets-config.xml"};
     }
 }

@@ -32,6 +32,6 @@ public class OracleStoredProcedureStreamingReturningResultsetTestCase extends Ab
     @Override
     protected String[] getFlowConfigurationResources()
     {
-        return new String[] {"integration/vendor.oracle/oracle-stored-procedure-streaming-returning-resultset-config.xml"};
+        return new String[] {"integration/vendor/oracle/oracle-stored-procedure-streaming-returning-resultset-config.xml"};
     }
 }

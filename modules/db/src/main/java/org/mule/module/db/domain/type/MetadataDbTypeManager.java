@@ -9,8 +9,8 @@ package org.mule.module.db.domain.type;
 
 import org.mule.module.db.domain.connection.DbConnection;
 import org.mule.module.db.result.resultset.ResultSetIterator;
+import org.mule.module.db.result.resultset.SingleResultResultSetCloser;
 import org.mule.module.db.result.row.InsensitiveMapRowHandler;
-import org.mule.module.db.result.statement.StatementStreamingResultSetCloser;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -88,7 +88,7 @@ public class MetadataDbTypeManager implements DbTypeManager
         {
             DatabaseMetaData metaData = connection.getMetaData();
             ResultSet typeInfo = metaData.getTypeInfo();
-            ResultSetIterator resultSetIterator = new ResultSetIterator(connection, typeInfo, new InsensitiveMapRowHandler(), new StatementStreamingResultSetCloser());
+            ResultSetIterator resultSetIterator = new ResultSetIterator(connection, typeInfo, new InsensitiveMapRowHandler(), new SingleResultResultSetCloser());
             while (resultSetIterator.hasNext())
             {
                 Map<String, Object> typeRecord = resultSetIterator.next();
