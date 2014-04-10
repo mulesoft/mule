@@ -60,24 +60,30 @@ public class ResultSetIterator implements Iterator<Map<String, Object>>, Closeab
             }
             catch (SQLException e)
             {
-                logger.warn("Unable to determine if there are more records", e);
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Unable to determine if there are more records", e);
+                }
+            }
+
+            if (!result)
+            {
+                try
+                {
+                    close();
+                }
+                catch (MuleException e)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Error closing resultset", e);
+                    }
+                }
             }
         }
         else
         {
             result = cachedNext;
-        }
-
-        if (!result)
-        {
-            try
-            {
-                close();
-            }
-            catch (MuleException e)
-            {
-                // Ignore: already managed on close method
-            }
         }
 
         return result;

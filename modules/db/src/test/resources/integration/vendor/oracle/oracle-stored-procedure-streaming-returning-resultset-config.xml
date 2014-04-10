@@ -14,7 +14,7 @@
         </db:stored-procedure>
 
         <!-- This is needed because foreach cannot iterator when the expression is iterable/iterator-->
-        <set-payload value="#[payload.next().result]"/>
+        <set-payload value="#[payload.get('resultSet1')]"/>
 
         <foreach>
             <outbound-endpoint address="vm://testOut"/>
@@ -32,7 +32,7 @@
         <set-variable variableName="records" value="#[new ArrayList()]"/>
 
         <!-- This is needed because foreach cannot iterator when the expression is iterable/iterator-->
-        <set-payload value="#[payload.next().result]"/>
+        <set-payload value="#[payload.get('resultSet1')]"/>
 
         <foreach>
             <expression-component>flowVars['records'].add(payload)</expression-component>

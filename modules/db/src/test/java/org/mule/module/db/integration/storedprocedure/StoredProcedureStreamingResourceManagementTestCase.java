@@ -12,18 +12,22 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
+import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
+import static org.mule.module.db.integration.TestRecordUtil.getAllRecords;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.matcher.SupportsStoredFunctionsUsingCallSyntax;
-import org.mule.module.db.result.statement.StatementResultIterator;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
+import org.mule.module.db.result.resultset.ResultSetIterator;
 import org.mule.transport.NullPayload;
 
 import java.util.List;
+import java.util.Map;
 
+import org.hamcrest.core.IsEqual;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
@@ -61,10 +65,13 @@ public class StoredProcedureStreamingResourceManagementTestCase extends Abstract
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://storedProcedureStreaming", TEST_MESSAGE, null);
 
-        assertThat(response.getPayload(), is(StatementResultIterator.class));
-        assertThat(response.getInboundProperty("processedResults"), is(List.class));
-    }
+        Map payload = (Map) response.getPayload();
 
+        assertThat(payload.size(), IsEqual.equalTo(1));
+        assertThat(payload.get("resultSet1"), is(ResultSetIterator.class));
+        assertThat(response.getInboundProperty("processedResults"), is(List.class));
+        assertRecords(response.getInboundProperty("processedResults"), getAllRecords());
+    }
 
     @Test
     public void closesConnectionsOnProcessingError() throws Exception
