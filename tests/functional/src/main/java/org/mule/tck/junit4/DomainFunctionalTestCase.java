@@ -74,6 +74,7 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase
             }
         }
         muleContexts.clear();
+        disposeMuleContext(domainContext);
     }
 
     protected MuleContext createAppMuleContext(String[] configResource) throws Exception
@@ -86,6 +87,11 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase
     public MuleContext getMuleContextForApp(String applicationName)
     {
         return muleContexts.get(applicationName);
+    }
+
+    public MuleContext getMuleContextForDomain()
+    {
+        return domainContext;
     }
 
     public class ApplicationConfig

@@ -464,20 +464,23 @@ public class JmxAgent extends AbstractAgent
             {
                 for (MessageReceiver messageReceiver : ((AbstractConnector) connector).getReceivers().values())
                 {
-                    EndpointServiceMBean service = new EndpointService(messageReceiver);
-
-                    String fullName = buildFullyQualifiedEndpointName(service, connector);
-                    if (logger.isInfoEnabled())
+                    if (muleContext.equals(messageReceiver.getFlowConstruct().getMuleContext()))
                     {
-                        logger.info("Attempting to register service with name: " + fullName);
-                    }
+                        EndpointServiceMBean service = new EndpointService(messageReceiver);
 
-                    ObjectName on = jmxSupport.getObjectName(fullName);
-                    ClassloaderSwitchingMBeanWrapper mBean = new ClassloaderSwitchingMBeanWrapper(service, EndpointServiceMBean.class, muleContext.getExecutionClassLoader());
-                    mBeanServer.registerMBean(mBean, on);
-                    if (logger.isInfoEnabled())
-                    {
-                        logger.info("Registered Endpoint Service with name: " + on);
+                        String fullName = buildFullyQualifiedEndpointName(service, connector);
+                        if (logger.isInfoEnabled())
+                        {
+                            logger.info("Attempting to register service with name: " + fullName);
+                        }
+
+                        ObjectName on = jmxSupport.getObjectName(fullName);
+                        ClassloaderSwitchingMBeanWrapper mBean = new ClassloaderSwitchingMBeanWrapper(service, EndpointServiceMBean.class, muleContext.getExecutionClassLoader());
+                        mBeanServer.registerMBean(mBean, on);
+                        if (logger.isInfoEnabled())
+                        {
+                            logger.info("Registered Endpoint Service with name: " + on);
+                        }
                     }
                 }
             }
