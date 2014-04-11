@@ -35,12 +35,16 @@ public class StatementStreamingResultSetCloser extends AbstractStreamingResultSe
             checkValidConnectionLock(connection, connectionLock);
 
             Set<ResultSet> resultSets = getConnectionResultSets(connection, resultSet);
-
-            super.close(connection, resultSet);
-
-            if (resultSets.size() == 0)
+            try
             {
-                releaseResources(connection, connectionLock);
+                super.close(connection, resultSet);
+            }
+            finally
+            {
+                if (resultSets.size() == 0)
+                {
+                    releaseResources(connection, connectionLock);
+                }
             }
         }
     }

@@ -45,7 +45,10 @@ public class SingleResultResultSetCloser extends AbstractStreamingResultSetClose
             }
             catch (SQLException e)
             {
-                // Ignore
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Error closing statement. Ignored", e);
+                }
             }
         }
     }
@@ -60,7 +63,10 @@ public class SingleResultResultSetCloser extends AbstractStreamingResultSetClose
         }
         catch (SQLException e)
         {
-            // Ignore
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Error closing statement. Ignored", e);
+            }
         }
 
         return statement;
