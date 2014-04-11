@@ -14,9 +14,9 @@ import org.mule.api.context.WorkManagerSource;
 public class LaxAsyncInterceptingMessageProcessor extends AsyncInterceptingMessageProcessor
 {
 
-    public LaxAsyncInterceptingMessageProcessor(WorkManagerSource workManagerSource)
+    public LaxAsyncInterceptingMessageProcessor(WorkManagerSource workManagerSource, boolean inExceptionStrategy)
     {
-        super(workManagerSource);
+        super(workManagerSource, inExceptionStrategy);
     }
 
     public LaxAsyncInterceptingMessageProcessor(ThreadingProfile threadingProfile,

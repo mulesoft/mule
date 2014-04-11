@@ -56,6 +56,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.OptimisedNotificationHandler;
+import org.mule.endpoint.DefaultOutboundEndpoint;
 import org.mule.endpoint.outbound.OutboundNotificationMessageProcessor;
 import org.mule.model.streaming.DelegatingInputStream;
 import org.mule.processor.AbstractRedeliveryPolicy;
@@ -2551,11 +2552,16 @@ public abstract class AbstractConnector implements Connector, WorkListener
                 {
                     return getDispatcherWorkManager();
                 }
-            });
+            }, isInExceptionStrategy(endpoint));
             builder.chain(async);
             builder.chain(new DispatcherMessageProcessor(endpoint));
             return builder.build();
         }
+    }
+
+    private boolean isInExceptionStrategy(OutboundEndpoint endpoint)
+    {
+        return (endpoint instanceof DefaultOutboundEndpoint) && ((DefaultOutboundEndpoint) endpoint).isInExceptionStrategy();
     }
 
     @Override

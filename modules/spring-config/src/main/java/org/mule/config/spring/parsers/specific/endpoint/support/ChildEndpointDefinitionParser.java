@@ -42,6 +42,11 @@ public class ChildEndpointDefinitionParser extends ChildDefinitionParser
     public BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class<?> beanClass)
     {
         BeanDefinitionBuilder builder = super.createBeanDefinitionBuilder(element, beanClass);
+        String parent = element.getParentNode().getLocalName();
+        if (parent.endsWith("exception-strategy"))
+        {
+            builder.addPropertyValue("inExceptionStrategyFlag", true);
+        }
         String global = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF);
         if (StringUtils.isNotBlank(global))
         {

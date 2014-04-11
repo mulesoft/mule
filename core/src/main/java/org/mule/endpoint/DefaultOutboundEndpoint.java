@@ -38,6 +38,8 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
 
     private List<String> responseProperties;
 
+    private boolean inExceptionStrategy;
+
     public DefaultOutboundEndpoint(Connector connector,
                                    EndpointURI endpointUri,
                                    String name,
@@ -85,6 +87,16 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
     public List<String> getResponseProperties()
     {
         return responseProperties;
+    }
+
+    public void setInExceptionStrategy(boolean inExceptionStrategy)
+    {
+        this.inExceptionStrategy = inExceptionStrategy;
+    }
+
+    public boolean isInExceptionStrategy()
+    {
+        return inExceptionStrategy;
     }
 
     public MuleEvent process(MuleEvent event) throws MuleException

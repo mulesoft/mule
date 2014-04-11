@@ -41,13 +41,15 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
 
     public static final String SYNCHRONOUS_EVENT_ERROR_MESSAGE = "Unable to process a synchronous event asynchronously";
 
+    private final boolean inExceptionStrategy;
     protected WorkManagerSource workManagerSource;
     protected boolean doThreading = true;
     protected WorkManager workManager;
 
-    public AsyncInterceptingMessageProcessor(WorkManagerSource workManagerSource)
+    public AsyncInterceptingMessageProcessor(WorkManagerSource workManagerSource, boolean inExceptionStrategy)
     {
         this.workManagerSource = workManagerSource;
+        this.inExceptionStrategy = inExceptionStrategy;
     }
 
     public AsyncInterceptingMessageProcessor(ThreadingProfile threadingProfile,
@@ -63,6 +65,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
                 return workManager;
             }
         };
+        inExceptionStrategy = false;
     }
 
     public void start() throws MuleException
@@ -172,7 +175,15 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         @Override
         protected void doRun()
         {
-            MessagingExceptionHandler exceptionHandler = event.getFlowConstruct() != null ? event.getFlowConstruct().getExceptionListener() : null;
+            MessagingExceptionHandler exceptionHandler;
+            if (inExceptionStrategy)
+            {
+                exceptionHandler = muleContext.getDefaultExceptionStrategy();
+            }
+            else
+            {
+                exceptionHandler = event.getFlowConstruct() != null ? event.getFlowConstruct().getExceptionListener() : null;
+            }
             ExecutionTemplate<MuleEvent> executionTemplate = TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate(
                     muleContext, new MuleTransactionConfig(), exceptionHandler);
 

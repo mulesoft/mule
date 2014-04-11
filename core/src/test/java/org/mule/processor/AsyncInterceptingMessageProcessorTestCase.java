@@ -13,7 +13,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.MessageExchangePattern;
 import org.mule.VoidMuleEvent;
 import org.mule.api.DefaultMuleException;
@@ -212,7 +211,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
         throws Exception
     {
         AsyncInterceptingMessageProcessor mp = new AsyncInterceptingMessageProcessor(
-            new TestWorkManagerSource());
+            new TestWorkManagerSource(), false);
         mp.setMuleContext(muleContext);
         mp.setListener(listener);
         return mp;

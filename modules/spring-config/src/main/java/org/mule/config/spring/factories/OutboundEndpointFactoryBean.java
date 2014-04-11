@@ -11,6 +11,7 @@ import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.registry.ServiceType;
 import org.mule.endpoint.AbstractEndpoint;
+import org.mule.endpoint.DefaultOutboundEndpoint;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.transport.service.TransportServiceDescriptor;
@@ -20,6 +21,8 @@ import org.mule.transport.service.TransportServiceDescriptor;
  */
 public class OutboundEndpointFactoryBean extends AbstractEndpointFactoryBean
 {
+
+    private boolean inExceptionStrategyFlag = false;
 
     public OutboundEndpointFactoryBean(EndpointURIEndpointBuilder global) throws EndpointException
     {
@@ -48,6 +51,10 @@ public class OutboundEndpointFactoryBean extends AbstractEndpointFactoryBean
         {
             AbstractEndpoint.class.cast(outboundEndpoint).setAnnotations(getAnnotations());
         }
+        if (outboundEndpoint instanceof DefaultOutboundEndpoint)
+        {
+            ((DefaultOutboundEndpoint) outboundEndpoint).setInExceptionStrategy(inExceptionStrategyFlag);
+        }
         return outboundEndpoint;
     }
 
@@ -56,4 +63,10 @@ public class OutboundEndpointFactoryBean extends AbstractEndpointFactoryBean
     {
         throw new IllegalStateException("A redelivery policy cannot be specified for an outbound endpoint.");
     }
+
+    public void setInExceptionStrategyFlag(boolean inExceptionStrategyFlag)
+    {
+        this.inExceptionStrategyFlag = inExceptionStrategyFlag;
+    }
+
 }
