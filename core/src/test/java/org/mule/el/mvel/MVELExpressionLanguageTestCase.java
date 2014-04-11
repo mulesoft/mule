@@ -652,5 +652,14 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         }
         return classes;
     }
-
+    
+    @Test
+    public void collectionAccessPayloadChangedMULE7506() throws Exception
+    {
+        MuleEvent event = getTestEvent(new String[]{"1", "2"});
+        assertEquals("1", mvel.evaluate("payload[0]", event));
+        event.getMessage().setPayload(Collections.singletonList("1"));
+        assertEquals("1", mvel.evaluate("payload[0]", event));
+    }
+    
 }
