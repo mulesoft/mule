@@ -186,6 +186,25 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
             }
         });
 
+        // Add a message processor that removes the invocation property CxfConstants.OPERATION if present
+        // (as it may change the behavior of CXF proxy client). It is added again after executing the proxy client.
+        chainBuilder.chain(new AbstractInterceptingMessageProcessor()
+        {
+            @Override
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                Object operation = event.getMessage().removeProperty(CxfConstants.OPERATION, PropertyScope.INVOCATION);
+
+                MuleEvent result = processNext(event);
+
+                if (operation != null)
+                {
+                    result.getMessage().setInvocationProperty(CxfConstants.OPERATION, operation);
+                }
+                return result;
+            }
+        });
+
         chainBuilder.chain(createCxfOutboundMessageProcessor(config.getSecurity()));
 
         // Add a MessageProcessor to remove outbound properties that are mapped to SOAP headers, so that the
