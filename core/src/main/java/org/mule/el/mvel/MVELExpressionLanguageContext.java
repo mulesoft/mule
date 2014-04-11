@@ -20,6 +20,7 @@ import java.util.Map;
 import org.mule.mvel2.ImmutableElementException;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.UnresolveablePropertyException;
+import org.mule.mvel2.ast.FunctionInstance;
 import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.VariableResolverFactory;
 import org.mule.mvel2.integration.impl.BaseVariableResolverFactory;
@@ -233,7 +234,7 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     @Override
     public void declareFunction(String name, ExpressionLanguageFunction function)
     {
-        addFinalVariable(name, new MVELFunctionAdaptor(name, function, parserContext));
+        addFinalVariable(name, new FunctionInstance(new MVELFunctionAdaptor(name, function, parserContext)));
     }
 
     @Override
