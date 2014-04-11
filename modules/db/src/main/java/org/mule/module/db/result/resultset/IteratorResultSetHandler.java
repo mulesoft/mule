@@ -9,6 +9,7 @@ package org.mule.module.db.result.resultset;
 
 import org.mule.module.db.domain.connection.DbConnection;
 import org.mule.module.db.result.row.RowHandler;
+import org.mule.module.db.result.statement.StatementStreamingResultSetCloser;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,6 +21,7 @@ public class IteratorResultSetHandler implements ResultSetHandler
 {
 
     private final RowHandler rowHandler;
+    private StatementStreamingResultSetCloser streamingResultSetCloser = new StatementStreamingResultSetCloser();
 
     public IteratorResultSetHandler(RowHandler rowHandler)
     {
@@ -29,6 +31,8 @@ public class IteratorResultSetHandler implements ResultSetHandler
     @Override
     public Object processResultSet(DbConnection connection, ResultSet resultSet) throws SQLException
     {
-        return new ResultSetIterator(connection, resultSet, rowHandler, new SingleResultResultSetCloser());
+        streamingResultSetCloser.trackResultSet(connection, resultSet);
+
+        return new ResultSetIterator(connection, resultSet, rowHandler, streamingResultSetCloser);
     }
 }

@@ -13,21 +13,21 @@ import java.sql.SQLException;
 import org.hamcrest.Description;
 
 /**
- * Checks whether or not a dataSource supports invoking user-defined or vendor
- * functions using the stored procedure escape syntax.
+ * Checks whether or not a dataSource supports to have multiple ResultSet
+ * objects returned from a CallableStatement object simultaneously.
  */
-public class SupportsStoredFunctionsUsingCallSyntax extends AbstractDataSourceFeatureMatcher
+public class SupportMultipleOpenResults extends AbstractDataSourceFeatureMatcher
 {
 
     @Override
     protected boolean supportsFeature(DatabaseMetaData metaData) throws SQLException
     {
-        return metaData.supportsStoredFunctionsUsingCallSyntax();
+        return metaData.supportsMultipleOpenResults();
     }
 
     @Override
     public void describeTo(Description description)
     {
-        description.appendText("database.supportsStoredFunctionsUsingCallSyntax == true");
+        description.appendText("database.supportMultipleOpenResults == true");
     }
 }

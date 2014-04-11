@@ -14,11 +14,19 @@
             <db:parameterized-query>{ call getTestRecords() }</db:parameterized-query>
         </db:stored-procedure>
 
-        <set-variable variableName="results" value="#[new ArrayList()]"/>
+        <enricher>
+            <processor-chain>
+                <set-payload value="#[payload.get('resultSet1')]"/>
+                <set-variable variableName="results" value="#[new ArrayList()]"/>
 
-        <foreach>
-            <expression-component>flowVars['results'].add(payload)</expression-component>
-        </foreach>
+                <foreach>
+                    <expression-component>flowVars['results'].add(payload)</expression-component>
+                </foreach>
+
+                <set-payload value="#[results]"/>
+            </processor-chain>
+            <enrich target="#[variable:results]"/>
+        </enricher>
 
         <set-property propertyName="processedResults" value="#[results]"/>
     </flow>

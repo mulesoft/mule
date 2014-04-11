@@ -8,21 +8,67 @@
 package org.mule.module.db.result.resultset;
 
 import org.mule.module.db.domain.connection.DbConnection;
-import org.mule.module.db.result.statement.StatementStreamingResultSetCloser;
+import org.mule.module.db.result.statement.AbstractStreamingResultSetCloser;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
- * Closes a connection after a {@link ResultSet} has been processed
+ * Closes a {@link ResultSet} and related {@link Statement}
  */
-public class SingleResultResultSetCloser extends StatementStreamingResultSetCloser
+public class SingleResultResultSetCloser extends AbstractStreamingResultSetCloser
 {
 
     @Override
     public void close(DbConnection connection, ResultSet resultSet)
     {
-        super.close(connection, resultSet);
+        Statement statement = getStatement(resultSet);
 
-        connection.release();
+        try
+        {
+            super.close(connection, resultSet);
+        }
+        finally
+        {
+            closeStatement(statement);
+        }
+    }
+
+    protected void closeStatement(Statement statement)
+    {
+        if (statement != null)
+        {
+            try
+            {
+                statement.close();
+            }
+            catch (SQLException e)
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Error closing statement. Ignored", e);
+                }
+            }
+        }
+    }
+
+    protected Statement getStatement(ResultSet resultSet)
+    {
+        Statement statement = null;
+
+        try
+        {
+            statement = resultSet.getStatement();
+        }
+        catch (SQLException e)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Error closing statement. Ignored", e);
+            }
+        }
+
+        return statement;
     }
 }
