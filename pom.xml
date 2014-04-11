@@ -155,7 +155,7 @@
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <!-- TODO EE-1395 -->
         <mqSeriesVersion>6.0</mqSeriesVersion>
-        <mvelVersion>2.1.3.Final</mvelVersion>
+        <mvelVersion>2.1.9-MULE-001</mvelVersion>
         <mx4jVersion>2.1.1</mx4jVersion>
         <ognlVersion>2.7.3</ognlVersion>
         <oroVersion>2.0.8</oroVersion>
@@ -1223,12 +1223,6 @@
                         <groupId>stax</groupId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>org.mvel</groupId>
-                <artifactId>mvel2</artifactId>
-                <version>${mvelVersion}</version>
             </dependency>
 
             <dependency>

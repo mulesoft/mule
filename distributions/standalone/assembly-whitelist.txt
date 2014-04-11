@@ -457,7 +457,7 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-sxc-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-tomcat-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-xml-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-mvel2-2.1.3.Final.jar
+/mule-standalone-${productVersion}/lib/mule/mule-mvel2-2.1.9-MULE-001.jar
 /mule-standalone-${productVersion}/lib/mule/mule-pattern-core-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-tools-anttasks-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-ajax-${productVersion}.jar

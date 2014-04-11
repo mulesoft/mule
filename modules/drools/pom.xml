@@ -29,12 +29,6 @@
             <groupId>org.drools</groupId>
             <artifactId>drools-core</artifactId>
             <version>${droolsVersion}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.mvel</groupId>
-                    <artifactId>mvel2</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.drools</groupId>
