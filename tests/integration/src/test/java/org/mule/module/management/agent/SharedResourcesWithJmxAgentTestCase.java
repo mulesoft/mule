@@ -18,11 +18,16 @@ import javax.management.ObjectName;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- *
- */
 public class SharedResourcesWithJmxAgentTestCase extends DomainFunctionalTestCase
 {
+
+    public static final String APP1 = "App1";
+    public static final String APP2 = "App2";
+    public static final String ENDPOINT_JMS_QUEUE_APP1 = "endpoint.jms.queueApp1";
+    public static final String ENDPOINT_JMS_QUEUE_APP2 = "endpoint.jms.queueApp2";
+    public static final String FLOW_APP1 = "flowApp1";
+    public static final String FLOW_APP2 = "flowApp2";
+    public static final String TYPE_ENDPOINT = "type=Endpoint";
 
     @Override
     protected String getDomainConfig()
@@ -35,8 +40,8 @@ public class SharedResourcesWithJmxAgentTestCase extends DomainFunctionalTestCas
     {
         return new ApplicationConfig[]
                 {
-                        new ApplicationConfig("App1", new String[] {"jmx-app-1.xml"}),
-                        new ApplicationConfig("App2", new String[] {"jmx-app-2.xml"})
+                        new ApplicationConfig(APP1, new String[] {"jmx-app-1.xml"}),
+                        new ApplicationConfig(APP2, new String[] {"jmx-app-2.xml"})
                 };
     }
 
@@ -48,31 +53,39 @@ public class SharedResourcesWithJmxAgentTestCase extends DomainFunctionalTestCas
 
         Set<ObjectName> objectNames = mBeanServer.queryNames(null, null);
 
-        List<String> endpointsForApp1 = getNames(objectNames, "endpoint.jms.queueApp1");
-        Assert.assertEquals(1, endpointsForApp1.size());
-        Assert.assertTrue(endpointsForApp1.get(0).contains("flowApp1"));
-        Assert.assertFalse(endpointsForApp1.get(0).contains("flowApp2"));
+        Assert.assertEquals(1, getNamesCount(objectNames, ENDPOINT_JMS_QUEUE_APP1));
+        Assert.assertEquals(1, getNamesCount(objectNames, ENDPOINT_JMS_QUEUE_APP1, FLOW_APP1));
 
-        List<String> endpointsForApp2 = getNames(objectNames, "endpoint.jms.queueApp2");
-        Assert.assertEquals(1, endpointsForApp2.size());
-        Assert.assertTrue(endpointsForApp2.get(0).contains("flowApp2"));
-        Assert.assertFalse(endpointsForApp2.get(0).contains("flowApp1"));
+        Assert.assertEquals(1, getNamesCount(objectNames, ENDPOINT_JMS_QUEUE_APP2));
+        Assert.assertEquals(1, getNamesCount(objectNames, ENDPOINT_JMS_QUEUE_APP2, FLOW_APP2));
 
-        Assert.assertEquals(1, getNames(objectNames, "flowApp1"));
-        Assert.assertEquals(1, getNames(objectNames, "flowApp2"));
+        Assert.assertEquals(1, getNamesCount(objectNames, FLOW_APP1, TYPE_ENDPOINT));
+        Assert.assertEquals(1, getNamesCount(objectNames, FLOW_APP2, TYPE_ENDPOINT));
     }
 
-    private List<String> getNames(Set<ObjectName> objectNames, String filter)
+    private int getNamesCount(Set<ObjectName> objectNames, String... filters)
     {
         List<String> names = new ArrayList<String>();
         for (ObjectName objectName : objectNames)
         {
             String canonicalName = objectName.getCanonicalName();
-            if (canonicalName.contains(filter))
+            if (containsAll(canonicalName, filters))
             {
                 names.add(canonicalName);
             }
         }
-        return names;
+        return names.size();
+    }
+
+    private boolean containsAll(String text, String... filters)
+    {
+        for (String filter : filters)
+        {
+            if (!text.contains(filter))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 }
