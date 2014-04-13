@@ -15,12 +15,11 @@ import org.mule.api.store.ObjectStoreException;
 import org.mule.util.journal.queue.LocalTxQueueTransactionJournal;
 import org.mule.util.journal.queue.LocalTxQueueTransactionRecoverer;
 import org.mule.util.journal.queue.XaTxQueueTransactionJournal;
-import org.mule.util.xa.ResourceManagerSystemException;
 import org.mule.util.xa.XaTransactionRecoverer;
 
 import java.io.File;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The Transactional Queue Manager is responsible for creating and Managing
@@ -38,7 +37,7 @@ public class TransactionalQueueManager extends AbstractQueueManager
     //Due to current VMConnector and TransactionQueueManager relationship we must close all the recovered queues
     //since queue configuration is applied after recovery and not taking into consideration once queues are created
     //for recovery. See https://www.mulesoft.org/jira/browse/MULE-7420
-    private Set<String> queuesAccessedForRecovery = new TreeSet<String>();
+    private Map<String, QueueStore> queuesAccessedForRecovery = new HashMap<String, QueueStore>();
 
     /**
      * {@inheritDoc}
@@ -83,8 +82,9 @@ public class TransactionalQueueManager extends AbstractQueueManager
     @Override
     public RecoverableQueueStore getRecoveryQueue(String queueName)
     {
-        queuesAccessedForRecovery.add(queueName);
-        return createQueueStore(queueName, new DefaultQueueConfiguration(0, true));
+        DefaultQueueStore queueStore = createQueueStore(queueName, new DefaultQueueConfiguration(0, true));
+        queuesAccessedForRecovery.put(queueName, queueStore);
+        return queueStore;
     }
 
     @Override
@@ -92,11 +92,11 @@ public class TransactionalQueueManager extends AbstractQueueManager
     {
         queueXaResourceManager.start();
         localTxQueueTransactionRecoverer.recover();
-        for (String queueName : queuesAccessedForRecovery)
+        for (QueueStore queueStore : queuesAccessedForRecovery.values())
         {
-            getQueue(queueName).close();
-            clearQueueConfiguration(queueName);
+            queueStore.close();
         }
+        queuesAccessedForRecovery.clear();
 
         //Need to do this in order to open all ListableObjectStore. See MULE-7486
         openAllListableObjectStores();
