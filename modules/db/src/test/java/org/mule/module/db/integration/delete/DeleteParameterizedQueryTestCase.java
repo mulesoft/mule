@@ -48,6 +48,6 @@ public class DeleteParameterizedQueryTestCase extends AbstractDbIntegrationTestC
 
         assertEquals(1, response.getPayload());
 
-        assertDeleteRecords(VENUS.getName());
+        assertDeletedPlanetRecords(VENUS.getName());
     }
 }

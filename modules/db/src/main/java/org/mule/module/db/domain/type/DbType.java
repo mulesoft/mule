@@ -40,6 +40,16 @@ public interface DbType
     void setParameterValue(PreparedStatement statement, int index, Object value) throws SQLException;
 
     /**
+     * Gets the value of an output parameter
+     *
+     * @param statement statement that contains the parameter
+     * @param index index of the parameter in the statement (first parameter is 1, the second is 2, etc)
+     * @throws SQLException if parameterIndex does not correspond to a parameter marker in the SQL statement;
+     * if a database access error occurs; this method is called on a closed statement
+     */
+    Object getParameterValue(CallableStatement statement, int index) throws SQLException;
+
+    /**
      * Registers an output parameter
      *
      * @param statement statement that contains the parameter

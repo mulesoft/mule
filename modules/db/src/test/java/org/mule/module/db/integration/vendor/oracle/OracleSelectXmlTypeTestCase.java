@@ -5,13 +5,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.config;
+package org.mule.module.db.integration.vendor.oracle;
 
 import static org.mule.module.db.integration.TestRecordUtil.assertMessageContains;
-import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
+import static org.mule.module.db.integration.TestRecordUtil.getAllAlienRecords;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
-import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 
@@ -20,10 +19,10 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class DynamicDataSourceTestCase extends AbstractDbIntegrationTestCase
+public class OracleSelectXmlTypeTestCase extends AbstractOracleXmlTypeTestCase
 {
 
-    public DynamicDataSourceTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
+    public OracleSelectXmlTypeTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
     {
         super(dataSourceConfigResource, testDatabase);
     }
@@ -31,22 +30,22 @@ public class DynamicDataSourceTestCase extends AbstractDbIntegrationTestCase
     @Parameterized.Parameters
     public static List<Object[]> parameters()
     {
-        return TestDbConfig.getResources();
+        return TestDbConfig.getOracleResource();
     }
 
     @Override
     protected String[] getFlowConfigurationResources()
     {
-        return new String[] {"integration/config/dynamic-db-config.xml"};
+        return new String[] {"integration/vendor/oracle/oracle-select-xml-type-config.xml"};
     }
 
     @Test
-    public void testRequestResponse() throws Exception
+    public void returnsXmlTypeColumn() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
 
-        MuleMessage response = client.send("vm://testRequestResponse", "dbConfig", null);
+        MuleMessage response = client.send("vm://managesXmlType", TEST_MESSAGE, null);
 
-        assertMessageContains(response, getAllPlanetRecords());
+        assertMessageContains(response, getAllAlienRecords());
     }
 }

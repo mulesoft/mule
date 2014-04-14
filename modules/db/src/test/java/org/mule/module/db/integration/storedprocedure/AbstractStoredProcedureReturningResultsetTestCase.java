@@ -10,7 +10,7 @@ package org.mule.module.db.integration.storedprocedure;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
-import static org.mule.module.db.integration.TestRecordUtil.getAllRecords;
+import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
@@ -48,7 +48,7 @@ public abstract class AbstractStoredProcedureReturningResultsetTestCase extends 
             assertThat(payload.size(), equalTo(1));
         }
 
-        assertRecords(payload.get("resultSet1"), getAllRecords());
+        assertRecords(payload.get("resultSet1"), getAllPlanetRecords());
     }
 
     @Before

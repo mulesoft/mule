@@ -7,6 +7,7 @@
 
 package org.mule.module.db.domain.type;
 
+import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -30,6 +31,12 @@ public class UnknownDbType extends AbstractDbType
     public void setParameterValue(PreparedStatement statement, int index, Object value) throws SQLException
     {
         statement.setObject(index, value);
+    }
+
+    @Override
+    public Object getParameterValue(CallableStatement statement, int index) throws SQLException
+    {
+        return statement.getObject(index);
     }
 
     public static DbType getInstance()

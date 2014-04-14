@@ -8,7 +8,7 @@
 package org.mule.module.db.integration.storedprocedure;
 
 import static org.mule.module.db.integration.TestRecordUtil.assertMessageContains;
-import static org.mule.module.db.integration.TestRecordUtil.getAllRecords;
+import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
@@ -32,7 +32,7 @@ public abstract class AbstractStoredProcedureReturningStreamingResultsetsTestCas
 
         MuleMessage response = client.send("vm://testRequestResponse", TEST_MESSAGE, null);
 
-        assertMessageContains(response, getAllRecords());
+        assertMessageContains(response, getAllPlanetRecords());
     }
 
     @Before

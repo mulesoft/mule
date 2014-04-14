@@ -37,6 +37,12 @@ public class DynamicDbType implements DbType
     }
 
     @Override
+    public Object getParameterValue(CallableStatement statement, int index) throws SQLException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void setParameterValue(PreparedStatement statement, int index, Object value) throws SQLException
     {
         throw new UnsupportedOperationException();
