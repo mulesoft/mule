@@ -7,6 +7,7 @@
 
 package org.mule.module.db.domain.type;
 
+import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -32,5 +33,11 @@ public class ResolvedDbType extends AbstractDbType
         {
             statement.setObject(index, value, id);
         }
+    }
+
+    @Override
+    public Object getParameterValue(CallableStatement statement, int index) throws SQLException
+    {
+        return statement.getObject(index);
     }
 }

@@ -17,6 +17,7 @@ import org.mule.module.db.result.resultset.ResultSetProcessingException;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLXML;
 import java.sql.Statement;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -209,7 +210,7 @@ public class StatementResultIterator implements Iterator<StatementResult>
 
         try
         {
-            Object paramValue = ((CallableStatement) statement).getObject(outputSqlParam.getIndex());
+            Object paramValue= outputSqlParam.getType().getParameterValue((CallableStatement) statement, outputSqlParam.getIndex());
 
             return doProcessOutputParam(outputSqlParam, paramValue);
         }
@@ -225,6 +226,12 @@ public class StatementResultIterator implements Iterator<StatementResult>
         if (paramValue instanceof ResultSet)
         {
             paramValue = resultSetHandler.processResultSet(connection, (ResultSet) paramValue);
+        }
+        else if (paramValue instanceof SQLXML)
+        {
+            SQLXML sqlxml = (SQLXML) paramValue;
+
+            paramValue = sqlxml.getString();
         }
 
         return new OutputParamResult(outputSqlParam.getName(), paramValue);

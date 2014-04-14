@@ -63,6 +63,6 @@ public class InsertBulkSourceTestCase extends AbstractDbIntegrationTestCase
         assertThat(counters[0], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));
         assertThat(counters[1], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));
 
-        assertRecordsFromQuery("Pluto", "Saturn");
+        assertPlanetRecordsFromQuery("Pluto", "Saturn");
     }
 }

@@ -54,6 +54,6 @@ public class InsertSourceTestCase extends AbstractDbIntegrationTestCase
     {
         assertEquals(1, response.getPayload());
 
-        assertRecordsFromQuery("Pluto");
+        assertPlanetRecordsFromQuery("Pluto");
     }
 }

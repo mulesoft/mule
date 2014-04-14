@@ -54,6 +54,6 @@ public class InsertBulkTargetTestCase extends AbstractDbIntegrationTestCase
     {
         assertEquals(1, responseValue);
 
-        assertRecordsFromQuery("Pluto");
+        assertPlanetRecordsFromQuery("Pluto");
     }
 }

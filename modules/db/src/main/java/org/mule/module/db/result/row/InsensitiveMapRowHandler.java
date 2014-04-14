@@ -12,6 +12,7 @@ import org.mule.util.CaseInsensitiveHashMap;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.SQLXML;
 import java.util.Map;
 
 /**
@@ -31,7 +32,17 @@ public class InsensitiveMapRowHandler implements RowHandler
         {
             String columnName = metaData.getColumnName(i);
             Object value = resultSet.getObject(i);
-            result.put(columnName, value);
+
+            if (value instanceof SQLXML)
+            {
+                SQLXML sqlxml = (SQLXML) value;
+
+                result.put(columnName, sqlxml.getString());
+            }
+            else
+            {
+                result.put(columnName, value);
+            }
         }
 
         return result;

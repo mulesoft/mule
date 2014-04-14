@@ -53,6 +53,6 @@ public class InsertDynamicQueryTestCase extends AbstractDbIntegrationTestCase
     {
         assertEquals(1, response.getPayload());
 
-        assertRecordsFromQuery("Pluto");
+        assertPlanetRecordsFromQuery("Pluto");
     }
 }

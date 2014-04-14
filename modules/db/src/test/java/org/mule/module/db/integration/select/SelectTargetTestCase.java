@@ -10,7 +10,7 @@ package org.mule.module.db.integration.select;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
-import static org.mule.module.db.integration.TestRecordUtil.getAllRecords;
+import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
@@ -49,6 +49,6 @@ public class SelectTargetTestCase extends AbstractDbIntegrationTestCase
         MuleMessage response = client.send("vm://queryCustomTarget", TEST_MESSAGE, null);
 
         assertThat(response.getPayloadAsString(), equalTo(TEST_MESSAGE));
-        assertRecords(response.getInboundProperty("resultSet"), getAllRecords());
+        assertRecords(response.getInboundProperty("resultSet"), getAllPlanetRecords());
     }
 }
