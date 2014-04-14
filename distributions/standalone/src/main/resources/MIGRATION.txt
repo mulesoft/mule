@@ -27,3 +27,4 @@ MULE-7425: xpath() MEL function no longer changes the message payload when a sou
 MULE-7439: org.mule.transport.http.servlet.MuleHttpServletResponse.formatDate now receives a StringBuilder instead of a StringBuffer
 MULE-7428: Mule queues underlying implementation has changed. To get previous behaviour you can set system property mule.queue.objectstoremode=true. Old classes were deprecated and moved to package org.mule.util.queue.objectstore
 MULE-7362: MEL expressions now propagate nulls instead of raising an exception. For example a.b.c would previously raise a NPE if a.b was null. It will return null now.
+MULE-7513: Attribute secondsBetweenRetries has been deprecated in favor of a new attribute called millisBetweenRetries. This change is backwards compatible, you can still use secondsBetweenRetries although it's not recommended. Setting both attributes at the same time will result in a configuration error
