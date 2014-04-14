@@ -8,6 +8,8 @@ package org.mule.el.mvel;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.mule.api.lifecycle.InitialisationException;
@@ -62,12 +64,6 @@ public class MVELExpressionExecutorTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void nullSafeGetIsEnabled()
-    {
-        assertEquals(null, mvel.execute("['test1' : null].test1.test2", null));
-    }
-
-    @Test
     public void validExpression()
     {
         mvel.validate("var a = 2");
@@ -92,6 +88,55 @@ public class MVELExpressionExecutorTestCase extends AbstractMuleTestCase
             Thread.currentThread().setContextClassLoader(originalClassLoader);
         }
     }
+
+    @Test
+    public void safeMapPropertyAccessIsEnabled()
+    {
+        assertEquals(null, mvel.execute("['test1' : null].doesntExist", context));
+    }
+
+    @Test
+    public void safeMapNestedPropertyAccessIsEnabled()
+    {
+        assertEquals(null, mvel.execute("['test1' : null].test1", context));
+    }
+
+    @Test
+    public void safeBeanPropertyAccessIsEnabled()
+    {
+        assertNull(mvel.execute("new Object().doesntExist", context));
+    }
+
+    @Test
+    public void safeNestedBeanPropertyAccessIsEnabled()
+    {
+        assertNull(mvel.execute("new Object().doesntExist.?other", context));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void safeNestedBeanPropertyAccessMaintainsNullSafeBehavior()
+    {
+        assertNull(mvel.execute("new Object().doesntExist.other", context));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void safeNestedMapPropertyAccessMaintainsNullSafeBehavior()
+    {
+        assertNull(mvel.execute("['test1' : null].doesntExist.other", context));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void safePropertyDoesntMessNullSafeMode()
+    {
+        assertNull(mvel.execute("null.doesntExist", context));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void invalidMethodCallFails()
+    {
+        assertNull(mvel.execute("new Object().doesntExist()", context));
+    }
+
 
     static class MyClassClassLoader extends ClassLoader
     {
