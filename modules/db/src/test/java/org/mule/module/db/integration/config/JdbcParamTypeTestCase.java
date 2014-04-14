@@ -9,8 +9,8 @@ package org.mule.module.db.integration.config;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import org.mule.module.db.domain.type.DbType;
-import org.mule.module.db.domain.type.JdbcTypes;
+import org.mule.module.db.internal.domain.type.DbType;
+import org.mule.module.db.internal.domain.type.JdbcTypes;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;

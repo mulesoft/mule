@@ -9,12 +9,12 @@ package org.mule.module.db.integration.config;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import org.mule.module.db.domain.connection.DbConnection;
-import org.mule.module.db.domain.connection.DbConnectionFactory;
-import org.mule.module.db.domain.database.GenericDbConfig;
-import org.mule.module.db.domain.transaction.TransactionalAction;
-import org.mule.module.db.domain.type.DbType;
-import org.mule.module.db.domain.type.DbTypeManager;
+import org.mule.module.db.internal.domain.connection.DbConnection;
+import org.mule.module.db.internal.domain.connection.DbConnectionFactory;
+import org.mule.module.db.internal.domain.database.GenericDbConfig;
+import org.mule.module.db.internal.domain.transaction.TransactionalAction;
+import org.mule.module.db.internal.domain.type.DbType;
+import org.mule.module.db.internal.domain.type.DbTypeManager;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.DerbyTestDatabase;

@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.domain.xa;
+package org.mule.module.db.internal.domain.xa;
 
 
 import org.mule.util.xa.XaResourceFactoryHolder;

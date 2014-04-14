@@ -7,7 +7,7 @@
 
 package org.mule.module.db.test.util;
 
-import org.mule.module.db.domain.type.JdbcTypes;
+import org.mule.module.db.internal.domain.type.JdbcTypes;
 
 /**
  * Type definitions for testing purposes

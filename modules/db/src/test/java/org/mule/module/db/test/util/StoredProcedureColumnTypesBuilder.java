@@ -7,8 +7,8 @@
 
 package org.mule.module.db.test.util;
 
-import org.mule.module.db.resolver.param.StoredProcedureParamTypeResolver;
-import org.mule.module.db.resolver.param.StoredProcedureParamTypeResolverTestCase;
+import org.mule.module.db.internal.resolver.param.StoredProcedureParamTypeResolver;
+import org.mule.module.db.internal.resolver.param.StoredProcedureParamTypeResolverTestCase;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;

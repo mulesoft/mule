@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.domain.connection;
+package org.mule.module.db.internal.domain.connection;
 
-import org.mule.module.db.domain.transaction.TransactionalAction;
-import org.mule.module.db.resolver.param.ParamTypeResolverFactory;
+import org.mule.module.db.internal.domain.transaction.TransactionalAction;
+import org.mule.module.db.internal.resolver.param.ParamTypeResolverFactory;
 
 import java.sql.Array;
 import java.sql.Blob;
