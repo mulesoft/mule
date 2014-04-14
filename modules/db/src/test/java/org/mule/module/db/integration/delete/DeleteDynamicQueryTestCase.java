@@ -48,6 +48,6 @@ public class DeleteDynamicQueryTestCase extends AbstractDbIntegrationTestCase
 
         assertEquals(1, response.getPayload());
 
-        assertDeleteRecords(VENUS.getName());
+        assertDeletedPlanetRecords(VENUS.getName());
     }
 }

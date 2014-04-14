@@ -77,6 +77,6 @@ public class DeleteBulkTestCase extends AbstractDbIntegrationTestCase
         assertExpectedUpdateCount(1, counters[0]);
         assertExpectedUpdateCount(1, counters[1]);
 
-        assertDeleteRecords(VENUS.getName());
+        assertDeletedPlanetRecords(VENUS.getName());
     }
 }

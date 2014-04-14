@@ -55,6 +55,6 @@ public class DeleteTargetTestCase extends AbstractDbIntegrationTestCase
     {
         assertEquals(1, responseValue);
 
-        assertDeleteRecords(VENUS.getName());
+        assertDeletedPlanetRecords(VENUS.getName());
     }
 }
