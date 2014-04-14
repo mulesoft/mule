@@ -20,9 +20,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Default implementation looks for property files on META-INF/services/org/mule/config/ with name registry-bootstrap.properties
+ * This class looks for bootstrap properties in files named registry-bootstrap.properties inside the META-INF/services/org/mule/config directories contained in the classpath
  */
-class DefaultRegistryBootstrapDiscoverer implements RegistryBootstrapDiscoverer
+class ClassPathRegistryBootstrapDiscoverer implements RegistryBootstrapDiscoverer
 {
 
     public static final String SERVICE_PATH = "META-INF/services/org/mule/config/";

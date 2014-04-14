@@ -91,7 +91,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 
     public SimpleRegistryBootstrap()
     {
-        this(new DefaultRegistryBootstrapDiscoverer());
+        this(new ClassPathRegistryBootstrapDiscoverer());
     }
 
     public SimpleRegistryBootstrap(RegistryBootstrapDiscoverer discoverer)
@@ -117,18 +117,18 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         {
             bootstraps = discoverer.discover();
         }
-        catch (Exception e1)
+        catch (Exception e)
         {
-            throw new InitialisationException(e1, this);
+            throw new InitialisationException(e, this);
         }
 
         // ... and only then merge and process them
         int objectCounter = 1;
         int transformerCounter = 1;
-        List<BootstrapProperty> transformers = new ArrayList<BootstrapProperty>();
-        List<BootstrapProperty> namedObjects = new ArrayList<BootstrapProperty>();
-        List<BootstrapProperty> unnamedObjects = new ArrayList<BootstrapProperty>();
-        List<BootstrapProperty> singleTransactionFactories = new ArrayList<BootstrapProperty>();
+        final List<BootstrapProperty> transformers = new ArrayList<BootstrapProperty>();
+        final List<BootstrapProperty> namedObjects = new ArrayList<BootstrapProperty>();
+        final List<BootstrapProperty> unnamedObjects = new ArrayList<BootstrapProperty>();
+        final List<BootstrapProperty> singleTransactionFactories = new ArrayList<BootstrapProperty>();
 
         for (Properties bootstrap : bootstraps)
         {
@@ -176,9 +176,9 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
             registerObjects(namedObjects, context.getRegistry());
             registerTransactionFactories(singleTransactionFactories, context);
         }
-        catch (Exception e1)
+        catch (Exception e)
         {
-            throw new InitialisationException(e1, this);
+            throw new InitialisationException(e, this);
         }
     }
 
@@ -191,13 +191,13 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                 context.getTransactionFactoryManager().registerTransactionFactory(Class.forName(bootstrapProperty.className), (TransactionFactory) Class.forName(bootstrapProperty.key).newInstance());
 
             }
-            catch (NoClassDefFoundError ncdfe)
+            catch (NoClassDefFoundError e)
             {
-                throwExceptionIfNotOptional(bootstrapProperty.optional, ncdfe, "Ignoring optional transaction factory: " + bootstrapProperty.className);
+                throwExceptionIfNotOptional(bootstrapProperty.optional, e, "Ignoring optional transaction factory: " + bootstrapProperty.className);
             }
-            catch (ClassNotFoundException cnfe)
+            catch (ClassNotFoundException e)
             {
-                throwExceptionIfNotOptional(bootstrapProperty.optional, cnfe, "Ignoring optional transaction factory: " + bootstrapProperty.className);
+                throwExceptionIfNotOptional(bootstrapProperty.optional, e, "Ignoring optional transaction factory: " + bootstrapProperty.className);
             }
 
         }
@@ -233,19 +233,19 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                 trans.setName(bootstrapProperty.objectName);
                 registry.registerTransformer(trans);
             }
-            catch (InvocationTargetException itex)
+            catch (InvocationTargetException e)
             {
-                Throwable cause = ExceptionUtils.getCause(itex);
+                Throwable cause = ExceptionUtils.getCause(e);
                 throwExceptionIfNotOptional(cause instanceof NoClassDefFoundError && bootstrapProperty.optional, cause, "Ignoring optional transformer: " + bootstrapProperty.className);
             }
-            catch (NoClassDefFoundError ncdfe)
+            catch (NoClassDefFoundError e)
             {
-                throwExceptionIfNotOptional(bootstrapProperty.optional, ncdfe, "Ignoring optional transformer: " + bootstrapProperty.className);
+                throwExceptionIfNotOptional(bootstrapProperty.optional, e, "Ignoring optional transformer: " + bootstrapProperty.className);
 
             }
-            catch (ClassNotFoundException cnfe)
+            catch (ClassNotFoundException e)
             {
-                throwExceptionIfNotOptional(bootstrapProperty.optional, cnfe, "Ignoring optional transformer: " + bootstrapProperty.className);
+                throwExceptionIfNotOptional(bootstrapProperty.optional, e, "Ignoring optional transformer: " + bootstrapProperty.className);
             }
         }
     }
@@ -300,18 +300,18 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
             }
             registry.registerObject(key, o, meta);
         }
-        catch (InvocationTargetException itex)
+        catch (InvocationTargetException e)
         {
-            Throwable cause = ExceptionUtils.getCause(itex);
+            Throwable cause = ExceptionUtils.getCause(e);
             throwExceptionIfNotOptional(cause instanceof NoClassDefFoundError && optional, cause, "Ignoring optional object: " + className);
         }
-        catch (NoClassDefFoundError ncdfe)
+        catch (NoClassDefFoundError e)
         {
-            throwExceptionIfNotOptional(optional, ncdfe, "Ignoring optional object: " + className);
+            throwExceptionIfNotOptional(optional, e, "Ignoring optional object: " + className);
         }
-        catch (ClassNotFoundException cnfe)
+        catch (ClassNotFoundException e)
         {
-            throwExceptionIfNotOptional(optional, cnfe, "Ignoring optional object: " + className);
+            throwExceptionIfNotOptional(optional, e, "Ignoring optional object: " + className);
         }
     }
 

@@ -6,15 +6,14 @@
  */
 package org.mule.config.bootstrap;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
 /**
- * This interface allows to discover the registry files to be used during the bootstrap process.
+ * Allows to discover properties to be used during the bootstrap process.
  */
-interface RegistryBootstrapDiscoverer
+public interface RegistryBootstrapDiscoverer
 {
 
-    List<Properties> discover() throws IOException;
+    List<Properties> discover() throws Exception;
 }

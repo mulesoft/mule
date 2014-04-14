@@ -43,10 +43,10 @@ public class SimpleRegistryBootstrapTransformerWithCustomKeyTest extends Abstrac
         properties.setProperty("core.transformer.1", String.format("org.mule.config.bootstrap.%s", TRANSFORMER1_CLASS));
         properties.setProperty("custom1", String.format("org.mule.config.bootstrap.%s,name=%s", TRANSFORMER2_CLASS, CUSTOM_TRANSFORMER_NAME));
 
-        SimpleRegistryBootstrap customRegistryBootstrap = new SimpleRegistryBootstrap(new AdHocRegistryBootstrapDiscoverer(properties));
+        SimpleRegistryBootstrap customRegistryBootstrap = new SimpleRegistryBootstrap(new TestRegistryBootstrapDiscoverer(properties));
         customRegistryBootstrap.setMuleContext(muleContext);
 
-        AdHocTransformerResolver transformerResolver = new AdHocTransformerResolver();
+        TestTransformerResolver transformerResolver = new TestTransformerResolver();
         muleContext.getRegistry().registerObject("adhocTransformerResolver", transformerResolver);
 
         customRegistryBootstrap.initialise();
@@ -103,44 +103,45 @@ public class SimpleRegistryBootstrapTransformerWithCustomKeyTest extends Abstrac
         }
     }
 
+    private static class TestRegistryBootstrapDiscoverer implements RegistryBootstrapDiscoverer
+    {
+
+        private final Properties properties;
+
+        public TestRegistryBootstrapDiscoverer(Properties properties)
+        {
+            this.properties = properties;
+        }
+
+        @Override
+        public List<Properties> discover() throws IOException
+        {
+            return Arrays.asList(properties);
+        }
+    }
+
+    private static class TestTransformerResolver implements TransformerResolver
+    {
+
+        private List<Transformer> transformers = new ArrayList<Transformer>();
+
+        @Override
+        public Transformer resolve(DataType<?> source, DataType<?> result) throws ResolverException
+        {
+            return null;
+        }
+
+        @Override
+        public void transformerChange(Transformer transformer, RegistryAction registryAction)
+        {
+            transformers.add(transformer);
+        }
+
+        public List<Transformer> getTransformers()
+        {
+            return transformers;
+        }
+    }
 }
 
-class AdHocRegistryBootstrapDiscoverer implements RegistryBootstrapDiscoverer
-{
 
-    private final Properties properties;
-
-    public AdHocRegistryBootstrapDiscoverer(Properties properties)
-    {
-        this.properties = properties;
-    }
-
-    @Override
-    public List<Properties> discover() throws IOException
-    {
-        return Arrays.asList(properties);
-    }
-}
-
-class AdHocTransformerResolver implements TransformerResolver
-{
-
-    private List<Transformer> transformers = new ArrayList<Transformer>();
-
-    @Override
-    public Transformer resolve(DataType<?> source, DataType<?> result) throws ResolverException
-    {
-        return null;
-    }
-
-    @Override
-    public void transformerChange(Transformer transformer, RegistryAction registryAction)
-    {
-        transformers.add(transformer);
-    }
-
-    public List<Transformer> getTransformers()
-    {
-        return transformers;
-    }
-}
