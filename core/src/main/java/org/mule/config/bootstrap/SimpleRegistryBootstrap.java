@@ -30,14 +30,14 @@ import org.mule.util.OrderedProperties;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.UUID;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -81,9 +81,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 {
-    public static final String SERVICE_PATH = "META-INF/services/org/mule/config/";
-
-    public static final String REGISTRY_PROPERTIES = "registry-bootstrap.properties";
 
     public String TRANSFORMER_KEY = ".transformer.";
     public String OBJECT_KEY = ".object.";
@@ -92,6 +89,18 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
     protected final transient Log logger = LogFactory.getLog(getClass());
 
     protected MuleContext context;
+
+    private final RegistryBoostrapDiscoverer discoverer;
+
+    public SimpleRegistryBootstrap()
+    {
+        this(new DefaultRegisrtyBoostrapDiscoverer());
+    }
+
+    public SimpleRegistryBootstrap(RegistryBoostrapDiscoverer discoverer)
+    {
+        this.discoverer = discoverer;
+    }
 
     /** {@inheritDoc} */
     public void setMuleContext(MuleContext context)
@@ -102,63 +111,52 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
     /** {@inheritDoc} */
     public void initialise() throws InitialisationException
     {
-        Enumeration<?> e = ClassUtils.getResources(SERVICE_PATH + REGISTRY_PROPERTIES, getClass());
-        List<Properties> bootstraps = new LinkedList<Properties>();
-
-        // load ALL of the bootstrap files first
-        while (e.hasMoreElements())
+        List<Properties> bootstraps;
+        try
         {
-            try
-            {
-                URL url = (URL) e.nextElement();
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Reading bootstrap file: " + url.toString());
-                }
-                Properties p = new OrderedProperties();
-                p.load(url.openStream());
-                bootstraps.add(p);
-            }
-            catch (Exception e1)
-            {
-                throw new InitialisationException(e1, this);
-            }
+            bootstraps = discoverer.discover();
+        }
+        catch (Exception e1)
+        {
+            throw new InitialisationException(e1, this);
         }
 
         // ... and only then merge and process them
         int objectCounter = 1;
         int transformerCounter = 1;
-        Properties transformers = new OrderedProperties();
-        Properties namedObjects = new OrderedProperties();
-        Properties unnamedObjects = new OrderedProperties();
-        Map<String,String> singleTransactionFactories = new LinkedHashMap<String,String>();
+        List<ParsedProperty> transformers = new ArrayList<ParsedProperty>();
+        List<ParsedProperty> namedObjects = new ArrayList<ParsedProperty>();
+        List<ParsedProperty> unnamedObjects = new ArrayList<ParsedProperty>();
+        List<ParsedProperty> singleTransactionFactories = new ArrayList<ParsedProperty>();
 
         for (Properties bootstrap : bootstraps)
         {
             for (Map.Entry entry : bootstrap.entrySet())
             {
-                final String key = (String) entry.getKey();
-                if (key.contains(OBJECT_KEY))
+                final ParsedProperty pp = parsePropertyEntry((String) entry.getKey(), (String) entry.getValue());
+                if (pp.keyContains(OBJECT_KEY))
                 {
-                    String newKey = key.substring(0, key.lastIndexOf(".")) + objectCounter++;
-                    unnamedObjects.put(newKey, entry.getValue());
+                    pp.disambiguateKey(objectCounter++);
+                    unnamedObjects.add(pp);
                 }
-                else if (key.contains(TRANSFORMER_KEY))
+                else if (pp.keyContains(TRANSFORMER_KEY) || pp.isOfType(Transformer.class))
                 {
-                    String newKey = key.substring(0, key.lastIndexOf(".")) + transformerCounter++;
-                    transformers.put(newKey, entry.getValue());
+                    if(pp.keyContains(TRANSFORMER_KEY) ){
+                        pp.disambiguateKey(transformerCounter++);
+                    }
+                    transformers.add(pp);
                 }
-                else if (key.contains(SINGLE_TX))
+                else if (pp.keyContains(SINGLE_TX))
                 {
-                    if (!key.contains(".transaction.resource"))
+                    if (!pp.keyContains(".transaction.resource"))
                     {
-                        String transactionResourceKey = key.replace(".transaction.factory",".transaction.resource");
+                        String transactionResourceKey = pp.key.replace(".transaction.factory",".transaction.resource");
                         String transactionResource = bootstrap.getProperty(transactionResourceKey);
                         if (transactionResource == null)
                         {
-                            throw new InitialisationException(CoreMessages.createStaticMessage(String.format("Theres no transaction resource specified for transaction factory %s",key)),this);
+                            throw new InitialisationException(CoreMessages.createStaticMessage(String.format("Theres no transaction resource specified for transaction factory %s", pp.key)),this);
                         }
-                        singleTransactionFactories.put((String) entry.getValue(),transactionResource);
+                        singleTransactionFactories.add(parsePropertyEntry(pp.className, transactionResource));
                     }
                 }
                 else
@@ -172,7 +170,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 //                    }
 //                    else
                     {
-                        namedObjects.put(key, entry.getValue());
+                        namedObjects.add(pp);
                     }
                 }
             }
@@ -192,121 +190,71 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         }
     }
 
-    private void registerTransactionFactories(Map<String, String> singleTransactionFactories, MuleContext context) throws Exception
+    private void registerTransactionFactories(List<ParsedProperty> singleTransactionFactories, MuleContext context) throws Exception
     {
-        for (Entry<String, String> entry : singleTransactionFactories.entrySet())
+        for (ParsedProperty pp : singleTransactionFactories)
         {
-            String transactionResourceClassNameProperties = entry.getValue();
-            String transactionFactoryClassName = entry.getKey();
-            boolean optional = false;
-            // reset
-            int x = transactionResourceClassNameProperties.indexOf(",");
-            if (x > -1)
-            {
-                Properties p = PropertiesUtils.getPropertiesFromString(transactionResourceClassNameProperties.substring(x + 1), ',');
-                optional = p.containsKey("optional");
-            }
-            final String transactionResourceClassName = (x == -1 ? transactionResourceClassNameProperties : transactionResourceClassNameProperties.substring(0, x));
             try
             {
-                context.getTransactionFactoryManager().registerTransactionFactory(Class.forName(transactionResourceClassName), (TransactionFactory) Class.forName(transactionFactoryClassName).newInstance());
+                context.getTransactionFactoryManager().registerTransactionFactory(Class.forName(pp.className), (TransactionFactory) Class.forName(pp.key).newInstance());
 
             }
             catch (NoClassDefFoundError ncdfe)
             {
-                throwExceptionIfNotOptional(optional,ncdfe,"Ignoring optional transaction factory: " + transactionResourceClassName);
+                throwExceptionIfNotOptional(pp.optional,ncdfe,"Ignoring optional transaction factory: " + pp.className);
             }
             catch (ClassNotFoundException cnfe)
             {
-                throwExceptionIfNotOptional(optional,cnfe,"Ignoring optional transaction factory: " + transactionResourceClassName);
+                throwExceptionIfNotOptional(pp.optional,cnfe,"Ignoring optional transaction factory: " + pp.className);
             }
             
         }
     }
 
-    private void registerTransformers(Properties props, MuleRegistry registry) throws Exception
+    private void registerTransformers(List<ParsedProperty> props, MuleRegistry registry) throws Exception
     {
-        String transString;
-        String name = null;
-        String returnClassString;
-        boolean optional = false;
-
-        for (Map.Entry<Object, Object> entry : props.entrySet())
+        for (ParsedProperty pp : props)
         {
-            transString = (String)entry.getValue();
-            // reset
             Class<?> returnClass = null;
-            returnClassString = null;
-            int x = transString.indexOf(",");
-            if (x > -1)
-            {
-                Properties p = PropertiesUtils.getPropertiesFromString(transString.substring(x + 1), ',');
-                name = p.getProperty("name", null);
-                returnClassString = p.getProperty("returnClass", null);
-                optional = p.containsKey("optional");
-            }
-
-            final String transClass = (x == -1 ? transString : transString.substring(0, x));
             try
             {
-                String mime = null;
-                if (returnClassString != null)
+                if (pp.returnClassName != null)
                 {
-                    int i = returnClassString.indexOf(":");
-                    if(i > -1)
-                    {
-                        mime = returnClassString.substring(i + 1);
-                        returnClassString = returnClassString.substring(0, i);
-                    }
-                    if (returnClassString.equals("byte[]"))
-                    {
-                        returnClass = byte[].class;
-                    }
-                    else
-                    {
-                        returnClass = ClassUtils.loadClass(returnClassString, getClass());
-                    }
+                    returnClass = pp.returnClassName.equals("byte[]") ? byte[].class : ClassUtils.loadClass(pp.returnClassName, getClass());
                 }
-                Transformer trans = (Transformer) ClassUtils.instanciateClass(transClass);
+                Transformer trans = (Transformer) ClassUtils.instanciateClass(pp.className);
                 if (!(trans instanceof DiscoverableTransformer))
                 {
                     throw new RegistrationException(CoreMessages.transformerNotImplementDiscoverable(trans));
                 }
                 if (returnClass != null)
                 {
-                    trans.setReturnDataType(DataTypeFactory.create(returnClass, mime));
+                    trans.setReturnDataType(DataTypeFactory.create(returnClass, pp.mime));
                 }
-                if (name != null)
+                if (pp.objectName == null)
                 {
-                    trans.setName(name);
-                }
-                else
-                {
-                    //This will generate a default name for the transformer
-                    name = trans.getName();
-                    //We then prefix the name to ensure there is less chance of conflict if the user registers
+                    // This will generate a default name for the transformer
+                    // We then prefix the name to ensure there is less chance of conflict if the user registers
                     // the transformer with the same name
-                    trans.setName("_" + name);
+                    pp.objectName = "_" + trans.getName();
                 }
+                trans.setName(pp.objectName);
                 registry.registerTransformer(trans);
             }
             catch (InvocationTargetException itex)
             {
                 Throwable cause = ExceptionUtils.getCause(itex);
-                throwExceptionIfNotOptional(cause instanceof NoClassDefFoundError && optional, cause, "Ignoring optional transformer: " + transClass);
+                throwExceptionIfNotOptional(cause instanceof NoClassDefFoundError && pp.optional, cause, "Ignoring optional transformer: " + pp.className);
             }
             catch (NoClassDefFoundError ncdfe)
             {
-                throwExceptionIfNotOptional( optional, ncdfe, "Ignoring optional transformer: " + transClass);
+                throwExceptionIfNotOptional( pp.optional, ncdfe, "Ignoring optional transformer: " + pp.className);
 
             }
             catch (ClassNotFoundException cnfe)
             {
-                throwExceptionIfNotOptional( optional, cnfe, "Ignoring optional transformer: " + transClass);
+                throwExceptionIfNotOptional( pp.optional, cnfe, "Ignoring optional transformer: " + pp.className);
             }
-
-            name = null;
-            returnClass = null;
         }
     }
 
@@ -319,43 +267,30 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         }
     }
 
-    private void registerObjects(Properties props, Registry registry) throws Exception
+    private void registerObjects(List<ParsedProperty> props, Registry registry) throws Exception
     {
-        for (Map.Entry<Object, Object> entry : props.entrySet())
+        for (ParsedProperty pp : props)
         {
-            registerObject((String)entry.getKey(), (String)entry.getValue(), registry);
+            registerObject(pp.key, pp.className, pp.optional, registry);
         }
         props.clear();
     }
 
-    private void registerUnnamedObjects(Properties props, Registry registry) throws Exception
+    private void registerUnnamedObjects(List<ParsedProperty> props, Registry registry) throws Exception
     {
-        for (Map.Entry<Object, Object> entry : props.entrySet())
+        for (ParsedProperty pp : props)
         {
-            final String key = String.format("%s#%s", entry.getKey(), UUID.getUUID());
-            registerObject(key, (String) entry.getValue(), registry);
+            final String key = String.format("%s#%s", pp.key, UUID.getUUID());
+            registerObject(key, pp.className, pp.optional, registry);
         }
         props.clear();
     }
 
-    private void registerObject(String key, String value, Registry registry) throws Exception
+    private void registerObject(String key, String className, boolean optional, Registry registry) throws Exception
     {
-        boolean optional = false;
-        String className = null;
 
         try
         {
-            int x = value.indexOf(",");
-            if (x > -1)
-            {
-                Properties p = PropertiesUtils.getPropertiesFromString(value.substring(x + 1), ',');
-                optional = p.containsKey("optional");
-                className = value.substring(0, x);
-            }
-            else
-            {
-                className = value;
-            }
             Object o = ClassUtils.instanciateClass(className);
             Class<?> meta = Object.class;
 
@@ -388,7 +323,78 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         }
     }
 
-    private void throwExceptionIfNotOptional(boolean optional, Throwable t, String message) throws Exception 
+    private class ParsedProperty
+    {
+        String key;
+        String className;
+        boolean optional;
+        public String objectName;
+        public String returnClassName;
+        private Class<?> classObject;
+        public String mime;
+
+        public boolean isOfType(Class<?> parentClass)
+        {
+            if(classObject==null)
+            {
+                try
+                {
+                    classObject = ClassUtils.getClass(className);
+                }
+                catch (ClassNotFoundException e)
+                {
+                    return false;
+                }
+            }
+            return parentClass.isAssignableFrom(classObject);
+        }
+
+        public boolean keyContains(String text)
+        {
+            return key!=null && key.contains(text);
+        }
+
+        public void disambiguateKey(int counter)
+        {
+            int lastPointPosition = key.lastIndexOf(".");
+            if(lastPointPosition > -1){
+                key = key.substring(0, lastPointPosition) + counter;
+            }
+        }
+    }
+
+    private ParsedProperty parsePropertyEntry(String propertyName, String propertyValue)
+    {
+        ParsedProperty pp = new ParsedProperty();
+        pp.key = propertyName;
+        pp.className = propertyValue;
+
+        int x = propertyValue.indexOf(",");
+        if (x > -1)
+        {
+            pp.className = propertyValue.substring(0, x);
+
+            Properties p = PropertiesUtils.getPropertiesFromString(propertyValue.substring(x + 1), ',');
+            pp.optional = p.containsKey("optional");
+            pp.objectName = p.getProperty("name", null);
+            pp.returnClassName = p.getProperty("returnClass", null);
+
+            pp.mime = null;
+            if (pp.returnClassName != null)
+            {
+                int i = pp.returnClassName.indexOf(":");
+                if(i > -1)
+                {
+                    pp.mime = pp.returnClassName.substring(i + 1);
+                    pp.returnClassName = pp.returnClassName.substring(0, i);
+                }
+            }
+
+        }
+        return pp;
+    }
+
+    private void throwExceptionIfNotOptional(boolean optional, Throwable t, String message) throws Exception
     {
         if (optional)
         {
@@ -405,5 +411,42 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         {
             throw new Exception(t);
         }
+    }
+}
+
+interface RegistryBoostrapDiscoverer
+{
+
+    List<Properties> discover() throws IOException;
+}
+
+class DefaultRegisrtyBoostrapDiscoverer implements RegistryBoostrapDiscoverer
+{
+
+    public static final String SERVICE_PATH = "META-INF/services/org/mule/config/";
+
+    public static final String REGISTRY_PROPERTIES = "registry-bootstrap.properties";
+
+    protected final transient Log logger = LogFactory.getLog(getClass());
+
+    @Override
+    public List<Properties> discover() throws IOException
+    {
+        Enumeration<?> e = ClassUtils.getResources(SERVICE_PATH + REGISTRY_PROPERTIES, getClass());
+        List<Properties> bootstraps = new LinkedList<Properties>();
+
+        // load ALL of the bootstrap files first
+        while (e.hasMoreElements())
+        {
+            URL url = (URL) e.nextElement();
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Reading bootstrap file: " + url.toString());
+            }
+            Properties p = new OrderedProperties();
+            p.load(url.openStream());
+            bootstraps.add(p);
+        }
+        return bootstraps;
     }
 }
