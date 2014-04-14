@@ -74,7 +74,7 @@
     </flow>
 
     <flow name="synchronous">
-        <until-successful synchronous="true">
+        <until-successful synchronous="true" secondsBetweenRetries="1">
             <test:component throwException="true"/>
         </until-successful>
     </flow>
@@ -89,6 +89,15 @@
         <rollback-exception-strategy>
             <test:invocation-counter name="exceptionStrategy"/>
         </rollback-exception-strategy>
+    </flow>
+
+    <flow name="measureSynchronousWait">
+        <until-successful maxRetries="1" secondsBetweenRetries="1" synchronous="true">
+            <processor-chain>
+                <custom-processor class="org.mule.test.routing.UntilSuccessfulTestCase$WaitMeasure" />
+                <test:component throwException="true"/>
+            </processor-chain>
+        </until-successful>
     </flow>
 
     <flow name="asynchronous-using-threading-profile">

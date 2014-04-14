@@ -146,6 +146,24 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
         }
     }
 
+    /**
+     * Verifies that the synchronous wait time is consistent with that requested
+     */
+    @Test
+    public void measureSynchronousWait() throws Exception {
+        final String payload = RandomStringUtils.randomAlphanumeric(20);
+        Flow flow = (Flow) getFlowConstruct("measureSynchronousWait");
+        try
+        {
+            flow.process(getTestEvent(payload));
+            fail("Exception should be thrown");
+        }
+        catch (Exception e)
+        {
+            assertThat(WaitMeasure.totalWait >= 1000, is(true));
+        }
+    }
+
     @Test
     public void executeAsynchronouslyDoingRetries() throws Exception
     {
@@ -247,6 +265,24 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
         {
             count++;
             return null;
+        }
+    }
+
+    static class WaitMeasure implements MessageProcessor {
+
+        public static long totalWait;
+        private long firstAttemptTime = 0;
+
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            if (firstAttemptTime == 0) {
+                firstAttemptTime = System.currentTimeMillis();
+            } else {
+                totalWait = System.currentTimeMillis() - firstAttemptTime;
+            }
+
+            return event;
         }
     }
 }
