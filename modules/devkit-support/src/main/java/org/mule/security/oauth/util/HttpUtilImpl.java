@@ -69,7 +69,18 @@ public class HttpUtilImpl implements HttpUtil
             OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
             out.write(body);
             out.close();
-            return IOUtils.toString(conn.getInputStream());
+            String response = "";
+
+            if (conn.getResponseCode() == 200) {
+                response = IOUtils.toString(conn.getInputStream());
+            } else {
+                response = IOUtils.toString(conn.getErrorStream());
+            }
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(String.format("Received [%d] for body [%s]", conn.getResponseCode(), response));
+            }
+            return response;
         }
         catch (IOException e)
         {
