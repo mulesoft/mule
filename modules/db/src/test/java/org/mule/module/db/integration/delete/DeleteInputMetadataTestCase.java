@@ -15,7 +15,7 @@ import org.mule.common.metadata.MetaData;
 import org.mule.construct.Flow;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
-import org.mule.module.db.processor.AbstractSingleQueryDbMessageProcessor;
+import org.mule.module.db.internal.processor.AbstractSingleQueryDbMessageProcessor;
 
 import java.util.List;
 

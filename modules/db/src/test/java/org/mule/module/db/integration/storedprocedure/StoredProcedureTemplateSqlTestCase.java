@@ -9,10 +9,10 @@ package org.mule.module.db.integration.storedprocedure;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import org.mule.module.db.domain.param.InputQueryParam;
-import org.mule.module.db.domain.query.QueryTemplate;
-import org.mule.module.db.domain.query.QueryType;
-import org.mule.module.db.domain.type.UnknownDbType;
+import org.mule.module.db.internal.domain.param.InputQueryParam;
+import org.mule.module.db.internal.domain.query.QueryTemplate;
+import org.mule.module.db.internal.domain.query.QueryType;
+import org.mule.module.db.internal.domain.type.UnknownDbType;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;

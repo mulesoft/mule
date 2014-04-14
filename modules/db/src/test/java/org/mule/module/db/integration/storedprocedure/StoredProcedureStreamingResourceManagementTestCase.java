@@ -21,7 +21,7 @@ import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.matcher.SupportsStoredFunctionsUsingCallSyntax;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
-import org.mule.module.db.result.resultset.ResultSetIterator;
+import org.mule.module.db.internal.result.resultset.ResultSetIterator;
 import org.mule.transport.NullPayload;
 
 import java.util.List;

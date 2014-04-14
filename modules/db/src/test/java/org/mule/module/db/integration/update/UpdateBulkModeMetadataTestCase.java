@@ -19,7 +19,7 @@ import org.mule.construct.Flow;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
-import org.mule.module.db.processor.AbstractDbMessageProcessor;
+import org.mule.module.db.internal.processor.AbstractDbMessageProcessor;
 
 import java.util.List;
 
