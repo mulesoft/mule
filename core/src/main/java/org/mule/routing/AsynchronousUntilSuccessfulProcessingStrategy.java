@@ -156,7 +156,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
                 }
                 return null;
             }
-        }, firstTime ? 0 : getUntilSuccessfulConfiguration().getSecondsBetweenRetries(), TimeUnit.SECONDS);
+        }, firstTime ? 0 : getUntilSuccessfulConfiguration().getMillisBetweenRetries(), TimeUnit.MILLISECONDS);
     }
 
     private void incrementProcessAttemptCountAndRescheduleOrRemoveFromStore(final Serializable eventStoreKey) throws Exception

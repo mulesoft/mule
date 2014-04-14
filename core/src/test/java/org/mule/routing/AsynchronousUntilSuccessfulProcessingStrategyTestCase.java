@@ -168,8 +168,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
             @Override
             public Object answer(final InvocationOnMock invocationOnMock) throws Throwable
             {
-                assertThat((Long) invocationOnMock.getArguments()[1], is(mockUntilSuccessfulConfiguration.getSecondsBetweenRetries()));
-                assertThat((TimeUnit) invocationOnMock.getArguments()[2], is(TimeUnit.SECONDS));
+                assertThat((Long) invocationOnMock.getArguments()[1], is(mockUntilSuccessfulConfiguration.getMillisBetweenRetries()));
+                assertThat((TimeUnit) invocationOnMock.getArguments()[2], is(TimeUnit.MILLISECONDS));
                 new Thread(new Runnable()
                 {
                     @Override

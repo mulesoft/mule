@@ -56,9 +56,9 @@ public interface UntilSuccessfulConfiguration
     String getAckExpression();
 
     /**
-     * @return the number of seconds between retries. Default value is 60.
+     * @return the number of milliseconds between retries. Default value is 60000.
      */
-    long getSecondsBetweenRetries();
+    long getMillisBetweenRetries();
 
     /**
      * @return the number of retries to process the route when failing. Default value is 5.
