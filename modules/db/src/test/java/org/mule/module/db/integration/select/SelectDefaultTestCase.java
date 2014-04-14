@@ -8,12 +8,12 @@
 package org.mule.module.db.integration.select;
 
 import static org.mule.module.db.integration.TestRecordUtil.assertMessageContains;
-import static org.mule.module.db.integration.TestRecordUtil.getAllRecords;
+import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
 
@@ -48,7 +48,7 @@ public class SelectDefaultTestCase extends AbstractDbIntegrationTestCase
         client.dispatch("vm://testOneWay", TEST_MESSAGE, null);
         MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
 
-        assertMessageContains(response, getAllRecords());
+        assertMessageContains(response, getAllPlanetRecords());
     }
 
     @Test
@@ -58,6 +58,6 @@ public class SelectDefaultTestCase extends AbstractDbIntegrationTestCase
 
         MuleMessage response = client.send("vm://testRequestResponse", TEST_MESSAGE, null);
 
-        assertMessageContains(response, getAllRecords());
+        assertMessageContains(response, getAllPlanetRecords());
     }
 }

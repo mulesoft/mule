@@ -8,7 +8,7 @@
 package org.mule.module.db.integration.update;
 
 import static org.mule.module.db.integration.TestRecordUtil.assertMessageContains;
-import static org.mule.module.db.integration.TestRecordUtil.getAllRecords;
+import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
@@ -45,7 +45,7 @@ public class UpdateBulkTargetTestCase extends AbstractUpdateBulkTestCase
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://updateBulkCustomTarget", TEST_MESSAGE, null);
 
-        assertMessageContains(response, getAllRecords());
+        assertMessageContains(response, getAllPlanetRecords());
         assertBulkModeResult(response.getInboundProperty("updateCounts"));
     }
 }

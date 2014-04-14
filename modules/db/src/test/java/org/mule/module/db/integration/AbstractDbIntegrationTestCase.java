@@ -81,7 +81,7 @@ public abstract class AbstractDbIntegrationTestCase extends FunctionalTestCase
 
     protected abstract String[] getFlowConfigurationResources();
 
-    protected void assertRecordsFromQuery(String... names) throws SQLException
+    protected void assertPlanetRecordsFromQuery(String... names) throws SQLException
     {
         if (names.length == 0)
         {
@@ -106,7 +106,7 @@ public abstract class AbstractDbIntegrationTestCase extends FunctionalTestCase
         assertRecords(result, records.toArray(new Record[0]));
     }
 
-    protected void assertDeleteRecords(String... names) throws SQLException
+    protected void assertDeletedPlanetRecords(String... names) throws SQLException
     {
         if (names.length == 0)
         {
@@ -127,4 +127,5 @@ public abstract class AbstractDbIntegrationTestCase extends FunctionalTestCase
         List<Map<String, String>> result = selectData(String.format("select * from PLANET where name in (%s)", conditionBuilder.toString()), getDefaultDataSource());
         assertThat(result.size(), equalTo(0));
     }
+
 }

@@ -53,6 +53,6 @@ public class InsertParameterizedQueryTestCase extends AbstractDbIntegrationTestC
     {
         assertEquals(1, response.getPayload());
 
-        assertRecordsFromQuery("Pluto");
+        assertPlanetRecordsFromQuery("Pluto");
     }
 }

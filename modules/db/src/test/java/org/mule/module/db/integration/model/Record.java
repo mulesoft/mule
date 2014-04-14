@@ -26,7 +26,14 @@ public class Record
     {
         for (String name : fields.keySet())
         {
-            this.fields.add(new Field(name, fields.get(name)));
+            if ("DESCRIPTION".equalsIgnoreCase(name))
+            {
+                this.fields.add(new XmlField(name, fields.get(name)));
+            }
+            else
+            {
+                this.fields.add(new Field(name, fields.get(name)));
+            }
         }
     }
 

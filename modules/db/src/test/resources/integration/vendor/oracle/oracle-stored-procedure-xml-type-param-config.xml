@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <flow name="xmlTypeOutputParam">
+        <inbound-endpoint address="vm://xmlTypeOutputParam" exchange-pattern="request-response"/>
+
+        <db:stored-procedure config-ref="dbConfig">
+            <db:parameterized-query>{ call getAlienDescription(:name,  :description) }</db:parameterized-query>
+            <db:in-param name="name" value="#[payload]" type="VARCHAR"/>
+            <db:out-param name="description" type="XMLTYPE"/>
+        </db:stored-procedure>
+    </flow>
+
+    <flow name="xmlTypeInputParam">
+        <inbound-endpoint address="vm://xmlTypeInputParam" exchange-pattern="request-response"/>
+
+        <db:stored-procedure config-ref="dbConfig">
+            <db:parameterized-query>{ call updateAlienDescription(:name, :description) }</db:parameterized-query>
+            <db:in-param name="name" value="#[header:INBOUND:name]" type="VARCHAR"/>
+            <db:in-param name="description" value="#[header:INBOUND:description]" type="XMLTYPE"/>
+        </db:stored-procedure>
+    </flow>
+</mule>

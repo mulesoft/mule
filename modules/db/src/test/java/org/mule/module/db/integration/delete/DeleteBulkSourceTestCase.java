@@ -60,6 +60,6 @@ public class DeleteBulkSourceTestCase extends AbstractDbIntegrationTestCase
         assertExpectedUpdateCount(1, counters[0]);
         assertExpectedUpdateCount(1, counters[1]);
 
-        assertDeleteRecords("Pluto", "Venus");
+        assertDeletedPlanetRecords("Pluto", "Venus");
     }
 }

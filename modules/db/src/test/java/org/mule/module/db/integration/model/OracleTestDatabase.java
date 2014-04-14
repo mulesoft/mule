@@ -19,7 +19,7 @@ public class OracleTestDatabase extends AbstractTestDatabase
 {
 
     @Override
-    public void createDefaultTestTable(Connection connection) throws SQLException
+    public void createPlanetTable(Connection connection) throws SQLException
     {
         executeDdl(connection, "CREATE TABLE PLANET(ID INTEGER NOT NULL PRIMARY KEY,POSITION SMALLINT, NAME VARCHAR(255))");
 
@@ -181,5 +181,53 @@ public class OracleTestDatabase extends AbstractTestDatabase
     public DataType getPositionFieldOutputMetaDataType()
     {
         return DataType.DECIMAL;
+    }
+
+    @Override
+    protected void createAlienTable(Connection connection) throws SQLException
+    {
+        String ddl = "CREATE TABLE ALIEN(\n" +
+                     "  NAME varchar2(255),\n" +
+                     "  DESCRIPTION XMLTYPE)";
+        executeDdl(connection, ddl);
+    }
+
+    @Override
+    protected String getInsertAlienSql(Alien alien)
+    {
+        String sql = "INSERT INTO Alien VALUES ('" + alien.getName()  + "' , XMLType('" +
+                     alien.getXml()+ "'))";
+
+        return sql;
+    }
+
+    @Override
+    public void createStoredProcedureGetAlienDescription(DataSource dataSource) throws SQLException
+    {
+        final String sql = "CREATE OR REPLACE PROCEDURE getAlienDescription(pName IN VARCHAR2, pDescription OUT XMLType)\n" +
+                     "IS\n" +
+                     "BEGIN\n" +
+                     "    select description into pDescription from Alien where name= pName; \n" +
+                     "END;\n";
+
+        executeDdl(dataSource, sql);
+    }
+
+    @Override
+    protected boolean supportsXmlType()
+    {
+        return true;
+    }
+
+    @Override
+    public void createStoredProcedureUpdateAlienDescription(DataSource dataSource) throws SQLException
+    {
+        final String sql = "CREATE OR REPLACE PROCEDURE updateAlienDescription(pName IN VARCHAR2, pDescription in XMLType)\n" +
+                           "IS\n" +
+                           "BEGIN\n" +
+                           "    update Alien set description = pDescription where name= pName; \n" +
+                           "END;\n";
+
+        executeDdl(dataSource, sql);
     }
 }

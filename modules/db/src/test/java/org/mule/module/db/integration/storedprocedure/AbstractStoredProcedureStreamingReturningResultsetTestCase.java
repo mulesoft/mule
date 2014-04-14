@@ -10,7 +10,7 @@ package org.mule.module.db.integration.storedprocedure;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.db.integration.TestRecordUtil.assertMessageContains;
-import static org.mule.module.db.integration.TestRecordUtil.getAllRecords;
+import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
 import static org.mule.module.db.integration.model.Planet.EARTH;
 import static org.mule.module.db.integration.model.Planet.MARS;
 import static org.mule.module.db.integration.model.Planet.VENUS;
@@ -60,7 +60,7 @@ public abstract class AbstractStoredProcedureStreamingReturningResultsetTestCase
 
         MuleMessage response = client.send("vm://testRequestResponse", TEST_MESSAGE, null);
 
-        assertMessageContains(response, getAllRecords());
+        assertMessageContains(response, getAllPlanetRecords());
     }
 
     @Before

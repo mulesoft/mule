@@ -43,7 +43,18 @@ public class Field
 
         Field field = (Field) o;
 
-        return name.equals(field.name) && !(value != null ? !value.toString().equals(field.value.toString()) : field.value != null);
+        return name.equals(field.name) && !(value != null ? !checkEqualValues(field) : field.value != null);
+    }
+
+    /**
+     * Lets subclasses to determine when another field has the same value
+     *
+     * @param field field to compare against to
+     * @return true if current field has the same value than the given one, false otherwise
+     */
+    protected boolean checkEqualValues(Field field)
+    {
+        return value.toString().equals(field.value.toString());
     }
 
     @Override
