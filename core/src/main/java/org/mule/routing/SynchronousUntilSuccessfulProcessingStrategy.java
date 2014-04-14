@@ -13,6 +13,8 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.CoreMessages;
 
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -47,7 +49,7 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
                     lastExecutionException = e;
                     if (i < getUntilSuccessfulConfiguration().getMaxRetries())
                     {
-                        Thread.sleep(getUntilSuccessfulConfiguration().getSecondsBetweenRetries());
+                        Thread.sleep(TimeUnit.SECONDS.toMillis(getUntilSuccessfulConfiguration().getSecondsBetweenRetries()));
                     }
                 }
             }
