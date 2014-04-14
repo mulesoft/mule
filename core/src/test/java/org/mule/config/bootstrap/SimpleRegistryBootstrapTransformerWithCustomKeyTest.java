@@ -6,7 +6,8 @@
  */
 package org.mule.config.bootstrap;
 
-import org.mule.api.MuleContext;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.ResolverException;
@@ -24,58 +25,39 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import junit.framework.Assert;
 import org.junit.Test;
 
 public class SimpleRegistryBootstrapTransformerWithCustomKeyTest extends AbstractMuleContextTestCase
 {
-    @Override
-    protected MuleContext createMuleContext() throws Exception
-    {
-        return null;
-    }
+
+    public static final String CUSTOM_TRANSFORMER_NAME = "MyCustomTransformer";
+    public static final String TRANSFORMER1_CLASS = "SimpleRegistryBootstrapTransformerWithCustomKeyTest$MyTransformer1";
+    public static final String TRANSFORMER2_CLASS = "SimpleRegistryBootstrapTransformerWithCustomKeyTest$MyTransformer2";
 
     @Test
     public void testTransformersWithCustomKeyRegistration() throws InitialisationException, RegistrationException
     {
         Map<String, Transformer> previousTransformers = muleContext.getRegistry().lookupByType(Transformer.class);
 
-        SimpleRegistryBootstrap customRegistryBootstrap = new SimpleRegistryBootstrap(new RegistryBoostrapDiscoverer()
-        {
-            @Override
-            public List<Properties> discover() throws IOException
-            {
-                Properties properties = new Properties();
-                properties.setProperty("core.transformer.1", "org.mule.config.bootstrap.SimpleRegistryBootstrapTransformerWithCustomKeyTest$MyTransformer1");
-                properties.setProperty("custom1", "org.mule.config.bootstrap.SimpleRegistryBootstrapTransformerWithCustomKeyTest$MyTransformer2,name=MyCustomTransformer");
-                return Arrays.asList(properties);
-            }
-        });
-        customRegistryBootstrap.setMuleContext(muleContext);
-        final List<Transformer> transformers = new ArrayList<Transformer>();
-        muleContext.getRegistry().registerObject("aaa", new TransformerResolver()
-        {
-            @Override
-            public Transformer resolve(DataType<?> source, DataType<?> result) throws ResolverException
-            {
-                return null;
-            }
+        Properties properties = new Properties();
+        properties.setProperty("core.transformer.1", String.format("org.mule.config.bootstrap.%s", TRANSFORMER1_CLASS));
+        properties.setProperty("custom1", String.format("org.mule.config.bootstrap.%s,name=%s", TRANSFORMER2_CLASS, CUSTOM_TRANSFORMER_NAME));
 
-            @Override
-            public void transformerChange(Transformer transformer, RegistryAction registryAction)
-            {
-                transformers.add(transformer);
-            }
-        });
+        SimpleRegistryBootstrap customRegistryBootstrap = new SimpleRegistryBootstrap(new AdHocRegistryBootstrapDiscoverer(properties));
+        customRegistryBootstrap.setMuleContext(muleContext);
+
+        AdHocTransformerResolver transformerResolver = new AdHocTransformerResolver();
+        muleContext.getRegistry().registerObject("adhocTransformerResolver", transformerResolver);
+
         customRegistryBootstrap.initialise();
 
-        transformers.removeAll(previousTransformers.values());
+        transformerResolver.getTransformers().removeAll(previousTransformers.values());
 
-        Assert.assertEquals(2, transformers.size());
+        assertEquals(2, transformerResolver.getTransformers().size());
 
-        Assert.assertTrue(findByName(transformers, "MyCustomTransformer") instanceof MyTransformer2);
+        assertTrue(findByName(transformerResolver.getTransformers(), CUSTOM_TRANSFORMER_NAME) instanceof MyTransformer2);
 
-        Assert.assertTrue(findByName(transformers, "_SimpleRegistryBootstrapTransformerWithCustomKeyTest$MyTransformer1") instanceof MyTransformer1);
+        assertTrue(findByName(transformerResolver.getTransformers(), "_" + TRANSFORMER1_CLASS) instanceof MyTransformer1);
 
     }
 
@@ -83,7 +65,7 @@ public class SimpleRegistryBootstrapTransformerWithCustomKeyTest extends Abstrac
     {
         for (Transformer t : transformers)
         {
-            if(name.equals(t.getName()))
+            if (name.equals(t.getName()))
             {
                 return t;
             }
@@ -93,6 +75,7 @@ public class SimpleRegistryBootstrapTransformerWithCustomKeyTest extends Abstrac
 
     public static class MyTransformer1 extends AbstractDiscoverableTransformer
     {
+
         public MyTransformer1()
         {
             super();
@@ -122,3 +105,42 @@ public class SimpleRegistryBootstrapTransformerWithCustomKeyTest extends Abstrac
 
 }
 
+class AdHocRegistryBootstrapDiscoverer implements RegistryBootstrapDiscoverer
+{
+
+    private final Properties properties;
+
+    public AdHocRegistryBootstrapDiscoverer(Properties properties)
+    {
+        this.properties = properties;
+    }
+
+    @Override
+    public List<Properties> discover() throws IOException
+    {
+        return Arrays.asList(properties);
+    }
+}
+
+class AdHocTransformerResolver implements TransformerResolver
+{
+
+    private List<Transformer> transformers = new ArrayList<Transformer>();
+
+    @Override
+    public Transformer resolve(DataType<?> source, DataType<?> result) throws ResolverException
+    {
+        return null;
+    }
+
+    @Override
+    public void transformerChange(Transformer transformer, RegistryAction registryAction)
+    {
+        transformers.add(transformer);
+    }
+
+    public List<Transformer> getTransformers()
+    {
+        return transformers;
+    }
+}
