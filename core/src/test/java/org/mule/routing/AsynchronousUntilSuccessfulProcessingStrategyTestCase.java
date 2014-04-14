@@ -77,7 +77,6 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
         });
         when(mockUntilSuccessfulConfiguration.getThreadingProfile().createScheduledPool(anyString())).thenReturn(mockScheduledPool);
         when(mockUntilSuccessfulConfiguration.getObjectStore()).thenReturn(objectStore);
-        objectStore.clear();
         configureMockScheduledPoolToInvokeRunnableInNewThread();
         configureMockRouteToCountDownRouteLatch();
         configureExceptionStrategyToReleaseLatchWhenExecuted();

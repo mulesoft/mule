@@ -45,7 +45,7 @@ public class PersistentStore6007TestCase extends FunctionalTestCase
     private Latch latch;
 
     @Override
-    protected String getConfigFile()
+    protected String getConfigResources()
     {
         return "org/mule/issues/persistent-store-6007.xml";
     }
@@ -125,12 +125,6 @@ public class PersistentStore6007TestCase extends FunctionalTestCase
         public synchronized Serializable remove(Serializable key) throws ObjectStoreException
         {
             return events.remove(key);
-        }
-
-        @Override
-        public synchronized void clear() throws ObjectStoreException
-        {
-            events.clear();
         }
 
         @Override
