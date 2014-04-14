@@ -27,21 +27,42 @@ import org.mule.util.store.AbstractPartitionedObjectStore;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class UntilSuccessfulTestCase extends FunctionalTestCase
 {
+    private final String configFile;
+
     private MuleClient client;
     private FunctionalTestComponent targetMessageProcessor;
     private FunctionalTestComponent deadLetterQueueProcessor;
 
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"until-successful-test.xml"},
+                {"until-successful-seconds-test.xml"}
+        });
+    }
+
+    public UntilSuccessfulTestCase(String configFile)
+    {
+        this.configFile = configFile;
+    }
+
     @Override
     protected String getConfigFile()
     {
-        return "until-successful-test.xml";
+        return configFile;
     }
 
     @Override

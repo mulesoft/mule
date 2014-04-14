@@ -22,6 +22,9 @@ import org.mule.api.store.ListableObjectStore;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.routing.filters.ExpressionFilter;
 import org.mule.routing.outbound.AbstractOutboundRouter;
+import org.mule.util.Preconditions;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * UntilSuccessful attempts to route a message to the message processor it contains.
@@ -49,10 +52,12 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
 
     public static final String PROCESS_ATTEMPT_COUNT_PROPERTY_NAME = "process.attempt.count";
     static final int DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE = 1;
+    private static final long DEFAULT_MILLIS_BETWEEN_RETRIES = 60 * 1000;
 
     private ListableObjectStore<MuleEvent> objectStore;
     private int maxRetries = 5;
-    private long secondsBetweenRetries = 60L;
+    private Long millisBetweenRetries = null;
+    private Long secondsBetweenRetries = null;
     private String failureExpression;
     private String ackExpression;
     private ExpressionFilter failureExpressionFilter;
@@ -62,6 +67,7 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
     private boolean synchronous = false;
     private ThreadingProfile threadingProfile;
     private UntilSuccessfulProcessingStrategy untilSuccessfulStrategy;
+
 
     @Override
     public void initialise() throws InitialisationException
@@ -80,6 +86,8 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
                                                    + " Use a Processor Chain to group several message processors into one."),
                 this);
         }
+
+        setWaitTime();
 
         super.initialise();
 
@@ -151,6 +159,24 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
         eventKeyPrefix = flowName + "-" + clusterId + "-";
     }
 
+    private void setWaitTime()
+    {
+        boolean hasSeconds = secondsBetweenRetries != null;
+        boolean hasMillis = millisBetweenRetries != null;
+
+        Preconditions.checkArgument(!(hasSeconds && hasMillis),
+                                    "Can't specify millisBetweenRetries and secondsBetweenRetries properties at the same time. Please specify only one and remember that secondsBetweenRetries is deprecated.");
+
+        if (hasSeconds)
+        {
+            setMillisBetweenRetries(TimeUnit.SECONDS.toMillis(secondsBetweenRetries));
+        }
+        else if (!hasMillis)
+        {
+            millisBetweenRetries = DEFAULT_MILLIS_BETWEEN_RETRIES;
+        }
+    }
+
     @Override
     public void start() throws MuleException
     {
@@ -203,14 +229,25 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
         this.maxRetries = maxRetries;
     }
 
-    public long getSecondsBetweenRetries()
-    {
-        return secondsBetweenRetries;
-    }
-
+    /**
+     * @deprecated use {@link #setMillisBetweenRetries(java.lang.Long)} instead
+     * @param secondsBetweenRetries the number of seconds to wait between retries
+     */
+    @Deprecated
     public void setSecondsBetweenRetries(final long secondsBetweenRetries)
     {
         this.secondsBetweenRetries = secondsBetweenRetries;
+    }
+
+    @Override
+    public long getMillisBetweenRetries()
+    {
+        return millisBetweenRetries;
+    }
+
+    public void setMillisBetweenRetries(Long millisBetweenRetries)
+    {
+        this.millisBetweenRetries = millisBetweenRetries;
     }
 
     public String getFailureExpression()

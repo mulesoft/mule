@@ -6424,11 +6424,21 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
-                    <xsd:attribute name="secondsBetweenRetries" type="substitutableInt" use="optional" default="60">
+                    <xsd:attribute name="millisBetweenRetries" type="substitutableInt" use="optional">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Specifies the minimum time interval between two process retries.
+                                Specifies the minimum time interval between two process retries in milliseconds.
                                 The actual time interval depends on the previous execution but should not exceed twice this number.
+                                Default value is 60000 (one minute)
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="secondsBetweenRetries" type="substitutableInt" use="optional">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Specifies the minimum time interval between two process retries in seconds.
+                                The actual time interval depends on the previous execution but should not exceed twice this number.
+                                THIS ATTRIBUTE IS DEPRECATED. Please use millisBetweenRetries instead
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
