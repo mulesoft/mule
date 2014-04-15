@@ -211,7 +211,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
         throws Exception
     {
         AsyncInterceptingMessageProcessor mp = new AsyncInterceptingMessageProcessor(
-            new TestWorkManagerSource(), false);
+            new TestWorkManagerSource());
         mp.setMuleContext(muleContext);
         mp.setListener(listener);
         return mp;

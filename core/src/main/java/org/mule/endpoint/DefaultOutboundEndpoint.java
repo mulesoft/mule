@@ -18,11 +18,13 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.Connector;
+import org.mule.exception.RollbackMessagingExceptionStrategy;
 import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.StringUtils;
@@ -35,10 +37,11 @@ import java.util.Map;
 public class DefaultOutboundEndpoint extends AbstractEndpoint implements OutboundEndpoint
 {
     private static final long serialVersionUID = 8860985949279708638L;
+    public static final String IN_EXCEPTION_STRATEGY_PROPERTY = "IN_EXCEPTION_STRATEGY";
 
     private List<String> responseProperties;
 
-    private boolean inExceptionStrategy;
+    private Boolean inExceptionStrategy;
 
     public DefaultOutboundEndpoint(Connector connector,
                                    EndpointURI endpointUri,
@@ -66,6 +69,9 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
                 endpointEncoding, endpointBuilderName, muleContext, retryPolicyTemplate, null,
                 messageProcessorsFactory, messageProcessors, responseMessageProcessors, disableTransportTransformer, endpointMimeType);
 
+
+        inExceptionStrategy = getProperty(IN_EXCEPTION_STRATEGY_PROPERTY) != null ? (Boolean) getProperty(IN_EXCEPTION_STRATEGY_PROPERTY) : false;
+
         if (redeliveryPolicy != null)
         {
             logger.warn("Ignoring redelivery policy set on outbound endpoint " + endpointUri);
@@ -89,16 +95,6 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         return responseProperties;
     }
 
-    public void setInExceptionStrategy(boolean inExceptionStrategy)
-    {
-        this.inExceptionStrategy = inExceptionStrategy;
-    }
-
-    public boolean isInExceptionStrategy()
-    {
-        return inExceptionStrategy;
-    }
-
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         MuleEvent result = getMessageProcessorChain(event.getFlowConstruct()).process(event);
@@ -118,7 +114,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
     {
         EndpointMessageProcessorChainFactory factory = getMessageProcessorsFactory();
         MessageProcessor chain = factory.createOutboundMessageProcessorChain(this, flowContruct,
-            ((AbstractConnector) getConnector()).createDispatcherMessageProcessor(this));
+            ((AbstractConnector) getConnector()).createDispatcherMessageProcessor(this, getExceptionHandler(flowContruct)));
 
         if (chain instanceof MuleContextAware)
         {
@@ -134,5 +130,29 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         }
         
         return chain;
+    }
+
+    private MessagingExceptionHandler getExceptionHandler(FlowConstruct flowConstruct)
+    {
+        if (inExceptionStrategy)
+        {
+            RollbackMessagingExceptionStrategy rollbackExceptionStrategy= new RollbackMessagingExceptionStrategy();
+            rollbackExceptionStrategy.setMuleContext(getMuleContext());
+            try
+            {
+                rollbackExceptionStrategy.initialise();
+                rollbackExceptionStrategy.start();
+            }
+            catch (MuleException e)
+            {
+                //This should never happen
+                logger.debug("Failed to initialise rollback exception handler.");
+            }
+            return rollbackExceptionStrategy;
+        }
+        else
+        {
+            return flowConstruct != null ? flowConstruct.getExceptionListener() : null;
+        }
     }
 }

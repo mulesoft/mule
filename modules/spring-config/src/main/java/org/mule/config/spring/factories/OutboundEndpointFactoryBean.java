@@ -22,7 +22,7 @@ import org.mule.transport.service.TransportServiceDescriptor;
 public class OutboundEndpointFactoryBean extends AbstractEndpointFactoryBean
 {
 
-    private boolean inExceptionStrategyFlag = false;
+    private Boolean inExceptionStrategyFlag = false;
 
     public OutboundEndpointFactoryBean(EndpointURIEndpointBuilder global) throws EndpointException
     {
@@ -41,6 +41,8 @@ public class OutboundEndpointFactoryBean extends AbstractEndpointFactoryBean
 
     public Object doGetObject() throws Exception
     {
+        this.setProperty(DefaultOutboundEndpoint.IN_EXCEPTION_STRATEGY_PROPERTY, inExceptionStrategyFlag);
+
         // If this is a meta endpoint, then we can wrap it using the meta endpoint builder from the TransportServiceDescriptor
         String scheme = getEndpointBuilder().getEndpoint().getFullScheme();
         TransportServiceDescriptor tsd = (TransportServiceDescriptor) muleContext.getRegistry().lookupServiceDescriptor(ServiceType.TRANSPORT, scheme, null);
@@ -50,10 +52,6 @@ public class OutboundEndpointFactoryBean extends AbstractEndpointFactoryBean
         if (outboundEndpoint instanceof AbstractEndpoint)
         {
             AbstractEndpoint.class.cast(outboundEndpoint).setAnnotations(getAnnotations());
-        }
-        if (outboundEndpoint instanceof DefaultOutboundEndpoint)
-        {
-            ((DefaultOutboundEndpoint) outboundEndpoint).setInExceptionStrategy(inExceptionStrategyFlag);
         }
         return outboundEndpoint;
     }
