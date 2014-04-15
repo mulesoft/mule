@@ -210,7 +210,6 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
     @Test
     public void testDefaultMillisWait() throws Exception
     {
-        untilSuccessful.setMillisBetweenRetries(null);
         untilSuccessful.initialise();
         untilSuccessful.start();
         assertEquals(60 * 1000, untilSuccessful.getMillisBetweenRetries());
@@ -231,7 +230,6 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
     public void testSecondsWait() throws Exception
     {
         final long seconds = 10;
-        untilSuccessful.setMillisBetweenRetries(null);
         untilSuccessful.setSecondsBetweenRetries(seconds);
         untilSuccessful.initialise();
         untilSuccessful.start();
