@@ -245,7 +245,7 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
         return millisBetweenRetries;
     }
 
-    public void setMillisBetweenRetries(Long millisBetweenRetries)
+    public void setMillisBetweenRetries(long millisBetweenRetries)
     {
         this.millisBetweenRetries = millisBetweenRetries;
     }
