@@ -73,18 +73,28 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
+        untilSuccessful = buildUntiSuccessful(1000L);
+    }
 
-        untilSuccessful = new UntilSuccessful();
+    private UntilSuccessful buildUntiSuccessful(Long millisBetweenRetries) throws Exception
+    {
+        UntilSuccessful untilSuccessful = new UntilSuccessful();
         untilSuccessful.setMuleContext(muleContext);
         untilSuccessful.setFlowConstruct(getTestService());
         untilSuccessful.setMaxRetries(2);
-        untilSuccessful.setMillisBetweenRetries(1000L);
+
+        if (millisBetweenRetries != null)
+        {
+            untilSuccessful.setMillisBetweenRetries(millisBetweenRetries);
+        }
 
         objectStore = new SimpleMemoryObjectStore<MuleEvent>();
         untilSuccessful.setObjectStore(objectStore);
 
         targetMessageProcessor = new ConfigurableMessageProcessor();
         untilSuccessful.addRoute(targetMessageProcessor);
+
+        return untilSuccessful;
     }
 
     @Override
@@ -210,6 +220,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
     @Test
     public void testDefaultMillisWait() throws Exception
     {
+        untilSuccessful = buildUntiSuccessful(null);
         untilSuccessful.initialise();
         untilSuccessful.start();
         assertEquals(60 * 1000, untilSuccessful.getMillisBetweenRetries());
@@ -230,6 +241,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
     public void testSecondsWait() throws Exception
     {
         final long seconds = 10;
+        untilSuccessful = buildUntiSuccessful(null);
         untilSuccessful.setSecondsBetweenRetries(seconds);
         untilSuccessful.initialise();
         untilSuccessful.start();
