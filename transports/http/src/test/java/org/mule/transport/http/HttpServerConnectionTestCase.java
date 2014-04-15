@@ -7,29 +7,50 @@
 package org.mule.transport.http;
 
 import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.tcp.TcpConnector;
 
+import java.io.BufferedInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import org.hamcrest.core.IsInstanceOf;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Answers;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * Test class for the {@link HttpServerConnection}.
  */
+@RunWith(MockitoJUnitRunner.class)
 public class HttpServerConnectionTestCase extends AbstractMuleContextTestCase
 {
-    @Rule
-    public DynamicPort port1 = new DynamicPort("port1");
-
     private final static boolean SEND_TCP_NO_DELAY = false;
     private final static boolean KEEP_ALIVE = true;
     private final static int RECEIVE_BUFFER_SIZE = 1024;
     private final static int SERVER_SO_TIMEOUT = 5000;
+
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
+
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private Socket mockSocket;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private HttpConnector mockHttpConnector;
+
+
+    @Test
+    public void inputStreamIsWrappedWithBufferedInputStream() throws Exception
+    {
+        HttpServerConnection httpServerConnection = new HttpServerConnection(mockSocket, muleContext.getConfiguration().getDefaultEncoding(), mockHttpConnector);
+        assertThat(httpServerConnection.getInputStream(), IsInstanceOf.instanceOf(BufferedInputStream.class));
+    }
 
     @Test
     public void testCorrectHttpConnectorPropertiesPropagation() throws Exception
