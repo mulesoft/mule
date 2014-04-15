@@ -16,8 +16,8 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.construct.Flow;
+import org.mule.el.context.AbstractELTestCase;
 import org.mule.expression.DefaultExpressionManager;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Fruit;
@@ -33,8 +33,13 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 @SmallTest
-public class ExpressionLanguageEnrichmentTestCase extends AbstractMuleTestCase
+public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase
 {
+
+    public ExpressionLanguageEnrichmentTestCase(Variant variant, String mvelOptimizer)
+    {
+        super(variant, mvelOptimizer);
+    }
 
     protected DefaultExpressionManager expressionManager;
     protected MuleContext muleContext;

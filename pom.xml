@@ -156,7 +156,7 @@
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <!-- TODO EE-1395 -->
         <mqSeriesVersion>6.0</mqSeriesVersion>
-        <muleMvelVersion>2.1.9-MULE-002</muleMvelVersion>
+        <muleMvelVersion>2.1.9-MULE-003-SNAPSHOT</muleMvelVersion>
         <mx4jVersion>2.1.1</mx4jVersion>
         <ognlVersion>2.7.3</ognlVersion>
         <oroVersion>2.0.8</oroVersion>

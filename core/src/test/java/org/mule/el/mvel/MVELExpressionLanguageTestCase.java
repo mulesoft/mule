@@ -31,6 +31,7 @@ import org.mule.el.function.RegexExpressionLanguageFuntion;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.PropertyAccessException;
 import org.mule.mvel2.ast.Function;
+import org.mule.mvel2.optimizers.OptimizerFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 
@@ -82,9 +83,13 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
                                    + "    sb.append('    <SIN>').append(fields[4]).append('</SIN>\n');"
                                    + "    sb.append('  </Contact>\n');" + "}" + "sb.toString();";
 
-    public MVELExpressionLanguageTestCase(Variant variant)
+    public MVELExpressionLanguageTestCase(Variant variant, String mvelOptimizer)
     {
         this.variant = variant;
+        if (mvelOptimizer != null)
+        {
+            OptimizerFactory.setDefaultOptimizer(mvelOptimizer);
+        }
     }
 
     @Before
@@ -576,8 +581,11 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     @Parameters
     public static List<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{Variant.EXPRESSION_WITH_DELIMITER},
-            {Variant.EXPRESSION_STRAIGHT_UP}});
+        return Arrays.asList(new Object[][]{
+            {Variant.EXPRESSION_WITH_DELIMITER, OptimizerFactory.SAFE_REFLECTIVE},
+            {Variant.EXPRESSION_WITH_DELIMITER, "ASM"}, {Variant.EXPRESSION_WITH_DELIMITER, null},
+            {Variant.EXPRESSION_STRAIGHT_UP, OptimizerFactory.SAFE_REFLECTIVE},
+            {Variant.EXPRESSION_STRAIGHT_UP, "ASM"}, {Variant.EXPRESSION_STRAIGHT_UP, null},});
     }
 
     private static class HelloWorldFunction extends Function
@@ -652,7 +660,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         }
         return classes;
     }
-    
+
     @Test
     public void collectionAccessPayloadChangedMULE7506() throws Exception
     {
@@ -661,5 +669,5 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         event.getMessage().setPayload(Collections.singletonList("1"));
         assertEquals("1", mvel.evaluate("payload[0]", event));
     }
-    
+
 }

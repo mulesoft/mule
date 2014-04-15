@@ -13,17 +13,13 @@ import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class FlowTestCase extends AbstractELTestCase
 {
-    public FlowTestCase(Variant variant)
+    public FlowTestCase(Variant variant, String mvelOptimizer)
     {
-        super(variant);
+        super(variant, mvelOptimizer);
     }
 
     @Test
@@ -40,12 +36,6 @@ public class FlowTestCase extends AbstractELTestCase
         MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("", muleContext),
             MessageExchangePattern.ONE_WAY, getTestService("flowName", Object.class));
         assertFinalProperty("flow.name='foo'", event);
-    }
-
-    @Parameters
-    public static List<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{{Variant.EVALUATOR_LANGUAGE}});
     }
 
 }

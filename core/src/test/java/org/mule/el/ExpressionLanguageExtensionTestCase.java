@@ -37,9 +37,9 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
     private String a = "hi";
     private String b = "hi";
 
-    public ExpressionLanguageExtensionTestCase(Variant variant)
+    public ExpressionLanguageExtensionTestCase(Variant variant, String mvelOptimizer)
     {
-        super(variant);
+        super(variant, mvelOptimizer);
     }
 
     @Override
