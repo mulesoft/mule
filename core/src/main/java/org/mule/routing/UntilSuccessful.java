@@ -169,6 +169,9 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
 
         if (hasSeconds)
         {
+            logger.warn("You're using the secondsBetweenRetries in the until-successful router. That attribute was deprecated in favor of the new millisBetweenRetries." +
+                        "Please consider updating your config since the old attribute will be removed in Mule 4");
+
             setMillisBetweenRetries(TimeUnit.SECONDS.toMillis(secondsBetweenRetries));
         }
         else if (!hasMillis)
@@ -230,7 +233,7 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
     }
 
     /**
-     * @deprecated use {@link #setMillisBetweenRetries(java.lang.Long)} instead
+     * @deprecated use {@link #setMillisBetweenRetries(long)} instead
      * @param secondsBetweenRetries the number of seconds to wait between retries
      */
     @Deprecated
