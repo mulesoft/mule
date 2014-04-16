@@ -18,6 +18,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
@@ -25,6 +26,7 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.Connector;
 import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.transport.AbstractConnector;
+import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
@@ -35,6 +37,7 @@ import java.util.Map;
 public class DefaultOutboundEndpoint extends AbstractEndpoint implements OutboundEndpoint
 {
     private static final long serialVersionUID = 8860985949279708638L;
+    private final MessagingExceptionHandler exceptionHandler;
 
     private List<String> responseProperties;
 
@@ -54,16 +57,19 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
                                    AbstractRedeliveryPolicy redeliveryPolicy,
                                    String responsePropertiesList,
                                    EndpointMessageProcessorChainFactory messageProcessorsFactory,
-                                   List <MessageProcessor> messageProcessors,
-                                   List <MessageProcessor> responseMessageProcessors,
+                                   List<MessageProcessor> messageProcessors,
+                                   List<MessageProcessor> responseMessageProcessors,
                                    boolean disableTransportTransformer,
-                                   String endpointMimeType)
+                                   String endpointMimeType,
+                                   MessagingExceptionHandler exceptionHandler)
     {
         super(connector, endpointUri, name, properties, transactionConfig, 
                 deleteUnacceptedMessage, messageExchangePattern, responseTimeout, initialState,
                 endpointEncoding, endpointBuilderName, muleContext, retryPolicyTemplate, null,
                 messageProcessorsFactory, messageProcessors, responseMessageProcessors, disableTransportTransformer, endpointMimeType);
 
+
+        this.exceptionHandler = exceptionHandler;
         if (redeliveryPolicy != null)
         {
             logger.warn("Ignoring redelivery policy set on outbound endpoint " + endpointUri);
@@ -106,7 +112,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
     {
         EndpointMessageProcessorChainFactory factory = getMessageProcessorsFactory();
         MessageProcessor chain = factory.createOutboundMessageProcessorChain(this, flowContruct,
-            ((AbstractConnector) getConnector()).createDispatcherMessageProcessor(this));
+            ((AbstractConnector) getConnector()).createDispatcherMessageProcessor(this, exceptionHandler));
 
         if (chain instanceof MuleContextAware)
         {
@@ -122,5 +128,11 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         }
         
         return chain;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return  super.hashCode() + ClassUtils.hash(new Object[] {exceptionHandler});
     }
 }

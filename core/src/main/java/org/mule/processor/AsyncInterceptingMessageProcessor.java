@@ -172,7 +172,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         @Override
         protected void doRun()
         {
-            MessagingExceptionHandler exceptionHandler = event.getFlowConstruct() != null ? event.getFlowConstruct().getExceptionListener() : null;
+            MessagingExceptionHandler exceptionHandler = getMessagingExceptionHandler(event);
             ExecutionTemplate<MuleEvent> executionTemplate = TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate(
                     muleContext, new MuleTransactionConfig(), exceptionHandler);
 
@@ -215,6 +215,11 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
                 muleContext.getExceptionListener().handleException(e);
             }
         }
+    }
+
+    protected MessagingExceptionHandler getMessagingExceptionHandler(MuleEvent event)
+    {
+        return event.getFlowConstruct() != null ? event.getFlowConstruct().getExceptionListener() : null;
     }
 
     protected void firePipelineNotification(MuleEvent event, MessagingException exception)

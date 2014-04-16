@@ -25,6 +25,7 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleCallback;
@@ -2542,7 +2543,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         requesters.setMaxWait(maxWait);
     }
 
-    public MessageProcessor createDispatcherMessageProcessor(OutboundEndpoint endpoint) throws MuleException
+    public MessageProcessor createDispatcherMessageProcessor(OutboundEndpoint endpoint, MessagingExceptionHandler exceptionHandler) throws MuleException
     {
         if (endpoint.getExchangePattern().hasResponse() || !getDispatcherThreadingProfile().isDoThreading())
         {
@@ -2560,7 +2561,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
                 {
                     return getDispatcherWorkManager();
                 }
-            });
+            }, exceptionHandler);
             builder.chain(async);
             builder.chain(new DispatcherMessageProcessor(endpoint));
             return builder.build();

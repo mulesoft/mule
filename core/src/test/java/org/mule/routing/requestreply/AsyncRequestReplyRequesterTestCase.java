@@ -94,7 +94,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
                 {
                     return muleContext.getWorkManager();
                 }
-            }
+            }, null
         );
 
         asyncMP.setListener(target);
@@ -126,7 +126,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
                 {
                     return muleContext.getWorkManager();
                 }
-            }
+            }, null
         );
 
         asyncMP.setListener(target);
@@ -221,7 +221,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
                 {
                     return muleContext.getWorkManager();
                 }
-            }
+            }, null
         );
 
         asyncMP.setListener(target);

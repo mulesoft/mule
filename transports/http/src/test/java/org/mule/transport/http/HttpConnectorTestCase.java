@@ -318,7 +318,7 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
 
                     OutboundEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(
                         "http://localhost:8080");
-                    httpConnector.createDispatcherMessageProcessor(endpoint);
+                    httpConnector.createDispatcherMessageProcessor(endpoint, null);
 
                     assertNotNull(httpConnector.borrowDispatcher(endpoint));
                     assertEquals(httpConnector.borrowDispatcher(endpoint),

@@ -16,6 +16,7 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
@@ -699,7 +700,7 @@ public class HttpConnector extends TcpConnector
     }
     
     @Override
-    public MessageProcessor createDispatcherMessageProcessor(OutboundEndpoint endpoint) throws MuleException
+    public MessageProcessor createDispatcherMessageProcessor(OutboundEndpoint endpoint, MessagingExceptionHandler messagingExceptionHandler) throws MuleException
     {
         if (singleDispatcherPerEndpoint)
         {
@@ -709,7 +710,7 @@ public class HttpConnector extends TcpConnector
             applyDispatcherLifecycle(dispatcher);
             endpointDispatchers.put(endpoint, dispatcher);
         }
-        return super.createDispatcherMessageProcessor(endpoint);
+        return super.createDispatcherMessageProcessor(endpoint, messagingExceptionHandler);
     }
 
     @Override

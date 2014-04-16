@@ -6,9 +6,16 @@
  */
 package org.mule.config.spring.parsers.specific.endpoint.support;
 
+import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.exception.RollbackMessagingExceptionStrategy;
 import org.mule.util.StringUtils;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -42,6 +49,11 @@ public class ChildEndpointDefinitionParser extends ChildDefinitionParser
     public BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class<?> beanClass)
     {
         BeanDefinitionBuilder builder = super.createBeanDefinitionBuilder(element, beanClass);
+        String parent = element.getParentNode().getLocalName();
+        if (parent.endsWith("exception-strategy"))
+        {
+            builder.addPropertyValue("isInExceptionStrategy", true);
+        }
         String global = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF);
         if (StringUtils.isNotBlank(global))
         {
