@@ -148,6 +148,17 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
         return objects;
     }
 
+    public <T> Collection<T> lookupLocalObjects(Class<T> type)
+    {
+        Collection<T> objects = new ArrayList<T>();
+        Iterator it = getRegistries().iterator();
+        while (it.hasNext())
+        {
+            objects.addAll(((Registry) it.next()).lookupLocalObjects(type));
+        }
+        return objects;
+    }
+
     public <T> Map<String, T> lookupByType(Class<T> type)
     {
         Map<String, T> results = new HashMap<String, T>();

@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleException;
-import org.mule.module.management.agent.JmxAgent;
+import org.mule.module.management.agent.JmxApplicationAgent;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
@@ -26,7 +26,7 @@ public class ManagementStartupTestCase extends FunctionalTestCase
     @Test
     public void testAgentConfiguration() throws MuleException
     {
-        JmxAgent agent = muleContext.getRegistry().lookupObject(JmxAgent.class);
+        JmxApplicationAgent agent = muleContext.getRegistry().lookupObject(JmxApplicationAgent.class);
         assertNotNull(agent);
         assertNotNull(agent.getConnectorServerUrl());
         assertEquals("service:jmx:rmi:///jndi/rmi://0.0.0.0:1100/server", agent.getConnectorServerUrl());

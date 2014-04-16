@@ -778,6 +778,12 @@ public class MuleRegistryHelper implements MuleRegistry
         return registry.lookupObjects(type);
     }
 
+    @Override
+    public <T> Collection<T> lookupLocalObjects(Class<T> type)
+    {
+        return registry.lookupLocalObjects(type);
+    }
+
     /**
      * {@inheritDoc}
      */

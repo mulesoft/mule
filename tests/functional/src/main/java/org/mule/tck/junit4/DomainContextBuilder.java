@@ -8,7 +8,6 @@ package org.mule.tck.junit4;
 
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
-import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.config.spring.SpringXmlDomainConfigurationBuilder;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
@@ -32,7 +31,6 @@ public class DomainContextBuilder
     {
         List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(3);
         ConfigurationBuilder cfgBuilder = getDomainBuilder(domainConfig);
-        builders.add(new DefaultsConfigurationBuilder());
         builders.add(cfgBuilder);
         DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
         MuleContext domainContext = muleContextFactory.createMuleContext(builders, new DefaultMuleContextBuilder());

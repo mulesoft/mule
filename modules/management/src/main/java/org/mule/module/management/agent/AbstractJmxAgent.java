@@ -16,6 +16,7 @@ import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.spring.SpringRegistry;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
@@ -71,11 +72,12 @@ import javax.management.remote.rmi.RMIConnectorServer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.context.ApplicationContext;
 
 /**
- * <code>JmxAgent</code> registers Mule Jmx management beans with an MBean server.
+ * <code>AbstractJmxAgent</code> registers Mule Jmx management beans with an MBean server.
  */
-public class JmxAgent extends AbstractAgent
+public abstract class AbstractJmxAgent extends AbstractAgent
 {
     public static final String NAME = "jmx-agent";
 
@@ -92,7 +94,7 @@ public class JmxAgent extends AbstractAgent
     /**
      * Logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(JmxAgent.class);
+    protected static final Log logger = LogFactory.getLog(AbstractJmxAgent.class);
 
     /**
      * Should MBeanServer be discovered.
@@ -124,8 +126,8 @@ public class JmxAgent extends AbstractAgent
      */
     private Map<String, String> credentials = new HashMap<String, String>();
 
-    private JmxAgent.MuleContextStartedListener muleContextStartedListener;
-    private JmxAgent.MuleContextStoppedListener muleContextStoppedListener;
+    private AbstractJmxAgent.MuleContextStartedListener muleContextStartedListener;
+    private AbstractJmxAgent.MuleContextStoppedListener muleContextStoppedListener;
 
     static
     {
@@ -134,7 +136,7 @@ public class JmxAgent extends AbstractAgent
         DEFAULT_CONNECTOR_SERVER_PROPERTIES = Collections.unmodifiableMap(props);
     }
 
-    public JmxAgent()
+    public AbstractJmxAgent()
     {
         super(NAME);
         connectorServerProperties = new HashMap<String, Object>(DEFAULT_CONNECTOR_SERVER_PROPERTIES);
@@ -337,7 +339,7 @@ public class JmxAgent extends AbstractAgent
     /**
      * Register a Java Service Wrapper agent.
      *
-     * @throws MuleException if registration failed
+     * @throws org.mule.api.MuleException if registration failed
      */
     protected void registerWrapperService() throws MuleException
     {
@@ -410,8 +412,8 @@ public class JmxAgent extends AbstractAgent
             final String rawName = service.getName();
             final String escapedName = jmxSupport.escape(rawName);
             final String jmxName = String.format("%s:%s%s",
-                jmxSupport.getDomainName(muleContext, !containerMode),
-                ServiceServiceMBean.DEFAULT_JMX_NAME_PREFIX, escapedName);
+                                                 jmxSupport.getDomainName(muleContext, !containerMode),
+                                                 ServiceServiceMBean.DEFAULT_JMX_NAME_PREFIX, escapedName);
             ObjectName on = jmxSupport.getObjectName(jmxName);
 
             ServiceServiceMBean serviceMBean = new ServiceService(rawName, muleContext);
@@ -487,7 +489,7 @@ public class JmxAgent extends AbstractAgent
             else
             {
                 logger.warn("Connector: " + connector
-                        + " is not an istance of AbstractConnector, cannot obtain Endpoint MBeans from it");
+                            + " is not an istance of AbstractConnector, cannot obtain Endpoint MBeans from it");
             }
         }
     }
@@ -510,7 +512,7 @@ public class JmxAgent extends AbstractAgent
     protected void registerConnectorServices() throws MalformedObjectNameException,
         NotCompliantMBeanException, MBeanRegistrationException, InstanceAlreadyExistsException
     {
-        for (Connector connector : muleContext.getRegistry().lookupObjects(Connector.class))
+        for (Connector connector : muleContext.getRegistry().lookupLocalObjects(Connector.class))
         {
             ConnectorServiceMBean service = new ConnectorService(connector);
             final String rawName = service.getName();
@@ -703,16 +705,7 @@ public class JmxAgent extends AbstractAgent
             {
                 try
                 {
-                    registerWrapperService();
-                    registerStatisticsService();
-                    registerMuleService();
-                    registerConfigurationService();
-                    registerModelServices();
-                    registerServiceServices();
-                    registerFlowConstructServices();
-                    registerEndpointServices();
-                    registerConnectorServices();
-                    registerApplicationServices();
+                    registerServices();
                 }
                 catch (Exception e)
                 {
@@ -721,6 +714,8 @@ public class JmxAgent extends AbstractAgent
             }
         }
     }
+
+    protected abstract void registerServices() throws MuleException, NotCompliantMBeanException, MBeanRegistrationException, InstanceAlreadyExistsException, MalformedObjectNameException;
 
     protected class MuleContextStoppedListener implements MuleContextNotificationListener<MuleContextNotification>
     {

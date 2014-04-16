@@ -191,6 +191,13 @@ public class TransientRegistry extends AbstractRegistry
         return (Collection<T>) registryMap.select(new InstanceofPredicate(returntype));
     }
 
+    @Override
+    public <T> Collection<T> lookupLocalObjects(Class<T> type)
+    {
+        //just delegate to lookupObjects since there's no parent ever
+        return lookupObjects(type);
+    }
+
     /**
      * Will fire any lifecycle methods according to the current lifecycle without actually
      * registering the object in the registry.  This is useful for prototype objects that are created per request and would

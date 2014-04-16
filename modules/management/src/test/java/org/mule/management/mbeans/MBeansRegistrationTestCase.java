@@ -22,7 +22,7 @@ import javax.management.ObjectInstance;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.module.management.agent.JmxAgent;
+import org.mule.module.management.agent.JmxApplicationAgent;
 import org.mule.module.management.agent.JmxServerNotificationAgent;
 import org.mule.module.management.mbean.ConnectorService;
 import org.mule.module.management.mbean.EndpointService;
@@ -56,7 +56,7 @@ public class MBeansRegistrationTestCase extends AbstractServiceAndFlowTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        JmxAgent jmxAgent = (JmxAgent) muleContext.getRegistry().lookupAgent("jmx-agent");
+        JmxApplicationAgent jmxAgent = (JmxApplicationAgent) muleContext.getRegistry().lookupAgent("jmx-agent");
         jmxSupport = jmxAgent.getJmxSupportFactory().getJmxSupport();
         domainName = jmxSupport.getDomainName(muleContext);
         mBeanServer = jmxAgent.getMBeanServer();

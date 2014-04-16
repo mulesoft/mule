@@ -8,7 +8,7 @@ package org.mule.management.mbeans;
 
 import org.mule.api.transport.Connector;
 import org.mule.management.AbstractMuleJmxTestCase;
-import org.mule.module.management.agent.JmxAgent;
+import org.mule.module.management.agent.JmxApplicationAgent;
 import org.mule.tck.testmodels.mule.TestConnector;
 
 import java.util.Set;
@@ -24,13 +24,13 @@ public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
 {
 
     protected String domainName;
-    protected JmxAgent jmxAgent;
+    protected JmxApplicationAgent jmxAgent;
 
     @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        jmxAgent = muleContext.getRegistry().lookupObject(JmxAgent.class);
+        jmxAgent = muleContext.getRegistry().lookupObject(JmxApplicationAgent.class);
 
     }
 

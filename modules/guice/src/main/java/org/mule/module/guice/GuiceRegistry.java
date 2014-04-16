@@ -178,6 +178,13 @@ public class GuiceRegistry extends AbstractRegistry
 //        }
     }
 
+    @Override
+    public <T> Collection<T> lookupLocalObjects(Class<T> type)
+    {
+        //just delegate to lookupObjects since there's no parent
+        return lookupObjects(type);
+    }
+
     public void registerObject(String key, Object value) throws RegistrationException
     {
         throw new UnsupportedOperationException("registerObject");
