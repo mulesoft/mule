@@ -11,9 +11,9 @@ import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.module.db.internal.config.domain.param.InputParamDefinitionDefinitionParser;
 import org.mule.module.db.internal.domain.param.InputQueryParam;
 import org.mule.module.db.internal.domain.param.QueryParam;
-import org.mule.module.db.internal.parser.SimpleQueryTemplateParser;
 import org.mule.module.db.internal.domain.query.QueryTemplate;
 import org.mule.module.db.internal.domain.query.QueryType;
+import org.mule.module.db.internal.parser.SimpleQueryTemplateParser;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
@@ -28,7 +28,7 @@ import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
 
 public class QueryTemplateBeanDefinitionParser extends AbstractMuleBeanDefinitionParser
 {
@@ -115,7 +115,6 @@ public class QueryTemplateBeanDefinitionParser extends AbstractMuleBeanDefinitio
 
     private void parseParameterizedQuery(Element element, BeanDefinitionBuilder builder, ParserContext nestedCtx, Element sqlElem)
     {
-        NodeList childNodes = sqlElem.getChildNodes();
         String sqlText;
         boolean hasFileAttribute = sqlElem.hasAttribute(FILE_ATTRIBUTE);
         boolean hasTextContent = !element.getTextContent().isEmpty();
@@ -139,7 +138,16 @@ public class QueryTemplateBeanDefinitionParser extends AbstractMuleBeanDefinitio
         }
         else
         {
-            sqlText = childNodes.item(0).getNodeValue();
+            Node node = sqlElem.getFirstChild();
+
+            if (node.getNextSibling() != null && node.getNextSibling().getNodeType() == Node.CDATA_SECTION_NODE)
+            {
+                sqlText = node.getNextSibling().getNodeValue();
+            }
+            else
+            {
+                sqlText = node.getNodeValue();
+            }
         }
 
         SimpleQueryTemplateParser simpleQueryParser = new SimpleQueryTemplateParser();
