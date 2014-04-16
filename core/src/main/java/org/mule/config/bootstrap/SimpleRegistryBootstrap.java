@@ -174,9 +174,9 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         try
         {
             registerUnnamedObjects(unnamedObjects, context.getRegistry());
-            registerObjects(namedObjects, context.getRegistry());
             registerTransformers((MuleRegistryHelper) context.getRegistry());
             registerTransformers(transformers, context.getRegistry());
+            registerObjects(namedObjects, context.getRegistry());
             registerTransactionFactories(singleTransactionFactories, context);
         }
         catch (Exception e1)

@@ -20,6 +20,7 @@ import org.mule.registry.DefaultRegistryBroker;
 import org.mule.registry.MuleRegistryHelper;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transformer.builder.MockConverterBuilder;
 import org.mule.transformer.types.DataTypeFactory;
@@ -35,12 +36,15 @@ public class MuleRegistryHelperTransformerLookupTestCase extends AbstractMuleTes
 {
 
     private static final DataType<Orange> ORANGE_DATA_TYPE = DataTypeFactory.create(Orange.class);
+    private static final DataType<Apple> APPLE_DATA_TYPE = DataTypeFactory.create(Apple.class);
 
     private final DefaultRegistryBroker registry = mock(DefaultRegistryBroker.class);
     private final MuleContext muleContext = mock(MuleContext.class);
     private final MuleRegistryHelper muleRegistryHelper = new MuleRegistryHelper(registry, muleContext);
     private final Converter stringToOrange = new MockConverterBuilder().from(DataTypeFactory.STRING).to(ORANGE_DATA_TYPE).build();
     private final Converter orangeToString = new MockConverterBuilder().from(ORANGE_DATA_TYPE).to(DataTypeFactory.STRING).build();
+    private final Converter stringToApple = new MockConverterBuilder().from(DataTypeFactory.STRING).to(APPLE_DATA_TYPE).build();
+    private final Converter appleToString = new MockConverterBuilder().from(APPLE_DATA_TYPE).to(DataTypeFactory.STRING).build();
 
     @Before
     public void setUp() throws Exception
@@ -48,11 +52,16 @@ public class MuleRegistryHelperTransformerLookupTestCase extends AbstractMuleTes
         TransformerResolver transformerResolver = mock(TransformerResolver.class);
         when(transformerResolver.resolve(DataTypeFactory.STRING, ORANGE_DATA_TYPE)).thenReturn(stringToOrange);
         when(transformerResolver.resolve(ORANGE_DATA_TYPE, DataTypeFactory.STRING)).thenReturn(orangeToString);
+        when(transformerResolver.resolve(DataTypeFactory.STRING, APPLE_DATA_TYPE)).thenReturn(stringToApple);
+        when(transformerResolver.resolve(APPLE_DATA_TYPE, DataTypeFactory.STRING)).thenReturn(appleToString);
 
         muleRegistryHelper.registerObject("mockTransformerResolver", transformerResolver);
 
         muleRegistryHelper.registerTransformer(orangeToString);
         muleRegistryHelper.registerTransformer(stringToOrange);
+
+        muleRegistryHelper.registerObject("StringToAppleConverter", stringToApple);
+        muleRegistryHelper.registerObject("AppleToStringConverter", appleToString, appleToString.getClass());
     }
 
     @Test
@@ -75,4 +84,16 @@ public class MuleRegistryHelperTransformerLookupTestCase extends AbstractMuleTes
         assertEquals(1, transformers.size());
         assertEquals(stringToOrange, transformers.get(0));
     }
+
+    @Test
+    public void registersNamedObjectsAsTransformers() throws Exception
+    {
+        Transformer transformer1 = muleRegistryHelper.lookupTransformer(DataTypeFactory.STRING, APPLE_DATA_TYPE);
+        Transformer transformer2 = muleRegistryHelper.lookupTransformer(APPLE_DATA_TYPE, DataTypeFactory.STRING);
+
+        assertEquals(stringToApple, transformer1);
+        assertEquals(appleToString, transformer2);
+    }
+
+
 }
