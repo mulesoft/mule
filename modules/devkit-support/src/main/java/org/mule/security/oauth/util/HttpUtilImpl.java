@@ -76,8 +76,8 @@ public class HttpUtilImpl implements HttpUtil
             	return IOUtils.toString(conn.getInputStream());
             } else {
                 String errorMsg = IOUtils.toString(conn.getErrorStream());
-                logger.error(String.format("Received [%d] for body [%s]", responseCode, errorMsg));
-
+                logger.error(String.format("Received status code [%d] while trying to get OAuth2 verification code. Response body was [%s]", responseCode, errorMsg));               
+                
                 throw new IOException("Server returned HTTP response code: " + responseCode + " for URL: " + url);
             }
         }
