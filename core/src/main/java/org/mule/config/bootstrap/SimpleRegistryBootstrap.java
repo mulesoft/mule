@@ -8,6 +8,7 @@ package org.mule.config.bootstrap;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -88,20 +89,48 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 {
+
+    protected final transient Log logger = LogFactory.getLog(getClass());
+
     public static final String SERVICE_PATH = "META-INF/services/org/mule/config/";
     public static final String REGISTRY_PROPERTIES = "registry-bootstrap.properties";
-    public static final String APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY = "applyToArtifactType";
-    public static final String APP_ARTIFACT_TYPE_VALUE = "app";
-    public static final String DOMAIN_ARTIFACT_TYPE_VALUE = "domain";
 
     public String TRANSFORMER_KEY = ".transformer.";
     public String OBJECT_KEY = ".object.";
     public String SINGLE_TX = ".singletx.";
 
-    protected final transient Log logger = LogFactory.getLog(getClass());
-
+    private ArtifactType supportedArtifactType = ArtifactType.APP;
     protected MuleContext context;
-    private String supportedArtifactType = APP_ARTIFACT_TYPE_VALUE;
+
+    public enum ArtifactType
+    {
+        APP("app"), DOMAIN("domain"), ALL("app/domain");
+
+        public static final String APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY = "applyToArtifactType";
+        private final String artifactTypeAsString;
+
+        ArtifactType(String artifactTypeAsString)
+        {
+            this.artifactTypeAsString = artifactTypeAsString;
+        }
+
+        public String getAsString()
+        {
+            return this.artifactTypeAsString;
+        }
+
+        public static ArtifactType createFromString(String artifactTypeAsString)
+        {
+            for (ArtifactType artifactType : values())
+            {
+                if (artifactType.artifactTypeAsString.equals(artifactTypeAsString))
+                {
+                    return artifactType;
+                }
+            }
+            throw new MuleRuntimeException(CoreMessages.createStaticMessage("No artifact type found for value: " + artifactTypeAsString));
+        }
+    }
 
     /** {@inheritDoc} */
     public void setMuleContext(MuleContext context)
@@ -355,7 +384,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 
     private void registerObject(String key, String value, Registry registry) throws Exception
     {
-        String artifactTypeParameterValue = APP_ARTIFACT_TYPE_VALUE;
+        ArtifactType artifactTypeParameterValue = ArtifactType.APP;
 
         boolean optional = false;
         String className = null;
@@ -366,9 +395,9 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
             if (x > -1)
             {
                 Properties p = PropertiesUtils.getPropertiesFromString(value.substring(x + 1), ',');
-                if (p.containsKey(APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY))
+                if (p.containsKey(ArtifactType.APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY))
                 {
-                    artifactTypeParameterValue = (String) p.get(APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY);
+                    artifactTypeParameterValue = ArtifactType.createFromString((String) p.get(ArtifactType.APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY));
                 }
                 optional = p.containsKey("optional");
                 className = value.substring(0, x);
@@ -378,7 +407,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                 className = value;
             }
 
-            if (!artifactTypeParameterValue.contains(supportedArtifactType))
+            if (!artifactTypeParameterValue.equals(ArtifactType.ALL) && !artifactTypeParameterValue.equals(supportedArtifactType))
             {
                 return;
             }
@@ -439,10 +468,8 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
      * created depending on the entry applyToArtifactType parameter value.
      *
      * @param supportedArtifactType type of the artifact to support.
-     *                              Possible values are {@link org.mule.config.bootstrap.SimpleRegistryBootstrap#APP_ARTIFACT_TYPE_VALUE}
-     *                              and {@link org.mule.config.bootstrap.SimpleRegistryBootstrap#DOMAIN_ARTIFACT_TYPE_VALUE}
      */
-    public void setSupportedArtifactType(String supportedArtifactType)
+    public void setSupportedArtifactType(ArtifactType supportedArtifactType)
     {
         this.supportedArtifactType = supportedArtifactType;
     }

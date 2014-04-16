@@ -9,7 +9,7 @@
 
     <bean name="_muleSimpleRegistryBootstrap" class="org.mule.config.bootstrap.SimpleRegistryBootstrap">
         <property name="supportedArtifactType">
-            <util:constant static-field="org.mule.config.bootstrap.SimpleRegistryBootstrap.DOMAIN_ARTIFACT_TYPE_VALUE"/>
+            <util:constant static-field="org.mule.config.bootstrap.SimpleRegistryBootstrap$ArtifactType.DOMAIN"/>
         </property>
     </bean>
 
