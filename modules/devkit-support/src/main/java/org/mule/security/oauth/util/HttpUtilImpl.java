@@ -69,7 +69,20 @@ public class HttpUtilImpl implements HttpUtil
             OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
             out.write(body);
             out.close();
-            return IOUtils.toString(conn.getInputStream());
+
+            int responseCode = conn.getResponseCode();
+            
+            if (responseCode == 200) 
+            {
+            	return IOUtils.toString(conn.getInputStream());
+            } 
+            else 
+            {
+                String response = IOUtils.toString(conn.getErrorStream());
+                String errorMsg = String.format("Received status code [%d] while trying to get OAuth2 verification code. Response body was [%s]", responseCode, errorMsg);    
+                logger.error(errorMsg);  
+                throw new IOException(errorMsg);
+            }
         }
         catch (IOException e)
         {
