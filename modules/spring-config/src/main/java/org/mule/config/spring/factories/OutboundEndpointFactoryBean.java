@@ -6,20 +6,30 @@
  */
 package org.mule.config.spring.factories;
 
+import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.registry.ServiceType;
 import org.mule.endpoint.AbstractEndpoint;
+import org.mule.endpoint.DefaultOutboundEndpoint;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.exception.RollbackMessagingExceptionStrategy;
 import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.transport.service.TransportServiceDescriptor;
 
 /**
  * Spring FactoryBean used to create concrete instances of outbound endpoints
  */
-public class OutboundEndpointFactoryBean extends AbstractEndpointFactoryBean
+public class OutboundEndpointFactoryBean extends AbstractEndpointFactoryBean implements FlowConstructAware
 {
+
+    private Boolean isInExceptionStrategy = false;
+    private FlowConstruct flowConstruct;
 
     public OutboundEndpointFactoryBean(EndpointURIEndpointBuilder global) throws EndpointException
     {
@@ -41,8 +51,8 @@ public class OutboundEndpointFactoryBean extends AbstractEndpointFactoryBean
         // If this is a meta endpoint, then we can wrap it using the meta endpoint builder from the TransportServiceDescriptor
         String scheme = getEndpointBuilder().getEndpoint().getFullScheme();
         TransportServiceDescriptor tsd = (TransportServiceDescriptor) muleContext.getRegistry().lookupServiceDescriptor(ServiceType.TRANSPORT, scheme, null);
+        resolveMessagingExceptionHandler();
         EndpointBuilder endpointBuilder = tsd.createEndpointBuilder(this);
-
         OutboundEndpoint outboundEndpoint = muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
         if (outboundEndpoint instanceof AbstractEndpoint)
         {
@@ -55,5 +65,43 @@ public class OutboundEndpointFactoryBean extends AbstractEndpointFactoryBean
     public void setRedeliveryPolicy(AbstractRedeliveryPolicy redeliveryPolicy)
     {
         throw new IllegalStateException("A redelivery policy cannot be specified for an outbound endpoint.");
+    }
+
+    public void setIsInExceptionStrategy(Boolean isInExceptionStrategy)
+    {
+        this.isInExceptionStrategy = isInExceptionStrategy;
+    }
+
+    private void resolveMessagingExceptionHandler()
+    {
+        if (isInExceptionStrategy)
+        {
+            RollbackMessagingExceptionStrategy rollbackExceptionStrategy = new RollbackMessagingExceptionStrategy();
+            rollbackExceptionStrategy.setMuleContext(this.muleContext);
+            try
+            {
+                rollbackExceptionStrategy.initialise();
+                rollbackExceptionStrategy.start();
+            }
+            catch (MuleException e)
+            {
+                //This should never happen
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Failed to initialise rollback exception handler.", e);
+                }
+            }
+            messagingExceptionHandler = rollbackExceptionStrategy;
+        }
+        else
+        {
+            messagingExceptionHandler = flowConstruct.getExceptionListener();
+        }
+    }
+
+    @Override
+    public void setFlowConstruct(FlowConstruct flowConstruct)
+    {
+        this.flowConstruct = flowConstruct;
     }
 }
