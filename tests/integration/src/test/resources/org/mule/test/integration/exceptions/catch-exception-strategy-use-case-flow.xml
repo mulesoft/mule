@@ -10,6 +10,7 @@
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
       xmlns:json="http://www.mulesoft.org/schema/mule/json"
       xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+      xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
@@ -20,7 +21,8 @@
        http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
        http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
-       http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
+       http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+       http://www.mulesoft.org/schema/mule/smtp http://www.mulesoft.org/schema/mule/smtp/current/mule-smtp.xsd">
 
     <https:connector name="httpsConnector">
         <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
@@ -84,7 +86,7 @@
             <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsErrorProcessor"/>
             <json:object-to-json-transformer/>
         </catch-exception-strategy>
-    </flow>    
+    </flow>
     
     <flow name="catchWithComponent">
       <vm:inbound-endpoint path="in2">
@@ -111,6 +113,15 @@
 	                return "$payload groovified"
 	            </script:script>
 	        </script:component>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="exceptionWithinCatch">
+        <vm:inbound-endpoint path="in4"/>
+        <test:component throwException="true"/>
+        <catch-exception-strategy>
+            <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$ExecutionCountProcessor" />
+            <smtp:outbound-endpoint host="localhost" responseTimeout="10000" />
         </catch-exception-strategy>
     </flow>
 
