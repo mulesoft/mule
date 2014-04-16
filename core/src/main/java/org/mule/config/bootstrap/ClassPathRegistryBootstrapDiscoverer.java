@@ -6,6 +6,7 @@
  */
 package org.mule.config.bootstrap;
 
+import org.mule.config.i18n.MessageFactory;
 import org.mule.util.ClassUtils;
 import org.mule.util.OrderedProperties;
 
@@ -20,35 +21,48 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * This class looks for bootstrap properties in files named registry-bootstrap.properties inside
- * the META-INF/services/org/mule/config directories contained in the classpath
+ * Default implementation for RegistryBootstrapDiscoverer interface.
+ * Looks for bootstrap properties in resources named META-INF/services/org/mule/config/registry-bootstrap.properties
+ * inside the classpath.
+ * All found properties resources are collected and loaded during the discovery process.
+ * Properties are returned in the same order they were found in the classpath.
+ * If while loading some properties resource an exception occurs the whole process is interrupted and a
+ * RegistryBootstrapDiscovery exception is raised.
  */
 public class ClassPathRegistryBootstrapDiscoverer implements RegistryBootstrapDiscoverer
 {
 
-    public static final String SERVICE_PATH = "META-INF/services/org/mule/config/";
+    private static final String BOOTSTRAP_PROPERTIES = "META-INF/services/org/mule/config/registry-bootstrap.properties";
 
-    public static final String REGISTRY_PROPERTIES = "registry-bootstrap.properties";
+    private final transient Log logger = LogFactory.getLog(getClass());
 
-    protected final transient Log logger = LogFactory.getLog(getClass());
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public List<Properties> discover() throws IOException
+    public List<Properties> discover() throws BootstrapException
     {
-        Enumeration<?> allRegistries = ClassUtils.getResources(SERVICE_PATH + REGISTRY_PROPERTIES, getClass());
-        List<Properties> bootstraps = new LinkedList<Properties>();
+        List<Properties> bootstrapsProperties = new LinkedList<Properties>();
 
-        while (allRegistries.hasMoreElements())
+        Enumeration<URL> allPropertiesResources = ClassUtils.getResources(BOOTSTRAP_PROPERTIES, getClass());
+        while (allPropertiesResources.hasMoreElements())
         {
-            URL url = (URL) allRegistries.nextElement();
+            URL propertiesResource = allPropertiesResources.nextElement();
             if (logger.isDebugEnabled())
             {
-                logger.debug("Reading bootstrap file: " + url.toString());
+                logger.debug("Reading bootstrap properties from: " + propertiesResource.toString());
             }
             Properties properties = new OrderedProperties();
-            properties.load(url.openStream());
-            bootstraps.add(properties);
+            try
+            {
+                properties.load(propertiesResource.openStream());
+            }
+            catch (IOException e)
+            {
+                throw new BootstrapException(MessageFactory.createStaticMessage("Could not load properties from: %s", propertiesResource.toString()), e);
+            }
+            bootstrapsProperties.add(properties);
         }
-        return bootstraps;
+        return bootstrapsProperties;
     }
 }

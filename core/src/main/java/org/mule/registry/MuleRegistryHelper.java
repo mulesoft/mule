@@ -803,10 +803,10 @@ public class MuleRegistryHelper implements MuleRegistry
     {
         registry.registerObject(key, value, metadata);
 
-        notifyObjectManagers(value);
+        postObjectRegistrationActions(value);
     }
 
-    private void notifyObjectManagers(Object value)
+    private void postObjectRegistrationActions(Object value)
     {
         if (value instanceof TransformerResolver)
         {
@@ -826,7 +826,7 @@ public class MuleRegistryHelper implements MuleRegistry
     {
         registry.registerObject(key, value);
 
-        notifyObjectManagers(value);
+        postObjectRegistrationActions(value);
     }
 
     private void registerTransformerResolver(TransformerResolver value)
@@ -853,7 +853,7 @@ public class MuleRegistryHelper implements MuleRegistry
 
         for (Object value : objects.values())
         {
-            notifyObjectManagers(value);
+            postObjectRegistrationActions(value);
         }
 
     }
