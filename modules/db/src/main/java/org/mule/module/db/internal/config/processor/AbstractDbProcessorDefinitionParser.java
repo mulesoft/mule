@@ -9,15 +9,13 @@ package org.mule.module.db.internal.config.processor;
 
 import org.mule.config.spring.parsers.AbstractHierarchicalDefinitionParser;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
-
 import org.mule.module.db.internal.config.resolver.database.DefaultDbConfigResolverFactoryBean;
 import org.mule.module.db.internal.domain.statement.QueryStatementFactory;
-import org.mule.module.db.internal.resolver.database.StaticDbConfigResolver;
 import org.mule.module.db.internal.resolver.database.DynamicDbConfigResolver;
+import org.mule.module.db.internal.resolver.database.StaticDbConfigResolver;
 import org.mule.util.StringUtils;
 
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
@@ -27,7 +25,6 @@ public abstract class AbstractDbProcessorDefinitionParser extends AbstractHierar
 
     public static final String LIST_SEPARATOR = ",";
     public static final String CONFIG_PROPERTY = "config-ref";
-    public static final String STATEMENT_FACTORY_REF_ATTRIBUTE = "statementFactory-ref";
     public static final String MAX_ROWS_ATTRIBUTE = "maxRows";
     public static final String FETCH_SIZE = "fetchSize";
     public static final String STREAMING_ATTRIBUTE = "streaming";
@@ -85,33 +82,24 @@ public abstract class AbstractDbProcessorDefinitionParser extends AbstractHierar
 
     protected Object parseStatementFactory(Element element)
     {
-        Object result;
-        if (element.hasAttribute(STATEMENT_FACTORY_REF_ATTRIBUTE))
+        QueryStatementFactory defaultStatementFactory = new QueryStatementFactory();
+
+        if (element.hasAttribute(MAX_ROWS_ATTRIBUTE))
         {
-            result = new RuntimeBeanReference(element.getAttribute(STATEMENT_FACTORY_REF_ATTRIBUTE));
+            defaultStatementFactory.setMaxRows(Integer.parseInt(element.getAttribute(MAX_ROWS_ATTRIBUTE)));
         }
-        else
+
+        if (element.hasAttribute(FETCH_SIZE))
         {
-            QueryStatementFactory defaultStatementFactory = new QueryStatementFactory();
-
-            if (element.hasAttribute(MAX_ROWS_ATTRIBUTE))
-            {
-                defaultStatementFactory.setMaxRows(Integer.parseInt(element.getAttribute(MAX_ROWS_ATTRIBUTE)));
-            }
-
-            if (element.hasAttribute(FETCH_SIZE))
-            {
-                defaultStatementFactory.setFetchSize(Integer.parseInt(element.getAttribute(FETCH_SIZE)));
-            }
-            else if (streaming)
-            {
-                logger.warn("Streaming mode needs to configure fetchSize property. Using default value: " + DEFAULT_FETCH_SIZE);
-                defaultStatementFactory.setFetchSize(DEFAULT_FETCH_SIZE);
-            }
-
-            result = defaultStatementFactory;
+            defaultStatementFactory.setFetchSize(Integer.parseInt(element.getAttribute(FETCH_SIZE)));
         }
-        return result;
+        else if (streaming)
+        {
+            logger.warn("Streaming mode needs to configure fetchSize property. Using default value: " + DEFAULT_FETCH_SIZE);
+            defaultStatementFactory.setFetchSize(DEFAULT_FETCH_SIZE);
+        }
+
+        return defaultStatementFactory;
     }
 
     protected void processStreamingAttribute(BeanDefinitionBuilder builder, String streamingValue)
