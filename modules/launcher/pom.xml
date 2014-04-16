@@ -16,28 +16,6 @@
         <licensePath>../../LICENSE_HEADER.txt</licensePath>
     </properties>
 
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>shitty-maven-plugin</artifactId>
-                        <version>1.0-alpha-3</version>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>clean</goal>
-                                    <goal>install</goal>
-                                    <goal>test</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <skip>${skipIntegrationTests}</skip>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
@@ -45,11 +23,10 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-core</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
