@@ -10,6 +10,7 @@ import org.mule.MessageExchangePattern;
 import org.mule.api.AnnotatedObject;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -20,6 +21,8 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.exception.ExceptionHandler;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.ServiceException;
@@ -31,6 +34,7 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.exception.RollbackMessagingExceptionStrategy;
 import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.processor.SecurityFilterMessageProcessor;
 import org.mule.routing.MessageFilter;
@@ -97,6 +101,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
     protected Boolean disableTransportTransformer;
     protected String mimeType;
     protected AbstractRedeliveryPolicy redeliveryPolicy;
+    protected MessagingExceptionHandler messagingExceptionHandler;
 
     private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
@@ -260,7 +265,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
 
         checkOutboundExchangePattern();
 
-        OutboundEndpoint outboundEndpoint = createOutboundEndpoint(endpointURI, mergedProcessors, mergedResponseProcessors, connector);
+        OutboundEndpoint outboundEndpoint = createOutboundEndpoint(endpointURI, mergedProcessors, mergedResponseProcessors, connector, messagingExceptionHandler);
         if (outboundEndpoint instanceof DefaultOutboundEndpoint)
         {
             ((DefaultOutboundEndpoint) outboundEndpoint).setAnnotations(getAnnotations());
@@ -269,7 +274,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
         return outboundEndpoint;
     }
 
-    protected OutboundEndpoint createOutboundEndpoint(EndpointURI endpointURI, List<MessageProcessor> messageProcessors, List<MessageProcessor> responseMessageProcessors, Connector connector)
+    protected OutboundEndpoint createOutboundEndpoint(EndpointURI endpointURI, List<MessageProcessor> messageProcessors, List<MessageProcessor> responseMessageProcessors, Connector connector, MessagingExceptionHandler exceptionHandler)
     {
 
         return new DefaultOutboundEndpoint(connector, endpointURI,
@@ -279,7 +284,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
                 getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector),
                 getRedeliveryPolicy(),
                 responsePropertiesList,  getMessageProcessorsFactory(), messageProcessors,
-                responseMessageProcessors, isDisableTransportTransformer(), mimeType);
+                responseMessageProcessors, isDisableTransportTransformer(), mimeType, exceptionHandler);
     }
 
     private String getDynamicUriFrom(String uri)
@@ -963,4 +968,5 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
         annotations.clear();
         annotations.putAll(newAnnotations);
     }
+
 }
