@@ -65,6 +65,13 @@ import org.apache.commons.logging.LogFactory;
  * myFoo=org.foo.MyObject
  * myBar=org.bar.MyObject
  * </pre>
+ * It's also possible to define if the entry must be applied to a domain, an application, or both by using the parameter applyToArtifactType.
+ * <pre>
+ * myFoo=org.foo.MyObject will be applied to any mule application since the parameter applyToArtifactType default value is app
+ * myFoo=org.foo.MyObject;applyToArtifactType=app will be applied to any mule application
+ * myFoo=org.foo.MyObject;applyToArtifactType=domain will be applied to any mule domain
+ * myFoo=org.foo.MyObject;applyToArtifactType=app/domain will be applied to any mule application and any mule domain
+ * </pre>
  * Loading transformers has a slightly different notation since you can define the 'returnClass' with optional mime type, and 'name'of
  * the transformer as parameters i.e.
  * <pre>
@@ -82,8 +89,10 @@ import org.apache.commons.logging.LogFactory;
 public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 {
     public static final String SERVICE_PATH = "META-INF/services/org/mule/config/";
-
     public static final String REGISTRY_PROPERTIES = "registry-bootstrap.properties";
+    public static final String APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY = "applyToArtifactType";
+    public static final String APP_ARTIFACT_TYPE_VALUE = "app";
+    public static final String DOMAIN_ARTIFACT_TYPE_VALUE = "domain";
 
     public String TRANSFORMER_KEY = ".transformer.";
     public String OBJECT_KEY = ".object.";
@@ -92,6 +101,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
     protected final transient Log logger = LogFactory.getLog(getClass());
 
     protected MuleContext context;
+    private String supportedArtifactType = APP_ARTIFACT_TYPE_VALUE;
 
     /** {@inheritDoc} */
     public void setMuleContext(MuleContext context)
@@ -102,28 +112,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
     /** {@inheritDoc} */
     public void initialise() throws InitialisationException
     {
-        Enumeration<?> e = ClassUtils.getResources(SERVICE_PATH + REGISTRY_PROPERTIES, getClass());
-        List<Properties> bootstraps = new LinkedList<Properties>();
-
-        // load ALL of the bootstrap files first
-        while (e.hasMoreElements())
-        {
-            try
-            {
-                URL url = (URL) e.nextElement();
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Reading bootstrap file: " + url.toString());
-                }
-                Properties p = new OrderedProperties();
-                p.load(url.openStream());
-                bootstraps.add(p);
-            }
-            catch (Exception e1)
-            {
-                throw new InitialisationException(e1, this);
-            }
-        }
+        List<Properties> bootstraps = loadBootstrapProperties();
 
         // ... and only then merge and process them
         int objectCounter = 1;
@@ -190,6 +179,32 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         {
             throw new InitialisationException(e1, this);
         }
+    }
+
+    protected List<Properties> loadBootstrapProperties() throws InitialisationException
+    {
+        Enumeration<?> e = ClassUtils.getResources(SERVICE_PATH + REGISTRY_PROPERTIES, getClass());
+        List<Properties> bootstraps = new LinkedList<Properties>();
+        // load ALL of the bootstrap files first
+        while (e.hasMoreElements())
+        {
+            try
+            {
+                URL url = (URL) e.nextElement();
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Reading bootstrap file: " + url.toString());
+                }
+                Properties p = new OrderedProperties();
+                p.load(url.openStream());
+                bootstraps.add(p);
+            }
+            catch (Exception e1)
+            {
+                throw new InitialisationException(e1, this);
+            }
+        }
+        return bootstraps;
     }
 
     private void registerTransactionFactories(Map<String, String> singleTransactionFactories, MuleContext context) throws Exception
@@ -340,6 +355,8 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 
     private void registerObject(String key, String value, Registry registry) throws Exception
     {
+        String artifactTypeParameterValue = APP_ARTIFACT_TYPE_VALUE;
+
         boolean optional = false;
         String className = null;
 
@@ -349,6 +366,10 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
             if (x > -1)
             {
                 Properties p = PropertiesUtils.getPropertiesFromString(value.substring(x + 1), ',');
+                if (p.containsKey(APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY))
+                {
+                    artifactTypeParameterValue = (String) p.get(APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY);
+                }
                 optional = p.containsKey("optional");
                 className = value.substring(0, x);
             }
@@ -356,6 +377,12 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
             {
                 className = value;
             }
+
+            if (!artifactTypeParameterValue.contains(supportedArtifactType))
+            {
+                return;
+            }
+
             Object o = ClassUtils.instanciateClass(className);
             Class<?> meta = Object.class;
 
@@ -405,5 +432,18 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         {
             throw new Exception(t);
         }
+    }
+
+    /**
+     * This attributes define which types or registry bootstrap entries will be
+     * created depending on the entry applyToArtifactType parameter value.
+     *
+     * @param supportedArtifactType type of the artifact to support.
+     *                              Possible values are {@link org.mule.config.bootstrap.SimpleRegistryBootstrap#APP_ARTIFACT_TYPE_VALUE}
+     *                              and {@link org.mule.config.bootstrap.SimpleRegistryBootstrap#DOMAIN_ARTIFACT_TYPE_VALUE}
+     */
+    public void setSupportedArtifactType(String supportedArtifactType)
+    {
+        this.supportedArtifactType = supportedArtifactType;
     }
 }

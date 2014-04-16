@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.agent.Agent;
-import org.mule.module.management.agent.JmxAgent;
+import org.mule.module.management.agent.JmxApplicationAgent;
 import org.mule.module.management.agent.JmxServerNotificationAgent;
 import org.mule.module.management.agent.Log4jAgent;
 import org.mule.module.management.agent.Mx4jAgent;
@@ -32,8 +32,8 @@ public class ManagementDefaultNamespaceHandlerTestCase extends FunctionalTestCas
     {
         Agent agent = muleContext.getRegistry().lookupAgent("jmx-agent");
         assertNotNull(agent);
-        assertEquals(JmxAgent.class, agent.getClass());
-        JmxAgent jmxAgent = (JmxAgent) agent;
+        assertEquals(JmxApplicationAgent.class, agent.getClass());
+        JmxApplicationAgent jmxAgent = (JmxApplicationAgent) agent;
         
         assertEquals(false, jmxAgent.isCreateServer());
         assertEquals(true, jmxAgent.isLocateServer());

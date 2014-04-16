@@ -154,6 +154,7 @@ public class GenericDbConfig implements DbConfig, Initialisable
                 throw new InitialisationException(e, this);
             }
         }
+        dataSource = decorateDataSourceIfRequired(dataSource);
     }
 
     protected DataSource createDataSource() throws Exception
@@ -161,10 +162,6 @@ public class GenericDbConfig implements DbConfig, Initialisable
         if (poolingProfile == null)
         {
             DataSource singleDataSource = createSingleDataSource();
-            if (useXaTransactions)
-            {
-                singleDataSource = decorateDataSourceIfRequired(singleDataSource);
-            }
             return singleDataSource;
         }
         else

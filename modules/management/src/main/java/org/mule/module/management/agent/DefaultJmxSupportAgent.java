@@ -106,7 +106,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
             // any existing jmx agent will be modified with remote connector settings
             agent = createJmxAgent();
             // there must be only one jmx agent, so lookup by type instead
-            if (registry.lookupObject(JmxAgent.class) == null)
+            if (registry.lookupObject(JmxApplicationAgent.class) == null)
             {
                 registry.registerAgent(agent);
             }
@@ -163,16 +163,16 @@ public class DefaultJmxSupportAgent extends AbstractAgent
         }
     }
 
-    public JmxAgent createJmxAgent()
+    public JmxApplicationAgent createJmxAgent()
     {
-        JmxAgent agent;
+        JmxApplicationAgent agent;
         try
         {
-            agent = muleContext.getRegistry().lookupObject(JmxAgent.class);
+            agent = muleContext.getRegistry().lookupObject(JmxApplicationAgent.class);
             if (agent == null)
             {
                 // nothing registered yet
-                agent = new JmxAgent();
+                agent = new JmxApplicationAgent();
             }
         }
         catch (RegistrationException e)
@@ -185,7 +185,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
         String remotingUri = null;
         if (StringUtils.isBlank(host) && StringUtils.isBlank(port))
         {
-            remotingUri = JmxAgent.DEFAULT_REMOTING_URI;
+            remotingUri = JmxApplicationAgent.DEFAULT_REMOTING_URI;
         }
         else if (StringUtils.isNotBlank(host))
         {

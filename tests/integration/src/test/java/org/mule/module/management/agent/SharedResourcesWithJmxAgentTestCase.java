@@ -48,7 +48,7 @@ public class SharedResourcesWithJmxAgentTestCase extends DomainFunctionalTestCas
     @Test
     public void testDomainAndAppsAgentsCreation() throws Exception
     {
-        JmxAgent jmxAgent = getMuleContextForDomain().getRegistry().lookupObject(JmxAgent.class);
+        JmxDomainAgent jmxAgent = getMuleContextForDomain().getRegistry().lookupObject(JmxDomainAgent.class);
         MBeanServer mBeanServer = jmxAgent.getMBeanServer();
 
         Set<ObjectName> objectNames = mBeanServer.queryNames(null, null);

@@ -10,7 +10,7 @@ import org.mule.api.context.MuleContextBuilder;
 import org.mule.component.simple.EchoComponent;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.module.management.agent.FixedHostRmiClientSocketFactory;
-import org.mule.module.management.agent.JmxAgent;
+import org.mule.module.management.agent.JmxApplicationAgent;
 import org.mule.module.management.agent.RmiRegistryAgent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -40,7 +40,7 @@ public class JmxAgentTestCase extends AbstractMuleContextTestCase
     private static final String DOMAIN = "JmxAgentTest";
 
     private JMXServiceURL serviceUrl;
-    private JmxAgent jmxAgent;
+    private JmxApplicationAgent jmxAgent;
 
     @Override
     protected void configureMuleContext(MuleContextBuilder contextBuilder)
@@ -56,10 +56,10 @@ public class JmxAgentTestCase extends AbstractMuleContextTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        serviceUrl = new JMXServiceURL(JmxAgent.DEFAULT_REMOTING_URI);
+        serviceUrl = new JMXServiceURL(JmxApplicationAgent.DEFAULT_REMOTING_URI);
         muleContext.getRegistry().registerAgent(new RmiRegistryAgent());
-        jmxAgent = muleContext.getRegistry().lookupObject(JmxAgent.class);
-        jmxAgent.setConnectorServerUrl(JmxAgent.DEFAULT_REMOTING_URI);
+        jmxAgent = muleContext.getRegistry().lookupObject(JmxApplicationAgent.class);
+        jmxAgent.setConnectorServerUrl(JmxApplicationAgent.DEFAULT_REMOTING_URI);
     }
 
     @Override
@@ -189,7 +189,7 @@ public class JmxAgentTestCase extends AbstractMuleContextTestCase
         agent.registerServiceServices();
     }
 
-    private static class TestJmxAgent extends JmxAgent
+    private static class TestJmxAgent extends JmxApplicationAgent
     {
         /**
          * Open up method for test access

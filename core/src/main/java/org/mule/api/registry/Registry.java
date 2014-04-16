@@ -9,6 +9,7 @@ package org.mule.api.registry;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.transport.Connector;
 
 import java.util.Collection;
 import java.util.Map;
@@ -36,6 +37,14 @@ public interface Registry extends Initialisable, Disposable
      * @return collection of objects or empty collection if none found
      */
     <T> Collection<T> lookupObjects(Class<T> type);
+
+    /**
+     * Look up all objects of a given type within the local registry.
+     * local means that no parent registry will be search for local objects.
+     *
+     * @return collection of objects or empty collection if none found
+     */
+    <T> Collection<T> lookupLocalObjects(Class<T> type);
 
     /**
      * Look up all objects of a given type that lifecycle should be applied to. This

@@ -8,7 +8,7 @@ package org.mule.management.agents;
 
 import org.mule.module.management.agent.DefaultJmxSupportAgent;
 import org.mule.module.management.agent.FixedHostRmiClientSocketFactory;
-import org.mule.module.management.agent.JmxAgent;
+import org.mule.module.management.agent.JmxApplicationAgent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Map;
@@ -29,7 +29,7 @@ public class DefaultJmxSupportAgentTestCase extends AbstractMuleContextTestCase
         DefaultJmxSupportAgent agent = new DefaultJmxSupportAgent();
         agent.setMuleContext(muleContext);
         agent.setHost("127.0.0.1");
-        JmxAgent jmxAgent = agent.createJmxAgent();
+        JmxApplicationAgent jmxAgent = agent.createJmxAgent();
         Map props = jmxAgent.getConnectorServerProperties();
         assertNotNull(props);
         assertEquals("JMX ConnectorServer properties should've been merged",

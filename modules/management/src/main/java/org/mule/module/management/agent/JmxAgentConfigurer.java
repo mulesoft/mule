@@ -159,7 +159,7 @@ public class JmxAgentConfigurer implements MuleContextAware
         try
         {
             // by the time mule context is injected, other attributes will have been set already
-            JmxAgent agent = muleContext.getRegistry().lookupObject(JmxAgent.class);
+            AbstractJmxAgent agent = muleContext.getRegistry().lookupObject(AbstractJmxAgent.class);
             // in case it is injected, otherwise will follow the init logic
             if (getMBeanServer() != null)
             {
