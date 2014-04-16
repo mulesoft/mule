@@ -6,19 +6,20 @@
  */
 package org.mule.config.bootstrap;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertNotNull;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transaction.TransactionFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import org.junit.Before;
+import org.junit.Test;
+
+
 public class SimpleRegistryBootstrapTest extends AbstractMuleContextTestCase
 {
-    
-    public static final String TEST_TRANSACTION_FACTORY_NAME = "jms.singletx.transaction.resource1";
+
     public static final String TEST_TRANSACTION_FACTORY_CLASS = "javax.jms.Connection";
-    
+
     @Before
     public void initRegistryBootstrap() throws InitialisationException
     {
@@ -26,20 +27,18 @@ public class SimpleRegistryBootstrapTest extends AbstractMuleContextTestCase
         simpleRegistryBootstrap.setMuleContext(muleContext);
         simpleRegistryBootstrap.initialise();
     }
-    
-    @Test(expected=ClassNotFoundException.class)
-    public void testRegisteringOptionalTransaction() throws ClassNotFoundException
+
+    @Test(expected = ClassNotFoundException.class)
+    public void testRegisteringOptionalTransaction() throws ClassNotFoundException, InitialisationException
     {
         muleContext.getTransactionFactoryManager().getTransactionFactoryFor(Class.forName(TEST_TRANSACTION_FACTORY_CLASS));
     }
-    
+
     @Test
     public void testExistingNotOptionalTransaction() throws Exception
     {
         TransactionFactory transactionFactoryFor = muleContext.getTransactionFactoryManager().getTransactionFactoryFor(FakeTransactionResource.class);
-        Assert.assertNotNull(transactionFactoryFor);
-        
+        assertNotNull(transactionFactoryFor);
+
     }
-    
-    
 }

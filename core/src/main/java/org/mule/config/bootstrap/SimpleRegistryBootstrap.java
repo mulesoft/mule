@@ -31,10 +31,7 @@ import org.mule.util.PropertiesUtils;
 import org.mule.util.UUID;
 
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.util.Enumeration;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -81,9 +78,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 {
-    public static final String SERVICE_PATH = "META-INF/services/org/mule/config/";
-
-    public static final String REGISTRY_PROPERTIES = "registry-bootstrap.properties";
 
     public String TRANSFORMER_KEY = ".transformer.";
     public String OBJECT_KEY = ".object.";
@@ -92,6 +86,18 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
     protected final transient Log logger = LogFactory.getLog(getClass());
 
     protected MuleContext context;
+
+    private final RegistryBootstrapDiscoverer discoverer;
+
+    public SimpleRegistryBootstrap()
+    {
+        this(new ClassPathRegistryBootstrapDiscoverer());
+    }
+
+    public SimpleRegistryBootstrap(RegistryBootstrapDiscoverer discoverer)
+    {
+        this.discoverer = discoverer;
+    }
 
     /** {@inheritDoc} */
     public void setMuleContext(MuleContext context)
@@ -102,30 +108,17 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
     /** {@inheritDoc} */
     public void initialise() throws InitialisationException
     {
-        Enumeration<?> e = ClassUtils.getResources(SERVICE_PATH + REGISTRY_PROPERTIES, getClass());
-        List<Properties> bootstraps = new LinkedList<Properties>();
-
-        // load ALL of the bootstrap files first
-        while (e.hasMoreElements())
+        List<Properties> bootstraps;
+        try
         {
-            try
-            {
-                URL url = (URL) e.nextElement();
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Reading bootstrap file: " + url.toString());
-                }
-                Properties p = new OrderedProperties();
-                p.load(url.openStream());
-                bootstraps.add(p);
-            }
-            catch (Exception e1)
-            {
-                throw new InitialisationException(e1, this);
-            }
+            bootstraps = discoverer.discover();
+        }
+        catch (Exception e)
+        {
+            throw new InitialisationException(e, this);
         }
 
-        // ... and only then merge and process them
+        // Merge and process properties
         int objectCounter = 1;
         int transformerCounter = 1;
         Properties transformers = new OrderedProperties();
@@ -220,7 +213,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
             {
                 throwExceptionIfNotOptional(optional,cnfe,"Ignoring optional transaction factory: " + transactionResourceClassName);
             }
-            
+
         }
     }
 
@@ -388,7 +381,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         }
     }
 
-    private void throwExceptionIfNotOptional(boolean optional, Throwable t, String message) throws Exception 
+    private void throwExceptionIfNotOptional(boolean optional, Throwable t, String message) throws Exception
     {
         if (optional)
         {
