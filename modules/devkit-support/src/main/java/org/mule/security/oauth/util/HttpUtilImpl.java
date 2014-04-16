@@ -79,7 +79,7 @@ public class HttpUtilImpl implements HttpUtil
             else 
             {
                 String response = IOUtils.toString(conn.getErrorStream());
-                String errorMsg = String.format("Received status code [%d] while trying to get OAuth2 verification code. Response body was [%s]", responseCode, errorMsg);    
+                String errorMsg = String.format("Received status code [%d] while trying to get OAuth2 verification code. Response body was [%s]", responseCode, response);
                 logger.error(errorMsg);  
                 throw new IOException(errorMsg);
             }
