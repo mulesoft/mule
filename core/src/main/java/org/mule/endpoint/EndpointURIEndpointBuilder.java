@@ -10,6 +10,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.processor.MessageProcessor;
 
 import java.util.Collections;
@@ -53,6 +54,7 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         transformers = global.transformers;
         responseTransformers = global.responseTransformers;
         redeliveryPolicy = global.redeliveryPolicy;
+        messagingExceptionHandler = global.messagingExceptionHandler;
         setAnnotations(global.getAnnotations());
 
     }
