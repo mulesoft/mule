@@ -1,8 +1,0 @@
-/lib
-/lib/user
-/lib/user/jruby-complete-1.0.jar
-/lib/user/jruby-engine-1.1-jdk14.jar
-/lib/user/js-1.6R5.jar
-/lib/user/js-engine-1.1-jdk14.jar
-/lib/user/jython-2.2.1.jar
-/lib/user/jython-engine-1.1-jdk14.jar
