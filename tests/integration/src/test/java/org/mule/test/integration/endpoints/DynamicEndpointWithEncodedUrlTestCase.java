@@ -23,7 +23,7 @@ public class DynamicEndpointWithEncodedUrlTestCase extends org.mule.tck.junit4.F
     public DynamicPort httpPort = new DynamicPort("httpPort");
 
     @Override
-    protected String getConfigFile()
+    protected String getConfigResources()
     {
         return "org/mule/test/integration/endpoints/dynamic-endpoint-encoded-url-config.xml";
     }
