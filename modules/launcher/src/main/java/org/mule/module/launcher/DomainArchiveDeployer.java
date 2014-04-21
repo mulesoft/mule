@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher;
 
+import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.artifact.ArtifactFactory;
 import org.mule.module.launcher.domain.Domain;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
@@ -14,23 +15,33 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class DomainBundleArchiveDeployer implements ArchiveDeployer<Domain>
+/**
+ * Archive deployer for domains.
+ * <p/>
+ * Knows how to deploy / undeploy a domain and a domain bundle (zip with domain + domains apps).
+ */
+public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
 {
 
     private transient final Log logger = LogFactory.getLog(getClass());
 
     public static final String DOMAIN_BUNDLE_APPS_FOLDER = "apps";
     private final ArchiveDeployer<Domain> domainDeployer;
+    private final DeploymentService deploymentService;
+    private final ArchiveDeployer<Application> applicationDeployer;
 
-    public DomainBundleArchiveDeployer(ArchiveDeployer<Domain> domainDeployer)
+    public DomainArchiveDeployer(ArchiveDeployer<Domain> domainDeployer, ArchiveDeployer<Application> applicationDeployer, DeploymentService deploymentService)
     {
         this.domainDeployer = domainDeployer;
+        this.applicationDeployer = applicationDeployer;
+        this.deploymentService = deploymentService;
     }
 
     @Override
@@ -57,9 +68,22 @@ public class DomainBundleArchiveDeployer implements ArchiveDeployer<Domain>
         return domain;
     }
 
+    /**
+     * Undeploys a domain.
+     * <p/>
+     * Before undeploying the domain it undeploys the applications
+     * associated.
+     *
+     * @param artifactDir domain name to undeploy
+     */
     @Override
     public void undeployArtifact(String artifactDir)
     {
+        Collection<Application> domainApplications = deploymentService.findDomainApplications(artifactDir);
+        for (Application domainApplication : domainApplications)
+        {
+            applicationDeployer.undeployArtifact(domainApplication.getArtifactName());
+        }
         domainDeployer.undeployArtifact(artifactDir);
     }
 
