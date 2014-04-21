@@ -9,14 +9,12 @@ package org.mule.el.mvel;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.el.context.AbstractELTestCase;
 import org.mule.mvel2.CompileException;
-import org.mule.mvel2.MVEL;
 import org.mule.mvel2.ParserConfiguration;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
@@ -26,10 +24,16 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 
 @SmallTest
-public class MVELExpressionExecutorTestCase extends AbstractMuleTestCase
+public class MVELExpressionExecutorTestCase extends AbstractELTestCase
 {
+
     protected MVELExpressionExecutor mvel;
     protected MVELExpressionLanguageContext context;
+
+    public MVELExpressionExecutorTestCase(Variant variant, String mvelOptimizer)
+    {
+        super(variant, mvelOptimizer);
+    }
 
     @Before
     public void setupMVEL() throws InitialisationException
@@ -136,7 +140,6 @@ public class MVELExpressionExecutorTestCase extends AbstractMuleTestCase
     {
         assertNull(mvel.execute("new Object().doesntExist()", context));
     }
-
 
     static class MyClassClassLoader extends ClassLoader
     {

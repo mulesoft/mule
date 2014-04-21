@@ -28,9 +28,9 @@ import org.mockito.Mockito;
 
 public class MessagePropertiesTestCase extends AbstractELTestCase
 {
-    public MessagePropertiesTestCase(Variant variant)
+    public MessagePropertiesTestCase(Variant variant, String mvelOptimizer)
     {
-        super(variant);
+        super(variant, mvelOptimizer);
     }
 
     @Test

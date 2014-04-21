@@ -19,9 +19,9 @@ import org.w3c.dom.Document;
 public class XMLExpressionLanguageEnrichmentW3CTestCase extends AbstractELTestCase
 {
 
-    public XMLExpressionLanguageEnrichmentW3CTestCase(Variant variant)
+    public XMLExpressionLanguageEnrichmentW3CTestCase(Variant variant, String optimizer)
     {
-        super(variant);
+        super(variant, optimizer);
     }
 
     @Test

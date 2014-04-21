@@ -42,10 +42,6 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
 
         MVEL.COMPILER_OPT_PROPERTY_ACCESS_DOESNT_FAIL = true;
 
-        // Use reflective optimizer rather than default to avoid concurrency issues with JIT complication.
-        // See MULE-6630
-        OptimizerFactory.setDefaultOptimizer(OptimizerFactory.SAFE_REFLECTIVE);
-
         compiledExpressionsCache = CacheBuilder.newBuilder()
             .maximumSize(COMPILED_EXPRESSION_MAX_CACHE_SIZE)
             .build(new CacheLoader<String, Serializable>()
@@ -56,7 +52,6 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
                     return MVEL.compileExpression(key, new ParserContext(parserConfiguration));
                 }
             });
-        OptimizerFactory.setDefaultOptimizer(OptimizerFactory.SAFE_REFLECTIVE);
     }
 
     @Override

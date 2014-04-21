@@ -17,9 +17,9 @@ import org.mockito.Mockito;
 
 public class PayloadTestCase extends AbstractELTestCase
 {
-    public PayloadTestCase(Variant variant)
+    public PayloadTestCase(Variant variant, String mvelOptimizer)
     {
-        super(variant);
+        super(variant, mvelOptimizer);
     }
 
     @Test

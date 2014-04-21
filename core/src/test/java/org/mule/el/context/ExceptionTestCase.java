@@ -22,9 +22,9 @@ import org.junit.Test;
 public class ExceptionTestCase extends AbstractELTestCase
 {
 
-    public ExceptionTestCase(Variant variant)
+    public ExceptionTestCase(Variant variant, String mvelOptimizer)
     {
-        super(variant);
+        super(variant, mvelOptimizer);
     }
 
     @Test

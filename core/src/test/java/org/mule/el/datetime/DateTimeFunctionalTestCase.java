@@ -16,9 +16,9 @@ import org.junit.Test;
 public class DateTimeFunctionalTestCase extends AbstractELTestCase
 {
 
-    public DateTimeFunctionalTestCase(Variant variant)
+    public DateTimeFunctionalTestCase(Variant variant, String mvelOptimizer)
     {
-        super(variant);
+        super(variant, mvelOptimizer);
     }
 
     @Test

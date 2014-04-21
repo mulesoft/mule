@@ -19,9 +19,9 @@ import org.junit.Test;
 public class AppContextTestCase extends AbstractELTestCase
 {
 
-    public AppContextTestCase(Variant variant)
+    public AppContextTestCase(Variant variant, String mvelOptimizer)
     {
-        super(variant);
+        super(variant, mvelOptimizer);
     }
 
     @Test

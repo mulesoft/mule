@@ -24,9 +24,9 @@ import org.mockito.Mockito;
 
 public class VariablesTestCase extends AbstractELTestCase
 {
-    public VariablesTestCase(Variant variant)
+    public VariablesTestCase(Variant variant, String mvelOptimizer)
     {
-        super(variant);
+        super(variant, mvelOptimizer);
     }
 
     @Test
