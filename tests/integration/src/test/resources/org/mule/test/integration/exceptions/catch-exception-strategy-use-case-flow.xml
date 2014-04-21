@@ -125,4 +125,13 @@
         </catch-exception-strategy>
     </flow>
 
+    <flow name="exceptionWithinCatchDynamicEndpoint">
+        <vm:inbound-endpoint path="in5"/>
+        <test:component throwException="true"/>
+        <catch-exception-strategy>
+            <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$ExecutionCountProcessor" />
+            <outbound-endpoint address="smtp://#[message.inboundProperties['host']]"/>
+        </catch-exception-strategy>
+    </flow>
+
 </mule>

@@ -19,6 +19,8 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -32,7 +34,6 @@ import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
 import org.junit.Rule;
 import org.junit.Test;
-
 
 public class CatchExceptionStrategyTestCase extends FunctionalTestCase
 {
@@ -48,7 +49,6 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
     @Rule
     public DynamicPort dynamicPort3 = new DynamicPort("port3");
-
 
     @Override
     protected String getConfigFile()
@@ -127,6 +127,19 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
         LocalMuleClient client = muleContext.getClient();
         latch = spy(new CountDownLatch(2));
         client.dispatch("vm://in4", MESSAGE, null);
+
+        assertFalse(latch.await(3, TimeUnit.SECONDS));
+        verify(latch).countDown();
+    }
+
+    @Test
+    public void testExceptionWithinCatchExceptionStrategyAndDynamicEndpoint() throws Exception
+    {
+        LocalMuleClient client = muleContext.getClient();
+        latch = spy(new CountDownLatch(2));
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("host", "localhost");
+        client.dispatch("vm://in5", MESSAGE, props);
 
         assertFalse(latch.await(3, TimeUnit.SECONDS));
         verify(latch).countDown();
