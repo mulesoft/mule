@@ -32,10 +32,7 @@ import org.mule.util.PropertiesUtils;
 import org.mule.util.UUID;
 
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.util.Enumeration;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -92,14 +89,12 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 
     protected final transient Log logger = LogFactory.getLog(getClass());
 
-    public static final String SERVICE_PATH = "META-INF/services/org/mule/config/";
-    public static final String REGISTRY_PROPERTIES = "registry-bootstrap.properties";
-
     public String TRANSFORMER_KEY = ".transformer.";
     public String OBJECT_KEY = ".object.";
     public String SINGLE_TX = ".singletx.";
 
     private ArtifactType supportedArtifactType = ArtifactType.APP;
+    private final RegistryBootstrapDiscoverer discoverer;
     protected MuleContext context;
 
     public enum ArtifactType
@@ -132,7 +127,28 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * Creates a default SimpleRegistryBootstrap using a {@link org.mule.config.bootstrap.ClassPathRegistryBootstrapDiscoverer}
+     * in order to get the Properties resources from the class path.
+     */
+    public SimpleRegistryBootstrap()
+    {
+        this(new ClassPathRegistryBootstrapDiscoverer());
+    }
+
+    /**
+     * Allows to specify a {@link org.mule.config.bootstrap.RegistryBootstrapDiscoverer} to discover the Properties
+     * resources to be used.
+     * @param discoverer
+     */
+    public SimpleRegistryBootstrap(RegistryBootstrapDiscoverer discoverer)
+    {
+        this.discoverer = discoverer;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void setMuleContext(MuleContext context)
     {
         this.context = context;
@@ -141,15 +157,23 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
     /** {@inheritDoc} */
     public void initialise() throws InitialisationException
     {
-        List<Properties> bootstraps = loadBootstrapProperties();
+        List<Properties> bootstraps;
+        try
+        {
+            bootstraps = discoverer.discover();
+        }
+        catch (Exception e)
+        {
+            throw new InitialisationException(e, this);
+        }
 
-        // ... and only then merge and process them
+        // Merge and process properties
         int objectCounter = 1;
         int transformerCounter = 1;
         Properties transformers = new OrderedProperties();
         Properties namedObjects = new OrderedProperties();
         Properties unnamedObjects = new OrderedProperties();
-        Map<String,String> singleTransactionFactories = new LinkedHashMap<String,String>();
+        Map<String,String> singleTransactionFactories = new LinkedHashMap<String, String>();
 
         for (Properties bootstrap : bootstraps)
         {
@@ -174,24 +198,14 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                         String transactionResource = bootstrap.getProperty(transactionResourceKey);
                         if (transactionResource == null)
                         {
-                            throw new InitialisationException(CoreMessages.createStaticMessage(String.format("Theres no transaction resource specified for transaction factory %s",key)),this);
+                            throw new InitialisationException(CoreMessages.createStaticMessage(String.format("Theres no transaction resource specified for transaction factory %s",key)), this);
                         }
                         singleTransactionFactories.put((String) entry.getValue(),transactionResource);
                     }
                 }
                 else
                 {
-                    // we allow arbitrary keys in the registry-bootstrap.properties but since we're
-                    // aggregating multiple files here we must make sure that the keys are unique
-//                    if (accumulatedProps.getProperty(key) != null)
-//                    {
-//                        throw new IllegalStateException(
-//                                "more than one registry-bootstrap.properties file contains a key " + key);
-//                    }
-//                    else
-                    {
-                        namedObjects.put(key, entry.getValue());
-                    }
+                    namedObjects.put(key, entry.getValue());
                 }
             }
         }
@@ -208,32 +222,6 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         {
             throw new InitialisationException(e1, this);
         }
-    }
-
-    protected List<Properties> loadBootstrapProperties() throws InitialisationException
-    {
-        Enumeration<?> e = ClassUtils.getResources(SERVICE_PATH + REGISTRY_PROPERTIES, getClass());
-        List<Properties> bootstraps = new LinkedList<Properties>();
-        // load ALL of the bootstrap files first
-        while (e.hasMoreElements())
-        {
-            try
-            {
-                URL url = (URL) e.nextElement();
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Reading bootstrap file: " + url.toString());
-                }
-                Properties p = new OrderedProperties();
-                p.load(url.openStream());
-                bootstraps.add(p);
-            }
-            catch (Exception e1)
-            {
-                throw new InitialisationException(e1, this);
-            }
-        }
-        return bootstraps;
     }
 
     private void registerTransactionFactories(Map<String, String> singleTransactionFactories, MuleContext context) throws Exception
@@ -258,13 +246,12 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
             }
             catch (NoClassDefFoundError ncdfe)
             {
-                throwExceptionIfNotOptional(optional,ncdfe,"Ignoring optional transaction factory: " + transactionResourceClassName);
+                throwExceptionIfNotOptional(optional,ncdfe, "Ignoring optional transaction factory: " + transactionResourceClassName);
             }
             catch (ClassNotFoundException cnfe)
             {
-                throwExceptionIfNotOptional(optional,cnfe,"Ignoring optional transaction factory: " + transactionResourceClassName);
+                throwExceptionIfNotOptional(optional,cnfe, "Ignoring optional transaction factory: " + transactionResourceClassName);
             }
-            
         }
     }
 
@@ -444,7 +431,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         }
     }
 
-    private void throwExceptionIfNotOptional(boolean optional, Throwable t, String message) throws Exception 
+    private void throwExceptionIfNotOptional(boolean optional, Throwable t, String message) throws Exception
     {
         if (optional)
         {

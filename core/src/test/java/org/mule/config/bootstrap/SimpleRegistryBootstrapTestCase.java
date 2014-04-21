@@ -9,29 +9,19 @@ package org.mule.config.bootstrap;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
-
-import org.hamcrest.core.IsNull;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Answers;
-import org.mockito.Mockito;
-import org.mockito.stubbing.Answer;
-
-import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transaction.TransactionFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Properties;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 public class SimpleRegistryBootstrapTestCase extends AbstractMuleContextTestCase
 {
-    
+
     public static final String TEST_TRANSACTION_FACTORY_CLASS = "javax.jms.Connection";
 
     @Test(expected=ClassNotFoundException.class)
@@ -76,19 +66,10 @@ public class SimpleRegistryBootstrapTestCase extends AbstractMuleContextTestCase
         properties.put("jms.singletx.transaction.resource1", String.format("%s,optional)", TEST_TRANSACTION_FACTORY_CLASS));
         properties.put("test.singletx.transaction.factory1", FakeTransactionFactory.class.getName());
         properties.put("test.singletx.transaction.resource1", FakeTransactionResource.class.getName());
-        SimpleRegistryBootstrap simpleRegistryBootstrap = new SimpleRegistryBootstrap()
-        {
-            @Override
-            protected List<Properties> loadBootstrapProperties() throws InitialisationException
-            {
-                return Arrays.asList(properties);
-            }
-        };
+        SimpleRegistryBootstrap simpleRegistryBootstrap = new SimpleRegistryBootstrap(new SinglePropertiesRegistryBootstrapDiscoverer(properties));
         simpleRegistryBootstrap.setSupportedArtifactType(artifactType);
         simpleRegistryBootstrap.setMuleContext(muleContext);
         simpleRegistryBootstrap.initialise();
         return simpleRegistryBootstrap;
     }
-
-
 }
