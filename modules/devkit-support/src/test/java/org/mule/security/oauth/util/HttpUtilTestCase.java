@@ -9,10 +9,14 @@ package org.mule.security.oauth.util;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
+import static org.mule.transport.http.HttpConstants.SC_ACCEPTED;
+import static org.mule.transport.http.HttpConstants.SC_CREATED;
+import static org.mule.transport.http.HttpConstants.SC_INTERNAL_SERVER_ERROR;
+import static org.mule.transport.http.HttpConstants.SC_NON_AUTHORITATIVE_INFORMATION;
+import static org.mule.transport.http.HttpConstants.SC_OK;
 
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.http.HttpConstants;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -31,11 +35,11 @@ public class HttpUtilTestCase extends FunctionalTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-                {HttpConstants.SC_OK},
-                {HttpConstants.SC_CREATED},
-                {HttpConstants.SC_ACCEPTED},
-                {HttpConstants.SC_NON_AUTHORITATIVE_INFORMATION},
-                {HttpConstants.SC_INTERNAL_SERVER_ERROR}
+                {SC_OK},
+                {SC_CREATED},
+                {SC_ACCEPTED},
+                {SC_NON_AUTHORITATIVE_INFORMATION},
+                {SC_INTERNAL_SERVER_ERROR}
         });
     }
 
@@ -64,11 +68,11 @@ public class HttpUtilTestCase extends FunctionalTestCase
         try
         {
             assertEquals(SUCCESS_PAYLOAD, util.post(String.format("http://localhost:%d/%d", port.getNumber(), statusCode), ""));
-            assertFalse(statusCode == 500);
+            assertFalse(statusCode == SC_INTERNAL_SERVER_ERROR);
         }
         catch (RuntimeException e)
         {
-            assertEquals(500, statusCode);
+            assertEquals(SC_INTERNAL_SERVER_ERROR, statusCode);
             assertTrue(e.getCause() instanceof IOException);
         }
     }
