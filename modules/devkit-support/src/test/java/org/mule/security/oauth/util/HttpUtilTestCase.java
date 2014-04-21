@@ -46,6 +46,11 @@ public class HttpUtilTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort port = new DynamicPort("port1");
 
+    public HttpUtilTestCase(int statusCode)
+    {
+        this.statusCode = statusCode;
+    }
+
     @Override
     protected String getConfigFile()
     {
@@ -57,11 +62,6 @@ public class HttpUtilTestCase extends FunctionalTestCase
     {
         super.doSetUp();
         util = new HttpUtilImpl();
-    }
-
-    public HttpUtilTestCase(int statusCode)
-    {
-        this.statusCode = statusCode;
     }
 
     @Test
