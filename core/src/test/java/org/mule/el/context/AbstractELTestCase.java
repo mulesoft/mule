@@ -39,14 +39,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
     public AbstractELTestCase(Variant variant, String mvelOptimizer)
     {
         this.variant = variant;
-        if (mvelOptimizer != null)
-        {
-            OptimizerFactory.setDefaultOptimizer(mvelOptimizer);
-        }
-        else
-        {
-            OptimizerFactory.setDefaultOptimizer(OptimizerFactory.DYNAMIC);
-        }
+        OptimizerFactory.setDefaultOptimizer(mvelOptimizer);
     }
 
     @Before
@@ -106,9 +99,13 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
     @Parameters
     public static List<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{Variant.EVALUATOR_LANGUAGE, null},
+        return Arrays.asList(new Object[][]
+        {
+            {Variant.EVALUATOR_LANGUAGE, OptimizerFactory.DYNAMIC},
             {Variant.EVALUATOR_LANGUAGE, OptimizerFactory.SAFE_REFLECTIVE},
-            {Variant.EVALUATOR_LANGUAGE, "ASM"}, {Variant.EXPRESSION_MANAGER, null}});
+            {Variant.EXPRESSION_MANAGER, OptimizerFactory.DYNAMIC},
+            {Variant.EXPRESSION_MANAGER, OptimizerFactory.SAFE_REFLECTIVE}
+        });
     }
 
     protected ExpressionLanguage getExpressionLanguage() throws Exception

@@ -18,9 +18,9 @@ import org.junit.Test;
 public class XMLExpressionLanguageEnrichmentDom4jTestCase extends AbstractELTestCase
 {
 
-    public XMLExpressionLanguageEnrichmentDom4jTestCase(Variant variant)
+    public XMLExpressionLanguageEnrichmentDom4jTestCase(Variant variant, String optimizer)
     {
-        super(variant);
+        super(variant, optimizer);
     }
 
     @Test

@@ -27,9 +27,9 @@ import org.junit.Test;
 public class XMLExpressionLanguageExtensionTestCase extends AbstractELTestCase
 {
 
-    public XMLExpressionLanguageExtensionTestCase(Variant variant)
+    public XMLExpressionLanguageExtensionTestCase(Variant variant, String optimizer)
     {
-        super(variant);
+        super(variant, optimizer);
     }
 
     @Test

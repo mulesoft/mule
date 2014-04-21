@@ -6,8 +6,10 @@
  */
 package org.mule.el.mvel;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
@@ -28,6 +30,7 @@ import org.mule.config.MuleManifest;
 import org.mule.el.context.AppContext;
 import org.mule.el.context.MessageContext;
 import org.mule.el.function.RegexExpressionLanguageFuntion;
+import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.PropertyAccessException;
 import org.mule.mvel2.ast.Function;
@@ -86,10 +89,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     public MVELExpressionLanguageTestCase(Variant variant, String mvelOptimizer)
     {
         this.variant = variant;
-        if (mvelOptimizer != null)
-        {
-            OptimizerFactory.setDefaultOptimizer(mvelOptimizer);
-        }
+        OptimizerFactory.setDefaultOptimizer(mvelOptimizer);
     }
 
     @Before
@@ -477,7 +477,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         catch (Exception e)
         {
             assertEquals(ExpressionRuntimeException.class, e.getClass());
-            assertEquals(PropertyAccessException.class, e.getCause().getClass());
+            assertThat(e.getCause(), instanceOf(CompileException.class));
         }
     }
 
@@ -581,11 +581,13 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     @Parameters
     public static List<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
+        return Arrays.asList(new Object[][]
+        {
             {Variant.EXPRESSION_WITH_DELIMITER, OptimizerFactory.SAFE_REFLECTIVE},
-            {Variant.EXPRESSION_WITH_DELIMITER, "ASM"}, {Variant.EXPRESSION_WITH_DELIMITER, null},
+            {Variant.EXPRESSION_WITH_DELIMITER, OptimizerFactory.DYNAMIC},
             {Variant.EXPRESSION_STRAIGHT_UP, OptimizerFactory.SAFE_REFLECTIVE},
-            {Variant.EXPRESSION_STRAIGHT_UP, "ASM"}, {Variant.EXPRESSION_STRAIGHT_UP, null},});
+            {Variant.EXPRESSION_STRAIGHT_UP, OptimizerFactory.DYNAMIC}
+        });
     }
 
     private static class HelloWorldFunction extends Function
