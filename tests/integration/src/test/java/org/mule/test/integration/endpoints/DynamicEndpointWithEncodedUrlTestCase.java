@@ -13,9 +13,11 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+@Ignore("MULE-7524")
 public class DynamicEndpointWithEncodedUrlTestCase extends org.mule.tck.junit4.FunctionalTestCase
 {
 
