@@ -1,0 +1,68 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://consumer.ws.module.mule.org/" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://consumer.ws.module.mule.org/">
+    <xs:element name="echo" type="tns:echo"/>
+    <xs:element name="echoResponse" type="tns:echoResponse"/>
+    <xs:element name="echoWithHeaders" type="tns:echoWithHeaders"/>
+    <xs:element name="echoWithHeadersResponse" type="tns:echoWithHeadersResponse"/>
+    <xs:element name="fail" type="tns:fail"/>
+    <xs:element name="failResponse" type="tns:failResponse"/>
+    <xs:element name="noParams" type="tns:noParams"/>
+    <xs:element name="noParamsResponse" type="tns:noParamsResponse"/>
+    <xs:element name="noParamsWithHeader" type="tns:noParamsWithHeader"/>
+    <xs:element name="noParamsWithHeaderResponse" type="tns:noParamsWithHeaderResponse"/>
+    <xs:complexType name="fail">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="text" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="failResponse">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="text" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="echoFault">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="text" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="noParamsWithHeader">
+        <xs:sequence/>
+    </xs:complexType>
+    <xs:complexType name="noParamsWithHeaderResponse">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="text" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="echoWithHeaders">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="text" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="echoWithHeadersResponse">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="text" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="noParams">
+        <xs:sequence/>
+    </xs:complexType>
+    <xs:complexType name="noParamsResponse">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="text" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="echo">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="text" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="echoResponse">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="text" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="EchoException" nillable="true" type="tns:echoFault"/>
+    <xs:element name="header" nillable="true" type="xs:string"/>
+    <xs:element name="headerIn" nillable="true" type="xs:string"/>
+    <xs:element name="headerInOut" nillable="true" type="xs:string"/>
+    <xs:element name="headerOut" nillable="true" type="xs:string"/>
+</xs:schema>
