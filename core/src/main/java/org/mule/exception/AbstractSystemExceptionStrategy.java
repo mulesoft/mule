@@ -115,7 +115,6 @@ public class AbstractSystemExceptionStrategy extends AbstractExceptionListener i
                     try
                     {
                         logger.debug("Reconnecting " + connector.getName());
-                        connector.connect();
                         connector.start();
                     }
                     catch (Exception e)
