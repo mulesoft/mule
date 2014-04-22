@@ -27,7 +27,7 @@ public interface ArchiveDeployer<T extends Artifact>
 
     T deployPackagedArtifact(URL artifactAchivedUrl);
 
-    void undeployArtifact(String artifactDir);
+    void undeployArtifact(String artifactId);
 
     File getDeploymentDirectory();
 

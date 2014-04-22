@@ -21,15 +21,19 @@ import org.mule.module.launcher.domain.DomainFactory;
 import org.mule.module.launcher.domain.MuleDomainClassLoaderRepository;
 import org.mule.module.launcher.util.DebuggableReentrantLock;
 import org.mule.module.launcher.util.ObservableList;
+import org.mule.util.Preconditions;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.io.filefilter.AndFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -77,7 +81,7 @@ public class MuleDeploymentService implements DeploymentService
 
         this.applicationDeployer = new DefaultArchiveDeployer(applicationMuleDeployer, applicationFactory, applications, deploymentLock);
         this.applicationDeployer.setDeploymentListener(applicationDeploymentListener);
-        this.domainDeployer = new DomainBundleArchiveDeployer(new DefaultArchiveDeployer(domainMuleDeployer, domainFactory, domains, deploymentLock));
+        this.domainDeployer = new DomainArchiveDeployer(new DefaultArchiveDeployer(domainMuleDeployer, domainFactory, domains, deploymentLock), applicationDeployer, this);
         this.domainDeployer.setDeploymentListener(domainDeploymentListener);
         this.deploymentDirectoryWatcher = new DeploymentDirectoryWatcher(domainDeployer, applicationDeployer, domains, applications, deploymentLock);
     }
@@ -123,6 +127,19 @@ public class MuleDeploymentService implements DeploymentService
     public Application findApplication(String appName)
     {
         return deploymentDirectoryWatcher.findArtifact(appName, applications);
+    }
+
+    public Collection<Application> findDomainApplications(final String domain)
+    {
+        Preconditions.checkArgument(domain != null, "Domain name cannot be null");
+        return (Collection<Application>) CollectionUtils.select(applications, new Predicate()
+        {
+            @Override
+            public boolean evaluate(Object object)
+            {
+                return ((Application) object).getDomain().getArtifactName().equals(domain);
+            }
+        });
     }
 
 

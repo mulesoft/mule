@@ -110,13 +110,13 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         return deployExplodedApp(artifactName);
     }
 
-    public void undeployArtifact(String artifactDir)
+    public void undeployArtifact(String artifactId)
     {
-        if (artifactZombieMap.containsKey(artifactDir))
+        if (artifactZombieMap.containsKey(artifactId))
         {
             return;
         }
-        T artifact = (T) CollectionUtils.find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactDir));
+        T artifact = (T) CollectionUtils.find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactId));
         undeploy(artifact);
     }
 
