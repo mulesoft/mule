@@ -10,6 +10,7 @@ import org.mule.api.el.VariableAssignmentCallback;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.mvel2.ImmutableElementException;
 
+@SuppressWarnings("serial")
 class MuleImmutableVariableResolver<T> extends MuleVariableResolver<T>
 {
     public MuleImmutableVariableResolver(String name, T value, Class<?> type)
