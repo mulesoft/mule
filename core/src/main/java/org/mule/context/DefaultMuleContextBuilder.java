@@ -30,6 +30,7 @@ import org.mule.api.context.notification.ServiceNotificationListener;
 import org.mule.api.context.notification.TransactionNotificationListener;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.config.DefaultMuleConfiguration;
+import org.mule.config.ImmutableThreadingProfile;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.AsyncMessageNotification;
@@ -67,8 +68,10 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DefaultMuleContextBuilder implements MuleContextBuilder
 {
+
     protected static final Log logger = LogFactory.getLog(DefaultMuleContextBuilder.class);
-    
+    public static final String MULE_CONTEXT_WORKMANAGER_MAXTHREADSACTIVE = "mule.context.workmanager.maxthreadsactive";
+
     protected MuleConfiguration config;
 
     protected MuleContextLifecycleManager lifecycleManager;
@@ -229,7 +232,23 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         final String threadPrefix = config.isContainerMode()
                 ? String.format("[%s].Mule", config.getId())
                 : "MuleServer";
-        return new MuleWorkManager(ThreadingProfile.DEFAULT_THREADING_PROFILE, threadPrefix, config.getShutdownTimeout());
+        ImmutableThreadingProfile threadingProfile = createMuleWorkManager();
+        return new MuleWorkManager(threadingProfile, threadPrefix, config.getShutdownTimeout());
+    }
+
+    protected ImmutableThreadingProfile createMuleWorkManager()
+    {
+        return new ImmutableThreadingProfile(
+                    Integer.valueOf(System.getProperty(MULE_CONTEXT_WORKMANAGER_MAXTHREADSACTIVE, String.valueOf(ThreadingProfile.DEFAULT_MAX_THREADS_ACTIVE))),
+                    ThreadingProfile.DEFAULT_MAX_THREADS_IDLE,
+                    ThreadingProfile.DEFAULT_MAX_BUFFER_SIZE,
+                    ThreadingProfile.DEFAULT_MAX_THREAD_TTL,
+                    ThreadingProfile.DEFAULT_THREAD_WAIT_TIMEOUT,
+                    ThreadingProfile.DEFAULT_POOL_EXHAUST_ACTION,
+                    ThreadingProfile.DEFAULT_DO_THREADING,
+                    null,
+                    null
+            );
     }
 
     protected DefaultWorkListener createWorkListener()
