@@ -1253,40 +1253,37 @@
         <repository>
             <id>mule-releases</id>
             <name>Mule Release Repository</name>
-            <url>dav:https://dav.codehaus.org/repository/mule/</url>
+            <url>https://repository-master.mulesoft.org/nexus/content/repositories/releases</url>
         </repository>
         <snapshotRepository>
             <id>mule-snapshots</id>
             <name>Mule Snapshot Repository</name>
-            <url>dav:https://dav.codehaus.org/snapshots.repository/mule/</url>
+            <url>https://repository-master.mulesoft.org/nexus/content/repositories/snapshots</url>
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
-        <site>
-            <id>mule-site</id>
-            <name>Mule Website</name>
-            <url>dav:https://dav.codehaus.org/mule/docs/${project.version}</url>
-        </site>
     </distributionManagement>
 
     <repositories>
         <repository>
-            <id>codehaus</id>
-            <name>Codehaus Maven 2.x Release Repository</name>
-            <url>http://repository.codehaus.org</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+            <id>mule-releases</id>
+            <name>Mule Dependencies</name>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/releases/</url>
         </repository>
         <repository>
-            <id>codehaus-snapshots</id>
-            <name>Codehaus Maven 2.x Snapshots Repository</name>
-            <url>http://snapshots.repository.codehaus.org</url>
+            <id>mule-snapshots</id>
+            <name>Mule snapshots</name>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/snapshots/</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
             <releases>
                 <enabled>false</enabled>
             </releases>
+        </repository>
+        <repository>
+            <id>mule-deps</id>
+            <name>Mule dependencies</name>
+            <url>http://dist.codehaus.org/mule/dependencies/maven2/</url>
         </repository>
         <repository>
             <id>java-net</id>
@@ -1299,26 +1296,17 @@
             <url>http://repository.jboss.org/nexus/content/groups/public-jboss</url>
         </repository>
         <repository>
-            <id>mule-deps</id>
-            <name>Mule Dependencies</name>
-            <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
+            <id>codehaus</id>
+            <name>Codehaus Maven Repository</name>
+            <url>http://repository.codehaus.org</url>
         </repository>
     </repositories>
 
     <pluginRepositories>
         <pluginRepository>
-            <id>mule-deps</id>
+            <id>mule-plugin-deps</id>
             <name>Mule Dependencies</name>
-            <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
-        </pluginRepository>
-        <!-- this is needed to download dependencies of plugins from our custom repo -->
-        <pluginRepository>
-            <id>mule-plugins-deps</id>
-            <name>Mule Plugin Dependencies</name>
-            <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/releases/</url>
         </pluginRepository>
     </pluginRepositories>
 

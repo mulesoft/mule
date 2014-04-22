@@ -15,15 +15,6 @@
         <licensePath>../LICENSE_HEADER.txt</licensePath>
     </properties>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>mule-dist-snapshots</id>
-            <name>Mule Distributions Snapshot Repository</name>
-            <url>dav:https://dav.codehaus.org/snapshots.dist/mule/</url>
-            <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
-    </distributionManagement>
-
     <build>
         <plugins>
             <plugin>
@@ -31,8 +22,6 @@
                 <artifactId>maven-deploy-plugin</artifactId>
                 <configuration>
                     <skip>${skipDistributions}</skip>
-                    <repositoryId>mule-dist-releases</repositoryId>
-                    <snapshotRepositoryId>mule-dist-snapshots</snapshotRepositoryId>
                 </configuration>
             </plugin>
         </plugins>
