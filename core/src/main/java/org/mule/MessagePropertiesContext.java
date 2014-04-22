@@ -105,13 +105,8 @@ public class MessagePropertiesContext implements Serializable
     {
         if (properties != null)
         {
-            Map<String, Object> props = new HashMap<String, Object>(properties.size());
-            for (Map.Entry<String, Object> entry : properties.entrySet())
-            {
-                props.put(entry.getKey(), entry.getValue());
-            }
-            getScopedProperties(PropertyScope.INBOUND).putAll(props);
-            keySet.addAll(props.keySet());
+            getScopedProperties(PropertyScope.INBOUND).putAll(properties);
+            keySet.addAll(properties.keySet());
         }
     }
 

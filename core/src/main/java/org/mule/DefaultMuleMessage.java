@@ -224,11 +224,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     protected void copyMessageProperties(MuleMessage muleMessage)
     {
-        // explicitly copy INBOUND message properties over. This cannot be done in the loop below
-        Map<String, Object> inboundProperties =
-                ((DefaultMuleMessage) muleMessage).properties.getScopedProperties(PropertyScope.INBOUND);
-        addInboundProperties(inboundProperties);
-
         for (PropertyScope scope : new PropertyScope[]{PropertyScope.INBOUND,
             PropertyScope.OUTBOUND})
         {
