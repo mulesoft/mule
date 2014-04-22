@@ -128,34 +128,16 @@
         </plugins>
     </build>
 
-    <distributionManagement>
-        <downloadUrl>http://mule.mulesoft.org/display/MULE/Download</downloadUrl>
-        <repository>
-            <id>mule-releases</id>
-            <name>Mule Release Repository</name>
-            <url>dav:https://dav.codehaus.org/repository/mule/</url>
-        </repository>
-        <snapshotRepository>
-            <id>mule-snapshots</id>
-            <name>Mule Snapshot Repository</name>
-            <url>dav:https://dav.codehaus.org/snapshots.repository/mule/</url>
-            <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
-    </distributionManagement>
-
     <repositories>
         <repository>
-            <id>codehaus</id>
-            <name>Codehaus Release Repository</name>
-            <url>http://repository.codehaus.org</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+            <id>mule-releases</id>
+            <name>Mule Dependencies</name>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/releases/</url>
         </repository>
         <repository>
-            <id>codehaus-snapshots</id>
-            <name>Codehaus Snapshots Repository</name>
-            <url>http://snapshots.repository.codehaus.org</url>
+            <id>mule-snapshots</id>
+            <name>Mule snapshots</name>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/snapshots/</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
