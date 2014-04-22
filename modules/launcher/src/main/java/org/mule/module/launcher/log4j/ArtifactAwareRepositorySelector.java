@@ -19,11 +19,14 @@ import org.mule.module.reboot.MuleContainerSystemClassLoader;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.apache.log4j.Appender;
+import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.DailyRollingFileAppender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Hierarchy;
@@ -42,6 +45,8 @@ public class ArtifactAwareRepositorySelector implements RepositorySelector
     protected static final String PATTERN_LAYOUT = "%-5p %d [%t] %c: %m%n";
 
     protected static final Integer NO_CCL_CLASSLOADER = 0;
+
+    public static final String MULE_APP_LOG_FILE_TEMPLATE = "mule-app-%s.log";
 
     protected LoggerRepositoryCache cache = new LoggerRepositoryCache();
 
@@ -77,7 +82,7 @@ public class ArtifactAwareRepositorySelector implements RepositorySelector
                     String logFileNamePatter;
                     if (ccl instanceof ApplicationClassLoader)
                     {
-                        logFileNamePatter = "mule-app-%s.log";
+                        logFileNamePatter = MULE_APP_LOG_FILE_TEMPLATE;
                     }
                     else
                     {
@@ -103,7 +108,7 @@ public class ArtifactAwareRepositorySelector implements RepositorySelector
                     }
                     else
                     {
-                        addDefaultAppenderToRootLogger(root, "mule-main.log", null);
+                        addDefaultAppender(root, "mule-main.log", null);
                     }
                 }
 
@@ -141,7 +146,7 @@ public class ArtifactAwareRepositorySelector implements RepositorySelector
         final String artifactName = artifactClassLoader.getArtifactName();
         if (artifactLogConfig == null)
         {
-            addDefaultAppenderToRootLogger(root, logFileNameTemplate, artifactName);
+            addDefaultAppender(root, logFileNameTemplate, artifactName);
         }
         else
         {
@@ -163,16 +168,35 @@ public class ArtifactAwareRepositorySelector implements RepositorySelector
             // If the artifact logging is configured using the global config file and there is no file appender for the artifact, then configure a default one
             if (MuleContainerBootstrapUtils.getMuleConfDir() != null && artifactLogConfig.toExternalForm().contains(MuleContainerBootstrapUtils.getMuleConfDir().getAbsolutePath()))
             {
-                if (!loggerHasFileAppender(root, artifactName))
+                if (!hasFileAppender(root, artifactName))
                 {
-                    addDefaultAppenderToRootLogger(root, logFileNameTemplate, artifactName);
+                    addDefaultAppender(root, logFileNameTemplate, artifactName);
+                    removeConsoleAppenders(root);
                 }
             }
         }
         return configWatchDog;
     }
 
-    private boolean loggerHasFileAppender(RootLogger root, String artifactName)
+    private void removeConsoleAppenders(RootLogger root)
+    {
+        Collection<Appender> appendersToRemove = new ArrayList<Appender>();
+        Enumeration appenders = root.getAllAppenders();
+        while (appenders.hasMoreElements())
+        {
+            Appender appender = (Appender) appenders.nextElement();
+            if (appender instanceof ConsoleAppender)
+            {
+                appendersToRemove.add(appender);
+            }
+        }
+        for(Appender appender : appendersToRemove)
+        {
+            root.removeAppender(appender);
+        }
+    }
+
+    private boolean hasFileAppender(RootLogger root, String artifactName)
     {
         Enumeration appenders = root.getAllAppenders();
         while (appenders.hasMoreElements())
@@ -189,12 +213,13 @@ public class ArtifactAwareRepositorySelector implements RepositorySelector
         return false;
     }
 
-    private void addDefaultAppenderToRootLogger(RootLogger root, String logFileNameTemplate, String artifactName) throws IOException
+    private void addDefaultAppender(RootLogger root, String logFileNameTemplate, String artifactName) throws IOException
     {
         String logName = String.format(logFileNameTemplate, (artifactName != null ? artifactName : ""));
         File logDir = new File(MuleContainerBootstrapUtils.getMuleHome(), "logs");
         File logFile = new File(logDir, logName);
         DailyRollingFileAppender fileAppender = new DailyRollingFileAppender(new PatternLayout(PATTERN_LAYOUT), logFile.getAbsolutePath(), "'.'yyyy-MM-dd");
+        fileAppender.setName("defaultFileAppender");
         fileAppender.setAppend(true);
         fileAppender.activateOptions();
         root.addAppender(fileAppender);
