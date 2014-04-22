@@ -10,6 +10,7 @@ import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.artifact.ArtifactFactory;
 import org.mule.module.launcher.domain.Domain;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
+import org.mule.util.Preconditions;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -74,17 +75,19 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
      * Before undeploying the domain it undeploys the applications
      * associated.
      *
-     * @param artifactDir domain name to undeploy
+     * @param artifactId domain name to undeploy
      */
     @Override
-    public void undeployArtifact(String artifactDir)
+    public void undeployArtifact(String artifactId)
     {
-        Collection<Application> domainApplications = deploymentService.findDomainApplications(artifactDir);
+        Domain domain = deploymentService.findDomain(artifactId);
+        Preconditions.checkArgument(domain != null, String.format("Domain %s does not exists", artifactId));
+        Collection<Application> domainApplications = deploymentService.findDomainApplications(artifactId);
         for (Application domainApplication : domainApplications)
         {
             applicationDeployer.undeployArtifact(domainApplication.getArtifactName());
         }
-        domainDeployer.undeployArtifact(artifactDir);
+        domainDeployer.undeployArtifact(artifactId);
     }
 
     @Override

@@ -43,6 +43,7 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase
     public static final String ZIP_FILE_EXTENSION = ".zip";
     public static final String MOCK_APPLICATION_1_NAME = "MOCK_APPLICATION1_NAME";
     public static final String MOCK_APPLICATION_2_NAME = "MOCK_APPLICATION2_NAME";
+    public static final String NON_EXISTENT_DOMAIN_ID = "NonExistentDomainId";
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -116,6 +117,7 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase
     @Test
     public void onDomainUndeployUndeployDomainWithNoApps() throws Exception
     {
+        when(mockDeploymentService.findDomain(DOMAIN_NAME)).thenReturn(mockDomain);
         when(mockDomainDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH)).thenReturn(mockDomain);
         when(mockDeploymentService.findDomainApplications(DOMAIN_NAME)).thenReturn(Arrays.asList(new Application[0]));
         DomainArchiveDeployer domainArchiveDeployer = new DomainArchiveDeployer(mockDomainDeployer, mockApplicationDeployer, mockDeploymentService);
@@ -126,6 +128,7 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase
     @Test
     public void onDomainUndeployUndeployDomainApps() throws Exception
     {
+        when(mockDeploymentService.findDomain(DOMAIN_NAME)).thenReturn(mockDomain);
         when(mockDomainDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH)).thenReturn(mockDomain);
         when(mockDeploymentService.findDomainApplications(DOMAIN_NAME)).thenReturn(Arrays.asList(new Application[] {mockApplication1, mockApplication2}));
         DomainArchiveDeployer domainArchiveDeployer = new DomainArchiveDeployer(mockDomainDeployer, mockApplicationDeployer, mockDeploymentService);
@@ -133,6 +136,14 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase
         verify(mockApplicationDeployer, times(1)).undeployArtifact(MOCK_APPLICATION_1_NAME);
         verify(mockApplicationDeployer, times(1)).undeployArtifact(MOCK_APPLICATION_2_NAME);
         verify(mockDomainDeployer, times(1)).undeployArtifact(DOMAIN_NAME);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void onDomainUndeployWithNonExistentDomain()
+    {
+        when(mockDeploymentService.findDomain(NON_EXISTENT_DOMAIN_ID)).thenReturn(null);
+        DomainArchiveDeployer domainArchiveDeployer = new DomainArchiveDeployer(mockDomainDeployer, mockApplicationDeployer, mockDeploymentService);
+        domainArchiveDeployer.undeployArtifact(NON_EXISTENT_DOMAIN_ID);
     }
 
     private void verifyApplicationCopyToAppsFolder(String applicationName)
