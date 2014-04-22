@@ -9,6 +9,7 @@ package org.mule.el.mvel;
 import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.impl.BaseVariableResolverFactory;
 
+@SuppressWarnings("serial")
 public abstract class MuleBaseVariableResolverFactory extends BaseVariableResolverFactory
 {
 
@@ -67,7 +68,7 @@ public abstract class MuleBaseVariableResolverFactory extends BaseVariableResolv
         }
         else
         {
-            addResolver(name, vr = new MuleVariableResolver(name, value, type, null));
+            addResolver(name, vr = new MuleVariableResolver<Object>(name, value, type, null));
         }
         return vr;
     }

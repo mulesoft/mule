@@ -13,7 +13,8 @@ import org.mule.api.expression.InvalidExpressionException;
 import org.mule.mvel2.MVEL;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ParserContext;
-import org.mule.mvel2.optimizers.OptimizerFactory;
+import org.mule.mvel2.optimizers.impl.asm.ASMAccessorOptimizer;
+import org.mule.mvel2.optimizers.impl.refl.ReflectiveAccessorOptimizer;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -25,6 +26,14 @@ import java.io.Serializable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This MVEL executor uses MVEL default optimizer implementation, the {@link DynamicOptimizer}. The dynamic optimizer will use the
+ * {@link ASMAccessorOptimizer} to optimize expressions using byte-code when possible if an expression is used
+ * more than tenuring threshold (default 50). If byte-code optimization can't be used (because ASM isn't
+ * available or value is null) then the {@link ReflectiveAccessorOptimizer} is used instead. In order to
+ * always use the {@link ReflectiveAccessorOptimizer} the system property <code>mvel2.disable.jit</code> should be set to
+ * 'true'.
+ */
 public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpressionLanguageContext>
 {
 
