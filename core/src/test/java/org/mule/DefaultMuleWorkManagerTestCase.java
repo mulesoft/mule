@@ -12,6 +12,7 @@ import static org.mule.context.DefaultMuleContextBuilder.MULE_CONTEXT_WORKMANAGE
 
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.util.concurrent.Latch;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -32,8 +33,8 @@ public class DefaultMuleWorkManagerTestCase extends AbstractMuleContextTestCase
     public void contextWorkManagerCanBeConfiguredThroughSystemProperties() throws Exception
     {
         final Thread currentThread = Thread.currentThread();
-        final AtomicBoolean stop = new AtomicBoolean(false);
         final AtomicBoolean workExecutedInCurrentThread = new AtomicBoolean(false);
+        final Latch holdThreads = new Latch();
         for (int i = 0; i < MAX_NUMBER_OF_THREADS_ALLOWED + 1; i++)
         {
             muleContext.getWorkManager().scheduleWork(new Work()
@@ -53,21 +54,19 @@ public class DefaultMuleWorkManagerTestCase extends AbstractMuleContextTestCase
                         workExecutedInCurrentThread.set(true);
                         return;
                     }
-                    while (!stop.get())
+                    try
                     {
-                        try
-                        {
-                            Thread.sleep(1000);
-                        }
-                        catch (InterruptedException e)
-                        {
-                            throw new RuntimeException(e);
-                        }
+                        holdThreads.await();
+                    }
+                    catch (InterruptedException e)
+                    {
+                        throw new RuntimeException(e);
                     }
                 }
             });
         }
         assertThat(workExecutedInCurrentThread.get(), is(true));
+        holdThreads.release();
     }
 
 }

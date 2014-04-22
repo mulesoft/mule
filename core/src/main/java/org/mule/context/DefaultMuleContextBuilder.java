@@ -257,18 +257,23 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         final String threadPrefix = config.isContainerMode()
                 ? String.format("[%s].Mule", config.getId())
                 : "MuleServer";
-        ImmutableThreadingProfile threadingProfile = new ImmutableThreadingProfile(
-                Integer.valueOf(System.getProperty(MULE_CONTEXT_WORKMANAGER_MAXTHREADSACTIVE, String.valueOf(ThreadingProfile.DEFAULT_MAX_THREADS_ACTIVE))),
-                ThreadingProfile.DEFAULT_MAX_THREADS_IDLE,
-                ThreadingProfile.DEFAULT_MAX_BUFFER_SIZE,
-                ThreadingProfile.DEFAULT_MAX_THREAD_TTL,
-                ThreadingProfile.DEFAULT_THREAD_WAIT_TIMEOUT,
-                ThreadingProfile.DEFAULT_POOL_EXHAUST_ACTION,
-                ThreadingProfile.DEFAULT_DO_THREADING,
-                null,
-                null
-        );
+        ImmutableThreadingProfile threadingProfile = createMuleWorkManager();
         return new MuleWorkManager(threadingProfile, threadPrefix, config.getShutdownTimeout());
+    }
+
+    protected ImmutableThreadingProfile createMuleWorkManager()
+    {
+        return new ImmutableThreadingProfile(
+                    Integer.valueOf(System.getProperty(MULE_CONTEXT_WORKMANAGER_MAXTHREADSACTIVE, String.valueOf(ThreadingProfile.DEFAULT_MAX_THREADS_ACTIVE))),
+                    ThreadingProfile.DEFAULT_MAX_THREADS_IDLE,
+                    ThreadingProfile.DEFAULT_MAX_BUFFER_SIZE,
+                    ThreadingProfile.DEFAULT_MAX_THREAD_TTL,
+                    ThreadingProfile.DEFAULT_THREAD_WAIT_TIMEOUT,
+                    ThreadingProfile.DEFAULT_POOL_EXHAUST_ACTION,
+                    ThreadingProfile.DEFAULT_DO_THREADING,
+                    null,
+                    null
+            );
     }
 
     protected DefaultWorkListener createWorkListener()
