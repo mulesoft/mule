@@ -126,6 +126,8 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     @Before
     public final void setUpMuleContext() throws Exception
     {
+        doSetUpBeforeMuleContextCreation();
+
         muleContext = createMuleContext();
 
         if (isStartContext() && muleContext != null && !muleContext.isStarted())
@@ -134,6 +136,10 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         }
 
         doSetUp();
+    }
+
+    protected void doSetUpBeforeMuleContextCreation() throws Exception
+    {
     }
 
     private void startMuleContext() throws MuleException, InterruptedException
@@ -244,7 +250,12 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         if (!isDisposeContextPerClass())
         {
             disposeContext();
+            doTearDownAfterMuleContextDispose();
         }
+    }
+
+    protected void doTearDownAfterMuleContextDispose() throws Exception
+    {
     }
 
     @AfterClass
