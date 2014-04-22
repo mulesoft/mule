@@ -1514,7 +1514,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void undeploysDomainAndDomainsApps() throws Exception
     {
-        undeployDomainAndVerifyAppsAreUndeployed(new Action()
+        doDomainUndeployAndVerifyAppsAreUndeployed(new Action()
         {
             @Override
             public void perform()
@@ -1528,7 +1528,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void undeploysDomainAndDomainsAppsRemovingAnchorFile() throws Exception
     {
-        undeployDomainAndVerifyAppsAreUndeployed(createUndeployDummyDomainAction());
+        doDomainUndeployAndVerifyAppsAreUndeployed(createUndeployDummyDomainAction());
     }
 
     @Test
@@ -1536,7 +1536,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         addPackedAppFromResource(emptyAppDescriptor.zipPath);
 
-        undeployDomainAndVerifyAppsAreUndeployed(createUndeployDummyDomainAction());
+        doDomainUndeployAndVerifyAppsAreUndeployed(createUndeployDummyDomainAction());
 
         assertThat(findApp(emptyAppDescriptor.id, 1), notNullValue());
     }
@@ -1797,7 +1797,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         };
     }
 
-    private void undeployDomainAndVerifyAppsAreUndeployed(Action undeployAction) throws IOException
+    private void doDomainUndeployAndVerifyAppsAreUndeployed(Action undeployAction) throws IOException
     {
         deploymentService.start();
 

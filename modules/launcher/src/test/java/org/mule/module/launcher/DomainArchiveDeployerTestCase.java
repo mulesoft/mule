@@ -115,7 +115,7 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void onDomainUndeployUndeployDomainWithNoApps() throws Exception
+    public void undeployDomainWithNoApps() throws Exception
     {
         when(mockDeploymentService.findDomain(DOMAIN_NAME)).thenReturn(mockDomain);
         when(mockDomainDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH)).thenReturn(mockDomain);
@@ -126,7 +126,7 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void onDomainUndeployUndeployDomainApps() throws Exception
+    public void undeployDomainApps() throws Exception
     {
         when(mockDeploymentService.findDomain(DOMAIN_NAME)).thenReturn(mockDomain);
         when(mockDomainDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH)).thenReturn(mockDomain);
@@ -139,7 +139,7 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void onDomainUndeployWithNonExistentDomain()
+    public void undeployNonExistentDomain()
     {
         when(mockDeploymentService.findDomain(NON_EXISTENT_DOMAIN_ID)).thenReturn(null);
         DomainArchiveDeployer domainArchiveDeployer = new DomainArchiveDeployer(mockDomainDeployer, mockApplicationDeployer, mockDeploymentService);
