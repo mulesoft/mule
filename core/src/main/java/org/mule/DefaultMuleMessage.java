@@ -177,9 +177,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         addProperties(inboundProperties, PropertyScope.INBOUND);
         addProperties(outboundProperties);
 
-        // Set encoding outbound property previously only being set after copying a message.
-        setEncoding(getEncoding());
-        
         //Add inbound attachments
         if (attachments != null)
         {
