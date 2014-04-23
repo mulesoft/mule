@@ -6,19 +6,15 @@
  */
 package org.mule.config.spring.factories;
 
-import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.registry.ServiceType;
 import org.mule.endpoint.AbstractEndpoint;
-import org.mule.endpoint.DefaultOutboundEndpoint;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.exception.RollbackMessagingExceptionStrategy;
+import org.mule.exception.MessagingExceptionGeneratorToHandlerAdapter;
 import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.transport.service.TransportServiceDescriptor;
 
@@ -76,26 +72,11 @@ public class OutboundEndpointFactoryBean extends AbstractEndpointFactoryBean imp
     {
         if (isInExceptionStrategy)
         {
-            RollbackMessagingExceptionStrategy rollbackExceptionStrategy = new RollbackMessagingExceptionStrategy();
-            rollbackExceptionStrategy.setMuleContext(this.muleContext);
-            try
-            {
-                rollbackExceptionStrategy.initialise();
-                rollbackExceptionStrategy.start();
-            }
-            catch (MuleException e)
-            {
-                //This should never happen
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Failed to initialise rollback exception handler.", e);
-                }
-            }
-            messagingExceptionHandler = rollbackExceptionStrategy;
+            messagingExceptionHandler = new MessagingExceptionGeneratorToHandlerAdapter();
         }
         else
         {
-            messagingExceptionHandler = flowConstruct.getExceptionListener();
+            messagingExceptionHandler = flowConstruct != null ? flowConstruct.getExceptionListener() : null;
         }
     }
 
@@ -104,4 +85,5 @@ public class OutboundEndpointFactoryBean extends AbstractEndpointFactoryBean imp
     {
         this.flowConstruct = flowConstruct;
     }
+
 }
