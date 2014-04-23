@@ -9,7 +9,7 @@
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <http:endpoint name="clientEndpoint1" host="localhost" port="${port1}" path="test1?foo=boo&amp;far=bar" exchange-pattern="request-response"/>
-    <http:endpoint name="clientEndpoint2" host="localhost" port="${port1}" path="test1?foo=%23[header:foo]&amp;far=%23[header:far]" exchange-pattern="request-response"/>
+    <http:endpoint name="clientEndpoint2" host="localhost" port="${port1}" path="test1?foo=#[header:foo]&amp;far=#[header:far]" exchange-pattern="request-response"/>
 
     <jetty:endpoint name="serverEndpoint1" address="http://localhost:${port1}/test1" exchange-pattern="request-response">
         <expression-transformer>
