@@ -36,7 +36,9 @@ public class ServiceServiceTestCase extends AbstractMuleJmxTestCase
         component.setMuleContext(muleContext);
         service.setComponent(component);
 
-        service.setThreadingProfile(ThreadingProfile.DEFAULT_THREADING_PROFILE);
+        ThreadingProfile defaultThreadingProfile = ThreadingProfile.DEFAULT_THREADING_PROFILE;
+        defaultThreadingProfile.setMuleContext(muleContext);
+        service.setThreadingProfile(defaultThreadingProfile);
         SedaModel model = new SedaModel();
         model.setMuleContext(muleContext);
         service.setModel(model);
