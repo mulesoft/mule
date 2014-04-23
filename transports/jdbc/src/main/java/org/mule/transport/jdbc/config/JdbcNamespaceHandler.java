@@ -35,6 +35,7 @@ public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
     @Override
     public void init()
     {
+        logger.warn(getDeprecationWarning());
         registerStandardTransportEndpoints(JdbcConnector.JDBC, ADDRESS_ATTRIBUTES).addAlias(QUERY_KEY, URIBuilder.PATH);
         registerConnectorDefinitionParser(JdbcConnector.class, JdbcConnector.JDBC);
         registerBeanDefinitionParser("dataSource", new ObjectFactoryWrapper("dataSourceFactory"));
@@ -47,6 +48,11 @@ public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("transaction", new TransactionDefinitionParser(JdbcTransactionFactory.class));
         registerBeanDefinitionParser("object-store", new ChildDefinitionParser("store", JdbcObjectStore.class));
         registerDataSourceDefinitionParsers();
+    }
+
+    protected String getDeprecationWarning()
+    {
+        return "JDBC transport is deprecated and will be removed in Mule 4.0. Use the DB module instead";
     }
 
     protected void registerDataSourceDefinitionParsers()
