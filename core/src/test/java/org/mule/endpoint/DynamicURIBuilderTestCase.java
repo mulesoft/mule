@@ -101,6 +101,15 @@ public class DynamicURIBuilderTestCase extends AbstractMuleTestCase
         doDynamicUriResolverTest(uriBuilder);
     }
 
+    @Test(expected = MalformedEndpointException.class)
+    public void throwsErrorOnInvalidUrl() throws Exception
+    {
+        URIBuilder uriBuilder = new URIBuilder("#[expression]://localhost", muleContext);
+
+        DynamicURIBuilder dynamicURIBuilder = new DynamicURIBuilder(uriBuilder);
+        dynamicURIBuilder.build(event);
+    }
+
     private void createExpressionManager(String templateUri)
     {
         ExpressionManager expressionManager = mock(ExpressionManager.class);
