@@ -75,6 +75,8 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         assertMessageSentSame(true);
 
         assertSame(responseMessage, result.getMessage());
+
+        assertMessageEqualEncodingPropertyAdded(responseMessage, result.getMessage());
     }
 
     @Test
@@ -111,6 +113,8 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         assertMessageSentSame(true);
 
         assertSame(responseMessage, result.getMessage());
+
+        assertMessageEqualEncodingPropertyAdded(responseMessage, result.getMessage());
     }
 
     @Test
@@ -313,6 +317,19 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
     {
         assertNull(dispacher.sensedSendEvent);
         assertNull(dispacher.sensedDispatchEvent);
+    }
+
+    protected void assertMessageEqualEncodingPropertyAdded(MuleMessage expect, MuleMessage actual)
+    {
+        assertEquals(expect.getPayload(), actual.getPayload());
+        assertEquals(expect.getEncoding(), actual.getEncoding());
+        assertEquals(expect.getUniqueId(), actual.getUniqueId());
+        assertEquals(expect.getExceptionPayload(), actual.getExceptionPayload());
+
+        // Outbound endcodin property is added
+        assertEquals(muleContext.getConfiguration().getDefaultEncoding(),
+                     actual.getOutboundProperty(MuleProperties.MULE_ENCODING_PROPERTY));
+
     }
 
     protected OutboundEndpoint createOutboundEndpoint(String uri, Filter filter,
