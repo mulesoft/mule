@@ -15,7 +15,7 @@
         <spring:property name="location" value="classpath:derby.properties"/>
     </spring:bean>
 
-    <db:derby-config name="dbConfig" url="${database.connection}" driverClassName="org.apache.derby.jdbc.EmbeddedDriver"/>
+    <db:derby-config name="dbConfig" url="${database.connection}"/>
 
 </mule-domain>
 

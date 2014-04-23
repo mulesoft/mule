@@ -5,7 +5,7 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
-    <db:derby-config name = "pooledJdbcConfig" url="jdbc:derby:muleEmbeddedDB;create=true" driverClassName="org.apache.derby.jdbc.EmbeddedDriver" useXaTransactions="true">
+    <db:derby-config name = "pooledJdbcConfig" url="jdbc:derby:muleEmbeddedDB;create=true" useXaTransactions="true">
         <db:pooling-profile maxPoolSize="1" minPoolSize="0" maxWaitMillis="1"/>
     </db:derby-config>
 

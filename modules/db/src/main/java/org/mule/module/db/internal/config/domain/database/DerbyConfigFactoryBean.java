@@ -10,7 +10,7 @@ package org.mule.module.db.internal.config.domain.database;
 public class DerbyConfigFactoryBean extends DbConfigFactoryBean
 {
 
-    private static final String DRIVER_CLASS_NAME = "org.apache.derby.jdbc.ClientDriver";
+    private static final String DRIVER_CLASS_NAME = "org.apache.derby.jdbc.EmbeddedDriver";
 
     public DerbyConfigFactoryBean()
     {
