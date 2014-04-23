@@ -85,6 +85,11 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
                 if (resultMessage != null)
                 {
                     resultMessage.setMessageRootId(event.getMessage().getMessageRootId());
+                    
+                    // Ensure ENCODING message property is set to give exactly same behavior as before
+                    // OutboundRewriteResponseEventMessageProcessor was removed (MULE-7535).
+                    resultMessage.setEncoding(resultMessage.getEncoding());
+                    
                     MuleSession storedSession = connector.getSessionHandler().retrieveSessionInfoFromMessage(
                         resultMessage);
                     event.getSession().merge(storedSession);
