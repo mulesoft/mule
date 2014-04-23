@@ -36,6 +36,8 @@ import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.endpoint.AbstractMessageProcessorTestCase;
 import org.mule.endpoint.DynamicOutboundEndpoint;
+import org.mule.endpoint.DynamicURIBuilder;
+import org.mule.endpoint.URIBuilder;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
@@ -250,7 +252,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         when(endpointBuilder.buildOutboundEndpoint()).thenReturn(prototypeEndpoint);
         when(endpointBuilder.clone()).thenReturn(staticEndpointBuilder);
 
-        DynamicOutboundEndpoint dynamicOutboundEndpoint = new DynamicOutboundEndpoint(endpointBuilder, "test://localhost:#[header:port]");
+        DynamicOutboundEndpoint dynamicOutboundEndpoint = new DynamicOutboundEndpoint(endpointBuilder, new DynamicURIBuilder(new URIBuilder("test://localhost:#[header:port]", muleContext)));
 
         testOutboundEvent = createTestOutboundEvent();
         dynamicOutboundEndpoint.process(testOutboundEvent);
