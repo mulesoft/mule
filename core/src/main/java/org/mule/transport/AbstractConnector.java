@@ -362,19 +362,11 @@ public abstract class AbstractConnector implements Connector, WorkListener
                                 MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE);
                     }
 
-                    if (dispatcherPoolFactory == null) {
-                        dispatcherPoolFactory = new DefaultConfigurableKeyedObjectPoolFactory();
-                    }
-
-                    dispatchers = dispatcherPoolFactory.createObjectPool();
-                    if (dispatcherFactory != null) {
-                        dispatchers.setFactory(getWrappedDispatcherFactory(dispatcherFactory));
-                    }
-
                     // Initialise the structure of this connector
                     initFromServiceDescriptor();
 
-                    configureDispatcherPool();
+                    initDispatchers();
+                    
                     setMaxRequestersActive(getRequesterThreadingProfile().getMaxThreadsActive());
 
                     try
@@ -1016,7 +1008,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         this.dispatchers.setMaxTotal(20 * maxActive);
     }
 
-    private MessageDispatcher getDispatcher(OutboundEndpoint endpoint) throws MuleException
+    private MessageDispatcher borrowDispatcher(OutboundEndpoint endpoint) throws MuleException
     {
         if (!isStarted())
         {
@@ -2553,9 +2545,14 @@ public abstract class AbstractConnector implements Connector, WorkListener
                 }
             });
             builder.chain(async);
-            builder.chain(new DispatcherMessageProcessor(endpoint));
+            builder.chain(createDispatcherMessageProcessor(endpoint));
             return builder.build();
         }
+    }
+
+    protected MessageProcessor createInternalDispatcherMessageProcessor(OutboundEndpoint endpoint)
+    {
+        return new DispatcherMessageProcessor(endpoint);
     }
 
     @Override
@@ -2597,7 +2594,20 @@ public abstract class AbstractConnector implements Connector, WorkListener
         }
     }
 
-    class DispatcherMessageProcessor implements MessageProcessor
+    protected void initDispatchers()
+    {
+        if (dispatcherPoolFactory == null) {
+            dispatcherPoolFactory = new DefaultConfigurableKeyedObjectPoolFactory();
+        }
+
+        dispatchers = dispatcherPoolFactory.createObjectPool();
+        if (dispatcherFactory != null) {
+            dispatchers.setFactory(getWrappedDispatcherFactory(dispatcherFactory));
+        }
+        configureDispatcherPool();
+    }
+
+    protected class DispatcherMessageProcessor implements MessageProcessor
     {
         private OutboundNotificationMessageProcessor notificationMessageProcessor;
         private OutboundEndpoint endpoint;
@@ -2613,7 +2623,19 @@ public abstract class AbstractConnector implements Connector, WorkListener
             MessageDispatcher dispatcher = null;
             try
             {
-                dispatcher = getDispatcher(endpoint);
+                dispatcher = borrowDispatcher(endpoint);
+                return dispatch(dispatcher, event);
+            }
+            finally
+            {
+                returnDispatcher(endpoint, dispatcher);
+            }
+        }
+
+        protected MuleEvent dispatch(MessageDispatcher dispatcher, MuleEvent event) throws MuleException
+        {
+            try
+            {
                 boolean fireNotification = event.isNotificationsEnabled();
                 EndpointMessageNotification beginNotification = null;
                 if (fireNotification)
@@ -2631,8 +2653,8 @@ public abstract class AbstractConnector implements Connector, WorkListener
                     // We need to invoke notification message processor with request
                     // message only after successful send/dispatch
                     notificationMessageProcessor.dispatchNotification(beginNotification);
-                    notificationMessageProcessor.process((result != null && !VoidMuleEvent.getInstance().equals(
-                            result)) ? result : event);
+                    notificationMessageProcessor.process((result != null && !VoidMuleEvent.getInstance()
+                        .equals(result)) ? result : event);
                 }
 
                 return result;
@@ -2644,10 +2666,6 @@ public abstract class AbstractConnector implements Connector, WorkListener
             catch (MuleException ex)
             {
                 throw new DispatchException(event, endpoint, ex);
-            }
-            finally
-            {
-                returnDispatcher(endpoint, dispatcher);
             }
         }
 
