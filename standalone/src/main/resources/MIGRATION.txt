@@ -30,3 +30,4 @@ MULE-7362: MEL expressions now propagate nulls instead of raising an exception. 
 MULE-7513: Attribute secondsBetweenRetries has been deprecated in favor of a new attribute called millisBetweenRetries. This change is backwards compatible, you can still use secondsBetweenRetries although it's not recommended. Setting both attributes at the same time will result in a configuration error
 MULE-7386: Class org.mule.module.management.agent.JmxAgent has been renamed to org.mule.module.management.agent.JmxApplicationAgent
 MULE-7536: Mule distribution does not provide a lib/shared/default domain for sharing class loading. Now we provide a default mule domains under domains/default which serves the same purpose and more. You can still use the old shared class loading mechanism by creating the folder lib/shared/default
+MULE-7524: Encoded mule expressions in dynamic endpoints address components are not supported anymore (ie: %23[expression] must be #[expression])
