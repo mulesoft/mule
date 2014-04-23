@@ -52,7 +52,7 @@ public class MysqlConfigFactoryBeanTestCase extends AbstractMuleTestCase
     public void staticUrlWithoutProperties()
     {
         factory.setUrl(URL);
-        assertEquals(withMetadata(URL), factory.getEffectiveUrl());
+        assertEquals(URL, factory.getEffectiveUrl());
     }
 
     @Test
@@ -62,7 +62,7 @@ public class MysqlConfigFactoryBeanTestCase extends AbstractMuleTestCase
         factory.setHost(HOST);
         factory.setPort(PORT);
 
-        assertEquals(withMetadata(URL), factory.getEffectiveUrl());
+        assertEquals(URL, factory.getEffectiveUrl());
     }
 
     @Test
@@ -71,7 +71,7 @@ public class MysqlConfigFactoryBeanTestCase extends AbstractMuleTestCase
         factory.setDatabase(DATABASE);
         factory.setHost(HOST);
 
-        assertEquals(withMetadata(URL_WITHOUT_PORT), factory.getEffectiveUrl());
+        assertEquals(URL_WITHOUT_PORT, factory.getEffectiveUrl());
     }
 
     @Test
@@ -81,7 +81,7 @@ public class MysqlConfigFactoryBeanTestCase extends AbstractMuleTestCase
         properties.put(USER_PROPERTY, USER_VALUE);
         properties.put(PASSWORD_PROPERTY, PASSWORD_VALUE);
 
-        assertEquals(URL + URL_PROPERTIES + "&" + METADATA_PROPERTY, factory.getEffectiveUrl());
+        assertEquals(URL + URL_PROPERTIES, factory.getEffectiveUrl());
     }
 
     @Test
@@ -94,7 +94,7 @@ public class MysqlConfigFactoryBeanTestCase extends AbstractMuleTestCase
         properties.put(USER_PROPERTY, USER_VALUE);
         properties.put(PASSWORD_PROPERTY, PASSWORD_VALUE);
 
-        assertEquals(URL + URL_PROPERTIES + "&" + METADATA_PROPERTY, factory.getEffectiveUrl());
+        assertEquals(URL + URL_PROPERTIES, factory.getEffectiveUrl());
     }
 
     @Test
@@ -106,7 +106,7 @@ public class MysqlConfigFactoryBeanTestCase extends AbstractMuleTestCase
         properties.put(USER_PROPERTY, USER_VALUE);
         properties.put(PASSWORD_PROPERTY, PASSWORD_VALUE);
 
-        assertEquals(URL_WITHOUT_PORT + URL_PROPERTIES + "&" + METADATA_PROPERTY, factory.getEffectiveUrl());
+        assertEquals(URL_WITHOUT_PORT + URL_PROPERTIES, factory.getEffectiveUrl());
     }
 
     @Test
@@ -130,10 +130,4 @@ public class MysqlConfigFactoryBeanTestCase extends AbstractMuleTestCase
 
         factory.validate();
     }
-
-    private String withMetadata(String url)
-    {
-        return url + "?" + METADATA_PROPERTY;
-    }
-
 }

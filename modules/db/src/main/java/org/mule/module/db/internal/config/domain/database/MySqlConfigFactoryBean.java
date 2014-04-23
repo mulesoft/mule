@@ -7,8 +7,6 @@
 
 package org.mule.module.db.internal.config.domain.database;
 
-import java.util.Map;
-
 public class MySqlConfigFactoryBean extends AbstractVendorConfigFactoryBean
 {
 
@@ -20,18 +18,5 @@ public class MySqlConfigFactoryBean extends AbstractVendorConfigFactoryBean
         super(MYSQL_URL_PREFIX);
 
         setDriverClassName(DRIVER_CLASS_NAME);
-    }
-
-    @Override
-    public Map<String, String> getConnectionProperties()
-    {
-        Map<String, String> connectionProperties = super.getConnectionProperties();
-
-        if (MySqlConfigFactoryBean.DRIVER_CLASS_NAME.equals(getDriverClassName()))
-        {
-            connectionProperties.put("generateSimpleParameterMetadata", "true");
-        }
-
-        return connectionProperties;
     }
 }
