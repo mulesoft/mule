@@ -30,7 +30,7 @@
             <mule-ss:http-security-filter realm="mule-realm"/>
         </http:inbound-endpoint>
 
-        <set-payload value="Processed: #[header:INBOUND:foo]"/>
+        <set-payload value="Processed: #[message.inboundProperties['foo']]"/>
     </flow>
 </mule>
 

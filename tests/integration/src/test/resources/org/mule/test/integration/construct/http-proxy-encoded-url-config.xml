@@ -11,13 +11,13 @@
     <pattern:http-proxy name="dynamicAddress">
         <http:inbound-endpoint address="http://localhost:${port1}"/>
 
-        <http:outbound-endpoint address="http://admin:admin%40123@localhost:${serverPort}/#[header:INBOUND:path]?foo=bar"
+        <http:outbound-endpoint address="http://admin:admin%40123@localhost:${serverPort}/#[message.inboundProperties['path']]?foo=bar"
                                 exchange-pattern="request-response"/>
     </pattern:http-proxy>
 
     <pattern:http-proxy name="assembledDynamicAddress">
         <http:inbound-endpoint address="http://localhost:${port2}"/>
-        <http:outbound-endpoint user="admin" password="admin%40123" path="#[header:INBOUND:path]?foo=bar" host="localhost"
+        <http:outbound-endpoint user="admin" password="admin%40123" path="#[message.inboundProperties['path']]?foo=bar" host="localhost"
                                 port="${serverPort}" exchange-pattern="request-response"/>
     </pattern:http-proxy>
 
