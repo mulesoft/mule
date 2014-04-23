@@ -7,7 +7,7 @@
 package org.mule.transport;
 
 import org.mule.DefaultMuleEvent;
-import org.mule.RequestContext;
+import org.mule.OptimizedRequestContext;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -89,7 +89,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
                         resultMessage);
                     event.getSession().merge(storedSession);
                     MuleEvent resultEvent = new DefaultMuleEvent(resultMessage, event);
-                    RequestContext.setEvent(resultEvent);
+                    OptimizedRequestContext.unsafeSetEvent(resultEvent);
                     return resultEvent;
                 }
                 else
