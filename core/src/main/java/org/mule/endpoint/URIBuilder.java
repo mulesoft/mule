@@ -534,4 +534,50 @@ public class URIBuilder implements AnnotatedObject
         annotations.clear();
         annotations.putAll(newAnnotations);
     }
+
+    public String getProtocol()
+    {
+        return protocol;
+    }
+
+    public String getMeta()
+    {
+        return meta;
+    }
+
+    public String getUser()
+    {
+        return user;
+    }
+
+    public String getPassword()
+    {
+        return password;
+    }
+
+    public String getHost()
+    {
+        return host;
+    }
+
+    public String getPort()
+    {
+        return port;
+    }
+
+    public String getPath()
+    {
+        return path;
+    }
+
+    public String getAddress()
+    {
+        return address;
+    }
+
+    public Map getQueryMap()
+    {
+        return queryMap;
+    }
+
 }

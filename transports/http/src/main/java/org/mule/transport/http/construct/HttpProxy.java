@@ -23,8 +23,10 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.construct.AbstractConfigurationPattern;
 import org.mule.endpoint.DynamicOutboundEndpoint;
+import org.mule.endpoint.DynamicURIBuilder;
 import org.mule.endpoint.DynamicURIOutboundEndpoint;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.endpoint.URIBuilder;
 import org.mule.processor.ResponseMessageProcessorAdapter;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.transformer.TransformerTemplate;
@@ -126,8 +128,11 @@ public class HttpProxy extends AbstractConfigurationPattern
                 final String uriTemplate = outboundEndpoint.getEndpointURI().getUri().toString()
                                            + "#[variable:http.path.extension]";
 
+                URIBuilder uriBuilder = new URIBuilder(uriTemplate, muleContext);
+                DynamicURIBuilder dynamicURIBuilder = new DynamicURIBuilder(uriBuilder);
+
                 dynamicOutboundEndpoint = new DynamicOutboundEndpoint(
-                        new EndpointURIEndpointBuilder(outboundEndpoint), uriTemplate);
+                        new EndpointURIEndpointBuilder(outboundEndpoint), dynamicURIBuilder);
             }
 
             proxyBuilder.chain(dynamicOutboundEndpoint);
