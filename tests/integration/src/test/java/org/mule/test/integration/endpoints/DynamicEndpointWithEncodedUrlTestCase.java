@@ -7,34 +7,36 @@
 
 package org.mule.test.integration.endpoints;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.junit4.rule.DynamicPort;
-
-import org.junit.Rule;
-import org.junit.Test;
-
-public class DynamicEndpointWithEncodedUrlTestCase extends org.mule.tck.junit4.FunctionalTestCase
+public class DynamicEndpointWithEncodedUrlTestCase extends AbstractEndpointEncodedUrlTestCase
 {
 
-    @Rule
-    public DynamicPort httpPort = new DynamicPort("httpPort");
-
     @Override
-    protected String getConfigResources()
+    protected String getEncodedUrlConfigFile()
     {
         return "org/mule/test/integration/endpoints/dynamic-endpoint-encoded-url-config.xml";
     }
 
-    @Test
-    public void encodesUrlInDynamicEndpoint() throws Exception
+    @Override
+    protected String getDynamicUrl()
     {
-        MuleClient client = muleContext.getClient();
+        return "vm://testDynamic";
+    }
 
-        MuleMessage response = client.send("vm://testInput", TEST_MESSAGE, null);
+    @Override
+    protected String getAssembledDynamicUrl()
+    {
+        return "vm://testAssembledDynamic";
+    }
 
-        assertThat(response.getPayloadAsString(), equalTo("Processed"));
+    @Override
+    protected String getStaticUrl()
+    {
+        return "vm://testStatic";
+    }
+
+    @Override
+    protected String getAssembledStaticUrl()
+    {
+        return "vm://testAssembledStatic";
     }
 }

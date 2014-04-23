@@ -225,9 +225,10 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
             {
                 uri = uriBuilder.getEncodedConstructor();
                 String dynamicAddress = getDynamicUriFrom(uri);
+                URIBuilder originalBuilder = uriBuilder;
                 uriBuilder = new URIBuilder(dynamicAddress, muleContext);
 
-                return new DynamicOutboundEndpoint(this, uri);
+                return new DynamicOutboundEndpoint(this, new DynamicURIBuilder(originalBuilder));
             }
             else
             {
