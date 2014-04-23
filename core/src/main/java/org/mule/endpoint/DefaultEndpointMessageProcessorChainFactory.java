@@ -25,7 +25,6 @@ import org.mule.endpoint.outbound.OutboundEndpointPropertyMessageProcessor;
 import org.mule.endpoint.outbound.OutboundEventTimeoutMessageProcessor;
 import org.mule.endpoint.outbound.OutboundLoggingMessageProcessor;
 import org.mule.endpoint.outbound.OutboundResponsePropertiesMessageProcessor;
-import org.mule.endpoint.outbound.OutboundRewriteResponseEventMessageProcessor;
 import org.mule.endpoint.outbound.OutboundRootMessageIdPropertyMessageProcessor;
 import org.mule.endpoint.outbound.OutboundSessionHandlerMessageProcessor;
 import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
@@ -35,6 +34,7 @@ import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class DefaultEndpointMessageProcessorChainFactory implements EndpointMessageProcessorChainFactory
@@ -91,11 +91,7 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
     /** Override this method to change the default MessageProcessors. */
     protected List<MessageProcessor> createOutboundResponseMessageProcessors(OutboundEndpoint endpoint) throws MuleException
     {
-        List<MessageProcessor> list = new ArrayList<MessageProcessor>();
-
-        list.add(new OutboundRewriteResponseEventMessageProcessor());
-
-        return list;
+        return Collections.emptyList();
     }
     
     public MessageProcessor createInboundMessageProcessorChain(InboundEndpoint endpoint, FlowConstruct flowConstruct, MessageProcessor target) throws MuleException
