@@ -362,19 +362,11 @@ public abstract class AbstractConnector implements Connector, WorkListener
                                 MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE);
                     }
 
-                    if (dispatcherPoolFactory == null) {
-                        dispatcherPoolFactory = new DefaultConfigurableKeyedObjectPoolFactory();
-                    }
-
-                    dispatchers = dispatcherPoolFactory.createObjectPool();
-                    if (dispatcherFactory != null) {
-                        dispatchers.setFactory(getWrappedDispatcherFactory(dispatcherFactory));
-                    }
-
                     // Initialise the structure of this connector
                     initFromServiceDescriptor();
 
-                    configureDispatcherPool();
+                    initDispatchers();
+                    
                     setMaxRequestersActive(getRequesterThreadingProfile().getMaxThreadsActive());
 
                     try
@@ -2558,7 +2550,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         }
     }
 
-    protected DispatcherMessageProcessor createInternalDispatcherMessageProcessor(OutboundEndpoint endpoint)
+    protected MessageProcessor createInternalDispatcherMessageProcessor(OutboundEndpoint endpoint)
     {
         return new DispatcherMessageProcessor(endpoint);
     }
@@ -2600,6 +2592,19 @@ public abstract class AbstractConnector implements Connector, WorkListener
         {
             throw new MuleRuntimeException(tse);
         }
+    }
+
+    protected void initDispatchers()
+    {
+        if (dispatcherPoolFactory == null) {
+            dispatcherPoolFactory = new DefaultConfigurableKeyedObjectPoolFactory();
+        }
+
+        dispatchers = dispatcherPoolFactory.createObjectPool();
+        if (dispatcherFactory != null) {
+            dispatchers.setFactory(getWrappedDispatcherFactory(dispatcherFactory));
+        }
+        configureDispatcherPool();
     }
 
     protected class DispatcherMessageProcessor implements MessageProcessor
