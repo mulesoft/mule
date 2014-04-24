@@ -31,9 +31,19 @@ public class RequestReplyInFlowTestCase extends FunctionalTestCase
     public void testRequestReply() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        client.dispatch("vm://input", "Message went", null);
-        MuleMessage reply = client.request("vm://destination", 10000);
+        client.dispatch(getDispatchUrl(), "Message went", null);
+        MuleMessage reply = client.request(getDestinationUrl(), 10000);
         assertNotNull(reply);
         assertEquals("Message went-out-and-back-in", reply.getPayload());
+    }
+
+    protected String getDispatchUrl()
+    {
+        return "vm://input";
+    }
+
+    protected String getDestinationUrl()
+    {
+        return "vm://destination";
     }
 }

@@ -13,6 +13,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.NameableObject;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
@@ -203,4 +204,12 @@ public interface Connector extends Lifecycle, NameableObject, Connectable, Lifec
      * @return AbstractRedeliveryPolicy to use for message redelivery, null if it shouldn't be used
      */
     AbstractRedeliveryPolicy createDefaultRedeliveryPolicy(int maxRedelivery);
+
+    /**
+     * Returns a canonical representation of the given {@link org.mule.api.endpoint.EndpointURI}
+     *
+     * @param uri a not null {@link org.mule.api.endpoint.EndpointURI}
+     * @return the canonical representation of the given uri as a {@link java.lang.String}
+     */
+    public String getCanonicalURI(EndpointURI uri);
 }

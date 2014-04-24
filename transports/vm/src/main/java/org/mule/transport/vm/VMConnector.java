@@ -105,6 +105,20 @@ public class VMConnector extends AbstractConnector
         return "VM";
     }
 
+    /**
+     * This implementation returns the default canonical representation
+     * with an added query param specifying the connector name
+     *
+     * @param uri a not null {@link org.mule.api.endpoint.EndpointURI}
+     * @return the canonical representation of the given uri as a {@link java.lang.String}
+     */
+    @Override
+    public String getCanonicalURI(EndpointURI uri)
+    {
+        String canonicalURI = super.getCanonicalURI(uri);
+        return String.format("%s?connector=%s", canonicalURI, getName());
+    }
+
     public QueueProfile getQueueProfile()
     {
         return queueProfile;

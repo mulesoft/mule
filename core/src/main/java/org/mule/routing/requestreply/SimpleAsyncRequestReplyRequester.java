@@ -45,7 +45,8 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
 
     private String getReplyTo()
     {
-        return ((InboundEndpoint) replyMessageSource).getEndpointURI().toString();
+        InboundEndpoint endpoint = ((InboundEndpoint) replyMessageSource);
+        return endpoint.getConnector().getCanonicalURI(endpoint.getEndpointURI());
     }
 
     @Override
