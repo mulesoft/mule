@@ -6,6 +6,7 @@
  */
 package org.mule.util;
 
+import org.safehaus.uuid.EthernetAddress;
 import org.safehaus.uuid.UUIDGenerator;
 
 /**
@@ -17,6 +18,7 @@ import org.safehaus.uuid.UUIDGenerator;
 public final class UUID
 {
     private static final UUIDGenerator generator = UUIDGenerator.getInstance();
+    private static final EthernetAddress dummyAddress = generator.getDummyAddress();
 
     private UUID()
     {
@@ -25,6 +27,6 @@ public final class UUID
 
     public static String getUUID()
     {
-        return generator.generateTimeBasedUUID().toString();
+        return generator.generateTimeBasedUUID(dummyAddress).toString();
     }
 }
