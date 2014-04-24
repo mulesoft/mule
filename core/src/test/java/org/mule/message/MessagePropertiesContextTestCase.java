@@ -119,8 +119,8 @@ public class MessagePropertiesContextTestCase extends AbstractMuleContextTestCas
         assertNull(mpc.getProperty("doo", PropertyScope.OUTBOUND));
         assertNull(mpc.getProperty("doo", PropertyScope.SESSION));
 
-        Set<String> keys = mpc.getPropertyNames();
-        assertEquals(3, keys.size());
+        Set<String> keys = mpc.getPropertyNames(PropertyScope.OUTBOUND);
+        assertEquals(2, keys.size());
 
         for (String key : keys)
         {
