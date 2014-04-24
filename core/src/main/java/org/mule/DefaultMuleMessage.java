@@ -55,7 +55,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -101,12 +100,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * Collection of attachments that were attached to the incoming message
      */
-    private transient Map<String, DataHandler> inboundAttachments = new ConcurrentHashMap<String, DataHandler>();
+    private transient Map<String, DataHandler> inboundAttachments = new HashMap<String, DataHandler>();
 
     /**
      * Collection of attachments that will be sent out with this message
      */
-    private transient Map<String, DataHandler> outboundAttachments = new ConcurrentHashMap<String, DataHandler>();
+    private transient Map<String, DataHandler> outboundAttachments = new HashMap<String, DataHandler>();
 
     private transient byte[] cache;
     protected transient MuleContext muleContext;
@@ -191,7 +190,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         id = previous.getUniqueId();
         rootId = previous.getMessageRootId();
         setMuleContext(muleContext);
-        setEncoding(previous.getEncoding());
 
         if (message instanceof MuleMessage)
         {
@@ -204,7 +202,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             setPayload(message);
             copyMessageProperties(previous);
         }
+
         originalPayload = previous.getPayload();
+        setEncoding(previous.getEncoding());
 
         if (previous.getExceptionPayload() != null)
         {
@@ -224,23 +224,30 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     protected void copyMessageProperties(MuleMessage muleMessage)
     {
-        for (PropertyScope scope : new PropertyScope[]{PropertyScope.INBOUND,
-            PropertyScope.OUTBOUND})
+        if (muleMessage instanceof DefaultMuleMessage)
         {
-            try
+            properties = new MessagePropertiesContext(((DefaultMuleMessage) muleMessage).properties);
+        }
+        else
+        {
+
+            for (PropertyScope scope : new PropertyScope[]{PropertyScope.INBOUND, PropertyScope.OUTBOUND})
             {
-                for (String name : muleMessage.getPropertyNames(scope))
+                try
                 {
-                    Object value = muleMessage.getProperty(name, scope);
-                    if (value != null)
+                    for (String name : muleMessage.getPropertyNames(scope))
                     {
-                        setProperty(name, value, scope);
+                        Object value = muleMessage.getProperty(name, scope);
+                        if (value != null)
+                        {
+                            setProperty(name, value, scope);
+                        }
                     }
                 }
-            }
-            catch (IllegalArgumentException iae)
-            {
-                // ignore non-registered property scope
+                catch (IllegalArgumentException iae)
+                {
+                    // ignore non-registered property scope
+                }
             }
         }
     }
@@ -635,7 +642,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         //TODO logger.warn("MuleMessage.getPropertyNames() method is deprecated, use MuleMessage.getOutboundPropertyNames() instead.  This method will be removed in the next point release");
         //return getOutboundPropertyNames();
         assertAccess(READ);
-        return properties.getPropertyNames();
+        return properties.getPropertyNames(PropertyScope.OUTBOUND);
     }
 
     /**
@@ -1294,6 +1301,16 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         assertAccess(WRITE);
         properties.clearProperties(scope);
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clearAttachments()
+    {
+        assertAccess(WRITE);
+        outboundAttachments.clear();
+    }
 
 
     /**
@@ -1800,12 +1817,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         this.muleContext = context;
         if (this.inboundAttachments == null)
         {
-            this.inboundAttachments = new ConcurrentHashMap<String, DataHandler>();
+            this.inboundAttachments = new HashMap<String, DataHandler>();
         }
 
         if (this.outboundAttachments == null)
         {
-            this.outboundAttachments = new ConcurrentHashMap<String, DataHandler>();
+            this.outboundAttachments = new HashMap<String, DataHandler>();
         }
     }
 

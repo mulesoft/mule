@@ -6,8 +6,6 @@
  */
 package org.mule.el.context;
 
-import org.mule.api.MuleRuntimeException;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -25,22 +23,6 @@ public abstract class AbstractMapContext<K, V> implements Map<K, V>
         for (Map.Entry<? extends K, ? extends V> entry : m.entrySet())
         {
             put(entry.getKey(), entry.getValue());
-        }
-    }
-
-    @Override
-    public void clear()
-    {
-        for (K key : keySet())
-        {
-            try
-            {
-                remove(key);
-            }
-            catch (Exception e)
-            {
-                throw new MuleRuntimeException(e);
-            }
         }
     }
 
