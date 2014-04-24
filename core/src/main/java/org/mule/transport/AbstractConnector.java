@@ -1445,6 +1445,15 @@ public abstract class AbstractConnector implements Connector, WorkListener
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getCanonicalURI(EndpointURI uri)
+    {
+        return uri.toString();
+    }
+
+    /**
      * Fires a server notification to all registered listeners
      *
      * @param notification the notification to fire.
