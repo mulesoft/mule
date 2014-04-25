@@ -4,14 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.message;
+package org.mule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.MessagePropertiesContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
@@ -86,6 +87,24 @@ public class MessagePropertiesContextTestCase extends AbstractMuleContextTestCas
         byte[] bytes = SerializationUtils.serialize(mpc);
         mpc = (MessagePropertiesContext) SerializationUtils.deserialize(bytes);
         doTest(mpc);
+    }
+    
+    @Test
+    public void testCopyConstructor() throws Exception
+    {
+        MessagePropertiesContext mpc = new MessagePropertiesContext();
+        mpc.setProperty("FOO", "BAR", PropertyScope.OUTBOUND);
+        mpc.setProperty("ABC", "abc", PropertyScope.OUTBOUND);
+        mpc.setProperty("DOO", "DAR", PropertyScope.INVOCATION);
+
+        MessagePropertiesContext copy = new MessagePropertiesContext(mpc);
+        
+        assertSame(mpc.invocationMap, copy.invocationMap);
+        assertSame(mpc.sessionMap, copy.sessionMap);
+        
+        assertNotSame(mpc.inboundMap, copy.inboundMap);
+        assertNotSame(mpc.outboundMap, copy.outboundMap);
+        doTest(copy);
     }
 
     /*@Test
