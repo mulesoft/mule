@@ -73,5 +73,11 @@ public class OutboundAttachmentMapContext extends AbstractMapContext<String, Dat
     {
         return message.getOutboundAttachmentNames();
     }
+    
+    @Override
+    public void clear()
+    {
+        message.clearAttachments();
+    }
 
 }

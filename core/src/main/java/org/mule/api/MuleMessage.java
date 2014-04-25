@@ -781,4 +781,10 @@ public interface MuleMessage extends Serializable
      * @return the inbound message
      */
     MuleMessage createInboundMessage() throws Exception;
+
+    /**
+     * Removes all outbound attachments on this message.  Note: inbound attachments are immutable.
+     * {@link org.mule.api.transport.PropertyScope#OUTBOUND}.
+     */
+    void clearAttachments();
 }
