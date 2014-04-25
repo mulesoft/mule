@@ -6,11 +6,14 @@
  */
 package org.mule.transaction;
 
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.api.MuleContext;
+import org.mule.api.transaction.Transaction;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.xa.XaResourceFactoryHolder;
 
@@ -66,6 +69,29 @@ public class XaTransactionTestCase extends AbstractMuleTestCase
         assertThat(xaTransaction.hasResource(mockXaResourceFactoryHolder1), is(true));
         assertThat(xaTransaction.hasResource(mockXaResourceFactoryHolder2), is(true));
         assertThat(xaTransaction.getResource(mockXaResourceFactoryHolder2), is(resource));
+    }
+
+    @Test
+    public void isRollbackOnly() throws Exception
+    {
+        javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+        when(tx.getStatus())
+                .thenReturn(Transaction.STATUS_ACTIVE)
+                .thenReturn(Transaction.STATUS_COMMITTED)
+                .thenReturn(Transaction.STATUS_MARKED_ROLLBACK)
+                .thenReturn(Transaction.STATUS_ROLLEDBACK)
+                .thenReturn(Transaction.STATUS_ROLLING_BACK);
+
+        when(mockTransactionManager.getTransaction()).thenReturn(tx);
+
+        XaTransaction xaTransaction = new XaTransaction(mockMuleContext);
+        xaTransaction.begin();
+
+        assertFalse(xaTransaction.isRollbackOnly());
+        assertFalse(xaTransaction.isRollbackOnly());
+        assertTrue(xaTransaction.isRollbackOnly());
+        assertTrue(xaTransaction.isRollbackOnly());
+        assertTrue(xaTransaction.isRollbackOnly());
     }
 
     private class BadHashCodeImplementation
