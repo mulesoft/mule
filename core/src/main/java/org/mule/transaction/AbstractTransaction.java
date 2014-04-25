@@ -37,7 +37,9 @@ public abstract class AbstractTransaction implements Transaction
 
     public boolean isRollbackOnly() throws TransactionException
     {
-        return getStatus() == STATUS_MARKED_ROLLBACK;
+        int status = getStatus();
+        return status == STATUS_MARKED_ROLLBACK || status == STATUS_ROLLEDBACK
+                || status == STATUS_ROLLING_BACK;
     }
 
     public boolean isBegun() throws TransactionException
