@@ -29,7 +29,7 @@ import org.mule.session.DefaultMuleSession;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.DefaultReplyToHandler;
-import org.mule.util.CaseInsensitiveHashMap;
+import org.mule.util.CopyOnWriteCaseInsensitiveMap;
 import org.mule.util.store.DeserializationPostInitialisable;
 
 import java.io.IOException;
@@ -91,7 +91,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
 
     private transient Map<String, Object> serializedData = null;
 
-    private Map<String, Object> flowVariables = new CaseInsensitiveHashMap/* <String, Object> */(6);
+    private CopyOnWriteCaseInsensitiveMap<String, Object> flowVariables = new CopyOnWriteCaseInsensitiveMap<String, Object>();
 
     // Constructors
 
@@ -988,10 +988,11 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this.message = message;
         if (message instanceof DefaultMuleMessage)
         {
-            for (String name : message.getInvocationPropertyNames())
-            {
-                setFlowVariable(name, message.getInvocationProperty(name));
-            }
+            // Don't copy properties from message to event every time we copy event as we did before. Rather
+            // only copy invocation properties over if MuleMessage had invocation properties set on it before
+            // MuleEvent was created.
+            flowVariables.putAll(((DefaultMuleMessage) message).getOrphanFlowVariables());
+            
             ((DefaultMuleMessage) message).setInvocationProperties(flowVariables);
             if (session instanceof DefaultMuleSession)
             {
@@ -1014,7 +1015,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         MuleMessage messageCopy = (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy();
         DefaultMuleEvent eventCopy = new DefaultMuleEvent(messageCopy, event, new DefaultMuleSession(
             event.getSession()));
-        eventCopy.flowVariables = new CaseInsensitiveHashMap(((DefaultMuleEvent) event).flowVariables);
+        eventCopy.flowVariables = new CopyOnWriteCaseInsensitiveMap<String,Object>(((DefaultMuleEvent) event).flowVariables);
         ((DefaultMuleMessage) messageCopy).setInvocationProperties(eventCopy.flowVariables);
         ((DefaultMuleMessage) messageCopy).resetAccessControl();
         return eventCopy;
