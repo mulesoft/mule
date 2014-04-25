@@ -116,7 +116,13 @@ public class VMConnector extends AbstractConnector
     public String getCanonicalURI(EndpointURI uri)
     {
         String canonicalURI = super.getCanonicalURI(uri);
-        return String.format("%s?connector=%s", canonicalURI, getName());
+
+        if (!canonicalURI.contains("?connector="))
+        {
+            canonicalURI = String.format("%s?connector=%s", canonicalURI, getName());
+        }
+
+        return canonicalURI;
     }
 
     public QueueProfile getQueueProfile()
