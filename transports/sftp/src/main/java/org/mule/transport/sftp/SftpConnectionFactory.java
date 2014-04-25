@@ -95,12 +95,22 @@ public class SftpConnectionFactory implements PoolableObjectFactory
             // {
             // try
             // {
-            if (identityFile != null)
+            // this first case is when a key-file AND password have been provided. 
+            //  Note - not caring about passphrase. We are covering here the case 
+            // where username/password AND key-file are provided only.
+            //See javadoc on the 3-argument client.login
+            if (identityFile != null && endpointURI.getPassword() != null)
+            {
+                client.login(endpointURI.getUser(), endpointURI.getPassword(), identityFile);
+            }
+            //this next case is where a only a key-file is provided
+            else if (identityFile != null)
             {
                 String passphrase = sftpUtil.getPassphrase();
 
                 client.login(endpointURI.getUser(), identityFile, passphrase);
             }
+            //lastly, if there is a username and password
             else
             {
                 client.login(endpointURI.getUser(), endpointURI.getPassword());
