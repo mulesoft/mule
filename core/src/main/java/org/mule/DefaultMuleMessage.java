@@ -2047,4 +2047,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         return id.hashCode();
     }
+    
+    protected Map<String, Object> getOrphanFlowVariables()
+    {
+        return properties.getOrphanFlowVariables();
+    }
 }
