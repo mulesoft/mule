@@ -1017,7 +1017,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         this.dispatchers.setMaxTotal(20 * maxActive);
     }
 
-    private MessageDispatcher getDispatcher(OutboundEndpoint endpoint) throws MuleException
+    protected MessageDispatcher borrowDispatcher(OutboundEndpoint endpoint) throws MuleException
     {
         if (!isStarted())
         {
@@ -1074,7 +1074,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         }
     }
 
-    private void returnDispatcher(OutboundEndpoint endpoint, MessageDispatcher dispatcher)
+    protected void returnDispatcher(OutboundEndpoint endpoint, MessageDispatcher dispatcher)
     {
         if (endpoint != null && dispatcher != null)
         {
@@ -2610,7 +2610,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
             MessageDispatcher dispatcher = null;
             try
             {
-                dispatcher = getDispatcher(endpoint);
+                dispatcher = borrowDispatcher(endpoint);
                 boolean fireNotification = event.isNotificationsEnabled();
                 EndpointMessageNotification beginNotification = null;
                 if (fireNotification)
