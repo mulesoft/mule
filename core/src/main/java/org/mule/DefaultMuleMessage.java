@@ -200,7 +200,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         else
         {
             setPayload(message);
-            copyMessageProperties(previous);
+            copyMessagePropertiesContext(previous);
         }
 
         originalPayload = previous.getPayload();
@@ -222,7 +222,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         resetAccessControl();
     }
 
-    protected void copyMessageProperties(MuleMessage muleMessage)
+    private void copyMessagePropertiesContext(MuleMessage muleMessage)
     {
         if (muleMessage instanceof DefaultMuleMessage)
         {
@@ -230,24 +230,29 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
         else
         {
+            copyMessageProperties(muleMessage);
+        }        
+    }
 
-            for (PropertyScope scope : new PropertyScope[]{PropertyScope.INBOUND, PropertyScope.OUTBOUND})
+    
+    protected void copyMessageProperties(MuleMessage muleMessage)
+    {
+        for (PropertyScope scope : new PropertyScope[]{PropertyScope.INBOUND, PropertyScope.OUTBOUND})
+        {
+            try
             {
-                try
+                for (String name : muleMessage.getPropertyNames(scope))
                 {
-                    for (String name : muleMessage.getPropertyNames(scope))
+                    Object value = muleMessage.getProperty(name, scope);
+                    if (value != null)
                     {
-                        Object value = muleMessage.getProperty(name, scope);
-                        if (value != null)
-                        {
-                            setProperty(name, value, scope);
-                        }
+                        setProperty(name, value, scope);
                     }
                 }
-                catch (IllegalArgumentException iae)
-                {
-                    // ignore non-registered property scope
-                }
+            }
+            catch (IllegalArgumentException iae)
+            {
+                // ignore non-registered property scope
             }
         }
     }

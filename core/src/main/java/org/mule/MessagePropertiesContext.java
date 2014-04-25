@@ -66,6 +66,8 @@ public class MessagePropertiesContext implements Serializable
     {
         inboundMap = new CopyOnWriteCaseInsensitiveMap<String, Object>(previous.inboundMap);
         outboundMap = new CopyOnWriteCaseInsensitiveMap<String, Object>(previous.outboundMap);
+        invocationMap = previous.invocationMap;
+        sessionMap = previous.sessionMap;
     }
 
     protected Map<String, Object> getScopedProperties(PropertyScope scope)
