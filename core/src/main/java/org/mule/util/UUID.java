@@ -6,20 +6,14 @@
  */
 package org.mule.util;
 
-import org.safehaus.uuid.EthernetAddress;
-import org.safehaus.uuid.UUIDGenerator;
-
 /**
- * <code>UUID</code> Generates a UUID using the <a href="http://jug.safehaus.org/">Safehaus UUID generator</a>
- * rather than the built-in version of JDK5. In our performance tests we found the Java version
- * to be blocking much more than the Safehaus one.
+ * <code>UUID</code> Generates a UUID using the <a href="http://johannburkard.de/software/uuid/">Johann
+ * Burkard UUID Library</a>. In our performance tests we found this to be the implementation of type 1 UUID
+ * that was most performant in high concurrency scenarios.
  */
 // @ThreadSafe
 public final class UUID
 {
-    private static final UUIDGenerator generator = UUIDGenerator.getInstance();
-    private static final EthernetAddress dummyAddress = generator.getDummyAddress();
-
     private UUID()
     {
         // no go
@@ -27,6 +21,6 @@ public final class UUID
 
     public static String getUUID()
     {
-        return generator.generateTimeBasedUUID(dummyAddress).toString();
+        return new com.eaio.uuid.UUID().toString();
     }
 }

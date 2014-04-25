@@ -578,6 +578,7 @@
 /mule-standalone-${productVersion}/lib/opt/geronimo-jta_1.1_spec-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-servlet_3.0_spec-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-stax-api_1.0_spec-1.0.1.jar
+/mule-standalone-${productVersion}/lib/opt/grabbag-1.8.1.jar
 /mule-standalone-${productVersion}/lib/opt/groovy-all-1.8.6.jar
 /mule-standalone-${productVersion}/lib/opt/guava-16.0.1.jar
 /mule-standalone-${productVersion}/lib/opt/hamcrest-core-1.1.jar
@@ -638,7 +639,6 @@
 /mule-standalone-${productVersion}/lib/opt/jta-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/juel-engine-2.1.0.jar
 /mule-standalone-${productVersion}/lib/opt/juel-impl-2.2.1.jar
-/mule-standalone-${productVersion}/lib/opt/jug-2.0.0-asl.jar
 /mule-standalone-${productVersion}/lib/opt/juli-6.0.29.jar
 /mule-standalone-${productVersion}/lib/opt/livetribe-jsr223-2.0.5.jar
 /mule-standalone-${productVersion}/lib/opt/mail-1.4.3.jar
@@ -690,6 +690,7 @@
 /mule-standalone-${productVersion}/lib/opt/sxc-xpath-0.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/tomcat-apr-5.5.23.jar
 /mule-standalone-${productVersion}/lib/opt/tomcat-util-5.5.23.jar
+/mule-standalone-${productVersion}/lib/opt/uuid-3.4.0.jar
 /mule-standalone-${productVersion}/lib/opt/woodstox-core-asl-4.1.4.jar
 /mule-standalone-${productVersion}/lib/opt/wsdl4j-1.6.2.jar
 /mule-standalone-${productVersion}/lib/opt/wss4j-1.6.9.jar
