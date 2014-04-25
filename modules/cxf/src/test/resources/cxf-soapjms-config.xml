@@ -16,23 +16,12 @@
 
     <flow name="dispatcher">
         <vm:inbound-endpoint exchange-pattern="request-response" path="testInput"/>
-
-        <mulexml:object-to-xml-transformer acceptMuleMessage="true"/>
-
         <jms:outbound-endpoint queue="soapjms" exchange-pattern="request-response"/>
 
-        <mulexml:xml-to-object-transformer/>
     </flow>
 
     <flow name="service">
         <jms:inbound-endpoint queue="soapjms" exchange-pattern="request-response"/>
-
-        <mulexml:xml-to-object-transformer/>
-
-        <response>
-            <mulexml:object-to-xml-transformer acceptMuleMessage="true"/>
-        </response>
-
         <cxf:jaxws-service serviceClass="org.mule.module.cxf.example.HelloWorldImpl"/>
     </flow>
 </mule>
