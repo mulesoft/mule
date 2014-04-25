@@ -396,4 +396,15 @@ public class MessagePropertiesContext implements Serializable
 
     }
 
+    protected Map<String, Object> getOrphanFlowVariables()
+    {
+        if (invocationMap instanceof UndefinedInvocationPropertiesMap)
+        {
+            return invocationMap;
+        }
+        else
+        {
+            return Collections.emptyMap();
+        }
+    }
 }

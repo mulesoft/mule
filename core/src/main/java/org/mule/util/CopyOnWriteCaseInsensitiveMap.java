@@ -34,7 +34,7 @@ public class CopyOnWriteCaseInsensitiveMap<K, V> implements Map<K, V>, Serializa
         requiresCopy = false;
     }
 
-    public CopyOnWriteCaseInsensitiveMap(CopyOnWriteCaseInsensitiveMap<K,V> original)
+    public CopyOnWriteCaseInsensitiveMap(CopyOnWriteCaseInsensitiveMap<K, V> original)
     {
         this.delegate = Collections.unmodifiableMap(original);
     }
@@ -86,6 +86,10 @@ public class CopyOnWriteCaseInsensitiveMap<K, V> implements Map<K, V>, Serializa
     @Override
     public void putAll(Map<? extends K, ? extends V> t)
     {
+        if (t.size() == 0)
+        {
+            return;
+        }
         copy();
         delegate.putAll(t);
     }
