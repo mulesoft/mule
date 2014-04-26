@@ -10,7 +10,7 @@
     <description>Shows how to configure multiple components to interact on a single request and how to manage event transformations.</description>
 
     <properties>
-        <muleVersion>3.5.0-RC1</muleVersion>
+        <muleVersion>3.5.0-M5-SNAPSHOT</muleVersion>
     </properties>
 
     <dependencies>
