@@ -9,7 +9,7 @@
     <version>1.0</version>
 
     <properties>
-        <muleVersion>3.5.0-M5-SNAPSHOT</muleVersion>
+        <muleVersion>3.5.1-SNAPSHOT</muleVersion>
     </properties>
 
     <description>A web based example that plots incoming emails on a world map.  This example demonstrates how to use Ajax events with Mule.</description>
