@@ -8,7 +8,7 @@
     <name>Loanbroker BPM Example</name>
 
     <properties>
-        <muleVersion>3.5.0-M5-SNAPSHOT</muleVersion>
+        <muleVersion>3.6.0-M1-SNAPSHOT</muleVersion>
     </properties>
 
     <build>
