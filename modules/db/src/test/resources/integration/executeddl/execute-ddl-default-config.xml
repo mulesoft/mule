@@ -22,4 +22,18 @@
 
         <outbound-endpoint address="vm://testOut" exchange-pattern="one-way"/>
     </flow>
+
+    <flow name="truncateTable">
+        <inbound-endpoint address="vm://truncateTable"/>
+
+        <db:insert config-ref="dbConfig" bulkMode="true">
+            <db:parameterized-query>INSERT INTO TestDdl VALUES (#[payload])</db:parameterized-query>
+        </db:insert>
+
+        <db:execute-ddl config-ref="dbConfig">
+            <db:dynamic-query>TRUNCATE TABLE TestDdl</db:dynamic-query>
+        </db:execute-ddl>
+
+        <outbound-endpoint address="vm://testOut" exchange-pattern="one-way"/>
+    </flow>
 </mule>
