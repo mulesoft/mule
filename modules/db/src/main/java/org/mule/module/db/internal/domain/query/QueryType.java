@@ -21,6 +21,8 @@ public enum QueryType
 
     DELETE,
 
+    TRUNCATE,
+
     STORE_PROCEDURE_CALL,
 
     DDL
