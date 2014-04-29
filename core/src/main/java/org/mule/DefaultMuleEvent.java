@@ -39,6 +39,7 @@ import java.io.OptionalDataException;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -1015,7 +1016,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         MuleMessage messageCopy = (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy();
         DefaultMuleEvent eventCopy = new DefaultMuleEvent(messageCopy, event, new DefaultMuleSession(
             event.getSession()));
-        eventCopy.flowVariables = new CopyOnWriteCaseInsensitiveMap<String,Object>(((DefaultMuleEvent) event).flowVariables);
+        eventCopy.flowVariables = ((DefaultMuleEvent) event).flowVariables.clone();
         ((DefaultMuleMessage) messageCopy).setInvocationProperties(eventCopy.flowVariables);
         ((DefaultMuleMessage) messageCopy).resetAccessControl();
         return eventCopy;
@@ -1024,7 +1025,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     @Override
     public Set<String> getFlowVariableNames()
     {
-        return flowVariables.keySet();
+        return Collections.unmodifiableSet(flowVariables.keySet());
     }
 
     @Override
