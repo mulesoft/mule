@@ -335,6 +335,14 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
         getTestService();
     }
 
+    
+    @Test(expected=UnsupportedOperationException.class)
+    public void testFlowVarNamesImmutable() throws Exception
+    {
+        MuleEvent event = getTestEvent("whatever");
+        event.setFlowVariable("test", "val");
+        event.getFlowVariableNames().add("other");
+    }
 
     @Test
     public void testFlowVarsNotShared() throws Exception

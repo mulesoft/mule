@@ -64,8 +64,8 @@ public class MessagePropertiesContext implements Serializable
 
     public MessagePropertiesContext(MessagePropertiesContext previous)
     {
-        inboundMap = new CopyOnWriteCaseInsensitiveMap<String, Object>(previous.inboundMap);
-        outboundMap = new CopyOnWriteCaseInsensitiveMap<String, Object>(previous.outboundMap);
+        inboundMap = previous.inboundMap.clone();
+        outboundMap = previous.outboundMap.clone();
         invocationMap = previous.invocationMap;
         sessionMap = previous.sessionMap;
     }
