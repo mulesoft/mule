@@ -106,18 +106,6 @@ public abstract class AbstractQueueManager implements QueueManager, QueueProvide
     @Override
     public final void dispose()
     {
-        queuesLock.lock();
-        try
-        {
-            for (CacheAwareQueueStore queueInfo : queues.values())
-            {
-                queueInfo.getDelegate().dispose();
-            }
-        }
-        finally
-        {
-            queuesLock.unlock();
-        }
         doDispose();
     }
 

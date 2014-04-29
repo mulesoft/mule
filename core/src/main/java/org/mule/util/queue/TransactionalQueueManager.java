@@ -58,9 +58,7 @@ public class TransactionalQueueManager extends AbstractQueueManager
     @Override
     protected void doDispose()
     {
-        localTxTransactionJournal.clear();
         localTxTransactionJournal.close();
-        xaTransactionJournal.clear();
         xaTransactionJournal.close();
     }
 
