@@ -105,6 +105,14 @@ public class MessagePropertiesContextTestCase extends AbstractMuleContextTestCas
         assertNotSame(mpc.inboundMap, copy.inboundMap);
         assertNotSame(mpc.outboundMap, copy.outboundMap);
         doTest(copy);
+        
+        // Mutate original
+        mpc.setProperty("FOO", "OTHER", PropertyScope.OUTBOUND);
+        assertSame(copy.getProperty("FOO", PropertyScope.OUTBOUND), "BAR");
+
+        // Mutate copy
+        copy.setProperty("ABC", "OTHER", PropertyScope.OUTBOUND);
+        assertSame(mpc.getProperty("ABC", PropertyScope.OUTBOUND), "abc");
     }
 
     /*@Test
@@ -147,4 +155,33 @@ public class MessagePropertiesContextTestCase extends AbstractMuleContextTestCas
             assertFalse(key.equals("foo") || key.equals("doo") || key.equals("abc"));
         }
     }
+    
+    @Test(expected=UnsupportedOperationException.class)
+    public void testInboundPropertyNamesImmutable() throws Exception
+    {
+        MessagePropertiesContext mpc = new MessagePropertiesContext();
+        mpc.getPropertyNames(PropertyScope.INBOUND).add("other");
+    }
+
+    @Test(expected=UnsupportedOperationException.class)
+    public void testOutboundPropertyNamesImmutable() throws Exception
+    {
+        MessagePropertiesContext mpc = new MessagePropertiesContext();
+        mpc.getPropertyNames(PropertyScope.OUTBOUND).add("other");
+    }
+    @Test(expected=UnsupportedOperationException.class)
+    public void testInvocationPropertyNamesImmutable() throws Exception
+    {
+        MessagePropertiesContext mpc = new MessagePropertiesContext();
+        mpc.getPropertyNames(PropertyScope.INVOCATION).add("other");
+    }
+
+    @Test(expected=UnsupportedOperationException.class)
+    public void testSessionPropertyNamesImmutable() throws Exception
+    {
+        MessagePropertiesContext mpc = new MessagePropertiesContext();
+        mpc.getPropertyNames(PropertyScope.SESSION).add("other");
+    }
+
+
 }
