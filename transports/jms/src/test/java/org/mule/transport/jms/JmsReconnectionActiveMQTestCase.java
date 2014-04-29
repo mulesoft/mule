@@ -8,18 +8,18 @@ package org.mule.transport.jms;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.tck.listener.ConnectionListener;
 import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 
 import javax.jms.Connection;
 import javax.jms.JMSException;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.broker.BrokerService;
-import org.junit.Rule;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -54,6 +54,8 @@ public class JmsReconnectionActiveMQTestCase extends AbstractBrokerFunctionalTes
     @Test
     public void reconnectsAfterRestartingActiveMQBroker() throws Exception
     {
+        jmsConnector = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnector");
+
         assertMessageRouted();
 
         // Stop the broker, and make the connection factory return invalid connections.
@@ -64,15 +66,28 @@ public class JmsReconnectionActiveMQTestCase extends AbstractBrokerFunctionalTes
         stopBroker();
 
         connectionListener.waitUntilNotificationsAreReceived();
+        assertTrue(jmsConnector.isStopped());
 
+        
         // Restart the broker
-        ConnectionListener reconnectionListener = new ConnectionListener(muleContext)
-                .setExpectedAction(ConnectionNotification.CONNECTION_CONNECTED).setNumberOfExecutionsRequired(1);
-
         CustomConnectionFactory.returnInvalidConnections = false;
         startBroker();
 
-        reconnectionListener.waitUntilNotificationsAreReceived();
+        // Wait until jmsConnector is reconnected and started.
+        prober.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return jmsConnector.isStarted();
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "JMS connector did not restart";
+            }
+        });
 
         // Check that reconnection worked
         assertMessageRouted();
