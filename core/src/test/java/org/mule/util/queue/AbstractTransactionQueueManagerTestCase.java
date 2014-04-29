@@ -35,7 +35,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
 
     protected QueueTestComponent disposeTest = new QueueTestComponent();
 
-    protected abstract QueueManager createQueueManager() throws Exception;
+    protected abstract AbstractQueueManager createQueueManager() throws Exception;
 
     protected abstract boolean isPersistent();
 
@@ -372,7 +372,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
     {
         if (isPersistent())
         {
-            QueueManager mgr = createQueueManager();
+            AbstractQueueManager mgr = createQueueManager();
 
             try
             {
@@ -388,6 +388,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
             finally
             {
                 mgr.stop();
+                mgr.dispose();
             }
 
             mgr = createQueueManager();
@@ -402,6 +403,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
             finally
             {
                 mgr.stop();
+                mgr.dispose();
             }
         }
         else
@@ -415,7 +417,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
     {
         if (isPersistent())
         {
-            QueueManager mgr = createQueueManager();
+            AbstractQueueManager mgr = createQueueManager();
 
             try
             {
@@ -444,6 +446,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
             finally
             {
                 mgr.stop();
+                mgr.dispose();
             }
         }
         else
@@ -457,7 +460,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
     {
         if (isPersistent())
         {
-            QueueManager mgr = createQueueManager();
+            AbstractQueueManager mgr = createQueueManager();
 
             try
             {
@@ -488,7 +491,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
             {
 
                 mgr.stop();
-
+                mgr.dispose();
             }
         }
         else
@@ -502,7 +505,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
     {
         if (isPersistent())
         {
-            QueueManager mgr1 = createQueueManager();
+            AbstractQueueManager mgr1 = createQueueManager();
 
             QueueSession s1 = mgr1.getQueueSession();
             Queue q1 = s1.getQueue("queue1");
@@ -517,7 +520,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
 
             mgr1.stop();
 
-            QueueManager mgr2 = createQueueManager();
+            AbstractQueueManager mgr2 = createQueueManager();
 
             QueueSession s2 = mgr2.getQueueSession();
             Queue q2 = s2.getQueue("queue1");
@@ -531,6 +534,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
             assertEquals("Queue size", 0, q2.size());
 
             mgr2.stop();
+            mgr2.dispose();
         }
     }
 
@@ -538,7 +542,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
     public void testTransactionsOnMultipleQueues() throws Exception
     {
 
-        QueueManager mgr = createQueueManager();
+        AbstractQueueManager mgr = createQueueManager();
 
         try
         {
@@ -602,6 +606,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         finally
         {
             mgr.stop();
+            mgr.dispose();
         }
     }
 
