@@ -209,6 +209,19 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         assertInboundAndOutboundMessageProperties(copy);
         assertEquals(muleContext.getConfiguration().getDefaultEncoding(),
             copy.getOutboundProperty(MuleProperties.MULE_ENCODING_PROPERTY));
+        
+        // Mutate original
+        original.setProperty("FOO", "OTHER", PropertyScope.OUTBOUND);
+        assertNull(copy.getProperty("FOO", PropertyScope.OUTBOUND));
+        original.setProperty("FOO", "OTHER", PropertyScope.INBOUND);
+        assertNull(copy.getProperty("FOO", PropertyScope.INBOUND));
+
+        // Mutate copy
+        copy.setProperty("ABC", "OTHER", PropertyScope.OUTBOUND);
+        assertNull(original.getProperty("ABC", PropertyScope.OUTBOUND));
+        copy.setProperty("ABC", "OTHER", PropertyScope.INBOUND);
+        assertNull(original.getProperty("ABC", PropertyScope.INBOUND));
+
     }
 
     private void assertInboundAndOutboundMessageProperties(MuleMessage original)
@@ -367,5 +380,40 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     {
         // taking advantage of the fact here that key and value are the same
         assertEquals(key, message.getOutboundProperty(key));
+    }
+    
+    @Test(expected=UnsupportedOperationException.class)
+    public void testPropertyNamesImmutable() throws Exception
+    {
+        MuleMessage message = createMuleMessage();
+        message.getPropertyNames().add("other");
+    }
+
+    @Test(expected=UnsupportedOperationException.class)
+    public void testInboundPropertyNamesImmutable() throws Exception
+    {
+        MuleMessage message = createMuleMessage();
+        message.getPropertyNames(PropertyScope.INBOUND).add("other");
+    }
+
+    @Test(expected=UnsupportedOperationException.class)
+    public void testOutboundPropertyNamesImmutable() throws Exception
+    {
+        MuleMessage message = createMuleMessage();
+        message.getPropertyNames(PropertyScope.OUTBOUND).add("other");
+    }
+
+    @Test(expected=UnsupportedOperationException.class)
+    public void testInvocationPropertyNamesImmutable() throws Exception
+    {
+        MuleMessage message = createMuleMessage();
+        message.getPropertyNames(PropertyScope.INVOCATION).add("other");
+    }
+    
+    @Test(expected=UnsupportedOperationException.class)
+    public void testSessionPropertyNamesImmutable() throws Exception
+    {
+        MuleMessage message = createMuleMessage();
+        message.getPropertyNames(PropertyScope.SESSION).add("other");
     }
 }

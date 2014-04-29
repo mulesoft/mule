@@ -7,7 +7,6 @@
 package org.mule.util;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -26,8 +25,18 @@ public class CaseInsensitiveHashMapTestCase extends AbstractMuleTestCase
     {
         Map map = new CaseInsensitiveHashMap();
         map.put("FOO", "BAR");
-        map.put("DOO", Integer.valueOf(3));
+        map.put("doo", Integer.valueOf(3));
         return map;
+    }
+
+    @Test
+    public void keysCaseSensitive() throws Exception
+    {
+        Map<String, Object> map = createTestMap();
+
+        assertEquals(2, map.keySet().size());
+        assertTrue(map.keySet().toArray()[0].equals("FOO") || map.keySet().toArray()[0].equals("doo"));
+        assertTrue(map.keySet().toArray()[1].equals("FOO") || map.keySet().toArray()[1].equals("doo"));
     }
 
     @Test
@@ -58,12 +67,5 @@ public class CaseInsensitiveHashMapTestCase extends AbstractMuleTestCase
         assertEquals(Integer.valueOf(3), map.get("doo"));
         assertEquals(Integer.valueOf(3), map.get("Doo"));
 
-        assertEquals(2, map.size());
-
-        // Test that the key set contains the same case as we put in
-        for (Object o : map.keySet())
-        {
-            assertFalse(o.equals("foo") || o.equals("doo"));
-        }
     }
 }

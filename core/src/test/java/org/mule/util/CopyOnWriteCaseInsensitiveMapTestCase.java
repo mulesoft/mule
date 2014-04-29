@@ -32,15 +32,25 @@ public class CopyOnWriteCaseInsensitiveMapTestCase extends AbstractMuleTestCase
     }
 
     @Test
+    public void keysCaseSensitive() throws Exception
+    {
+        Map<String, Object> map = createTestMap();
+
+        assertEquals(2, map.keySet().size());
+        assertTrue(map.keySet().toArray()[0].equals("FOO") || map.keySet().toArray()[0].equals("doo"));
+        assertTrue(map.keySet().toArray()[1].equals("FOO") || map.keySet().toArray()[1].equals("doo"));
+    }
+
+    @Test
     public void caseInsensitiveDelegate() throws Exception
     {
-        assertMapContents(new CopyOnWriteCaseInsensitiveMap<String, Object>(createTestMap()));
+        assertMapContents(createTestMap().clone());
     }
 
     @Test
     public void caseInsensitiveCopiedDelegate() throws Exception
     {
-        Map<String, Object> map = new CopyOnWriteCaseInsensitiveMap<String, Object>(createTestMap());
+        Map<String, Object> map = createTestMap().clone();
         map.put("new", "val");
         assertMapContents(map);
     }
@@ -54,14 +64,13 @@ public class CopyOnWriteCaseInsensitiveMapTestCase extends AbstractMuleTestCase
     @Test
     public void serializeDelegate() throws Exception
     {
-        assertMapContents(serializeAndDeserialize(new CopyOnWriteCaseInsensitiveMap<String, Object>(
-            createTestMap())));
+        assertMapContents(serializeAndDeserialize(createTestMap().clone()));
     }
 
     @Test
     public void serializeCopiedDelegate() throws Exception
     {
-        Map<String, Object> map = new CopyOnWriteCaseInsensitiveMap<String, Object>(createTestMap());
+        Map<String, Object> map = createTestMap().clone();
         map.put("new", "val");
         assertMapContents(serializeAndDeserialize(map));
     }
@@ -72,6 +81,10 @@ public class CopyOnWriteCaseInsensitiveMapTestCase extends AbstractMuleTestCase
         return (Map) SerializationUtils.deserialize(bytes);
     }
 
+    /*
+     * Assert that Map created with createTestMap() has both of the original properties (FOO and DOO) and that
+     * these can be accessed using case-insensitive keys
+     */
     protected void assertMapContents(Map<String, Object> map)
     {
         assertEquals("BAR", map.get("FOO"));
@@ -81,102 +94,239 @@ public class CopyOnWriteCaseInsensitiveMapTestCase extends AbstractMuleTestCase
         assertEquals(Integer.valueOf(3), map.get("DOO"));
         assertEquals(Integer.valueOf(3), map.get("doo"));
         assertEquals(Integer.valueOf(3), map.get("Doo"));
-
-        // Test that the key set contains the same case as we put in
-        for (Object o : map.keySet())
-        {
-            assertFalse(o.equals("foo") || o.equals("doo"));
-        }
     }
 
+    /*
+     * Create a CopyOnWriteCaseInsensitiveMap with two properties: F00=BAR (String) and DOO=3 (int).
+     */
     protected CopyOnWriteCaseInsensitiveMap<String, Object> createTestMap()
     {
         CopyOnWriteCaseInsensitiveMap<String, Object> map = new CopyOnWriteCaseInsensitiveMap<String, Object>();
         map.put("FOO", "BAR");
-        map.put("DOO", Integer.valueOf(3));
+        map.put("doo", Integer.valueOf(3));
         return map;
     }
 
     @Test
-    public void copyOnPut() throws Exception
+    public void putClone() throws Exception
     {
         CopyOnWriteCaseInsensitiveMap<String, Object> original = createTestMap();
-        Map<String, Object> copyOnWriteMap = new CopyOnWriteCaseInsensitiveMap<String, Object>(original);
+        Map<String, Object> copyOnWriteMap = original.clone();
 
-        copyOnWriteMap.put("other", "val");
-
-        // Assert state of original map
-        assertMapContents(original);
-        assertEquals(2, original.size());
-        assertFalse(original.containsKey("other"));
-
-        // Assert state of copy on write map
-        assertMapContents(copyOnWriteMap);
-        assertEquals(3, copyOnWriteMap.size());
-        assertTrue(copyOnWriteMap.containsKey("other"));
-    }
-
-    @Test
-    public void copyOnPutAll() throws Exception
-    {
-        CopyOnWriteCaseInsensitiveMap<String, Object> original = createTestMap();
-        Map<String, Object> copyOnWriteMap = new CopyOnWriteCaseInsensitiveMap<String, Object>(original);
-
-        Map<String, String> extrasMap = new HashMap<String, String>();
-        extrasMap.put("extra1", "val");
-        extrasMap.put("extra2", "val");
-        extrasMap.put("extra3", "val");
-        copyOnWriteMap.putAll(extrasMap);
-
-        // Assert state of original map
-        assertMapContents(original);
-        assertEquals(2, original.size());
-        assertFalse(original.containsKey("extra1"));
-        assertFalse(original.containsKey("extra2"));
-        assertFalse(original.containsKey("extra3"));
-
-        // Assert state of copy on write map
-        assertMapContents(copyOnWriteMap);
-        assertEquals(5, copyOnWriteMap.size());
-        assertTrue(copyOnWriteMap.containsKey("extra1"));
-        assertTrue(copyOnWriteMap.containsKey("extra2"));
-        assertTrue(copyOnWriteMap.containsKey("extra3"));
-    }
-
-    @Test
-    public void copyOnPutRemove() throws Exception
-    {
-        CopyOnWriteCaseInsensitiveMap<String, Object> original = createTestMap();
-        original.put("extra", "value");
-        Map<String, Object> copyOnWriteMap = new CopyOnWriteCaseInsensitiveMap<String, Object>(original);
-
-        copyOnWriteMap.remove("extra");
+        original.put("newOriginal", "val");
+        copyOnWriteMap.put("newCopy", "val");
 
         // Assert state of original map
         assertMapContents(original);
         assertEquals(3, original.size());
-        assertTrue(original.containsKey("extra"));
+        assertFalse(original.containsKey("newCopy"));
+        assertTrue(original.containsKey("newOriginal"));
 
         // Assert state of copy on write map
         assertMapContents(copyOnWriteMap);
-        assertEquals(2, copyOnWriteMap.size());
-        assertFalse(copyOnWriteMap.containsKey("extra"));
+        assertEquals(3, copyOnWriteMap.size());
+        assertTrue(copyOnWriteMap.containsKey("newCopy"));
+        assertFalse(copyOnWriteMap.containsKey("newOriginal"));
     }
 
     @Test
-    public void copyOnClear() throws Exception
+    public void putAllClone() throws Exception
     {
         CopyOnWriteCaseInsensitiveMap<String, Object> original = createTestMap();
-        Map<String, Object> copyOnWriteMap = new CopyOnWriteCaseInsensitiveMap<String, Object>(original);
+        Map<String, Object> copyOnWriteMap = original.clone();
 
-        copyOnWriteMap.clear();
+        Map<String, String> newOriginalEntriesMap = new HashMap<String, String>();
+        newOriginalEntriesMap.put("newOriginal1", "val");
+        newOriginalEntriesMap.put("newOriginal2", "val");
+        newOriginalEntriesMap.put("newOriginal3", "val");
+        original.putAll(newOriginalEntriesMap);
+
+        Map<String, String> newCopyEntriesMap = new HashMap<String, String>();
+        newCopyEntriesMap.put("newCopy1", "val");
+        newCopyEntriesMap.put("newCopy2", "val");
+        newCopyEntriesMap.put("newCopy3", "val");
+        copyOnWriteMap.putAll(newCopyEntriesMap);
 
         // Assert state of original map
         assertMapContents(original);
-        assertEquals(2, original.size());
+        assertEquals(5, original.size());
+        assertTrue(original.containsKey("newOriginal1"));
+        assertTrue(original.containsKey("newOriginal2"));
+        assertTrue(original.containsKey("newOriginal3"));
+        assertFalse(original.containsKey("newCopy1"));
+        assertFalse(original.containsKey("newCopy2"));
+        assertFalse(original.containsKey("newCopy3"));
 
         // Assert state of copy on write map
+        assertMapContents(copyOnWriteMap);
+        assertEquals(5, copyOnWriteMap.size());
+        assertTrue(copyOnWriteMap.containsKey("newCopy1"));
+        assertTrue(copyOnWriteMap.containsKey("newCopy2"));
+        assertTrue(copyOnWriteMap.containsKey("newCopy3"));
+        assertFalse(copyOnWriteMap.containsKey("newOriginal1"));
+        assertFalse(copyOnWriteMap.containsKey("newOriginal2"));
+        assertFalse(copyOnWriteMap.containsKey("newOriginal3"));
+    }
+
+    @Test
+    public void removeClone() throws Exception
+    {
+        CopyOnWriteCaseInsensitiveMap<String, Object> original = createTestMap();
+        original.put("extra", "value");
+        original.put("extra2", "value");
+        Map<String, Object> copyOnWriteMap = original.clone();
+
+        original.remove("extra");
+        copyOnWriteMap.remove("extra2");
+
+        // Assert state of original map
+        assertMapContents(original);
+        assertEquals(3, original.size());
+        assertFalse(original.containsKey("extra"));
+        assertTrue(original.containsKey("extra2"));
+
+        // Assert state of copy on write map
+        assertMapContents(copyOnWriteMap);
+        assertEquals(3, copyOnWriteMap.size());
+        assertTrue(copyOnWriteMap.containsKey("extra"));
+        assertFalse(copyOnWriteMap.containsKey("extra2"));
+    }
+
+    @Test
+    public void clearOrignalClone() throws Exception
+    {
+        CopyOnWriteCaseInsensitiveMap<String, Object> original = createTestMap();
+        Map<String, Object> copyOnWriteMap = original.clone();
+
+        original.clear();
+        assertEquals(0, original.size());
+        assertEquals(0, original.entrySet().size());
+        assertEquals(2, copyOnWriteMap.size());
+        assertEquals(2, copyOnWriteMap.entrySet().size());
+    }
+
+    @Test
+    public void clearCopyClone() throws Exception
+    {
+        CopyOnWriteCaseInsensitiveMap<String, Object> original = createTestMap();
+        Map<String, Object> copyOnWriteMap = original.clone();
+
+        copyOnWriteMap.clear();
+        assertEquals(2, original.size());
+        assertEquals(2, original.entrySet().size());
         assertEquals(0, copyOnWriteMap.size());
+        assertEquals(0, copyOnWriteMap.entrySet().size());
+    }
+
+    @Test
+    public void putDeserialized() throws Exception
+    {
+        CopyOnWriteCaseInsensitiveMap<String, Object> original = createTestMap();
+        Map<String, Object> copyOnWriteMap = serializeAndDeserialize(original);
+
+        original.put("newOriginal", "val");
+        copyOnWriteMap.put("newCopy", "val");
+
+        // Assert state of original map
+        assertMapContents(original);
+        assertEquals(3, original.size());
+        assertFalse(original.containsKey("newCopy"));
+        assertTrue(original.containsKey("newOriginal"));
+
+        // Assert state of copy on write map
+        assertMapContents(copyOnWriteMap);
+        assertEquals(3, copyOnWriteMap.size());
+        assertTrue(copyOnWriteMap.containsKey("newCopy"));
+        assertFalse(copyOnWriteMap.containsKey("newOriginal"));
+    }
+
+    @Test
+    public void putAllDeserialized() throws Exception
+    {
+        CopyOnWriteCaseInsensitiveMap<String, Object> original = createTestMap();
+        Map<String, Object> copyOnWriteMap = serializeAndDeserialize(original);
+
+        Map<String, String> newOriginalEntriesMap = new HashMap<String, String>();
+        newOriginalEntriesMap.put("newOriginal1", "val");
+        newOriginalEntriesMap.put("newOriginal2", "val");
+        newOriginalEntriesMap.put("newOriginal3", "val");
+        original.putAll(newOriginalEntriesMap);
+
+        Map<String, String> newCopyEntriesMap = new HashMap<String, String>();
+        newCopyEntriesMap.put("newCopy1", "val");
+        newCopyEntriesMap.put("newCopy2", "val");
+        newCopyEntriesMap.put("newCopy3", "val");
+        copyOnWriteMap.putAll(newCopyEntriesMap);
+
+        // Assert state of original map
+        assertMapContents(original);
+        assertEquals(5, original.size());
+        assertTrue(original.containsKey("newOriginal1"));
+        assertTrue(original.containsKey("newOriginal2"));
+        assertTrue(original.containsKey("newOriginal3"));
+        assertFalse(original.containsKey("newCopy1"));
+        assertFalse(original.containsKey("newCopy2"));
+        assertFalse(original.containsKey("newCopy3"));
+
+        // Assert state of copy on write map
+        assertMapContents(copyOnWriteMap);
+        assertEquals(5, copyOnWriteMap.size());
+        assertTrue(copyOnWriteMap.containsKey("newCopy1"));
+        assertTrue(copyOnWriteMap.containsKey("newCopy2"));
+        assertTrue(copyOnWriteMap.containsKey("newCopy3"));
+        assertFalse(copyOnWriteMap.containsKey("newOriginal1"));
+        assertFalse(copyOnWriteMap.containsKey("newOriginal2"));
+        assertFalse(copyOnWriteMap.containsKey("newOriginal3"));
+    }
+
+    @Test
+    public void removeDeserialized() throws Exception
+    {
+        CopyOnWriteCaseInsensitiveMap<String, Object> original = createTestMap();
+        original.put("extra", "value");
+        original.put("extra2", "value");
+        Map<String, Object> copyOnWriteMap = serializeAndDeserialize(original);
+
+        original.remove("extra");
+        copyOnWriteMap.remove("extra2");
+
+        // Assert state of original map
+        assertMapContents(original);
+        assertEquals(3, original.size());
+        assertFalse(original.containsKey("extra"));
+        assertTrue(original.containsKey("extra2"));
+
+        // Assert state of copy on write map
+        assertMapContents(copyOnWriteMap);
+        assertEquals(3, copyOnWriteMap.size());
+        assertTrue(copyOnWriteMap.containsKey("extra"));
+        assertFalse(copyOnWriteMap.containsKey("extra2"));
+    }
+
+    @Test
+    public void clearOrignalDeserialized() throws Exception
+    {
+        CopyOnWriteCaseInsensitiveMap<String, Object> original = createTestMap();
+        Map<String, Object> copyOnWriteMap = serializeAndDeserialize(original);
+
+        original.clear();
+        assertEquals(0, original.size());
+        assertEquals(0, original.entrySet().size());
+        assertEquals(2, copyOnWriteMap.size());
+        assertEquals(2, copyOnWriteMap.entrySet().size());
+    }
+
+    @Test
+    public void clearCopyDeserialized() throws Exception
+    {
+        CopyOnWriteCaseInsensitiveMap<String, Object> original = createTestMap();
+        Map<String, Object> copyOnWriteMap = serializeAndDeserialize(original);
+
+        copyOnWriteMap.clear();
+        assertEquals(2, original.size());
+        assertEquals(2, original.entrySet().size());
+        assertEquals(0, copyOnWriteMap.size());
+        assertEquals(0, copyOnWriteMap.entrySet().size());
     }
 
 }
