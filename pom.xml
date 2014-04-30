@@ -89,6 +89,7 @@
             instead a module artifact id is erroneously substituted.
          -->
         <productUrl>http://www.mulesoft.org</productUrl>
+        <dev.list>dev@mule.codehaus.org</dev.list>
 
         <!--
              Use the name of an Eclipse Java execution environment, Eclipse will
@@ -1791,7 +1792,7 @@
                             <!-- include repository revision from buildnumber plugin -->
                             <Build-Revision>${buildNumber}</Build-Revision>
                             <Build-Date>${timestamp}</Build-Date>
-                            <Dev-List-Email>dev@mule.codehaus.org</Dev-List-Email>
+                            <Dev-List-Email>${dev.list}</Dev-List-Email>
                             <Supported-Jdks>[1.6,1.8)</Supported-Jdks>
                             <Recommended-Jdks>[1.6.0_26,1.7),[1.7.0_3,1.8)</Recommended-Jdks>
                         </manifestEntries>
