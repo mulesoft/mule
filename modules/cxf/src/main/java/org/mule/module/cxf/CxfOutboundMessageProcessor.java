@@ -331,7 +331,19 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
 
         if (method == null)
         {
-            method = event.getMessage().getInvocationProperty(MuleProperties.MULE_METHOD_PROPERTY);
+            Object muleMethodProperty = event.getMessage().getInvocationProperty(MuleProperties.MULE_METHOD_PROPERTY);
+
+            if (muleMethodProperty != null)
+            {
+                if (muleMethodProperty instanceof Method)
+                {
+                    method = ((Method) muleMethodProperty).getName();
+                }
+                else
+                {
+                    method = muleMethodProperty.toString();
+                }
+            }
         }
 
         if (method == null)
