@@ -1551,26 +1551,6 @@
                     </executions>
                 </plugin>
                 <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>buildnumber-maven-plugin</artifactId>
-                    <version>1.1</version>
-                    <executions>
-                        <execution>
-                            <phase>validate</phase>
-                            <goals>
-                                <goal>create</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <!-- never touch vcs -->
-                        <doCheck>false</doCheck>
-                        <doUpdate>false</doUpdate>
-                        <timestampFormat>{0,date,yyyy-MMM-dd HH:mm:ss}</timestampFormat>
-                        <shortRevisionLength>8</shortRevisionLength>
-                    </configuration>
-                </plugin>
-                <plugin>
                     <groupId>com.mycila</groupId>
                     <artifactId>license-maven-plugin</artifactId>
                     <version>2.6</version>
@@ -2164,6 +2144,26 @@
                                 </goals>
                             </execution>
                         </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>buildnumber-maven-plugin</artifactId>
+                        <version>1.1</version>
+                        <executions>
+                            <execution>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>create</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <!-- never touch vcs -->
+                            <doCheck>false</doCheck>
+                            <doUpdate>false</doUpdate>
+                            <timestampFormat>{0,date,yyyy-MMM-dd HH:mm:ss}</timestampFormat>
+                            <shortRevisionLength>8</shortRevisionLength>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
