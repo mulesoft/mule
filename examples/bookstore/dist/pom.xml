@@ -12,7 +12,7 @@
     <description>Bookstore Example App</description>
 
     <properties>
-        <muleVersion>3.4.2-SNAPSHOT</muleVersion>
+        <muleVersion>3.4.3-SNAPSHOT</muleVersion>
         <licensePath>../../../LICENSE_HEADER.txt</licensePath>
     </properties>
 
