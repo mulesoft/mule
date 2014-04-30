@@ -71,6 +71,7 @@ public class HttpUtilImpl implements HttpUtil
         {
             out = new OutputStreamWriter(conn.getOutputStream());
             out.write(body);
+            out.flush();
 
             int responseCode = conn.getResponseCode();
 
