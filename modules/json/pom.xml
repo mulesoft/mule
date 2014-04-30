@@ -108,6 +108,11 @@
             <version>${jacksonVersion}</version>
         </dependency>
         <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-xc</artifactId>
+            <version>${jacksonVersion}</version>
+        </dependency>
+        <dependency>
             <groupId>de.odysseus.staxon</groupId>
             <artifactId>staxon</artifactId>
             <version>${staxonVersion}</version>
