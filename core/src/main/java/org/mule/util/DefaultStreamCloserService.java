@@ -25,7 +25,10 @@ import org.xml.sax.InputSource;
 
 /**
  * Closes streams of different types by looking up available {@link StreamCloser}'s
- * from the Mule registry.
+ * from the Mule registry. {@link org.mule.api.util.StreamCloser} instances are only fetched
+ * from the registry the first time the {@link #closeStream(Object)} method is called
+ * with a steam that cannot be closed by {@lnk CoreStreamTypesCloser}. Any other closers
+ * added to the registry after that will be ignored
  */
 public class DefaultStreamCloserService implements StreamCloserService
 {
