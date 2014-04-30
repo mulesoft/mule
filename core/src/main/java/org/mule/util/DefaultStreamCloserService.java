@@ -14,6 +14,7 @@ import org.mule.api.util.StreamCloserService;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
@@ -33,6 +34,7 @@ public class DefaultStreamCloserService implements StreamCloserService
 
     private MuleContext muleContext;
     private StreamCloser coreStreamTypesCloser = new CoreStreamTypesCloser();
+    private Collection<StreamCloser> allStreamClosers = null;
 
     public void closeStream(Object stream)
     {
@@ -44,7 +46,7 @@ public class DefaultStreamCloserService implements StreamCloserService
             }
             else
             {
-                for (StreamCloser closer : muleContext.getRegistry().lookupObjects(StreamCloser.class))
+                for (StreamCloser closer : getAllStreamClosers())
                 {
                     if (closer.canClose(stream.getClass()))
                     {
@@ -61,6 +63,26 @@ public class DefaultStreamCloserService implements StreamCloserService
             log.debug("Exception closing stream: " + stream, e);
         }
 
+    }
+
+    /**
+     * Lazyly fetches and keeps all the registered {@link org.mule.api.util.StreamCloser}
+     * instances from the registry. Because there're not too many of them, this is
+     * the most efficient option to avoid accessing the registry continuosly.
+     * If we get to a situation in which we have many of them, considering using a
+     * {@link java.util.Map} guarded by a {@link java.util.concurrent.locks.ReadWriteLock}
+     *
+     * @return all {@link org.mule.api.util.StreamCloser} instances in the registry
+     * @throws Exception
+     */
+    private Collection<StreamCloser> getAllStreamClosers() throws Exception
+    {
+        if (allStreamClosers == null)
+        {
+            allStreamClosers = muleContext.getRegistry().lookupObjects(StreamCloser.class);
+        }
+
+        return allStreamClosers;
     }
 
     public void setMuleContext(MuleContext context)
