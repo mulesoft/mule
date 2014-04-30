@@ -9,18 +9,18 @@ package org.mule.util;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * Implementation of {@link Map} that provides copy on write semantics while providing the case-insensitivity
  * of {@link CaseInsensitiveHashMap}. <br>
- * <b>Note:</b> In this {@link Map} implementation {@link #keySet()}, {@link #values()} and
- * {@link #entrySet()} return unmodifiable {@link Collection}'s. In order to mutate this Map implementation
- * you should use {@link #put(Object, Object)}, {@link #putAll(Map)}, {@link #remove(Object)} and
- * {@link #clear()} methods.<br>
+ * <b>Note:</b> In this {@link Map} implementation {@link #values()} and {@link #entrySet()} return
+ * unmodifiable {@link Collection}'s.<br>
  * This implementation is not thread-safe.
  */
 public class CopyOnWriteCaseInsensitiveMap<K, V> implements Map<K, V>, Serializable
@@ -31,6 +31,7 @@ public class CopyOnWriteCaseInsensitiveMap<K, V> implements Map<K, V>, Serializa
     private Map<K, V> core;
     private transient Map<K, V> view;
     private transient boolean requiresCopy;
+    private transient Set<K> keyset = new KeySet();
 
     @SuppressWarnings("unchecked")
     public CopyOnWriteCaseInsensitiveMap()
@@ -126,10 +127,64 @@ public class CopyOnWriteCaseInsensitiveMap<K, V> implements Map<K, V>, Serializa
         updateCore(new CaseInsensitiveHashMap());
     }
 
-    @Override
     public Set<K> keySet()
     {
-        return view.keySet();
+        return keyset;
+    }
+
+    private final class KeySet extends AbstractSet<K>
+    {
+        public Iterator<K> iterator()
+        {
+            return new KeyIterator();
+        }
+
+        public int size()
+        {
+            return CopyOnWriteCaseInsensitiveMap.this.size();
+        }
+
+        public boolean contains(Object o)
+        {
+            return containsKey(o);
+        }
+
+        public boolean remove(Object o)
+        {
+            return CopyOnWriteCaseInsensitiveMap.this.remove(o) != null;
+        }
+
+        public void clear()
+        {
+            CopyOnWriteCaseInsensitiveMap.this.clear();
+        }
+    }
+
+    private final class KeyIterator implements Iterator<K>
+    {
+        private int current;
+        private K[] keyArray;
+
+        @SuppressWarnings("unchecked")
+        public KeyIterator()
+        {
+            keyArray = (K[]) core.keySet().toArray();
+        }
+
+        public boolean hasNext()
+        {
+            return current < keyArray.length;
+        }
+
+        public K next()
+        {
+            return keyArray[current++];
+        }
+
+        public void remove()
+        {
+            CopyOnWriteCaseInsensitiveMap.this.remove(keyArray[current]);
+        }
     }
 
     @Override
@@ -163,6 +218,7 @@ public class CopyOnWriteCaseInsensitiveMap<K, V> implements Map<K, V>, Serializa
     {
         in.defaultReadObject();
         this.view = Collections.unmodifiableMap(core);
+        this.keyset = new KeySet();
     }
 
 }
