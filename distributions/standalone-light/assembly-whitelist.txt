@@ -246,7 +246,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/jackson-databind-2.1.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jackson-jaxrs-1.9.11.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jackson-mapper-asl-1.9.11.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/jackson-xc-1.7.1.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/jackson-xc-1.9.11.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jasper-6.0.29.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jasper-el-6.0.29.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jasper-jdt-6.0.29.jar

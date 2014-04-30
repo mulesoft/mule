@@ -1213,6 +1213,10 @@
                         <artifactId>jackson-lgpl</artifactId>
                     </exclusion>
                     <exclusion>
+                        <groupId>org.codehaus.jackson</groupId>
+                        <artifactId>jackson-xc</artifactId>
+                    </exclusion>
+                    <exclusion>
                         <groupId>org.codehaus.jettison</groupId>
                         <artifactId>jettison</artifactId>
                     </exclusion>
