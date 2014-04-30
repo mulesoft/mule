@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+            http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <flow name="client">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="${port}" path="hello" />
+        <logger level="WARN" message="#[payload]" />
+        <cxf:jaxws-service serviceClass="org.mule.module.cxf.example.HelloWorld" />
+
+        <!-- The MULE_METHOD_PROPERTY invocation property set by the jaxws-service should override the "invalidOperation"
+            value of the operation attribute in jaxws-client -->
+        <cxf:jaxws-client serviceClass="org.mule.module.cxf.example.HelloWorld" operation="invalidOperation"/>
+        <logger level="WARN" message="#[payload]" />
+        <http:outbound-endpoint exchange-pattern="request-response" host="localhost" port="${port}" path="hello2" method="POST" />
+    </flow>
+
+
+    <flow name="server">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="${port}" path="hello2"/>
+        <cxf:jaxws-service serviceClass="org.mule.module.cxf.example.HelloWorld"/>
+        <component class="org.mule.module.cxf.example.HelloWorldImpl"/>
+    </flow>
+
+</mule>
