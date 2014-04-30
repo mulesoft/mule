@@ -108,6 +108,53 @@ public class CopyOnWriteCaseInsensitiveMapTestCase extends AbstractMuleTestCase
     }
 
     @Test
+    public void entrySet() throws Exception
+    {
+        CopyOnWriteCaseInsensitiveMap<String, Object> original = createTestMap();
+        assertEquals(2, original.size());
+        original.keySet().remove("FOO");
+        assertEquals(1, original.size());
+        original.keySet().clear();;
+        assertEquals(0, original.size());
+    }
+
+    @Test
+    public void entrySetCloneMutateOriginal() throws Exception
+    {
+        CopyOnWriteCaseInsensitiveMap<String, Object> original = createTestMap();
+        Map<String, Object> copyOnWriteMap = original.clone();
+
+        assertEquals(2, original.size());
+        assertEquals(2, copyOnWriteMap.size());
+
+        original.keySet().remove("FOO");
+        assertEquals(1, original.size());
+        assertEquals(2, copyOnWriteMap.size());
+
+        original.keySet().clear();;
+        assertEquals(0, original.size());
+        assertEquals(2, copyOnWriteMap.size());
+    }
+
+    @Test
+    public void entrySetCloneMutateClone() throws Exception
+    {
+        CopyOnWriteCaseInsensitiveMap<String, Object> original = createTestMap();
+        Map<String, Object> copyOnWriteMap = original.clone();
+
+        assertEquals(2, original.size());
+        assertEquals(2, copyOnWriteMap.size());
+
+        copyOnWriteMap.keySet().remove("FOO");
+        assertEquals(2, original.size());
+        assertEquals(1, copyOnWriteMap.size());
+
+        copyOnWriteMap.keySet().clear();;
+        assertEquals(2, original.size());
+        assertEquals(0, copyOnWriteMap.size());
+    }
+
+    @Test
     public void putClone() throws Exception
     {
         CopyOnWriteCaseInsensitiveMap<String, Object> original = createTestMap();
@@ -216,6 +263,42 @@ public class CopyOnWriteCaseInsensitiveMapTestCase extends AbstractMuleTestCase
         assertEquals(2, original.entrySet().size());
         assertEquals(0, copyOnWriteMap.size());
         assertEquals(0, copyOnWriteMap.entrySet().size());
+    }
+
+    @Test
+    public void entrySetDeserializedMutateOriginal() throws Exception
+    {
+        CopyOnWriteCaseInsensitiveMap<String, Object> original = createTestMap();
+        Map<String, Object> copyOnWriteMap = serializeAndDeserialize(original);
+
+        assertEquals(2, original.size());
+        assertEquals(2, copyOnWriteMap.size());
+
+        original.keySet().remove("FOO");
+        assertEquals(1, original.size());
+        assertEquals(2, copyOnWriteMap.size());
+
+        original.keySet().clear();;
+        assertEquals(0, original.size());
+        assertEquals(2, copyOnWriteMap.size());
+    }
+
+    @Test
+    public void entrySetDeserializedMutateClone() throws Exception
+    {
+        CopyOnWriteCaseInsensitiveMap<String, Object> original = createTestMap();
+        Map<String, Object> copyOnWriteMap = serializeAndDeserialize(original);
+
+        assertEquals(2, original.size());
+        assertEquals(2, copyOnWriteMap.size());
+
+        copyOnWriteMap.keySet().remove("FOO");
+        assertEquals(2, original.size());
+        assertEquals(1, copyOnWriteMap.size());
+
+        copyOnWriteMap.keySet().clear();;
+        assertEquals(2, original.size());
+        assertEquals(0, copyOnWriteMap.size());
     }
 
     @Test
