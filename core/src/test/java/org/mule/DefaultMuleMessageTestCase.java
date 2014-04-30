@@ -390,12 +390,20 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     }
 
     @Test(expected=UnsupportedOperationException.class)
-    public void testInboundPropertyNamesImmutable() throws Exception
+    public void testInboundPropertyNamesAddImmutable() throws Exception
     {
         MuleMessage message = createMuleMessage();
         message.getPropertyNames(PropertyScope.INBOUND).add("other");
     }
 
+    public void testInboundPropertyNamesRemoveMmutable() throws Exception
+    {
+        MuleMessage message = createMuleMessage();
+        message.setProperty("foo", "bar", PropertyScope.INBOUND);
+        message.getPropertyNames(PropertyScope.INBOUND).remove("foo");
+        assertNull(message.getInboundProperty("foo"));
+    }
+    
     @Test(expected=UnsupportedOperationException.class)
     public void testOutboundPropertyNamesImmutable() throws Exception
     {
@@ -403,6 +411,14 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         message.getPropertyNames(PropertyScope.OUTBOUND).add("other");
     }
 
+    public void testOutboundPropertyNamesRemoveMmutable() throws Exception
+    {
+        MuleMessage message = createMuleMessage();
+        message.setOutboundProperty("foo", "bar");
+        message.getPropertyNames(PropertyScope.OUTBOUND).remove("foo");
+        assertNull(message.getOutboundProperty("foo"));
+    }
+    
     @Test(expected=UnsupportedOperationException.class)
     public void testInvocationPropertyNamesImmutable() throws Exception
     {
@@ -410,10 +426,26 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         message.getPropertyNames(PropertyScope.INVOCATION).add("other");
     }
     
+    public void tesInvocationPropertyNamesRemoveMmutable() throws Exception
+    {
+        MuleMessage message = createMuleMessage();
+        message.setInvocationProperty("foo", "bar");
+        message.getPropertyNames(PropertyScope.INVOCATION).remove("foo");
+        assertNull(message.getInvocationProperty("foo"));
+    }
+    
     @Test(expected=UnsupportedOperationException.class)
     public void testSessionPropertyNamesImmutable() throws Exception
     {
         MuleMessage message = createMuleMessage();
         message.getPropertyNames(PropertyScope.SESSION).add("other");
+    }
+    
+    public void testtSessionPropertyNamesRemoveMmutable() throws Exception
+    {
+        MuleMessage message = createMuleMessage();
+        message.setSessionProperty("foo", "bar");
+        message.getPropertyNames(PropertyScope.SESSION).remove("foo");
+        assertNull(message.getSessionProperty("foo"));
     }
 }
