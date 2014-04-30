@@ -308,7 +308,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
      */
     protected <T, U> void runFlowWithPayloadAndExpect(String flowName, T expect, U payload) throws Exception
     {
-        Assert.assertEquals(expect, this.runFlow(flowName).getMessage().getPayload());
+        Assert.assertEquals(expect, this.runFlow(flowName, payload).getMessage().getPayload());
     }
 
     /**
