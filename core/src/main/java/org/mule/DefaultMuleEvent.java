@@ -39,7 +39,6 @@ import java.io.OptionalDataException;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.net.URI;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -1025,7 +1024,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     @Override
     public Set<String> getFlowVariableNames()
     {
-        return Collections.unmodifiableSet(flowVariables.keySet());
+        return flowVariables.keySet();
     }
 
     @Override
