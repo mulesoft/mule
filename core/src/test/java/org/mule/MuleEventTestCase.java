@@ -344,7 +344,6 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
         event.getFlowVariableNames().add("other");
     }
     
-    @Test(expected=UnsupportedOperationException.class)
     public void testFlowVarNamesRemoveMutable() throws Exception
     {
         MuleEvent event = getTestEvent("whatever");
