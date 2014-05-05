@@ -7,8 +7,9 @@
 
 package org.mule.module.db.internal.config.processor;
 
-import static org.mule.module.db.internal.domain.query.QueryType.*;
 import static org.mule.module.db.internal.domain.query.QueryType.STORE_PROCEDURE_CALL;
+import static org.mule.module.db.internal.domain.query.QueryType.TRUNCATE;
+import static org.mule.module.db.internal.domain.query.QueryType.UPDATE;
 import org.mule.module.db.internal.domain.query.QueryType;
 
 import java.util.Arrays;
