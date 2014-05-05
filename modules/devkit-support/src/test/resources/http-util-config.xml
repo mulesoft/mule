@@ -36,4 +36,11 @@
         <set-payload value="fail" />
         <test:component throwException="true"/>
     </flow>
+
+    <flow name="echoFlow">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" path="echo" port="${port1}" />
+        <set-payload value="#[payload]" />
+        <http:response-builder status="200"/>
+    </flow>
+
 </mule>
