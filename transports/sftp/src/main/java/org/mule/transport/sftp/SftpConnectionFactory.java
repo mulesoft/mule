@@ -6,6 +6,7 @@
  */
 package org.mule.transport.sftp;
 
+import java.io.File;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.util.StringUtils;
@@ -95,17 +96,32 @@ public class SftpConnectionFactory implements PoolableObjectFactory
             // {
             // try
             // {
-            if (identityFile != null)
+            // this first case is when a key-file AND password have been provided. 
+            //  Note - not caring about passphrase. We are covering here the case 
+            // where username/password AND key-file are provided only.
+            //See javadoc on the client.login method that takes a File object as one of its arguments
+            if (identityFile != null && endpointURI.getPassword() != null && sftpUtil.getPassphrase() == null)
+            {
+              File idFile = new File(identityFile);
+              if (!idFile.exists() ){
+                throw new IOException(String.format("file '%s' does not exist", identityFile));
+              }
+              logger.info(String.format("using multi-auth: userName '%s', password (not logged), ssh key-file '%s'", endpointURI.getUser(), idFile.getAbsolutePath()));
+              client.login(endpointURI.getUser(), endpointURI.getPassword(), idFile);
+            }
+            //this next case is where a only a key-file is provided
+            else if (identityFile != null)
             {
                 String passphrase = sftpUtil.getPassphrase();
 
                 client.login(endpointURI.getUser(), identityFile, passphrase);
             }
+            //lastly, if there is a username and password
             else
             {
                 client.login(endpointURI.getUser(), endpointURI.getPassword());
-            }
-            // } catch (SocketException e)
+            }            
+			// } catch (SocketException e)
             // {
             // numberOfAttempts--;
             // continue;
