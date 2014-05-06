@@ -74,23 +74,27 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     protected static final int ONE_HOUR_IN_MILLISECONDS = 3600000;
 
     private static final String MULE_CONFIG_XML_FILE = "mule-config.xml";
+    private static final String EMPTY_APP_CONFIG_XML = "/empty-config.xml";
+    private static final String BAD_APP_CONFIG_XML = "/bad-app-config.xml";
 
     //APP constants
     private static final ArtifactDescriptor dummyAppDescriptor = new ArtifactDescriptor("dummy-app", "/dummy-app.zip", "/dummy-app", null, null);
     private static final ArtifactDescriptor emptyAppDescriptor = new ArtifactDescriptor("empty-app", "/empty-app.zip", null, "empty-app.zip", null);
     private static final ArtifactDescriptor brokenAppDescriptor = new ArtifactDescriptor("broken-app", "/broken-app.zip", null, "brokenApp.zip", null);
-    private static final ArtifactDescriptor incompleteAppDescriptor = new ArtifactDescriptor("incompleteApp", "/incompleteApp.zip", "/incompleteApp", "incompleteApp.zip", null);
 
+    private static final ArtifactDescriptor incompleteAppDescriptor = new ArtifactDescriptor("incompleteApp", "/incompleteApp.zip", "/incompleteApp", "incompleteApp.zip", null);
     //Domain constants
     private static final ArtifactDescriptor brokenDomainDescriptor = new ArtifactDescriptor("brokenDomain", "/broken-domain.zip", null, "brokenDomain.zip", "/broken-config.xml");
-    private static final ArtifactDescriptor dummyDomainDescriptor = new ArtifactDescriptor("dummy-domain", "/dummy-domain.zip", null, null, null);
+    private static final ArtifactDescriptor dummyDomainDescriptor = new ArtifactDescriptor("dummy-domain", "/dummy-domain.zip", "/dummy-domain", null, "mule-domain-config.xml");
     private static final ArtifactDescriptor dummyDomainApp1Descriptor = new ArtifactDescriptor("dummy-domain-app1", "/dummy-domain-app1.zip", null, null, null);
-    private static final ArtifactDescriptor dummyDomainApp2Descriptor = new ArtifactDescriptor("dummy-domain-app2", "/dummy-domain-app2.zip", null, null, null);
+    private static final ArtifactDescriptor dummyDomainApp2Descriptor = new ArtifactDescriptor("dummy-domain-app2", "/dummy-domain-app2.zip", "/dummy-domain-app2", null, null);
+    private static final ArtifactDescriptor dummyDomainApp3Descriptor = new ArtifactDescriptor("dummy-domain-app3", "/dummy-domain-app3.zip", "/dummy-domain-app3", null, null);
     private static final ArtifactDescriptor dummyDomainBundleDescriptor = new ArtifactDescriptor("dummy-domain-bundle", "/dummy-domain-bundle.zip", null, null, null);
-    private static final ArtifactDescriptor emptyDomainDescriptor = new ArtifactDescriptor("empty-domain", "/empty-domain.zip", null, "empty-domain.zip", "/empty-config.xml");
+    private static final ArtifactDescriptor emptyDomainDescriptor = new ArtifactDescriptor("empty-domain", "/empty-domain.zip", null, "empty-domain.zip", EMPTY_APP_CONFIG_XML);
     private static final ArtifactDescriptor incompleteDomainDescriptor = new ArtifactDescriptor("incompleteDomain", "/incompleteDomain.zip", null, "incompleteDomain.zip", null);
     private static final ArtifactDescriptor invalidDomainBundle = new ArtifactDescriptor("invalid-domain-bundle", "/invalid-domain-bundle.zip", null, null, null);
     private static final ArtifactDescriptor httpSharedDomainBundle = new ArtifactDescriptor("http-shared-domain", "/http-shared-domain.zip", null, null, null);
+
 
     protected File muleHome;
     protected File appsDir;
@@ -1124,7 +1128,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         final Domain domain = findADomain(dummyDomainDescriptor.id, 1);
         assertNotNull(domain);
-        assertNull(domain.getMuleContext());
+        assertNotNull(domain.getMuleContext());
     }
 
 
@@ -1247,8 +1251,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         final Domain domain = findADomain(dummyDomainDescriptor.id, 1);
         assertNotNull(domain);
-        assertNull(domain.getMuleContext());
-
+        assertNotNull(domain.getMuleContext());
     }
 
     @Test
@@ -1816,6 +1819,206 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
         assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp2Descriptor.id);
         assertUndeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
+    }
+
+
+    @Test
+    public void redeploysFixedDomainAfterBrokenExplodedDomainOnStartup() throws Exception
+    {
+        addExplodedDomainFromResource("/incompleteDomain.zip", "incompleteDomain");
+
+        deploymentService.start();
+
+        doRedeployFixedDomainAfterBrokenDomain();
+    }
+
+    @Test
+    public void redeploysFixedDomainAfterBrokenExplodedDomainAfterStartup() throws Exception
+    {
+        deploymentService.start();
+
+        addExplodedDomainFromResource("/incompleteDomain.zip", "incompleteDomain");
+
+        doRedeployFixedDomainAfterBrokenDomain();
+    }
+
+    @Test
+    public void redeploysDomainAndItsApplications() throws Exception
+    {
+        addExplodedDomainFromResource(dummyDomainDescriptor.zipPath, dummyDomainDescriptor.id);
+
+        addExplodedAppFromResource(dummyDomainApp1Descriptor.zipPath, dummyDomainApp1Descriptor.id);
+        addExplodedAppFromResource(dummyDomainApp2Descriptor.zipPath, dummyDomainApp2Descriptor.id);
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
+
+        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
+        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp2Descriptor.id);
+
+        reset(domainDeploymentListener);
+        reset(applicationDeploymentListener);
+
+        doRedeployDummyDomainByChangingConfigFileWithGoodOne();
+
+        assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
+
+        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
+        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp2Descriptor.id);
+    }
+
+    @Test
+    public void redeploysDomainAndFails() throws Exception
+    {
+        addExplodedDomainFromResource(dummyDomainDescriptor.zipPath, dummyDomainDescriptor.id);
+
+        addExplodedAppFromResource(dummyDomainApp1Descriptor.zipPath, dummyDomainApp1Descriptor.id);
+        addExplodedAppFromResource(dummyDomainApp2Descriptor.zipPath, dummyDomainApp2Descriptor.id);
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
+
+        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
+        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp2Descriptor.id);
+
+        reset(domainDeploymentListener);
+        reset(applicationDeploymentListener);
+
+        doRedeployDummyDomainByChangingConfigFileWithBadOne();
+
+        assertDeploymentFailure(domainDeploymentListener, dummyDomainDescriptor.id);
+
+        assertNoDeploymentInvoked(applicationDeploymentListener);
+    }
+
+    @Test
+    public void redeploysDomainWithOneApplicationFailedOnFirstDeployment() throws Exception
+    {
+        deploymentService.start();
+
+        addExplodedDomainFromResource(dummyDomainDescriptor.zipPath, dummyDomainDescriptor.id);
+
+        addExplodedAppFromResource(dummyDomainApp1Descriptor.zipPath, dummyDomainApp1Descriptor.id);
+        addExplodedAppFromResource(dummyDomainApp2Descriptor.zipPath, dummyDomainApp2Descriptor.id);
+        addExplodedAppFromResource(dummyDomainApp3Descriptor.zipPath, dummyDomainApp3Descriptor.id);
+
+        assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
+
+        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
+        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp2Descriptor.id);
+        assertDeploymentFailure(applicationDeploymentListener, dummyDomainApp3Descriptor.id);
+
+        reset(domainDeploymentListener);
+        reset(applicationDeploymentListener);
+
+        deploymentService.getLock().lock();
+        try
+        {
+            doRedeployDummyDomainByChangingConfigFileWithGoodOne();
+            doRedeployAppByChangingConfigFileWithGoodOne(dummyDomainApp3Descriptor.path);
+        }
+        finally
+        {
+            deploymentService.getLock().unlock();
+        }
+
+        assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
+
+        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
+        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp2Descriptor.id);
+        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp3Descriptor.id);
+    }
+
+    @Test
+    public void redeploysDomainWithOneApplicationFailedAfterRedeployment() throws Exception
+    {
+        deploymentService.start();
+
+        addExplodedDomainFromResource(dummyDomainDescriptor.zipPath, dummyDomainDescriptor.id);
+
+        addExplodedAppFromResource(dummyDomainApp1Descriptor.zipPath, dummyDomainApp1Descriptor.id);
+        addExplodedAppFromResource(dummyDomainApp2Descriptor.zipPath, dummyDomainApp2Descriptor.id);
+
+        assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
+
+        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
+        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp2Descriptor.id);
+
+        reset(domainDeploymentListener);
+        reset(applicationDeploymentListener);
+
+        deploymentService.getLock().lock();
+        try
+        {
+            doRedeployDummyDomainByChangingConfigFileWithGoodOne();
+            doRedeployAppByChangingConfigFileWithBadOne(dummyDomainApp2Descriptor.path);
+        }
+        finally
+        {
+            deploymentService.getLock().unlock();
+        }
+
+        assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
+
+        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
+        assertDeploymentFailure(applicationDeploymentListener, dummyDomainApp2Descriptor.id);
+    }
+
+    private void doRedeployAppByChangingConfigFileWithGoodOne(String applicationPath) throws Exception
+    {
+        doRedeployAppByChangingConfigFile(applicationPath, EMPTY_APP_CONFIG_XML);
+    }
+
+    private void doRedeployAppByChangingConfigFileWithBadOne(String applicationPath) throws Exception
+    {
+        doRedeployAppByChangingConfigFile(applicationPath, BAD_APP_CONFIG_XML);
+    }
+
+    private void doRedeployAppByChangingConfigFile(String applicationPath, String configFile) throws Exception
+    {
+        File originalConfigFile = new File(appsDir + applicationPath, MULE_CONFIG_XML_FILE);
+        URL url = getClass().getResource(configFile);
+        File newConfigFile = new File(url.toURI());
+        FileUtils.copyFile(newConfigFile, originalConfigFile);
+    }
+
+    private void doRedeployDummyDomainByChangingConfigFileWithGoodOne() throws URISyntaxException, IOException
+    {
+        doRedeployDummyDomainByChangingConfigFile("/empty-domain-config.xml");
+    }
+
+    private void doRedeployDummyDomainByChangingConfigFileWithBadOne() throws URISyntaxException, IOException
+    {
+        doRedeployDummyDomainByChangingConfigFile("/bad-domain-config.xml");
+    }
+
+    private void doRedeployDummyDomainByChangingConfigFile(String configFile) throws URISyntaxException, IOException
+    {
+        File originalConfigFile = new File(domainsDir + dummyDomainDescriptor.path, dummyDomainDescriptor.configFilePath);
+        URL url = getClass().getResource(configFile);
+        File newConfigFile = new File(url.toURI());
+        FileUtils.copyFile(newConfigFile, originalConfigFile);
+    }
+
+    private void doRedeployFixedDomainAfterBrokenDomain() throws URISyntaxException, IOException
+    {
+        assertDeploymentFailure(domainDeploymentListener, "incompleteDomain");
+
+        reset(domainDeploymentListener);
+
+        File originalConfigFile = new File(domainsDir + "/incompleteDomain", "mule-domain-config.xml");
+        URL url = getClass().getResource("/empty-domain-config.xml");
+        File newConfigFile = new File(url.toURI());
+        FileUtils.copyFile(newConfigFile, originalConfigFile);
+        assertDeploymentSuccess(domainDeploymentListener, "incompleteDomain");
+
+        addPackedDomainFromResource("/dummy-domain.zip");
+        assertDeploymentSuccess(domainDeploymentListener, "dummy-domain");
+
+        // Check that the failed application folder is still there
+        assertDomainFolderIsMaintained("incompleteDomain");
     }
 
     public void doBrokenAppArchiveTest() throws Exception

@@ -81,7 +81,7 @@ public class MuleDeploymentService implements DeploymentService
 
         this.applicationDeployer = new DefaultArchiveDeployer(applicationMuleDeployer, applicationFactory, applications, deploymentLock);
         this.applicationDeployer.setDeploymentListener(applicationDeploymentListener);
-        this.domainDeployer = new DomainArchiveDeployer(new DefaultArchiveDeployer(domainMuleDeployer, domainFactory, domains, deploymentLock), applicationDeployer, this);
+        this.domainDeployer = new DomainArchiveDeployer(new DefaultArchiveDeployer(domainMuleDeployer, domainFactory, domains, deploymentLock), applicationDeployer, applicationMuleDeployer, this);
         this.domainDeployer.setDeploymentListener(domainDeploymentListener);
         this.deploymentDirectoryWatcher = new DeploymentDirectoryWatcher(domainDeployer, applicationDeployer, domains, applications, deploymentLock);
     }
@@ -194,7 +194,17 @@ public class MuleDeploymentService implements DeploymentService
     @Override
     public void redeploy(String artifactName)
     {
-        applicationDeployer.redeploy(findApplication(artifactName));
+        try
+        {
+            applicationDeployer.redeploy(findApplication(artifactName));
+        }
+        catch (DeploymentException e)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Failure while redeploying application: " + artifactName, e);
+            }
+        }
     }
 
     @Override
