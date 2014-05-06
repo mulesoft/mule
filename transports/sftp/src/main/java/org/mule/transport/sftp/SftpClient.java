@@ -121,7 +121,7 @@ public class SftpClient
         return path;
     }
 
-/**
+    /**
      * This method supports multi-factor authentication - in particular, 
      * username+password AND ssh-key
      * @param user the userID whose SSH credentials are being used
