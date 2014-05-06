@@ -54,7 +54,6 @@ import org.mule.util.concurrent.Latch;
 import org.mule.util.queue.QueueManager;
 
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
 
 import javax.resource.spi.work.WorkListener;
 import javax.transaction.TransactionManager;
