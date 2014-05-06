@@ -22,7 +22,6 @@ import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
-import org.mule.processor.AbstractRedeliveryPolicy;
 
 import java.util.List;
 import java.util.Map;
@@ -169,11 +168,6 @@ public abstract class InboundEndpointWrapper implements InboundEndpoint
     public String getMimeType()
     {
         return delegate.getMimeType();
-    }
-
-    public AbstractRedeliveryPolicy getRedeliveryPolicy()
-    {
-        return delegate.getRedeliveryPolicy();
     }
 
     public boolean isDisableTransportTransformer()

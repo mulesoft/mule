@@ -6,6 +6,7 @@
  */
 package org.mule;
 
+import static edu.emory.mathcs.backport.java.util.concurrent.TimeUnit.*;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
@@ -49,15 +50,10 @@ import org.mule.util.ApplicationStartupSplashScreen;
 import org.mule.util.ServerShutdownSplashScreen;
 import org.mule.util.ServerStartupSplashScreen;
 import org.mule.util.SplashScreen;
-import org.mule.util.UUID;
 import org.mule.util.concurrent.Latch;
-import org.mule.util.lock.LockFactory;
 import org.mule.util.queue.QueueManager;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.resource.spi.work.WorkListener;
@@ -675,7 +671,7 @@ public class DefaultMuleContext implements MuleContext
     @Override
     public boolean waitUtilStarted(int timeout) throws InterruptedException
     {
-        return startLatch.await(timeout, TimeUnit.MILLISECONDS);
+        return startLatch.await(timeout, MILLISECONDS);
     }
 
 }
