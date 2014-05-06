@@ -104,7 +104,7 @@ public class SftpConnectionFactory implements PoolableObjectFactory
             {
               File idFile = new File(identityFile);
               if (!idFile.exists() ){
-                throw new IOException(String.format("file '%s' does not exist", identityFile));
+                 throw new IOException(String.format("file '%s' does not exist", identityFile));
               }
               logger.info(String.format("using multi-auth: userName '%s', password (not logged), ssh key-file '%s'", endpointURI.getUser(), idFile.getAbsolutePath()));
               client.login(endpointURI.getUser(), endpointURI.getPassword(), idFile);
