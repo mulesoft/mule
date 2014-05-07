@@ -10,18 +10,24 @@ import org.mule.api.config.MuleConfiguration;
 import org.mule.api.transaction.TransactionManagerFactory;
 
 import com.arjuna.ats.arjuna.common.arjPropertyManager;
+import com.arjuna.common.util.propertyservice.PropertiesFactory;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.transaction.TransactionManager;
+
+import org.springframework.util.StringUtils;
 
 public class JBossArjunaTransactionManagerFactory implements TransactionManagerFactory
 {
 
+    public static final String PROPERTY_USER_DIR = "user.dir";
+    public static final String PROPERTY_ENVIRONMENT_OBJECTSTORE_DIR = "ObjectStoreEnvironmentBean.objectStoreDir";
     public static final String PROPERTY_OBJECTSTORE_DIR = "com.arjuna.ats.arjuna.objectstore.objectStoreDir";
     public static final String PROPERTY_NODE_IDENTIFIER = "com.arjuna.ats.arjuna.nodeIdentifier";
     public static final String PROPERTY_DEFAULT_TIMEOUT = "com.arjuna.ats.arjuna.coordinator.defaultTimeout";
@@ -50,12 +56,21 @@ public class JBossArjunaTransactionManagerFactory implements TransactionManagerF
     {
         if (tm == null)
         {
-            // let the user override those in the config
-            if (!properties.containsKey(PROPERTY_OBJECTSTORE_DIR))
+            final String muleInternalDir = config.getWorkingDirectory();
+            String objectStoreDir = properties.get(PROPERTY_OBJECTSTORE_DIR);
+
+            if (StringUtils.isEmpty(objectStoreDir))
             {
-                final String muleInternalDir = config.getWorkingDirectory();
-                arjPropertyManager.getObjectStoreEnvironmentBean().setObjectStoreDir(muleInternalDir + "/transaction-log");
+                objectStoreDir = muleInternalDir + "/transaction-log";
             }
+
+            arjPropertyManager.getObjectStoreEnvironmentBean().setObjectStoreDir(objectStoreDir);
+            arjPropertyManager.getObjectStoreEnvironmentBean().setLocalOSRoot(muleInternalDir);
+
+            Properties props = PropertiesFactory.getDefaultProperties();
+            props.setProperty(PROPERTY_ENVIRONMENT_OBJECTSTORE_DIR, objectStoreDir);
+            props.setProperty(PROPERTY_OBJECTSTORE_DIR, objectStoreDir);
+            props.setProperty(PROPERTY_USER_DIR, muleInternalDir);
 
             if (!properties.containsKey(PROPERTY_NODE_IDENTIFIER))
             {
@@ -76,17 +91,17 @@ public class JBossArjunaTransactionManagerFactory implements TransactionManagerF
             // and com.arjuna.ats.arjuna.common.CoreEnvironmentBean, CoordinatorEnvironmentBean and ObjectStoreEnvironmentBean 
             //Setting the timeout if any
             if(properties.containsKey(PROPERTY_DEFAULT_TIMEOUT)){
-            	arjPropertyManager.getCoordinatorEnvironmentBean().setDefaultTimeout(Integer.valueOf(properties.get(PROPERTY_DEFAULT_TIMEOUT)));
+                arjPropertyManager.getCoordinatorEnvironmentBean().setDefaultTimeout(Integer.valueOf(properties.get(PROPERTY_DEFAULT_TIMEOUT)));
             }
             //Setting the tx reaper timeout if any
             if(properties.containsKey(PROPERTY_TX_REAPER_TIMEOUT)){
-            	arjPropertyManager.getCoordinatorEnvironmentBean().setTxReaperTimeout(Long.valueOf(properties.get(PROPERTY_TX_REAPER_TIMEOUT)));
+                arjPropertyManager.getCoordinatorEnvironmentBean().setTxReaperTimeout(Long.valueOf(properties.get(PROPERTY_TX_REAPER_TIMEOUT)));
             }
             /*for (Map.Entry<String, String> entry : properties.entrySet())
             {
                 arjPropertyManager.propertyManager.setProperty(entry.getKey(), entry.getValue());
             }*/
-            
+
             tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
         }

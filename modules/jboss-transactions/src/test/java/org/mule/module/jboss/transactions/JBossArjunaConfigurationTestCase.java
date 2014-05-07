@@ -6,29 +6,35 @@
  */
 package org.mule.module.jboss.transactions;
 
-import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.transaction.TransactionManagerFactory;
-import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.module.jboss.transaction.JBossArjunaTransactionManagerFactory;
-import org.mule.tck.AbstractTxThreadAssociationTestCase;
-
-import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
 import com.arjuna.ats.arjuna.common.arjPropertyManager;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import java.io.File;
 
-public class JBossArjunaConfigurationTestCase extends AbstractTxThreadAssociationTestCase
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
+public class JBossArjunaConfigurationTestCase extends AbstractJbossArjunaConfigurationTestCase
 {
 
+    private static final String TEMP_OBJECTSTORE_DIR_PROPERTY = "objectstore.dir";
+
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    private File objectStoreFolder;
 
     @Override
-    protected ConfigurationBuilder getBuilder() throws Exception
+    protected void doSetUpBeforeMuleContextCreation() throws Exception
     {
-        return new SpringXmlConfigurationBuilder(getConfigResources());
+        objectStoreFolder = temporaryFolder.newFolder("os_dir");
+        System.setProperty(TEMP_OBJECTSTORE_DIR_PROPERTY, objectStoreFolder.getAbsolutePath());
+        super.doSetUpBeforeMuleContextCreation();
     }
 
+    @Override
     protected String getConfigResources()
     {
         return "jbossts-configuration.xml";
@@ -37,17 +43,11 @@ public class JBossArjunaConfigurationTestCase extends AbstractTxThreadAssociatio
     @Test
     public void testConfiguration()
     {
-        assertNotNull(muleContext.getTransactionManager());
-        assertTrue(muleContext.getTransactionManager().getClass().getName().compareTo("arjuna") > 0);
-        
+        assertTransactionManagerPresent();
+
         assertTrue(arjPropertyManager.getCoordinatorEnvironmentBean().getTxReaperTimeout() == 108000);
         assertTrue(arjPropertyManager.getCoordinatorEnvironmentBean().getDefaultTimeout() == 47);
+
+        assertObjectStoreDir(objectStoreFolder.getAbsolutePath(), muleContext.getConfiguration().getWorkingDirectory());
     }
-
-	@Override
-	protected TransactionManagerFactory getTransactionManagerFactory()
-	{
-		return new JBossArjunaTransactionManagerFactory();
-	}
-
 }

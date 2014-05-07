@@ -6,13 +6,6 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
        http://www.mulesoft.org/schema/mule/jbossts http://www.mulesoft.org/schema/mule/jbossts/3.2/mule-jbossts.xsd">
 
-    <jbossts:transaction-manager>
-        <!-- this is in seconds -->
-        <property key="com.arjuna.ats.arjuna.coordinator.defaultTimeout" value="47"/>
-        <!-- this is in milliseconds -->
-        <property key="com.arjuna.ats.arjuna.coordinator.txReaperTimeout" value="108000"/>
-
-        <property key="com.arjuna.ats.arjuna.objectstore.objectStoreDir" value="${objectstore.dir}"/>
-    </jbossts:transaction-manager>
+    <jbossts:transaction-manager />
 
 </mule>
