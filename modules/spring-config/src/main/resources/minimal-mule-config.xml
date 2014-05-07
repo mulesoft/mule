@@ -60,7 +60,7 @@
 
     <alias name="_muleQueueManager" alias="_localQueueManager"/>
 
-    <bean name="_muleObjectStoreManager" class="org.mule.util.store.MuleObjectStoreManager" />
+    <bean name="_muleObjectStoreManager" class="org.mule.util.store.MuleObjectStoreManager" destroy-method="dispose" />
 
     <alias name="_muleObjectStoreManager" alias="_localObjectStoreManager" />
     
