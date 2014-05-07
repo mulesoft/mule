@@ -60,6 +60,8 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase
     private Application mockApplication1;
     @Mock
     private Application mockApplication2;
+    @Mock
+    private ArtifactDeployer<Application> mockApplicationArtifactDeployer;
 
     private File domainsFolder;
     private File appsFolder;
@@ -88,7 +90,7 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase
     public void returnNullIfDeploymentReturnsNull()
     {
         when(mockDomainDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH)).thenReturn(null);
-        DomainArchiveDeployer domainArchiveDeployer = new DomainArchiveDeployer(mockDomainDeployer, mockApplicationDeployer, mockDeploymentService);
+        DomainArchiveDeployer domainArchiveDeployer = new DomainArchiveDeployer(mockDomainDeployer, mockApplicationDeployer, mockApplicationArtifactDeployer, mockDeploymentService);
         assertThat(domainArchiveDeployer.deployPackagedArtifact("someZipFile"), nullValue());
     }
 
@@ -96,7 +98,7 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase
     public void doNotFailIfNoAppsFolderPresent() throws Exception
     {
         when(mockDomainDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH)).thenReturn(mockDomain);
-        DomainArchiveDeployer domainArchiveDeployer = new DomainArchiveDeployer(mockDomainDeployer, mockApplicationDeployer, mockDeploymentService);
+        DomainArchiveDeployer domainArchiveDeployer = new DomainArchiveDeployer(mockDomainDeployer, mockApplicationDeployer, mockApplicationArtifactDeployer, mockDeploymentService);
         assertThat(domainArchiveDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH), is(mockDomain));
     }
 
@@ -108,7 +110,7 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase
         when(mockDomainDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH)).thenReturn(mockDomain);
         putApplicationInTestDomainAppsFolder(testAppName);
         putApplicationInTestDomainAppsFolder(testApp2Name);
-        DomainArchiveDeployer domainArchiveDeployer = new DomainArchiveDeployer(mockDomainDeployer, mockApplicationDeployer, mockDeploymentService);
+        DomainArchiveDeployer domainArchiveDeployer = new DomainArchiveDeployer(mockDomainDeployer, mockApplicationDeployer, mockApplicationArtifactDeployer, mockDeploymentService);
         domainArchiveDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH);
         verifyApplicationCopyToAppsFolder(testAppName);
         verifyApplicationCopyToAppsFolder(testApp2Name);
@@ -120,7 +122,7 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase
         when(mockDeploymentService.findDomain(DOMAIN_NAME)).thenReturn(mockDomain);
         when(mockDomainDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH)).thenReturn(mockDomain);
         when(mockDeploymentService.findDomainApplications(DOMAIN_NAME)).thenReturn(Arrays.asList(new Application[0]));
-        DomainArchiveDeployer domainArchiveDeployer = new DomainArchiveDeployer(mockDomainDeployer, mockApplicationDeployer, mockDeploymentService);
+        DomainArchiveDeployer domainArchiveDeployer = new DomainArchiveDeployer(mockDomainDeployer, mockApplicationDeployer, mockApplicationArtifactDeployer, mockDeploymentService);
         domainArchiveDeployer.undeployArtifact(DOMAIN_NAME);
         verify(mockDomainDeployer, times(1)).undeployArtifact(DOMAIN_NAME);
     }
@@ -131,7 +133,7 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase
         when(mockDeploymentService.findDomain(DOMAIN_NAME)).thenReturn(mockDomain);
         when(mockDomainDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH)).thenReturn(mockDomain);
         when(mockDeploymentService.findDomainApplications(DOMAIN_NAME)).thenReturn(Arrays.asList(new Application[] {mockApplication1, mockApplication2}));
-        DomainArchiveDeployer domainArchiveDeployer = new DomainArchiveDeployer(mockDomainDeployer, mockApplicationDeployer, mockDeploymentService);
+        DomainArchiveDeployer domainArchiveDeployer = new DomainArchiveDeployer(mockDomainDeployer, mockApplicationDeployer, mockApplicationArtifactDeployer, mockDeploymentService);
         domainArchiveDeployer.undeployArtifact(DOMAIN_NAME);
         verify(mockApplicationDeployer, times(1)).undeployArtifact(MOCK_APPLICATION_1_NAME);
         verify(mockApplicationDeployer, times(1)).undeployArtifact(MOCK_APPLICATION_2_NAME);
@@ -142,7 +144,7 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase
     public void undeployNonExistentDomain()
     {
         when(mockDeploymentService.findDomain(NON_EXISTENT_DOMAIN_ID)).thenReturn(null);
-        DomainArchiveDeployer domainArchiveDeployer = new DomainArchiveDeployer(mockDomainDeployer, mockApplicationDeployer, mockDeploymentService);
+        DomainArchiveDeployer domainArchiveDeployer = new DomainArchiveDeployer(mockDomainDeployer, mockApplicationDeployer, mockApplicationArtifactDeployer, mockDeploymentService);
         domainArchiveDeployer.undeployArtifact(NON_EXISTENT_DOMAIN_ID);
     }
 

@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher;
 
+import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.artifact.Artifact;
 import org.mule.module.launcher.artifact.ArtifactFactory;
 
@@ -33,10 +34,13 @@ public interface ArchiveDeployer<T extends Artifact>
 
     void setDeploymentListener(CompositeDeploymentListener deploymentListener);
 
-    void redeploy(T artifact);
+    void redeploy(T artifact) throws DeploymentException;
 
     Map<URL, Long> getArtifactsZombieMap();
 
     void setArtifactFactory(ArtifactFactory<T> artifactFactory);
 
+    void undeployArtifactWithoutUninstall(T artifact);
+
+    void deployArtifact(T artifact) throws DeploymentException;
 }
