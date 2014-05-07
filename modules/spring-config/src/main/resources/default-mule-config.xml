@@ -58,7 +58,7 @@
 
     <bean name="_muleQueueManager" class="org.mule.util.queue.TransactionalQueueManager"/>
 
-    <bean name="_muleObjectStoreManager" class="org.mule.util.store.MuleObjectStoreManager"/>
+    <bean name="_muleObjectStoreManager" class="org.mule.util.store.MuleObjectStoreManager" destroy-method="dispose"/>
 
     <bean name="_muleSecurityManager" class="org.mule.security.MuleSecurityManager"/>
 
