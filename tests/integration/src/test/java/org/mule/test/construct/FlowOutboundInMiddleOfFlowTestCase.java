@@ -8,10 +8,13 @@ package org.mule.test.construct;
 
 import static org.junit.Assert.*;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
+
+
 
 public class FlowOutboundInMiddleOfFlowTestCase extends FunctionalTestCase
 {
@@ -21,8 +24,9 @@ public class FlowOutboundInMiddleOfFlowTestCase extends FunctionalTestCase
     {
         return "org/mule/test/construct/flow-outbound-in-middle-of-flow.xml";
     }
-    
+
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testOutboundInMiddleOfFlow() throws Exception
     {
         MuleClient client = muleContext.getClient();
