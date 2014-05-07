@@ -112,10 +112,6 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
 
     public void undeployArtifact(String artifactId)
     {
-        if (artifactZombieMap.containsKey(artifactId))
-        {
-            return;
-        }
         T artifact = (T) CollectionUtils.find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactId));
         undeploy(artifact);
     }
@@ -143,8 +139,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
                 String artifactName = StringUtils.removeEnd(artifactArchive.getName(), ZIP_FILE_SUFFIX);
 
                 // error text has been created by the deployer already
-                final String msg = miniSplash(String.format("Failed to deploy artifact '%s', see below", artifactName));
-                logger.error(msg, t);
+                logDeploymentFailure(t, artifactName);
 
                 addZombieFile(artifactName, artifactArchive);
 
@@ -169,6 +164,12 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         }
     }
 
+    private void logDeploymentFailure(Throwable t, String artifactName)
+    {
+        final String msg = miniSplash(String.format("Failed to deploy artifact '%s', see below", artifactName));
+        logger.error(msg, t);
+    }
+
     public Map<URL, Long> getArtifactsZombieMap()
     {
         Map<URL, Long> result = new HashMap<URL, Long>();
@@ -184,6 +185,39 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
     public void setArtifactFactory(final ArtifactFactory<T> artifactFactory)
     {
         this.artifactFactory = artifactFactory;
+    }
+
+    @Override
+    public void undeployArtifactWithoutUninstall(T artifact)
+    {
+        logRequestToUndeployArtifact(artifact);
+        try
+        {
+            if (!deploymentLock.tryLock(0, TimeUnit.SECONDS))
+            {
+                return;
+            }
+
+            deploymentListener.onUndeploymentStart(artifact.getArtifactName());
+            deployer.undeploy(artifact);
+            deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
+        }
+        catch (DeploymentException e)
+        {
+            deploymentListener.onUndeploymentFailure(artifact.getArtifactName(), e);
+            throw e;
+        }
+        catch (InterruptedException e)
+        {
+            Thread.currentThread().interrupt();
+        }
+        finally
+        {
+            if (deploymentLock.isHeldByCurrentThread())
+            {
+                deploymentLock.unlock();
+            }
+        }
     }
 
     ArtifactDeployer getDeployer()
@@ -284,7 +318,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         }
     }
 
-    private void deployArtifact(T artifact) throws DeploymentException
+    public void deployArtifact(T artifact) throws DeploymentException
     {
         try
         {
@@ -380,11 +414,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
 
     private void undeploy(T artifact)
     {
-        if (logger.isInfoEnabled())
-        {
-            logger.info("================== Request to Undeploy Artifact: " + artifact.getArtifactName());
-        }
-
+        logRequestToUndeployArtifact(artifact);
         try
         {
             deploymentListener.onUndeploymentStart(artifact.getArtifactName());
@@ -398,6 +428,14 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         {
             deploymentListener.onUndeploymentFailure(artifact.getArtifactName(), e);
             throw e;
+        }
+    }
+
+    private void logRequestToUndeployArtifact(T artifact)
+    {
+        if (logger.isInfoEnabled())
+        {
+            logger.info("================== Request to Undeploy Artifact: " + artifact.getArtifactName());
         }
     }
 
@@ -456,11 +494,11 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         }
     }
 
-    public void redeploy(T artifact)
+    public void redeploy(T artifact) throws DeploymentException
     {
         if (logger.isInfoEnabled())
         {
-            logger.info(miniSplash(String.format("Redeploying app '%s'", artifact.getArtifactName())));
+            logger.info(miniSplash(String.format("Redeploying artifact '%s'", artifact.getArtifactName())));
         }
 
         deploymentListener.onUndeploymentStart(artifact.getArtifactName());
@@ -481,10 +519,22 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
             deployer.deploy(artifact);
             deploymentListener.onDeploymentSuccess(artifact.getArtifactName());
         }
-        catch (Throwable e)
+        catch (Throwable t)
         {
-            //TODO make the exception beter
-            deploymentListener.onDeploymentFailure(artifact.getArtifactName(), e);
+            try
+            {
+                logDeploymentFailure(t, artifact.getArtifactName());
+                if (t instanceof DeploymentException)
+                {
+                    throw (DeploymentException) t;
+                }
+                String msg = "Failed to deploy artifact: " + artifact.getArtifactName();
+                throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
+            }
+            finally
+            {
+                deploymentListener.onDeploymentFailure(artifact.getArtifactName(), t);
+            }
         }
 
         artifactZombieMap.remove(artifact.getArtifactName());

@@ -62,6 +62,12 @@ public class DefaultMuleDomain implements Domain
         this.domainClassLoaderRepository = domainClassLoaderRepository;
         this.deploymentListener = new NullDeploymentListener();
         this.name = name;
+        this.deploymentClassLoader = domainClassLoaderRepository.getDomainClassLoader(name);
+        URL resource = deploymentClassLoader.findLocalResource(this.DOMAIN_CONFIG_FILE_LOCATION);
+        if (resource != null)
+        {
+            this.configResourceFile = new File(resource.getFile());
+        }
     }
 
     public void setDeploymentListener(DeploymentListener deploymentListener)
@@ -130,7 +136,6 @@ public class DefaultMuleDomain implements Domain
         {
             logger.info(miniSplash(String.format("New domain '%s'", getArtifactName())));
         }
-        deploymentClassLoader = domainClassLoaderRepository.getDomainClassLoader(name);
     }
 
 
@@ -144,11 +149,8 @@ public class DefaultMuleDomain implements Domain
 
         try
         {
-            URL resource = deploymentClassLoader.getClassLoader().getResource(this.DOMAIN_CONFIG_FILE_LOCATION);
-            if (resource != null)
+            if (this.configResourceFile != null)
             {
-                this.configResourceFile = new File(resource.getFile());
-
                 validateConfigurationFileDoNotUsesCoreNamespace();
 
                 ConfigurationBuilder cfgBuilder = createConfigurationBuilder();
@@ -307,7 +309,7 @@ public class DefaultMuleDomain implements Domain
     @Override
     public File[] getResourceFiles()
     {
-        return new File[] {configResourceFile};
+        return configResourceFile == null ? new File[0] : new File[] {configResourceFile};
     }
 
     @Override

@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -38,7 +39,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
     private final DeploymentService deploymentService;
     private final ArchiveDeployer<Application> applicationDeployer;
 
-    public DomainArchiveDeployer(ArchiveDeployer<Domain> domainDeployer, ArchiveDeployer<Application> applicationDeployer, DeploymentService deploymentService)
+    public DomainArchiveDeployer(ArchiveDeployer<Domain> domainDeployer, ArchiveDeployer<Application> applicationDeployer, ArtifactDeployer<Application> applicationArtifactDeployer, DeploymentService deploymentService)
     {
         this.domainDeployer = domainDeployer;
         this.applicationDeployer = applicationDeployer;
@@ -80,14 +81,24 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
     @Override
     public void undeployArtifact(String artifactId)
     {
-        Domain domain = deploymentService.findDomain(artifactId);
-        Preconditions.checkArgument(domain != null, String.format("Domain %s does not exists", artifactId));
-        Collection<Application> domainApplications = deploymentService.findDomainApplications(artifactId);
+        Collection<Application> domainApplications = findApplicationsAssociated(artifactId);
         for (Application domainApplication : domainApplications)
         {
             applicationDeployer.undeployArtifact(domainApplication.getArtifactName());
         }
         domainDeployer.undeployArtifact(artifactId);
+    }
+
+    private Collection<Application> findApplicationsAssociated(String artifactId)
+    {
+        Domain domain = deploymentService.findDomain(artifactId);
+        Preconditions.checkArgument(domain != null, String.format("Domain %s does not exists", artifactId));
+        return findApplicationsAssociated(domain);
+    }
+
+    private Collection<Application> findApplicationsAssociated(Domain domain)
+    {
+        return deploymentService.findDomainApplications(domain.getArtifactName());
     }
 
     @Override
@@ -103,9 +114,36 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
     }
 
     @Override
-    public void redeploy(Domain artifact)
+    public void redeploy(Domain artifact) throws DeploymentException
     {
-        domainDeployer.redeploy(artifact);
+        Collection<Application> domainApplications = findApplicationsAssociated(artifact);
+        for (Application domainApplication : domainApplications)
+        {
+            applicationDeployer.undeployArtifactWithoutUninstall(domainApplication);
+        }
+        try
+        {
+            domainDeployer.redeploy(artifact);
+        }
+        catch (DeploymentException e)
+        {
+            logger.warn(String.format("Failure during redeployment of domain %s, domain applications deployment will be skipped", artifact.getArtifactName()));
+            throw e;
+        }
+        for (Application domainApplication : domainApplications)
+        {
+            try
+            {
+                applicationDeployer.deployArtifact(domainApplication);
+            }
+            catch (Exception e)
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(e);
+                }
+            }
+        }
     }
 
     @Override
@@ -118,6 +156,18 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
     public void setArtifactFactory(ArtifactFactory<Domain> artifactFactory)
     {
         domainDeployer.setArtifactFactory(artifactFactory);
+    }
+
+    @Override
+    public void undeployArtifactWithoutUninstall(Domain artifact)
+    {
+        throw new NotImplementedException("undeploy without uninstall is not supported for domains");
+    }
+
+    @Override
+    public void deployArtifact(Domain artifact)
+    {
+        domainDeployer.deployArtifact(artifact);
     }
 
     private void deployBundledAppsIfDomainWasCreated(Domain domain)
