@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.collections.BidiMap;
 import org.apache.commons.collections.bidimap.TreeBidiMap;
@@ -52,6 +53,7 @@ public class PersistentObjectStorePartition<T extends Serializable>
     private static final String PARTITION_DESCRIPTOR_FILE = "partition-descriptor";
     protected final Log logger = LogFactory.getLog(this.getClass());
     private final MuleContext muleContext;
+    private final AtomicBoolean loaded = new AtomicBoolean(false);
 
     private File partitionDirectory;
     private String partitionName;
@@ -90,7 +92,6 @@ public class PersistentObjectStorePartition<T extends Serializable>
     {
         createDirectory(partitionDirectory);
         createOrRetrievePartitionDescriptorFile();
-        loadStoredKeysAndFileNames();
     }
 
     @Override
@@ -101,18 +102,22 @@ public class PersistentObjectStorePartition<T extends Serializable>
     @Override
     public List<Serializable> allKeys() throws ObjectStoreException
     {
+        assureLoaded();
         return Collections.unmodifiableList(new ArrayList<Serializable>(realKeyToUUIDIndex.keySet()));
     }
 
     @Override
     public boolean contains(Serializable key) throws ObjectStoreException
     {
+        assureLoaded();
         return realKeyToUUIDIndex.containsKey(key);
     }
 
     @Override
     public void store(Serializable key, T value) throws ObjectStoreException
     {
+        assureLoaded();
+
         if (realKeyToUUIDIndex.containsKey(key))
         {
             throw new ObjectAlreadyExistsException();
@@ -141,6 +146,8 @@ public class PersistentObjectStorePartition<T extends Serializable>
     @Override
     public T retrieve(Serializable key) throws ObjectStoreException
     {
+        assureLoaded();
+
         if (!realKeyToUUIDIndex.containsKey(key))
         {
             String message = "Key does not exist: " + key;
@@ -154,6 +161,8 @@ public class PersistentObjectStorePartition<T extends Serializable>
     @Override
     public T remove(Serializable key) throws ObjectStoreException
     {
+        assureLoaded();
+
         T value = retrieve(key);
         deleteStoreFile(getValueFile((String) realKeyToUUIDIndex.get(key)));
         return value;
@@ -168,6 +177,8 @@ public class PersistentObjectStorePartition<T extends Serializable>
     @Override
     public void expire(int entryTTL, int maxEntries) throws ObjectStoreException
     {
+        assureLoaded();
+
         File[] files = listValuesFiles();
         Arrays.sort(files, new Comparator<File>()
         {
@@ -200,6 +211,14 @@ public class PersistentObjectStorePartition<T extends Serializable>
             {
                 break;
             }
+        }
+    }
+
+    private void assureLoaded() throws ObjectStoreException
+    {
+        if (loaded.compareAndSet(false, true))
+        {
+            loadStoredKeysAndFileNames();
         }
     }
 
