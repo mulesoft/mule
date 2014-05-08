@@ -9,9 +9,10 @@ package org.mule.transport.jms.activemq;
 import org.mule.api.MuleContext;
 import org.mule.transport.ConnectException;
 import org.mule.transport.jms.JmsConnector;
-import org.mule.util.proxy.TargetInvocationHandler;
 import org.mule.util.ClassUtils;
+import org.mule.util.proxy.TargetInvocationHandler;
 
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -83,18 +84,25 @@ public class ActiveMQJmsConnector extends JmsConnector
             }
 
             final Class clazz = connection.getClass();
-            Method cleanupMethod;
+            Method cleanupMethod = null;
             if (Proxy.isProxyClass(clazz))
             {
-                TargetInvocationHandler handler =
-                        (TargetInvocationHandler) Proxy.getInvocationHandler(connection);
-                // this is really an XA connection, bypass the java.lang.reflect.Proxy as it
-                // can't delegate to non-interfaced methods (like proprietary 'cleanup' one)
-                // TODO check if CGlib will manage to enhance the AMQ connection class,
-                // there are no final methods, but a number of private ones, though
-                connection = (Connection) handler.getTargetObject();
-                Class realConnectionClass = connection.getClass();
-                cleanupMethod = realConnectionClass.getMethod("cleanup", (Class[])null);
+                InvocationHandler invocationHandler = Proxy.getInvocationHandler(connection);
+
+                // When using caching-connection-factory, the type of the invocation handler is
+                // SharedConnectionInvocationHandler, in that case we do nothing.
+
+                if (invocationHandler instanceof TargetInvocationHandler)
+                {
+                    // this is really an XA connection, bypass the java.lang.reflect.Proxy as it
+                    // can't delegate to non-interfaced methods (like proprietary 'cleanup' one)
+                    // TODO check if CGlib will manage to enhance the AMQ connection class,
+                    // there are no final methods, but a number of private ones, though
+                    TargetInvocationHandler targetInvocationHandler = (TargetInvocationHandler) invocationHandler;
+                    connection = (Connection) targetInvocationHandler.getTargetObject();
+                    Class realConnectionClass = connection.getClass();
+                    cleanupMethod = realConnectionClass.getMethod("cleanup", (Class[])null);
+                }
             }
             else
             {
