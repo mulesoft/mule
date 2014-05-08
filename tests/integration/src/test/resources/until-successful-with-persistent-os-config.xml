@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <spring:beans>
+        <spring:bean id="objectStore" name="objectStore" factory-bean="_muleObjectStoreManager" lazy-init="false"
+                     factory-method="getObjectStore">
+            <spring:constructor-arg value="objectStore"/>
+            <spring:constructor-arg name="isPersistent" value="true"/>
+        </spring:bean>
+    </spring:beans>
+
+    <vm:connector name="vm"/>
+
+    <flow name="recoverMuleEvent">
+        <vm:inbound-endpoint connector-ref="vm" exchange-pattern="one-way" path="recover"/>
+        <until-successful objectStore-ref="objectStore" maxRetries="10" secondsBetweenRetries="5">
+            <processor-chain>
+                <custom-processor
+                        class="org.mule.test.routing.UntilSuccessfulWithPersistentObjectStoreTestCase$FailingTestMessageProcessor"/>
+                <vm:outbound-endpoint connector-ref="vm" path="success" exchange-pattern="one-way"/>
+            </processor-chain>
+        </until-successful>
+    </flow>
+</mule>
