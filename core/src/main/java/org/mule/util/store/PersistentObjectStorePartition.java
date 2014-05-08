@@ -8,7 +8,6 @@
 package org.mule.util.store;
 
 import static org.mule.api.store.ObjectStoreManager.UNBOUNDED;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.store.ExpirableObjectStore;
@@ -53,6 +52,9 @@ public class PersistentObjectStorePartition<T extends Serializable>
     protected final Log logger = LogFactory.getLog(this.getClass());
     private final MuleContext muleContext;
 
+    private boolean loaded = false;
+
+
     private File partitionDirectory;
     private String partitionName;
     private BidiMap realKeyToUUIDIndex;
@@ -90,7 +92,6 @@ public class PersistentObjectStorePartition<T extends Serializable>
     {
         createDirectory(partitionDirectory);
         createOrRetrievePartitionDescriptorFile();
-        loadStoredKeysAndFileNames();
     }
 
     @Override
@@ -101,18 +102,22 @@ public class PersistentObjectStorePartition<T extends Serializable>
     @Override
     public List<Serializable> allKeys() throws ObjectStoreException
     {
+        assureLoaded();
         return Collections.unmodifiableList(new ArrayList<Serializable>(realKeyToUUIDIndex.keySet()));
     }
 
     @Override
     public boolean contains(Serializable key) throws ObjectStoreException
     {
+        assureLoaded();
         return realKeyToUUIDIndex.containsKey(key);
     }
 
     @Override
     public void store(Serializable key, T value) throws ObjectStoreException
     {
+        assureLoaded();
+
         if (realKeyToUUIDIndex.containsKey(key))
         {
             throw new ObjectAlreadyExistsException();
@@ -141,6 +146,8 @@ public class PersistentObjectStorePartition<T extends Serializable>
     @Override
     public T retrieve(Serializable key) throws ObjectStoreException
     {
+        assureLoaded();
+
         if (!realKeyToUUIDIndex.containsKey(key))
         {
             String message = "Key does not exist: " + key;
@@ -154,6 +161,8 @@ public class PersistentObjectStorePartition<T extends Serializable>
     @Override
     public T remove(Serializable key) throws ObjectStoreException
     {
+        assureLoaded();
+
         T value = retrieve(key);
         deleteStoreFile(getValueFile((String) realKeyToUUIDIndex.get(key)));
         return value;
@@ -168,6 +177,8 @@ public class PersistentObjectStorePartition<T extends Serializable>
     @Override
     public void expire(int entryTTL, int maxEntries) throws ObjectStoreException
     {
+        assureLoaded();
+
         File[] files = listValuesFiles();
         Arrays.sort(files, new Comparator<File>()
         {
@@ -203,8 +214,27 @@ public class PersistentObjectStorePartition<T extends Serializable>
         }
     }
 
-    private void loadStoredKeysAndFileNames() throws ObjectStoreException
+    private void assureLoaded() throws ObjectStoreException
     {
+        if (!loaded)
+        {
+            loadStoredKeysAndFileNames();
+        }
+    }
+
+    private synchronized void loadStoredKeysAndFileNames() throws ObjectStoreException
+    {
+        /*
+        by re-checking this condition here we can avoid contention in
+        {@link #assureLoaded}. The amount of times that this condition
+        should evaluate to {@code true} is really limited, which provides
+        better performance in the long run
+        */
+        if (loaded)
+        {
+            return;
+        }
+
         try
         {
             File[] files = listValuesFiles();
@@ -215,6 +245,8 @@ public class PersistentObjectStorePartition<T extends Serializable>
                 StoreValue<T> storeValue = deserialize(file);
                 realKeyToUUIDIndex.put(storeValue.getKey(), file.getName());
             }
+
+            loaded = true;
         }
         catch (Exception e)
         {
