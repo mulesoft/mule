@@ -11,8 +11,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
 import org.mule.context.notification.ConnectionNotification;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.listener.ConnectionListener;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
@@ -22,9 +20,7 @@ import javax.jms.Connection;
 import javax.jms.JMSException;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.broker.BrokerService;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -35,15 +31,11 @@ import org.mockito.Mockito;
  * exception. To reproduce the problem a custom connection factory is used that returns invalid Connection objects
  * when needed.
  */
-public class JmsReconnectionActiveMQTestCase extends FunctionalTestCase
+public class JmsReconnectionActiveMQTestCase extends AbstractBrokerFunctionalTestCase
 {
 
     private static final long PROBER_TIMEOUT = 3000;
 
-    @Rule
-    public DynamicPort port = new DynamicPort("port");
-
-    private BrokerService broker;
     private Prober prober;
     private JmsConnector jmsConnector;
 
@@ -57,34 +49,6 @@ public class JmsReconnectionActiveMQTestCase extends FunctionalTestCase
     public void doSetUp()
     {
         prober = new PollingProber(PROBER_TIMEOUT, PollingProber.DEFAULT_POLLING_INTERVAL);
-    }
-
-    @Override
-    protected void doSetUpBeforeMuleContextCreation() throws Exception
-    {
-        startBroker();
-    }
-
-    @Override
-    protected void doTearDownAfterMuleContextDispose() throws Exception
-    {
-        stopBroker();
-    }
-
-    private void startBroker() throws Exception
-    {
-        broker = new BrokerService();
-        broker.setUseJmx(false);
-        broker.setPersistent(false);
-        broker.addConnector("tcp://localhost:" + this.port.getValue());
-        broker.start(true);
-        broker.waitUntilStarted();
-    }
-
-    private void stopBroker() throws Exception
-    {
-        broker.stop();
-        broker.waitUntilStopped();
     }
 
     @Test
