@@ -28,7 +28,7 @@ import org.junit.runners.model.Statement;
 public class UntilSuccessfulWithPersistentObjectStoreTestCase extends FunctionalTestCase
 {
 
-    private static final int TIMEOUT = 5000;
+    private static final int TIMEOUT = 20000;
     private static boolean shouldFail = false;
     private static Latch latch = null;
 
