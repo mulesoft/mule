@@ -3,9 +3,11 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
 	<spring:bean id="testMergeStrategy" class="org.mule.test.routing.ScatterGatherRouterTestCase$TestAggregationStrategy" />
@@ -113,6 +115,65 @@
     	
     	<test:assert expression="#[flowVars['flow'] == 'var']" />
     	<test:assert expression="#[sessionVars['session'] == 'sessionvar']" />
+    </flow>
+
+    <flow name="oneRouteWithRequestResponseInboundEndpoint">
+        <vm:inbound-endpoint path="oneRouteWithRequestResponseInboundEndpoint" exchange-pattern="request-response" />
+        <set-payload value="apple"/>
+        <scatter-gather>
+            <set-payload value="banana" />
+        </scatter-gather>
+
+        <test:assert expression="#[payload == 'banana']" />
+    </flow>
+
+    <flow name="oneRouteWithOneWayResponseInboundEndpoint">
+        <vm:inbound-endpoint path="oneRouteWithOneWayResponseInboundEndpoint" exchange-pattern="one-way" />
+        <set-payload value="apple"/>
+        <scatter-gather>
+            <set-payload value="banana" />
+        </scatter-gather>
+
+        <test:assert expression="#[payload == 'banana']" />
+    </flow>
+
+    <flow name="manyRoutesWithRequestResponseInboundEndpoint">
+        <vm:inbound-endpoint path="manyRoutesWithRequestResponseInboundEndpoint" exchange-pattern="request-response" />
+        <scatter-gather>
+            <set-payload value="apple" />
+            <set-payload value="banana" />
+            <set-payload value="orange" />
+        </scatter-gather>
+
+        <flow-ref name="testRoutes" />
+    </flow>
+
+    <flow name="manyRoutesWithOneWayInboundEndpoint">
+        <vm:inbound-endpoint path="manyRoutesWithOneWayInboundEndpoint" exchange-pattern="one-way" />
+        <scatter-gather>
+            <set-payload value="apple" />
+            <set-payload value="banana" />
+            <set-payload value="orange" />
+        </scatter-gather>
+
+        <flow-ref name="testRoutes" />
+    </flow>
+
+    <flow name="routesWithForeachAndInboundEndpoint">
+        <vm:inbound-endpoint path="routesWithForeachAndInboundEndpoint" exchange-pattern="request-response" />
+        <scatter-gather>
+            <foreach>
+                <set-property propertyName="timeStamp" value="#[server.dateTime]" />
+            </foreach>
+            <foreach>
+                <set-property propertyName="timeStamp" value="#[server.dateTime]" />
+            </foreach>
+            <foreach>
+                <set-property propertyName="timeStamp" value="#[server.dateTime]" />
+            </foreach>
+        </scatter-gather>
+
+        <flow-ref name="testRoutes" />
     </flow>
     
     <sub-flow name="testAggregationStrategy">
