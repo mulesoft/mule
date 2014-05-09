@@ -185,7 +185,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
         }
         catch (final ObjectStoreException ose)
         {
-            logger.error("Failed to increment failure count for event stored with key: " + eventStoreKey);
+            logger.error("Failed to increment failure count for event stored with key: " + eventStoreKey, ose);
         }
     }
 
