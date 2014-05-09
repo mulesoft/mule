@@ -132,7 +132,17 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
         AbstractRoutingStrategy.validateMessageIsNotConsumable(event, message);
 
         List<ProcessingMuleEventWork> works = this.executeWork(event);
-        return this.processResponses(event, works);
+        MuleEvent response = this.processResponses(event, works);
+
+        if (response instanceof DefaultMuleEvent)
+        {
+            // use a copy instead of a resetAccessControl
+            // to assure that all property changes
+            // are flushed from the worker thread to this one
+            response = DefaultMuleEvent.copy(response);
+        }
+
+        return response;
     }
 
     private MuleEvent processResponses(MuleEvent event, List<ProcessingMuleEventWork> works)

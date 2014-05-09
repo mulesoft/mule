@@ -8,6 +8,7 @@ package org.mule.routing;
 
 import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
 import org.mule.OptimizedRequestContext;
 import org.mule.api.MuleContext;
@@ -128,7 +129,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
         MuleMessageCollection coll = new DefaultMessageCollection(muleContext);
         for (MuleEvent event : nonNullResults)
         {
-            coll.addMessage(event.getMessage());
+            coll.addMessage(new DefaultMuleMessage(event.getMessage(), muleContext));
         }
         coll.propagateRootId(previous.getMessage());
         MuleEvent resultEvent = new DefaultMuleEvent(coll, previous, previous.getSession());
