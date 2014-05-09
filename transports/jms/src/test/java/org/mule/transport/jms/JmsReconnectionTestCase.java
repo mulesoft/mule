@@ -9,11 +9,8 @@ package org.mule.transport.jms;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageReceiver;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 
@@ -22,22 +19,15 @@ import java.util.Collection;
 import javax.jms.Connection;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.broker.BrokerService;
-import org.junit.Rule;
 import org.junit.Test;
 
-public class JmsReconnectionTestCase extends FunctionalTestCase
+public class JmsReconnectionTestCase extends AbstractBrokerFunctionalTestCase
 {
 
     private static final int CONSUMER_COUNT = 4;
     private static final int TIMEOUT_MILLIS = 5000;
     private static final String PAYLOAD = "HELLO";
 
-    @Rule
-    public DynamicPort port = new DynamicPort("port");
-
-    private BrokerService broker;
-    private String url;
     private MultiConsumerJmsMessageReceiver receiver;
     private Connection connection;
 
@@ -48,37 +38,20 @@ public class JmsReconnectionTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected void doSetUpBeforeMuleContextCreation() throws Exception
+    protected void startBroker() throws Exception
     {
-        this.url = "tcp://localhost:" + this.port.getValue();
-        this.startBroker();
-    }
-
-    @Override
-    protected void doTearDownAfterMuleContextDispose() throws Exception
-    {
-        this.stopBroker();
-    }
-
-    private void startBroker() throws Exception
-    {
-        this.broker = new BrokerService();
-        this.broker.setUseJmx(false);
-        this.broker.setPersistent(false);
-        this.broker.addConnector(this.url);
-        this.broker.start(true);
-        this.broker.waitUntilStarted();
+        super.startBroker();
 
         // this is needed because for some reason the broker will reject any connections
         // otherwise
-        this.connection = new ActiveMQConnectionFactory(this.url).createQueueConnection();
+        connection = new ActiveMQConnectionFactory(this.url).createQueueConnection();
     }
 
-    private void stopBroker() throws Exception
+    @Override
+    protected void stopBroker() throws Exception
     {
-        this.connection.close();
-        this.broker.stop();
-        this.broker.waitUntilStopped();
+        super.stopBroker();
+        connection.close();
     }
 
     @Test
