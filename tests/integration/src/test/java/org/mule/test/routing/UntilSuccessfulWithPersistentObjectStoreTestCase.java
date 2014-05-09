@@ -10,6 +10,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
@@ -81,6 +82,15 @@ public class UntilSuccessfulWithPersistentObjectStoreTestCase extends Functional
         {
             workingDirectory = originalWorkingDirectory;
         }
+    }
+
+    @Override
+    protected MuleContext createMuleContext() throws Exception
+    {
+        MuleContext ctx = super.createMuleContext();
+        ctx.setExecutionClassLoader(getClass().getClassLoader());
+
+        return ctx;
     }
 
     public static class FailingTestMessageProcessor implements MessageProcessor
