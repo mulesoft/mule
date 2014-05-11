@@ -208,6 +208,8 @@ public class DefaultMuleContext implements MuleContext
 
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTED));
 
+        startLatch.release();
+
         if (logger.isInfoEnabled())
         {
             SplashScreen startupScreen = buildStartupSplash();
