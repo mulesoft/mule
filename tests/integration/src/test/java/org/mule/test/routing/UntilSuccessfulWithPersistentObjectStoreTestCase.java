@@ -10,6 +10,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -21,6 +22,7 @@ import org.mule.util.concurrent.Latch;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.Description;
@@ -52,6 +54,7 @@ public class UntilSuccessfulWithPersistentObjectStoreTestCase extends Functional
      * Mule will actually reattempt upon restart
      */
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void recoverMuleEvent() throws Exception
     {
         shouldFail = true;
