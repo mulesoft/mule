@@ -26,7 +26,7 @@ import org.mule.module.db.internal.resolver.param.ParamValueResolver;
 import org.mule.module.db.internal.resolver.query.QueryResolver;
 
 import java.sql.SQLException;
-import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -83,24 +83,40 @@ public class PreparedBulkUpdateMessageProcessor extends AbstractDbMessageProcess
             payload = muleContext.getExpressionManager().evaluate(source, muleEvent);
         }
 
-        if (!(payload instanceof Collection))
-        {
-            throw new IllegalArgumentException("Bulk mode operations require a collection as payload");
-        }
+        final Iterator<Object> paramsIterator = getIterator(payload);
 
         ParamValueResolver paramValueResolver = new DynamicParamValueResolver(muleContext.getExpressionManager());
 
         List<List<QueryParamValue>> result = new LinkedList<List<QueryParamValue>>();
-        Collection collection = (Collection) payload;
-        for (Object aCollection : collection)
+
+        while (paramsIterator.hasNext())
         {
-            MuleMessage itemMessage = new DefaultMuleMessage(aCollection, muleContext);
+            MuleMessage itemMessage = new DefaultMuleMessage(paramsIterator.next(), muleContext);
             MuleEvent itemEvent = new DefaultMuleEvent(itemMessage, muleEvent);
             List<QueryParamValue> queryParamValues = paramValueResolver.resolveParams(itemEvent, query.getParamValues());
             result.add(queryParamValues);
         }
 
         return result;
+    }
+
+    private Iterator<Object> getIterator(Object payload)
+    {
+        if (payload instanceof Iterable)
+        {
+            return ((Iterable<Object>) payload).iterator();
+        }
+        else if (payload instanceof Iterator)
+        {
+            return (Iterator<Object>) payload;
+        }
+        else
+        {
+            throw new IllegalArgumentException(
+                    String.format("Bulk mode operations require a Iterable/Iterator as payload. Got %s instead",
+                                  payload != null ? payload.getClass().getCanonicalName() : "null")
+            );
+        }
     }
 
     @Override
