@@ -201,6 +201,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testNoMoveNoDeleteFilePayload() throws Exception
     {
         File inFile = initForRequest();
