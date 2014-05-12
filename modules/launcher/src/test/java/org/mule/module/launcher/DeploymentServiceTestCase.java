@@ -173,13 +173,29 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void deploysExplodedAppAndVerifyAnchorFileIsCreatedAfterDeploymentEnds() throws Exception
     {
-        deploysAppAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(true);
+        Action deployExplodedWaitAppAction = new Action()
+        {
+            @Override
+            public void perform() throws Exception
+            {
+                addExplodedAppFromResource(waitAppDescriptor.zipPath);
+            }
+        };
+        deploysAppAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(deployExplodedWaitAppAction);
     }
 
     @Test
     public void deploysPackagedAppAndVerifyAnchorFileIsCreatedAfterDeploymentEnds() throws Exception
     {
-        deploysAppAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(false);
+        Action deployPackagedWaitAppAction = new Action()
+        {
+            @Override
+            public void perform() throws Exception
+            {
+                addPackedAppFromResource(waitAppDescriptor.zipPath);
+            }
+        };
+        deploysAppAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(deployPackagedWaitAppAction);
     }
 
     @Test
@@ -1163,13 +1179,29 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void deploysPackagedDomainAndVerifyAnchorFileIsCreatedAfterDeploymentEnds() throws Exception
     {
-        deploysDomainAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(false);
+        Action deployPackagedWaitDomainAction = new Action()
+        {
+            @Override
+            public void perform() throws Exception
+            {
+                addPackedDomainFromResource(waitDomainDescriptor.zipPath);
+            }
+        };
+        deploysDomainAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(deployPackagedWaitDomainAction);
     }
 
     @Test
     public void deploysExplodedDomainAndVerifyAnchorFileIsCreatedAfterDeploymentEnds() throws Exception
     {
-        deploysDomainAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(true);
+        Action deployExplodedWaitDomainAction = new Action()
+        {
+            @Override
+            public void perform() throws Exception
+            {
+                addExplodedDomainFromResource(waitDomainDescriptor.zipPath);
+            }
+        };
+        deploysDomainAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(deployExplodedWaitDomainAction);
     }
 
     @Test
@@ -2136,24 +2168,9 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         }
     }
 
-    private void deploysAppAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(final boolean useExplodedMode) throws Exception
+    private void deploysAppAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(Action deployArtifactAction) throws Exception
     {
-        Action deployArtifact = new Action()
-        {
-            @Override
-            public void perform() throws Exception
-            {
-                if (useExplodedMode)
-                {
-                    addExplodedAppFromResource(waitAppDescriptor.zipPath);
-                }
-                else
-                {
-                    addPackedAppFromResource(waitAppDescriptor.zipPath);
-                }
-            }
-        };
-        Action verifyAnchorFileDoesNotExists = new Action()
+        Action verifyAnchorFileDoesNotExistsAction = new Action()
         {
             @Override
             public void perform() throws Exception
@@ -2161,7 +2178,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
                 assertApplicationAnchorFileDoesNotExists(waitAppDescriptor.id);
             }
         };
-        Action verifyDeploymentSuccessful = new Action()
+        Action verifyDeploymentSuccessfulAction = new Action()
         {
             @Override
             public void perform() throws Exception
@@ -2169,7 +2186,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
                 assertDeploymentSuccess(applicationDeploymentListener, waitAppDescriptor.id);
             }
         };
-        Action verifyAnchorFileExists = new Action()
+        Action verifyAnchorFileExistsAction = new Action()
         {
             @Override
             public void perform() throws Exception
@@ -2177,26 +2194,11 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
                 assertApplicationAnchorFileExists(waitAppDescriptor.id);
             }
         };
-        deploysArtifactAndVerifyAnchorFileCreatedWhenDeploymentEnds(deployArtifact, verifyAnchorFileDoesNotExists, verifyDeploymentSuccessful, verifyAnchorFileExists);
+        deploysArtifactAndVerifyAnchorFileCreatedWhenDeploymentEnds(deployArtifactAction, verifyAnchorFileDoesNotExistsAction, verifyDeploymentSuccessfulAction, verifyAnchorFileExistsAction);
     }
 
-    private void deploysDomainAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(final boolean useExplodedMode) throws Exception
+    private void deploysDomainAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(Action deployArtifactAction) throws Exception
     {
-        Action deployArtifact = new Action()
-        {
-            @Override
-            public void perform() throws Exception
-            {
-                if (useExplodedMode)
-                {
-                    addExplodedDomainFromResource(waitDomainDescriptor.zipPath);
-                }
-                else
-                {
-                    addPackedDomainFromResource(waitDomainDescriptor.zipPath);
-                }
-            }
-        };
         Action verifyAnchorFileDoesNotExists = new Action()
         {
             @Override
@@ -2221,32 +2223,32 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
                 assertDomainAnchorFileExists(waitDomainDescriptor.id);
             }
         };
-        deploysArtifactAndVerifyAnchorFileCreatedWhenDeploymentEnds(deployArtifact, verifyAnchorFileDoesNotExists, verifyDeploymentSuccessful, verifyAnchorFileExists);
+        deploysArtifactAndVerifyAnchorFileCreatedWhenDeploymentEnds(deployArtifactAction, verifyAnchorFileDoesNotExists, verifyDeploymentSuccessful, verifyAnchorFileExists);
     }
 
-    private void deploysArtifactAndVerifyAnchorFileCreatedWhenDeploymentEnds(Action deployArtifact,
-                                                                             Action verifyAnchorFileDoesNotExists,
-                                                                             Action verifyDeploymentSuccessful,
-                                                                             Action verifyAnchorFileExists
+    private void deploysArtifactAndVerifyAnchorFileCreatedWhenDeploymentEnds(Action deployArtifactAction,
+                                                                             Action verifyAnchorFileDoesNotExistsAction,
+                                                                             Action verifyDeploymentSuccessfulAction,
+                                                                             Action verifyAnchorFileExistsAction
     ) throws Exception
     {
         WaitComponent.reset();
         deploymentService.start();
-        deployArtifact.perform();
+        deployArtifactAction.perform();
         try
         {
             if (!WaitComponent.componentInitializedLatch.await(DEPLOYMENT_TIMEOUT, TimeUnit.MILLISECONDS))
             {
                 fail("WaitComponent should be initilaized already. Probably app deployment failed");
             }
-            verifyAnchorFileDoesNotExists.perform();
+            verifyAnchorFileDoesNotExistsAction.perform();
         }
         finally
         {
             WaitComponent.waitLatch.release();
         }
-        verifyDeploymentSuccessful.perform();
-        verifyAnchorFileExists.perform();
+        verifyDeploymentSuccessfulAction.perform();
+        verifyAnchorFileExistsAction.perform();
     }
 
     private void assertDeploymentSuccess(final DeploymentListener listener, final String artifactName)
