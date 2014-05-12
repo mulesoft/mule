@@ -96,7 +96,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
     private List<MessageProcessor> routes = new ArrayList<MessageProcessor>();
 
     /**
-     * Wheter or not {@link #initialise()} was already successfully executed
+     * Whether or not {@link #initialise()} was already successfully executed
      */
     private boolean initialised = false;
 
