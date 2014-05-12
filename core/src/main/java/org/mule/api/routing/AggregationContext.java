@@ -7,6 +7,7 @@
 
 package org.mule.api.routing;
 
+import org.mule.VoidMuleEvent;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleEvent;
 import org.mule.util.Preconditions;
@@ -37,6 +38,11 @@ public final class AggregationContext
         @Override
         public boolean evaluate(Object object)
         {
+            if (VoidMuleEvent.getInstance().equals(object))
+            {
+                return false;
+            }
+
             MuleEvent event = (MuleEvent) object;
             ExceptionPayload ep = event.getMessage().getExceptionPayload();
             return ep != null && ep.getException() != null;

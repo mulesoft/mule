@@ -153,7 +153,8 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void routesWithForeachAndInboundEndpoint() throws Exception {
+    public void routesWithForeachAndInboundEndpoint() throws Exception
+    {
         final String[] payload = new String[] {"apple", "banana", "orange"};
         muleContext.getClient().send("vm://routesWithForeachAndInboundEndpoint", getTestEvent(Arrays.asList(payload)).getMessage());
         FlowAssert.verify("routesWithForeachAndInboundEndpoint");
@@ -178,11 +179,32 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
             assertEquals(UnsupportedOperationException.class, e.getCause().getClass());
         }
     }
-    
+
     @Test
     public void messageProperties() throws Exception
     {
         this.testFlow("messageProperties", getTestEvent(""));
+    }
+
+    @Test
+    public void oneWayRouteWithSingleResponse() throws Exception
+    {
+        muleContext.getClient().send("vm://oneWayRouteWithSingleResponse", getTestEvent("").getMessage());
+        FlowAssert.verify("oneWayRouteWithSingleResponse");
+    }
+
+    @Test
+    public void oneWayRouteWithMultipleResponses() throws Exception
+    {
+        muleContext.getClient().send("vm://oneWayRouteWithMultipleResponses", getTestEvent("").getMessage());
+        FlowAssert.verify("oneWayRouteWithMultipleResponses");
+    }
+
+    @Test
+    public void oneWayRoutesOnly() throws Exception
+    {
+        muleContext.getClient().send("vm://oneWayRoutesOnly", getTestEvent("").getMessage());
+        FlowAssert.verify("oneWayRoutesOnly");
     }
 
     public static class TestAggregationStrategy implements AggregationStrategy
