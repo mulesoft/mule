@@ -81,7 +81,6 @@ public class ArtifactArchiveInstaller
             {
                 FileUtils.deleteQuietly(source);
             }
-            installExplodedArtifact(artifactName);
         }
         catch (URISyntaxException e)
         {
@@ -125,7 +124,7 @@ public class ArtifactArchiveInstaller
             final File artifactDir = new File(artifactParentDir, artifactName);
             FileUtils.deleteDirectory(artifactDir);
             // remove a marker, harmless, but a tidy artifact dir is always better :)
-            File marker = getArtifactMarkerFile(artifactName);
+            File marker = getArtifactAnchorFile(artifactName);
             marker.delete();
             Introspector.flushCaches();
         }
@@ -141,20 +140,15 @@ public class ArtifactArchiveInstaller
         }
     }
 
-    public void installExplodedArtifact(String artifactName) throws IOException
-    {
-        createMarkerFile(artifactName);
-    }
-
-    private File getArtifactMarkerFile(String artifactName)
+    private File getArtifactAnchorFile(String artifactName)
     {
         return new File(artifactParentDir, String.format("%s%s", artifactName, MuleDeploymentService.ARTIFACT_ANCHOR_SUFFIX));
     }
 
-    private void createMarkerFile(String artifactName) throws IOException
+    public void createAnchorFile(String artifactName) throws IOException
     {
         // save artifact's state in the marker file
-        File marker = getArtifactMarkerFile(artifactName);
+        File marker = getArtifactAnchorFile(artifactName);
         FileUtils.writeStringToFile(marker, ANCHOR_FILE_BLURB);
     }
 
