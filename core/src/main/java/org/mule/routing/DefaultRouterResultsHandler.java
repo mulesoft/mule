@@ -103,8 +103,10 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
                 {
                     public boolean evaluate(Object object)
                     {
-                        return object != null && ((MuleEvent) object).getMessage() != null
-                               && !VoidMuleEvent.getInstance().equals(object);
+                        return
+                                !VoidMuleEvent.getInstance().equals(object) &&
+                                object != null &&
+                                ((MuleEvent) object).getMessage() != null;
                     }
                 });
 
