@@ -76,7 +76,7 @@ import org.slf4j.LoggerFactory;
  * <b>EIP Reference:</b> <a
  * href="http://www.eaipatterns.com/BroadcastAggregate.html"<a/>
  * </p>
- * 
+ *
  * @since 3.5.0
  */
 public class ScatterGatherRouter extends AbstractMessageProcessorOwner implements MessageRouter
@@ -123,7 +123,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        if (CollectionUtils.isEmpty(this.routes))
+        if (CollectionUtils.isEmpty(routes))
         {
             throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), event, null);
         }
@@ -131,23 +131,33 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
         MuleMessage message = event.getMessage();
         AbstractRoutingStrategy.validateMessageIsNotConsumable(event, message);
 
-        List<ProcessingMuleEventWork> works = this.executeWork(event);
-        return this.processResponses(event, works);
+        List<ProcessingMuleEventWork> works = executeWork(event);
+        MuleEvent response = processResponses(event, works);
+
+        if (response instanceof DefaultMuleEvent)
+        {
+            // use a copy instead of a resetAccessControl
+            // to assure that all property changes
+            // are flushed from the worker thread to this one
+            response = DefaultMuleEvent.copy(response);
+        }
+
+        return response;
     }
 
     private MuleEvent processResponses(MuleEvent event, List<ProcessingMuleEventWork> works)
-        throws MuleException
+            throws MuleException
     {
         List<MuleEvent> responses = new ArrayList<MuleEvent>(works.size());
 
-        long remainingTimeout = this.timeout;
+        long remainingTimeout = timeout;
         for (int routeIndex = 0; routeIndex < works.size(); routeIndex++)
         {
             MuleEvent response = null;
             Exception exception = null;
 
             ProcessingMuleEventWork work = works.get(routeIndex);
-            MessageProcessor route = this.routes.get(routeIndex);
+            MessageProcessor route = routes.get(routeIndex);
 
             long startedAt = System.currentTimeMillis();
             try
@@ -161,12 +171,12 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
             catch (InterruptedException e)
             {
                 throw new DefaultMuleException(MessageFactory.createStaticMessage(String.format(
-                    "Was interrupted while waiting for route %d", routeIndex)), e);
+                        "Was interrupted while waiting for route %d", routeIndex)), e);
             }
             catch (Exception e)
             {
                 exception = new DispatchException(MessageFactory.createStaticMessage(String.format(
-                    "route number %d failed to be executed", routeIndex)), event, route, exception);
+                        "route number %d failed to be executed", routeIndex)), event, route, exception);
             }
 
             remainingTimeout -= System.currentTimeMillis() - startedAt;
@@ -176,8 +186,8 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
                 if (logger.isDebugEnabled())
                 {
                     logger.debug(
-                        String.format("route %d generated exception for MuleEvent %s", routeIndex,
-                            event.getId()), exception);
+                            String.format("route %d generated exception for MuleEvent %s", routeIndex,
+                                          event.getId()), exception);
                 }
                 response = DefaultMuleEvent.copy(event);
                 response.getMessage().setExceptionPayload(new DefaultExceptionPayload(exception));
@@ -186,34 +196,33 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
             {
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug(String.format("route %d executed successfuly for event %s", routeIndex,
-                        event.getId()));
+                    logger.debug(String.format("route %d executed successfully for event %s", routeIndex,
+                                               event.getId()));
                 }
             }
 
             responses.add(response);
         }
 
-        return this.aggregationStrategy.aggregate(new AggregationContext(event, responses));
+        return aggregationStrategy.aggregate(new AggregationContext(event, responses));
     }
 
     private List<ProcessingMuleEventWork> executeWork(MuleEvent event) throws MuleException
     {
-        List<ProcessingMuleEventWork> works = new ArrayList<ProcessingMuleEventWork>(this.routes.size());
+        List<ProcessingMuleEventWork> works = new ArrayList<ProcessingMuleEventWork>(routes.size());
         try
         {
-            for (final MessageProcessor route : this.routes)
+            for (final MessageProcessor route : routes)
             {
-                ProcessingMuleEventWork work = new ProcessingMuleEventWork(route,
-                    DefaultMuleEvent.copy(event));
-                this.workManager.scheduleWork(work);
+                ProcessingMuleEventWork work = new ProcessingMuleEventWork(route, event);
+                workManager.scheduleWork(work);
                 works.add(work);
             }
         }
         catch (WorkException e)
         {
             throw new DefaultMuleException(
-                MessageFactory.createStaticMessage("Could not schedule work for route"), e);
+                    MessageFactory.createStaticMessage("Could not schedule work for route"), e);
         }
 
         return works;
@@ -224,26 +233,26 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
     {
         try
         {
-            this.buildRouteChains();
+            buildRouteChains();
 
-            if (this.threadingProfile == null)
+            if (threadingProfile == null)
             {
-                this.threadingProfile = this.muleContext.getDefaultThreadingProfile();
+                threadingProfile = muleContext.getDefaultThreadingProfile();
             }
 
-            if (this.aggregationStrategy == null)
+            if (aggregationStrategy == null)
             {
-                this.aggregationStrategy = new CollectAllAggregationStrategy();
+                aggregationStrategy = new CollectAllAggregationStrategy();
             }
 
-            if (this.timeout <= 0)
+            if (timeout <= 0)
             {
-                this.timeout = Long.MAX_VALUE;
+                timeout = Long.MAX_VALUE;
             }
 
-            this.workManager = this.threadingProfile.createWorkManager(
-                ThreadNameHelper.getPrefix(this.muleContext) + "ScatterGatherWorkManager",
-                this.muleContext.getConfiguration().getShutdownTimeout());
+            workManager = threadingProfile.createWorkManager(
+                    ThreadNameHelper.getPrefix(muleContext) + "ScatterGatherWorkManager",
+                    muleContext.getConfiguration().getShutdownTimeout());
         }
         catch (Exception e)
         {
@@ -251,13 +260,13 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
         }
 
         super.initialise();
-        this.initialised = true;
+        initialised = true;
     }
 
     @Override
     public void start() throws MuleException
     {
-        this.workManager.start();
+        workManager.start();
         super.start();
     }
 
@@ -266,12 +275,12 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
     {
         try
         {
-            this.workManager.dispose();
+            workManager.dispose();
         }
         catch (Exception e)
         {
             logger.error(
-                "Exception found while tring to dispose work manager. Will continue with the disposal", e);
+                    "Exception found while tring to dispose work manager. Will continue with the disposal", e);
         }
         finally
         {
@@ -281,49 +290,50 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws IllegalStateException if invoked after {@link #initialise()} is
      *             completed
      */
     @Override
     public void addRoute(MessageProcessor processor) throws MuleException
     {
-        this.checkNotInitialised();
-        this.routes.add(processor);
+        checkNotInitialised();
+        routes.add(processor);
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws IllegalStateException if invoked after {@link #initialise()} is
      *             completed
      */
     @Override
     public void removeRoute(MessageProcessor processor) throws MuleException
     {
-        this.checkNotInitialised();
-        this.routes.remove(processor);
+        checkNotInitialised();
+        routes.remove(processor);
     }
 
     private void buildRouteChains() throws MuleException
     {
-        this.routeChains = new ArrayList<MessageProcessor>(this.routes.size());
-        for (MessageProcessor route : this.routes)
+        Preconditions.checkState(routes.size() > 1, "At least 2 routes are required for ScatterGather");
+        routeChains = new ArrayList<MessageProcessor>(routes.size());
+        for (MessageProcessor route : routes)
         {
-            this.routeChains.add(new DefaultMessageProcessorChainBuilder().chain(route).build());
+            routeChains.add(new DefaultMessageProcessorChainBuilder().chain(route).build());
         }
     }
 
     private void checkNotInitialised()
     {
-        Preconditions.checkState(this.initialised == false,
-            "<scatter-gather> router is not dynamic. Cannot modify routes after initialisation");
+        Preconditions.checkState(initialised == false,
+                                 "<scatter-gather> router is not dynamic. Cannot modify routes after initialisation");
     }
 
     @Override
     protected List<MessageProcessor> getOwnedMessageProcessors()
     {
-        return this.routes;
+        return routes;
     }
 
     public void setAggregationStrategy(AggregationStrategy aggregationStrategy)
