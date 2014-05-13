@@ -121,6 +121,48 @@ public class SftpClient
         return path;
     }
 
+    /**
+     * This method supports multi-factor authentication - in particular, 
+     * username+password AND ssh-key
+     * @param user the userID whose SSH credentials are being used
+     * @param password the user's password - not to be confused with SSH-key passphrase
+     * @param identityFile the SSH-key for the user 
+     * @throws IOException 
+     */
+    public void login(String user, String password, File identityFile) throws IOException
+    {
+        try
+        {
+            Properties hash = new Properties();
+            hash.put(STRICT_HOST_KEY_CHECKING, "no");
+            if (!StringUtils.isEmpty(preferredAuthenticationMethods))
+            {
+                hash.put(PREFERRED_AUTHENTICATION_METHODS, preferredAuthenticationMethods);
+            }
+
+            session = jsch.getSession(user, host);
+            jsch.addIdentity(identityFile.getAbsolutePath());
+            session.setConfig(hash);
+            session.setPort(port);
+            session.setPassword(password);
+            session.connect();
+
+            Channel channel = session.openChannel(CHANNEL_SFTP);
+            channel.connect();
+
+            channelSftp = (ChannelSftp) channel;
+            setHome(channelSftp.pwd());
+        }
+        catch (JSchException e)
+        {
+            logAndThrowLoginError(user, e);
+        }
+        catch (SftpException e)
+        {
+            logAndThrowLoginError(user, e);
+        }
+    }        
+    
     public void login(String user, String password) throws IOException
     {
         try
