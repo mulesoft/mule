@@ -30,7 +30,6 @@ import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.util.concurrent.Latch;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.httpclient.Header;
@@ -48,16 +47,15 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     private HttpRequest request;
     private boolean badRequest;
     private Latch messageProcessedLatch = new Latch();
-    private Long remainingRequestInCurrentPeriod;
-    private Long maximumRequestAllowedPerPeriod;
-    private Long timeUntilNextPeriodInMillis;
     private RequestLine requestLine;
     private boolean failureResponseSentToClient;
+    private HttpThrottlingHeadersMapBuilder httpThrottlingHeadersMapBuilder;
 
     public HttpMessageProcessTemplate(final HttpMessageReceiver messageReceiver, final HttpServerConnection httpServerConnection, final WorkManager flowExecutionWorkManager)
     {
         super(messageReceiver,flowExecutionWorkManager);
         this.httpServerConnection = httpServerConnection;
+        this.httpThrottlingHeadersMapBuilder = new HttpThrottlingHeadersMapBuilder();
     }
 
     @Override
@@ -443,9 +441,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     @Override
     public void setThrottlingPolicyStatistics(long remainingRequestInCurrentPeriod, long maximumRequestAllowedPerPeriod, long timeUntilNextPeriodInMillis)
     {
-        this.remainingRequestInCurrentPeriod = remainingRequestInCurrentPeriod;
-        this.maximumRequestAllowedPerPeriod  = maximumRequestAllowedPerPeriod;
-        this.timeUntilNextPeriodInMillis = timeUntilNextPeriodInMillis;
+        httpThrottlingHeadersMapBuilder.setThrottlingPolicyStatistics(remainingRequestInCurrentPeriod, maximumRequestAllowedPerPeriod, timeUntilNextPeriodInMillis);
     }
 
     private void sendFailureResponseToClient(int httpStatus, String message) throws IOException
@@ -465,19 +461,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
 
     private Map<String,String> getThrottlingHeaders()
     {
-        Map<String, String> throttlingHeaders = new HashMap<String, String>();
-        addToMapIfNotNull(throttlingHeaders, X_RATE_LIMIT_LIMIT_HEADER,this.remainingRequestInCurrentPeriod);
-        addToMapIfNotNull(throttlingHeaders, X_RATE_LIMIT_REMAINING_HEADER,this.maximumRequestAllowedPerPeriod);
-        addToMapIfNotNull(throttlingHeaders, X_RATE_LIMIT_RESET_HEADER,this.timeUntilNextPeriodInMillis);
-        return throttlingHeaders;
-    }
-
-    private void addToMapIfNotNull(Map<String,String> map, String key, Long value)
-    {
-        if (value != null)
-        {
-            map.put(key, String.valueOf(value));
-        }
+        return httpThrottlingHeadersMapBuilder.build();
     }
 
     @Override
