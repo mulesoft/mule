@@ -316,6 +316,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
 
     private void buildRouteChains() throws MuleException
     {
+        Preconditions.checkState(routes.size() > 1, "At least 2 routes are required for ScatterGather");
         routeChains = new ArrayList<MessageProcessor>(routes.size());
         for (MessageProcessor route : routes)
         {

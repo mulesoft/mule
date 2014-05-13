@@ -76,14 +76,6 @@
         <flow-ref name="testRoutes"/>
     </flow>
 
-    <flow name="onlyOneRoute">
-        <scatter-gather>
-            <set-payload value="apple"/>
-        </scatter-gather>
-
-        <test:assert expression="#[payload == 'apple']"/>
-    </flow>
-
     <flow name="exceptionStrategy">
         <scatter-gather timeout="1000">
             <set-payload value="apple"/>
@@ -120,28 +112,8 @@
         <test:assert expression="#[sessionVars['session'] == 'sessionvar']"/>
     </flow>
 
-    <flow name="oneRouteWithRequestResponseInboundEndpoint">
-        <vm:inbound-endpoint path="oneRouteWithRequestResponseInboundEndpoint" exchange-pattern="request-response"/>
-        <set-payload value="apple"/>
-        <scatter-gather>
-            <set-payload value="banana"/>
-        </scatter-gather>
-
-        <test:assert expression="#[payload == 'banana']"/>
-    </flow>
-
-    <flow name="oneRouteWithOneWayResponseInboundEndpoint">
-        <vm:inbound-endpoint path="oneRouteWithOneWayResponseInboundEndpoint" exchange-pattern="one-way"/>
-        <set-payload value="apple"/>
-        <scatter-gather>
-            <set-payload value="banana"/>
-        </scatter-gather>
-
-        <test:assert expression="#[payload == 'banana']"/>
-    </flow>
-
-    <flow name="manyRoutesWithRequestResponseInboundEndpoint">
-        <vm:inbound-endpoint path="manyRoutesWithRequestResponseInboundEndpoint" exchange-pattern="request-response"/>
+    <flow name="requestResponseInboundEndpoint">
+        <vm:inbound-endpoint path="requestResponseInboundEndpoint" exchange-pattern="request-response"/>
         <scatter-gather>
             <set-payload value="apple"/>
             <set-payload value="banana"/>
@@ -151,8 +123,8 @@
         <flow-ref name="testRoutes"/>
     </flow>
 
-    <flow name="manyRoutesWithOneWayInboundEndpoint">
-        <vm:inbound-endpoint path="manyRoutesWithOneWayInboundEndpoint" exchange-pattern="one-way"/>
+    <flow name="oneWayInboundEndpoint">
+        <vm:inbound-endpoint path="oneWayInboundEndpoint" exchange-pattern="one-way"/>
         <scatter-gather>
             <set-payload value="apple"/>
             <set-payload value="banana"/>
