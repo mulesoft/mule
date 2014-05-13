@@ -119,37 +119,17 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void onlyOneRoute() throws Exception
+    public void requestResponseInboundEndpoint() throws Exception
     {
-        this.testFlow("onlyOneRoute", getTestEvent(""));
+        muleContext.getClient().send("vm://requestResponseInboundEndpoint", getTestEvent("").getMessage());
+        FlowAssert.verify("requestResponseInboundEndpoint");
     }
 
     @Test
-    public void oneRouteWithRequestResponseInboundEndpoint() throws Exception
+    public void oneWayInboundEndpoint() throws Exception
     {
-        muleContext.getClient().send("vm://oneRouteWithRequestResponseInboundEndpoint", getTestEvent("").getMessage());
-        FlowAssert.verify("oneRouteWithRequestResponseInboundEndpoint");
-    }
-
-    @Test
-    public void oneRouteWithOneWayResponseInboundEndpoint() throws Exception
-    {
-        muleContext.getClient().send("vm://oneRouteWithOneWayResponseInboundEndpoint", getTestEvent("").getMessage());
-        FlowAssert.verify("oneRouteWithOneWayResponseInboundEndpoint");
-    }
-
-    @Test
-    public void manyRoutesWithRequestResponseInboundEndpoint() throws Exception
-    {
-        muleContext.getClient().send("vm://manyRoutesWithRequestResponseInboundEndpoint", getTestEvent("").getMessage());
-        FlowAssert.verify("manyRoutesWithRequestResponseInboundEndpoint");
-    }
-
-    @Test
-    public void manyRoutesWithOneWayInboundEndpoint() throws Exception
-    {
-        muleContext.getClient().send("vm://manyRoutesWithOneWayInboundEndpoint", getTestEvent("").getMessage());
-        FlowAssert.verify("manyRoutesWithOneWayInboundEndpoint");
+        muleContext.getClient().send("vm://oneWayInboundEndpoint", getTestEvent("").getMessage());
+        FlowAssert.verify("oneWayInboundEndpoint");
     }
 
     @Test
