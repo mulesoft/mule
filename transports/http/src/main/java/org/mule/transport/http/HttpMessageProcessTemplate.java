@@ -30,7 +30,6 @@ import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.util.concurrent.Latch;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.httpclient.Header;
@@ -40,24 +39,20 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
 {
 
     public static final int MESSAGE_DISCARD_STATUS_CODE = Integer.valueOf(System.getProperty("mule.transport.http.throttling.discardstatuscode","429"));
-    public static final String X_RATE_LIMIT_LIMIT_HEADER = "X-RateLimit-Limit";
-    public static final String X_RATE_LIMIT_REMAINING_HEADER = "X-RateLimit-Remaining";
-    public static final String X_RATE_LIMIT_RESET_HEADER = "X-RateLimit-Reset";
 
     private final HttpServerConnection httpServerConnection;
     private HttpRequest request;
     private boolean badRequest;
     private Latch messageProcessedLatch = new Latch();
-    private Long remainingRequestInCurrentPeriod;
-    private Long maximumRequestAllowedPerPeriod;
-    private Long timeUntilNextPeriodInMillis;
     private RequestLine requestLine;
     private boolean failureResponseSentToClient;
+    private HttpThrottlingHeadersBuilder httpThrottlingHeadersBuilder;
 
     public HttpMessageProcessTemplate(final HttpMessageReceiver messageReceiver, final HttpServerConnection httpServerConnection, final WorkManager flowExecutionWorkManager)
     {
         super(messageReceiver,flowExecutionWorkManager);
         this.httpServerConnection = httpServerConnection;
+        this.httpThrottlingHeadersBuilder = new HttpThrottlingHeadersBuilder();
     }
 
     @Override
@@ -443,9 +438,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     @Override
     public void setThrottlingPolicyStatistics(long remainingRequestInCurrentPeriod, long maximumRequestAllowedPerPeriod, long timeUntilNextPeriodInMillis)
     {
-        this.remainingRequestInCurrentPeriod = remainingRequestInCurrentPeriod;
-        this.maximumRequestAllowedPerPeriod  = maximumRequestAllowedPerPeriod;
-        this.timeUntilNextPeriodInMillis = timeUntilNextPeriodInMillis;
+        httpThrottlingHeadersBuilder.setThrottlingPolicyStatistics(remainingRequestInCurrentPeriod, maximumRequestAllowedPerPeriod, timeUntilNextPeriodInMillis);
     }
 
     private void sendFailureResponseToClient(int httpStatus, String message) throws IOException
@@ -465,19 +458,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
 
     private Map<String,String> getThrottlingHeaders()
     {
-        Map<String, String> throttlingHeaders = new HashMap<String, String>();
-        addToMapIfNotNull(throttlingHeaders, X_RATE_LIMIT_LIMIT_HEADER,this.remainingRequestInCurrentPeriod);
-        addToMapIfNotNull(throttlingHeaders, X_RATE_LIMIT_REMAINING_HEADER,this.maximumRequestAllowedPerPeriod);
-        addToMapIfNotNull(throttlingHeaders, X_RATE_LIMIT_RESET_HEADER,this.timeUntilNextPeriodInMillis);
-        return throttlingHeaders;
-    }
-
-    private void addToMapIfNotNull(Map<String,String> map, String key, Long value)
-    {
-        if (value != null)
-        {
-            map.put(key, String.valueOf(value));
-        }
+        return httpThrottlingHeadersBuilder.getThrottlingHeaders();
     }
 
     @Override
