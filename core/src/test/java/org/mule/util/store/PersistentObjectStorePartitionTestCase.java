@@ -7,34 +7,49 @@
 
 package org.mule.util.store;
 
+import static junit.framework.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.when;
 import org.mule.api.MuleContext;
 import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.mockito.Mockito;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
+@RunWith(MockitoJUnitRunner.class)
 public class PersistentObjectStorePartitionTestCase extends AbstractMuleTestCase
 {
 
     @Rule
     public TemporaryFolder objectStoreFolder = new TemporaryFolder();
 
+    @Mock
+    private MuleContext muleContext;
+
+    private PersistentObjectStorePartition partition;
+
+    @Before
+    public void setUp() throws Exception
+    {
+        when(muleContext.getExecutionClassLoader()).thenReturn(getClass().getClassLoader());
+        partition = new PersistentObjectStorePartition(muleContext, "test", objectStoreFolder.getRoot());
+        partition.open();
+    }
+
     @Test
     public void indicatesUnexistentKeyOnRetrieveError() throws ObjectStoreException
     {
-
-        MuleContext muleContext = Mockito.mock(MuleContext.class);
-        PersistentObjectStorePartition partition = new PersistentObjectStorePartition(muleContext, "test", objectStoreFolder.getRoot());
-        partition.open();
-
         final String nonExistentKey = "nonExistentKey";
 
         try
@@ -46,5 +61,27 @@ public class PersistentObjectStorePartitionTestCase extends AbstractMuleTestCase
         {
             assertTrue(e.getMessage().contains(nonExistentKey));
         }
+    }
+
+    @Test
+    public void clear() throws Exception
+    {
+        final String KEY = "key";
+        final String VALUE = "value";
+
+
+        partition.store(KEY, VALUE);
+        assertTrue(partition.contains(KEY));
+        assertEquals(VALUE, partition.retrieve(KEY));
+
+        partition.clear();
+        assertFalse(partition.contains(KEY));
+    }
+
+    @Test
+    public void clearBeforeLoading() throws Exception
+    {
+        partition.clear();
+        assertEquals(0, partition.allKeys().size());
     }
 }
