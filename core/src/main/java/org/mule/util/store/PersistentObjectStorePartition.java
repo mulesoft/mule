@@ -140,7 +140,10 @@ public class PersistentObjectStorePartition<T extends Serializable>
                 e);
         }
 
-        this.realKeyToUUIDIndex.clear();
+        if (realKeyToUUIDIndex != null)
+        {
+            realKeyToUUIDIndex.clear();
+        }
     }
 
     @Override
