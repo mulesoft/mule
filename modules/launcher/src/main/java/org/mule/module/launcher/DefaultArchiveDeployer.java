@@ -112,10 +112,12 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
 
     public void undeployArtifact(String artifactId)
     {
-        if (artifactZombieMap.containsKey(artifactId))
+        ZombieFile zombieFile = artifactZombieMap.get(artifactId);
+        if ((zombieFile != null))
         {
             return;
         }
+
         T artifact = (T) CollectionUtils.find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactId));
         undeploy(artifact);
     }
@@ -289,8 +291,8 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         try
         {
             deploymentListener.onDeploymentStart(artifact.getArtifactName());
-            artifactArchiveInstaller.installExplodedArtifact(artifact.getArtifactName());
             guardedDeploy(artifact);
+            artifactArchiveInstaller.createAnchorFile(artifact.getArtifactName());
             deploymentListener.onDeploymentSuccess(artifact.getArtifactName());
             artifactZombieMap.remove(artifact.getArtifactName());
         }
@@ -479,6 +481,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         try
         {
             deployer.deploy(artifact);
+            artifactArchiveInstaller.createAnchorFile(artifact.getArtifactName());
             deploymentListener.onDeploymentSuccess(artifact.getArtifactName());
         }
         catch (Throwable e)
