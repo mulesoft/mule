@@ -81,7 +81,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         }
 
     }
-    
+
     @Test
     public void testLoadPrimitiveClass() throws Exception
     {
@@ -94,7 +94,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         assertSame(ClassUtils.loadClass("long", getClass()), Long.TYPE);
         assertSame(ClassUtils.loadClass("short", getClass()), Short.TYPE);
     }
-    
+
     @Test
     public void testLoadClassOfType() throws Exception
     {
@@ -106,7 +106,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
 
         try
         {
-            ClassUtils.loadClass("java.lang.UnsupportedOperationException", getClass(), String.class);            
+            ClassUtils.loadClass("java.lang.UnsupportedOperationException", getClass(), String.class);
             fail("IllegalArgumentException should be thrown since class is not of expected type");
         }
         catch (IllegalArgumentException e)
@@ -185,37 +185,37 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
     public void testGetSatisfiableMethods() throws Exception
     {
         List methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, true,
-                true, ignoreMethods);
+                                                        true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(2, methods.size());
 
         methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, false, true,
-                ignoreMethods);
+                                                   ignoreMethods);
         assertNotNull(methods);
         assertEquals(0, methods.size());
 
         // Test object param being unacceptible
         methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, true,
-                false, ignoreMethods);
+                                                   false, ignoreMethods);
         assertNotNull(methods);
         assertEquals(0, methods.size());
 
         // Test object param being acceptible
         methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, true,
-                true, ignoreMethods);
+                                                   true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(2, methods.size());
 
         // Test object param being acceptible but not void
         methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, false,
-                true, ignoreMethods);
+                                                   true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(1, methods.size());
         assertEquals("doSomethingElse", ((Method) methods.get(0)).getName());
 
         // Test object param being acceptible by interface Type
         methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[]{WaterMelon[].class}, true,
-                true, ignoreMethods);
+                                                   true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(1, methods.size());
         assertEquals("setFruit", ((Method) methods.get(0)).getName());

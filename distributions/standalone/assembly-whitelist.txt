@@ -122,6 +122,8 @@
 /mule-standalone-${productVersion}/lib/mule/mule-common-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-core-${productVersion}-tests.jar
 /mule-standalone-${productVersion}/lib/mule/mule-core-${productVersion}.jar
+/mule-standalone-${productVersion}/lib/mule/mule-extensions-annotations-1.0.0-SNAPSHOT.jar
+/mule-standalone-${productVersion}/lib/mule/mule-extensions-api-1.0.0-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-annotations-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-atom-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-bpm-${productVersion}.jar
@@ -131,6 +133,8 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-db-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-devkit-support-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-drools-${productVersion}.jar
+/mule-standalone-${productVersion}/lib/mule/mule-module-extensions-support-${productVersion}.jar
+/mule-standalone-${productVersion}/lib/mule/mule-module-extensions-spring-support-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-http-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-jaas-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-jbossts-${productVersion}.jar
@@ -351,6 +355,7 @@
 /mule-standalone-${productVersion}/lib/opt/oro-2.0.8.jar
 /mule-standalone-${productVersion}/lib/opt/osgi-resource-locator-1.0.1.jar
 /mule-standalone-${productVersion}/lib/opt/quartz-1.8.5.jar
+/mule-standalone-${productVersion}/lib/opt/reflections-0.9.9.jar
 /mule-standalone-${productVersion}/lib/opt/relaxngDatatype-20020414.jar
 /mule-standalone-${productVersion}/lib/opt/rhino-1.7R4.jar
 /mule-standalone-${productVersion}/lib/opt/rome-0.9.jar

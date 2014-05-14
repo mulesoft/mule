@@ -113,6 +113,7 @@
         <module>tools</module>
         <module>transports</module>
         <module>tests</module>
+        <module>extensions</module>
     </modules>
 
     <properties>
@@ -139,6 +140,7 @@
         <gmavenPluginVersion>1.4</gmavenPluginVersion>
         <javadocPluginVersion>2.9.1</javadocPluginVersion>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
+        <mavenCompilerVersion>3.1</mavenCompilerVersion>
 
         <!--
             The above project.url will not be picked up in the manifest,
@@ -194,6 +196,7 @@
         <hibernateVersion>3.6.0.Final</hibernateVersion>
         <jacksonVersion>1.9.11</jacksonVersion>
         <jackson2Version>2.4.3</jackson2Version>
+        <javaInjectionVersion>2.3.0-b05</javaInjectionVersion>
         <jerseyVersion>2.11</jerseyVersion>
         <jaxbApiVersion>2.1</jaxbApiVersion>
         <javassistVersion>3.7.ga</javassistVersion>
@@ -212,6 +215,7 @@
         <log4jVersion>2.1</log4jVersion>
         <disruptorVersion>3.3.0</disruptorVersion>
         <mockitoVersion>1.9.5</mockitoVersion>
+        <muleExtensionsApiVersion>1.0.0-SNAPSHOT</muleExtensionsApiVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <!-- TODO EE-1395 -->
         <mqSeriesVersion>6.0</mqSeriesVersion>
@@ -220,6 +224,7 @@
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
         <ognlVersion>2.7.3</ognlVersion>
         <oroVersion>2.0.8</oroVersion>
+        <reflectionsVersion>0.9.9</reflectionsVersion>
         <quartzVersion>1.8.5</quartzVersion>
         <rhinoVersion>1.7R4</rhinoVersion>
         <rhinoJsr223Version>1.1</rhinoJsr223Version>
@@ -1323,6 +1328,17 @@
             </dependency>
 
             <dependency>
+                <groupId>org.mule</groupId>
+                <artifactId>mule-extensions-api</artifactId>
+                <version>${muleExtensionsApiVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mule</groupId>
+                <artifactId>mule-extensions-annotations</artifactId>
+                <version>${muleExtensionsApiVersion}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.mule.mvel</groupId>
                 <artifactId>mule-mvel2</artifactId>
                 <version>${muleMvelVersion}</version>
@@ -1417,7 +1433,25 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-
+            <dependency>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>${reflectionsVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.google.code.findbugs</groupId>
+                        <artifactId>annotations</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>dom4j</groupId>
+                        <artifactId>dom4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.javassist</groupId>
+                        <artifactId>javassist</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
         </dependencies>
 
     </dependencyManagement>
@@ -1497,13 +1531,14 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>2.3.2</version>
+                    <version>${mavenCompilerVersion}</version>
                     <configuration>
                         <encoding>ISO-8859-1</encoding>
                         <fork>true</fork>
                         <maxmem>512m</maxmem>
                         <source>1.7</source>
                         <target>1.7</target>
+                        <proc>none</proc>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -1643,6 +1678,7 @@
                         <skip>${skipVerifications}</skip>
                         <header>${licensePath}</header>
                         <excludes>
+                            <exclude>**/org/mule/repackaged/**</exclude>
                             <exclude>target/**</exclude>
                             <exclude>**/.gitignore</exclude>
                             <exclude>**/*.txt</exclude>
