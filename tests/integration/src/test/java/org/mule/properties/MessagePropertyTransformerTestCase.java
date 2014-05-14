@@ -27,7 +27,7 @@ public class MessagePropertyTransformerTestCase extends FunctionalTestCase
     @Test
     public void testAddProperty() throws Exception
     {
-        runScenario("addProperty");
+        runScenario("addParameter");
     }
     
     @Test

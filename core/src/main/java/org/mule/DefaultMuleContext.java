@@ -50,6 +50,7 @@ import org.mule.context.notification.ServerNotificationManager;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.exception.DefaultSystemExceptionStrategy;
 import org.mule.expression.DefaultExpressionManager;
+import org.mule.extensions.ExtensionsManager;
 import org.mule.lifecycle.MuleContextLifecycleManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.management.stats.ProcessingTimeWatcher;
@@ -167,6 +168,8 @@ public class DefaultMuleContext implements MuleContext
     private final Latch startLatch = new Latch();
 
     private QueueManager queueManager;
+
+    private ExtensionsManager extensionsManager;
 
     /**
      * @deprecated Use empty constructor instead and use setter for dependencies.
@@ -556,6 +559,12 @@ public class DefaultMuleContext implements MuleContext
             }
         }
         return queueManager;
+    }
+
+    @Override
+    public ExtensionsManager getExtensionsManager()
+    {
+        return extensionsManager;
     }
 
     @Override
@@ -997,5 +1006,10 @@ public class DefaultMuleContext implements MuleContext
     public void setLocalMuleClient(DefaultLocalMuleClient localMuleContext)
     {
         this.localMuleClient = localMuleContext;
+    }
+
+    public void setExtensionsManager(ExtensionsManager extensionsManager)
+    {
+        this.extensionsManager = extensionsManager;
     }
 }
