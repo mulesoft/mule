@@ -114,6 +114,9 @@
             <outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
             <useStrictFiltering>true</useStrictFiltering>
             <includes>
+                <!-- extensions API -->
+                <include>org.mule:mule-extensions-api</include>
+                <include>org.mule:mule-extensions-annotations</include>
                 <!-- Core -->
                 <include>org.mule:mule-core</include>
                 <!-- Transports -->
@@ -148,6 +151,8 @@
                 <include>org.mule.modules:mule-module-db</include>
                 <include>org.mule.modules:mule-module-devkit-support</include>
                 <include>org.mule.modules:mule-module-drools</include>
+                <include>org.mule.modules:mule-module-extensions-support</include>
+                <include>org.mule.modules:mule-module-extensions-spring-support</include>
                 <include>org.mule.modules:mule-module-http</include>
                 <include>org.mule.modules:mule-module-jaas</include>
                 <include>org.mule.modules:mule-module-jersey</include>
@@ -187,6 +192,9 @@
     _exclude_ all libs which should _not_ go into this directory (usually
     because they are already in a different directory). -->
             <excludes>
+                <!--extensions API-->
+                <exclude>org.mule:mule-extensions-api</exclude>
+                <exclude>org.mule:mule-extensions-annotations</exclude>
                 <!-- lib/mule -->
                 <exclude>org.mule.common:mule-common</exclude>
                 <exclude>org.mule.mvel:mule-mvel2</exclude>
@@ -223,6 +231,8 @@
                 <exclude>org.mule.modules:mule-module-db</exclude>
                 <exclude>org.mule.modules:mule-module-devkit-support</exclude>
                 <exclude>org.mule.modules:mule-module-drools</exclude>
+                <exclude>org.mule.modules:mule-module-extensions-support</exclude>
+                <exclude>org.mule.modules:mule-module-extensions-spring-support</exclude>
                 <exclude>org.mule.modules:mule-module-http</exclude>
                 <exclude>org.mule.modules:mule-module-jaas</exclude>
                 <exclude>org.mule.modules:mule-module-jersey</exclude>
