@@ -28,6 +28,7 @@
         <module>db</module>
         <module>devkit-support</module>
         <module>drools</module>
+        <module>extensions-support</module>
         <module>launcher</module>
         <module>client</module>
         <module>guice</module>

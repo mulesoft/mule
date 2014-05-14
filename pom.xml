@@ -52,6 +52,7 @@
 
     <modules>
         <module>buildtools</module>
+        <module>extensions-api</module>
         <module>core</module>
         <module>distributions</module>
         <module>examples</module>
@@ -154,6 +155,7 @@
         <jsr181Version>1.0-MR1</jsr181Version>
         <jsr250AnnotationVerson>1.0</jsr250AnnotationVerson>
         <log4jVersion>1.2.16</log4jVersion>
+        <muleExtensionsApiVersion>1.0-SNAPSHOT</muleExtensionsApiVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <!-- TODO EE-1395 -->
         <mqSeriesVersion>6.0</mqSeriesVersion>

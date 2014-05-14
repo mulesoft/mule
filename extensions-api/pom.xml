@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule</groupId>
+        <artifactId>mule</artifactId>
+        <version>3.6.0-M1-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-extensions-api</artifactId>
+    <packaging>jar</packaging>
+    <version>${muleExtensionsApiVersion}</version>
+    <name>Mule Extensions API</name>
+    <description>Mule server and core classes</description>
+
+    <properties>
+        <skipExportTests>false</skipExportTests>
+        <licensePath>../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
+    <!--
+        group/artifact id only, version and exclusions are specified
+        via dependency management
+    -->
+    <dependencies>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>        
+
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
