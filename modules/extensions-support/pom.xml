@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.mule.modules</groupId>
+		<artifactId>mule-modules</artifactId>
+		<version>3.7.0-M1-SNAPSHOT</version>
+	</parent>
+	<groupId>org.mule.modules</groupId>
+	<artifactId>mule-module-extensions-support</artifactId>
+	<name>Mule Extensions Support</name>
+	<packaging>jar</packaging>
+	<description>
+        Default implementation of the Mule Extension API.
+    </description>
+
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
+    <dependencies>
+		<!-- Mule Dependencies -->
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-extensions-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-extensions-annotations</artifactId>
+        </dependency>
+		<dependency>
+			<groupId>org.mule</groupId>
+			<artifactId>mule-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+        </dependency>
+
+        <!--move to higher level-->
+        <dependency>
+            <groupId>org.glassfish.hk2.external</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>${javaInjectionVersion}</version>
+        </dependency>
+
+        <!--Other Dependencies-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!--Test Dependencies-->
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-extensions-api</artifactId>
+            <version>${muleExtensionsApiVersion}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+		<dependency>
+			<groupId>org.mule</groupId>
+			<artifactId>mule-core</artifactId>
+			<version>${project.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+            <scope>test</scope>
+        </dependency>
+	</dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
