@@ -25,7 +25,8 @@ public class WildcardExpressionLanguageFuntion implements ExpressionLanguageFunc
         int numParams = params.length;
         if (numParams < 1 || numParams > 3)
         {
-            throw new IllegalArgumentException("invalid number of arguments");
+            throw new IllegalArgumentException("invalid number of arguments for the signature wildcard(" +
+                    "wildcardExpression, [melExpression], [caseSensitive]) was expected");
         }
 
         String wildcardPattern = verifyWildcardPattern(params[0]);

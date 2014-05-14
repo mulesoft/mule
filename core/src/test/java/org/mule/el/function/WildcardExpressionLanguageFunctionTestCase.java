@@ -108,31 +108,60 @@ public class WildcardExpressionLanguageFunctionTestCase extends AbstractMuleTest
     }
 
     @Test
-    public void testReturnFalseWhenDoesNotMatchesDefinedTextArgumentAndSensitivity() throws Exception
+    public void testReturnFalseWhenDoesNotMatchesDefinedTextArgumentAndSensitivityIsTrue() throws Exception
     {
-        boolean result = (Boolean) wildcardFunction.call(new Object[]{"'*ASDF*QWER*'", "TEST", true}, context);
+        boolean result = (Boolean) wildcardFunction.call(new Object[]{"'tes*'", "TEST", true}, context);
         assertFalse(result);
     }
 
     @Test
-    public void testReturnFalseWhenDoesNotMatchesDefinedTextArgumentAndSensitivityMVEL() throws Exception
+    public void testReturnFalseWhenDoesNotMatchesDefinedTextArgumentAndSensitivityMVELIsTrue() throws Exception
     {
-        boolean result = (Boolean) expressionExecutor.execute("wildcard('*ASDF*QWER*', 'TEST', true)", context);
+        boolean result = (Boolean) expressionExecutor.execute("wildcard('tes?', 'TEST', true)", context);
         assertFalse(result);
     }
 
     @Test
-    public void testReturnsTrueWhenMatchesDefinedTextArgumentAndSensitivity() throws Exception
+    public void testReturnFalseWhenDoesNotMatchesDefinedTextArgumentAndSensitivityIsFalse() throws Exception
+    {
+        boolean result = (Boolean) wildcardFunction.call(new Object[]{"'*ASDF*QWER*'", "TEST", false}, context);
+        assertFalse(result);
+    }
+
+    @Test
+    public void testReturnFalseWhenDoesNotMatchesDefinedTextArgumentAndSensitivityMVELIsFalse() throws Exception
+    {
+        boolean result = (Boolean) expressionExecutor.execute("wildcard('*ASDF*QWER*', 'TEST', false)", context);
+        assertFalse(result);
+    }
+
+    @Test
+    public void testReturnsTrueWhenMatchesDefinedTextArgumentAndSensitivityIsTrue() throws Exception
     {
         boolean result = (Boolean) wildcardFunction.call(new Object[]{"test*TEST", "testfooTEST", true}, context);
         assertTrue(result);
     }
 
     @Test
-    public void testReturnsTrueWhenMatchesDefinedTextArgumentAndSensitivityMVEL() throws Exception
+    public void testReturnsTrueWhenMatchesDefinedTextArgumentAndSensitivityMVELIsTrue() throws Exception
     {
         addMessageToContextWithPayload("TESTfooTEST");
         boolean result = (Boolean) expressionExecutor.execute("wildcard('test*TEST', 'testfooTEST', true)", context);
+        assertTrue(result);
+    }
+
+    @Test
+    public void testReturnsTrueWhenMatchesDefinedTextArgumentAndSensitivityIsFalse() throws Exception
+    {
+        boolean result = (Boolean) wildcardFunction.call(new Object[]{"TEST*test", "testfooTEST", false}, context);
+        assertTrue(result);
+    }
+
+    @Test
+    public void testReturnsTrueWhenMatchesDefinedTextArgumentAndSensitivityMVELIsFalse() throws Exception
+    {
+        addMessageToContextWithPayload("TESTfooTEST");
+        boolean result = (Boolean) expressionExecutor.execute("wildcard('TEST???test', 'testfooTEST', false)", context);
         assertTrue(result);
     }
 
