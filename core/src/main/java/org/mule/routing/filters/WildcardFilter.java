@@ -129,7 +129,8 @@ public class WildcardFilter implements Filter, ObjectFilter
     }
 
     @Deprecated
-    private boolean filterByClassName(Object object, String pattern) {
+    private boolean filterByClassName(Object object, String pattern) 
+    {
         String className = pattern.substring(0, pattern.length() - 1);
         try
         {
