@@ -10,13 +10,16 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManagerSource;
+import org.mule.api.exception.MessagingExceptionHandler;
 
 public class LaxAsyncInterceptingMessageProcessor extends AsyncInterceptingMessageProcessor
 {
+    private MessagingExceptionHandler exceptionHandler;
 
-    public LaxAsyncInterceptingMessageProcessor(WorkManagerSource workManagerSource)
+    public LaxAsyncInterceptingMessageProcessor(WorkManagerSource workManagerSource, MessagingExceptionHandler exceptionHandler)
     {
         super(workManagerSource);
+        this.exceptionHandler = exceptionHandler;
     }
 
     public LaxAsyncInterceptingMessageProcessor(ThreadingProfile threadingProfile,
@@ -31,4 +34,9 @@ public class LaxAsyncInterceptingMessageProcessor extends AsyncInterceptingMessa
         return doThreading && !event.isSynchronous() && !event.isTransacted();
     }
 
+    @Override
+    protected MessagingExceptionHandler getMessagingExceptionHandler(MuleEvent event)
+    {
+        return exceptionHandler != null ? exceptionHandler : super.getMessagingExceptionHandler(event);
+    }
 }
