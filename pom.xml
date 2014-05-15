@@ -75,6 +75,7 @@
         <skipDistributions>true</skipDistributions>
         <skipVerifications>false</skipVerifications>
         <skipInstalls>false</skipInstalls>
+        <skipGpg>true</skipGpg>
 
         <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
         <licensePath>LICENSE_HEADER.txt</licensePath>
@@ -2182,6 +2183,9 @@
                                 </goals>
                             </execution>
                         </executions>
+                        <configuration>
+                            <skip>${skipGpg}</skip>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
