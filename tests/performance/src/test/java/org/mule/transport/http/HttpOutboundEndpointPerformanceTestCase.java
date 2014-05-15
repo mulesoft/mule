@@ -79,6 +79,8 @@ public class HttpOutboundEndpointPerformanceTestCase extends AbstractMuleTestCas
         ThreadingProfile tp = new ChainedThreadingProfile();
         tp.setMaxThreadsActive(500);
         httpConnector.setDispatcherThreadingProfile(tp);
+        muleContext.getRegistry().registerConnector(httpConnector);
+
         EndpointBuilder builder = muleContext.getEndpointFactory().getEndpointBuilder(
             "http://localhost:" + connector.getLocalPort() + "/echo");
         builder.setConnector(httpConnector);
@@ -100,6 +102,7 @@ public class HttpOutboundEndpointPerformanceTestCase extends AbstractMuleTestCas
     {
         endpoint.process(createMuleEvent()).getMessageAsBytes();
     }
+
     
     @Test
     @PerfTest(duration = 20000, threads = 10, warmUp = 10000)
