@@ -555,7 +555,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                 for (Object anExpired : expired)
                 {
                     final EventGroup group = (EventGroup) anExpired;
-                    ExecutionTemplate<MuleEvent> executionTemplate = ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate(muleContext, group.getMessageCollectionEvent().getFlowConstruct().getExceptionListener());
+                    ExecutionTemplate<MuleEvent> executionTemplate = ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate(muleContext, group.getMessageCollectionEvent().getExceptionHandler());
                     try
                     {
                         executionTemplate.execute(new ExecutionCallback<MuleEvent>()

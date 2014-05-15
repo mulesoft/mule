@@ -13,6 +13,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
@@ -308,5 +309,17 @@ public class VoidMuleEvent implements MuleEvent
     {
         throw new UnsupportedOperationException();
     }
+    
+    @Override
+    public MessagingExceptionHandler getExceptionHandler()
+    {
+        return null;
+    }
+    
+    @Override
+    public void setExceptionHandler(MessagingExceptionHandler exceptionHandler)
+    {
+    }
+
 
 }

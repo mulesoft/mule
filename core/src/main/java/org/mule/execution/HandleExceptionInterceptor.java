@@ -38,7 +38,7 @@ class HandleExceptionInterceptor implements ExecutionInterceptor<MuleEvent>
             }
             else
             {
-                result = e.getEvent().getFlowConstruct().getExceptionListener().handleException(e,e.getEvent());
+                result = e.getEvent().getExceptionHandler().handleException(e,e.getEvent());
             }
             e.setProcessedEvent(result);
             throw e;

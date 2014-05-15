@@ -8,10 +8,13 @@ package org.mule.api;
 
 import org.mule.MessageExchangePattern;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.exception.ExceptionHandler;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.ReplyToHandler;
+import org.mule.construct.Flow;
 import org.mule.management.stats.ProcessingTime;
 
 import java.io.OutputStream;
@@ -322,4 +325,22 @@ public interface MuleEvent extends Serializable
      * @param enabled
      */
     void setEnableNotifications(boolean enabled);
+    
+    /**
+     * The messaging exception handler to be used when exception are thrown in the current execution context.
+     * This will use {@link Flow#getExceptionListener()} by default.
+     * 
+     * @return
+     */
+    MessagingExceptionHandler getExceptionHandler();
+
+    /**
+     * Set a specific messaging exception handler to handle exception during flow execution. By default the
+     * {@link Flow#getExceptionListener()} is used and this will only needs to be changed in specific
+     * circimstance such as within an exception strategy where we don't want to use the default handle to
+     * avoid a infinite loop.
+     * 
+     * @param exceptionHandler
+     */
+    void setExceptionHandler(MessagingExceptionHandler exceptionHandler);
 }

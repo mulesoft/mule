@@ -224,8 +224,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
             logger.info("Retry attempts exhausted and no DLQ defined");
             RetryPolicyExhaustedException retryPolicyExhaustedException = new RetryPolicyExhaustedException(
                     CoreMessages.createStaticMessage("until-successful retries exhausted"), this);
-            event.getFlowConstruct()
-                    .getExceptionListener()
+            event.getExceptionHandler()
                     .handleException(new MessagingException(event, retryPolicyExhaustedException), event);
             return;
         }
