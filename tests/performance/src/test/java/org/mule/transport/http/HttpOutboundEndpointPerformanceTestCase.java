@@ -76,14 +76,11 @@ public class HttpOutboundEndpointPerformanceTestCase extends AbstractMuleTestCas
         muleContext = new DefaultMuleContextFactory().createMuleContext();
 
         HttpConnector httpConnector = new HttpConnector(muleContext);
-        httpConnector.setName("500Threads");
         ThreadingProfile tp = new ChainedThreadingProfile();
         tp.setMaxThreadsActive(500);
         httpConnector.setDispatcherThreadingProfile(tp);
-        muleContext.getRegistry().registerConnector(httpConnector);
-
         EndpointBuilder builder = muleContext.getEndpointFactory().getEndpointBuilder(
-            "http://localhost:" + connector.getLocalPort() + "/echo?connectorName");
+            "http://localhost:" + connector.getLocalPort() + "/echo");
         builder.setConnector(httpConnector);
         endpoint = builder.buildOutboundEndpoint();;
         muleContext.start();
@@ -97,6 +94,13 @@ public class HttpOutboundEndpointPerformanceTestCase extends AbstractMuleTestCas
         muleContext.dispose();
     }
 
+    @Test
+    @PerfTest(duration = 20000, threads = 1, warmUp = 10000)
+    public void send1Thread() throws MuleException, Exception
+    {
+        endpoint.process(createMuleEvent()).getMessageAsBytes();
+    }
+    
     @Test
     @PerfTest(duration = 20000, threads = 10, warmUp = 10000)
     public void send10Threads() throws MuleException, Exception
