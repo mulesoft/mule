@@ -10,10 +10,15 @@ package org.mule.transport.http;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.config.ThreadingProfile;
+import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.config.ChainedThreadingProfile;
 import org.mule.construct.Flow;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.context.DefaultMuleContextFactory;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,13 +36,13 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.nio.BlockingChannelConnector;
 import org.eclipse.jetty.util.ByteArrayOutputStream2;
 import org.eclipse.jetty.util.IO;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 
-public class HttpOutboundEndpointPerformanceTestCase extends AbstractMuleContextTestCase
+public class HttpOutboundEndpointPerformanceTestCase extends AbstractMuleTestCase
 {
     @Rule
     public ContiPerfRule rule = new ContiPerfRule();
@@ -45,9 +50,10 @@ public class HttpOutboundEndpointPerformanceTestCase extends AbstractMuleContext
     @Mock
     private Flow flow;
 
-    protected Server jetty;
-    protected OutboundEndpoint endpoint;
-    protected byte[] payload;
+    protected static Server jetty;
+    protected static OutboundEndpoint endpoint;
+    protected static byte[] payload;
+    protected static MuleContext muleContext;
 
     @Override
     public int getTestTimeoutSecs()
@@ -55,8 +61,8 @@ public class HttpOutboundEndpointPerformanceTestCase extends AbstractMuleContext
         return 180;
     }
 
-    @Before
-    public void before() throws Exception
+    @BeforeClass
+    public static void before() throws Exception
     {
         payload = createPayload(2048);
 
@@ -67,13 +73,24 @@ public class HttpOutboundEndpointPerformanceTestCase extends AbstractMuleContext
         jetty.setThreadPool(new org.eclipse.jetty.util.thread.QueuedThreadPool(500));
         jetty.start();
 
-        endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(
-            "http://localhost:" + connector.getLocalPort() + "/echo");
+        muleContext = new DefaultMuleContextFactory().createMuleContext();
+
+        HttpConnector httpConnector = new HttpConnector(muleContext);
+        httpConnector.setName("500Threads");
+        ThreadingProfile tp = new ChainedThreadingProfile();
+        tp.setMaxThreadsActive(500);
+        httpConnector.setDispatcherThreadingProfile(tp);
+        muleContext.getRegistry().registerConnector(httpConnector);
+
+        EndpointBuilder builder = muleContext.getEndpointFactory().getEndpointBuilder(
+            "http://localhost:" + connector.getLocalPort() + "/echo?connectorName");
+        builder.setConnector(httpConnector);
+        endpoint = builder.buildOutboundEndpoint();;
         muleContext.start();
     }
 
-    @After
-    public void after() throws Exception
+    @AfterClass
+    public static void after() throws Exception
     {
         jetty.stop();
         endpoint.getConnector().stop();
@@ -81,45 +98,45 @@ public class HttpOutboundEndpointPerformanceTestCase extends AbstractMuleContext
     }
 
     @Test
-    @PerfTest(duration = 40000, threads = 10, warmUp = 10000)
+    @PerfTest(duration = 20000, threads = 10, warmUp = 10000)
     public void send10Threads() throws MuleException, Exception
     {
-        endpoint.process(createMuleEvent());
+        endpoint.process(createMuleEvent()).getMessageAsBytes();
     }
 
     @Test
-    @PerfTest(duration = 40000, threads = 20, warmUp = 10000)
+    @PerfTest(duration = 20000, threads = 20, warmUp = 10000)
     public void send20Threads() throws MuleException, Exception
     {
-        endpoint.process(createMuleEvent());
+        endpoint.process(createMuleEvent()).getMessageAsBytes();
     }
 
     @Test
-    @PerfTest(duration = 40000, threads = 50, warmUp = 10000)
+    @PerfTest(duration = 20000, threads = 50, warmUp = 10000)
     public void send50Threads() throws MuleException, Exception
     {
-        endpoint.process(createMuleEvent());
+        endpoint.process(createMuleEvent()).getMessageAsBytes();
     }
 
     @Test
-    @PerfTest(duration = 40000, threads = 100, warmUp = 10000)
+    @PerfTest(duration = 20000, threads = 100, warmUp = 10000)
     public void send100Threads() throws MuleException, Exception
     {
-        endpoint.process(createMuleEvent());
+        endpoint.process(createMuleEvent()).getMessageAsBytes();
     }
 
     @Test
     @PerfTest(duration = 40000, threads = 200, warmUp = 10000)
     public void send200Threads() throws MuleException, Exception
     {
-        endpoint.process(createMuleEvent());
+        endpoint.process(createMuleEvent()).getMessageAsBytes();
     }
 
     @Test
     @PerfTest(duration = 40000, threads = 500, warmUp = 10000)
     public void send500Threads() throws MuleException, Exception
     {
-        endpoint.process(createMuleEvent());
+        endpoint.process(createMuleEvent()).getMessageAsBytes();
     }
 
     protected DefaultMuleEvent createMuleEvent() throws Exception
@@ -128,7 +145,7 @@ public class HttpOutboundEndpointPerformanceTestCase extends AbstractMuleContext
             MessageExchangePattern.REQUEST_RESPONSE, flow);
     }
 
-    protected byte[] createPayload(int length)
+    protected static byte[] createPayload(int length)
     {
         final byte[] content = new byte[length];
         final int r = Math.abs(content.hashCode());
