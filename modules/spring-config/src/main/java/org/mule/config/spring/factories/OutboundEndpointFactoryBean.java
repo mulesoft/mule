@@ -14,7 +14,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.registry.ServiceType;
 import org.mule.endpoint.AbstractEndpoint;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.exception.MessagingExceptionGeneratorToHandlerAdapter;
+import org.mule.exception.SystemToMessagingExceptionHandlerAdapter;
 import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.transport.service.TransportServiceDescriptor;
 
@@ -72,7 +72,7 @@ public class OutboundEndpointFactoryBean extends AbstractEndpointFactoryBean imp
     {
         if (isInExceptionStrategy)
         {
-            messagingExceptionHandler = new MessagingExceptionGeneratorToHandlerAdapter();
+            messagingExceptionHandler = new SystemToMessagingExceptionHandlerAdapter();
         }
         else
         {

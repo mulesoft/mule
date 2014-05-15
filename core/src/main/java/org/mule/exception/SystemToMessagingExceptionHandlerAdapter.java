@@ -9,14 +9,14 @@ package org.mule.exception;
 import org.mule.api.MuleEvent;
 import org.mule.api.exception.MessagingExceptionHandler;
 
-public class MessagingExceptionGeneratorToHandlerAdapter implements MessagingExceptionHandler
+public class SystemToMessagingExceptionHandlerAdapter implements MessagingExceptionHandler
 {
-    MessagingExceptionGenerator messagingExceptionGenerator = new MessagingExceptionGenerator();
 
     @Override
     public MuleEvent handleException(Exception exception, MuleEvent event)
     {
-        messagingExceptionGenerator.generateMessagingExceptionAndRollbackTransaction(exception, event);
+        event.getMuleContext().getExceptionListener().handleException(exception);
         return event;
     }
+
 }

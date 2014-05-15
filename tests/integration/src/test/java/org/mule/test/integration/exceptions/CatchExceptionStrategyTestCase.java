@@ -16,9 +16,11 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -34,8 +36,9 @@ import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized;
 
-public class CatchExceptionStrategyTestCase extends FunctionalTestCase
+public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
 {
     public static final int TIMEOUT = 5000;
     public static final String ERROR_PROCESSING_NEWS = "error processing news";
@@ -50,10 +53,16 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort3 = new DynamicPort("port3");
 
-    @Override
-    protected String getConfigFile()
+    public CatchExceptionStrategyTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/exceptions/catch-exception-strategy-use-case-flow.xml";
+        super(variant, configResources);
+    }
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/catch-exception-strategy-use-case-service.xml"},
+                {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/catch-exception-strategy-use-case-flow.xml"}});
     }
 
     @Test
