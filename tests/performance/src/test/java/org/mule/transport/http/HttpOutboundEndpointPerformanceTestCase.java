@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.transport.http;
 
 import org.mule.DefaultMuleEvent;
@@ -46,6 +47,7 @@ public class HttpOutboundEndpointPerformanceTestCase extends AbstractMuleContext
 
     protected Server jetty;
     protected OutboundEndpoint endpoint;
+    protected byte[] payload;
 
     @Override
     public int getTestTimeoutSecs()
@@ -56,6 +58,8 @@ public class HttpOutboundEndpointPerformanceTestCase extends AbstractMuleContext
     @Before
     public void before() throws Exception
     {
+        payload = createPayload(2048);
+
         final BlockingChannelConnector connector = new BlockingChannelConnector();
         jetty = new Server();
         jetty.addConnector(connector);
@@ -77,16 +81,62 @@ public class HttpOutboundEndpointPerformanceTestCase extends AbstractMuleContext
     }
 
     @Test
-    @PerfTest(duration = 40000, threads = 200, warmUp = 10000)
-    public void send() throws MuleException, Exception
+    @PerfTest(duration = 40000, threads = 10, warmUp = 10000)
+    public void send10Threads() throws MuleException, Exception
     {
-        endpoint.process(createMuleEvent("1"));
+        endpoint.process(createMuleEvent());
     }
 
-    protected DefaultMuleEvent createMuleEvent(Object payload) throws Exception
+    @Test
+    @PerfTest(duration = 40000, threads = 20, warmUp = 10000)
+    public void send20Threads() throws MuleException, Exception
+    {
+        endpoint.process(createMuleEvent());
+    }
+
+    @Test
+    @PerfTest(duration = 40000, threads = 50, warmUp = 10000)
+    public void send50Threads() throws MuleException, Exception
+    {
+        endpoint.process(createMuleEvent());
+    }
+
+    @Test
+    @PerfTest(duration = 40000, threads = 100, warmUp = 10000)
+    public void send100Threads() throws MuleException, Exception
+    {
+        endpoint.process(createMuleEvent());
+    }
+
+    @Test
+    @PerfTest(duration = 40000, threads = 200, warmUp = 10000)
+    public void send200Threads() throws MuleException, Exception
+    {
+        endpoint.process(createMuleEvent());
+    }
+
+    @Test
+    @PerfTest(duration = 40000, threads = 500, warmUp = 10000)
+    public void send500Threads() throws MuleException, Exception
+    {
+        endpoint.process(createMuleEvent());
+    }
+
+    protected DefaultMuleEvent createMuleEvent() throws Exception
     {
         return new DefaultMuleEvent(new DefaultMuleMessage(payload, muleContext),
             MessageExchangePattern.REQUEST_RESPONSE, flow);
+    }
+
+    protected byte[] createPayload(int length)
+    {
+        final byte[] content = new byte[length];
+        final int r = Math.abs(content.hashCode());
+        for (int i = 0; i < content.length; i++)
+        {
+            content[i] = (byte) ((r + i) % 96 + 32);
+        }
+        return content;
     }
 
     static class EchoHandler extends AbstractHandler
