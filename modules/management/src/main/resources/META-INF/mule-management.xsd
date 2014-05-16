@@ -193,6 +193,8 @@
                 <xsd:attribute name="host" type="xsd:string" >
                     <xsd:annotation>
                         <xsd:documentation>
+                            DEPRECATED: The host attribute for jmx-default-config is deprecated, for multi-homed hosts consider using
+                            instead the Java system property java.rmi.server.hostname.
                             The host to bind to. Normally, override this only for multi-NIC servers (default is localhost).
                         </xsd:documentation>
                     </xsd:annotation>
