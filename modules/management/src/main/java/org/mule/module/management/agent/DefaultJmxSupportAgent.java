@@ -6,6 +6,8 @@
  */
 package org.mule.module.management.agent;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.AbstractAgent;
 import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
@@ -27,6 +29,11 @@ import javax.management.remote.rmi.RMIConnectorServer;
 public class DefaultJmxSupportAgent extends AbstractAgent
 {
     private static final Logger logger = LoggerFactory.getLogger(DefaultJmxSupportAgent.class);
+
+    /**
+     * logger used by this class
+     */
+    protected transient final Log logger = LogFactory.getLog(DefaultJmxSupportAgent.class);
 
     public static final String DEFAULT_HOST = "localhost";
     public static final String DEFAULT_PORT = "1099";
