@@ -18,6 +18,8 @@ import javax.wsdl.Definition;
 import javax.wsdl.Port;
 import javax.wsdl.Service;
 import javax.wsdl.WSDLException;
+import javax.wsdl.extensions.soap.SOAPBinding;
+import javax.wsdl.extensions.soap12.SOAP12Binding;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -32,6 +34,8 @@ public class ProxyServiceConfiguration extends DefaultServiceConfiguration
 {
 
     private static final Logger LOG = LogUtils.getLogger(ProxyServiceFactoryBean.class);
+
+    private String soapVersion;
 
     /**
      * Override to use port name from service definition in WSDL when we are doing
@@ -52,7 +56,17 @@ public class ProxyServiceConfiguration extends DefaultServiceConfiguration
                     .getDefinition(getServiceFactory().getWsdlURL());
                 Service service = getServiceFromDefinition(definition);
                 setServiceNamespace(service.getQName().getNamespaceURI());
-                return new QName(getServiceNamespace(), ((Port) service.getPorts().values().iterator().next()).getName());
+
+                // Try to find a port that matches the SOAP version specified in the proxy service (if available).
+                QName endpointName = getPortMatchingSoapVersion(service);
+                if (endpointName == null)
+                {
+                    // Fallback to default behaviour
+                    endpointName = new QName(getServiceNamespace(), ((Port) service.getPorts().values().iterator().next()).getName());
+                }
+
+                LOG.fine(String.format("ProxyServiceConfiguration using endpoint %s", endpointName));
+                return endpointName;
             }
             else
             {
@@ -64,6 +78,30 @@ public class ProxyServiceConfiguration extends DefaultServiceConfiguration
         {
             throw new ServiceConstructionException(new Message("SERVICE_CREATION_MSG", LOG), e);
         }
+    }
+
+    private QName getPortMatchingSoapVersion(Service service)
+    {
+        if (soapVersion == null)
+        {
+            // No SOAP version specified in the config.
+            return null;
+        }
+
+        for (Port port : (Iterable<Port>) service.getPorts().values())
+        {
+            for (Object element : port.getBinding().getExtensibilityElements())
+            {
+                if ((element instanceof SOAPBinding && "1.1".equals(soapVersion)) ||
+                    (element instanceof SOAP12Binding && "1.2".equals(soapVersion)))
+                {
+                    return new QName(getServiceNamespace(), port.getName());
+                }
+            }
+        }
+
+        // No port matching the specified SOAP version.
+        return null;
     }
 
     protected Service getServiceFromDefinition(Definition definition)
@@ -121,5 +159,10 @@ public class ProxyServiceConfiguration extends DefaultServiceConfiguration
             }
         }
         return probableServices;
+    }
+
+    public void setSoapVersion(String soapVersion)
+    {
+        this.soapVersion = soapVersion;
     }
 }
