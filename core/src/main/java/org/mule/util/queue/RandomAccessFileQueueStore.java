@@ -29,12 +29,14 @@ class RandomAccessFileQueueStore
 {
 
     private final Log logger = LogFactory.getLog(this.getClass());
+    protected static final int CONTROL_DATA_SIZE = 5;
     private static final byte NOT_REMOVED = 0;
     private static final byte REMOVED = 1;
 
     private final File file;
     private RandomAccessFile queueFile;
     private LinkedList<Long> orderedKeys = new LinkedList<Long>();
+    private long fileTotalSpace = 0;
 
     public RandomAccessFileQueueStore(File file)
     {
@@ -124,6 +126,7 @@ class RandomAccessFileQueueStore
             throw new RuntimeException(e);
         }
         orderedKeys.clear();
+        fileTotalSpace = 0;
         FileUtils.deleteQuietly(file);
         createQueueFile();
     }
@@ -283,17 +286,18 @@ class RandomAccessFileQueueStore
     {
         try
         {
-            if (queueFile.length() > 0)
+            if (getSize() > 0)
             {
-                queueFile.seek(queueFile.length());
+                queueFile.seek(fileTotalSpace);
             }
             long filePointer = queueFile.getFilePointer();
-            int totalBytesRequired = 5 + data.length;
+            int totalBytesRequired = CONTROL_DATA_SIZE + data.length;
             ByteBuffer byteBuffer = ByteBuffer.allocate(totalBytesRequired);
             byteBuffer.put(NOT_REMOVED);
             byteBuffer.putInt(data.length);
             byteBuffer.put(data);
             queueFile.write(byteBuffer.array());
+            fileTotalSpace += totalBytesRequired;
             return filePointer;
         }
         catch (IOException e)
@@ -370,13 +374,6 @@ class RandomAccessFileQueueStore
      */
     public long getLength()
     {
-        try
-        {
-            return queueFile.length();
-        }
-        catch (IOException e)
-        {
-            throw new MuleRuntimeException(e);
-        }
+        return fileTotalSpace;
     }
 }
