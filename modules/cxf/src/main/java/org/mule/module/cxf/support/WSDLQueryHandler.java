@@ -259,7 +259,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
             for (Element el : elementList) {
                 String sl = el.getAttribute("schemaLocation");
                 if (smp.containsKey(URLDecoder.decode(sl, "utf-8"))) {
-                    el.setAttribute("schemaLocation", base + "?xsd=" + sl.replace(" ", "%20"));
+                    el.setAttribute("schemaLocation", rewriteSchemaLocation(base, sl));
                 }
             }
 
@@ -269,7 +269,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
             for (Element el : elementList) {
                 String sl = el.getAttribute("schemaLocation");
                 if (smp.containsKey(URLDecoder.decode(sl, "utf-8"))) {
-                    el.setAttribute("schemaLocation", base + "?xsd=" + sl.replace(" ", "%20"));
+                    el.setAttribute("schemaLocation", rewriteSchemaLocation(base, sl));
                 }
             }
             elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
@@ -278,7 +278,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
             for (Element el : elementList) {
                 String sl = el.getAttribute("schemaLocation");
                 if (smp.containsKey(URLDecoder.decode(sl, "utf-8"))) {
-                    el.setAttribute("schemaLocation", base + "?xsd=" + sl.replace(" ", "%20"));
+                    el.setAttribute("schemaLocation", rewriteSchemaLocation(base, sl));
                 }
             }
             elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
@@ -287,7 +287,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
             for (Element el : elementList) {
                 String sl = el.getAttribute("location");
                 if (mp.containsKey(URLDecoder.decode(sl, "utf-8"))) {
-                    el.setAttribute("location", base + "?wsdl=" + sl.replace(" ", "%20"));
+                    el.setAttribute("location", rewriteSchemaLocation(base, sl));
                 }
             }
         } catch (UnsupportedEncodingException e) {
@@ -303,6 +303,11 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
         } catch (Exception ex) {
             //likely not DOM level 3
         }
+    }
+
+    protected String rewriteSchemaLocation(String base, String schemaLocation)
+    {
+        return base + "?xsd=" + schemaLocation.replace(" ", "%20");
     }
 
     protected void rewriteOperationAddress(EndpointInfo ei, Document doc, String base)
@@ -470,8 +475,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                         String resolvedSchemaLocation = resolveWithCatalogs(catalogs, start, base);
                         if (resolvedSchemaLocation == null) {
                             try {
-                                //check to see if it's already in a URL format.  If so, leave it.
-                                new URL(start);
+                                checkSchemaUrl(doneSchemas, start, decodedStart, imp);
                             } catch (MalformedURLException e) {
                                 if (doneSchemas.put(decodedStart, imp) == null) {
                                     updateSchemaImports(imp.getReferencedSchema(), doneSchemas, base);
@@ -508,8 +512,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                 if (resolvedSchemaLocation == null) {
                     if (!doneSchemas.containsKey(decodedStart)) {
                         try {
-                            //check to see if it's aleady in a URL format.  If so, leave it.
-                            new URL(start);
+                            checkSchemaUrl(doneSchemas, start, decodedStart, included);
                         } catch (MalformedURLException e) {
                             if (doneSchemas.put(decodedStart, included) == null) {
                                 updateSchemaImports(included.getReferencedSchema(), doneSchemas, base);
@@ -544,8 +547,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                 if (resolvedSchemaLocation == null) {
                     if (!doneSchemas.containsKey(decodedStart)) {
                         try {
-                            //check to see if it's aleady in a URL format.  If so, leave it.
-                            new URL(start);
+                            checkSchemaUrl(doneSchemas, start, decodedStart, included);
                         } catch (MalformedURLException e) {
                             if (doneSchemas.put(decodedStart, included) == null) {
                                 updateSchemaImports(included.getReferencedSchema(), doneSchemas, base);
@@ -560,6 +562,12 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                 }
             }
         }
+    }
+
+    protected void checkSchemaUrl(Map<String, SchemaReference> doneSchemas, String start, String decodedStart, SchemaReference imp) throws MalformedURLException
+    {
+        //check to see if it's already in a URL format.  If so, leave it.
+        new URL(start);
     }
 
     @Override

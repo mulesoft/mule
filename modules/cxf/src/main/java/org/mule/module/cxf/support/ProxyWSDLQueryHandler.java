@@ -9,10 +9,13 @@ package org.mule.module.cxf.support;
 
 import org.mule.module.cxf.CxfConstants;
 
+import java.net.MalformedURLException;
 import java.util.List;
+import java.util.Map;
 
 import javax.wsdl.Definition;
 import javax.wsdl.WSDLException;
+import javax.wsdl.extensions.schema.SchemaReference;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.stream.XMLStreamReader;
 
@@ -31,6 +34,8 @@ import org.xml.sax.InputSource;
 
 public class ProxyWSDLQueryHandler extends WSDLQueryHandler
 {
+
+    public static final String XSD_PARAMETER_NAME = "?xsd=";
     private final String port;
 
     public ProxyWSDLQueryHandler(Bus b, final String port)
@@ -155,6 +160,39 @@ public class ProxyWSDLQueryHandler extends WSDLQueryHandler
     private boolean rewritePortAddress(Element el)
     {
         return port == null || el.getAttribute("name").equals(port);
+    }
+
+    @Override
+    protected void checkSchemaUrl(Map<String, SchemaReference> doneSchemas, String start, String decodedStart, SchemaReference imp) throws MalformedURLException
+    {
+        super.checkSchemaUrl(doneSchemas, start, decodedStart, imp);
+        doneSchemas.put(decodedStart, imp);
+        String xsdParameterValue = getXsdParameterValue(decodedStart);
+        if( xsdParameterValue != null )
+        {
+            doneSchemas.put(xsdParameterValue, imp);
+        }
+    }
+
+    @Override
+    protected String rewriteSchemaLocation(String base, String schemaLocation)
+    {
+        String xsdParameterValue = getXsdParameterValue(schemaLocation);
+        if( xsdParameterValue != null )
+        {
+            schemaLocation =  xsdParameterValue;
+        }
+        return super.rewriteSchemaLocation(base, schemaLocation);
+    }
+
+    private String getXsdParameterValue(String schemaLocation)
+    {
+        int position = schemaLocation.indexOf(XSD_PARAMETER_NAME);
+        if( position > -1 )
+        {
+            return schemaLocation.substring(position + XSD_PARAMETER_NAME.length());
+        }
+        return null;
     }
 
 }
