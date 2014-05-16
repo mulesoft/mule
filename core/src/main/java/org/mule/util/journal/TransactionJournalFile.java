@@ -128,14 +128,17 @@ class TransactionJournalFile<T, K extends JournalEntry<T>>
      * @param txId transaction identifier
      * @return a copy collection of the journal entries for txId
      */
-    public synchronized Collection<K> getLogEntries(T txId)
+    public Collection<K> getLogEntries(T txId)
     {
-        Collection<K> entries = this.entries.get(txId);
+        final Collection<K> entries = this.entries.asMap().get(txId);
         if (entries == null)
         {
             return Collections.emptyList();
         }
-        return new ArrayList<K>(entries);
+        synchronized (entries)
+        {
+            return Collections.unmodifiableCollection(new ArrayList<K>(entries));
+        }
     }
 
     /**
