@@ -15,7 +15,7 @@ public class Field
 
     public Field(String name, Object value)
     {
-        this.name = name;
+        this.name = name.toUpperCase();
         this.value = value;
     }
 

@@ -30,18 +30,18 @@ public class InsensitiveMapRowHandler implements RowHandler
 
         for (int i = 1; i <= cols; i++)
         {
-            String columnName = metaData.getColumnName(i);
+            String column = metaData.getColumnLabel(i);
             Object value = resultSet.getObject(i);
 
             if (value instanceof SQLXML)
             {
                 SQLXML sqlxml = (SQLXML) value;
 
-                result.put(columnName, sqlxml.getString());
+                result.put(column, sqlxml.getString());
             }
             else
             {
-                result.put(columnName, value);
+                result.put(column, value);
             }
         }
 

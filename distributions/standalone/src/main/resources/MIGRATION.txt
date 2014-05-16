@@ -32,3 +32,4 @@ MULE-7386: Class org.mule.module.management.agent.JmxAgent has been renamed to o
 MULE-7536: Mule distribution does not provide a lib/shared/default domain for sharing class loading. Now we provide a default mule domains under domains/default which serves the same purpose and more. You can still use the old shared class loading mechanism by creating the folder lib/shared/default
 MULE-7524: Encoded mule expressions in dynamic endpoints address components are not supported anymore (ie: %23[expression] must be #[expression])
 MULE-7546: Implementations of org.mule.api.MuleMessage now need to implement clearAttachments() which was added to the interface. Implementations that extend org.mule.el.context.AbstractMapContext must now implement clear() given this method has been removed from the abstract implementation.
+MULE-7612: maps returned by queries using the Database connector can have different keys as now column's aliases are used instead of column's names
