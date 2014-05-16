@@ -6,6 +6,8 @@
  */
 package org.mule.module.management.agent;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.AbstractAgent;
 import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
@@ -19,10 +21,19 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.management.remote.rmi.RMIConnectorServer;
 
 public class DefaultJmxSupportAgent extends AbstractAgent
 {
+    private static final Logger logger = LoggerFactory.getLogger(DefaultJmxSupportAgent.class);
+
+    /**
+     * logger used by this class
+     */
+    protected transient final Log logger = LogFactory.getLog(DefaultJmxSupportAgent.class);
 
     public static final String DEFAULT_HOST = "localhost";
     public static final String DEFAULT_PORT = "1099";
@@ -301,13 +312,17 @@ public class DefaultJmxSupportAgent extends AbstractAgent
         this.port = port;
     }
 
+    @Deprecated
     public String getHost()
     {
         return host;
     }
 
+    @Deprecated
     public void setHost(final String host)
     {
+        logger.warn("The host attribute for jmx-default-config is deprecated, for multi-homed hosts consider using " +
+                "instead the Java system property java.rmi.server.hostname");
         this.host = host;
     }
 
