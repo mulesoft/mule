@@ -41,6 +41,7 @@ public abstract class AbstractInMemoryResultSet implements ResultSet
 
     private final Map<String, ColumnMetadata> columnsByName = new HashMap<String, ColumnMetadata>();
     private final Map<Integer, ColumnMetadata> columnsByIndex = new HashMap<Integer, ColumnMetadata>();
+    private List<ColumnMetadata> columns;
     private final List<Map<String, Object>> records;
 
     private int currentColumnIndex = 0;
@@ -55,6 +56,7 @@ public abstract class AbstractInMemoryResultSet implements ResultSet
      */
     public AbstractInMemoryResultSet(List<ColumnMetadata> columns, List<Map<String, Object>> records)
     {
+        this.columns = columns;
         this.records = records;
 
         for (ColumnMetadata column : columns)
@@ -304,7 +306,7 @@ public abstract class AbstractInMemoryResultSet implements ResultSet
     {
         checkOpenResultSet();
 
-        throw new UnsupportedOperationException();
+        return new TestResultSetMetaData(columns);
     }
 
     @Override
