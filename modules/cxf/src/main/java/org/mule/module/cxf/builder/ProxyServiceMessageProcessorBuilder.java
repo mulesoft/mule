@@ -6,7 +6,6 @@
  */
 package org.mule.module.cxf.builder;
 
-import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
 import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.support.CopyAttachmentInInterceptor;
 import org.mule.module.cxf.support.CopyAttachmentOutInterceptor;
@@ -21,6 +20,7 @@ import org.mule.module.cxf.support.ResetStaxInterceptor;
 import org.mule.module.cxf.support.ReversibleStaxInInterceptor;
 import org.mule.module.cxf.support.ReversibleValidatingInterceptor;
 
+import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
 import org.apache.cxf.binding.soap.interceptor.RPCInInterceptor;
 import org.apache.cxf.binding.soap.interceptor.RPCOutInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
@@ -50,7 +50,11 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
         ServerFactoryBean sfb = new ServerFactoryBean();
         sfb.setDataBinding(new StaxDataBinding());
         sfb.getFeatures().add(new StaxDataBindingFeature());
-        sfb.setServiceFactory(new ProxyServiceFactoryBean());
+
+        ProxyServiceFactoryBean proxyServiceFactoryBean = new ProxyServiceFactoryBean();
+        proxyServiceFactoryBean.setSoapVersion(getSoapVersion());
+        sfb.setServiceFactory(proxyServiceFactoryBean);
+
         sfb.setServiceClass(ProxyService.class);
 
         addProxyInterceptors(sfb);
