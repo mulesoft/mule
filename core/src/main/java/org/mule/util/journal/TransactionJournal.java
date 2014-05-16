@@ -99,8 +99,8 @@ public class TransactionJournal<T, K extends JournalEntry<T>>
      */
     public Collection<K> getLogEntriesForTx(T txId)
     {
-        TransactionJournalFile logFile = determineLogFile(txId);
-        if (!logFile.containsTx(txId))
+        TransactionJournalFile logFile = determineLogFileWithoutModifyingCurrent(txId);
+        if (logFile == null || !logFile.containsTx(txId))
         {
             return Collections.emptyList();
         }
@@ -110,7 +110,7 @@ public class TransactionJournal<T, K extends JournalEntry<T>>
     /**
      * @return all the transactional entries from the journal
      */
-    public Multimap<T, K> getAllLogEntries()
+    public synchronized Multimap<T, K> getAllLogEntries()
     {
         LinkedHashMultimap<T, K> logEntries = LinkedHashMultimap.create();
         logEntries.putAll(currentLogFile.getAllLogEntries());
@@ -128,7 +128,7 @@ public class TransactionJournal<T, K extends JournalEntry<T>>
     }
 
     /**
-     * Removes all the entries from the transactionl jorunal
+     * Removes all the entries from the transactional journal
      */
     public synchronized void clear()
     {
@@ -138,13 +138,10 @@ public class TransactionJournal<T, K extends JournalEntry<T>>
 
     private TransactionJournalFile determineLogFile(T txId)
     {
-        if (currentLogFile.containsTx(txId))
+        final TransactionJournalFile logFile = determineLogFileWithoutModifyingCurrent(txId);
+        if (logFile != null)
         {
-            return currentLogFile;
-        }
-        if (notCurrentLogFile.containsTx(txId))
-        {
-            return notCurrentLogFile;
+            return logFile;
         }
         if (currentLogFile.size() > MAXIMUM_LOG_FILE_ENTRIES && notCurrentLogFile.size() == 0)
         {
@@ -153,6 +150,19 @@ public class TransactionJournal<T, K extends JournalEntry<T>>
             notCurrentLogFile = aux;
         }
         return currentLogFile;
+    }
+
+    private TransactionJournalFile determineLogFileWithoutModifyingCurrent(T txId)
+    {
+        if (currentLogFile.containsTx(txId))
+        {
+            return currentLogFile;
+        }
+        if (notCurrentLogFile.containsTx(txId))
+        {
+            return notCurrentLogFile;
+        }
+        return null;
     }
 
 }

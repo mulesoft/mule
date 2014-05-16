@@ -7,16 +7,22 @@
 package org.mule.util.journal.queue;
 
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.api.MuleEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.util.journal.JournalEntry;
 import org.mule.util.queue.DefaultQueueStore;
+import org.mule.util.queue.QueueStore;
 
 import com.google.common.collect.Multimap;
 
+import java.util.Collection;
+
+import org.hamcrest.core.IsNot;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -153,5 +159,22 @@ public class LocalTxQueueTransactionJournalTestCase extends AbstractMuleContextT
         assertThat(journalEntry.isAdd(), is(true));
     }
 
+    @Test
+    public void getTxEntriesReturnsACopy() throws Exception
+    {
+        LocalTxQueueTransactionJournal transactionJournal = new LocalTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
+        addTransactionJournalEntry(transactionJournal);
+        addTransactionJournalEntry(transactionJournal);
+        Collection<LocalQueueTxJournalEntry> logEntriesForTx = transactionJournal.getLogEntriesForTx(1);
+        addTransactionJournalEntry(transactionJournal);
+        Collection<LocalQueueTxJournalEntry> modifiedLogEntries = transactionJournal.getLogEntriesForTx(1);
+        assertThat(logEntriesForTx, not(is(modifiedLogEntries)));
+        assertThat(logEntriesForTx.size(), is(2));
+    }
+
+    private void addTransactionJournalEntry(LocalTxQueueTransactionJournal transactionJournal)
+    {
+        transactionJournal.logAdd(1, mockQueueInfo, "data");
+    }
 
 }
