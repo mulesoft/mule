@@ -1,0 +1,22 @@
+<mule xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <flow name="proxy11_multiplePorts">
+        <cxf:proxy-service wsdlLocation="stockquote.wsdl" namespace="http://www.webserviceX.NET/" service="StockQuote"
+                           payload="envelope" soapVersion="1.1"/>
+    </flow>
+
+    <flow name="proxy12_multiplePorts">
+        <cxf:proxy-service wsdlLocation="stockquote.wsdl" namespace="http://www.webserviceX.NET/" service="StockQuote"
+                           payload="envelope" soapVersion="1.2"/>
+    </flow>
+
+    <flow name="proxy12_singlePort">
+        <cxf:proxy-service wsdlLocation="echo-11.wsdl" namespace="http://new.webservice.namespace" service="EchoService"
+                           payload="envelope" soapVersion="1.2"/>
+    </flow>
+
+</mule>
