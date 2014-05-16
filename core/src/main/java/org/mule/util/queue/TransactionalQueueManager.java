@@ -72,11 +72,6 @@ public class TransactionalQueueManager extends AbstractQueueManager
         xaTransactionRecoverer = new XaTransactionRecoverer(xaTransactionJournal, this);
     }
 
-    public XaTxQueueTransactionJournal getXaTransactionJournal()
-    {
-        return xaTransactionJournal;
-    }
-
     @Override
     public RecoverableQueueStore getRecoveryQueue(String queueName)
     {
