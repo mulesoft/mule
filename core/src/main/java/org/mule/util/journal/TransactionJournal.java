@@ -97,7 +97,7 @@ public class TransactionJournal<T, K extends JournalEntry<T>>
      * @param txId transaction identifier
      * @return all the transaction entries for a certain transaction identifier
      */
-    public Collection<K> getLogEntriesForTx(T txId)
+    public synchronized Collection<K> getLogEntriesForTx(T txId)
     {
         TransactionJournalFile logFile = determineLogFile(txId);
         if (!logFile.containsTx(txId))
@@ -110,7 +110,7 @@ public class TransactionJournal<T, K extends JournalEntry<T>>
     /**
      * @return all the transactional entries from the journal
      */
-    public Multimap<T, K> getAllLogEntries()
+    public synchronized Multimap<T, K> getAllLogEntries()
     {
         LinkedHashMultimap<T, K> logEntries = LinkedHashMultimap.create();
         logEntries.putAll(currentLogFile.getAllLogEntries());

@@ -20,7 +20,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
@@ -124,15 +126,22 @@ class TransactionJournalFile<T, K extends JournalEntry<T>>
 
     /**
      * @param txId transaction identifier
-     * @return journal entries for txId
+     * @return a copy collection of the journal entries for txId
      */
     public synchronized Collection<K> getLogEntries(T txId)
     {
-        return entries.get(txId);
+        Collection<K> entries = this.entries.get(txId);
+        if (entries == null)
+        {
+            return Collections.emptyList();
+        }
+        return new ArrayList<K>(entries);
     }
 
     /**
-     * @return all journal entries entries
+     * @return all journal entries exactly as stored in the journal.
+     * No modifications should be done to such collections and the journal file should not
+     * be access concurrently for other purposes while working with the collection.
      */
     public synchronized Multimap<T, K> getAllLogEntries()
     {
