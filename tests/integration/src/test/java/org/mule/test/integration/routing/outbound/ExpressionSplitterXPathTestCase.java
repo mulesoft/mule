@@ -45,7 +45,7 @@ public class ExpressionSplitterXPathTestCase extends AbstractServiceAndFlowTestC
             "        <Amount>40000</Amount>\n" +
             "        <Currency>USD</Currency>\n" +
             "        <Date>28102008</Date>\n" +
-            "        <Received>ServiceOne</Received>\n" +
+            "        <Received/>\n" +
             "    </Trade>";
 
     private final String EXPECTED_MESSAGE_2 = "<Trade xmlns=\"http://acme.com\">\n" +
@@ -53,7 +53,7 @@ public class ExpressionSplitterXPathTestCase extends AbstractServiceAndFlowTestC
             "        <Amount>2000</Amount>\n" +
             "        <Currency>GBP</Currency>\n" +
             "        <Date>28102008</Date>\n" +
-            "        <Received>ServiceTwo</Received>\n" +
+            "        <Received/>\n" +
             "    </Trade>";
 
 
@@ -85,7 +85,7 @@ public class ExpressionSplitterXPathTestCase extends AbstractServiceAndFlowTestC
         assertEquals(2, coll.size());
         List<?> results = (List<?>) coll.getPayload();
 
-        XMLUnit.compareXML(EXPECTED_MESSAGE_1, results.get(0).toString());
-        XMLUnit.compareXML(EXPECTED_MESSAGE_2, results.get(1).toString());
+        assertTrue(XMLUnit.compareXML(EXPECTED_MESSAGE_1, results.get(0).toString()).identical());
+        assertTrue(XMLUnit.compareXML(EXPECTED_MESSAGE_2, results.get(1).toString()).identical();
     }
 }
