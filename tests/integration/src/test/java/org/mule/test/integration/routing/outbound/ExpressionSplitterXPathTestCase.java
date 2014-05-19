@@ -86,6 +86,6 @@ public class ExpressionSplitterXPathTestCase extends AbstractServiceAndFlowTestC
         List<?> results = (List<?>) coll.getPayload();
 
         assertTrue(XMLUnit.compareXML(EXPECTED_MESSAGE_1, results.get(0).toString()).identical());
-        assertTrue(XMLUnit.compareXML(EXPECTED_MESSAGE_2, results.get(1).toString()).identical();
+        assertTrue(XMLUnit.compareXML(EXPECTED_MESSAGE_2, results.get(1).toString()).identical());
     }
 }
