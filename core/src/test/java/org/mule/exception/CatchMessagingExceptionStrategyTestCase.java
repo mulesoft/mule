@@ -20,6 +20,7 @@ import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.processor.MessageProcessor;
@@ -108,6 +109,22 @@ public class CatchMessagingExceptionStrategyTestCase
         assertThat(exceptionHandlingResult, Is.is(lastEventCreated));
     }
 
+    /**
+     *  On fatal error, the exception strategies are not supposed to use MuleMessage.toString() as it could
+     * potentially log sensible data.
+     */
+    @Test
+    public void testMessageToStringNotCalledOnFailure() throws Exception
+    {
+        MuleEvent lastEventCreated = mock(MuleEvent.class,Answers.RETURNS_DEEP_STUBS.get());
+        catchMessagingExceptionStrategy.setMessageProcessors(asList(createFailingEventMessageProcessor(mock(MuleEvent.class, Answers.RETURNS_DEEP_STUBS.get())), createFailingEventMessageProcessor(lastEventCreated)));
+        catchMessagingExceptionStrategy.initialise();
+
+        when(mockMuleEvent.getMessage().toString()).thenThrow(new RuntimeException("MuleMessage.toString() should not be called"));
+
+        MuleEvent exceptionHandlingResult = exceptionHandlingResult = catchMessagingExceptionStrategy.handleException(mockException, mockMuleEvent);
+    }
+
     private MessageProcessor createChagingEventMessageProcessor(final MuleEvent lastEventCreated)
     {
         return new MessageProcessor()
@@ -120,6 +137,17 @@ public class CatchMessagingExceptionStrategyTestCase
         };
     }
 
+    private MessageProcessor createFailingEventMessageProcessor(final MuleEvent lastEventCreated)
+    {
+        return new MessageProcessor()
+        {
+            @Override
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                throw new DefaultMuleException(mockException);
+            }
+        };
+    }
 
     private MessageProcessor createSetStringMessageProcessor(final String appendText)
     {
