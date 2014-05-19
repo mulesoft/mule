@@ -6,6 +6,9 @@
  */
 package org.mule.module.cxf.support;
 
+import org.mule.module.cxf.CxfConstants;
+import org.mule.module.cxf.i18n.CxfMessages;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,14 +19,12 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.service.factory.AbstractServiceConfiguration;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
-
-import org.mule.module.cxf.CxfConstants;
-import org.mule.module.cxf.i18n.CxfMessages;
 
 public class ProxyServiceFactoryBean extends ReflectionServiceFactoryBean
 {
@@ -112,6 +113,19 @@ public class ProxyServiceFactoryBean extends ReflectionServiceFactoryBean
             throw new ServiceConstructionException(e);
         }
 
+    }
+
+    public void setSoapVersion(String soapVersion)
+    {
+        for (AbstractServiceConfiguration serviceConfiguration : getServiceConfigurations())
+        {
+            if (serviceConfiguration instanceof ProxyServiceConfiguration)
+            {
+                ProxyServiceConfiguration proxyServiceConfiguration = ((ProxyServiceConfiguration) serviceConfiguration);
+                proxyServiceConfiguration.setSoapVersion(soapVersion);
+                return;
+            }
+        }
     }
 
 }
