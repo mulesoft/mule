@@ -7,9 +7,11 @@
 
 package org.mule.module.cxf;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.tck.junit4.ApplicationContextBuilder;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -30,22 +32,46 @@ import org.xml.sax.InputSource;
 public class ProxyWSDLRewriteSchemaLocationsTestCase extends FunctionalTestCase
 {
     @Rule
-    public final DynamicPort httpPort = new DynamicPort("port1");
+    public final DynamicPort httpPortProxy = new DynamicPort("portProxy");
+
+    @Rule
+    public final DynamicPort httpPortMockServer = new DynamicPort("portMockServer");
+
+    private MuleContext mockServerContext;
 
     @Override
     protected String getConfigFile()
     {
-        return "proxy-wsdl-rewrite-schema-locations-conf.xml";
+        return "wsdlAndXsdMockServer/proxy-wsdl-rewrite-schema-locations-conf.xml";
+    }
+
+    @Override
+    protected void doSetUpBeforeMuleContextCreation() throws Exception
+    {
+        ApplicationContextBuilder applicationContextBuilder = new ApplicationContextBuilder();
+        applicationContextBuilder.setApplicationResources(new String[]{"wsdlAndXsdMockServer/proxy-wsdl-rewrite-schema-locations-conf-server.xml"});
+        mockServerContext = applicationContextBuilder.build();
+        super.doSetUpBeforeMuleContextCreation();
+    }
+
+    @Override
+    protected void doTearDownAfterMuleContextDispose() throws Exception
+    {
+        super.doTearDownAfterMuleContextDispose();
+        if(mockServerContext !=null)
+        {
+            mockServerContext.dispose();
+        }
     }
 
     @Test
     public void testProxyWSDLRewriteAllSchemaLocations() throws Exception
     {
-        String proxyAddress = "http://localhost:" + httpPort.getNumber() + "/localServicePath";
+        String proxyAddress = "http://localhost:" + httpPortProxy.getNumber() + "/localServicePath";
         MuleMessage response = muleContext.getClient().send(proxyAddress + "?wsdl", null, null);
 
         Set<String> expectedParametersValues = new HashSet<String>();
-        expectedParametersValues.addAll(Arrays.asList("xsd=xsd0", "xsd=xsd1", "xsd=xsd2", "xsd=xsd3"));
+        expectedParametersValues.addAll(Arrays.asList("xsd=xsd0"));
 
         List<Element> schemaImports = getSchemaImports(getWsdl(response));
         for(Element schemaImport : schemaImports)
