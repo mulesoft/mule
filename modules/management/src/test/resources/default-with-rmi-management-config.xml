@@ -8,5 +8,5 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/management http://www.mulesoft.org/schema/mule/management/current/mule-management.xsd">
 
-    <management:jmx-default-config host="127.0.0.1" port="1098" />
+    <management:jmx-default-config host="127.0.0.1" port="${port}" />
 </mule>
