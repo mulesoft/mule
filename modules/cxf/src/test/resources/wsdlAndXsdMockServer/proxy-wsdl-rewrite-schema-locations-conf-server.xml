@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
+
+    <flow name="xsd0-mock">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost"  path="remoteServicePathXsd0"
+                               port="${portMockServer}"/>
+        <parse-template location="wsdlAndXsdMockServer/mock-xsd0.xml"/>
+    </flow>
+
+    <flow name="xsd2-mock">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost"  path="remoteServicePathXsd2"
+                               port="${portMockServer}"/>
+        <parse-template location="wsdlAndXsdMockServer/mock-xsd2.xml"/>
+    </flow>
+
+    <flow name="wsdl-mock">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" path="remoteServicePathWsdl"
+                               port="${portMockServer}"/>
+        <parse-template location="wsdlAndXsdMockServer/mock-wsdl.xml"/>
+    </flow>
+
+</mule>

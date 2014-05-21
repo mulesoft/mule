@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema elementFormDefault="qualified" targetNamespace="http://localhost:#[server.systemProperties.portMockServer]/ServiceContracts/2008/01"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:tns="http://localhost:#[server.systemProperties.portMockServer]/ServiceContracts/2008/01">
+    <xs:import schemaLocation="http://localhost:#[server.systemProperties.portMockServer]/remoteServicePathXsd2/mock-xsd2.xml?xsd=xsd2"
+               namespace="http://localhost:#[server.systemProperties.portMockServer]/DataContracts/2008/01"/>
+    <xs:element name="Analyse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" name="request" nillable="true" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="AnalyseResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" name="AnalyseResult" nillable="true" type="q1:GeoLocation"
+                            xmlns:q1="http://localhost:#[server.systemProperties.portMockServer]/DataContracts/2008/01"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
