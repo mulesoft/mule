@@ -23,6 +23,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
+                    <!--
+                        Fork each test in its own VM to minimize side effects of
+                        failed AMQ shutdowns and other unrelated failures.
+                    -->
+                    <forkMode>pertest</forkMode>
                     <argLine>-Xmx512m -XX:MaxPermSize=128m</argLine>
                 </configuration>
             </plugin>
