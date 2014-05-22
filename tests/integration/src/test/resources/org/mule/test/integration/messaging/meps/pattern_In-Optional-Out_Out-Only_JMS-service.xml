@@ -23,7 +23,7 @@
     </description>
 
     <vm:connector name="vmConnector"/>
-    <jms:activemq-connector name="jmsConnector" brokerURL="tcp://localhost:61616"/>
+    <jms:activemq-connector name="jmsConnector" brokerURL="tcp://localhost:${serverPort}"/>
 
     <vm:endpoint path="test.inbound" name="inboundEndpoint" exchange-pattern="request-response"/>
     <jms:endpoint queue="test.header.received" name="receivedEndpoint" exchange-pattern="one-way"/>

@@ -9,12 +9,14 @@ package org.mule.test.integration.message;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Rule;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.NonSerializableObject;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 /**
  * see EE-2307
@@ -24,6 +26,9 @@ import org.junit.Test;
  */
 public class SessionPropertyChainingRouterTestCase extends FunctionalTestCase
 {
+    @Rule
+    public DynamicPort serverPort = new DynamicPort("serverPort");
+
     @Override
     protected String getConfigFile()
     {
