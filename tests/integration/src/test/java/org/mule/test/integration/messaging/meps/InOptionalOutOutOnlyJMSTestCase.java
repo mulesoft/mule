@@ -9,9 +9,11 @@ package org.mule.test.integration.messaging.meps;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.junit.*;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.NullPayload;
 
 import java.util.Arrays;
@@ -20,14 +22,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.activemq.broker.BrokerService;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 //START SNIPPET: full-class
 public class InOptionalOutOutOnlyJMSTestCase extends AbstractServiceAndFlowTestCase
 {
+    @ClassRule
+    public static DynamicPort serverPort = new DynamicPort("serverPort");
+
     public static final long TIMEOUT = 3000;
 
     private static BrokerService broker;
@@ -36,7 +38,7 @@ public class InOptionalOutOutOnlyJMSTestCase extends AbstractServiceAndFlowTestC
     public static void startBroker() throws Exception
     {
         broker = new BrokerService();
-        broker.addConnector("tcp://localhost:61616");
+        broker.addConnector("tcp://localhost:" + serverPort.getNumber());
         broker.start();
     }
 
