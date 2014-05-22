@@ -340,7 +340,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
         int correlationGroupSeq = logMessage.getCorrelationSequence();
 
         String printableLogMessage = MessageFormat.format("Message identification summary here: " +
-                "id={1} correlationId={2}, correlationGroup={2}, correlationSeq={3}",
+                "id={0} correlationId={1}, correlationGroup={2}, correlationSeq={3}",
                 logUniqueId, correlationId, correlationGroupSize, correlationGroupSeq);
 
         logger.fatal(
