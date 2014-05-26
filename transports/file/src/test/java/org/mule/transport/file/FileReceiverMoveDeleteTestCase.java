@@ -40,15 +40,6 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         super(variant, configResources);
     }
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-
-        // get rid of a warning that complains about two transformers with the same data type
-        muleContext.getRegistry().unregisterTransformer("_ObjectToByteArray");
-    }
-
     @Test
     public void testMoveAndDeleteStreaming() throws Exception
     {
