@@ -6,6 +6,7 @@
  */
 package org.mule.transport.file.transformers;
 
+import static org.junit.Assert.assertTrue;
 import org.mule.api.transformer.Transformer;
 import org.mule.transformer.AbstractTransformerTestCase;
 import org.mule.util.FileUtils;
@@ -17,8 +18,6 @@ import java.io.FileWriter;
 import java.util.Arrays;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
 
 public class FileToByteArrayTestCase extends AbstractTransformerTestCase
 {
@@ -89,30 +88,5 @@ public class FileToByteArrayTestCase extends AbstractTransformerTestCase
         }
     }
 
-    @Test
-    public void testTransformByteArray() throws Exception
-    {
-        FileInputStream fis = new FileInputStream(testFile);
-        byte[] bytes = new byte[(int) testFile.length()];
-        try
-        {
-            int count;
-            while ((count = fis.read(bytes)) != -1)
-            {
-                // read fully
-            }
-            assertTrue(Arrays.equals(resultData, (byte[]) getTransformer().transform(bytes)));
-        }
-        finally
-        {
-            fis.close();
-        }
-    }
-
-    @Test
-    public void testTransformString() throws Exception
-    {
-        assertTrue(Arrays.equals(resultData, (byte[]) getTransformer().transform(TEST_STRING)));
-    }
 
 }
