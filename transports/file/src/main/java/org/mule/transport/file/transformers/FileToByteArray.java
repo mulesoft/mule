@@ -6,8 +6,10 @@
  */
 package org.mule.transport.file.transformers;
 
+import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.simple.ObjectToByteArray;
+import org.mule.config.i18n.MessageFactory;
+import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ArrayUtils;
 
@@ -15,39 +17,37 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
 
 /**
  * <code>FileToByteArray</code> reads the contents of a file as a byte array.
  */
-public class FileToByteArray extends ObjectToByteArray
+public class FileToByteArray extends AbstractTransformer implements DiscoverableTransformer
 {
+    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
+
     public FileToByteArray()
     {
         super();
         registerSourceType(DataTypeFactory.create(File.class));
-        registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        registerSourceType(DataTypeFactory.create(FileInputStream.class));
+        setReturnDataType(DataTypeFactory.BYTE_ARRAY);
     }
 
     @Override
     public Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
-        // Support other payload types so that this transformer can be used
-        // transparently both when streaming is on and off
-        if (src instanceof byte[])
+        File file = null;
+        FileInputStream fileInputStream = null;
+
+        if (src instanceof FileInputStream)
         {
-            return src;
+            fileInputStream = (FileInputStream) src;
         }
-        
-        if (src instanceof InputStream || src instanceof String)
+        else if (src instanceof File)
         {
-            return super.doTransform(src, outputEncoding);
-        }
-        else
-        {
-            File file = (File) src;
+            file = (File) src;
 
             if (file == null)
             {
@@ -65,32 +65,49 @@ public class FileToByteArray extends ObjectToByteArray
                 return ArrayUtils.EMPTY_BYTE_ARRAY;
             }
 
-            FileInputStream fis = null;
-            byte[] bytes = null;
-
             try
             {
-                fis = new FileInputStream(file);
-                // TODO Attention: arbitrary 4GB limit & also a great way to reap
-                // OOMs
-                int length = new Long(file.length()).intValue();
-                bytes = new byte[length];
-                fis.read(bytes);
-                return bytes;
+                fileInputStream = new FileInputStream(file);
             }
-            // at least try..
-            catch (OutOfMemoryError oom)
-            {
-                throw new TransformerException(this, oom);
-            }
-            catch (IOException e)
+            catch (FileNotFoundException e)
             {
                 throw new TransformerException(this, e);
             }
-            finally
-            {
-                IOUtils.closeQuietly(fis);
-            }
+
+        }
+        else
+        {
+            throw new TransformerException(
+                    MessageFactory.createStaticMessage("Cannot handle source type %s", src.getClass().getName()), this);
+        }
+
+        try
+        {
+            return IOUtils.toByteArray(fileInputStream);
+        }
+        // at least try..
+        catch (OutOfMemoryError oom)
+        {
+            throw new TransformerException(this, oom);
+        }
+        catch (IOException e)
+        {
+            throw new TransformerException(this, e);
+        }
+        finally
+        {
+            IOUtils.closeQuietly(fileInputStream);
         }
     }
+
+    public int getPriorityWeighting()
+    {
+        return priorityWeighting;
+    }
+
+    public void setPriorityWeighting(int priorityWeighting)
+    {
+        this.priorityWeighting = priorityWeighting;
+    }
+
 }
