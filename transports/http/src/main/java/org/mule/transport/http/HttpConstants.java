@@ -108,6 +108,7 @@ public class HttpConstants
     public static final String HEADER_VIA = "Via"; // [General]
     public static final String HEADER_WARNING = "Warning"; // [General]
     public static final String HEADER_WWW_AUTHENTICATE = "WWW-Authenticate"; // [Response]
+    public static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For"; // [Request]
 
     // This is a POST-related request header value
     public static final String HEADER_EXPECT_CONTINUE_REQUEST_VALUE = "100-continue"; // [Request]
@@ -186,7 +187,7 @@ public class HttpConstants
             HEADER_ACCEPT_LANGUAGE, HEADER_AUTHORIZATION, HEADER_COOKIE, HEADER_EXPECT, HEADER_FROM,
             HEADER_HOST, HEADER_IF_MATCH, HEADER_IF_MODIFIED_SINCE, HEADER_IF_NONE_MATCH,
             HEADER_IF_RANGE, HEADER_IF_UNMODIFIED_SINCE, HEADER_MAX_FORWARDS, HEADER_PROXY_AUTHORIZATION,
-            HEADER_RANGE, HEADER_REFERER, HEADER_TE, HEADER_USER_AGENT, HEADER_SLUG};
+            HEADER_RANGE, HEADER_REFERER, HEADER_TE, HEADER_USER_AGENT, HEADER_SLUG, HEADER_X_FORWARDED_FOR};
 
         REQUEST_HEADER_NAMES = Collections.unmodifiableMap(MapUtils.mapWithKeysAndValues(
             CaseInsensitiveMap.class, strings, strings));
