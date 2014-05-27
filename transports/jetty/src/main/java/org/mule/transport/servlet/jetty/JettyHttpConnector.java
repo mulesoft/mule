@@ -425,16 +425,6 @@ public class JettyHttpConnector extends AbstractConnector
         this.receiverServlet = receiverServlet;
     }
 
-    @Override
-    public ReplyToHandler getReplyToHandler(ImmutableEndpoint endpoint)
-    {
-        if (isUseContinuations())
-        {
-            return new JettyContinuationsReplyToHandler(muleContext);
-        }
-        return super.getReplyToHandler(endpoint);
-    }
-
     public boolean isUseContinuations()
     {
         return useContinuations;
@@ -517,11 +507,11 @@ public class JettyHttpConnector extends AbstractConnector
         {
             if(isUseContinuations())
             {
-                servlet = new JettyContinuationsReceiverServlet();
+                servlet = new JettyContinuationsReceiverServlet(muleContext);
             }
             else
             {
-                servlet = new JettyReceiverServlet();
+                servlet = new JettyReceiverServlet(muleContext);
             }
         }
         else

@@ -19,7 +19,7 @@ public class HttpsMessageProcessTemplate extends HttpMessageProcessTemplate
 
     public HttpsMessageProcessTemplate(final HttpMessageReceiver messageReceiver, final HttpServerConnection httpServerConnection, final WorkManager flowExecutionWorkManager)
     {
-        super(messageReceiver,httpServerConnection,flowExecutionWorkManager);
+        super(messageReceiver,httpServerConnection);
     }
 
     @Override

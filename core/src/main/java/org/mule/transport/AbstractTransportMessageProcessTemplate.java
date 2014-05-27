@@ -28,31 +28,23 @@ import java.io.OutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverType extends AbstractMessageReceiver, ConnectorType extends AbstractConnector> implements FlowProcessingPhaseTemplate, ValidationPhaseTemplate, MessageProcessContext
+public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverType extends AbstractMessageReceiver, ConnectorType extends AbstractConnector> implements FlowProcessingPhaseTemplate, ValidationPhaseTemplate
 {
 
     protected transient Log logger = LogFactory.getLog(getClass());
 
     private final MessageReceiverType messageReceiver;
     private Object rawMessage;
-    private WorkManager flowExecutionWorkManager;
 
-    public AbstractTransportMessageProcessTemplate(MessageReceiverType messageReceiver, WorkManager flowExecutionWorkManager)
+    public AbstractTransportMessageProcessTemplate(MessageReceiverType messageReceiver)
     {
         this.messageReceiver = messageReceiver;
-        this.flowExecutionWorkManager = flowExecutionWorkManager;
     }
 
     public MuleEvent getMuleEvent() throws MuleException
     {
         MuleMessage messageFromSource = createMessageFromSource(getOriginalMessage());
         return createEventFromMuleMessage(messageFromSource);
-    }
-
-    @Override
-    public MessageSource getMessageSource()
-    {
-        return this.messageReceiver.getEndpoint();
     }
 
     @Override
@@ -177,12 +169,6 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
     }
 
     @Override
-    public boolean supportsAsynchronousProcessing()
-    {
-        return true;
-    }
-
-    @Override
     public MuleEvent beforeRouteEvent(MuleEvent muleEvent) throws MuleException
     {
         return muleEvent;
@@ -194,22 +180,5 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
         return muleEvent;
     }
 
-    @Override
-    public WorkManager getFlowExecutionWorkManager()
-    {
-        return flowExecutionWorkManager;
-    }
-
-    @Override
-    public TransactionConfig getTransactionConfig()
-    {
-        return getInboundEndpoint().getTransactionConfig();
-    }
-
-    @Override
-    public ClassLoader getExecutionClassLoader()
-    {
-        return messageReceiver.getEndpoint().getMuleContext().getExecutionClassLoader();
-    }
 }
 
