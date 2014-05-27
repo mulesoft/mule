@@ -32,6 +32,7 @@
 				<add-message-property key="If-Unmodified-Since" value="gzip"/>
 				<add-message-property key="Max-Forwards" value="gzip"/>
 				<add-message-property key="Proxy-Authorization" value="gzip"/>
+				<add-message-property key="X-Forwarded-For" value="1.1.1.1,2.2.2.2"/>
 				<add-message-property key="Range" value="gzip"/>
 				<add-message-property key="Referer" value="gzip"/>
 				<add-message-property key="TE" value="gzip"/>
