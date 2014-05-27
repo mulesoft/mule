@@ -6,17 +6,21 @@
  */
 package org.mule.transport.servlet.jetty;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleContext;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.Connector;
+import org.mule.execution.MessageProcessingManager;
 import org.mule.transport.AbstractMessageReceiver;
+import org.mule.transport.TransportMessageProcessContext;
 
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.eclipse.jetty.continuation.Continuation;
 
 /**
  * <code>JettyHttpMessageReceiver</code> is a simple http server that can be used to
@@ -24,7 +28,7 @@ import javax.resource.spi.work.WorkException;
  */
 public class JettyHttpMessageReceiver extends AbstractMessageReceiver
 {
-    public static final String JETTY_SERVLET_CONNECTOR_NAME = "_jettyConnector";
+    private MessageProcessingManager messageProcessingManager;
 
     public JettyHttpMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
         throws CreateException
@@ -32,34 +36,40 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
         super(connector, flowConstruct, endpoint);
     }
     
-    public void routeMessageAsync(final MuleMessage message, final ContinuationsReplyTo continuationsReplyTo)
+    public void processMessage(HttpServletRequest request, HttpServletResponse response)
     {
-        try
-        {
-            getWorkManager().scheduleWork(new Work() {
+        final JettyMessageProcessTemplate messageProcessTemplate = new JettyMessageProcessTemplate(request, response, this, getEndpoint().getMuleContext());
+        final TransportMessageProcessContext messageProcessContext = new TransportMessageProcessContext(this);
+        messageProcessingManager.processMessage(messageProcessTemplate, messageProcessContext);
+    }
 
-                public void run()
-                {
-                    try
-                    {
-                        MuleMessage threadSafeMessage = new DefaultMuleMessage(message);
-                        routeMessage(threadSafeMessage);
-                    }
-                    catch (MuleException e)
-                    {
-                        continuationsReplyTo.setAndResume(e);
-                    }
-                }
+    public ContinuationsResponseHandler processMessageAsync(HttpServletRequest request, HttpServletResponse response, Continuation continuation)
+    {
+        final JettyContinuationsMessageProcessTemplate messageProcessTemplate = new JettyContinuationsMessageProcessTemplate(request, response, this, getEndpoint().getMuleContext(), continuation);
+        final TransportMessageProcessContext messageProcessContext = new TransportMessageProcessContext(this, getWorkManager());
+        messageProcessingManager.processMessage(messageProcessTemplate, messageProcessContext);
+        return new ContinuationsResponseHandler(messageProcessTemplate);
+    }
 
-                public void release()
-                {
-                    // nothing to clean up
-                }
-            });
-        }
-        catch (WorkException e)
+    public static class ContinuationsResponseHandler
+    {
+        private JettyContinuationsMessageProcessTemplate jettyMessageProcessTemplateAndContext;
+
+        public ContinuationsResponseHandler(JettyContinuationsMessageProcessTemplate jettyMessageProcessTemplateAndContext)
         {
-            getEndpoint().getMuleContext().getExceptionListener().handleException(e);
+            this.jettyMessageProcessTemplateAndContext = jettyMessageProcessTemplateAndContext;
         }
+
+        void complete()
+        {
+            this.jettyMessageProcessTemplateAndContext.completeProcessingRequest();
+        }
+    }
+
+    @Override
+    protected void doInitialise() throws InitialisationException
+    {
+        super.doInitialise();
+        this.messageProcessingManager = endpoint.getMuleContext().getRegistry().get(MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER);
     }
 }

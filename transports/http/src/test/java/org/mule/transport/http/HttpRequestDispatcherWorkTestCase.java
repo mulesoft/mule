@@ -15,7 +15,6 @@ import static org.mockito.Mockito.when;
 
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.execution.MessageProcessContext;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -94,7 +93,7 @@ public class HttpRequestDispatcherWorkTestCase extends AbstractMuleTestCase
         HttpRequestDispatcherWork httpRequestDispatcherWork = new HttpRequestDispatcherWork(mockHttpConnector, mockSocket);
         when(mockHttpConnector.lookupReceiver(isA(Socket.class), isA(RequestLine.class))).thenReturn(mockHttpMessageReceiver);
         setUpSocketMessage();
-        when(mockHttpMessageReceiver.createMessageContext(isA(HttpServerConnection.class))).thenReturn(mockMessageContext);
+        when(mockHttpMessageReceiver.createMessageProcessContext()).thenReturn(mockMessageContext);
         httpRequestDispatcherWork.run();
         verify(mockHttpMessageReceiver, times(1)).processRequest(isA(HttpServerConnection.class));
     }

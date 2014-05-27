@@ -39,7 +39,7 @@ public class HttpsMessageReceiver extends HttpMessageReceiver
     }
 
     @Override
-    HttpMessageProcessTemplate createMessageContext(HttpServerConnection httpServerConnection)
+    HttpMessageProcessTemplate createMessageProcessTemplate(HttpServerConnection httpServerConnection)
     {
         return new HttpsMessageProcessTemplate(this, httpServerConnection,getWorkManager());
     }
