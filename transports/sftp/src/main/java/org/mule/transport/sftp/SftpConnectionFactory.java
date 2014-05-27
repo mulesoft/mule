@@ -6,6 +6,7 @@
  */
 package org.mule.transport.sftp;
 
+import java.io.File;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.util.StringUtils;
@@ -95,7 +96,20 @@ public class SftpConnectionFactory implements PoolableObjectFactory
             // {
             // try
             // {
-            if (identityFile != null)
+            if (identityFile != null && endpointURI.getPassword() != null && sftpUtil.getPassphrase() != null)
+            {
+              throw new UnsupportedOperationException("SFTP connector does not currently support login with (userID + password + SSH-keyfile + passphrase). Logins supported are: (userID + password), (userID + SSH-keyfile + passphrase), (userID + SSH-keyfile + password)");
+            }
+            if (identityFile != null && endpointURI.getPassword() != null)
+            {
+              File idFile = new File(identityFile);
+              if (!idFile.exists() ){
+                 throw new IOException(String.format("file '%s' does not exist", identityFile));
+              }
+              logger.info(String.format("using multi-auth: userName '%s', password (not logged), ssh key-file '%s'", endpointURI.getUser(), idFile.getAbsolutePath()));
+              client.login(endpointURI.getUser(), endpointURI.getPassword(), idFile);
+            }
+            else if (identityFile != null)
             {
                 String passphrase = sftpUtil.getPassphrase();
 
