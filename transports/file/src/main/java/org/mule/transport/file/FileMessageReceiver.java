@@ -283,20 +283,21 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             logger.info("Lock obtained on file: " + file.getAbsolutePath());
         }
 
+        // The file may get moved/renamed here so store the original file info.
+        final String originalSourceFilePath = file.getAbsolutePath();
+        final String originalSourceFileName = file.getName();
+        final String originalSourceDirectory = file.getParent();
+
         // This isn't nice but is needed as MuleMessage is required to resolve
         // destination file name
-        DefaultMuleMessage fileParserMessasge = new DefaultMuleMessage(null, connector.getMuleContext());
-        fileParserMessasge.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
+        DefaultMuleMessage fileParserMessasge = new DefaultMuleMessage(null, getEndpoint().getMuleContext());
+        fileParserMessasge.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
+        fileParserMessasge.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory);
 
-        // The file may get moved/renamed here so store the original file info.
-        final String originalSourceFile = file.getAbsolutePath();
-        final String originalSourceFileName = file.getName();
         final File sourceFile;
         if (workDir != null)
         {
-            String workFileName = file.getName();
-
-            workFileName = fileConnector.getFilenameParser().getFilename(fileParserMessasge, workFileNamePattern);
+            String workFileName = fileConnector.getFilenameParser().getFilename(fileParserMessasge, workFileNamePattern);
             // don't use new File() directly, see MULE-1112
             File workFile = FileUtils.newFile(workDir, workFileName);
 
@@ -316,8 +317,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             String destinationFileName = originalSourceFileName;
             if (moveToPattern != null)
             {
-                destinationFileName = fileConnector.getFilenameParser().getFilename(fileParserMessasge,
-                                                                                    moveToPattern);
+                destinationFileName = fileConnector.getFilenameParser().getFilename(fileParserMessasge, moveToPattern);
             }
             // don't use new File() directly, see MULE-1112
             destinationFile = FileUtils.newFile(moveDir, destinationFileName);
@@ -358,6 +358,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
 
         message.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
+        message.setProperty(FileConnector.PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory, PropertyScope.INBOUND);
         if (forceSync)
         {
             message.setProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY, Boolean.TRUE, PropertyScope.INBOUND);
@@ -374,7 +375,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
         else
         {
-            processWithoutStreaming(originalSourceFile, originalSourceFileName, sourceFile, destinationFile, executionTemplate, finalMessage);
+            processWithoutStreaming(originalSourceFilePath, originalSourceFileName, originalSourceDirectory, sourceFile, destinationFile, executionTemplate, finalMessage);
         }
     }
 
@@ -421,7 +422,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
-    private void processWithoutStreaming(String originalSourceFile, final String originalSourceFileName, final File sourceFile,final File destinationFile, ExecutionTemplate<MuleEvent> executionTemplate, final MuleMessage finalMessage) throws DefaultMuleException
+    private void processWithoutStreaming(String originalSourceFile, final String originalSourceFileName, final String originalSourceDirectory, final File sourceFile,final File destinationFile, ExecutionTemplate<MuleEvent> executionTemplate, final MuleMessage finalMessage) throws DefaultMuleException
     {
         try
         {
@@ -430,7 +431,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                 @Override
                 public MuleEvent process() throws Exception
                 {
-                    moveAndDelete(sourceFile, destinationFile, originalSourceFileName, finalMessage);
+                    moveAndDelete(sourceFile, destinationFile, originalSourceFileName, originalSourceDirectory, finalMessage);
                     return null;
                 }
             });
@@ -543,7 +544,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     }
 
     private void moveAndDelete(final File sourceFile, File destinationFile,
-                               String sourceFileOriginalName, MuleMessage message) throws MuleException
+                               String originalSourceFileName, String originalSourceDirectory, MuleMessage message) throws MuleException
     {
         // If we are moving the file to a read directory, move it there now and
         // hand over a reference to the
@@ -565,7 +566,8 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             // create new Message for destinationFile
             message = createMuleMessage(destinationFile, endpoint.getEncoding());
             message.setOutboundProperty(FileConnector.PROPERTY_FILENAME, destinationFile.getName());
-            message.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
+            message.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
+            message.setProperty(FileConnector.PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory, PropertyScope.INBOUND);
         }
 
         // finally deliver the file message

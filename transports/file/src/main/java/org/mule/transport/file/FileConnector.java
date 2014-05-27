@@ -64,8 +64,9 @@ public class FileConnector extends AbstractConnector
     // message properties
     public static final String PROPERTY_FILENAME = "filename";
     public static final String PROPERTY_ORIGINAL_FILENAME = "originalFilename";
-    public static final String PROPERTY_SOURCE_FILENAME = "sourceFileName";
+    public static final String PROPERTY_ORIGINAL_DIRECTORY = "originalDirectory";
     public static final String PROPERTY_DIRECTORY = "directory";
+    public static final String PROPERTY_SOURCE_FILENAME = "sourceFileName";
     public static final String PROPERTY_SOURCE_DIRECTORY = "sourceDirectory";
     public static final String PROPERTY_WRITE_TO_DIRECTORY = "writeToDirectoryName";
     public static final String PROPERTY_FILE_SIZE = "fileSize";
