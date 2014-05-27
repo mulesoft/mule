@@ -51,9 +51,9 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     private boolean failureResponseSentToClient;
     private HttpThrottlingHeadersMapBuilder httpThrottlingHeadersMapBuilder;
 
-    public HttpMessageProcessTemplate(final HttpMessageReceiver messageReceiver, final HttpServerConnection httpServerConnection, final WorkManager flowExecutionWorkManager)
+    public HttpMessageProcessTemplate(final HttpMessageReceiver messageReceiver, final HttpServerConnection httpServerConnection)
     {
-        super(messageReceiver,flowExecutionWorkManager);
+        super(messageReceiver);
         this.httpServerConnection = httpServerConnection;
         this.httpThrottlingHeadersMapBuilder = new HttpThrottlingHeadersMapBuilder();
     }
@@ -397,13 +397,6 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
         }
     }
 
-
-    @Override
-    public boolean supportsAsynchronousProcessing()
-    {
-        return true;
-    }
-
     protected HttpResponse doBad(RequestLine requestLine) throws MuleException
     {
         MuleMessage message = getMessageReceiver().createMuleMessage(null);
@@ -418,11 +411,6 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     protected HttpServerConnection getHttpServerConnection()
     {
         return httpServerConnection;
-    }
-
-    public Latch getMessageProcessedLatch()
-    {
-        return messageProcessedLatch;
     }
 
     @Override

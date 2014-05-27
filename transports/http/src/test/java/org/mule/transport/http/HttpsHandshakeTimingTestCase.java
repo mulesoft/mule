@@ -26,12 +26,10 @@ import org.mule.transport.ssl.MockHandshakeCompletedEvent;
 import org.mule.transport.ssl.MockSslSocket;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 
 import javax.net.ssl.HandshakeCompletedEvent;
-import javax.resource.spi.work.Work;
 
 import org.junit.Test;
 import org.mockito.Answers;
@@ -54,7 +52,7 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleContextTestCase
         MockHttpsMessageReceiver messageReceiver = setupMockHttpsMessageReceiver();
 
         MockSslSocket socket = new MockSslSocket();
-        HttpMessageProcessTemplate messageProcessTemplate = messageReceiver.createMessageContext(new HttpServerConnection(socket, messageReceiver.getEndpoint().getEncoding(), (HttpConnector) messageReceiver.getConnector()));
+        HttpMessageProcessTemplate messageProcessTemplate = messageReceiver.createMessageProcessTemplate(new HttpServerConnection(socket, messageReceiver.getEndpoint().getEncoding(), (HttpConnector) messageReceiver.getConnector()));
 
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         messageProcessTemplate.beforeRouteEvent(getTestEvent(message));
@@ -68,7 +66,7 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleContextTestCase
         MockSslSocket socket = new MockSslSocket();
         socket.setInputStream(new ByteArrayInputStream("GET /path/to/file/index.html HTTP/1.0\n\n\n".getBytes()));
         HttpServerConnection serverConnection = new HttpServerConnection(socket, "utf-8", (HttpConnector) messageReceiver.getConnector());
-        HttpMessageProcessTemplate messageContext = messageReceiver.createMessageContext(serverConnection);
+        HttpMessageProcessTemplate messageContext = messageReceiver.createMessageProcessTemplate(serverConnection);
 
         invokeHandshakeCompleted(serverConnection, socket);
 

@@ -19,6 +19,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.execution.MessageProcessContext;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.ConnectException;
+import org.mule.transport.TransportMessageProcessContext;
 import org.mule.util.MapUtils;
 
 import java.util.List;
@@ -48,16 +49,22 @@ public class HttpMessageReceiver extends AbstractMessageReceiver
         ((HttpConnector) connector).disconnect(endpoint.getEndpointURI());
     }
 
-    MessageProcessContext createMessageContext(HttpServerConnection httpServerConnection)
+    HttpMessageProcessTemplate createMessageProcessTemplate(HttpServerConnection httpServerConnection)
     {
-        return new HttpMessageProcessTemplate(this,httpServerConnection,getWorkManager());
+        return new HttpMessageProcessTemplate(this,httpServerConnection);
+    }
+
+    MessageProcessContext createMessageProcessContext()
+    {
+        return new TransportMessageProcessContext(this, getWorkManager());
     }
 
     void processRequest(HttpServerConnection httpServerConnection) throws InterruptedException, MuleException
     {
-        HttpMessageProcessTemplate messageContext = (HttpMessageProcessTemplate) createMessageContext(httpServerConnection);
-        processMessage(messageContext,messageContext);
-        messageContext.awaitTermination();
+        HttpMessageProcessTemplate messageProcessTemplate = createMessageProcessTemplate(httpServerConnection);
+        MessageProcessContext messageProcessContext = createMessageProcessContext();
+        processMessage(messageProcessTemplate, messageProcessContext);
+        messageProcessTemplate.awaitTermination();
     }
 
     protected String processRelativePath(String contextPath, String path)
