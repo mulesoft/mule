@@ -10,7 +10,7 @@
     <packaging>maven-plugin</packaging>
     <artifactId>mule-catalog-archetype</artifactId>
     <version>3.1.5-SNAPSHOT</version>
-    <name>Mule Configuration Patterns Catalog Artifact</name>
+    <name>Mule Configuration Patterns Catalog Archetype</name>
 
     <properties>
         <licensePath>../../LICENSE_HEADER.txt</licensePath>
@@ -86,22 +86,33 @@
                     </execution>
                 </executions>
             </plugin>
+            <!--
+                This archetype extends the mule-module-archetype. Copy the sources and resources from the
+                module archetype over.
+
+                ATTENTION:
+                Although the path to the mule-module-archetype is hardcoded here, it's the only approach
+                that reliably works. Earlier versions of this pom used the maven-dependency-plugin to
+                unpack mule-module-archetype's source jar but that jar is not always available, e.g. when
+                building the site.
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
+                <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>src-dependencies</id>
                         <phase>initialize</phase>
                         <goals>
-                            <goal>unpack-dependencies</goal>
+                            <goal>run</goal>
                         </goals>
                         <configuration>
-                            <classifier>sources</classifier>
-                            <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
-                            <outputDirectory>${project.build.directory}/src-other</outputDirectory>
-                            <includeGroupIds>${groupId}</includeGroupIds>
-                            <includeArtifactIds>mule-module-archetype</includeArtifactIds>
+                            <tasks>
+                                <copy todir="${project.build.directory}/src-other">
+                                    <fileset dir="${project.basedir}/../mule-module-archetype/src/main/java"/>
+                                    <fileset dir="${project.basedir}/../mule-module-archetype/src/main/resources"/>
+                                </copy>
+                            </tasks>
                         </configuration>
                     </execution>
                 </executions>
