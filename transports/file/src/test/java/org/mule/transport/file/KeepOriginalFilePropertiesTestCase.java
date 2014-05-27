@@ -61,19 +61,17 @@ public class KeepOriginalFilePropertiesTestCase extends FunctionalTestCase
         assertTrue(new File(getFileInsideWorkingDirectory(OUTPUT_DIRECTORY), PROCESSED_PREFIX + getProperty(msg, CUSTOM_PROPERTY_ORIGINAL_FILENAME)).exists());
     }
 
-    private void assertOriginalDirectoryIsCorrectlySet(MuleMessage msg)
+    private void assertOriginalDirectoryIsCorrectlySet(MuleMessage msg) throws IOException
     {
         String originalDirectory = getFileInsideWorkingDirectory(INPUT_DIRECTORY).getPath();
         String originalDirectoryPropertyValue = getProperty(msg, CUSTOM_PROPERTY_ORIGINAL_DIRECTORY);
-        try
-        {
-            assertEquals(originalDirectory, originalDirectoryPropertyValue);
-        } catch(Throwable t)
-        {
-            originalDirectory = removePrivatePath(originalDirectory);
-            originalDirectoryPropertyValue = removePrivatePath(originalDirectoryPropertyValue);
-            assertEquals(originalDirectory, originalDirectoryPropertyValue);
-        }
+
+        assertEquals(disambiguateFie(originalDirectory), disambiguateFie(originalDirectoryPropertyValue));
+    }
+
+    private String disambiguateFie(String path) throws IOException
+    {
+        return new File(path).getCanonicalFile().getAbsolutePath();
     }
 
     private String removePrivatePath(String path)
