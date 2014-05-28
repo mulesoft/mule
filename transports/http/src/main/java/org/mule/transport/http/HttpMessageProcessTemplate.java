@@ -27,8 +27,6 @@ import org.mule.execution.ThrottlingPhaseTemplate;
 import org.mule.transport.AbstractTransportMessageProcessTemplate;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.i18n.HttpMessages;
-import org.mule.util.ArrayUtils;
-import org.mule.util.StringUtils;
 import org.mule.util.concurrent.Latch;
 
 import java.io.IOException;
@@ -316,47 +314,8 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
                             processRelativePath(contextPath, path),
                             PropertyScope.INBOUND);
 
-        processRemoteAddresses(muleMessage);
+        muleMessage.setProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS, httpServerConnection.getRemoteClientAddress(), PropertyScope.INBOUND);
         return muleMessage;
-    }
-
-    /**
-     *  For a given MuleMessage will set the <code>MULE_REMOTE_CLIENT_ADDRESS</code> property taking into consideration
-     * if the header <code>X-Forwarded-For</code> is present in the request or not. In case it is, this method will
-     * also set the <code>MULE_PROXY_ADDRESS</code> property. If a proxy address is not passed in
-     * <code>X-Forwarded-For</code>, the connection address will be set as <code>MULE_PROXY_ADDRESS</code>.
-     *
-     * @param muleMessage MuleMessage to be enriched
-     * @see <a href="https://en.wikipedia.org/wiki/X-Forwarded-For">https://en.wikipedia.org/wiki/X-Forwarded-For</a>
-     */
-    protected void processRemoteAddresses(MuleMessage muleMessage)
-    {
-        String xForwardedFor = muleMessage.getInboundProperty(HttpConstants.HEADER_X_FORWARDED_FOR);
-
-        if (StringUtils.isEmpty(xForwardedFor))
-        {
-            muleMessage.setProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS,
-                    httpServerConnection.getRemoteClientAddress(), PropertyScope.INBOUND);
-            return;
-        }
-
-        String[] xForwardedForItems = StringUtils.splitAndTrim(xForwardedFor, ",");
-        if (!ArrayUtils.isEmpty(xForwardedForItems))
-        {
-            muleMessage.setProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS,
-                    xForwardedForItems[0], PropertyScope.INBOUND);
-            if (xForwardedForItems.length > 1)
-            {
-                muleMessage.setProperty(MuleProperties.MULE_PROXY_ADDRESS,
-                        xForwardedForItems[xForwardedForItems.length-1], PropertyScope.INBOUND);
-            }
-            else
-            {
-                // If only one address has been passed, we can assume the connection address is a proxy
-                muleMessage.setProperty(MuleProperties.MULE_PROXY_ADDRESS,
-                        httpServerConnection.getRemoteClientAddress(), PropertyScope.INBOUND);
-            }
-        }
     }
 
     protected String processRelativePath(String contextPath, String path)
