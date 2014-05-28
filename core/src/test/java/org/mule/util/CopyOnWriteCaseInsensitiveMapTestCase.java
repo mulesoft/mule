@@ -6,16 +6,20 @@
  */
 package org.mule.util;
 
+import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 import org.apache.commons.lang.SerializationUtils;
 import org.junit.Test;
@@ -24,6 +28,9 @@ import org.junit.Test;
 @SmallTest
 public class CopyOnWriteCaseInsensitiveMapTestCase extends AbstractMuleTestCase
 {
+
+    private static final String KEY1 = "FOO";
+    private static final String KEY2 = "doo";
 
     @Test
     public void caseInsensitive() throws Exception
@@ -102,8 +109,8 @@ public class CopyOnWriteCaseInsensitiveMapTestCase extends AbstractMuleTestCase
     protected CopyOnWriteCaseInsensitiveMap<String, Object> createTestMap()
     {
         CopyOnWriteCaseInsensitiveMap<String, Object> map = new CopyOnWriteCaseInsensitiveMap<String, Object>();
-        map.put("FOO", "BAR");
-        map.put("doo", Integer.valueOf(3));
+        map.put(KEY1, "BAR");
+        map.put(KEY2, Integer.valueOf(3));
         return map;
     }
 
@@ -412,4 +419,60 @@ public class CopyOnWriteCaseInsensitiveMapTestCase extends AbstractMuleTestCase
         assertEquals(0, copyOnWriteMap.entrySet().size());
     }
 
+    @Test
+    public void keySetGivesAllKeys() throws Exception
+    {
+        CopyOnWriteCaseInsensitiveMap<String, Object> map = createTestMap();
+        Set<String> foundKeys = new HashSet<String>();
+        for (String key : map.keySet())
+        {
+            assertTrue(KEY1.equals(key) || KEY2.equals(key));
+            assertFalse(foundKeys.contains(key));
+            foundKeys.add(key);
+        }
+    }
+
+    @Test
+    public void removeKeySetItem() throws Exception
+    {
+        CopyOnWriteCaseInsensitiveMap<String, Object> map = createTestMap();
+        Iterator<String> it = map.keySet().iterator();
+
+        assertTrue(it.hasNext());
+        String key = it.next();
+        it.remove();
+
+        assertFalse(map.keySet().contains(key));
+        it = map.keySet().iterator();
+        assertTrue(it.hasNext());
+        String key2 = it.next();
+        assertFalse(key.equals(key2));
+        assertFalse(it.hasNext());
+        it.remove();
+        assertFalse(it.hasNext());
+
+        assertTrue(map.keySet().isEmpty());
+        it = map.keySet().iterator();
+        assertFalse(it.hasNext());
+
+        try
+        {
+            it.next();
+            fail("Was expecting NoSuchElementException");
+        }
+        catch (NoSuchElementException e)
+        {
+            // happyness
+        }
+    }
+
+    @Test(expected = NoSuchElementException.class)
+    public void emptyMapKeySetIterator() throws Exception
+    {
+        Map<String, String> map = new CopyOnWriteCaseInsensitiveMap<String, String>();
+        assertTrue(map.keySet().isEmpty());
+        Iterator<String> iterator = map.keySet().iterator();
+        assertFalse(iterator.hasNext());
+        iterator.next();
+    }
 }

@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
@@ -162,7 +163,7 @@ public class CopyOnWriteCaseInsensitiveMap<K, V> implements Map<K, V>, Serializa
 
     private final class KeyIterator implements Iterator<K>
     {
-        private int current;
+        private int current = -1;
         private K[] keyArray;
 
         @SuppressWarnings("unchecked")
@@ -173,12 +174,19 @@ public class CopyOnWriteCaseInsensitiveMap<K, V> implements Map<K, V>, Serializa
 
         public boolean hasNext()
         {
-            return current < keyArray.length;
+            return current < keyArray.length -1;
         }
 
         public K next()
         {
-            return keyArray[current++];
+            try
+            {
+                return keyArray[++current];
+            }
+            catch (ArrayIndexOutOfBoundsException e)
+            {
+                throw new NoSuchElementException();
+            }
         }
 
         public void remove()
