@@ -6,16 +6,22 @@
  */
 package org.mule.util;
 
+import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 import org.apache.commons.lang.SerializationUtils;
 import org.junit.Test;
@@ -24,6 +30,9 @@ import org.junit.Test;
 @SmallTest
 public class CopyOnWriteCaseInsensitiveMapTestCase extends AbstractMuleTestCase
 {
+
+    private static final String KEY1 = "FOO";
+    private static final String KEY2 = "doo";
 
     @Test
     public void caseInsensitive() throws Exception
@@ -102,8 +111,8 @@ public class CopyOnWriteCaseInsensitiveMapTestCase extends AbstractMuleTestCase
     protected CopyOnWriteCaseInsensitiveMap<String, Object> createTestMap()
     {
         CopyOnWriteCaseInsensitiveMap<String, Object> map = new CopyOnWriteCaseInsensitiveMap<String, Object>();
-        map.put("FOO", "BAR");
-        map.put("doo", Integer.valueOf(3));
+        map.put(KEY1, "BAR");
+        map.put(KEY2, Integer.valueOf(3));
         return map;
     }
 
@@ -114,7 +123,7 @@ public class CopyOnWriteCaseInsensitiveMapTestCase extends AbstractMuleTestCase
         assertEquals(2, original.size());
         original.keySet().remove("FOO");
         assertEquals(1, original.size());
-        original.keySet().clear();;
+        original.keySet().clear();
         assertEquals(0, original.size());
     }
 
@@ -131,7 +140,7 @@ public class CopyOnWriteCaseInsensitiveMapTestCase extends AbstractMuleTestCase
         assertEquals(1, original.size());
         assertEquals(2, copyOnWriteMap.size());
 
-        original.keySet().clear();;
+        original.keySet().clear();
         assertEquals(0, original.size());
         assertEquals(2, copyOnWriteMap.size());
     }
@@ -149,7 +158,7 @@ public class CopyOnWriteCaseInsensitiveMapTestCase extends AbstractMuleTestCase
         assertEquals(2, original.size());
         assertEquals(1, copyOnWriteMap.size());
 
-        copyOnWriteMap.keySet().clear();;
+        copyOnWriteMap.keySet().clear();
         assertEquals(2, original.size());
         assertEquals(0, copyOnWriteMap.size());
     }
@@ -278,7 +287,7 @@ public class CopyOnWriteCaseInsensitiveMapTestCase extends AbstractMuleTestCase
         assertEquals(1, original.size());
         assertEquals(2, copyOnWriteMap.size());
 
-        original.keySet().clear();;
+        original.keySet().clear();
         assertEquals(0, original.size());
         assertEquals(2, copyOnWriteMap.size());
     }
@@ -296,7 +305,7 @@ public class CopyOnWriteCaseInsensitiveMapTestCase extends AbstractMuleTestCase
         assertEquals(2, original.size());
         assertEquals(1, copyOnWriteMap.size());
 
-        copyOnWriteMap.keySet().clear();;
+        copyOnWriteMap.keySet().clear();
         assertEquals(2, original.size());
         assertEquals(0, copyOnWriteMap.size());
     }
@@ -412,4 +421,101 @@ public class CopyOnWriteCaseInsensitiveMapTestCase extends AbstractMuleTestCase
         assertEquals(0, copyOnWriteMap.entrySet().size());
     }
 
+    @Test
+    public void keySetGivesAllKeys() throws Exception
+    {
+        CopyOnWriteCaseInsensitiveMap<String, Object> map = createTestMap();
+        Set<String> foundKeys = new HashSet<String>();
+        for (String key : map.keySet())
+        {
+            assertTrue(KEY1.equals(key) || KEY2.equals(key));
+            assertFalse(foundKeys.contains(key));
+            foundKeys.add(key);
+        }
+    }
+
+    @Test
+    public void removeKeySetItem() throws Exception
+    {
+        CopyOnWriteCaseInsensitiveMap<String, Object> map = createTestMap();
+        Iterator<String> it = map.keySet().iterator();
+
+        assertTrue(it.hasNext());
+        String key = it.next();
+        it.remove();
+
+        assertFalse(map.keySet().contains(key));
+        it = map.keySet().iterator();
+        assertTrue(it.hasNext());
+        String key2 = it.next();
+        assertFalse(key.equals(key2));
+        assertFalse(it.hasNext());
+        it.remove();
+        assertFalse(it.hasNext());
+
+        assertTrue(map.keySet().isEmpty());
+        it = map.keySet().iterator();
+        assertFalse(it.hasNext());
+
+        try
+        {
+            it.next();
+            fail("Was expecting NoSuchElementException");
+        }
+        catch (NoSuchElementException e)
+        {
+            // happyness
+        }
+    }
+
+    @Test(expected = NoSuchElementException.class)
+    public void emptyMapKeySetIterator() throws Exception
+    {
+        Map<String, String> map = new CopyOnWriteCaseInsensitiveMap<String, String>();
+        assertTrue(map.keySet().isEmpty());
+        Iterator<String> iterator = map.keySet().iterator();
+        assertFalse(iterator.hasNext());
+        iterator.next();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void removeInKeySetIteratorBeforeAnyNext() throws Exception
+    {
+        createTestMap().keySet().iterator().remove();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void keySetIteratorWithTwoRemovesInTheSameNext() throws Exception
+    {
+        Iterator<String> iterator = createTestMap().keySet().iterator();
+        iterator.next();
+        iterator.remove();
+        iterator.remove();
+    }
+
+    @Test
+    public void removeShouldNotMoveForward() throws Exception
+    {
+        CopyOnWriteCaseInsensitiveMap<String, Object> map = createTestMap();
+
+        //add a third element to spice things up
+        final String EXTRA_KEY = "THIRD";
+        map.put(EXTRA_KEY, new Object());
+
+        // store iteration order
+        List<String> keys = new ArrayList<String>();
+        for (String key : map.keySet())
+        {
+            keys.add(key);
+        }
+
+        //now remove second element and make sure that the next element is the third
+        Iterator<String> iterator = map.keySet().iterator();
+        iterator.next();
+        iterator.next();
+        iterator.remove();
+        String key = iterator.next();
+        assertEquals(keys.get(2), key);
+        assertFalse(iterator.hasNext());
+    }
 }
