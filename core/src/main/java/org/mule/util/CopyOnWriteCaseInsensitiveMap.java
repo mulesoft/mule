@@ -13,7 +13,10 @@ import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
@@ -162,28 +165,46 @@ public class CopyOnWriteCaseInsensitiveMap<K, V> implements Map<K, V>, Serializa
 
     private final class KeyIterator implements Iterator<K>
     {
-        private int current;
-        private K[] keyArray;
+        private int current = -1;
+        private int lastRemovalIndex = current;
+        private List<K> keys;
 
         @SuppressWarnings("unchecked")
         public KeyIterator()
         {
-            keyArray = (K[]) core.keySet().toArray();
+            keys = new LinkedList<K>(core.keySet());
         }
 
         public boolean hasNext()
         {
-            return current < keyArray.length;
+            return current < keys.size() -1;
         }
 
         public K next()
         {
-            return keyArray[current++];
+            try
+            {
+                return keys.get(++current);
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                throw new NoSuchElementException();
+            }
         }
 
         public void remove()
         {
-            CopyOnWriteCaseInsensitiveMap.this.remove(keyArray[current]);
+            if (current == -1) {
+                throw new IllegalStateException("Cannot remove element before first invoking next()");
+            }
+
+            if (current == lastRemovalIndex) {
+                throw new IllegalStateException("Remove can only be called once per call to next()");
+            }
+
+            CopyOnWriteCaseInsensitiveMap.this.remove(keys.get(current));
+            keys.remove(current);
+            lastRemovalIndex = current;
         }
     }
 
