@@ -11,7 +11,7 @@ import org.mule.extensions.api.exception.NoSuchOperationException;
 
 import java.util.List;
 
-public interface MuleExtension extends Described
+public interface MuleExtension extends Described, Capable
 {
 
     String getVersion();

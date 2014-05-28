@@ -9,9 +9,12 @@ package org.mule.extensions.internal;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertSame;
+import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import org.mule.extensions.api.exception.NoSuchConfigurationException;
 import org.mule.extensions.api.exception.NoSuchOperationException;
+import org.mule.extensions.introspection.api.Capability;
 import org.mule.extensions.introspection.api.MuleExtension;
 import org.mule.extensions.introspection.api.MuleExtensionBuilder;
 import org.mule.extensions.introspection.api.MuleExtensionConfiguration;
@@ -19,6 +22,8 @@ import org.mule.extensions.introspection.api.MuleExtensionOperation;
 import org.mule.extensions.introspection.api.MuleExtensionParameter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import com.google.common.base.Optional;
 
 import java.util.List;
 
@@ -56,6 +61,7 @@ public class WSConsumerDeclarationTestCase extends AbstractMuleTestCase
         extension = builder.setName(WS_CONSUMER)
                 .setDescription(GENERIC_CONSUMER_FOR_SOAP_WEB_SERVICES)
                 .setVersion(VERSION)
+                .addCapablity(new TestCapability())
                 .addConfiguration(
                         builder.newConfiguration()
                                 .addParameter(builder.newParameter()
@@ -113,6 +119,10 @@ public class WSConsumerDeclarationTestCase extends AbstractMuleTestCase
         assertEquals(GENERIC_CONSUMER_FOR_SOAP_WEB_SERVICES, extension.getDescription());
         assertEquals(VERSION, extension.getVersion());
         assertEquals(1, extension.getConfigurations().size());
+
+        Optional<TestCapability> capability = extension.getCapability(TestCapability.class);
+        assertTrue(capability.isPresent());
+        assertTrue(capability.get() instanceof TestCapability);
     }
 
     @Test
@@ -148,6 +158,13 @@ public class WSConsumerDeclarationTestCase extends AbstractMuleTestCase
     public void noSuchOperation() throws Exception
     {
         extension.getOperation("fake");
+    }
+
+    @Test
+    public void noSuchCapability()
+    {
+        Optional<Capability> capability = extension.getCapability(Capability.class);
+        assertFalse(capability.isPresent());
     }
 
     @Test
@@ -200,4 +217,21 @@ public class WSConsumerDeclarationTestCase extends AbstractMuleTestCase
         assertEquals(1, types.size());
         assertEquals(expected, types.get(0));
     }
+
+    private class TestCapability implements Capability
+    {
+
+        @Override
+        public String getName()
+        {
+            return "test";
+        }
+
+        @Override
+        public String getDescription()
+        {
+            return "test capability";
+        }
+    }
+
 }

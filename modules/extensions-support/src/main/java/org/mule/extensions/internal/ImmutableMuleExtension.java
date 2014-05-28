@@ -9,18 +9,23 @@ package org.mule.extensions.internal;
 import static org.mule.extensions.internal.MuleExtensionUtils.checkNullOrRepeatedNames;
 import org.mule.extensions.api.exception.NoSuchConfigurationException;
 import org.mule.extensions.api.exception.NoSuchOperationException;
+import org.mule.extensions.introspection.api.Capability;
 import org.mule.extensions.introspection.api.Described;
 import org.mule.extensions.introspection.api.MuleExtension;
 import org.mule.extensions.introspection.api.MuleExtensionConfiguration;
 import org.mule.extensions.introspection.api.MuleExtensionOperation;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 final class ImmutableMuleExtension extends AbstractImmutableDescribed implements MuleExtension
 {
@@ -28,8 +33,14 @@ final class ImmutableMuleExtension extends AbstractImmutableDescribed implements
     private final String version;
     private final Map<String, MuleExtensionConfiguration> configurations;
     private final Map<String, MuleExtensionOperation> operations;
+    private Map<Class<? extends Capability>, Capability> capabilities;
 
-    protected ImmutableMuleExtension(String name, String description, String version, List<MuleExtensionConfiguration> configurations, List<MuleExtensionOperation> operations)
+    protected ImmutableMuleExtension(String name,
+                                     String description,
+                                     String version,
+                                     List<MuleExtensionConfiguration> configurations,
+                                     List<MuleExtensionOperation> operations,
+                                     Set<Capability> capabilities)
     {
         super(name, description);
 
@@ -39,6 +50,7 @@ final class ImmutableMuleExtension extends AbstractImmutableDescribed implements
         this.version = version;
         this.configurations = toMap(configurations);
         this.operations = toMap(operations);
+        this.capabilities = toCapabilitiesMap(capabilities);
     }
 
     private <T extends Described> Map<String, T> toMap(List<T> objects)
@@ -47,6 +59,20 @@ final class ImmutableMuleExtension extends AbstractImmutableDescribed implements
         for (T object : objects)
         {
             map.put(object.getName(), object);
+        }
+
+        return ImmutableMap.copyOf(map);
+    }
+
+    private Map<Class<? extends Capability>, Capability> toCapabilitiesMap(Collection<Capability> capabilities)
+    {
+        Map<Class<? extends Capability>, Capability> map = new HashMap<Class<? extends Capability>, Capability>();
+        if (capabilities != null)
+        {
+            for (Capability capability : capabilities)
+            {
+                map.put(capability.getClass(), capability);
+            }
         }
 
         return ImmutableMap.copyOf(map);
@@ -92,6 +118,12 @@ final class ImmutableMuleExtension extends AbstractImmutableDescribed implements
         }
 
         return muleExtensionOperation;
+    }
+
+    @Override
+    public <T extends Capability> Optional<T> getCapability(Class<T> capabilityType)
+    {
+        return (Optional<T>) Optional.fromNullable(capabilities.get(capabilityType));
     }
 
     @Override

@@ -19,6 +19,8 @@ public interface MuleExtensionBuilder extends Builder<MuleExtension>
 
     MuleExtensionBuilder addOperation(MuleExtensionOperationBuilder operation);
 
+    MuleExtensionBuilder addCapablity(Capability capability);
+
     MuleExtensionConfigurationBuilder newConfiguration();
 
     MuleExtensionOperationBuilder newOperation();

@@ -8,7 +8,6 @@ package org.mule.extensions.internal;
 
 import org.mule.extensions.introspection.api.MuleExtensionParameter;
 import org.mule.extensions.introspection.api.MuleExtensionParameterBuilder;
-import org.mule.util.Preconditions;
 
 final class DefaultMuleExtensionParameterBuilder implements MuleExtensionParameterBuilder
 {
@@ -69,7 +68,11 @@ final class DefaultMuleExtensionParameterBuilder implements MuleExtensionParamet
     @Override
     public MuleExtensionParameter build()
     {
-        Preconditions.checkState(required && defaultValue != null, "If a parameter is required then it cannot have a default value");
+        if (required && defaultValue != null)
+        {
+            throw new IllegalStateException("If a parameter is required then it cannot have a default value");
+        }
+
         return new ImmutableMuleExtensionParameter(name, description, type, required, acceptsExpressions, defaultValue);
     }
 }

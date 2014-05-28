@@ -6,14 +6,18 @@
  */
 package org.mule.extensions.internal;
 
+import static org.mule.util.Preconditions.checkArgument;
+import org.mule.extensions.introspection.api.Capability;
 import org.mule.extensions.introspection.api.MuleExtension;
 import org.mule.extensions.introspection.api.MuleExtensionBuilder;
 import org.mule.extensions.introspection.api.MuleExtensionConfigurationBuilder;
 import org.mule.extensions.introspection.api.MuleExtensionOperationBuilder;
 import org.mule.extensions.introspection.api.MuleExtensionParameterBuilder;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public final class DefaultMuleExtensionBuilder implements MuleExtensionBuilder
 {
@@ -23,6 +27,7 @@ public final class DefaultMuleExtensionBuilder implements MuleExtensionBuilder
     private String version;
     private List<MuleExtensionConfigurationBuilder> configurations = new LinkedList<MuleExtensionConfigurationBuilder>();
     private List<MuleExtensionOperationBuilder> operations = new LinkedList<MuleExtensionOperationBuilder>();
+    private Set<Capability> capabilities = new HashSet<Capability>();
 
     public static MuleExtensionBuilder newBuilder()
     {
@@ -57,14 +62,27 @@ public final class DefaultMuleExtensionBuilder implements MuleExtensionBuilder
     @Override
     public MuleExtensionBuilder addConfiguration(MuleExtensionConfigurationBuilder configuration)
     {
+        checkArgument(configuration != null, "cannot add a null configuration builder");
         configurations.add(configuration);
+
         return this;
     }
 
     @Override
     public MuleExtensionBuilder addOperation(MuleExtensionOperationBuilder operation)
     {
+        checkArgument(operation != null, "Cannot add a null operation builder");
         operations.add(operation);
+
+        return this;
+    }
+
+    @Override
+    public MuleExtensionBuilder addCapablity(Capability capability)
+    {
+        checkArgument(capability != null, "Cannot add a null capability");
+        capabilities.add(capability);
+
         return this;
     }
 
@@ -75,7 +93,8 @@ public final class DefaultMuleExtensionBuilder implements MuleExtensionBuilder
                                           description,
                                           version,
                                           MuleExtensionUtils.build(configurations),
-                                          MuleExtensionUtils.build(operations));
+                                          MuleExtensionUtils.build(operations),
+                                          capabilities);
     }
 
     @Override
