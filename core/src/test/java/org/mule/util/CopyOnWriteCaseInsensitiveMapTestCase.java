@@ -14,9 +14,11 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -121,7 +123,8 @@ public class CopyOnWriteCaseInsensitiveMapTestCase extends AbstractMuleTestCase
         assertEquals(2, original.size());
         original.keySet().remove("FOO");
         assertEquals(1, original.size());
-        original.keySet().clear();;
+        original.keySet().clear();
+        ;
         assertEquals(0, original.size());
     }
 
@@ -138,7 +141,8 @@ public class CopyOnWriteCaseInsensitiveMapTestCase extends AbstractMuleTestCase
         assertEquals(1, original.size());
         assertEquals(2, copyOnWriteMap.size());
 
-        original.keySet().clear();;
+        original.keySet().clear();
+        ;
         assertEquals(0, original.size());
         assertEquals(2, copyOnWriteMap.size());
     }
@@ -156,7 +160,8 @@ public class CopyOnWriteCaseInsensitiveMapTestCase extends AbstractMuleTestCase
         assertEquals(2, original.size());
         assertEquals(1, copyOnWriteMap.size());
 
-        copyOnWriteMap.keySet().clear();;
+        copyOnWriteMap.keySet().clear();
+        ;
         assertEquals(2, original.size());
         assertEquals(0, copyOnWriteMap.size());
     }
@@ -285,7 +290,8 @@ public class CopyOnWriteCaseInsensitiveMapTestCase extends AbstractMuleTestCase
         assertEquals(1, original.size());
         assertEquals(2, copyOnWriteMap.size());
 
-        original.keySet().clear();;
+        original.keySet().clear();
+        ;
         assertEquals(0, original.size());
         assertEquals(2, copyOnWriteMap.size());
     }
@@ -303,7 +309,8 @@ public class CopyOnWriteCaseInsensitiveMapTestCase extends AbstractMuleTestCase
         assertEquals(2, original.size());
         assertEquals(1, copyOnWriteMap.size());
 
-        copyOnWriteMap.keySet().clear();;
+        copyOnWriteMap.keySet().clear();
+        ;
         assertEquals(2, original.size());
         assertEquals(0, copyOnWriteMap.size());
     }
@@ -474,5 +481,44 @@ public class CopyOnWriteCaseInsensitiveMapTestCase extends AbstractMuleTestCase
         Iterator<String> iterator = map.keySet().iterator();
         assertFalse(iterator.hasNext());
         iterator.next();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void removeInKeySetIteratorBeforeAnyNext() throws Exception
+    {
+        createTestMap().keySet().iterator().remove();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void keySetIteratorWithTwoRemovesInTheSameNext() throws Exception
+    {
+        Iterator<String> iterator = createTestMap().keySet().iterator();
+        iterator.next();
+        iterator.remove();
+        iterator.remove();
+    }
+
+    @Test
+    public void removeShouldNotMoveForward() throws Exception
+    {
+        CopyOnWriteCaseInsensitiveMap<String, Object> map = createTestMap();
+
+        //add a third element to spice things up
+        final String EXTRA_KEY = "THIRD";
+        map.put(EXTRA_KEY, new Object());
+
+        // store iteration order
+        List<String> keys = new ArrayList<String>();
+        for (String key : map.keySet())
+        {
+            keys.add(key);
+        }
+
+        //now remove second element and make sure that the next element is the third
+        Iterator<String> iterator = map.keySet().iterator();
+        iterator.next();
+        iterator.remove();
+        String key = iterator.next();
+        assertEquals(keys.get(2), key);
     }
 }
