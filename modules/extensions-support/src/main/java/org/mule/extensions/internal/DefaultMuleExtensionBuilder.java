@@ -14,10 +14,10 @@ import org.mule.extensions.introspection.api.MuleExtensionConfigurationBuilder;
 import org.mule.extensions.introspection.api.MuleExtensionOperationBuilder;
 import org.mule.extensions.introspection.api.MuleExtensionParameterBuilder;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 public final class DefaultMuleExtensionBuilder implements MuleExtensionBuilder
 {
@@ -27,7 +27,7 @@ public final class DefaultMuleExtensionBuilder implements MuleExtensionBuilder
     private String version;
     private List<MuleExtensionConfigurationBuilder> configurations = new LinkedList<MuleExtensionConfigurationBuilder>();
     private List<MuleExtensionOperationBuilder> operations = new LinkedList<MuleExtensionOperationBuilder>();
-    private Set<Capability> capabilities = new HashSet<Capability>();
+    private Map<Class<? extends Capability>, Capability> capabilities = new HashMap<Class<? extends Capability>, Capability>();
 
     public static MuleExtensionBuilder newBuilder()
     {
@@ -78,11 +78,12 @@ public final class DefaultMuleExtensionBuilder implements MuleExtensionBuilder
     }
 
     @Override
-    public MuleExtensionBuilder addCapablity(Capability capability)
+    public <T extends Capability, C extends T> MuleExtensionBuilder addCapablity(Class<T> capabilityType, C capability)
     {
-        checkArgument(capability != null, "Cannot add a null capability");
-        capabilities.add(capability);
+        checkArgument(capabilityType != null, "capabilityType cannot be null");
+        checkArgument(capability != null, "capability cannot be null");
 
+        capabilities.put(capabilityType, capability);
         return this;
     }
 

@@ -6,19 +6,7 @@
  */
 package org.mule.extensions.introspection.api;
 
-public interface MuleExtensionParameter extends Described
+public interface Capability extends Described
 {
 
-    Class<?> getType();
-
-    boolean isRequired();
-
-    boolean isDynamic();
-
-    /**
-     * Might be an expression is {@link #isDynamic()}  is {@code true}
-     * That's why this interface is not typed
-     * @return
-     */
-    Object getDefaultValue();
 }

@@ -61,7 +61,7 @@ public class WSConsumerDeclarationTestCase extends AbstractMuleTestCase
         extension = builder.setName(WS_CONSUMER)
                 .setDescription(GENERIC_CONSUMER_FOR_SOAP_WEB_SERVICES)
                 .setVersion(VERSION)
-                .addCapablity(new TestCapability())
+                .addCapablity(TestCapability.class, new TestCapability())
                 .addConfiguration(
                         builder.newConfiguration()
                                 .addParameter(builder.newParameter()
@@ -167,6 +167,20 @@ public class WSConsumerDeclarationTestCase extends AbstractMuleTestCase
         assertFalse(capability.isPresent());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void nullCapabilityType()
+    {
+        MuleExtensionBuilder builder = DefaultMuleExtensionBuilder.newBuilder();
+        builder.addCapablity(null, new TestCapability());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nullCapability()
+    {
+        MuleExtensionBuilder builder = DefaultMuleExtensionBuilder.newBuilder();
+        builder.addCapablity(TestCapability.class, null);
+    }
+
     @Test
     public void operations() throws Exception
     {
@@ -198,7 +212,7 @@ public class WSConsumerDeclarationTestCase extends AbstractMuleTestCase
         assertNotNull(parameter);
         assertEquals(name, parameter.getName());
         assertEquals(description, parameter.getDescription());
-        assertEquals(acceptsExpressions, parameter.isAcceptingExpressions());
+        assertEquals(acceptsExpressions, parameter.isDynamic());
         assertEquals(required, parameter.isRequired());
         assertEquals(type, parameter.getType());
 

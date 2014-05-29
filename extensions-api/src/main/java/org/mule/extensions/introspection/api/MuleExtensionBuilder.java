@@ -19,7 +19,7 @@ public interface MuleExtensionBuilder extends Builder<MuleExtension>
 
     MuleExtensionBuilder addOperation(MuleExtensionOperationBuilder operation);
 
-    MuleExtensionBuilder addCapablity(Capability capability);
+    <T extends Capability, C extends T> MuleExtensionBuilder addCapablity(Class<T> capabilityType, C capability);
 
     MuleExtensionConfigurationBuilder newConfiguration();
 

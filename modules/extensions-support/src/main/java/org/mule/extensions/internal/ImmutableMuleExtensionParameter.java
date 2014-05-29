@@ -48,7 +48,7 @@ final class ImmutableMuleExtensionParameter extends AbstractImmutableDescribed i
     }
 
     @Override
-    public boolean isAcceptingExpressions()
+    public boolean isDynamic()
     {
         return acceptingExpressions;
     }

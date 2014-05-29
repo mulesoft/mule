@@ -20,12 +20,9 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 final class ImmutableMuleExtension extends AbstractImmutableDescribed implements MuleExtension
 {
@@ -40,7 +37,7 @@ final class ImmutableMuleExtension extends AbstractImmutableDescribed implements
                                      String version,
                                      List<MuleExtensionConfiguration> configurations,
                                      List<MuleExtensionOperation> operations,
-                                     Set<Capability> capabilities)
+                                     Map<Class<? extends Capability>, Capability> capabilities)
     {
         super(name, description);
 
@@ -50,7 +47,7 @@ final class ImmutableMuleExtension extends AbstractImmutableDescribed implements
         this.version = version;
         this.configurations = toMap(configurations);
         this.operations = toMap(operations);
-        this.capabilities = toCapabilitiesMap(capabilities);
+        this.capabilities = ImmutableMap.copyOf(capabilities);
     }
 
     private <T extends Described> Map<String, T> toMap(List<T> objects)
@@ -59,20 +56,6 @@ final class ImmutableMuleExtension extends AbstractImmutableDescribed implements
         for (T object : objects)
         {
             map.put(object.getName(), object);
-        }
-
-        return ImmutableMap.copyOf(map);
-    }
-
-    private Map<Class<? extends Capability>, Capability> toCapabilitiesMap(Collection<Capability> capabilities)
-    {
-        Map<Class<? extends Capability>, Capability> map = new HashMap<Class<? extends Capability>, Capability>();
-        if (capabilities != null)
-        {
-            for (Capability capability : capabilities)
-            {
-                map.put(capability.getClass(), capability);
-            }
         }
 
         return ImmutableMap.copyOf(map);
