@@ -15,9 +15,11 @@ public class MuleProcessController
 
     private Controller controller;
 
+    private static final int DEFAULT_TIMEOUT = 60000;
+
     public MuleProcessController(String muleHome)
     {
-        this(muleHome, 0);
+        this(muleHome, DEFAULT_TIMEOUT);
     }
 
     public MuleProcessController(String muleHome, int timeout)
