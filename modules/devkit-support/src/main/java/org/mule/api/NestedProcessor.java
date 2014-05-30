@@ -6,45 +6,12 @@
  */
 package org.mule.api;
 
-import java.util.Map;
-
 /**
- * Callback interface used by message processors methods. <p/>
- * The method parameters of type {@link NestedProcessor} will be able to receive other
- * message processors.
+ * Deprecated since Mule 3.6.0. Use {@link org.mule.extensions.spi.NestedProcessor}
+ * instead. This interface will be removed in Mule 4.
  */
-public interface NestedProcessor
+@Deprecated
+public interface NestedProcessor extends org.mule.extensions.spi.NestedProcessor
 {
 
-    /**
-     * Dispatch original message to the processor chain
-     *
-     * @param invocationProperties Additional invocation properties
-     * @return The return payload for the processor chain
-     */
-    Object processWithExtraProperties(Map<String, Object> invocationProperties) throws Exception;
-
-    /**
-     * Dispatch message to the processor chain
-     *
-     * @param payload              The payload of the message
-     * @param invocationProperties Additional invocation properties
-     * @return The return payload for the processor chain
-     */
-    Object process(Object payload, Map<String, Object> invocationProperties) throws Exception;
-
-    /**
-     * Dispatch message to the processor chain
-     *
-     * @param payload The payload of the message
-     * @return The return payload for the processor chain
-     */
-    Object process(Object payload) throws Exception;
-
-    /**
-     * Dispatch original message to the processor chain
-     *
-     * @return The return payload for the processor chain
-     */
-    Object process() throws Exception;
 }

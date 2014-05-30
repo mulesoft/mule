@@ -7,70 +7,16 @@
 package org.mule.extensions.internal;
 
 import org.mule.extensions.introspection.api.MuleExtensionOperation;
-import org.mule.extensions.introspection.api.MuleExtensionOperationBuilder;
-import org.mule.extensions.introspection.api.MuleExtensionParameterBuilder;
+import org.mule.extensions.introspection.spi.MuleExtensionOperationBuilder;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-final class DefaultMuleExtensionOperationBuilder implements MuleExtensionOperationBuilder
+final class DefaultMuleExtensionOperationBuilder extends
+        AbstractMuleExtensionOperationBuilder<MuleExtensionOperation, MuleExtensionOperationBuilder>
+        implements MuleExtensionOperationBuilder
 {
-
-    private String name;
-    private String description;
-    private List<Class<?>> inputTypes = new LinkedList<Class<?>>();
-    private List<Class<?>> outputTypes = new LinkedList<Class<?>>();
-    private List<MuleExtensionParameterBuilder> parameters = new LinkedList<MuleExtensionParameterBuilder>();
-    private Set<String> ownerConfigurations = new HashSet<String>();
 
 
     DefaultMuleExtensionOperationBuilder()
     {
-    }
-
-    @Override
-    public MuleExtensionOperationBuilder setName(String name)
-    {
-        this.name = name;
-        return this;
-    }
-
-    @Override
-    public MuleExtensionOperationBuilder setDescription(String description)
-    {
-        this.description = description;
-        return this;
-    }
-
-    @Override
-    public MuleExtensionOperationBuilder setInputTypes(Class<?>... inputTypes)
-    {
-        addAll(this.inputTypes, inputTypes);
-        return this;
-    }
-
-    @Override
-    public MuleExtensionOperationBuilder setOutputTypes(Class<?>... outputTypes)
-    {
-        addAll(this.outputTypes, outputTypes);
-        return this;
-    }
-
-    @Override
-    public MuleExtensionOperationBuilder addOwnerConfiguration(String name)
-    {
-        ownerConfigurations.add(name);
-        return this;
-    }
-
-    @Override
-    public MuleExtensionOperationBuilder addParameter(MuleExtensionParameterBuilder parameter)
-    {
-        parameters.add(parameter);
-        return this;
     }
 
     @Override
@@ -84,11 +30,9 @@ final class DefaultMuleExtensionOperationBuilder implements MuleExtensionOperati
                                                    MuleExtensionUtils.build(parameters));
     }
 
-    private <T> void addAll(List<T> list, T[] elements)
+    @Override
+    protected MuleExtensionOperationBuilder chain()
     {
-        if (elements != null)
-        {
-            list.addAll(Arrays.asList(elements));
-        }
+        return this;
     }
 }

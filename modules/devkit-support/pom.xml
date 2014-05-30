@@ -39,6 +39,16 @@
 			<artifactId>mule-module-spring-config</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-extensions-api</artifactId>
+            <version>${muleExtensionsApiVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-extensions-support</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>oauth.signpost</groupId>
 			<artifactId>signpost-core</artifactId>

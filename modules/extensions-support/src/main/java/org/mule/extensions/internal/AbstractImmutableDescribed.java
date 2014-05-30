@@ -20,7 +20,6 @@ abstract class AbstractImmutableDescribed implements Described
     protected AbstractImmutableDescribed(String name, String description)
     {
         Preconditions.checkArgument(!StringUtils.isBlank(name), "Name attribute cannot be null or blank");
-        Preconditions.checkArgument(!StringUtils.isBlank(description), "Description attribute cannot be null or blank");
 
         this.name = name;
         this.description = description;

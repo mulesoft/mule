@@ -4,7 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extensions.introspection.api;
+package org.mule.extensions.introspection.spi;
+
+import org.mule.extensions.introspection.api.MuleExtensionConfiguration;
 
 public interface MuleExtensionConfigurationBuilder extends Builder<MuleExtensionConfiguration>
 {

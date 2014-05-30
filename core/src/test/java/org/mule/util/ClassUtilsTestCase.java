@@ -6,6 +6,13 @@
  */
 package org.mule.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.AbstractFruit;
@@ -16,6 +23,7 @@ import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.WaterMelon;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Arrays;
@@ -24,15 +32,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Ignore;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 @SmallTest
 public class ClassUtilsTestCase extends AbstractMuleTestCase
@@ -277,6 +278,55 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         assertFalse(ClassUtils.compare(c2, c1, true));
     }
 
+    @Test
+    public void testGetFields()
+    {
+        List<Field> fields = ClassUtils.getDeclaredFields(DummyObject.class, false);
+        assertEquals(2, fields.size());
+        assertEquals("foo", fields.get(0).getName());
+        assertEquals("bar", fields.get(1).getName());
+    }
+
+    @Test
+    public void testGetFieldsWithInheritanceOnOrphan() {
+        List<Field> fields = ClassUtils.getDeclaredFields(DummyObject.class, true);
+        assertEquals(2, fields.size());
+        assertEquals("foo", fields.get(0).getName());
+        assertEquals("bar", fields.get(1).getName());
+    }
+
+    @Test
+    public void testGetFieldsWithInheritanceOnChild()
+    {
+        List<Field> fields = ClassUtils.getDeclaredFields(ExtendedDummyObject.class, true);
+        assertEquals(3, fields.size());
+        assertEquals("extended", fields.get(0).getName());
+        assertEquals("foo", fields.get(1).getName());
+        assertEquals("bar", fields.get(2).getName());
+    }
+
+    @Test
+    public void testGetFieldsWithNoResults()
+    {
+        assertTrue(ClassUtils.getDeclaredFields(Object.class, true).isEmpty());
+    }
+
+    @Test
+    public void getMethodsAnnotatedWith()
+    {
+        List<Method> methods = ClassUtils.getMethodsAnnotatedWith(ExtendedDummyObject.class, Ignore.class);
+        assertEquals(2, methods.size());
+        assertEquals("getExtended", methods.get(0).getName());
+        assertEquals("doSomething", methods.get(1).getName());
+    }
+
+    @Test
+    public void getMethodsAnnotedWithNoResults()
+    {
+        assertTrue(ClassUtils.getMethodsAnnotatedWith(DummyObject.class, Test.class).isEmpty());
+    }
+
+
     private void simpleNameHelper(String target, Class clazz)
     {
         assertEquals(target, ClassUtils.getSimpleName(clazz));
@@ -284,6 +334,21 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
 
     private static class DummyObject
     {
+
+        private String foo;
+        private String bar;
+
+        public String getFoo()
+        {
+            return foo;
+        }
+
+        public String getBar()
+        {
+            return bar;
+        }
+
+        @Ignore
         public void doSomething(Object object)
         {
             // do nothing
@@ -292,6 +357,18 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         public Object doSomethingElse(Object object)
         {
             return object;
+        }
+    }
+
+    private static class ExtendedDummyObject extends DummyObject
+    {
+
+        private String extended;
+
+        @Ignore
+        public String getExtended()
+        {
+            return extended;
         }
     }
 

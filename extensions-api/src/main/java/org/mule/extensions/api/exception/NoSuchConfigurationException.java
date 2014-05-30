@@ -8,7 +8,7 @@ package org.mule.extensions.api.exception;
 
 import org.mule.extensions.introspection.api.MuleExtension;
 
-public class NoSuchConfigurationException extends Exception
+public final class NoSuchConfigurationException extends Exception
 {
 
     public NoSuchConfigurationException(MuleExtension muleExtension, String configName) {

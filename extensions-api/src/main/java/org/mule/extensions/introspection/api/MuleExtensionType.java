@@ -6,8 +6,11 @@
  */
 package org.mule.extensions.introspection.api;
 
-public interface Builder<T>
+public abstract class MuleExtensionType
 {
 
-    T build();
+    public static final MuleExtensionType MODULE = new ModuleExtensionType();
+
+    public static final MuleExtensionType CONNECTOR = new ConnectorExtensionType();
+
 }

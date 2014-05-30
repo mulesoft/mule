@@ -4,10 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extensions.introspection.spi;
+package org.mule.extensions.introspection.api;
 
-public interface MuleExtensionDescriber
+class ConnectorExtensionType extends MuleExtensionType
 {
 
-    void describe(MuleExtensionBuilder builder);
+    protected ConnectorExtensionType()
+    {
+    }
 }

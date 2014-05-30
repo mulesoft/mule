@@ -6,8 +6,8 @@
  */
 package org.mule.extensions.introspection.spi;
 
-public interface MuleExtensionDescriber
+public interface Builder<T>
 {
 
-    void describe(MuleExtensionBuilder builder);
+    T build();
 }

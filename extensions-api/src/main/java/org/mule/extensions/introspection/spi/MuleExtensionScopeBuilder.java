@@ -6,8 +6,10 @@
  */
 package org.mule.extensions.introspection.spi;
 
-public interface MuleExtensionDescriber
+import org.mule.extensions.introspection.api.MuleExtensionScope;
+
+public interface MuleExtensionScopeBuilder extends OperationBuilder<MuleExtensionScope, MuleExtensionScopeBuilder>
 {
 
-    void describe(MuleExtensionBuilder builder);
+    MuleExtensionScopeBuilder addOperationGroup(MuleExtensionOperationGroupBuilder group);
 }

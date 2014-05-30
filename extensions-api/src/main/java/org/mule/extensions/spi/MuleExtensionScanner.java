@@ -16,6 +16,6 @@ public interface MuleExtensionScanner
 
     List<MuleExtension> scan();
 
-    int scanAndRegister(MuleExtensionsManager muleExtensionsManager);
+    List<MuleExtension> scanAndRegister(MuleExtensionsManager muleExtensionsManager);
 
 }

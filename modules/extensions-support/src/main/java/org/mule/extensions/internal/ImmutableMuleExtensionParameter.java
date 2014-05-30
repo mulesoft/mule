@@ -14,10 +14,15 @@ final class ImmutableMuleExtensionParameter extends AbstractImmutableDescribed i
 
     private final Class<?> type;
     private final boolean required;
-    private final boolean acceptingExpressions;
+    private final boolean dynamic;
     private final Object defaultValue;
 
-    protected ImmutableMuleExtensionParameter(String name, String description, Class<?> type, boolean required, boolean acceptingExpressions, Object defaultValue)
+    protected ImmutableMuleExtensionParameter(String name,
+                                              String description,
+                                              Class<?> type,
+                                              boolean required,
+                                              boolean dynamic,
+                                              Object defaultValue)
     {
         super(name, description);
 
@@ -31,7 +36,7 @@ final class ImmutableMuleExtensionParameter extends AbstractImmutableDescribed i
 
         this.type = type;
         this.required = required;
-        this.acceptingExpressions = acceptingExpressions;
+        this.dynamic = dynamic;
         this.defaultValue = defaultValue;
     }
 
@@ -50,7 +55,7 @@ final class ImmutableMuleExtensionParameter extends AbstractImmutableDescribed i
     @Override
     public boolean isDynamic()
     {
-        return acceptingExpressions;
+        return dynamic;
     }
 
     @Override

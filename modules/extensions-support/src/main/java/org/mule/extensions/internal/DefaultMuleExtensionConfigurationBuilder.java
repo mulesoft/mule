@@ -9,8 +9,11 @@ package org.mule.extensions.internal;
 import static org.mule.extensions.introspection.api.MuleExtensionConfiguration.DEFAULT_DESCRIPTION;
 import static org.mule.extensions.introspection.api.MuleExtensionConfiguration.DEFAULT_NAME;
 import org.mule.extensions.introspection.api.MuleExtensionConfiguration;
-import org.mule.extensions.introspection.api.MuleExtensionConfigurationBuilder;
-import org.mule.extensions.introspection.api.MuleExtensionParameterBuilder;
+import org.mule.extensions.introspection.api.MuleExtensionOperationGroup;
+import org.mule.extensions.introspection.spi.MuleExtensionConfigurationBuilder;
+import org.mule.extensions.introspection.spi.MuleExtensionOperationBuilder;
+import org.mule.extensions.introspection.spi.MuleExtensionOperationGroupBuilder;
+import org.mule.extensions.introspection.spi.MuleExtensionParameterBuilder;
 
 import java.util.LinkedList;
 import java.util.List;

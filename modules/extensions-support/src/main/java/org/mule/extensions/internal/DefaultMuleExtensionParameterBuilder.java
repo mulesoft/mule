@@ -7,7 +7,7 @@
 package org.mule.extensions.internal;
 
 import org.mule.extensions.introspection.api.MuleExtensionParameter;
-import org.mule.extensions.introspection.api.MuleExtensionParameterBuilder;
+import org.mule.extensions.introspection.spi.MuleExtensionParameterBuilder;
 
 final class DefaultMuleExtensionParameterBuilder implements MuleExtensionParameterBuilder
 {
@@ -16,7 +16,7 @@ final class DefaultMuleExtensionParameterBuilder implements MuleExtensionParamet
     private String description;
     private Class<?> type;
     private boolean required = false;
-    private boolean acceptsExpressions = true;
+    private boolean dynamic = true;
     private Object defaultValue;
 
     DefaultMuleExtensionParameterBuilder()
@@ -52,9 +52,9 @@ final class DefaultMuleExtensionParameterBuilder implements MuleExtensionParamet
     }
 
     @Override
-    public MuleExtensionParameterBuilder setAcceptsExpressions(boolean acceptsExpressions)
+    public MuleExtensionParameterBuilder setDynamic(boolean dynamic)
     {
-        this.acceptsExpressions = acceptsExpressions;
+        this.dynamic = dynamic;
         return this;
     }
 
@@ -73,6 +73,6 @@ final class DefaultMuleExtensionParameterBuilder implements MuleExtensionParamet
             throw new IllegalStateException("If a parameter is required then it cannot have a default value");
         }
 
-        return new ImmutableMuleExtensionParameter(name, description, type, required, acceptsExpressions, defaultValue);
+        return new ImmutableMuleExtensionParameter(name, description, type, required, dynamic, defaultValue);
     }
 }

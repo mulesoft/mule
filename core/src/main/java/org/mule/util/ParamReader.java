@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.mule.config.spring.util;
+package org.mule.util;
 
 // import org.apache.axis.utils.Messages;
 

@@ -6,12 +6,13 @@
  */
 package org.mule.extensions.internal;
 
-import org.mule.extensions.introspection.api.Builder;
+import org.mule.extensions.introspection.spi.Builder;
 import org.mule.extensions.introspection.api.Described;
 import org.mule.util.Preconditions;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.LinkedHashMultiset;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
@@ -21,6 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -82,6 +84,17 @@ abstract class MuleExtensionUtils
     static <T> List<T> immutableList(Collection<T> collection)
     {
         return ImmutableList.copyOf(collection != null ? collection : Collections.<T>emptyList());
+    }
+
+    static <T extends Described> Map<String, T> toMap(List<T> objects)
+    {
+        ImmutableMap.Builder<String, T> map = ImmutableMap.builder();
+        for (T object : objects)
+        {
+            map.put(object.getName(), object);
+        }
+
+        return map.build();
     }
 
 }

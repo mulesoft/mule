@@ -15,7 +15,7 @@ public interface MuleExtensionOperation extends Described
 
     List<Class<?>> getInputTypes();
 
-    List<Class<?>> getOutputType();
+    List<Class<?>> getOutputTypes();
 
     /**
      * Returns a new {@link OperationContext}

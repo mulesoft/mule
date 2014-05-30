@@ -12,7 +12,9 @@ import java.io.BufferedReader;
 import java.io.CharArrayReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -28,6 +30,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -672,6 +675,28 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     }
 
     /**
+     * Returns all public {@link java.lang.reflect.Method}s from {@code type} that are annotated
+     * with {@code annotationType}
+     *
+     * @param type           the class you want to introspect
+     * @param annotationType the annotation type you want to filter by
+     * @return a {@link java.util.List} with the matching methods. If none found then it returns an empty list
+     */
+    public static List<Method> getMethodsAnnotatedWith(Class<?> type, Class<? extends Annotation> annotationType)
+    {
+        List<Method> methods = new LinkedList<Method>();
+        for (Method method : type.getMethods())
+        {
+            if (method.getAnnotation(annotationType) != null)
+            {
+                methods.add(method);
+            }
+        }
+
+        return methods;
+    }
+
+    /**
      * Can be used by serice endpoints to select which service to use based on what's
      * loaded on the classpath
      *
@@ -987,5 +1012,38 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     {
         CodeSource cs = clazz.getProtectionDomain().getCodeSource();
         return (cs != null ? cs.getLocation() : null);
+    }
+
+    /**
+     * Returns all the declared {@link java.lang.reflect.Field}s in the given {@code clazz}.
+     *
+     * @param clazz the {@link java.lang.Class} you want to introsect
+     * @param includeInherited if {@code true} then it will include the fields from all superclasses
+     * @return a {@link java.util.List} with all the matching fields. If none found, then an empty list is returned
+     */
+    public static List<Field> getDeclaredFields(Class<?> clazz, boolean includeInherited)
+    {
+        List<Field> fields = new LinkedList<Field>();
+        Class<?> type = clazz;
+
+        Field[] declared = type.getDeclaredFields();
+
+        if (declared == null)
+        {
+            return Collections.emptyList();
+        }
+
+        do
+        {
+            for (Field field : type.getDeclaredFields())
+            {
+                fields.add(field);
+            }
+
+            type = type.getSuperclass();
+        }
+        while (includeInherited && type != null && !Object.class.equals(type));
+
+        return fields;
     }
 }

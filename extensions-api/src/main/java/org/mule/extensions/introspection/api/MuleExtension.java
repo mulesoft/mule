@@ -14,7 +14,13 @@ import java.util.List;
 public interface MuleExtension extends Described, Capable
 {
 
+    public static final String MIN_MULE_VERSION = "3.6.0";
+
     String getVersion();
+
+    String getMinMuleVersion();
+
+    MuleExtensionType getExtensionType();
 
     List<MuleExtensionConfiguration> getConfigurations();
 

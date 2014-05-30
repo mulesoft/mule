@@ -16,10 +16,13 @@ import org.mule.extensions.api.exception.NoSuchConfigurationException;
 import org.mule.extensions.api.exception.NoSuchOperationException;
 import org.mule.extensions.introspection.api.Capability;
 import org.mule.extensions.introspection.api.MuleExtension;
-import org.mule.extensions.introspection.api.MuleExtensionBuilder;
 import org.mule.extensions.introspection.api.MuleExtensionConfiguration;
 import org.mule.extensions.introspection.api.MuleExtensionOperation;
+import org.mule.extensions.introspection.api.MuleExtensionOperationGroup;
 import org.mule.extensions.introspection.api.MuleExtensionParameter;
+import org.mule.extensions.introspection.api.MuleExtensionScope;
+import org.mule.extensions.introspection.api.MuleExtensionType;
+import org.mule.extensions.introspection.spi.MuleExtensionBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -31,12 +34,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class WSConsumerDeclarationTestCase extends AbstractMuleTestCase
+public class MuleExtensionBuildersTestCase extends AbstractMuleTestCase
 {
 
     private static final String WS_CONSUMER = "WSConsumer";
-    private static final String GENERIC_CONSUMER_FOR_SOAP_WEB_SERVICES = "Generic Consumer for SOAP Web Services";
-    private static final String VERSION = "3.5";
+    private static final String WS_CONSUMER_DESCRIPTION = "Generic Consumer for SOAP Web Services";
+    private static final String VERSION = "3.6.0";
+    private static final MuleExtensionType EXTENSION_TYPE = MuleExtensionType.MODULE;
+    private static final String MIN_MULE_VERSION = VERSION;
     private static final String WSDL_LOCATION = "wsdlLocation";
     private static final String URI_TO_FIND_THE_WSDL = "URI to find the WSDL";
     private static final String SERVICE = "service";
@@ -50,17 +55,22 @@ public class WSConsumerDeclarationTestCase extends AbstractMuleTestCase
     private static final String OPERATION = "operation";
     private static final String THE_OPERATION_TO_USE = "The operation to use";
     private static final String MTOM_ENABLED = "mtomEnabled";
-    private static final String WHETHER_OR_NOT_USE_MTOM_FOR_ATTACHMENTS = "Whether or not use MTOM for attachments";
+    private static final String MTOM_DESCRIPTION = "Whether or not use MTOM for attachments";
+    private static final String BROADCAST = "broadcast";
+    private static final String BROADCAST_DESCRIPTION = "consumes many services";
+    private static final String CALLBACK = "callback";
+    private static final String CALLBACK_DESCRIPTION = "async callback";
 
     private MuleExtension extension;
 
-    @Before
-    public void declare() throws Exception
+    private MuleExtensionBuilder populatedBuilder()
     {
         MuleExtensionBuilder builder = DefaultMuleExtensionBuilder.newBuilder();
-        extension = builder.setName(WS_CONSUMER)
-                .setDescription(GENERIC_CONSUMER_FOR_SOAP_WEB_SERVICES)
+        return builder.setName(WS_CONSUMER)
+                .setDescription(WS_CONSUMER_DESCRIPTION)
                 .setVersion(VERSION)
+                .setExtensionType(EXTENSION_TYPE)
+                .setMinMuleVersion(MIN_MULE_VERSION)
                 .addCapablity(TestCapability.class, new TestCapability())
                 .addConfiguration(
                         builder.newConfiguration()
@@ -68,7 +78,7 @@ public class WSConsumerDeclarationTestCase extends AbstractMuleTestCase
                                                       .setName(WSDL_LOCATION)
                                                       .setDescription(URI_TO_FIND_THE_WSDL)
                                                       .setRequired(true)
-                                                      .setAcceptsExpressions(false)
+                                                      .setDynamic(false)
                                                       .setType(String.class)
                                 )
                                 .addParameter(builder.newParameter()
@@ -103,21 +113,50 @@ public class WSConsumerDeclarationTestCase extends AbstractMuleTestCase
                                       )
                                       .addParameter(builder.newParameter()
                                                             .setName(MTOM_ENABLED)
-                                                            .setDescription(WHETHER_OR_NOT_USE_MTOM_FOR_ATTACHMENTS)
+                                                            .setDescription(MTOM_DESCRIPTION)
                                                             .setRequired(false)
                                                             .setDefaultValue(true)
                                                             .setType(Boolean.class)
                                       )
-                )
-                .build();
+                ).addOperation(builder.newScope()
+                                       .setName(BROADCAST)
+                                       .setDescription(BROADCAST_DESCRIPTION)
+                                       .setInputTypes(String.class)
+                                       .setOutputTypes(List.class)
+                                       .addParameter(builder.newParameter()
+                                                             .setName(OPERATION)
+                                                             .setDescription(THE_OPERATION_TO_USE)
+                                                             .setRequired(true)
+                                                             .setType(List.class)
+                                       ).addParameter(builder.newParameter()
+                                                              .setName(MTOM_ENABLED)
+                                                              .setDescription(MTOM_DESCRIPTION)
+                                                              .setRequired(false)
+                                                              .setDefaultValue(true)
+                                                              .setType(Boolean.class)
+                                       ).addOperationGroup(builder.newOperationGroup()
+                                                                   .setName(CALLBACK)
+                                                                   .setDescription(CALLBACK_DESCRIPTION)
+                                                                   .setAllowedChildsType(MuleExtensionOperationGroup.AllowedChildsType.ANY)
+                                                                   .setMinOperations(1)
+                                       )
+                );
+    }
+
+    @Before
+    public void buildExtension() throws Exception
+    {
+        extension = populatedBuilder().build();
     }
 
     @Test
     public void assertExtension()
     {
         assertEquals(WS_CONSUMER, extension.getName());
-        assertEquals(GENERIC_CONSUMER_FOR_SOAP_WEB_SERVICES, extension.getDescription());
+        assertEquals(WS_CONSUMER_DESCRIPTION, extension.getDescription());
         assertEquals(VERSION, extension.getVersion());
+        assertEquals(EXTENSION_TYPE, extension.getExtensionType());
+        assertEquals(MIN_MULE_VERSION, extension.getMinMuleVersion());
         assertEquals(1, extension.getConfigurations().size());
 
         Optional<TestCapability> capability = extension.getCapability(TestCapability.class);
@@ -170,34 +209,70 @@ public class WSConsumerDeclarationTestCase extends AbstractMuleTestCase
     @Test(expected = IllegalArgumentException.class)
     public void nullCapabilityType()
     {
-        MuleExtensionBuilder builder = DefaultMuleExtensionBuilder.newBuilder();
-        builder.addCapablity(null, new TestCapability());
+        populatedBuilder().addCapablity(null, new TestCapability());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullCapability()
     {
-        MuleExtensionBuilder builder = DefaultMuleExtensionBuilder.newBuilder();
-        builder.addCapablity(TestCapability.class, null);
+        populatedBuilder().addCapablity(TestCapability.class, null);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void invalidMinMuleVersion() throws Exception
+    {
+        populatedBuilder().setMinMuleVersion("3.5.0").build();
     }
 
     @Test
     public void operations() throws Exception
     {
         List<MuleExtensionOperation> operations = extension.getOperations();
-        assertEquals(1, operations.size());
+        assertEquals(2, operations.size());
+        assertConsumeOperation(operations);
+        assertBroadcastOperation(operations);
+    }
+
+    private void assertConsumeOperation(List<MuleExtensionOperation> operations) throws NoSuchOperationException
+    {
         MuleExtensionOperation operation = operations.get(0);
         assertSame(operation, extension.getOperation(CONSUMER));
 
         assertEquals(CONSUMER, operation.getName());
         assertEquals(GO_GET_THEM_TIGER, operation.getDescription());
         strictTypeAssert(operation.getInputTypes(), String.class);
-        strictTypeAssert(operation.getOutputType(), String.class);
+        strictTypeAssert(operation.getOutputTypes(), String.class);
 
         List<MuleExtensionParameter> parameters = operation.getParameters();
         assertEquals(2, parameters.size());
         assertParameter(parameters.get(0), OPERATION, THE_OPERATION_TO_USE, true, true, String.class, null);
-        assertParameter(parameters.get(1), MTOM_ENABLED, WHETHER_OR_NOT_USE_MTOM_FOR_ATTACHMENTS, true, false, Boolean.class, true);
+        assertParameter(parameters.get(1), MTOM_ENABLED, MTOM_DESCRIPTION, true, false, Boolean.class, true);
+    }
+
+    private void assertBroadcastOperation(List<MuleExtensionOperation> operations) throws NoSuchOperationException
+    {
+        MuleExtensionOperation operation = operations.get(1);
+        assertSame(operation, extension.getOperation(BROADCAST));
+
+        assertEquals(BROADCAST, operation.getName());
+        assertEquals(BROADCAST_DESCRIPTION, operation.getDescription());
+        strictTypeAssert(operation.getInputTypes(), String.class);
+        strictTypeAssert(operation.getOutputTypes(), List.class);
+
+        List<MuleExtensionParameter> parameters = operation.getParameters();
+        assertEquals(2, parameters.size());
+        assertParameter(parameters.get(0), OPERATION, THE_OPERATION_TO_USE, true, true, List.class, null);
+        assertParameter(parameters.get(1), MTOM_ENABLED, MTOM_DESCRIPTION, true, false, Boolean.class, true);
+
+        assertTrue(operation instanceof MuleExtensionScope);
+        MuleExtensionScope scope = (MuleExtensionScope) operation;
+        assertEquals(1, scope.getGroups().size());
+        MuleExtensionOperationGroup group = scope.getGroups().get(0);
+        assertEquals(CALLBACK, group.getName());
+        assertEquals(CALLBACK_DESCRIPTION, group.getDescription());
+        assertEquals(1, group.getMinOperations());
+        assertEquals(0, group.getMaxOperations());
+        assertEquals(MuleExtensionOperationGroup.AllowedChildsType.ANY, group.getAllowedChildsType());
     }
 
     private void assertParameter(MuleExtensionParameter parameter,

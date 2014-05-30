@@ -17,4 +17,6 @@ public interface MuleExtensionsManager
 
     Iterator<MuleExtension> getExtensions();
 
+
+
 }

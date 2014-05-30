@@ -27,7 +27,17 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-        </dependency>        
+        </dependency>
+        <dependency>
+            <groupId>org.mule.common</groupId>
+            <artifactId>mule-common</artifactId>
+            <version>${parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${parent.version}</version>
+        </dependency>
 
         <!-- test dependencies -->
         <dependency>

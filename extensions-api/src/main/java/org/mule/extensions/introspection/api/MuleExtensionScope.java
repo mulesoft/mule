@@ -4,10 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extensions.introspection.spi;
+package org.mule.extensions.introspection.api;
 
-public interface MuleExtensionDescriber
+import java.util.List;
+
+public interface MuleExtensionScope extends MuleExtensionOperation
 {
 
-    void describe(MuleExtensionBuilder builder);
+    List<MuleExtensionOperationGroup> getGroups();
+
 }

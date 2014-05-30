@@ -8,11 +8,11 @@ package org.mule.extensions.api.exception;
 
 import org.mule.extensions.introspection.api.MuleExtension;
 
-public final class NoSuchOperationException extends Exception
+public final class NoSuchScopeException extends Exception
 {
 
-    public NoSuchOperationException(MuleExtension muleExtension, String extensionName)
+    public NoSuchScopeException(MuleExtension muleExtension, String scopeName)
     {
-        super(String.format("Operation '%s' does not exists in Mule Extension '%s'", extensionName, muleExtension.getName()));
+        super(String.format("Scope '%s' does not exists in Mule Extension '%s'", scopeName, muleExtension.getName()));
     }
 }
