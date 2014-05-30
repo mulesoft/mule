@@ -17,7 +17,7 @@ public class MuleProcessController
 
     public MuleProcessController(String muleHome)
     {
-        this(muleHome, 0);
+        this(muleHome, 60000);
     }
 
     public MuleProcessController(String muleHome, int timeout)
