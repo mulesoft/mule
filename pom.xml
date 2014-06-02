@@ -1266,48 +1266,17 @@
 
     <repositories>
         <repository>
-            <id>mule-releases</id>
-            <name>Mule Dependencies</name>
-            <url>https://repository.mulesoft.org/nexus/content/repositories/releases/</url>
-        </repository>
-        <repository>
-            <id>mule-snapshots</id>
-            <name>Mule snapshots</name>
-            <url>https://repository.mulesoft.org/nexus/content/repositories/snapshots/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-        <repository>
-            <id>mule-deps</id>
-            <name>Mule dependencies</name>
-            <url>http://dist.codehaus.org/mule/dependencies/maven2/</url>
-        </repository>
-        <repository>
-            <id>java-net</id>
-            <name>Java net repository</name>
-            <url>http://download.java.net/maven/2</url>
-        </repository>
-        <repository>
-            <id>public-jboss</id>
-            <name>JBoss Public Repository</name>
-            <url>http://repository.jboss.org/nexus/content/groups/public-jboss</url>
-        </repository>
-        <repository>
-            <id>codehaus</id>
-            <name>Codehaus Maven Repository</name>
-            <url>http://repository.codehaus.org</url>
+            <id>mule</id>
+            <name>Mule Repository</name>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
         </repository>
     </repositories>
 
     <pluginRepositories>
         <pluginRepository>
-            <id>mule-plugin-deps</id>
-            <name>Mule Dependencies</name>
-            <url>https://repository.mulesoft.org/nexus/content/repositories/releases/</url>
+            <id>mule-plugin</id>
+            <name>Mule Repository</name>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
         </pluginRepository>
     </pluginRepositories>
 
@@ -2141,35 +2110,6 @@
             </distributionManagement>
         </profile>
         <profile>
-            <id>nexus</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <distributionManagement>
-                <repository>
-                    <id>mule-ee-releases</id>
-                    <name>Mule Release Repository</name>
-                    <url>https://repository-master.mulesoft.org/nexus/content/repositories/ci-releases</url>
-                </repository>
-                <snapshotRepository>
-                    <id>mule-ee-snapshots</id>
-                    <name>Mule Snapshot Repository</name>
-                    <url>https://repository-master.mulesoft.org/nexus/content/repositories/ci-snapshots</url>
-                    <uniqueVersion>false</uniqueVersion>
-                </snapshotRepository>
-            </distributionManagement>
-        </profile>
-        <profile>
-            <id>nexus-ee</id>
-            <distributionManagement>
-                <repository>
-                    <id>mule-ee-customer-releases</id>
-                    <name>Mule Release Repository</name>
-                    <url>https://repository-master.mulesoft.org/nexus/content/repositories/releases-ee</url>
-                </repository>
-            </distributionManagement>
-        </profile>
-       <profile>
             <id>mac</id>
             <activation>
                 <os>

@@ -94,14 +94,6 @@
         </dependency>
     </dependencies>
 
-    <repositories>
-        <repository>
-            <name>jsch</name>
-            <url>http://jsch.sourceforge.net/maven2/</url>
-            <id>jsch</id>
-        </repository>
-    </repositories>
-
     <profiles>
         <!-- A profile that can be used to run all tests with pooling enabled -->
         <profile>
