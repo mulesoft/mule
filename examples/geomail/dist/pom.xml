@@ -134,8 +134,9 @@
 
     <repositories>
         <repository>
-            <id>mule-deps</id>
-            <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
+            <id>mule</id>
+            <name>Mule Repository</name>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
         </repository>
     </repositories>
 </project>
