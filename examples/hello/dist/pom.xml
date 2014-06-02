@@ -67,20 +67,9 @@
 
     <repositories>
         <repository>
-            <id>mule-releases</id>
-            <name>Mule Dependencies</name>
-            <url>https://repository.mulesoft.org/nexus/content/repositories/releases/</url>
-        </repository>
-        <repository>
-            <id>mule-snapshots</id>
-            <name>Mule snapshots</name>
-            <url>https://repository.mulesoft.org/nexus/content/repositories/snapshots/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
+            <id>mule</id>
+            <name>Mule Repository</name>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
         </repository>
     </repositories>
 
