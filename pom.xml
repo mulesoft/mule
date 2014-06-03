@@ -1528,6 +1528,15 @@
                     <version>1.0-alpha-3</version>
                 </plugin>
                 <plugin>
+                    <groupId>org.owasp</groupId>
+                    <artifactId>dependency-check-maven</artifactId>
+                    <version>1.2.1</version>
+                    <configuration>
+                        <format>ALL</format>
+                        <failBuildOnCVSS>5</failBuildOnCVSS>
+                    </configuration>
+                </plugin>
+                <plugin>
                     <groupId>org.mule.tools</groupId>
                     <artifactId>mule-assembly-verifier</artifactId>
                     <version>1.4</version>
@@ -1639,6 +1648,10 @@
         </pluginManagement>
 
         <plugins>
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
