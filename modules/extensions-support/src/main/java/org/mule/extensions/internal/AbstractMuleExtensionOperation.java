@@ -10,12 +10,16 @@ import static org.mule.extensions.internal.MuleExtensionUtils.immutableList;
 import org.mule.extensions.introspection.api.MuleExtensionConfiguration;
 import org.mule.extensions.introspection.api.MuleExtensionOperation;
 import org.mule.extensions.introspection.api.MuleExtensionParameter;
-import org.mule.extensions.introspection.api.OperationContext;
 import org.mule.util.Preconditions;
 
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Convenience superclass for implementations of {@link org.mule.extensions.introspection.api.MuleExtensionOperation}
+ *
+ * @since 1.0
+ */
 abstract class AbstractMuleExtensionOperation extends AbstractImmutableDescribed implements MuleExtensionOperation
 {
 
@@ -39,30 +43,36 @@ abstract class AbstractMuleExtensionOperation extends AbstractImmutableDescribed
         this.ownerConfigurations = ownerConfigurations;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<MuleExtensionParameter> getParameters()
     {
         return parameters;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Class<?>> getInputTypes()
     {
         return inputTypes;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Class<?>> getOutputTypes()
     {
         return outputTypes;
     }
 
-    @Override
-    public OperationContext prepare()
-    {
-        return null;
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isAvailableFor(MuleExtensionConfiguration muleExtensionConfiguration)
     {

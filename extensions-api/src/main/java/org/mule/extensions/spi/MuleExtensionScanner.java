@@ -11,11 +11,42 @@ import org.mule.extensions.introspection.api.MuleExtension;
 
 import java.util.List;
 
+/**
+ * This component is responsible from discovering the available extensions in the context classpath.
+ * When an extension is found, it will parse the Annotations in it to generate an instance of
+ * {@link org.mule.extensions.introspection.api.MuleExtension} that describes it.
+ * <p/>
+ * Optionally, it can also register those extensions in a {@link org.mule.extensions.api.MuleExtensionsManager}
+ * <p/>
+ * The scanning process works as follows:
+ * <ul>
+ * <li>It scans the classpath looking for files in the path META-INF/extensions/mule.extensions</li>
+ * <li>The found files are assumed to be text files in which one canonical name is found per line</li>
+ * <li>Those classes are loaded and scanned for annotation which are parsed in turn</li>
+ * </ul>
+ * <p/>
+ * Exceptions will result from listing extensions classes not properly annotated.
+ *
+ * @since 1.0
+ */
 public interface MuleExtensionScanner
 {
 
+    /**
+     * Scans the classpath for extensions and describes them as {@link org.mule.extensions.introspection.api.MuleExtension}s.
+     * Found extensions are then returned in a {@link java.util.List}
+     *
+     * @return a {@link java.util.List} of {@link org.mule.extensions.introspection.api.MuleExtension}
+     */
     List<MuleExtension> scan();
 
+    /**
+     * Calls {@link #scan()} but also registers the found exceptions in the given {@code muleExtensionsManager}
+     * by invoking {@link org.mule.extensions.api.MuleExtensionsManager#register(org.mule.extensions.introspection.api.MuleExtension)}
+     *
+     * @param muleExtensionsManager a {@link org.mule.extensions.api.MuleExtensionsManager}
+     * @return a {@link java.util.List} of {@link org.mule.extensions.introspection.api.MuleExtension}
+     */
     List<MuleExtension> scanAndRegister(MuleExtensionsManager muleExtensionsManager);
 
 }

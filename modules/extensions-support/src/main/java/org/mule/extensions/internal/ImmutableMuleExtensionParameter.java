@@ -9,6 +9,11 @@ package org.mule.extensions.internal;
 import org.mule.extensions.introspection.api.MuleExtensionParameter;
 import org.mule.util.Preconditions;
 
+/**
+ * Immutable implementation of {@link org.mule.extensions.introspection.api.MuleExtensionParameter}
+ *
+ * @since 1.0
+ */
 final class ImmutableMuleExtensionParameter extends AbstractImmutableDescribed implements MuleExtensionParameter
 {
 
@@ -40,24 +45,36 @@ final class ImmutableMuleExtensionParameter extends AbstractImmutableDescribed i
         this.defaultValue = defaultValue;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Class<?> getType()
     {
         return type;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isRequired()
     {
         return required;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isDynamic()
     {
         return dynamic;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object getDefaultValue()
     {

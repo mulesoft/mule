@@ -22,6 +22,8 @@ import java.lang.annotation.Target;
  * - It cannot be an interface
  * - It must be public
  * - It cannot have a typed parameter (no generic)
+ *
+ * @since 1.0
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -67,6 +69,7 @@ public @interface Module
     TODO: does this make sense? How do me model several configuration other than the auto magical OAuth support?
     if only automatic version is available, then we shouldn't expose this
     */
+
     /**
      * Name of the configuration element
      */

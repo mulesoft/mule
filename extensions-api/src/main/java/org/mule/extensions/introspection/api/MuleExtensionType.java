@@ -6,11 +6,20 @@
  */
 package org.mule.extensions.introspection.api;
 
+/**
+ * Discriminator to specify the type of extension. These types imply
+ * different assumptions regarding the {@link org.mule.extensions.introspection.api.MuleExtension} behavior
+ * and nature.
+ * <p/>
+ * TODO: For now I'm having this as singletons implementing the WKI pattern. I'm doing this
+ * because I have a hunch that having the ability to easily add logic and implement patterns such as visitor
+ * or double dispatch will come handy in the future. If that's not the case, this will turn into an enum.
+ */
 public abstract class MuleExtensionType
 {
 
-    public static final MuleExtensionType MODULE = new ModuleExtensionType();
+    public static final MuleExtensionType MODULE = ModuleExtensionType.INSTANCE;
 
-    public static final MuleExtensionType CONNECTOR = new ConnectorExtensionType();
+    public static final MuleExtensionType CONNECTOR = ConnectorExtensionType.INSTANCE;
 
 }

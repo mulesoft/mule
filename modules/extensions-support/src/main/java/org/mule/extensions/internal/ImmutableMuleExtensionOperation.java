@@ -11,6 +11,11 @@ import org.mule.extensions.introspection.api.MuleExtensionParameter;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Immutable concrete implementation of {@link org.mule.extensions.introspection.api.MuleExtensionOperation}
+ *
+ * @since 1.0
+ */
 final class ImmutableMuleExtensionOperation extends AbstractMuleExtensionOperation
 {
 

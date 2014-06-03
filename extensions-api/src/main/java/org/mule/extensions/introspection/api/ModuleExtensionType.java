@@ -6,10 +6,19 @@
  */
 package org.mule.extensions.introspection.api;
 
+/**
+ * A {@link org.mule.extensions.introspection.api.MuleExtensionType} that defines a
+ * module. A module is an extension which simply adds messages processors that accomplish coherent tasks
+ * on a consistent domain. Modules do not necessarily imply a connection to an external system (stateful or not)
+ *
+ * @since 1.0
+ */
 class ModuleExtensionType extends MuleExtensionType
 {
 
-    protected ModuleExtensionType()
+    protected static final ModuleExtensionType INSTANCE = new ModuleExtensionType();
+
+    private ModuleExtensionType()
     {
     }
 }

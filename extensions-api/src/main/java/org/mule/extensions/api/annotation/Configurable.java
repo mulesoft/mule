@@ -17,6 +17,8 @@ import java.lang.annotation.Target;
  * bean properties when using the Module.
  * <p/>
  * The field must be a Java bean property (ie it needs to have setters and getters matching the field name).
+ *
+ * @since 1.0
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)

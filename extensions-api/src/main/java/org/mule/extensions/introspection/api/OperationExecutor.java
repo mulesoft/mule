@@ -8,6 +8,9 @@ package org.mule.extensions.introspection.api;
 
 import java.util.concurrent.Future;
 
+/**
+ * Doodle class. Disregard for now
+ */
 public interface OperationExecutor
 {
 

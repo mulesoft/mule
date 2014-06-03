@@ -10,13 +10,31 @@ import org.mule.extensions.introspection.api.MuleExtension;
 
 import java.util.Iterator;
 
+/**
+ * Manages the {@link org.mule.extensions.introspection.api.MuleExtension}s available in the current context.
+ * TODO: Define scopes and hierarchies. The extensions manager available in APP1 should see the extensions in the
+ * runtime, the domain and the app. The one in APP2 should see the ones in runtime, domain and APP2. At the same time,
+ * the one at a domain level should only see runtime and domain, and so forth...
+ *
+ * @since 1.0
+ */
 public interface MuleExtensionsManager
 {
 
+    /**
+     * Registers the given {@link org.mule.extensions.introspection.api.MuleExtension}
+     *
+     * @param extension a not {@code null} {@link org.mule.extensions.introspection.api.MuleExtension}
+     */
     void register(MuleExtension extension);
 
+    /**
+     * Returns a {@link java.util.Iterator} listing all the available
+     * {@link org.mule.extensions.introspection.api.MuleExtension}s.
+     *
+     * @return an {@link java.util.Iterator}. Will not be {@code null} but might be empty
+     */
     Iterator<MuleExtension> getExtensions();
-
 
 
 }

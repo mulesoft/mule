@@ -29,8 +29,16 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
+/**
+ * Default implementation of {@link org.mule.extensions.introspection.spi.MuleExtensionBuilder}
+ * which builds instances of {@link org.mule.extensions.internal.ImmutableMuleExtension}
+ *
+ * @since 1.0
+ */
 public final class DefaultMuleExtensionBuilder implements MuleExtensionBuilder
 {
+
+    private static final MuleVersion DEFAULT_MIN_MULE_VERSION = new MuleVersion(MuleExtension.MIN_MULE_VERSION);
 
     private String name;
     private String description;
@@ -50,6 +58,9 @@ public final class DefaultMuleExtensionBuilder implements MuleExtensionBuilder
     {
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MuleExtensionBuilder setName(String name)
     {
@@ -57,6 +68,9 @@ public final class DefaultMuleExtensionBuilder implements MuleExtensionBuilder
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MuleExtensionBuilder setDescription(String description)
     {
@@ -64,6 +78,9 @@ public final class DefaultMuleExtensionBuilder implements MuleExtensionBuilder
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MuleExtensionBuilder setVersion(String version)
     {
@@ -71,6 +88,9 @@ public final class DefaultMuleExtensionBuilder implements MuleExtensionBuilder
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MuleExtensionBuilder setExtensionType(MuleExtensionType extensionType)
     {
@@ -78,6 +98,9 @@ public final class DefaultMuleExtensionBuilder implements MuleExtensionBuilder
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MuleExtensionBuilder setMinMuleVersion(String minMuleVersion)
     {
@@ -85,6 +108,9 @@ public final class DefaultMuleExtensionBuilder implements MuleExtensionBuilder
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MuleExtensionBuilder addConfiguration(MuleExtensionConfigurationBuilder configuration)
     {
@@ -103,6 +129,9 @@ public final class DefaultMuleExtensionBuilder implements MuleExtensionBuilder
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <T extends Capability, C extends T> MuleExtensionBuilder addCapablity(Class<T> capabilityType, C capability)
     {
@@ -113,6 +142,9 @@ public final class DefaultMuleExtensionBuilder implements MuleExtensionBuilder
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MuleExtension build()
     {
@@ -134,30 +166,45 @@ public final class DefaultMuleExtensionBuilder implements MuleExtensionBuilder
                    String.format("Minimum Mule version must be at least %s", DEFAULT_MIN_MULE_VERSION.toString()));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MuleExtensionConfigurationBuilder newConfiguration()
     {
         return new DefaultMuleExtensionConfigurationBuilder();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MuleExtensionOperationBuilder newOperation()
     {
         return new DefaultMuleExtensionOperationBuilder();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MuleExtensionScopeBuilder newScope()
     {
         return new DefaultMuleExtensionScopeBuilder();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MuleExtensionOperationGroupBuilder newOperationGroup()
     {
         return new DefaultMuleExtensionOperationGroupBuilder();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MuleExtensionParameterBuilder newParameter()
     {

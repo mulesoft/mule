@@ -13,6 +13,11 @@ import org.mule.extensions.introspection.api.MuleExtensionParameter;
 
 import java.util.List;
 
+/**
+ * Immutable implementation of {@link org.mule.extensions.introspection.api.MuleExtensionConfiguration}
+ *
+ * @since 1.0
+ */
 final class ImmutableMuleExtensionConfiguration extends AbstractImmutableDescribed implements MuleExtensionConfiguration
 {
 
@@ -25,6 +30,9 @@ final class ImmutableMuleExtensionConfiguration extends AbstractImmutableDescrib
         this.parameters = immutableList(parameters);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final List<MuleExtensionParameter> getParameters()
     {

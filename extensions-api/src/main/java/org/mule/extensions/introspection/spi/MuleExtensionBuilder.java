@@ -6,15 +6,23 @@
  */
 package org.mule.extensions.introspection.spi;
 
-import org.mule.common.MuleVersion;
 import org.mule.extensions.introspection.api.Capability;
 import org.mule.extensions.introspection.api.MuleExtension;
 import org.mule.extensions.introspection.api.MuleExtensionOperation;
 import org.mule.extensions.introspection.api.MuleExtensionType;
 
+/**
+ * Implementation of the Builder design pattern to construct instances of
+ * {@link org.mule.extensions.introspection.api.MuleExtension} without coupling
+ * to implementations
+ * <p/>
+ * No user or spi component should ever create a {@link org.mule.extensions.introspection.api.MuleExtension}
+ * in a way other than through this builder
+ *
+ * @since 1.0
+ */
 public interface MuleExtensionBuilder extends Builder<MuleExtension>
 {
-    public static final MuleVersion DEFAULT_MIN_MULE_VERSION = new MuleVersion(MuleExtension.MIN_MULE_VERSION);
 
     MuleExtensionBuilder setName(String name);
 

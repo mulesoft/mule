@@ -11,6 +11,12 @@ import org.mule.util.Preconditions;
 
 import org.apache.commons.lang.StringUtils;
 
+/**
+ * Abstract implementation to act as a convenience superclass for
+ * implementations of {@link org.mule.extensions.introspection.api.Described}
+ *
+ * @since 1.0
+ */
 abstract class AbstractImmutableDescribed implements Described
 {
 
@@ -25,21 +31,21 @@ abstract class AbstractImmutableDescribed implements Described
         this.description = description;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final String getName()
     {
         return name;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final String getDescription()
     {
         return description;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return name.hashCode();
     }
 }

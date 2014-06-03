@@ -12,6 +12,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * This annotation marks a method inside a extension class as a callable
+ * from within a Mule runtime, defining a
+ * {@link org.mule.extensions.introspection.api.MuleExtensionOperation}.
+ * <p/>
+ * Each argument on this method will be featured as an
+ * {@link org.mule.extensions.introspection.api.MuleExtensionParameter}
+ *
+ * @since 1.0
+ */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

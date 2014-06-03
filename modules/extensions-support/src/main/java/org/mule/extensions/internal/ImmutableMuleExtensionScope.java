@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Immutable implementation of {@link org.mule.extensions.introspection.api.MuleExtensionScope}
+ */
 final class ImmutableMuleExtensionScope extends AbstractMuleExtensionOperation implements MuleExtensionScope
 {
 
@@ -34,6 +37,9 @@ final class ImmutableMuleExtensionScope extends AbstractMuleExtensionOperation i
         this.groups = toMap(groups);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<MuleExtensionOperationGroup> getGroups()
     {

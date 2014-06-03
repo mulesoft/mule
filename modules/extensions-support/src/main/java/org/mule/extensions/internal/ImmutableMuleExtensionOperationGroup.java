@@ -8,6 +8,9 @@ package org.mule.extensions.internal;
 
 import org.mule.extensions.introspection.api.MuleExtensionOperationGroup;
 
+/**
+ * A immutable implementation of {@link org.mule.extensions.introspection.api.MuleExtensionOperationGroup}
+ */
 final class ImmutableMuleExtensionOperationGroup extends AbstractImmutableDescribed implements MuleExtensionOperationGroup
 {
 
@@ -27,18 +30,27 @@ final class ImmutableMuleExtensionOperationGroup extends AbstractImmutableDescri
         this.maxOperations = maxOperations;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public AllowedChildsType getAllowedChildsType()
     {
         return allowedChildsType;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMinOperations()
     {
         return minOperations;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMaxOperations()
     {

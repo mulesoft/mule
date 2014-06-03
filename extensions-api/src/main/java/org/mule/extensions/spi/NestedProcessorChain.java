@@ -16,6 +16,11 @@ import org.mule.api.processor.MessageProcessor;
 
 import java.util.Map;
 
+/**
+ * Implementation of {@link org.mule.extensions.spi.NestedProcessor}
+ *
+ * @since 1.0
+ */
 public class NestedProcessorChain implements NestedProcessor, MuleContextAware
 {
 
@@ -41,7 +46,7 @@ public class NestedProcessorChain implements NestedProcessor, MuleContextAware
 
     /**
      * Sets muleContext
-     * 
+     *
      * @param value Value to set
      */
     public void setMuleContext(MuleContext value)
@@ -51,7 +56,7 @@ public class NestedProcessorChain implements NestedProcessor, MuleContextAware
 
     /**
      * Sets chain
-     * 
+     *
      * @param value Value to set
      */
     public void setChain(MessageProcessor value)
@@ -61,7 +66,7 @@ public class NestedProcessorChain implements NestedProcessor, MuleContextAware
 
     /**
      * Sets event
-     * 
+     *
      * @param value Value to set
      */
     public void setEvent(MuleEvent value)

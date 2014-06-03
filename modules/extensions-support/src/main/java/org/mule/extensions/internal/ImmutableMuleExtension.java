@@ -27,6 +27,11 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
+/**
+ * Immutable implementation of {@link org.mule.extensions.introspection.api.MuleExtension}
+ *
+ * @since 1.0
+ */
 final class ImmutableMuleExtension extends AbstractImmutableDescribed implements MuleExtension
 {
 
@@ -66,13 +71,18 @@ final class ImmutableMuleExtension extends AbstractImmutableDescribed implements
     }
 
 
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<MuleExtensionConfiguration> getConfigurations()
     {
         return ImmutableList.copyOf(configurations.values());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MuleExtensionConfiguration getConfiguration(String name) throws NoSuchConfigurationException
     {
@@ -85,30 +95,45 @@ final class ImmutableMuleExtension extends AbstractImmutableDescribed implements
         return muleExtensionConfiguration;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<MuleExtensionOperation> getOperations()
     {
         return ImmutableList.copyOf(operations.values());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getVersion()
     {
         return version;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getMinMuleVersion()
     {
         return minMuleVersion;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MuleExtensionType getExtensionType()
     {
         return extensionType;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MuleExtensionOperation getOperation(String name) throws NoSuchOperationException
     {
@@ -121,12 +146,19 @@ final class ImmutableMuleExtension extends AbstractImmutableDescribed implements
         return muleExtensionOperation;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <T extends Capability> Optional<T> getCapability(Class<T> capabilityType)
     {
         return (Optional<T>) Optional.fromNullable(capabilities.get(capabilityType));
     }
 
+    /**
+     * Defines equality by matching the extension's {@link #getName()} and
+     * {@link #getVersion()}
+     */
     @Override
     public boolean equals(Object obj)
     {
@@ -139,6 +171,10 @@ final class ImmutableMuleExtension extends AbstractImmutableDescribed implements
         return false;
     }
 
+    /**
+     * Returns a hash code based on the extension's {@link #getName()} and
+     * {@link #getVersion()}
+     */
     @Override
     public int hashCode()
     {

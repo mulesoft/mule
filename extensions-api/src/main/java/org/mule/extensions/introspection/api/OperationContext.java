@@ -6,6 +6,9 @@
  */
 package org.mule.extensions.introspection.api;
 
+/**
+ * Doodle class. Disregard for now
+ */
 public interface OperationContext
 {
 
