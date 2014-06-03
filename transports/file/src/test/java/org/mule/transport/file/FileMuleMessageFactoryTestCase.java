@@ -8,9 +8,13 @@ package org.mule.transport.file;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MuleMessageFactory;
+
+import java.io.File;
 
 import org.junit.Test;
 
@@ -47,6 +51,22 @@ public class FileMuleMessageFactoryTestCase extends AbstractFileMuleMessageFacto
         MuleMessage message = factory.create(stream, encoding, muleContext);
         assertNotNull(message);
         assertMessageProperties(message);
+    }
+
+    @Test
+    public void testCloseSeveralTimes() throws Exception
+    {
+        MuleMessageFactory factory = createMuleMessageFactory();
+        File moveTo = tempFolder.newFile("moveTo.tmp");
+        moveTo.deleteOnExit();
+        InputStreamCloseListener closeListener = mock(InputStreamCloseListener.class);
+        ReceiverFileInputStream stream = new ReceiverFileInputStream(tempFile, false, moveTo, closeListener);
+        MuleMessage message = factory.create(stream, encoding, muleContext);
+        assertNotNull(message);
+        stream.close();
+        stream.close();
+        verify(closeListener, times(1)).fileClose(tempFile);
+        verify(closeListener, times(0)).fileClose(moveTo);
     }
 
     private void assertMessageProperties(MuleMessage message)
