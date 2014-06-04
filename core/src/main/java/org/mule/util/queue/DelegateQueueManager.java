@@ -106,4 +106,9 @@ public class DelegateQueueManager implements QueueManager, Lifecycle, MuleContex
     {
         return Boolean.getBoolean(MULE_QUEUE_OLD_MODE_KEY);
     }
+
+    QueueManager getDelegate()
+    {
+        return delegate;
+    }
 }

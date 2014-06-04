@@ -376,4 +376,46 @@ class RandomAccessFileQueueStore
     {
         return fileTotalSpace;
     }
+
+    /**
+     * Searches for data within the queue store using a {@link RawDataSelector}
+     *
+     * @param rawDataSelector to determine if the element is the one we are looking for
+     * @return true if an element exists within the queue, false otherwise
+     */
+    public synchronized boolean contains(RawDataSelector rawDataSelector)
+    {
+        try
+        {
+            queueFile.seek(0);
+            while (true)
+            {
+                byte removed = queueFile.readByte();
+                if (removed == NOT_REMOVED)
+                {
+                    byte[] data = readDataInCurrentPosition();
+                    if (rawDataSelector.isSelectedData(data))
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    moveFilePointerToNextData();
+                }
+            }
+        }
+        catch (EOFException e)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(e);
+            }
+            return false;
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
 }

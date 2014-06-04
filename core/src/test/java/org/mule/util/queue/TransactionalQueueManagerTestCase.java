@@ -6,6 +6,9 @@
  */
 package org.mule.util.queue;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -19,7 +22,6 @@ public class TransactionalQueueManagerTestCase extends AbstractMuleContextTestCa
     @Test
     public void allowChangingConfigurationOnDisposedQueue() throws Exception
     {
-        muleContext.start();
         QueueManager queueManager = muleContext.getQueueManager();
         queueManager.setQueueConfiguration(TEST_QUEUE_NAME, new DefaultQueueConfiguration(0, true));
         QueueSession queueSession = queueManager.getQueueSession();
@@ -31,8 +33,6 @@ public class TransactionalQueueManagerTestCase extends AbstractMuleContextTestCa
     @Test
     public void clearRecoveryQueuesAfterRecovery() throws Exception
     {
-        muleContext.start();
-
         createDanglingTx();
 
         QueueManager queueManager = muleContext.getQueueManager();
@@ -41,6 +41,20 @@ public class TransactionalQueueManagerTestCase extends AbstractMuleContextTestCa
 
         queueManager.setQueueConfiguration(TEST_QUEUE_NAME, new DefaultQueueConfiguration());
         queueManager.start();
+    }
+
+    @Test
+    public void doNotCreateTwiceTheSameRecoveryQueue()
+    {
+        TransactionalQueueManager queueManager = (TransactionalQueueManager) ((DelegateQueueManager) muleContext.getQueueManager()).getDelegate();
+        final RecoverableQueueStore recoryQueue = queueManager.getRecoveryQueue(TEST_QUEUE_NAME);
+        assertThat(recoryQueue, is(queueManager.getRecoveryQueue(TEST_QUEUE_NAME)));
+    }
+
+    @Override
+    protected boolean isStartContext()
+    {
+        return true;
     }
 
     private void createDanglingTx() throws InterruptedException, MuleException
