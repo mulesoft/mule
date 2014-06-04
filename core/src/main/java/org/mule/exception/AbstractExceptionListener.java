@@ -34,8 +34,10 @@ import org.mule.routing.filters.WildcardFilter;
 import org.mule.routing.outbound.MulticastingRouter;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.util.CollectionUtils;
+import org.mule.util.StringUtils;
 
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -50,6 +52,9 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractExceptionListener extends AbstractMessageProcessorOwner
 {
+
+    protected static final String NOT_SET = "<not set>";
+
     protected transient Log logger = LogFactory.getLog(getClass());
 
     @SuppressWarnings("unchecked")
@@ -316,9 +321,19 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
             statistics.incFatalError();
         }
 
+        MuleMessage logMessage = event.getMessage();
+        String logUniqueId = StringUtils.defaultString(logMessage.getUniqueId(), NOT_SET);
+        String correlationId = StringUtils.defaultString(logMessage.getCorrelationId(), NOT_SET);
+        int correlationGroupSize = logMessage.getCorrelationGroupSize();
+        int correlationGroupSeq = logMessage.getCorrelationSequence();
+
+        String printableLogMessage = MessageFormat.format("Message identification summary here: " +
+                "id={0} correlationId={1}, correlationGroup={2}, correlationSeq={3}",
+                logUniqueId, correlationId, correlationGroupSize, correlationGroupSeq);
+
         logger.fatal(
-            "Failed to dispatch message to error queue after it failed to process.  This may cause message loss."
-                            + (event.getMessage() == null ? "" : "Logging Message here: \n" + event.getMessage().toString()), t);
+            "Failed to dispatch message to error queue after it failed to process.  This may cause message loss. "
+                      + (event.getMessage() == null ? "" : printableLogMessage), t);
     }
 
     public boolean isInitialised()
