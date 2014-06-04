@@ -264,9 +264,10 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
         lock.lock();
         try
         {
-            if (!deserializeValues(randomAccessFileQueueStore1.allElements()).contains(value))
+            final RawDataSelector dataSelector = createDataSelector(value);
+            if (!randomAccessFileQueueStore1.contains(dataSelector))
             {
-                return deserializeValues(randomAccessFileQueueStore2.allElements()).contains(value);
+                return randomAccessFileQueueStore2.contains(dataSelector);
             }
         }
         finally
