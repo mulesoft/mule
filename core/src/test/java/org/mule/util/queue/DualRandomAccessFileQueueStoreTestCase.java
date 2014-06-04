@@ -6,7 +6,15 @@
  */
 package org.mule.util.queue;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleContext;
+
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+
+import org.junit.Test;
 
 public class DualRandomAccessFileQueueStoreTestCase extends QueueStoreTestCase
 {
@@ -17,4 +25,71 @@ public class DualRandomAccessFileQueueStoreTestCase extends QueueStoreTestCase
         return new DefaultQueueStore("testQueue", muleContext, new DefaultQueueConfiguration(capacity, true));
     }
 
+    @Test
+    public void containsDoesNotLoadEverythingInMemory() throws Exception
+    {
+        final DefaultQueueStore queue = (DefaultQueueStore) createQueue();
+        queue.offer(new CounterClass(1), 0, 10);
+        final CounterClass counterClassToSearch = new CounterClass(2);
+        queue.offer(counterClassToSearch, 0, 10);
+        queue.offer(new CounterClass(3), 0, 10);
+        CounterClass.clearNumberOfInstances();
+        queue.contains(counterClassToSearch);
+        assertThat(CounterClass.numberOfInstances, is(2));
+    }
+
+    public static class CounterClass implements Serializable
+    {
+        public static int numberOfInstances = 0;
+        private int value;
+
+        public CounterClass(int value)
+        {
+            this.value = value;
+        }
+
+        public int getValue()
+        {
+            return value;
+        }
+
+        public static void clearNumberOfInstances()
+        {
+            numberOfInstances = 0;
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o)
+            {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass())
+            {
+                return false;
+            }
+
+            CounterClass that = (CounterClass) o;
+
+            if (value != that.value)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private void readObject(ObjectInputStream in) throws Exception
+        {
+            numberOfInstances++;
+            in.defaultReadObject();
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return value;
+        }
+    }
 }
