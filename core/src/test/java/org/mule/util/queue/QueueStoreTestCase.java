@@ -147,7 +147,7 @@ public abstract class QueueStoreTestCase extends AbstractMuleContextTestCase
         }
     }
 
-    private QueueStore createQueue()
+    protected QueueStore createQueue()
     {
         return createQueueWithCapacity(MAXIMUM_CAPACITY);
     }
