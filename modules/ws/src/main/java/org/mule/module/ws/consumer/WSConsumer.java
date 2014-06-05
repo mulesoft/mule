@@ -66,7 +66,6 @@ import org.slf4j.LoggerFactory;
 public class WSConsumer implements MessageProcessor, Initialisable, MuleContextAware
 {
 
-    public static final String SOAP_ACTION_PROPERTY = "SOAPAction";
     public static final String SOAP_HEADERS_PROPERTY_PREFIX = "soap.";
 
     private static final Logger logger = LoggerFactory.getLogger(WSConsumer.class);
@@ -100,10 +99,6 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        if (shouldAddSoapActionHeader())
-        {
-            event.getMessage().setOutboundProperty(SOAP_ACTION_PROPERTY, soapAction);
-        }
         return messageProcessor.process(event);
     }
 
@@ -269,6 +264,10 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
         cxfOutboundMessageProcessor.getClient().getInInterceptors().add(new NamespaceSaverStaxInterceptor());
         cxfOutboundMessageProcessor.getClient().getInInterceptors().add(new NamespaceRestorerStaxInterceptor());
 
+        if (soapAction != null)
+        {
+            cxfOutboundMessageProcessor.getClient().getOutInterceptors().add(new SoapActionInterceptor(soapAction));
+        }
 
         cxfOutboundMessageProcessor.getClient().getOutInterceptors().add(new InputSoapHeadersInterceptor(muleContext));
         cxfOutboundMessageProcessor.getClient().getInInterceptors().add(new OutputSoapHeadersInterceptor(muleContext));
@@ -352,11 +351,6 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
             }
         }
         return null;
-    }
-
-    private boolean shouldAddSoapActionHeader()
-    {
-        return soapAction != null && soapVersion == SoapVersion.SOAP_11;
     }
 
     /**
