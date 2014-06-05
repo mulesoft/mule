@@ -14,6 +14,9 @@ import org.mule.api.MuleEventContext;
 import org.mule.construct.Flow;
 import org.mule.tck.functional.EventCallback;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
@@ -33,29 +36,30 @@ public class SoapActionFunctionalTestCase extends AbstractWSConsumerFunctionalTe
     @Test
     public void operationWithSoapActionVersion11() throws Exception
     {
-        assertSoapActionInRequest("operationWithSoapActionVersion11", "TestOperationWithSoapAction");
+        assertSoapAction("operationWithSoapActionVersion11", "TestOperationWithSoapAction", null);
     }
 
     @Test
     public void operationWithNoSoapActionVersion11() throws Exception
     {
-        assertSoapActionInRequest("operationWithNoSoapActionVersion11", "");
+        assertSoapAction("operationWithNoSoapActionVersion11", "", null);
     }
 
     @Test
     public void operationWithSoapActionVersion12() throws Exception
     {
-        assertSoapActionInRequest("operationWithSoapActionVersion12", null);
+        assertSoapAction("operationWithSoapActionVersion12", null, "TestOperationWithSoapAction");
     }
 
     @Test
     public void operationWithNoSoapActionVersion12() throws Exception
     {
-        assertSoapActionInRequest("operationWithNoSoapActionVersion12", null);
+        assertSoapAction("operationWithNoSoapActionVersion12", null, null);
     }
 
 
-    private void assertSoapActionInRequest(String flowName, final String expectedSoapAction) throws Exception
+    private void assertSoapAction(String flowName, final String expectedSoapActionHeader,
+                                  final String expectedActionInContentType) throws Exception
     {
         Flow flow = (Flow) getFlowConstruct(flowName);
         MuleEvent event = getTestEvent("<test/>");
@@ -66,19 +70,40 @@ public class SoapActionFunctionalTestCase extends AbstractWSConsumerFunctionalTe
             public void eventReceived(MuleEventContext context, Object component) throws Exception
             {
                 String soapAction = context.getMessage().getInboundProperty("SOAPAction");
+                String contentType = context.getMessage().getInboundProperty("Content-Type");
 
-                if (expectedSoapAction == null)
-                {
-                    errorCollector.checkThat(soapAction, nullValue());
-                }
-                else
-                {
-                    errorCollector.checkThat(soapAction, equalTo(String.format("\"%s\"", expectedSoapAction)));
-                }
+                String actionInContentType = extractAction(contentType);
+
+                assertMatchesQuoted(expectedSoapActionHeader, soapAction);
+                assertMatchesQuoted(expectedActionInContentType, actionInContentType);
             }
         });
 
         flow.process(event);
     }
 
+    private String extractAction(String contentType)
+    {
+        Pattern pattern = Pattern.compile("action=(.*?);");
+        Matcher matcher = pattern.matcher(contentType);
+
+        if (!matcher.find())
+        {
+            return null;
+        }
+
+        return matcher.group(1);
+    }
+
+    private void assertMatchesQuoted(String expected, String value)
+    {
+        if (expected == null)
+        {
+            errorCollector.checkThat(value, nullValue());
+        }
+        else
+        {
+            errorCollector.checkThat(value, equalTo(String.format("\"%s\"", expected)));
+        }
+    }
 }
