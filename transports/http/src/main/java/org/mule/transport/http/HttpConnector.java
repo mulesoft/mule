@@ -50,6 +50,7 @@ import org.apache.commons.httpclient.auth.AuthPolicy;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.util.IdleConnectionTimeoutThread;
+import org.mule.util.StringUtils;
 
 /**
  * <code>HttpConnector</code> provides a way of receiving and sending http requests
@@ -506,9 +507,9 @@ public class HttpConnector extends TcpConnector
             String auth = event.getMessage().getOutboundProperty(HttpConstants.HEADER_AUTHORIZATION);
             httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION, auth);
         }
-        else
+        else if (StringUtils.isEmpty(getProxyUsername()))
         {
-            // don't use preemptive if there are no credentials to send
+            // don't use preemptive if there are no user or proxy credentials to send
             client.getParams().setAuthenticationPreemptive(false);
         }
     }
