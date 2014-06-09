@@ -14,7 +14,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.DataType;
@@ -459,7 +458,7 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
         }
         else if (enc == null)
         {
-            enc = System.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY);
+            enc = muleContext.getConfiguration().getDefaultEncoding();
         }
         return enc;
     }
