@@ -1217,7 +1217,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
         else
         {
-            return System.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY);
+            return muleContext.getConfiguration().getDefaultEncoding();
         }
     }
 
