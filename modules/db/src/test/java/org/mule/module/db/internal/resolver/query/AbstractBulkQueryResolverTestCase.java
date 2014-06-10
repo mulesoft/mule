@@ -11,7 +11,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.module.db.internal.resolver.query.AbstractBulkQueryResolver.BULK_QUERY_SEPARATOR;
 import org.mule.api.MuleEvent;
 import org.mule.module.db.internal.domain.param.QueryParam;
 import org.mule.module.db.internal.domain.query.BulkQuery;
@@ -27,7 +26,7 @@ public class AbstractBulkQueryResolverTestCase extends AbstractMuleTestCase
 
     public static final String STATIC_SQL_1 = "delete from test1";
     public static final String STATIC_SQL_2 = "delete from test2";
-    public static final String BULK_SQL_QUERY = STATIC_SQL_1 + BULK_QUERY_SEPARATOR + STATIC_SQL_2;
+    public static final String BULK_SQL_QUERY = STATIC_SQL_1 + ";\n" + STATIC_SQL_2;
 
     protected final MuleEvent muleEvent = mock(MuleEvent.class);
 

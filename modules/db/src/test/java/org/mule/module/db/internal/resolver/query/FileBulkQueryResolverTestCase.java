@@ -35,13 +35,30 @@ public class FileBulkQueryResolverTestCase extends AbstractBulkQueryResolverTest
     }
 
     @Test
-    public void resolvesBulkQuery() throws Exception
+    public void resolvesBulkQueryWithLinuxLineSeparator() throws Exception
+    {
+        doResolveBulkQueryTest(BULK_SQL_QUERY);
+    }
+
+    @Test
+    public void resolvesBulkQueryWithWindowsLineSeparator() throws Exception
+    {
+        doResolveBulkQueryTest(STATIC_SQL_1 + ";\r\n" + STATIC_SQL_2);
+    }
+
+    @Test
+    public void resolvesBulkQueryWithOldMacLineSeparator() throws Exception
+    {
+        doResolveBulkQueryTest(STATIC_SQL_1 + ";\r" + STATIC_SQL_2);
+    }
+
+    private void doResolveBulkQueryTest(String bulkSqlQuery) throws IOException
     {
         String fileName = "fileName";
 
         QueryTemplateParser queryTemplateParser = createQueryTemplateParser();
         FileReader fileReader = mock(FileReader.class);
-        when(fileReader.getResourceAsString(fileName)).thenReturn(BULK_SQL_QUERY);
+        when(fileReader.getResourceAsString(fileName)).thenReturn(bulkSqlQuery);
 
         BulkQueryResolver bulkQueryResolver = new FileBulkQueryResolver(fileName, queryTemplateParser, fileReader);
 
