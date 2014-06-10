@@ -9,16 +9,17 @@ package org.mule.module.db.integration.config;
 
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
-import org.mule.module.db.integration.model.MySqlTestDatabase;
+import org.mule.module.db.integration.model.OracleTestDatabase;
 
 import java.util.Collections;
 import java.util.List;
 
 import org.junit.runners.Parameterized;
 
-public class MySqlHostPortConfigTestCase extends AbstractHostPortConfigTestCase
+public class OracleHostPortConfigTestCase extends AbstractHostPortConfigTestCase
 {
-    public MySqlHostPortConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
+
+    public OracleHostPortConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
     {
         super(dataSourceConfigResource, testDatabase);
     }
@@ -26,9 +27,9 @@ public class MySqlHostPortConfigTestCase extends AbstractHostPortConfigTestCase
     @Parameterized.Parameters
     public static List<Object[]> parameters()
     {
-        if (TestDbConfig.getMySqlResource() != null)
+        if (TestDbConfig.getOracleResource() != null)
         {
-            return Collections.singletonList(new Object[] {"integration/config/mysql-host-port-db-config.xml", new MySqlTestDatabase()});
+            return Collections.singletonList(new Object[] {"integration/config/oracle-host-port-db-config.xml", new OracleTestDatabase()});
         }
         else
         {
@@ -39,6 +40,7 @@ public class MySqlHostPortConfigTestCase extends AbstractHostPortConfigTestCase
     @Override
     protected String getDatabasePortPropertyValue()
     {
-        return "3306";
+        return "1521";
     }
+
 }
