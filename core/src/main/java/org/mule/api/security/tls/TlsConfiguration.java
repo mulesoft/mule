@@ -364,7 +364,7 @@ public final class TlsConfiguration
         return tlsProperties.getEnabledProtocols();
     }
 
-    private SSLContext getSslContext() throws NoSuchAlgorithmException, KeyManagementException
+    public SSLContext getSslContext() throws NoSuchAlgorithmException, KeyManagementException
     {
         KeyManager[] keyManagers =
                 null == getKeyManagerFactory() ? null : getKeyManagerFactory().getKeyManagers();
