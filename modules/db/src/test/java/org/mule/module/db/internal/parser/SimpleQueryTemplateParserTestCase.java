@@ -130,6 +130,12 @@ public class SimpleQueryTemplateParserTestCase extends AbstractMuleTestCase
         doStoredProcedureParsingTest("{ call \ngetTestRecords() } ");
     }
 
+    @Test
+    public void detectsStoredProcedureWithoutSpaceAfterBracket() throws Exception
+    {
+        doStoredProcedureParsingTest("{call getTestRecords() } ");
+    }
+
     private void doStoredProcedureParsingTest(String sql)
     {
         QueryTemplate queryTemplate = parser.parse(sql);
