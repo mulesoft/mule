@@ -9,6 +9,8 @@ package org.mule.transport.http.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
@@ -23,6 +25,7 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,6 +33,9 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
 {
+
+    private static final String EXPECTED_CUSTOM_COOKIE = "$Version=0; customCookie=yes";
+    private static final String EXPECTED_EXPRESSION_COOKIE = "$Version=0; expressionCookie=MYCOOKIE";
 
     private CountDownLatch latch = new CountDownLatch(1);
     private boolean cookieFound = false;
@@ -58,22 +64,73 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
     }
 
     @Test
-    public void testCookies() throws Exception
+    public void sendsCookiesFromMapInPathWithoutEncodedCharacters() throws Exception
     {
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("COOKIE_HEADER", "MYCOOKIE");
+        doRequest("testPath", getCookieMap());
+        assertCookiesReceived(EXPECTED_CUSTOM_COOKIE, EXPECTED_EXPRESSION_COOKIE);
+    }
+
+    @Test
+    public void sendsCookiesFromMapInPathWithEncodedCharacters() throws Exception
+    {
+        doRequest("testPath%25", getCookieMap());
+        assertCookiesReceived(EXPECTED_CUSTOM_COOKIE, EXPECTED_EXPRESSION_COOKIE);
+    }
+
+    @Test
+    public void sendsCookiesFromArrayInPathWithoutEncodedCharacters() throws Exception
+    {
+        doRequest("testPath", getCookieArray());
+        assertCookiesReceived(EXPECTED_CUSTOM_COOKIE);
+    }
+
+    @Test
+    public void sendsCookiesFromArrayInPathWithEncodedCharacters() throws Exception
+    {
+        doRequest("testPath%25", getCookieArray());
+        assertCookiesReceived(EXPECTED_CUSTOM_COOKIE);
+    }
+
+    private void doRequest(String path, Object cookiesObject) throws Exception
+    {
+        Map<String, Object> outboundProperties = new HashMap<String, Object>();
+
+        outboundProperties.put("COOKIE_HEADER", "MYCOOKIE");
+        outboundProperties.put("PATH", path);
+        outboundProperties.put("cookies", cookiesObject);
 
         MuleClient client = muleContext.getClient();
-        client.dispatch("vm://vm-in", "foobar", properties);
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, outboundProperties, muleContext);
+
+        client.dispatch("vm://vm-in", message);
 
         assertTrue(latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
         assertTrue(cookieFound);
-
-        assertEquals(2, cookieHeaders.size());
-        assertThereIsCookieWithThisContent("$Version=0; customCookie=yes", cookieHeaders);
-        assertThereIsCookieWithThisContent("$Version=0; expressionCookie=MYCOOKIE", cookieHeaders);
     }
 
+    private Map<String, String> getCookieMap()
+    {
+        Map<String, String> cookieMap = new HashMap<String, String>();
+        cookieMap.put("customCookie", "yes");
+        cookieMap.put("expressionCookie", "#[header:INBOUND:COOKIE_HEADER]");
+        return cookieMap;
+    }
+
+    private Cookie[] getCookieArray()
+    {
+        Cookie[] cookieArray = new Cookie[1];
+        cookieArray[0] = new Cookie("localhost", "customCookie", "yes");
+        return cookieArray;
+    }
+
+    private void assertCookiesReceived(String... cookies)
+    {
+        assertEquals(cookies.length, cookieHeaders.size());
+        for (String cookie : cookies)
+        {
+            assertThereIsCookieWithThisContent(cookie, cookieHeaders);
+        }
+    }
     private void assertThereIsCookieWithThisContent(String content, List<String> listOfRawCookies)
     {
         for (String rawCookie : listOfRawCookies)
