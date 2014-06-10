@@ -536,7 +536,7 @@ enum CookieStorageType
             if (cookies != null && cookies.length > 0)
             {
                 String host = destinationUri.getHost();
-                String path = destinationUri.getPath();
+                String path = destinationUri.getRawPath();
                 for (Cookie cookie : cookies)
                 {
                     client.getState().addCookie(
@@ -656,7 +656,7 @@ enum CookieStorageType
             client.getParams().setCookiePolicy(CookieHelper.getCookiePolicy(policy));
 
             String host = destinationUri.getHost();
-            String path = destinationUri.getPath();
+            String path = destinationUri.getRawPath();
             Iterator<String> keyIter = cookieMap.keySet().iterator();
             while (keyIter.hasNext())
             {
