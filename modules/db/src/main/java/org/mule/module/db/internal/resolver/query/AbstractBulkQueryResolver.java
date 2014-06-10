@@ -18,7 +18,7 @@ import org.mule.module.db.internal.parser.QueryTemplateParser;
 public abstract class AbstractBulkQueryResolver implements BulkQueryResolver
 {
 
-    public static final String BULK_QUERY_SEPARATOR = ";\n";
+    private static final String BULK_QUERY_SEPARATOR = ";[\\r\\n]+";
 
     protected final String bulkQueryText;
     private final QueryTemplateParser parser;
