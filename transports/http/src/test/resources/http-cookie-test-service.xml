@@ -19,18 +19,8 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <http:outbound-endpoint address="http://localhost:${port1}" method="POST" 
-                        exchange-pattern="one-way">
-                        <properties>
-                            <spring:entry key="Content-Type" value="text/xml" />
-                            <spring:entry key="cookies">
-                                <spring:map>
-                                    <spring:entry key="customCookie" value="yes"/>
-                                    <spring:entry key="expressionCookie" value="#[header:INBOUND:COOKIE_HEADER]"/>
-                                </spring:map>
-                            </spring:entry>
-                        </properties>
-                    </http:outbound-endpoint>
+                    <http:outbound-endpoint address="http://localhost:${port1}/#[header:INBOUND:PATH]" method="POST"
+                                            exchange-pattern="one-way" />
                 </pass-through-router>
             </outbound>
         </service>
