@@ -803,7 +803,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="port" type="xsd:int" use="optional">
+                <xsd:attribute name="port" type="mule:substitutableInt" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
                             Allows to configure just the port part of the JDBC URL (and leave the rest of the default JDBC URL untouched).
