@@ -8,6 +8,8 @@ package org.mule.api.security.tls;
 
 import org.mule.util.ArrayUtils;
 
+import com.google.common.base.Joiner;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -16,6 +18,9 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * SSLServerSocketFactory decorator that restricts the available protocols and cipher suites
@@ -23,6 +28,8 @@ import javax.net.ssl.SSLServerSocketFactory;
  */
 public class RestrictedSSLServerSocketFactory extends SSLServerSocketFactory
 {
+
+    private static final Logger logger = LoggerFactory.getLogger(RestrictedSSLServerSocketFactory.class);
 
     private final SSLServerSocketFactory sslServerSocketFactory;
     private final String[] enabledCipherSuites;
@@ -44,7 +51,12 @@ public class RestrictedSSLServerSocketFactory extends SSLServerSocketFactory
         {
             protocols = sslContext.getDefaultSSLParameters().getProtocols();
         }
-        this.enabledProtocols = ArrayUtils.intersection(protocols, sslContext.getDefaultSSLParameters().getProtocols());
+        this.enabledProtocols = ArrayUtils.intersection(protocols, sslContext.getSupportedSSLParameters().getProtocols());
+
+        if (this.enabledProtocols.length != protocols.length)
+        {
+            logger.warn("Current context supports less SSL protocols than configured. Only the following are enabled: [{}]", Joiner.on(", ").join(this.enabledProtocols));
+        }
     }
 
     @Override
