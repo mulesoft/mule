@@ -45,7 +45,7 @@ public class SimpleQueryTemplateParser implements QueryTemplateParser
 
     private static final Log logger = LogFactory.getLog(SimpleQueryTemplateParser.class);
 
-    private final Pattern storedProcedureMatcher = Pattern.compile("(?ms)(\\{\\s+)?CALL\\s* \\s*.*");
+    private final Pattern storedProcedureMatcher = Pattern.compile("(?ms)(\\{\\s*)?CALL\\s* \\s*.*");
     private final Pattern updateMatcher = Pattern.compile("(?ms)UPDATE\\s* \\s*.+");
     private final Pattern selectMatcher = Pattern.compile("(?ms)SELECT\\s* \\s*.+");
     private final Pattern insertMatcher = Pattern.compile("(?ms)INSERT\\s* \\s*.+");
