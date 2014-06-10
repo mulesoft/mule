@@ -5,5 +5,11 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
-    <db:mysql-config name="dbConfig" host="localhost" port="${database.port}" database="test"/>
+    <flow name="usesHostPortConfig">
+        <inbound-endpoint address="vm://usesHostPortConfig" exchange-pattern="request-response"/>
+
+        <db:select config-ref="dbConfig">
+            <db:parameterized-query>select * from PLANET order by ID</db:parameterized-query>
+        </db:select>
+    </flow>
 </mule>
