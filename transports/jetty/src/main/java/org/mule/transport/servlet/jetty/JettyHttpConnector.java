@@ -17,7 +17,6 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.transport.MessageReceiver;
-import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
@@ -75,6 +74,11 @@ public class JettyHttpConnector extends AbstractConnector
 
     public static final String MULE_CONTEXT_ATTRIBUTE = "muleContext";
 
+    public static final Class<SelectChannelConnector> DEFAULT_JETTY_CONNECTOR_CLASS = SelectChannelConnector.class;
+
+    public static final String JETTY_CONNECTOR_SYSTEM_PROPERTY = MuleProperties.SYSTEM_PROPERTY_PREFIX
+                                                                 + "transport.jetty.jettyConnectorClass";
+
     private Server httpServer;
 
     private String configFile;
@@ -93,13 +97,37 @@ public class JettyHttpConnector extends AbstractConnector
 
     private ContextHandlerCollection contexts;
 
+    private Class<? extends Connector> jettyConnectorClass;
+
     public JettyHttpConnector(MuleContext context)
     {
         super(context);
+        resolveDefaultJettyConnectorClass();
         setupJettyLogging();
         registerSupportedProtocol("http");
         registerSupportedProtocol(JETTY);
         setInitialStateStopped(true);
+    }
+
+    protected void resolveDefaultJettyConnectorClass()
+    {
+        jettyConnectorClass = DEFAULT_JETTY_CONNECTOR_CLASS;
+
+        // Use alternative default connector implementation if system property is set.
+        String connectorSystemProperty = System.getProperty(JETTY_CONNECTOR_SYSTEM_PROPERTY);
+        try
+        {
+            if (connectorSystemProperty != null)
+            {
+                jettyConnectorClass = ClassUtils.loadClass(connectorSystemProperty, this.getClass());
+            }
+        }
+        catch (ClassNotFoundException e)
+        {
+            logger.warn("The connector " + connectorSystemProperty
+                        + " was not found on the classpath. The default implementation ("
+                        + DEFAULT_JETTY_CONNECTOR_CLASS + ") will be used instead");
+        }
     }
 
     protected void setupJettyLogging()
@@ -371,14 +399,27 @@ public class JettyHttpConnector extends AbstractConnector
         return receiver;
     }
 
-    protected org.eclipse.jetty.server.AbstractConnector createJettyConnector()
+    protected Connector createJettyConnector() throws InitialisationException
     {
-        final SelectChannelConnector cnn = new SelectChannelConnector();
+        Class<? extends Connector> connectorClass = getJettyConnectorClass() != null
+                                                                                    ? getJettyConnectorClass()
+                                                                                    : DEFAULT_JETTY_CONNECTOR_CLASS;
+        try
+        {
+            Connector cnn = ClassUtils.instanciateClass(connectorClass, new Object[]{});
+            if (cnn instanceof org.eclipse.jetty.server.AbstractConnector)
+            {
+                // get and set number of acceptor threads into the underlying connector
+                ((org.eclipse.jetty.server.AbstractConnector) cnn).setAcceptors(getAcceptors());
+            }
+            return cnn;
 
-        // get and set number of acceptor threads into the underlying connector
-        cnn.setAcceptors(getAcceptors());
-
-        return cnn;
+        }
+        catch (Exception e)
+        {
+            throw new InitialisationException(CoreMessages.createStaticMessage(
+                "Error initializing Jetty Connector: " + connectorClass, e), this);
+        }
     }
 
     public void unregisterListener(MessageReceiver receiver) throws MuleException
@@ -633,6 +674,16 @@ public class JettyHttpConnector extends AbstractConnector
     public boolean canHostFullWars()
     {
         return true;
+    }
+
+    public Class<? extends Connector> getJettyConnectorClass()
+    {
+        return jettyConnectorClass;
+    }
+
+    public void setJettyConnectorClass(Class<? extends Connector> jettyConnectorClass)
+    {
+        this.jettyConnectorClass = jettyConnectorClass;
     }
 
 }
