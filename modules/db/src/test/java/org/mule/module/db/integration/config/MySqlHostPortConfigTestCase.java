@@ -26,13 +26,13 @@ public class MySqlHostPortConfigTestCase extends AbstractHostPortConfigTestCase
     @Parameterized.Parameters
     public static List<Object[]> parameters()
     {
-        if (TestDbConfig.getMySqlResource() != null)
+        if (TestDbConfig.getMySqlResource().isEmpty())
         {
-            return Collections.singletonList(new Object[] {"integration/config/mysql-host-port-db-config.xml", new MySqlTestDatabase()});
+            return Collections.emptyList();
         }
         else
         {
-            return null;
+            return Collections.singletonList(new Object[] {"integration/config/mysql-host-port-db-config.xml", new MySqlTestDatabase()});
         }
     }
 
