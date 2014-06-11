@@ -6,11 +6,15 @@
  */
 package org.mule.util;
 
+import org.mule.api.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.AccessController;
@@ -27,6 +31,9 @@ public class IOUtils extends org.apache.commons.io.IOUtils
 {
     /** Logger. */
     private static final Log logger = LogFactory.getLog(IOUtils.class);
+
+    protected static int bufferSize = NumberUtils.toInt(
+        System.getProperty(MuleProperties.MULE_STREAMING_BUFFER_SIZE), 4 * 1024);
 
     /**
      * Attempts to load a resource from the file system, from a URL, or from the
@@ -274,5 +281,39 @@ public class IOUtils extends org.apache.commons.io.IOUtils
         {
             throw new RuntimeException(iox);
         }
+    }
+    
+    /**
+     * Re-implement copy method to allow buffer size to be configured. This won't impact all methods because
+     * there is no polymorphism for static methods, but rather just direct use of these two methods.
+     */
+    public static long copyLarge(InputStream input, OutputStream output) throws IOException
+    {
+        byte[] buffer = new byte[bufferSize];
+        long count = 0;
+        int n = 0;
+        while (-1 != (n = input.read(buffer)))
+        {
+            output.write(buffer, 0, n);
+            count += n;
+        }
+        return count;
+    }
+
+    /**
+     * Re-implement copy method to allow buffer size to be configured. This won't impact all methods because
+     * there is no polymorphism for static methods, but rather just direct use of these two methods.
+     */
+    public static long copyLarge(Reader input, Writer output) throws IOException
+    {
+        char[] buffer = new char[bufferSize];
+        long count = 0;
+        int n = 0;
+        while (-1 != (n = input.read(buffer)))
+        {
+            output.write(buffer, 0, n);
+            count += n;
+        }
+        return count;
     }
 }
