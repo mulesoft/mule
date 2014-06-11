@@ -688,15 +688,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
     protected void basicListFiles(File currentDirectory, List<File> discoveredFiles)
     {
-        File[] files;
-        if (fileFilter != null)
-        {
-            files = currentDirectory.listFiles(fileFilter);
-        }
-        else
-        {
-            files = currentDirectory.listFiles(filenameFilter);
-        }
+        File[] files = currentDirectory.listFiles();
 
         // the listFiles calls above may actually return null (check the JDK code).
         if (files == null)
@@ -706,15 +698,26 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
         for (File file : files)
         {
-            if (!file.isDirectory())
+            if (file.isDirectory())
             {
-                discoveredFiles.add(file);
+                basicListFiles(file, discoveredFiles);
             }
             else
             {
-                if (fileConnector.isRecursive())
+                boolean addFile = true;
+
+                if (fileFilter != null)
                 {
-                    this.basicListFiles(file, discoveredFiles);
+                    addFile = fileFilter.accept(file);
+                }
+                else if (filenameFilter != null)
+                {
+                    addFile = filenameFilter.accept(currentDirectory, file.getName());
+                }
+
+                if (addFile)
+                {
+                    discoveredFiles.add(file);
                 }
             }
         }
