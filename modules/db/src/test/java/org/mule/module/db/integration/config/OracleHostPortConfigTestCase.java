@@ -27,13 +27,13 @@ public class OracleHostPortConfigTestCase extends AbstractHostPortConfigTestCase
     @Parameterized.Parameters
     public static List<Object[]> parameters()
     {
-        if (TestDbConfig.getOracleResource() != null)
+        if (TestDbConfig.getOracleResource().isEmpty())
         {
-            return Collections.singletonList(new Object[] {"integration/config/oracle-host-port-db-config.xml", new OracleTestDatabase()});
+            return Collections.emptyList();
         }
         else
         {
-            return null;
+            return Collections.singletonList(new Object[] {"integration/config/oracle-host-port-db-config.xml", new OracleTestDatabase()});
         }
     }
 
