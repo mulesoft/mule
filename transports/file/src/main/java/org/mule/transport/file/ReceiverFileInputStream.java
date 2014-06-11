@@ -52,29 +52,34 @@ class ReceiverFileInputStream extends FileInputStream
     {
         super.close();
 
-        if (!streamProcessingError)
+        if (!isStreamProcessingError())
         {
             if (moveToOnClose != null)
             {
-                if (!FileUtils.moveFileWithCopyFallback(currentFile, moveToOnClose))
+                if (currentFile.exists())
                 {
-                    logger.warn(String.format("Failed to move file from %s to %s\n", currentFile.getPath(), moveToOnClose.getPath()));
+                    if (!FileUtils.moveFileWithCopyFallback(currentFile, moveToOnClose))
+                    {
+                        logger.warn(String.format("Failed to move file from %s to %s\n", currentFile.getPath(), moveToOnClose.getPath()));
+                    }
+                }
+                else if (logger.isDebugEnabled())
+                {
+                    logger.debug(String.format("Failed to move file from %s to %s. The file does not exist.\n", currentFile.getPath(), moveToOnClose.getPath()));
                 }
             }
             else if (deleteOnClose)
             {
-                if (!currentFile.delete())
+                if (currentFile.exists())
                 {
-                    try
+                    if (!currentFile.delete())
                     {
-                        throw new DefaultMuleException(FileMessages.failedToDeleteFile(currentFile));
+                        throw new IOException(new DefaultMuleException(FileMessages.failedToDeleteFile(currentFile)));
                     }
-                    catch (DefaultMuleException e)
-                    {
-                        IOException e2 = new IOException();
-                        e2.initCause(e);
-                        throw e2;
-                    }
+                }
+                else if (logger.isDebugEnabled())
+                {
+                    logger.debug(String.format("Failed to delete file %s. The file does not exist.\n", currentFile.getPath()));
                 }
             }
         }
