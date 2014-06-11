@@ -21,10 +21,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>native2ascii-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
                 <configuration>
@@ -43,25 +39,6 @@
         			<configuration>
         				<lifecycleMappingMetadata>
         					<pluginExecutions>
-        						<pluginExecution>
-        							<pluginExecutionFilter>
-        								<groupId>
-        									org.codehaus.mojo
-        								</groupId>
-        								<artifactId>
-        									native2ascii-maven-plugin
-        								</artifactId>
-        								<versionRange>
-        									[1.0-alpha-1,)
-        								</versionRange>
-        								<goals>
-        									<goal>native2ascii</goal>
-        								</goals>
-        							</pluginExecutionFilter>
-        							<action>
-        								<ignore></ignore>
-        							</action>
-        						</pluginExecution>
         						<pluginExecution>
         							<pluginExecutionFilter>
         								<groupId>

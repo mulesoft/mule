@@ -1503,26 +1503,6 @@
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>native2ascii-maven-plugin</artifactId>
-                    <version>1.0-alpha-1</version>
-                    <executions>
-                        <execution>
-                            <phase>generate-test-resources</phase>
-                            <goals>
-                                <goal>native2ascii</goal>
-                            </goals>
-                            <configuration>
-                                <src>${project.basedir}/src/test/resources</src>
-                                <dest>${project.basedir}/src/test/resources</dest>
-                                <includes>*.src</includes>
-                                <ext>.properties</ext>
-                                <encoding>UTF-8</encoding>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
                     <artifactId>shitty-maven-plugin</artifactId>
                     <version>1.0-alpha-3</version>
                 </plugin>
