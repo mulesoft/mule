@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:jetty="http://www.mulesoft.org/schema/mule/jetty"
+    xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/jetty http://www.mulesoft.org/schema/mule/jetty/current/mule-jetty.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <jetty:connector name="defaultConnector" />
+
+    <jetty:connector name="customConnector">
+        <spring:property name="jettyConnectorClass" value="org.eclipse.jetty.server.nio.BlockingChannelConnector" />
+    </jetty:connector>
+
+    <flow name="defaultConnectoFlowr">
+        <jetty:inbound-endpoint address="http://localhost:${port1}/test" connector-ref="defaultConnector" />
+        <echo-component />
+    </flow>
+
+    <flow name="customConnectorFlow">
+        <jetty:inbound-endpoint address="http://localhost:${port2}/test" connector-ref="customConnector" />
+        <echo-component />
+    </flow>
+
+</mule>
