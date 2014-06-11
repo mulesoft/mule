@@ -17,7 +17,6 @@
         <module>performance</module>
         <module>archetypes</module>
         <module>integration</module>
-        <module>integration-jdk6</module>
         <module>integration-axis</module>
     </modules>
 
