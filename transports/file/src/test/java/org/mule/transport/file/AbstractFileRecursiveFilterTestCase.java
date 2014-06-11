@@ -15,7 +15,6 @@ import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.io.File;
-import java.io.FileOutputStream;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -26,12 +25,9 @@ public class AbstractFileRecursiveFilterTestCase extends FunctionalTestCase
     @Before
     public void setUpFile() throws Exception
     {
-        File subfolder = new File(workingDirectory.getRoot(), "subfolder");
-        subfolder.mkdir();
-        File outFile = new File(subfolder, "test.txt");
-        FileOutputStream out = new FileOutputStream(outFile);
-        out.write(TEST_MESSAGE.getBytes());
-        out.close();
+        File subfolder = FileTestUtils.createFolder(workingDirectory.getRoot(), "subfolder");
+
+        FileTestUtils.createDataFile(subfolder, TEST_MESSAGE);
     }
 
     @Test

@@ -9,7 +9,7 @@
     <file:connector name="File" autoDelete="true" streaming="false" validateConnections="true" fileAge="1" recursive="true"/>
 
     <flow name="recursiveService">
-        <file:inbound-endpoint path="${workingDirectory}/subfolder">
+        <file:inbound-endpoint path="${workingDirectory}">
             <file:filename-wildcard-filter pattern="*.txt"/>
         </file:inbound-endpoint>
 
