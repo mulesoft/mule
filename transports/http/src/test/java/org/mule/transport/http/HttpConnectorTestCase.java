@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
@@ -266,6 +267,39 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
         httpConnector.setSendTcpNoDelay(true);
         httpConnector.initialise();
         assertTrue(httpConnector.clientConnectionManager.getParams().getTcpNoDelay());
+    }
+    
+    @Test
+    public void httpClientDisableStaleConnectionDefault() throws Exception
+    {
+        assertHttpClientStaleConnectionCheck(getInitialisedHttpConnector(), true);
+    }
+
+    @Test
+    public void httpClientDisableStaleConnectionSystemProperty() throws Exception
+    {
+        testWithSystemProperty(HttpConnector.DISABLE_STALE_CONNECTION_CHECK_SYSTEM_PROPERTY, "true",
+            new TestCallback()
+            {
+                @Override
+                public void run() throws Exception
+                {
+                    assertHttpClientStaleConnectionCheck(getInitialisedHttpConnector(), false);
+                }
+            });
+    }
+
+    protected HttpConnector getInitialisedHttpConnector() throws Exception, InitialisationException
+    {
+        HttpConnector httpConnector = (HttpConnector) createConnector();
+        httpConnector.initialise();
+        return httpConnector;
+    }
+
+    protected void assertHttpClientStaleConnectionCheck(HttpConnector connector, boolean enabled)
+        throws Exception, InitialisationException
+    {
+        assertEquals(enabled, connector.clientConnectionManager.getParams().isStaleCheckingEnabled());
     }
 
 }
