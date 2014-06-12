@@ -7,7 +7,6 @@
 package org.mule.module.launcher;
 
 import static org.mule.util.SplashScreen.miniSplash;
-
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.application.NullDeploymentListener;
@@ -15,7 +14,6 @@ import org.mule.module.launcher.artifact.Artifact;
 import org.mule.module.launcher.artifact.ArtifactFactory;
 import org.mule.module.launcher.util.ObservableList;
 import org.mule.util.CollectionUtils;
-import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
 
 import java.io.File;
@@ -358,21 +356,10 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
     private void addZombieApp(Artifact artifact)
     {
         File resourceFile = artifact.getResourceFiles()[0];
-        ZombieFile zombieFile = new ZombieFile();
 
         if (resourceFile.exists())
         {
-            try
-            {
-                zombieFile.url = resourceFile.toURI().toURL();
-                zombieFile.lastUpdated = resourceFile.lastModified();
-
-                artifactZombieMap.put(artifact.getArtifactName(), zombieFile);
-            }
-            catch (MalformedURLException e)
-            {
-                // Ignore resource
-            }
+            artifactZombieMap.put(artifact.getArtifactName(), new ZombieFile(resourceFile));
         }
     }
 
@@ -389,20 +376,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
             return;
         }
 
-        try
-        {
-            long lastModified = marker.lastModified();
-
-            ZombieFile zombieFile = new ZombieFile();
-            zombieFile.url = marker.toURI().toURL();
-            zombieFile.lastUpdated = lastModified;
-
-            artifactZombieMap.put(artifactName, zombieFile);
-        }
-        catch (MalformedURLException e)
-        {
-            logger.debug(String.format("Failed to mark an exploded artifact [%s] as a zombie", marker.getName()), e);
-        }
+        artifactZombieMap.put(artifactName, new ZombieFile(marker));
     }
 
     private T findArtifact(String artifactName)
@@ -552,6 +526,21 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
 
         URL url;
         Long lastUpdated;
+        File file;
+
+        private ZombieFile(File file)
+        {
+            this.file = file;
+            lastUpdated = file.lastModified();
+            try
+            {
+                url = file.toURI().toURL();
+            }
+            catch (MalformedURLException e)
+            {
+                throw new IllegalArgumentException(e);
+            }
+        }
 
         public boolean isFor(URL url)
         {
@@ -560,8 +549,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
 
         public boolean updatedZombieApp()
         {
-            long currentTimeStamp = FileUtils.getFileTimeStamp(url);
-            return lastUpdated != currentTimeStamp;
+            return lastUpdated != file.lastModified();
         }
     }
 }
