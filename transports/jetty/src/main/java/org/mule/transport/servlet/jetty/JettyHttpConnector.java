@@ -77,7 +77,7 @@ public class JettyHttpConnector extends AbstractConnector
     public static final Class<SelectChannelConnector> DEFAULT_JETTY_CONNECTOR_CLASS = SelectChannelConnector.class;
 
     public static final String JETTY_CONNECTOR_SYSTEM_PROPERTY = MuleProperties.SYSTEM_PROPERTY_PREFIX
-                                                                 + "transport.jetty.jettyConnectorClass";
+                                                                 + "transport.jetty.defaultJettyConnectorClass";
 
     private Server httpServer;
 
