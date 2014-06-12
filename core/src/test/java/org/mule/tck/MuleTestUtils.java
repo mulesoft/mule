@@ -640,4 +640,33 @@ public final class MuleTestUtils
         t.initialise();
         return t;
     }
+    
+    public static void withSystemProperty(String propertyName, String propertyValue, TestCallback callback)
+        throws Exception
+    {
+        assert propertyName != null && propertyValue != null && callback != null;
+        String orginalPropertyValue = System.getProperty(propertyName);
+        try
+        {
+            System.setProperty(propertyName, propertyValue);
+            callback.run();
+        }
+        finally
+        {
+            if (orginalPropertyValue == null)
+            {
+                System.clearProperty(propertyName);
+            }
+            else
+            {
+                System.setProperty(propertyName, orginalPropertyValue);
+            }
+        }
+    }
+
+    public static interface TestCallback
+    {
+        void run() throws Exception;
+    }
+
 }
