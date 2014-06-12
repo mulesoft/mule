@@ -654,11 +654,18 @@ public final class MuleTestUtils
     public static void testWithSystemProperty(String propertyName, String propertyValue, TestCallback callback)
         throws Exception
     {
-        assert propertyName != null && propertyValue != null && callback != null;
+        assert propertyName != null && callback != null;
         String originalPropertyValue = null;
         try
         {
-            originalPropertyValue = System.setProperty(propertyName, propertyValue);
+            if (propertyValue == null)
+            {
+                originalPropertyValue = System.clearProperty(propertyName);
+            }
+            else
+            {
+                originalPropertyValue = System.setProperty(propertyName, propertyValue);
+            }
             callback.run();
         }
         finally

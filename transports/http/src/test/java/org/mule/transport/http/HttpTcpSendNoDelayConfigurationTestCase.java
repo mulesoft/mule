@@ -25,24 +25,24 @@ public class HttpTcpSendNoDelayConfigurationTestCase extends FunctionalTestCase
     @Test
     public void tcpNoDelay() throws Exception
     {
-        HttpConnector httpConnector = (HttpConnector) muleContext.getRegistry().lookupConnector("httpConnector");
-        assertEquals(getDefaultSendTcpNoDelay(), httpConnector.isSendTcpNoDelay());
+        assertEquals(getDefaultSendTcpNoDelay(), lookupConnector("httpConnector").isSendTcpNoDelay());
     }
 
     @Test
     public void tcpNoDelayTrue() throws Exception
     {
-        HttpConnector httpConnector = (HttpConnector) muleContext.getRegistry().lookupConnector(
-            "httpConnectorSendTcpNoDelayTrue");
-        assertTrue(httpConnector.isSendTcpNoDelay());
+        assertTrue(lookupConnector("httpConnectorSendTcpNoDelayTrue").isSendTcpNoDelay());
     }
 
     @Test
     public void tcpNoDelayFalse() throws Exception
     {
-        HttpConnector httpConnector = (HttpConnector) muleContext.getRegistry().lookupConnector(
-            "httpConnectorSendTcpNoDelayFalse");
-        assertFalse(httpConnector.isSendTcpNoDelay());
+        assertFalse(lookupConnector("httpConnectorSendTcpNoDelayFalse").isSendTcpNoDelay());
+    }
+
+    protected HttpConnector lookupConnector(String name)
+    {
+        return (HttpConnector) muleContext.getRegistry().lookupConnector(name);
     }
 
     protected boolean getDefaultSendTcpNoDelay()
