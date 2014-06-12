@@ -20,10 +20,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.Initialisable;
@@ -84,6 +84,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private static final ArtifactDescriptor dummyAppDescriptor = new ArtifactDescriptor("dummy-app", "/dummy-app.zip", "/dummy-app", null, null);
     private static final ArtifactDescriptor emptyAppDescriptor = new ArtifactDescriptor("empty-app", "/empty-app.zip", null, "empty-app.zip", null);
     private static final ArtifactDescriptor brokenAppDescriptor = new ArtifactDescriptor("broken-app", "/broken-app.zip", null, "brokenApp.zip", null);
+    private static final ArtifactDescriptor brokenAppWithFunkyNameDescriptor = new ArtifactDescriptor("broken-app+", "/broken-app+.zip", null, "brokenApp+.zip", null);
     private static final ArtifactDescriptor incompleteAppDescriptor = new ArtifactDescriptor("incompleteApp", "/incompleteApp.zip", "/incompleteApp", "incompleteApp.zip", null);
     private static final ArtifactDescriptor waitAppDescriptor = new ArtifactDescriptor("wait-app", "/wait-app.zip", "/wait-app", "wait-app.zip", "mule-config.xml");
 
@@ -235,6 +236,43 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
         assertEquals("Wrong URL tagged as zombie.", "brokenApp.zip", new File(zombie.getKey().getFile()).getName());
         assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+    }
+
+    /**
+     * This tests deploys a broken app which name has a weird character.
+     * It verifies that after failing deploying that app, it doesn't try to do it
+     * again, which is a behavior than can be seen in some file systems due to
+     * path handling issues
+     */
+    @Test
+    public void dontRetryBrokenAppWithFunkyName() throws Exception
+    {
+        addPackedAppFromResource(brokenAppWithFunkyNameDescriptor.zipPath, brokenAppWithFunkyNameDescriptor.targetPath);
+
+        deploymentService.start();
+
+        assertDeploymentFailure(applicationDeploymentListener, "brokenApp+");
+
+        assertAppsDir(new String[] {"brokenApp+.zip"}, NONE, true);
+
+        assertApplicationAnchorFileDoesNotExists(brokenAppDescriptor.id);
+
+        final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
+        assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
+        final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
+        assertEquals("Wrong URL tagged as zombie.", "brokenApp+.zip", new File(zombie.getKey().getFile()).getName());
+        assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+
+        reset(applicationDeploymentListener);
+
+        addPackedAppFromResource(dummyAppDescriptor.zipPath);
+
+        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertDeploymentFailure(applicationDeploymentListener, "brokenApp+", never());
+
+        addPackedAppFromResource(emptyAppDescriptor.zipPath);
+        assertDeploymentSuccess(applicationDeploymentListener, emptyAppDescriptor.id);
+        assertDeploymentFailure(applicationDeploymentListener, "brokenApp+", never());
     }
 
     @Test
@@ -2250,6 +2288,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         verifyDeploymentSuccessfulAction.perform();
         verifyAnchorFileExistsAction.perform();
     }
+
 
     private void assertDeploymentSuccess(final DeploymentListener listener, final String artifactName)
     {
