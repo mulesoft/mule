@@ -10,6 +10,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -50,6 +51,7 @@ import org.apache.commons.httpclient.auth.AuthPolicy;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.util.IdleConnectionTimeoutThread;
+import org.apache.commons.lang.BooleanUtils;
 
 /**
  * <code>HttpConnector</code> provides a way of receiving and sending http requests
@@ -73,6 +75,10 @@ public class HttpConnector extends TcpConnector
 
     public static final String HTTP = "http";
     public static final String HTTP_PREFIX = "http.";
+    public static final String DISABLE_STALE_CONNECTION_CHECK_SYSTEM_PROPERTY = MuleProperties.SYSTEM_PROPERTY_PREFIX
+                                                                                + "transport."
+                                                                                + HTTP_PREFIX
+                                                                                + "disableHttpClientStaleConnectionCheck";
 
     /**
      * MuleEvent property to pass back the status for the response
@@ -238,6 +244,7 @@ public class HttpConnector extends TcpConnector
             params.setTcpNoDelay(isSendTcpNoDelay());
             params.setMaxTotalConnections(dispatchers.getMaxTotal());
             params.setDefaultMaxConnectionsPerHost(dispatchers.getMaxTotal());
+            params.setStaleCheckingEnabled(!BooleanUtils.toBoolean(System.getProperty(DISABLE_STALE_CONNECTION_CHECK_SYSTEM_PROPERTY)));
 
             if (getConnectionTimeout() != INT_VALUE_NOT_SET)
             {
