@@ -10,8 +10,8 @@ import static org.mule.util.Preconditions.checkArgument;
 import static org.mule.util.Preconditions.checkState;
 import org.mule.common.MuleVersion;
 import org.mule.extensions.introspection.api.Capability;
-import org.mule.extensions.introspection.api.MuleExtension;
-import org.mule.extensions.introspection.api.MuleExtensionOperation;
+import org.mule.extensions.introspection.api.Extension;
+import org.mule.extensions.introspection.api.ExtensionOperation;
 import org.mule.extensions.introspection.api.MuleExtensionType;
 import org.mule.extensions.introspection.spi.Builder;
 import org.mule.extensions.introspection.spi.MuleExtensionBuilder;
@@ -31,14 +31,14 @@ import org.apache.commons.lang.StringUtils;
 
 /**
  * Default implementation of {@link org.mule.extensions.introspection.spi.MuleExtensionBuilder}
- * which builds instances of {@link org.mule.extensions.internal.ImmutableMuleExtension}
+ * which builds instances of {@link ImmutableExtension}
  *
  * @since 1.0
  */
 public final class DefaultMuleExtensionBuilder implements MuleExtensionBuilder
 {
 
-    private static final MuleVersion DEFAULT_MIN_MULE_VERSION = new MuleVersion(MuleExtension.MIN_MULE_VERSION);
+    private static final MuleVersion DEFAULT_MIN_MULE_VERSION = new MuleVersion(Extension.MIN_MULE_VERSION);
 
     private String name;
     private String description;
@@ -46,7 +46,7 @@ public final class DefaultMuleExtensionBuilder implements MuleExtensionBuilder
     private MuleExtensionType extensionType;
     private String minMuleVersion;
     private List<MuleExtensionConfigurationBuilder> configurations = new LinkedList<MuleExtensionConfigurationBuilder>();
-    private List<Builder<MuleExtensionOperation>> operations = new LinkedList<Builder<MuleExtensionOperation>>();
+    private List<Builder<ExtensionOperation>> operations = new LinkedList<Builder<ExtensionOperation>>();
     private Map<Class<? extends Capability>, Capability> capabilities = new HashMap<Class<? extends Capability>, Capability>();
 
     public static MuleExtensionBuilder newBuilder()
@@ -121,10 +121,10 @@ public final class DefaultMuleExtensionBuilder implements MuleExtensionBuilder
     }
 
     @Override
-    public <T extends MuleExtensionOperation, B> MuleExtensionBuilder addOperation(OperationBuilder<T, B> operation)
+    public <T extends ExtensionOperation, B> MuleExtensionBuilder addOperation(OperationBuilder<T, B> operation)
     {
         checkArgument(operation != null, "Cannot add a null operation builder");
-        operations.add((Builder<MuleExtensionOperation>) operation);
+        operations.add((Builder<ExtensionOperation>) operation);
 
         return this;
     }
@@ -146,10 +146,10 @@ public final class DefaultMuleExtensionBuilder implements MuleExtensionBuilder
      * {@inheritDoc}
      */
     @Override
-    public MuleExtension build()
+    public Extension build()
     {
         validateMuleVersion();
-        return new ImmutableMuleExtension(name,
+        return new ImmutableExtension(name,
                                           description,
                                           version,
                                           extensionType,

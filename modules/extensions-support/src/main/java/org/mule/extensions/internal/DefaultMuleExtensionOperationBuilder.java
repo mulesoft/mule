@@ -6,11 +6,11 @@
  */
 package org.mule.extensions.internal;
 
-import org.mule.extensions.introspection.api.MuleExtensionOperation;
+import org.mule.extensions.introspection.api.ExtensionOperation;
 import org.mule.extensions.introspection.spi.MuleExtensionOperationBuilder;
 
 final class DefaultMuleExtensionOperationBuilder extends
-        AbstractMuleExtensionOperationBuilder<MuleExtensionOperation, MuleExtensionOperationBuilder>
+        AbstractMuleExtensionOperationBuilder<ExtensionOperation, MuleExtensionOperationBuilder>
         implements MuleExtensionOperationBuilder
 {
 
@@ -20,9 +20,9 @@ final class DefaultMuleExtensionOperationBuilder extends
     }
 
     @Override
-    public MuleExtensionOperation build()
+    public ExtensionOperation build()
     {
-        return new ImmutableMuleExtensionOperation(name,
+        return new ImmutableExtensionOperation(name,
                                                    description,
                                                    ownerConfigurations,
                                                    inputTypes,

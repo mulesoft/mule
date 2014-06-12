@@ -7,14 +7,14 @@
 package org.mule.extensions.spi;
 
 import org.mule.extensions.api.MuleExtensionsManager;
-import org.mule.extensions.introspection.api.MuleExtension;
+import org.mule.extensions.introspection.api.Extension;
 
 import java.util.List;
 
 /**
  * This component is responsible from discovering the available extensions in the context classpath.
  * When an extension is found, it will parse the Annotations in it to generate an instance of
- * {@link org.mule.extensions.introspection.api.MuleExtension} that describes it.
+ * {@link org.mule.extensions.introspection.api.Extension} that describes it.
  * <p/>
  * Optionally, it can also register those extensions in a {@link org.mule.extensions.api.MuleExtensionsManager}
  * <p/>
@@ -33,20 +33,20 @@ public interface MuleExtensionScanner
 {
 
     /**
-     * Scans the classpath for extensions and describes them as {@link org.mule.extensions.introspection.api.MuleExtension}s.
+     * Scans the classpath for extensions and describes them as {@link org.mule.extensions.introspection.api.Extension}s.
      * Found extensions are then returned in a {@link java.util.List}
      *
-     * @return a {@link java.util.List} of {@link org.mule.extensions.introspection.api.MuleExtension}
+     * @return a {@link java.util.List} of {@link org.mule.extensions.introspection.api.Extension}
      */
-    List<MuleExtension> scan();
+    List<Extension> scan();
 
     /**
      * Calls {@link #scan()} but also registers the found exceptions in the given {@code muleExtensionsManager}
-     * by invoking {@link org.mule.extensions.api.MuleExtensionsManager#register(org.mule.extensions.introspection.api.MuleExtension)}
+     * by invoking {@link org.mule.extensions.api.MuleExtensionsManager#register(org.mule.extensions.introspection.api.Extension)}
      *
      * @param muleExtensionsManager a {@link org.mule.extensions.api.MuleExtensionsManager}
-     * @return a {@link java.util.List} of {@link org.mule.extensions.introspection.api.MuleExtension}
+     * @return a {@link java.util.List} of {@link org.mule.extensions.introspection.api.Extension}
      */
-    List<MuleExtension> scanAndRegister(MuleExtensionsManager muleExtensionsManager);
+    List<Extension> scanAndRegister(MuleExtensionsManager muleExtensionsManager);
 
 }

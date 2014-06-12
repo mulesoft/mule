@@ -10,7 +10,7 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.extensions.api.MuleExtensionsManager;
 import org.mule.extensions.internal.DefaultMuleExtensionBuilder;
-import org.mule.extensions.introspection.api.MuleExtension;
+import org.mule.extensions.introspection.api.Extension;
 import org.mule.extensions.introspection.spi.MuleExtensionBuilder;
 import org.mule.extensions.spi.MuleExtensionScanner;
 import org.mule.util.ClassUtils;
@@ -32,10 +32,10 @@ public final class DefaultMuleExtensionScanner implements MuleExtensionScanner
     private static final String EXTENSIONS_PROPERTIES = "META-INF/extensions/mule.extensions";
 
     @Override
-    public List<MuleExtension> scan()
+    public List<Extension> scan()
     {
         Enumeration<URL> allExtensions = ClassUtils.getResources(EXTENSIONS_PROPERTIES, getClass());
-        List<MuleExtension> extensions = new LinkedList<MuleExtension>();
+        List<Extension> extensions = new LinkedList<Extension>();
 
         while (allExtensions.hasMoreElements())
         {
@@ -56,10 +56,10 @@ public final class DefaultMuleExtensionScanner implements MuleExtensionScanner
     }
 
     @Override
-    public List<MuleExtension> scanAndRegister(MuleExtensionsManager muleExtensionsManager)
+    public List<Extension> scanAndRegister(MuleExtensionsManager muleExtensionsManager)
     {
-        List<MuleExtension> extensions = scan();
-        for (MuleExtension extension : extensions)
+        List<Extension> extensions = scan();
+        for (Extension extension : extensions)
         {
             muleExtensionsManager.register(extension);
         }
@@ -67,7 +67,7 @@ public final class DefaultMuleExtensionScanner implements MuleExtensionScanner
         return extensions;
     }
 
-    private MuleExtension loadExtension(String extensionClassname)
+    private Extension loadExtension(String extensionClassname)
     {
         try
         {

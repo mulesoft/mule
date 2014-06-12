@@ -6,9 +6,9 @@
  */
 package org.mule.extensions.introspection.spi;
 
-import org.mule.extensions.introspection.api.MuleExtensionOperation;
+import org.mule.extensions.introspection.api.ExtensionOperation;
 
-public interface MuleExtensionOperationBuilder extends OperationBuilder<MuleExtensionOperation, MuleExtensionOperationBuilder>
+public interface MuleExtensionOperationBuilder extends OperationBuilder<ExtensionOperation, MuleExtensionOperationBuilder>
 {
 
 }

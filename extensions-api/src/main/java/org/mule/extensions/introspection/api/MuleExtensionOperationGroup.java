@@ -22,7 +22,7 @@ public interface MuleExtensionOperationGroup extends Described
 
         /**
          * Only simple message processors that are not endpoints nor
-         * {@link org.mule.extensions.introspection.api.MuleExtensionOperation}s
+         * {@link ExtensionOperation}s
          */
         MESSAGE_PROCESSOR,
 
@@ -38,8 +38,8 @@ public interface MuleExtensionOperationGroup extends Described
         MESSAGE_PROCESSOR_OR_OUTBOUND_ENDPOINT,
 
         /**
-         * Only {@link org.mule.extensions.introspection.api.MuleExtensionOperation}s defined
-         * between the current {@link org.mule.extensions.introspection.api.MuleExtension}
+         * Only {@link ExtensionOperation}s defined
+         * between the current {@link Extension}
          */
         OWN_EXTENSION_OPERATION,
 

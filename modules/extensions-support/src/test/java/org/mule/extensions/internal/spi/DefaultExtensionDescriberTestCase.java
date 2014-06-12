@@ -16,9 +16,9 @@ import static org.mule.extensions.HeisenbergModule.EXTENSION_VERSION;
 import static org.mule.extensions.HeisenbergModule.HEISENBERG;
 import org.mule.extensions.HeisenbergModule;
 import org.mule.extensions.internal.DefaultMuleExtensionBuilder;
-import org.mule.extensions.introspection.api.MuleExtension;
-import org.mule.extensions.introspection.api.MuleExtensionConfiguration;
-import org.mule.extensions.introspection.api.MuleExtensionOperation;
+import org.mule.extensions.introspection.api.Extension;
+import org.mule.extensions.introspection.api.ExtensionConfiguration;
+import org.mule.extensions.introspection.api.ExtensionOperation;
 import org.mule.extensions.introspection.api.MuleExtensionParameter;
 import org.mule.extensions.introspection.api.MuleExtensionType;
 import org.mule.extensions.introspection.spi.MuleExtensionBuilder;
@@ -32,7 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class DefaultMuleExtensionDescriberTestCase extends AbstractMuleTestCase
+public class DefaultExtensionDescriberTestCase extends AbstractMuleTestCase
 {
 
     private static final String SAY_MY_NAME_OPERATION = "sayMyName";
@@ -56,24 +56,24 @@ public class DefaultMuleExtensionDescriberTestCase extends AbstractMuleTestCase
         MuleExtensionDescriber describer = new DefaultMuleExtensionDescriber(HeisenbergModule.class);
         describer.describe(builder);
 
-        MuleExtension extension = builder.build();
+        Extension extension = builder.build();
         assertNotNull(extension);
 
         assertEquals(EXTENSION_NAME, extension.getName());
         assertEquals(EXTENSION_DESCRIPTION, extension.getDescription());
         assertEquals(EXTENSION_VERSION, extension.getVersion());
-        assertEquals(MuleExtension.MIN_MULE_VERSION, extension.getMinMuleVersion());
+        assertEquals(Extension.MIN_MULE_VERSION, extension.getMinMuleVersion());
         assertEquals(MuleExtensionType.MODULE, extension.getExtensionType());
 
         assertTestModuleConfiguration(extension);
         assertTestModuleOperations(extension);
     }
 
-    private void assertTestModuleConfiguration(MuleExtension extension) throws Exception
+    private void assertTestModuleConfiguration(Extension extension) throws Exception
     {
         assertEquals(1, extension.getConfigurations().size());
-        MuleExtensionConfiguration conf = extension.getConfigurations().get(0);
-        assertSame(conf, extension.getConfiguration(MuleExtensionConfiguration.DEFAULT_NAME));
+        ExtensionConfiguration conf = extension.getConfigurations().get(0);
+        assertSame(conf, extension.getConfiguration(ExtensionConfiguration.DEFAULT_NAME));
 
         List<MuleExtensionParameter> parameters = conf.getParameters();
         assertEquals(2, parameters.size());
@@ -82,17 +82,17 @@ public class DefaultMuleExtensionDescriberTestCase extends AbstractMuleTestCase
         assertParameter(parameters.get(1), "enemies", "", List.class, true, true, null);
     }
 
-    private void assertTestModuleOperations(MuleExtension extension) throws Exception
+    private void assertTestModuleOperations(Extension extension) throws Exception
     {
         assertEquals(6, extension.getOperations().size());
-        assertOperation(extension, SAY_MY_NAME_OPERATION, "", new Class<?>[] {Object.class}, new Class<?>[] {String.class}, MuleExtensionConfiguration.DEFAULT_NAME);
-        assertOperation(extension, GET_ENEMY_OPERATION, "", new Class<?>[] {Object.class}, new Class<?>[] {String.class}, MuleExtensionConfiguration.DEFAULT_NAME);
-        assertOperation(extension, KILL_OPERATION, "", new Class<?>[] {Object.class}, new Class<?>[] {String.class}, MuleExtensionConfiguration.DEFAULT_NAME);
-        assertOperation(extension, KILL_CUSTOM_OPERATION, "", new Class<?>[] {Object.class}, new Class<?>[] {String.class}, MuleExtensionConfiguration.DEFAULT_NAME);
-        assertOperation(extension, HIDE_METH_IN_EVENT_OPERATION, "", new Class<?>[] {Object.class}, new Class<?>[] {void.class}, MuleExtensionConfiguration.DEFAULT_NAME);
-        assertOperation(extension, HIDE_METH_IN_MESSAGE_OPERATION, "", new Class<?>[] {Object.class}, new Class<?>[] {void.class}, MuleExtensionConfiguration.DEFAULT_NAME);
+        assertOperation(extension, SAY_MY_NAME_OPERATION, "", new Class<?>[] {Object.class}, new Class<?>[] {String.class}, ExtensionConfiguration.DEFAULT_NAME);
+        assertOperation(extension, GET_ENEMY_OPERATION, "", new Class<?>[] {Object.class}, new Class<?>[] {String.class}, ExtensionConfiguration.DEFAULT_NAME);
+        assertOperation(extension, KILL_OPERATION, "", new Class<?>[] {Object.class}, new Class<?>[] {String.class}, ExtensionConfiguration.DEFAULT_NAME);
+        assertOperation(extension, KILL_CUSTOM_OPERATION, "", new Class<?>[] {Object.class}, new Class<?>[] {String.class}, ExtensionConfiguration.DEFAULT_NAME);
+        assertOperation(extension, HIDE_METH_IN_EVENT_OPERATION, "", new Class<?>[] {Object.class}, new Class<?>[] {void.class}, ExtensionConfiguration.DEFAULT_NAME);
+        assertOperation(extension, HIDE_METH_IN_MESSAGE_OPERATION, "", new Class<?>[] {Object.class}, new Class<?>[] {void.class}, ExtensionConfiguration.DEFAULT_NAME);
 
-        MuleExtensionOperation operation = extension.getOperation(SAY_MY_NAME_OPERATION);
+        ExtensionOperation operation = extension.getOperation(SAY_MY_NAME_OPERATION);
         assertNotNull(operation);
         assertTrue(operation.getParameters().isEmpty());
 
@@ -119,7 +119,7 @@ public class DefaultMuleExtensionDescriberTestCase extends AbstractMuleTestCase
         assertTrue(operation.getParameters().isEmpty());
     }
 
-    private void assertOperation(MuleExtension extension,
+    private void assertOperation(Extension extension,
                                  String operationName,
                                  String operationDescription,
                                  Class<?>[] inputTypes,
@@ -127,7 +127,7 @@ public class DefaultMuleExtensionDescriberTestCase extends AbstractMuleTestCase
                                  String... availableConfs) throws Exception
     {
 
-        MuleExtensionOperation operation = extension.getOperation(operationName);
+        ExtensionOperation operation = extension.getOperation(operationName);
 
         assertEquals(operationName, operation.getName());
         assertEquals(operationDescription, operation.getDescription());

@@ -6,9 +6,9 @@
  */
 package org.mule.extensions.introspection.spi;
 
-import org.mule.extensions.introspection.api.MuleExtensionOperation;
+import org.mule.extensions.introspection.api.ExtensionOperation;
 
-public interface OperationBuilder<T extends MuleExtensionOperation, B> extends Builder<T>
+public interface OperationBuilder<T extends ExtensionOperation, B> extends Builder<T>
 {
 
     B setName(String name);

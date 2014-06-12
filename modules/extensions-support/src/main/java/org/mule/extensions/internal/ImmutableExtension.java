@@ -9,12 +9,12 @@ package org.mule.extensions.internal;
 import static org.mule.extensions.internal.MuleExtensionUtils.checkNullOrRepeatedNames;
 import static org.mule.extensions.internal.MuleExtensionUtils.toMap;
 import static org.mule.util.Preconditions.checkArgument;
-import org.mule.extensions.api.exception.NoSuchConfigurationException;
-import org.mule.extensions.api.exception.NoSuchOperationException;
+import org.mule.extensions.introspection.api.ExtensionOperation;
+import org.mule.extensions.introspection.api.NoSuchConfigurationException;
+import org.mule.extensions.introspection.api.NoSuchOperationException;
 import org.mule.extensions.introspection.api.Capability;
-import org.mule.extensions.introspection.api.MuleExtension;
-import org.mule.extensions.introspection.api.MuleExtensionConfiguration;
-import org.mule.extensions.introspection.api.MuleExtensionOperation;
+import org.mule.extensions.introspection.api.Extension;
+import org.mule.extensions.introspection.api.ExtensionConfiguration;
 import org.mule.extensions.introspection.api.MuleExtensionType;
 
 import com.google.common.base.Objects;
@@ -28,28 +28,28 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * Immutable implementation of {@link org.mule.extensions.introspection.api.MuleExtension}
+ * Immutable implementation of {@link org.mule.extensions.introspection.api.Extension}
  *
  * @since 1.0
  */
-final class ImmutableMuleExtension extends AbstractImmutableDescribed implements MuleExtension
+final class ImmutableExtension extends AbstractImmutableDescribed implements Extension
 {
 
     private final String version;
     private final MuleExtensionType extensionType;
     private final String minMuleVersion;
-    private final Map<String, MuleExtensionConfiguration> configurations;
-    private final Map<String, MuleExtensionOperation> operations;
+    private final Map<String, ExtensionConfiguration> configurations;
+    private final Map<String, ExtensionOperation> operations;
     private Map<Class<? extends Capability>, Capability> capabilities;
 
-    protected ImmutableMuleExtension(String name,
-                                     String description,
-                                     String version,
-                                     MuleExtensionType extensionType,
-                                     String minMuleVersion,
-                                     List<MuleExtensionConfiguration> configurations,
-                                     List<MuleExtensionOperation> operations,
-                                     Map<Class<? extends Capability>, Capability> capabilities)
+    protected ImmutableExtension(String name,
+                                 String description,
+                                 String version,
+                                 MuleExtensionType extensionType,
+                                 String minMuleVersion,
+                                 List<ExtensionConfiguration> configurations,
+                                 List<ExtensionOperation> operations,
+                                 Map<Class<? extends Capability>, Capability> capabilities)
     {
         super(name, description);
 
@@ -75,7 +75,7 @@ final class ImmutableMuleExtension extends AbstractImmutableDescribed implements
      * {@inheritDoc}
      */
     @Override
-    public List<MuleExtensionConfiguration> getConfigurations()
+    public List<ExtensionConfiguration> getConfigurations()
     {
         return ImmutableList.copyOf(configurations.values());
     }
@@ -84,22 +84,22 @@ final class ImmutableMuleExtension extends AbstractImmutableDescribed implements
      * {@inheritDoc}
      */
     @Override
-    public MuleExtensionConfiguration getConfiguration(String name) throws NoSuchConfigurationException
+    public ExtensionConfiguration getConfiguration(String name) throws NoSuchConfigurationException
     {
-        MuleExtensionConfiguration muleExtensionConfiguration = configurations.get(name);
-        if (muleExtensionConfiguration == null)
+        ExtensionConfiguration extensionConfiguration = configurations.get(name);
+        if (extensionConfiguration == null)
         {
             throw new NoSuchConfigurationException(this, name);
         }
 
-        return muleExtensionConfiguration;
+        return extensionConfiguration;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<MuleExtensionOperation> getOperations()
+    public List<ExtensionOperation> getOperations()
     {
         return ImmutableList.copyOf(operations.values());
     }
@@ -135,15 +135,15 @@ final class ImmutableMuleExtension extends AbstractImmutableDescribed implements
      * {@inheritDoc}
      */
     @Override
-    public MuleExtensionOperation getOperation(String name) throws NoSuchOperationException
+    public ExtensionOperation getOperation(String name) throws NoSuchOperationException
     {
-        MuleExtensionOperation muleExtensionOperation = operations.get(name);
-        if (muleExtensionOperation == null)
+        ExtensionOperation extensionOperation = operations.get(name);
+        if (extensionOperation == null)
         {
             throw new NoSuchOperationException(this, name);
         }
 
-        return muleExtensionOperation;
+        return extensionOperation;
     }
 
     /**
@@ -162,9 +162,9 @@ final class ImmutableMuleExtension extends AbstractImmutableDescribed implements
     @Override
     public boolean equals(Object obj)
     {
-        if (obj instanceof MuleExtension)
+        if (obj instanceof Extension)
         {
-            MuleExtension other = (MuleExtension) obj;
+            Extension other = (Extension) obj;
             return Objects.equal(getName(), other.getName()) && Objects.equal(getVersion(), other.getVersion());
         }
 

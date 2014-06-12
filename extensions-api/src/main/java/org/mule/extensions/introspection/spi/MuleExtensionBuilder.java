@@ -7,21 +7,21 @@
 package org.mule.extensions.introspection.spi;
 
 import org.mule.extensions.introspection.api.Capability;
-import org.mule.extensions.introspection.api.MuleExtension;
-import org.mule.extensions.introspection.api.MuleExtensionOperation;
+import org.mule.extensions.introspection.api.Extension;
+import org.mule.extensions.introspection.api.ExtensionOperation;
 import org.mule.extensions.introspection.api.MuleExtensionType;
 
 /**
  * Implementation of the Builder design pattern to construct instances of
- * {@link org.mule.extensions.introspection.api.MuleExtension} without coupling
+ * {@link org.mule.extensions.introspection.api.Extension} without coupling
  * to implementations
  * <p/>
- * No user or spi component should ever create a {@link org.mule.extensions.introspection.api.MuleExtension}
+ * No user or spi component should ever create a {@link org.mule.extensions.introspection.api.Extension}
  * in a way other than through this builder
  *
  * @since 1.0
  */
-public interface MuleExtensionBuilder extends Builder<MuleExtension>
+public interface MuleExtensionBuilder extends Builder<Extension>
 {
 
     MuleExtensionBuilder setName(String name);
@@ -36,7 +36,7 @@ public interface MuleExtensionBuilder extends Builder<MuleExtension>
 
     MuleExtensionBuilder addConfiguration(MuleExtensionConfigurationBuilder configuration);
 
-    <T extends MuleExtensionOperation, B> MuleExtensionBuilder addOperation(OperationBuilder<T, B> operation);
+    <T extends ExtensionOperation, B> MuleExtensionBuilder addOperation(OperationBuilder<T, B> operation);
 
     <T extends Capability, C extends T> MuleExtensionBuilder addCapablity(Class<T> capabilityType, C capability);
 

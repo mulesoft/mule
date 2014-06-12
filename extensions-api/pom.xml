@@ -34,6 +34,12 @@
             <version>${parent.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>core</artifactId>
+            <version>4.3.0</version>
+        </dependency>
+
         <!-- test dependencies -->
         <dependency>
             <groupId>org.mockito</groupId>

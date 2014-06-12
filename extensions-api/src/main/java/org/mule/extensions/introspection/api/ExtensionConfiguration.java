@@ -9,34 +9,29 @@ package org.mule.extensions.introspection.api;
 import java.util.List;
 
 /**
- * An access point to a sub set of {@link org.mule.extensions.introspection.api.MuleExtensionOperation}s
- * available in a {@link org.mule.extensions.introspection.api.MuleExtension}.
+ * A named configuration for an extension
  * <p/>
+ * <p>
+ *     Configurations describe different ways to intialize a scope for operations.
+ *     Upon execution, each operation will be associated to a given configuration, so configurations define both
+ *     a set of shared properties used in operations, and a common context to relate operations.
+ * </p>
+ * <p>
+ *     For example, an extension that provides access to an external resource may provide
+ * </p>
  * The configuration can also imply different implicit behaviors not strictly attached to the operations
  * (e.g.: A connector supporting both stateful connections an OAuth2 authentication. Depending on the
  * configuration used, the same connector will have different reconnection strategies).
  * <p/>
  * The configuration is also the place in which cross operation, extension level attributes are configured.
  * <p/>
- * Every {@link org.mule.extensions.introspection.api.MuleExtension} is required to have at least one configuration.
+ * Every {@link Extension} is required to have at least one configuration.
  * That configuration is defined as the &quot;default configuration&quot;
  *
  * @since 1.0
  */
-public interface MuleExtensionConfiguration extends Described
+public interface ExtensionConfiguration extends Described
 {
-
-    /**
-     * Default name for the default configuration. This is just a default name. The default configuration
-     * is not required to be named like this
-     */
-    public static final String DEFAULT_NAME = "config";
-
-    /**
-     * A default description for the default configuration
-     */
-    public static final String DEFAULT_DESCRIPTION = "Default config";
-
     /**
      * Returns the {@link org.mule.extensions.introspection.api.MuleExtensionParameter}s
      * available for this configuration

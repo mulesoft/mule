@@ -6,7 +6,7 @@
  */
 package org.mule.extensions.internal;
 
-import org.mule.extensions.introspection.api.MuleExtensionOperation;
+import org.mule.extensions.introspection.api.ExtensionOperation;
 import org.mule.extensions.introspection.spi.MuleExtensionParameterBuilder;
 import org.mule.extensions.introspection.spi.OperationBuilder;
 
@@ -16,7 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-abstract class AbstractMuleExtensionOperationBuilder<T extends MuleExtensionOperation, B> implements OperationBuilder<T, B>
+abstract class AbstractMuleExtensionOperationBuilder<T extends ExtensionOperation, B> implements OperationBuilder<T, B>
 {
 
     protected String name;

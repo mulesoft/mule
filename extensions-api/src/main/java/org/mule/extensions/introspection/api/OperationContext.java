@@ -37,6 +37,6 @@ public interface OperationContext
      */
     OperationContext setParameter(MuleExtensionParameter param, Object value);
 
-    MuleExtensionOperation getOperation();
+    ExtensionOperation getOperation();
 
 }

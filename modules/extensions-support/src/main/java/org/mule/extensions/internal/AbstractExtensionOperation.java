@@ -7,8 +7,8 @@
 package org.mule.extensions.internal;
 
 import static org.mule.extensions.internal.MuleExtensionUtils.immutableList;
-import org.mule.extensions.introspection.api.MuleExtensionConfiguration;
-import org.mule.extensions.introspection.api.MuleExtensionOperation;
+import org.mule.extensions.introspection.api.ExtensionConfiguration;
+import org.mule.extensions.introspection.api.ExtensionOperation;
 import org.mule.extensions.introspection.api.MuleExtensionParameter;
 import org.mule.util.Preconditions;
 
@@ -16,11 +16,11 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Convenience superclass for implementations of {@link org.mule.extensions.introspection.api.MuleExtensionOperation}
+ * Convenience superclass for implementations of {@link org.mule.extensions.introspection.api.ExtensionOperation}
  *
  * @since 1.0
  */
-abstract class AbstractMuleExtensionOperation extends AbstractImmutableDescribed implements MuleExtensionOperation
+abstract class AbstractExtensionOperation extends AbstractImmutableDescribed implements ExtensionOperation
 {
 
     protected final Set<String> ownerConfigurations;
@@ -28,12 +28,12 @@ abstract class AbstractMuleExtensionOperation extends AbstractImmutableDescribed
     protected final List<Class<?>> outputTypes;
     protected final List<MuleExtensionParameter> parameters;
 
-    AbstractMuleExtensionOperation(String name,
-                                              String description,
-                                              Set<String> ownerConfigurations,
-                                              List<Class<?>> inputTypes,
-                                              List<Class<?>> outputTypes,
-                                              List<MuleExtensionParameter> parameters)
+    AbstractExtensionOperation(String name,
+                               String description,
+                               Set<String> ownerConfigurations,
+                               List<Class<?>> inputTypes,
+                               List<Class<?>> outputTypes,
+                               List<MuleExtensionParameter> parameters)
     {
         super(name, description);
 
@@ -74,12 +74,12 @@ abstract class AbstractMuleExtensionOperation extends AbstractImmutableDescribed
      * {@inheritDoc}
      */
     @Override
-    public boolean isAvailableFor(MuleExtensionConfiguration muleExtensionConfiguration)
+    public boolean isAvailableFor(ExtensionConfiguration extensionConfiguration)
     {
-        Preconditions.checkArgument(muleExtensionConfiguration != null, "configuration cannot be null");
+        Preconditions.checkArgument(extensionConfiguration != null, "configuration cannot be null");
 
         return ownerConfigurations.isEmpty()
                ? true
-               : ownerConfigurations.contains(muleExtensionConfiguration.getName());
+               : ownerConfigurations.contains(extensionConfiguration.getName());
     }
 }

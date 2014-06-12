@@ -6,7 +6,7 @@
  */
 package org.mule.extensions.internal;
 
-import org.mule.extensions.introspection.api.MuleExtensionScope;
+import org.mule.extensions.introspection.api.ExtensionScope;
 import org.mule.extensions.introspection.spi.MuleExtensionOperationGroupBuilder;
 import org.mule.extensions.introspection.spi.MuleExtensionScopeBuilder;
 
@@ -14,7 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 final class DefaultMuleExtensionScopeBuilder
-        extends AbstractMuleExtensionOperationBuilder<MuleExtensionScope, MuleExtensionScopeBuilder>
+        extends AbstractMuleExtensionOperationBuilder<ExtensionScope, MuleExtensionScopeBuilder>
         implements MuleExtensionScopeBuilder
 {
 
@@ -38,9 +38,9 @@ final class DefaultMuleExtensionScopeBuilder
     }
 
     @Override
-    public MuleExtensionScope build()
+    public ExtensionScope build()
     {
-        return new ImmutableMuleExtensionScope(name,
+        return new ImmutableExtensionScope(name,
                                                description,
                                                ownerConfigurations,
                                                inputTypes,

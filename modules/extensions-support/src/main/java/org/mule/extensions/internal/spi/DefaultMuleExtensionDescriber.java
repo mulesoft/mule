@@ -9,7 +9,7 @@ package org.mule.extensions.internal.spi;
 import org.mule.extensions.api.annotation.Configurable;
 import org.mule.extensions.api.annotation.Operation;
 import org.mule.extensions.api.annotation.param.Optional;
-import org.mule.extensions.introspection.api.MuleExtensionConfiguration;
+import org.mule.extensions.introspection.api.ExtensionConfiguration;
 import org.mule.extensions.introspection.spi.MuleExtensionBuilder;
 import org.mule.extensions.introspection.spi.MuleExtensionConfigurationBuilder;
 import org.mule.extensions.introspection.spi.MuleExtensionDescriber;
@@ -57,7 +57,7 @@ final class DefaultMuleExtensionDescriber implements MuleExtensionDescriber
         // TODO: for now we add only one configuration, when we do OAuth or when we resolve the question around config representations this has to change
         MuleExtensionConfigurationBuilder configuration = builder.newConfiguration()
                 .setName(descriptor.getConfigElementName())
-                .setDescription(MuleExtensionConfiguration.DEFAULT_DESCRIPTION);
+                .setDescription(ExtensionConfiguration.DEFAULT_DESCRIPTION);
 
         builder.addConfiguration(configuration);
 

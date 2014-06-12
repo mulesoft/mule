@@ -9,7 +9,7 @@ package org.mule.extensions.introspection.api;
 import java.util.List;
 
 /**
- * A scope is a special kind of {@link org.mule.extensions.introspection.api.MuleExtensionOperation}
+ * A scope is a special kind of {@link ExtensionOperation}
  * which encloses groups of child operations. Scopes are operations themselves, but they also include
  * other operations that they might or might not execute.
  * <p/>
@@ -20,7 +20,7 @@ import java.util.List;
  *
  * @since 1.0
  */
-public interface MuleExtensionScope extends MuleExtensionOperation
+public interface ExtensionScope extends ExtensionOperation
 {
 
     /**

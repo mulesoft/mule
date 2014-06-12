@@ -7,7 +7,7 @@
 package org.mule.extensions.internal;
 
 import org.mule.extensions.api.MuleExtensionsManager;
-import org.mule.extensions.introspection.api.MuleExtension;
+import org.mule.extensions.introspection.api.Extension;
 import org.mule.util.Preconditions;
 
 import com.google.common.collect.ForwardingIterator;
@@ -20,10 +20,10 @@ import java.util.List;
 final class DefaultMuleExtensionsManager implements MuleExtensionsManager
 {
 
-    private final List<MuleExtension> extensions = new LinkedList<MuleExtension>();
+    private final List<Extension> extensions = new LinkedList<Extension>();
 
     @Override
-    public void register(MuleExtension extension)
+    public void register(Extension extension)
     {
         Preconditions.checkArgument(extension != null, "Cannot register a null extension");
         extensions.add(extension);
@@ -31,14 +31,14 @@ final class DefaultMuleExtensionsManager implements MuleExtensionsManager
 
 
     @Override
-    public Iterator<MuleExtension> getExtensions()
+    public Iterator<Extension> getExtensions()
     {
-        final Iterator<MuleExtension> iterator = new ArrayList(extensions).iterator();
+        final Iterator<Extension> iterator = new ArrayList(extensions).iterator();
 
-        return new ForwardingIterator<MuleExtension>()
+        return new ForwardingIterator<Extension>()
         {
             @Override
-            protected Iterator<MuleExtension> delegate()
+            protected Iterator<Extension> delegate()
             {
                 return iterator;
             }

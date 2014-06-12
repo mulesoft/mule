@@ -6,9 +6,9 @@
  */
 package org.mule.extensions.introspection.spi;
 
-import org.mule.extensions.introspection.api.MuleExtensionConfiguration;
+import org.mule.extensions.introspection.api.ExtensionConfiguration;
 
-public interface MuleExtensionConfigurationBuilder extends Builder<MuleExtensionConfiguration>
+public interface MuleExtensionConfigurationBuilder extends Builder<ExtensionConfiguration>
 {
 
     MuleExtensionConfigurationBuilder setName(String name);

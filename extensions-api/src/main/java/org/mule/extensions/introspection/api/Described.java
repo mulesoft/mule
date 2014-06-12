@@ -18,14 +18,14 @@ public interface Described
     /**
      * Returns the component's name
      *
-     * @return a not blank {@link java.lang.String}
+     * @return a non blank {@link java.lang.String}
      */
     String getName();
 
     /**
      * Returns the component's description
      *
-     * @return a not blank {@link java.lang.String}
+     * @return a non blank {@link java.lang.String}
      */
     String getDescription();
 }

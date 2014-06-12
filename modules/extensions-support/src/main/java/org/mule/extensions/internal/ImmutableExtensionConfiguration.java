@@ -8,22 +8,22 @@ package org.mule.extensions.internal;
 
 import static org.mule.extensions.internal.MuleExtensionUtils.checkNullOrRepeatedNames;
 import static org.mule.extensions.internal.MuleExtensionUtils.immutableList;
-import org.mule.extensions.introspection.api.MuleExtensionConfiguration;
+import org.mule.extensions.introspection.api.ExtensionConfiguration;
 import org.mule.extensions.introspection.api.MuleExtensionParameter;
 
 import java.util.List;
 
 /**
- * Immutable implementation of {@link org.mule.extensions.introspection.api.MuleExtensionConfiguration}
+ * Immutable implementation of {@link org.mule.extensions.introspection.api.ExtensionConfiguration}
  *
  * @since 1.0
  */
-final class ImmutableMuleExtensionConfiguration extends AbstractImmutableDescribed implements MuleExtensionConfiguration
+final class ImmutableExtensionConfiguration extends AbstractImmutableDescribed implements ExtensionConfiguration
 {
 
     private final List<MuleExtensionParameter> parameters;
 
-    protected ImmutableMuleExtensionConfiguration(String name, String description, List<MuleExtensionParameter> parameters)
+    protected ImmutableExtensionConfiguration(String name, String description, List<MuleExtensionParameter> parameters)
     {
         super(name, description);
         checkNullOrRepeatedNames(parameters, "parameters");

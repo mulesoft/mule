@@ -6,13 +6,13 @@
  */
 package org.mule.extensions.api.exception;
 
-import org.mule.extensions.introspection.api.MuleExtension;
+import org.mule.extensions.introspection.api.Extension;
 
 public final class NoSuchScopeException extends Exception
 {
 
-    public NoSuchScopeException(MuleExtension muleExtension, String scopeName)
+    public NoSuchScopeException(Extension extension, String scopeName)
     {
-        super(String.format("Scope '%s' does not exists in Mule Extension '%s'", scopeName, muleExtension.getName()));
+        super(String.format("Scope '%s' does not exists in Mule Extension '%s'", scopeName, extension.getName()));
     }
 }

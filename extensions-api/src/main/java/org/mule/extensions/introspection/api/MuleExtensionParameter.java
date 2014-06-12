@@ -7,10 +7,12 @@
 package org.mule.extensions.introspection.api;
 
 /**
- * Describes a user configured parameter in the context of a {@link org.mule.extensions.introspection.api.MuleExtension}.
- * <p/>
- * It can apply either to a {@link org.mule.extensions.introspection.api.MuleExtensionConfiguration} or a
- * {@link org.mule.extensions.introspection.api.MuleExtensionOperation}
+ * A parameter of an operation or configuration
+ * <p>
+ *     A parameter provides a name and
+ * </p>
+ * It can apply either to a {@link ExtensionConfiguration} or a
+ * {@link ExtensionOperation}
  *
  * @since 1.0
  */

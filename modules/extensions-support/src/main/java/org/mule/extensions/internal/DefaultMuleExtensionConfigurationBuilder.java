@@ -6,13 +6,10 @@
  */
 package org.mule.extensions.internal;
 
-import static org.mule.extensions.introspection.api.MuleExtensionConfiguration.DEFAULT_DESCRIPTION;
-import static org.mule.extensions.introspection.api.MuleExtensionConfiguration.DEFAULT_NAME;
-import org.mule.extensions.introspection.api.MuleExtensionConfiguration;
-import org.mule.extensions.introspection.api.MuleExtensionOperationGroup;
+import static org.mule.extensions.introspection.api.ExtensionConfiguration.DEFAULT_DESCRIPTION;
+import static org.mule.extensions.introspection.api.ExtensionConfiguration.DEFAULT_NAME;
+import org.mule.extensions.introspection.api.ExtensionConfiguration;
 import org.mule.extensions.introspection.spi.MuleExtensionConfigurationBuilder;
-import org.mule.extensions.introspection.spi.MuleExtensionOperationBuilder;
-import org.mule.extensions.introspection.spi.MuleExtensionOperationGroupBuilder;
 import org.mule.extensions.introspection.spi.MuleExtensionParameterBuilder;
 
 import java.util.LinkedList;
@@ -51,9 +48,9 @@ final class DefaultMuleExtensionConfigurationBuilder implements MuleExtensionCon
     }
 
     @Override
-    public MuleExtensionConfiguration build()
+    public ExtensionConfiguration build()
     {
-        return new ImmutableMuleExtensionConfiguration(name, description, MuleExtensionUtils.build(parameters));
+        return new ImmutableExtensionConfiguration(name, description, MuleExtensionUtils.build(parameters));
     }
 
 }

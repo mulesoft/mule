@@ -12,15 +12,15 @@ import static junit.framework.Assert.assertSame;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import org.mule.extensions.api.exception.NoSuchConfigurationException;
-import org.mule.extensions.api.exception.NoSuchOperationException;
+import org.mule.extensions.introspection.api.ExtensionOperation;
+import org.mule.extensions.introspection.api.ExtensionScope;
+import org.mule.extensions.introspection.api.NoSuchConfigurationException;
+import org.mule.extensions.introspection.api.NoSuchOperationException;
 import org.mule.extensions.introspection.api.Capability;
-import org.mule.extensions.introspection.api.MuleExtension;
-import org.mule.extensions.introspection.api.MuleExtensionConfiguration;
-import org.mule.extensions.introspection.api.MuleExtensionOperation;
+import org.mule.extensions.introspection.api.Extension;
+import org.mule.extensions.introspection.api.ExtensionConfiguration;
 import org.mule.extensions.introspection.api.MuleExtensionOperationGroup;
 import org.mule.extensions.introspection.api.MuleExtensionParameter;
-import org.mule.extensions.introspection.api.MuleExtensionScope;
 import org.mule.extensions.introspection.api.MuleExtensionType;
 import org.mule.extensions.introspection.spi.MuleExtensionBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -34,7 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class MuleExtensionBuildersTestCase extends AbstractMuleTestCase
+public class ExtensionBuildersTestCase extends AbstractMuleTestCase
 {
 
     private static final String WS_CONSUMER = "WSConsumer";
@@ -61,7 +61,7 @@ public class MuleExtensionBuildersTestCase extends AbstractMuleTestCase
     private static final String CALLBACK = "callback";
     private static final String CALLBACK_DESCRIPTION = "async callback";
 
-    private MuleExtension extension;
+    private Extension extension;
 
     private MuleExtensionBuilder populatedBuilder()
     {
@@ -167,10 +167,10 @@ public class MuleExtensionBuildersTestCase extends AbstractMuleTestCase
     @Test
     public void defaultConfiguration() throws Exception
     {
-        MuleExtensionConfiguration configuration = extension.getConfiguration(MuleExtensionConfiguration.DEFAULT_NAME);
+        ExtensionConfiguration configuration = extension.getConfiguration(ExtensionConfiguration.DEFAULT_NAME);
         assertNotNull(configuration);
-        assertEquals(MuleExtensionConfiguration.DEFAULT_NAME, configuration.getName());
-        assertEquals(MuleExtensionConfiguration.DEFAULT_DESCRIPTION, configuration.getDescription());
+        assertEquals(ExtensionConfiguration.DEFAULT_NAME, configuration.getName());
+        assertEquals(ExtensionConfiguration.DEFAULT_DESCRIPTION, configuration.getDescription());
 
         List<MuleExtensionParameter> parameters = configuration.getParameters();
         assertEquals(4, parameters.size());
@@ -184,7 +184,7 @@ public class MuleExtensionBuildersTestCase extends AbstractMuleTestCase
     public void onlyOneConfig() throws Exception
     {
         assertEquals(1, extension.getConfigurations().size());
-        assertSame(extension.getConfigurations().get(0), extension.getConfiguration(MuleExtensionConfiguration.DEFAULT_NAME));
+        assertSame(extension.getConfigurations().get(0), extension.getConfiguration(ExtensionConfiguration.DEFAULT_NAME));
     }
 
     @Test(expected = NoSuchConfigurationException.class)
@@ -227,15 +227,15 @@ public class MuleExtensionBuildersTestCase extends AbstractMuleTestCase
     @Test
     public void operations() throws Exception
     {
-        List<MuleExtensionOperation> operations = extension.getOperations();
+        List<ExtensionOperation> operations = extension.getOperations();
         assertEquals(2, operations.size());
         assertConsumeOperation(operations);
         assertBroadcastOperation(operations);
     }
 
-    private void assertConsumeOperation(List<MuleExtensionOperation> operations) throws NoSuchOperationException
+    private void assertConsumeOperation(List<ExtensionOperation> operations) throws NoSuchOperationException
     {
-        MuleExtensionOperation operation = operations.get(0);
+        ExtensionOperation operation = operations.get(0);
         assertSame(operation, extension.getOperation(CONSUMER));
 
         assertEquals(CONSUMER, operation.getName());
@@ -249,9 +249,9 @@ public class MuleExtensionBuildersTestCase extends AbstractMuleTestCase
         assertParameter(parameters.get(1), MTOM_ENABLED, MTOM_DESCRIPTION, true, false, Boolean.class, true);
     }
 
-    private void assertBroadcastOperation(List<MuleExtensionOperation> operations) throws NoSuchOperationException
+    private void assertBroadcastOperation(List<ExtensionOperation> operations) throws NoSuchOperationException
     {
-        MuleExtensionOperation operation = operations.get(1);
+        ExtensionOperation operation = operations.get(1);
         assertSame(operation, extension.getOperation(BROADCAST));
 
         assertEquals(BROADCAST, operation.getName());
@@ -264,8 +264,8 @@ public class MuleExtensionBuildersTestCase extends AbstractMuleTestCase
         assertParameter(parameters.get(0), OPERATION, THE_OPERATION_TO_USE, true, true, List.class, null);
         assertParameter(parameters.get(1), MTOM_ENABLED, MTOM_DESCRIPTION, true, false, Boolean.class, true);
 
-        assertTrue(operation instanceof MuleExtensionScope);
-        MuleExtensionScope scope = (MuleExtensionScope) operation;
+        assertTrue(operation instanceof ExtensionScope);
+        ExtensionScope scope = (ExtensionScope) operation;
         assertEquals(1, scope.getGroups().size());
         MuleExtensionOperationGroup group = scope.getGroups().get(0);
         assertEquals(CALLBACK, group.getName());
@@ -307,7 +307,7 @@ public class MuleExtensionBuildersTestCase extends AbstractMuleTestCase
         assertEquals(expected, types.get(0));
     }
 
-    private class TestCapability implements Capability
+    private class TestCapability
     {
 
         @Override

@@ -9,11 +9,11 @@ package org.mule.extensions.introspection.api;
 import java.util.List;
 
 /**
- * A definition of an operation in a {@link org.mule.extensions.introspection.api.MuleExtension}
+ * A definition of an operation in a {@link Extension}
  *
  * @since 1.0
  */
-public interface MuleExtensionOperation extends Described
+public interface ExtensionOperation extends Described
 {
 
     /**
@@ -46,16 +46,5 @@ public interface MuleExtensionOperation extends Described
      *
      * @return a immutable {@link java.util.List} with instances of {@link java.lang.Class}
      */
-    List<Class<?>> getOutputTypes();
-
-    /**
-     * Whether or not this operation is available for the given {@link org.mule.extensions.introspection.api.MuleExtensionConfiguration}.
-     * <p/>
-     * By default, all operations are available on all configurations and this method always returns {@code true}. However,
-     * it is possible to limit operations to specific configurations only, in which case this method becomes relevant
-     *
-     * @param muleExtensionConfiguration a not {@code null} {@link org.mule.extensions.introspection.api.MuleExtensionConfiguration}
-     * @return a boolean value
-     */
-    boolean isAvailableFor(MuleExtensionConfiguration muleExtensionConfiguration);
+    Class<?> getOutputType(Class<?> input);
 }

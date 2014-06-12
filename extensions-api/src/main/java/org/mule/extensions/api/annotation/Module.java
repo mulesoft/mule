@@ -6,8 +6,8 @@
  */
 package org.mule.extensions.api.annotation;
 
-import org.mule.extensions.introspection.api.MuleExtension;
-import org.mule.extensions.introspection.api.MuleExtensionConfiguration;
+import org.mule.extensions.introspection.api.Extension;
+import org.mule.extensions.introspection.api.ExtensionConfiguration;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -36,61 +36,15 @@ public @interface Module
      */
     String name();
 
-    // XML specifics should go to a capability?
-
-    ///**
-    // * The version of the module. Defaults to 1.0.
-    // */
-    //String schemaVersion() default DEFAULT_VERSION;
-    ///**
-    // * Namespace of the module
-    // */
-    //String namespace() default "";
-    //
-    ///**
-    // * Location URI for the schema
-    // */
-    //String schemaLocation() default "";
-
     String version();
-
-    /**
-     * Minimum Mule version required
-     */
-    String minMuleVersion() default MuleExtension.MIN_MULE_VERSION;
-
-    // does friendly name makes sense? I think not
-    ///**
-    // * Provides a friendly name for the module.
-    // */
-    //String friendlyName() default "";
-
-    /*
-    TODO: does this make sense? How do me model several configuration other than the auto magical OAuth support?
-    if only automatic version is available, then we shouldn't expose this
-    */
 
     /**
      * Name of the configuration element
      */
-    String configElementName() default MuleExtensionConfiguration.DEFAULT_NAME;
+    String configElementName() default "";
 
     /**
      * Short description about the annotated module.
      */
     String description() default "";
-
-    //String DEFAULT_VERSION = "1.0";
-
-    ///**
-    // * Whether connectivity testing is enabled or not in this connector
-    // */
-    //ConnectivityTesting connectivityTesting() default ConnectivityTesting.OFF;
-    //
-    ///**
-    // * Whether metadata is enable or not in this connector
-    // */
-    //
-    //MetaDataSwitch metaData() default MetaDataSwitch.OFF;
-
 }

@@ -9,7 +9,7 @@ package org.mule.extensions.internal.spi;
 import static junit.framework.Assert.assertEquals;
 import org.mule.extensions.HeisenbergModule;
 import org.mule.extensions.api.MuleExtensionsManager;
-import org.mule.extensions.introspection.api.MuleExtension;
+import org.mule.extensions.introspection.api.Extension;
 import org.mule.extensions.spi.MuleExtensionScanner;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -26,7 +26,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class DefaultMuleExtensionScannerTestCase extends AbstractMuleTestCase
+public class DefaultExtensionScannerTestCase extends AbstractMuleTestCase
 {
 
     @Mock
@@ -43,10 +43,10 @@ public class DefaultMuleExtensionScannerTestCase extends AbstractMuleTestCase
     @Test
     public void scan() throws Exception
     {
-        List<MuleExtension> extensions = scanner.scan();
+        List<Extension> extensions = scanner.scan();
         assertEquals(1, extensions.size());
 
-        MuleExtension extension = extensions.get(0);
+        Extension extension = extensions.get(0);
         assertMuleExtension(extension);
 
     }
@@ -55,14 +55,14 @@ public class DefaultMuleExtensionScannerTestCase extends AbstractMuleTestCase
     public void scanAndRegister() throws Exception
     {
         scanner.scanAndRegister(extensionsManager);
-        ArgumentCaptor<MuleExtension> captor = ArgumentCaptor.forClass(MuleExtension.class);
+        ArgumentCaptor<Extension> captor = ArgumentCaptor.forClass(Extension.class);
         Mockito.verify(extensionsManager).register(captor.capture());
 
-        MuleExtension extension = captor.getValue();
+        Extension extension = captor.getValue();
         assertMuleExtension(extension);
     }
 
-    private void assertMuleExtension(MuleExtension extension)
+    private void assertMuleExtension(Extension extension)
     {
         assertEquals(HeisenbergModule.EXTENSION_NAME, extension.getName());
     }
