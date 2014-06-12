@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
-import static org.mule.tck.MuleTestUtils.withSystemProperty;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
@@ -230,7 +230,7 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
     @Test
     public void tcpNoDelayDefaultSystemPropertyTrue() throws Exception
     {
-        withSystemProperty(TcpConnector.SEND_TCP_NO_DELAY_SYSTEM_PROPERTY, "true", new TestCallback()
+        testWithSystemProperty(TcpConnector.SEND_TCP_NO_DELAY_SYSTEM_PROPERTY, "true", new TestCallback()
         {
             @Override
             public void run() throws Exception
@@ -244,7 +244,7 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
     @Test
     public void tcpNoDelayDefaultSystemPropertyFalse() throws Exception
     {
-        withSystemProperty(TcpConnector.SEND_TCP_NO_DELAY_SYSTEM_PROPERTY, "false", new TestCallback()
+        testWithSystemProperty(TcpConnector.SEND_TCP_NO_DELAY_SYSTEM_PROPERTY, "false", new TestCallback()
         {
             @Override
             public void run() throws Exception
@@ -258,7 +258,6 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
     @Test
     public void tcpNoDelayHttpClientConnectionManagerConfiguration() throws Exception
     {
-        // default
         HttpConnector httpConnector = (HttpConnector) createConnector();
         httpConnector.initialise();
         assertFalse(httpConnector.clientConnectionManager.getParams().getTcpNoDelay());
