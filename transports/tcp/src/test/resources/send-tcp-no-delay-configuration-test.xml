@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
+    xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd">
+
+    <tcp:connector name="tcpConnector" />
+
+    <tcp:connector name="tcpConnectorSendTcpNoDelayTrue" sendTcpNoDelay="true" />
+
+    <tcp:connector name="tcpConnectorSendTcpNoDelayFalse" sendTcpNoDelay="false" />
+
+</mule>
