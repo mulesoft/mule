@@ -7,9 +7,11 @@
 package org.mule.transport.servlet.jetty;
 
 import static org.junit.Assert.assertEquals;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.tck.MuleTestUtils.TestCallback;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.eclipse.jetty.server.bio.SocketConnector;
@@ -19,6 +21,8 @@ import org.junit.Test;
 
 public class JettyHttpConnectorTestCase extends AbstractMuleContextTestCase
 {
+    private static String CUSTOM_JETTY_CONNECTOR_CLASS = "org.eclipse.jetty.server.bio.SocketConnector";
+
     private JettyHttpConnector connector = new JettyHttpConnector(muleContext);
 
     @Test
@@ -35,58 +39,32 @@ public class JettyHttpConnectorTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void customConnectorImplementationViaSystemProperty() throws MuleException
+    public void customConnectorImplementationViaSystemProperty() throws Exception
     {
-        testWithSystemProperty(new Callback()
-        {
-            public void run() throws InitialisationException
+        testWithSystemProperty(JettyHttpConnector.JETTY_CONNECTOR_SYSTEM_PROPERTY,
+            CUSTOM_JETTY_CONNECTOR_CLASS, new TestCallback()
             {
-                connector = new JettyHttpConnector(muleContext);
-                assertEquals(SocketConnector.class, connector.createJettyConnector().getClass());
-            }
-        });
+                public void run() throws InitialisationException
+                {
+                    connector = new JettyHttpConnector(muleContext);
+                    assertEquals(SocketConnector.class, connector.createJettyConnector().getClass());
+                }
+            });
     }
 
     @Test
-    public void customConnectorImplementationSetterTakesPrecedence() throws MuleException
+    public void customConnectorImplementationSetterTakesPrecedence() throws Exception
     {
-        testWithSystemProperty(new Callback()
-        {
-            public void run() throws InitialisationException
+        testWithSystemProperty(JettyHttpConnector.JETTY_CONNECTOR_SYSTEM_PROPERTY,
+            CUSTOM_JETTY_CONNECTOR_CLASS, new TestCallback()
             {
-                connector = new JettyHttpConnector(muleContext);
-                connector.setJettyConnectorClass(BlockingChannelConnector.class);
-                assertEquals(BlockingChannelConnector.class, connector.createJettyConnector().getClass());
-            }
-        });
-    }
-
-    protected void testWithSystemProperty(Callback callback) throws MuleException
-    {
-        String orginalSystemPropertyValue = System.getProperty(JettyHttpConnector.JETTY_CONNECTOR_SYSTEM_PROPERTY);
-        try
-        {
-            System.setProperty(JettyHttpConnector.JETTY_CONNECTOR_SYSTEM_PROPERTY,
-                "org.eclipse.jetty.server.bio.SocketConnector");
-            callback.run();
-        }
-        finally
-        {
-            if (orginalSystemPropertyValue == null)
-            {
-                System.clearProperty(JettyHttpConnector.JETTY_CONNECTOR_SYSTEM_PROPERTY);
-            }
-            else
-            {
-                System.setProperty(JettyHttpConnector.JETTY_CONNECTOR_SYSTEM_PROPERTY,
-                    orginalSystemPropertyValue);
-            }
-        }
-    }
-
-    private static interface Callback
-    {
-        void run() throws MuleException;
+                public void run() throws InitialisationException
+                {
+                    connector = new JettyHttpConnector(muleContext);
+                    connector.setJettyConnectorClass(BlockingChannelConnector.class);
+                    assertEquals(BlockingChannelConnector.class, connector.createJettyConnector().getClass());
+                }
+            });
     }
 
 }
