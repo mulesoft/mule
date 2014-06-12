@@ -641,25 +641,35 @@ public final class MuleTestUtils
         return t;
     }
     
-    public static void withSystemProperty(String propertyName, String propertyValue, TestCallback callback)
+    /**
+     * Execute callback with a given system property set and replaces the system property with it's original
+     * value once done. Useful for asserting behaviour that is dependent on the presence of a system property.
+     * 
+     * @param propertyName Name of system property to set
+     * @param propertyValue Value of system property
+     * @param callback Callback implementing the the test code and assertions to be run with system property
+     *            set.
+     * @throws Exception any exception thrown by the execution of callback
+     */
+    public static void testWithSystemProperty(String propertyName, String propertyValue, TestCallback callback)
         throws Exception
     {
         assert propertyName != null && propertyValue != null && callback != null;
-        String orginalPropertyValue = System.getProperty(propertyName);
+        String originalPropertyValue = null;
         try
         {
-            System.setProperty(propertyName, propertyValue);
+            originalPropertyValue = System.setProperty(propertyName, propertyValue);
             callback.run();
         }
         finally
         {
-            if (orginalPropertyValue == null)
+            if (originalPropertyValue == null)
             {
                 System.clearProperty(propertyName);
             }
             else
             {
-                System.setProperty(propertyName, orginalPropertyValue);
+                System.setProperty(propertyName, originalPropertyValue);
             }
         }
     }
