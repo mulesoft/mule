@@ -96,14 +96,13 @@
              Use the name of an Eclipse Java execution environment, Eclipse will
              choose the right one by itself.
         -->
-        <jdk6Name>JavaSE-1.6</jdk6Name>
         <jdk7Name>JavaSE-1.7</jdk7Name>
 
         <activemqVersion>5.5.0</activemqVersion>
         <antVersion>1.7.0</antVersion>
         <antlrVersion>3.1.1</antlrVersion>
         <asmVersion>3.3.1</asmVersion>
-        <aspectjVersion>1.6.11</aspectjVersion>
+        <aspectjVersion>1.7.3</aspectjVersion>
         <bitronixTMVersion>2.1.4</bitronixTMVersion>
         <bshVersion>2.0b4</bshVersion>
         <bouncycastleVersion>1.46</bouncycastleVersion>
@@ -1400,8 +1399,8 @@
                         <encoding>ISO-8859-1</encoding>
                         <fork>true</fork>
                         <maxmem>512m</maxmem>
-                        <source>1.6</source>
-                        <target>1.6</target>
+                        <source>1.7</source>
+                        <target>1.7</target>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -1413,11 +1412,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>2.5</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-idea-plugin</artifactId>
-                    <version>2.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1501,26 +1495,6 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
                     <version>1.5</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>native2ascii-maven-plugin</artifactId>
-                    <version>1.0-alpha-1</version>
-                    <executions>
-                        <execution>
-                            <phase>generate-test-resources</phase>
-                            <goals>
-                                <goal>native2ascii</goal>
-                            </goals>
-                            <configuration>
-                                <src>${project.basedir}/src/test/resources</src>
-                                <dest>${project.basedir}/src/test/resources</dest>
-                                <includes>*.src</includes>
-                                <ext>.properties</ext>
-                                <encoding>UTF-8</encoding>
-                            </configuration>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -1628,7 +1602,7 @@
                                         <version>[3.0.0,)</version>
                                     </requireMavenVersion>
                                     <requireJavaVersion>
-                                        <version>[1.6.0,)</version>
+                                        <version>[1.7.0,)</version>
                                     </requireJavaVersion>
                                 </rules>
                             </configuration>
@@ -1717,7 +1691,7 @@
                     <downloadSources>true</downloadSources>
                     <!-- configure a JDK named 'jdk6' for this project -->
                     <classpathContainers>
-                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${vmtype}/${jdk6Name}
+                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${vmtype}/${jdk7Name}
                         </classpathContainer>
                     </classpathContainers>
                 </configuration>
@@ -1755,8 +1729,8 @@
                             <Build-Revision>${buildNumber}</Build-Revision>
                             <Build-Date>${timestamp}</Build-Date>
                             <Dev-List-Email>${dev.list}</Dev-List-Email>
-                            <Supported-Jdks>[1.6,1.8)</Supported-Jdks>
-                            <Recommended-Jdks>[1.6.0_26,1.7),[1.7.0_3,1.8)</Recommended-Jdks>
+                            <Supported-Jdks>[1.7.0,1.8)</Supported-Jdks>
+                            <Recommended-Jdks>[1.7.0_3,1.8)</Recommended-Jdks>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -1820,10 +1794,10 @@
                                 <maxmemory>512m</maxmemory>
                                 <charset>ISO-8859-1</charset>
                                 <encoding>ISO-8859-1</encoding>
-                                <source>1.6</source>
+                                <source>1.7</source>
                                 <!-- Link to the external online JavaDoc -->
                                 <links>
-                                    <link>http://java.sun.com/j2se/1.6.0/docs/api/</link>
+                                    <link>http://docs.oracle.com/javase/7/docs/api/</link>
                                     <link>http://java.sun.com/j2ee/sdk_1.3/techdocs/api/</link>
                                     <link>http://jakarta.apache.org/commons/beanutils/commons-beanutils-1.7.0/docs/api/</link>
                                     <link>http://jakarta.apache.org/commons/collections/api-3.2/</link>
@@ -1916,38 +1890,6 @@
     </build>
 
     <profiles>
-        <profile>
-            <id>jdk7</id>
-            <activation>
-                <jdk>1.7</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-eclipse-plugin</artifactId>
-                        <version>${eclipsePluginVersion}</version>
-                        <configuration>
-                            <!-- by default download all sources when generating project files -->
-                            <downloadSources>true</downloadSources>
-                            <!-- configure a JDK named 'jdk6' for this project -->
-                            <classpathContainers>
-                                <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${vmtype}/${jdk7Name}
-                                </classpathContainer>
-                            </classpathContainers>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-idea-plugin</artifactId>
-                        <configuration>
-                            <downloadSources>true</downloadSources>
-                            <jdkName>1.7</jdkName>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
 
          <profile>
             <id>ci-server</id>
