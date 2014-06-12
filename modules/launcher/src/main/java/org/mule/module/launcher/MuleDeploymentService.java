@@ -22,7 +22,6 @@ import org.mule.module.launcher.util.ObservableList;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.ArrayUtils;
 import org.mule.util.CollectionUtils;
-import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
 
 import java.beans.PropertyChangeEvent;
@@ -337,7 +336,7 @@ public class MuleDeploymentService implements DeploymentService
         for (String app : zombieMap.keySet())
         {
             ZombieFile file = zombieMap.get(app);
-            result.put(file.url, file.lastUpdated);
+            result.put(file.url, file.originalTimestamp);
         }
 
         return result;
@@ -533,18 +532,14 @@ public class MuleDeploymentService implements DeploymentService
 
         String resource = application.getDescriptor().getConfigResources()[0];
         File resourceFile = new File(appDir, resource);
-        ZombieFile zombieFile = new ZombieFile();
 
         if (resourceFile.exists())
         {
             try
             {
-                zombieFile.url = resourceFile.toURI().toURL();
-                zombieFile.lastUpdated = resourceFile.lastModified();
-
-                zombieMap.put(application.getAppName(), zombieFile);
+                zombieMap.put(application.getAppName(), new ZombieFile(resourceFile));
             }
-            catch (MalformedURLException e)
+            catch (Exception e)
             {
                 // Ignore resource
             }
@@ -566,15 +561,9 @@ public class MuleDeploymentService implements DeploymentService
 
         try
         {
-            long lastModified = marker.lastModified();
-
-            ZombieFile zombieFile = new ZombieFile();
-            zombieFile.url = marker.toURI().toURL();
-            zombieFile.lastUpdated = lastModified;
-
-            zombieMap.put(appName, zombieFile);
+            zombieMap.put(appName, new ZombieFile(marker));
         }
-        catch (MalformedURLException e)
+        catch (Exception e)
         {
             logger.debug(String.format("Failed to mark an exploded app [%s] as a zombie", marker.getName()), e);
         }
@@ -632,7 +621,7 @@ public class MuleDeploymentService implements DeploymentService
         ZombieFile zombieFile = zombieMap.get(appName);
         if (zombieFile != null)
         {
-            if (isZombieFile(url, zombieFile) && !updatedZombieApp(zombieFile))
+            if (zombieFile.isFor(url) && !zombieFile.updatedZombieApp())
             {
                 // Skips the file because it was already deployed with failure
                 return;
@@ -658,7 +647,7 @@ public class MuleDeploymentService implements DeploymentService
         {
             ZombieFile zombieFile = zombieMap.get(addedApp);
 
-            if ((zombieFile != null) && (!updatedZombieApp(zombieFile)))
+            if ((zombieFile != null) && (!zombieFile.updatedZombieApp()))
             {
                 continue;
             }
@@ -718,18 +707,6 @@ public class MuleDeploymentService implements DeploymentService
         }
 
         deployApplication(application);
-    }
-
-    private boolean isZombieFile(URL url, ZombieFile zombieFile)
-    {
-        return zombieFile.url.equals(url);
-    }
-
-    private boolean updatedZombieApp(ZombieFile zombieFile)
-    {
-        long currentTimeStamp = FileUtils.getFileTimeStamp(zombieFile.url);
-
-        return zombieFile.lastUpdated != currentTimeStamp;
     }
 
     /**
@@ -892,7 +869,33 @@ public class MuleDeploymentService implements DeploymentService
 
     private static class ZombieFile
     {
+
         URL url;
-        Long lastUpdated;
+        Long originalTimestamp;
+        File file;
+
+        private ZombieFile(File file)
+        {
+            this.file = file;
+            originalTimestamp = file.lastModified();
+            try
+            {
+                url = file.toURI().toURL();
+            }
+            catch (MalformedURLException e)
+            {
+                throw new IllegalArgumentException(e);
+            }
+        }
+
+        public boolean isFor(URL url)
+        {
+            return this.url.equals(url);
+        }
+
+        public boolean updatedZombieApp()
+        {
+            return originalTimestamp != file.lastModified();
+        }
     }
 }

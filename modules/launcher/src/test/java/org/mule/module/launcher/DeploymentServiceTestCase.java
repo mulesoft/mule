@@ -16,6 +16,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -160,6 +161,41 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
         assertEquals("Wrong URL tagged as zombie.", "brokenApp.zip", new File(zombie.getKey().getFile()).getName());
         assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+    }
+
+    /**
+     * This tests deploys a broken app which name has a weird character.
+     * It verifies that after failing deploying that app, it doesn't try to do it
+     * again, which is a behavior than can be seen in some file systems due to
+     * path handling issues
+     */
+    @Test
+    public void dontRetryBrokenAppWithFunkyName() throws Exception
+    {
+        addPackedAppFromResource("/broken-app+.zip", "brokenApp+.zip");
+
+        deploymentService.start();
+
+        assertDeploymentFailure(deploymentListener, "brokenApp+");
+
+        assertAppsDir(new String[] {"brokenApp+.zip"}, NONE, true);
+
+        final Map<URL, Long> zombieMap = deploymentService.getZombieMap();
+        assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
+        final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
+        assertEquals("Wrong URL tagged as zombie.", "brokenApp+.zip", new File(zombie.getKey().getFile()).getName());
+        assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+
+        reset(deploymentListener);
+
+        addPackedAppFromResource("/dummy-app.zip");
+
+        assertDeploymentSuccess(deploymentListener, "dummy-app");
+        assertDeploymentFailure(deploymentListener, "brokenApp+", never());
+
+        addPackedAppFromResource("/empty-app.zip");
+        assertDeploymentSuccess(deploymentListener, "empty-app");
+        assertDeploymentFailure(deploymentListener, "brokenApp+", never());
     }
 
     @Test
