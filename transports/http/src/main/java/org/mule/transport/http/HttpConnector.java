@@ -15,8 +15,13 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.config.i18n.CoreMessages;
@@ -37,6 +42,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.Credentials;
@@ -151,6 +157,8 @@ public class HttpConnector extends TcpConnector
     public static final String HTTP_ENCODE_PARAMVALUE = HTTP_PREFIX + "encode.paramvalue";
 
     public static final Set<String> HTTP_INBOUND_PROPERTIES;
+    
+    protected Map<OutboundEndpoint, MessageDispatcher> endpointDispatchers = new ConcurrentHashMap<OutboundEndpoint, MessageDispatcher>();
 
     static
     {
@@ -680,5 +688,49 @@ public class HttpConnector extends TcpConnector
     {
         logger.warn("keepSendSocketOpen attribute is deprecated, use keepAlive in the outbound endpoint instead");
         super.setKeepSendSocketOpen(keepSendSocketOpen);
+    }
+    
+    @Override
+    public MessageProcessor createDispatcherMessageProcessor(OutboundEndpoint endpoint) throws MuleException
+    {
+        // Avoid lazy initialization of dispatcher in borrow method which would be less performant by
+        // creating the dispatcher instance when DispatcherMessageProcessor is created.
+        MessageDispatcher dispatcher = dispatcherFactory.create(endpoint);
+        applyDispatcherLifecycle(dispatcher);
+        endpointDispatchers.put(endpoint, dispatcher);
+        return super.createDispatcherMessageProcessor(endpoint);
+    }
+    
+    @Override
+    protected MessageDispatcher borrowDispatcher(OutboundEndpoint endpoint) throws MuleException
+    {
+        return endpointDispatchers.get(endpoint);
+    }
+    
+    @Override
+    protected void returnDispatcher(OutboundEndpoint endpoint, MessageDispatcher dispatcher)
+    {
+        // Nothing to do because implementation of borrowDispatcher doesn't use dispatcher pool
+    }
+
+    protected void applyDispatcherLifecycle(MessageDispatcher dispatcher) throws MuleException
+    {
+        String phase = lifecycleManager.getCurrentPhase();
+        if (phase.equals(Startable.PHASE_NAME) && !dispatcher.getLifecycleState().isStarted())
+        {
+            if (!dispatcher.getLifecycleState().isInitialised())
+            {
+                dispatcher.initialise();
+            }
+            dispatcher.start();
+        }
+        else if (phase.equals(Stoppable.PHASE_NAME) && dispatcher.getLifecycleState().isStarted())
+        {
+            dispatcher.stop();
+        }
+        else if (Disposable.PHASE_NAME.equals(phase))
+        {
+            dispatcher.dispose();
+        }
     }
 }
