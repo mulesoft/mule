@@ -8,6 +8,7 @@ package org.mule.transport.http;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -15,6 +16,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
@@ -36,6 +38,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -266,6 +269,20 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
         httpConnector.setSendTcpNoDelay(true);
         httpConnector.initialise();
         assertTrue(httpConnector.clientConnectionManager.getParams().getTcpNoDelay());
+    }
+    
+    @Test
+    public void singleDispatcherPerEndpoint() throws Exception
+    {
+        HttpConnector httpConnector = (HttpConnector) createConnector();
+        httpConnector.initialise();
+        
+        OutboundEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint("http://localhost:8080");
+        httpConnector.createDispatcherMessageProcessor(endpoint);
+        
+        assertNotNull(httpConnector.borrowDispatcher(endpoint));
+        assertEquals(httpConnector.borrowDispatcher(endpoint), httpConnector.borrowDispatcher(endpoint));
+        assertEquals(0,httpConnector.getDispatchers().getNumIdle());
     }
 
 }
