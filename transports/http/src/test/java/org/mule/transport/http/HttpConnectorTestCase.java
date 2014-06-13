@@ -303,18 +303,29 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
     {
         assertEquals(enabled, connector.clientConnectionManager.getParams().isStaleCheckingEnabled());
     }
-    
-     public void singleDispatcherPerEndpoint() throws Exception
+
+    public void singleDispatcherPerEndpointSyetemProperty() throws Exception
     {
-        HttpConnector httpConnector = (HttpConnector) createConnector();
-        httpConnector.initialise();
-        
-        OutboundEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint("http://localhost:8080");
-        httpConnector.createDispatcherMessageProcessor(endpoint);
-        
-        assertNotNull(httpConnector.borrowDispatcher(endpoint));
-        assertEquals(httpConnector.borrowDispatcher(endpoint), httpConnector.borrowDispatcher(endpoint));
-        assertEquals(0,httpConnector.getDispatchers().getNumIdle());
+        testWithSystemProperty(HttpConnector.SINGLE_DISPATCHER_PER_ENDPOINT_SYSTEM_PROPERTY, "true",
+            new TestCallback()
+            {
+
+                @Override
+                public void run() throws Exception
+                {
+                    HttpConnector httpConnector = (HttpConnector) createConnector();
+                    httpConnector.initialise();
+
+                    OutboundEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(
+                        "http://localhost:8080");
+                    httpConnector.createDispatcherMessageProcessor(endpoint);
+
+                    assertNotNull(httpConnector.borrowDispatcher(endpoint));
+                    assertEquals(httpConnector.borrowDispatcher(endpoint),
+                        httpConnector.borrowDispatcher(endpoint));
+                    assertEquals(0, httpConnector.getDispatchers().getNumIdle());
+                }
+            });
     }
 
 }
