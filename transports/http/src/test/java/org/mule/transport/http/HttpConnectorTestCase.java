@@ -8,6 +8,7 @@ package org.mule.transport.http;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -15,6 +16,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
@@ -300,6 +302,19 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
         throws Exception, InitialisationException
     {
         assertEquals(enabled, connector.clientConnectionManager.getParams().isStaleCheckingEnabled());
+    }
+    
+     public void singleDispatcherPerEndpoint() throws Exception
+    {
+        HttpConnector httpConnector = (HttpConnector) createConnector();
+        httpConnector.initialise();
+        
+        OutboundEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint("http://localhost:8080");
+        httpConnector.createDispatcherMessageProcessor(endpoint);
+        
+        assertNotNull(httpConnector.borrowDispatcher(endpoint));
+        assertEquals(httpConnector.borrowDispatcher(endpoint), httpConnector.borrowDispatcher(endpoint));
+        assertEquals(0,httpConnector.getDispatchers().getNumIdle());
     }
 
 }
