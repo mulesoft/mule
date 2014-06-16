@@ -8,6 +8,7 @@ package org.mule.spring.config;
 
 import org.mule.common.MuleArtifactFactoryException;
 import org.mule.common.config.XmlConfigurationCallback;
+import org.mule.tck.util.MuleDerbyTestDatabase;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -71,18 +72,27 @@ public class DatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFa
     }
 
     @Test
-    public void verifiesDerby() throws SAXException, IOException, MuleArtifactFactoryException
+    public void verifiesDerby() throws Exception
     {
-        String config = "<jdbc:connector name=\"jdbcConnector\" pollingFrequency=\"1000\" dataSource-ref=\"jdbcDataSource\" queryTimeout=\"3000\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"/>";
-        Document document = XMLUnit.buildControlDocument(config);
-        String refDef =
-                "<spring:bean xmlns:spring=\"http://www.springframework.org/schema/beans\" class=\"org.apache.commons.dbcp.BasicDataSource\" destroy-method=\"close\" id=\"jdbcDataSource\" name=\"Bean\">"
-                + "<spring:property name=\"driverClassName\" value=\"org.apache.derby.jdbc.EmbeddedDriver\"/>"
-                + "<spring:property name=\"url\" value=\"jdbc:derby:muleEmbeddedDB;create=true\"/>"
-                + "</spring:bean>";
-        XmlConfigurationCallback callback = new DatabaseConfigurationCallback(Collections.singletonMap("jdbcDataSource", refDef));
+        MuleDerbyTestDatabase derbyTestDatabase = new MuleDerbyTestDatabase("database.name");
+        try
+        {
+            derbyTestDatabase.startDatabase();
+            String config = "<jdbc:connector name=\"jdbcConnector\" pollingFrequency=\"1000\" dataSource-ref=\"jdbcDataSource\" queryTimeout=\"3000\" xmlns:jdbc=\"http://www.mulesoft.org/schema/mule/jdbc\"/>";
+            Document document = XMLUnit.buildControlDocument(config);
+            String refDef =
+                    "<spring:bean xmlns:spring=\"http://www.springframework.org/schema/beans\" class=\"org.apache.commons.dbcp.BasicDataSource\" destroy-method=\"close\" id=\"jdbcDataSource\" name=\"Bean\">"
+                    + "<spring:property name=\"driverClassName\" value=\"org.apache.derby.jdbc.EmbeddedDriver\"/>"
+                    + "<spring:property name=\"url\" value=\"jdbc:derby:muleEmbeddedDB;create=true\"/>"
+                    + "</spring:bean>";
+            XmlConfigurationCallback callback = new DatabaseConfigurationCallback(Collections.singletonMap("jdbcDataSource", refDef));
 
-        doTest(document, callback);
+            doTest(document, callback);
+        }
+        finally
+        {
+            derbyTestDatabase.stopDatabase();
+        }
     }
 
     // This will required having MySQL drivers in the classpath and a MySQL instance running
