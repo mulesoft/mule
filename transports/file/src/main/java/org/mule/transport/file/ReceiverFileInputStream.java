@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,6 +32,8 @@ class ReceiverFileInputStream extends FileInputStream
     private File moveToOnClose;
     private boolean streamProcessingError;
     private InputStreamCloseListener closeListener;
+    private AtomicBoolean alreadyClosed = new AtomicBoolean(false);
+    private AtomicBoolean alreadyNotified = new AtomicBoolean(false);
 
     public ReceiverFileInputStream(File currentFile, boolean deleteOnClose, File moveToOnClose)
         throws FileNotFoundException
@@ -52,38 +55,25 @@ class ReceiverFileInputStream extends FileInputStream
     {
         super.close();
 
-        if (!isStreamProcessingError())
+        if (!isStreamProcessingError() && !alreadyClosed.getAndSet(true))
         {
             if (moveToOnClose != null)
             {
-                if (currentFile.exists())
+                if (!FileUtils.moveFileWithCopyFallback(currentFile, moveToOnClose))
                 {
-                    if (!FileUtils.moveFileWithCopyFallback(currentFile, moveToOnClose))
-                    {
-                        logger.warn(String.format("Failed to move file from %s to %s\n", currentFile.getPath(), moveToOnClose.getPath()));
-                    }
-                }
-                else if (logger.isDebugEnabled())
-                {
-                    logger.debug(String.format("Failed to move file from %s to %s. The file does not exist.\n", currentFile.getPath(), moveToOnClose.getPath()));
+                    logger.warn(String.format("Failed to move file from %s to %s\n", currentFile.getPath(), moveToOnClose.getPath()));
                 }
             }
             else if (deleteOnClose)
             {
-                if (currentFile.exists())
+                if (!currentFile.delete())
                 {
-                    if (!currentFile.delete())
-                    {
-                        throw new IOException(new DefaultMuleException(FileMessages.failedToDeleteFile(currentFile)));
-                    }
-                }
-                else if (logger.isDebugEnabled())
-                {
-                    logger.debug(String.format("Failed to delete file %s. The file does not exist.\n", currentFile.getPath()));
+                    throw new IOException(new DefaultMuleException(FileMessages.failedToDeleteFile(currentFile)));
                 }
             }
         }
-        if (closeListener != null)
+
+        if (closeListener != null && !alreadyNotified.getAndSet(true))
         {
             closeListener.fileClose(currentFile);
         }
