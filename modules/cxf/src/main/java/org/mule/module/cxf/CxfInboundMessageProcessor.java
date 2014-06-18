@@ -349,7 +349,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             }
             
             MuleMessage muleResMsg = responseEvent.getMessage();
-            muleResMsg.setPayload(getRessponseOutputHandler(m));
+            muleResMsg.setPayload(getResponseOutputHandler(m));
 
             // Handle a fault if there is one.
             Message faultMsg = m.getExchange().getOutFaultMessage();
@@ -389,7 +389,12 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         return super.processNext(event);
     }
 
+    @Deprecated
     protected OutputHandler getRessponseOutputHandler(final MessageImpl m)
+    {
+        return getResponseOutputHandler(m);
+    }
+    protected OutputHandler getResponseOutputHandler(final MessageImpl m)
     {
         OutputHandler outputHandler = new OutputHandler()
         {
