@@ -14,6 +14,7 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.util.FileUtils;
+import org.mule.api.MuleContext;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -45,15 +46,16 @@ public class FileMoveToFunctionalTestCase extends FunctionalTestCase {
     public TemporaryFolder moveToTemporaryFolder = new TemporaryFolder();
 
     @Override
-    protected String getConfigFile() {
+    protected String getConfigResources() {
         return "file-functional-move-to.xml";
     }
 
     @Override
-    protected void doSetUpBeforeMuleContextCreation() throws Exception
+    protected MuleContext createMuleContext() throws Exception
     {
         System.setProperty(INPUT_DIRECTORY_PROPERTY, inputTemporaryFolder.getRoot().getAbsolutePath());
         System.setProperty(MOVE_TO_DIRECTORY_PROPERTY, moveToTemporaryFolder.getRoot().getAbsolutePath());
+		return super.createMuleContext();
     }
 
     @Override

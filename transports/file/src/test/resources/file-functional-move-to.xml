@@ -14,7 +14,7 @@
                    path="${FileMoveToFunctionalTestCase-inputDirectory}"
                    moveToDirectory="${FileMoveToFunctionalTestCase-moveToDirectory}"
                    pollingFrequency="1000"
-                   moveToPattern="#[message.inboundProperties.originalFilename]_#[message.id]"
+                   moveToPattern="#[message.outboundProperties.originalFilename]_#[message.id]"
                    fileAge="1000" responseTimeout="10000"
                    connector-ref="FileConnector"/>
 
