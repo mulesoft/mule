@@ -8,6 +8,7 @@ package org.mule.transport.file;
 
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
@@ -37,8 +38,8 @@ import static org.mockito.Mockito.*;
 @SmallTest
 public class ReceiverFileInputStreamTestCase extends AbstractMuleTestCase
 {
-    @ClassRule
-    public static TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Mock
     InputStreamCloseListener listener;
