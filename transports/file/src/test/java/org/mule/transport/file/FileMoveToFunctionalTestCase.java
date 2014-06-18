@@ -38,19 +38,19 @@ public class FileMoveToFunctionalTestCase extends FunctionalTestCase {
 
     private static final int FILE_SIZE = 1024;
 
-    @ClassRule
-    public static TemporaryFolder inputTemporaryFolder = new TemporaryFolder();
+    @Rule
+    public TemporaryFolder inputTemporaryFolder = new TemporaryFolder();
 
-    @ClassRule
-    public static TemporaryFolder moveToTemporaryFolder = new TemporaryFolder();
-
+    @Rule
+    public TemporaryFolder moveToTemporaryFolder = new TemporaryFolder();
 
     @Override
     protected String getConfigFile() {
         return "file-functional-move-to.xml";
     }
 
-    public FileMoveToFunctionalTestCase()
+    @Override
+    protected void doSetUpBeforeMuleContextCreation() throws Exception
     {
         System.setProperty(INPUT_DIRECTORY_PROPERTY, inputTemporaryFolder.getRoot().getAbsolutePath());
         System.setProperty(MOVE_TO_DIRECTORY_PROPERTY, moveToTemporaryFolder.getRoot().getAbsolutePath());
