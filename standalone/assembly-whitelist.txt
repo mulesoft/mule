@@ -13,6 +13,7 @@
 /mule-standalone-${productVersion}/src
 /mule-standalone-${productVersion}/LICENSE.txt
 /mule-standalone-${productVersion}/README.txt
+/mule-standalone-${productVersion}/MIGRATION.txt
 
 #
 # /apps
@@ -46,6 +47,11 @@
 #
 /mule-standalone-${productVersion}/docs/api
 /mule-standalone-${productVersion}/docs/api/+
+
+#
+# /domains
+#
+/mule-standalone-${productVersion}/domains/default
 
 
 #
@@ -127,8 +133,9 @@
 /mule-standalone-${productVersion}/examples/echo/src/main
 /mule-standalone-${productVersion}/examples/echo/src/main/app
 /mule-standalone-${productVersion}/examples/echo/src/main/app/adding-logging-to-a-flow.xml
-/mule-standalone-${productVersion}/examples/echo/src/main/app/mule-app.properties
 /mule-standalone-${productVersion}/examples/echo/src/main/app/mule-deploy.properties
+/mule-standalone-${productVersion}/examples/echo/src/main/resources
+/mule-standalone-${productVersion}/examples/echo/src/main/resources/mule-app.properties
 /mule-standalone-${productVersion}/examples/echo/src/test
 /mule-standalone-${productVersion}/examples/echo/src/test/java
 /mule-standalone-${productVersion}/examples/echo/src/test/java/org
@@ -284,6 +291,9 @@
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/main/java/org/mule/example/loanbroker/model/CreditProfile.java
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/main/java/org/mule/example/loanbroker/model/Customer.java
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/main/java/org/mule/example/loanbroker/model/LoanQuote.java
+/mule-standalone-${productVersion}/examples/loanbroker-simple/src/main/resources
+/mule-standalone-${productVersion}/examples/loanbroker-simple/src/main/resources/log4j.properties
+/mule-standalone-${productVersion}/examples/loanbroker-simple/src/main/resources/loanbroker-simple.properties
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/test
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/test/java
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/test/java/org
@@ -291,6 +301,8 @@
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/test/java/org/mule/example
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/test/java/org/mule/example/loanbroker
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/test/java/org/mule/example/loanbroker/LoanBrokerSyncTestCase.java
+/mule-standalone-${productVersion}/examples/loanbroker-simple/src/test/resources
+/mule-standalone-${productVersion}/examples/loanbroker-simple/src/test/resources/log4j.properties
 
 #
 # /examples/scripting
@@ -432,7 +444,7 @@
 # /lib/mule
 #
 /mule-standalone-${productVersion}/lib/mule
-/mule-standalone-${productVersion}/lib/mule/mule-common-3.5.0-M4-SNAPSHOT.jar
+/mule-standalone-${productVersion}/lib/mule/mule-common-3.5.0-M5-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-core-${productVersion}-tests.jar
 /mule-standalone-${productVersion}/lib/mule/mule-core-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-annotations-${productVersion}.jar
@@ -463,7 +475,7 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-tomcat-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-ws-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-xml-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-mvel2-2.1.8.Final-MULE-002-SNAPSHOT.jar
+/mule-standalone-${productVersion}/lib/mule/mule-mvel2-2.1.9-MULE-003.jar
 /mule-standalone-${productVersion}/lib/mule/mule-pattern-core-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-tools-anttasks-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-ajax-${productVersion}.jar
@@ -566,6 +578,7 @@
 /mule-standalone-${productVersion}/lib/opt/geronimo-jta_1.1_spec-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-servlet_3.0_spec-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-stax-api_1.0_spec-1.0.1.jar
+/mule-standalone-${productVersion}/lib/opt/grabbag-1.8.1.jar
 /mule-standalone-${productVersion}/lib/opt/groovy-all-1.8.6.jar
 /mule-standalone-${productVersion}/lib/opt/guava-16.0.1.jar
 /mule-standalone-${productVersion}/lib/opt/hamcrest-core-1.1.jar
@@ -579,7 +592,7 @@
 /mule-standalone-${productVersion}/lib/opt/jackson-databind-2.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-jaxrs-1.9.11.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-mapper-asl-1.9.11.jar
-/mule-standalone-${productVersion}/lib/opt/jackson-xc-1.7.1.jar
+/mule-standalone-${productVersion}/lib/opt/jackson-xc-1.9.11.jar
 /mule-standalone-${productVersion}/lib/opt/jasper-6.0.29.jar
 /mule-standalone-${productVersion}/lib/opt/jasper-el-6.0.29.jar
 /mule-standalone-${productVersion}/lib/opt/jasper-jdt-6.0.29.jar
@@ -626,13 +639,12 @@
 /mule-standalone-${productVersion}/lib/opt/jta-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/juel-engine-2.1.0.jar
 /mule-standalone-${productVersion}/lib/opt/juel-impl-2.2.1.jar
-/mule-standalone-${productVersion}/lib/opt/jug-2.0.0-asl.jar
 /mule-standalone-${productVersion}/lib/opt/juli-6.0.29.jar
 /mule-standalone-${productVersion}/lib/opt/livetribe-jsr223-2.0.5.jar
 /mule-standalone-${productVersion}/lib/opt/mail-1.4.3.jar
 /mule-standalone-${productVersion}/lib/opt/mailapi-1.4.3.jar
 /mule-standalone-${productVersion}/lib/opt/msv-core-2011.1.jar
-/mule-standalone-${productVersion}/lib/opt/mvel2-2.1.3.Final.jar
+/mule-standalone-${productVersion}/lib/opt/mvel2-2.0.10.jar
 /mule-standalone-${productVersion}/lib/opt/mx4j-impl-2.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/mx4j-jmx-2.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/mx4j-remote-2.1.1.jar
@@ -678,6 +690,7 @@
 /mule-standalone-${productVersion}/lib/opt/sxc-xpath-0.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/tomcat-apr-5.5.23.jar
 /mule-standalone-${productVersion}/lib/opt/tomcat-util-5.5.23.jar
+/mule-standalone-${productVersion}/lib/opt/uuid-3.4.0.jar
 /mule-standalone-${productVersion}/lib/opt/woodstox-core-asl-4.1.4.jar
 /mule-standalone-${productVersion}/lib/opt/wsdl4j-1.6.2.jar
 /mule-standalone-${productVersion}/lib/opt/wss4j-1.6.9.jar
@@ -694,8 +707,7 @@
 /mule-standalone-${productVersion}/lib/opt/xmlbeans-2.3.0.jar
 /mule-standalone-${productVersion}/lib/opt/xmltooling-1.3.2-1.jar
 /mule-standalone-${productVersion}/lib/shared
-/mule-standalone-${productVersion}/lib/shared/default
-/mule-standalone-${productVersion}/lib/shared/default/README.txt
+/mule-standalone-${productVersion}/lib/shared/README.txt
 /mule-standalone-${productVersion}/lib/user
 /mule-standalone-${productVersion}/lib/user/junit-4.9.jar
 /mule-standalone-${productVersion}/lib/user/mule-tests-functional-${productVersion}.jar

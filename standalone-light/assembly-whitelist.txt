@@ -10,7 +10,7 @@
 /mule-standalone-nodocs-${productVersion}/logs
 /mule-standalone-nodocs-${productVersion}/LICENSE.txt
 /mule-standalone-nodocs-${productVersion}/README.txt
-
+/mule-standalone-nodocs-${productVersion}/MIGRATION.txt
 
 #
 # /apps
@@ -38,6 +38,10 @@
 /mule-standalone-nodocs-${productVersion}/conf/tls-default.conf
 /mule-standalone-nodocs-${productVersion}/conf/tls-fips140-2.conf
 
+#
+# /domains
+#
+/mule-standalone-nodocs-${productVersion}/domains/default
 
 #
 # /lib/boot
@@ -94,7 +98,7 @@
 # /lib/mule
 #
 /mule-standalone-nodocs-${productVersion}/lib/mule
-/mule-standalone-nodocs-${productVersion}/lib/mule/mule-common-3.5.0-M4-SNAPSHOT.jar
+/mule-standalone-nodocs-${productVersion}/lib/mule/mule-common-3.5.0-M5-SNAPSHOT.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-core-${productVersion}-tests.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-core-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-annotations-${productVersion}.jar
@@ -125,7 +129,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-tomcat-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-ws-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-xml-${productVersion}.jar
-/mule-standalone-nodocs-${productVersion}/lib/mule/mule-mvel2-2.1.8.Final-MULE-002-SNAPSHOT.jar
+/mule-standalone-nodocs-${productVersion}/lib/mule/mule-mvel2-2.1.9-MULE-003.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-pattern-core-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-tools-anttasks-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-transport-ajax-${productVersion}.jar
@@ -228,6 +232,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/geronimo-jta_1.1_spec-1.1.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/geronimo-servlet_3.0_spec-1.0.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/geronimo-stax-api_1.0_spec-1.0.1.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/grabbag-1.8.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/groovy-all-1.8.6.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/guava-16.0.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/hamcrest-core-1.1.jar
@@ -241,7 +246,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/jackson-databind-2.1.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jackson-jaxrs-1.9.11.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jackson-mapper-asl-1.9.11.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/jackson-xc-1.7.1.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/jackson-xc-1.9.11.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jasper-6.0.29.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jasper-el-6.0.29.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jasper-jdt-6.0.29.jar
@@ -288,13 +293,12 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/jta-1.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/juel-engine-2.1.0.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/juel-impl-2.2.1.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/jug-2.0.0-asl.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/juli-6.0.29.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/livetribe-jsr223-2.0.5.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/mail-1.4.3.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/mailapi-1.4.3.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/msv-core-2011.1.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/mvel2-2.1.3.Final.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/mvel2-2.0.10.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/mx4j-impl-2.1.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/mx4j-jmx-2.1.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/mx4j-remote-2.1.1.jar
@@ -340,6 +344,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/sxc-xpath-0.7.3.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/tomcat-apr-5.5.23.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/tomcat-util-5.5.23.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/uuid-3.4.0.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/woodstox-core-asl-4.1.4.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/wsdl4j-1.6.2.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/wss4j-1.6.9.jar
@@ -356,8 +361,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/xmlbeans-2.3.0.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/xmltooling-1.3.2-1.jar
 /mule-standalone-nodocs-${productVersion}/lib/shared
-/mule-standalone-nodocs-${productVersion}/lib/shared/default
-/mule-standalone-nodocs-${productVersion}/lib/shared/default/README.txt
+/mule-standalone-nodocs-${productVersion}/lib/shared/README.txt
 /mule-standalone-nodocs-${productVersion}/lib/user
 /mule-standalone-nodocs-${productVersion}/lib/user/junit-4.9.jar
 /mule-standalone-nodocs-${productVersion}/lib/user/mule-tests-functional-${productVersion}.jar
