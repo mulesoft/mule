@@ -197,7 +197,7 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
                 <xsd:attribute name="resourceResolver-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Reference to a Spring bean that implements <code>org.w3c.dom.ls.LSResourceResolver</code>.
+                            Reference to a Spring bean that implements <code>org.w3c.dom.ls.LSResourceResolver</code>. By default a <code>oorg.mule.module.xml.util.MuleResourceResolver</code> instance will be used to resolve from the file system, from a URL, or from the classpath, in that specific order.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
