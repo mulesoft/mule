@@ -6,33 +6,66 @@
  */
 package org.mule.module.xml.filters;
 
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
+import org.mule.tck.size.SmallTest;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
-
+@RunWith(MockitoJUnitRunner.class)
+@SmallTest
 public class SchemaValidationTestCase extends AbstractMuleTestCase
 {
-    MuleContext muleContext = mock(MuleContext.class);
+    private static final String SIMPLE_SCHEMA = "schema1.xsd";
 
-    /**
-     * tests validation
-     */
+    private static final String INCLUDE_SCHEMA = "schema-with-include.xsd";
+
+    private static final String VALID_XML_FILE = "/validation1.xml";
+
+    private static final String INVALID_XML_FILE = "/validation2.xml";
+
+    @Mock
+    private MuleContext muleContext;
+
     @Test
     public void testValidate() throws Exception
     {
         SchemaValidationFilter filter = new SchemaValidationFilter();
-        filter.setSchemaLocations("schema1.xsd");
+        filter.setSchemaLocations(SIMPLE_SCHEMA);
         filter.initialise();
-        
-        assertTrue(filter.accept(new DefaultMuleMessage(getClass().getResourceAsStream("/validation1.xml"), muleContext)));
-        assertFalse(filter.accept(new DefaultMuleMessage(getClass().getResourceAsStream("/validation2.xml"), muleContext)));
+
+        assertThat(filter.accept(new DefaultMuleMessage(getClass().getResourceAsStream(VALID_XML_FILE), muleContext)), is(true));
+        assertThat(filter.accept(new DefaultMuleMessage(getClass().getResourceAsStream(INVALID_XML_FILE), muleContext)), is(false));
     }
 
+    @Test
+    public void testDefaultResourceResolverIsPresent() throws Exception
+    {
+        SchemaValidationFilter filter = new SchemaValidationFilter();
+        filter.setSchemaLocations(SIMPLE_SCHEMA);
+        filter.initialise();
+
+        assertThat(filter.getResourceResolver(), is(not(nullValue())));
+    }
+
+    @Test
+    public void testValidateWithIncludes() throws Exception
+    {
+        SchemaValidationFilter filter = new SchemaValidationFilter();
+        filter.setSchemaLocations(INCLUDE_SCHEMA);
+        filter.initialise();
+
+        assertThat(filter.accept(new DefaultMuleMessage(getClass().getResourceAsStream(VALID_XML_FILE), muleContext)), is(true));
+        assertThat(filter.accept(new DefaultMuleMessage(getClass().getResourceAsStream(INVALID_XML_FILE), muleContext)), is(false));
+    }
 }
