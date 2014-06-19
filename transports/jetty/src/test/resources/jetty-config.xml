@@ -2,10 +2,8 @@
 <!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
 
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
-    <Set name="ThreadPool">
-     <New class="org.eclipse.jetty.util.thread.QueuedThreadPool">
+    <Get name="ThreadPool">
       <Set name="minThreads">10</Set>
       <Set name="maxThreads">255</Set>
-     </New>
-    </Set>
+    </Get>
 </Configure>

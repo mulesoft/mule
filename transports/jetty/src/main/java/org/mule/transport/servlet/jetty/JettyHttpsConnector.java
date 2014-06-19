@@ -19,9 +19,8 @@ import java.io.IOException;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManagerFactory;
 
-import org.eclipse.jetty.server.AbstractConnector;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
-import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
+import org.eclipse.jetty.server.AbstractNetworkConnector;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 /**
@@ -247,15 +246,10 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
     }
 
     @Override
-    protected AbstractConnector createJettyConnector()
+    protected AbstractNetworkConnector createJettyConnector()
     {
         SslContextFactory sslContextFactory = createSslContextFactory();
-        SelectChannelConnector cnn = new SslSelectChannelConnector(sslContextFactory);
-
-        // get (from parent Mule connector) and set number of acceptor threads into the underlying SSL connector
-        cnn.setAcceptors(getAcceptors());
-
-        return cnn;
+        return new ServerConnector(getHttpServer(), getAcceptors(), getSelectors(), sslContextFactory);
     }
 
     private SslContextFactory createSslContextFactory()
@@ -285,7 +279,7 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
         }
         if (tls.getTrustStore() != null)
         {
-            sslContextFactory.setTrustStore(tls.getTrustStore());
+            sslContextFactory.setTrustStorePath(tls.getTrustStore());
         }
         if (tls.getTrustStoreType() != null)
         {
