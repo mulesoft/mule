@@ -12,6 +12,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.xml.transformer.DelayedResult;
+import org.mule.module.xml.util.MuleResourceResolver;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
@@ -38,8 +39,7 @@ import org.xml.sax.SAXException;
 /**
  * Filter for schema validation.
  * 
- * @author Ryan Heaton
- */
+ **/
 public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter, Initialisable
 {
     public static final String DEFAULT_SCHEMA_LANGUAGE = "http://www.w3.org/2001/XMLSchema";
@@ -235,10 +235,12 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
                 schemaFactory.setErrorHandler(this.errorHandler);
             }
 
-            if (this.resourceResolver != null)
+            if (this.resourceResolver == null)
             {
-                schemaFactory.setResourceResolver(this.resourceResolver);
+                this.resourceResolver = new MuleResourceResolver();
             }
+
+            schemaFactory.setResourceResolver(this.resourceResolver);
 
             Schema schema;
             try
