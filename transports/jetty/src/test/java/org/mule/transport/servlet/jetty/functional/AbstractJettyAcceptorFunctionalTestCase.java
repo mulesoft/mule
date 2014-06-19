@@ -87,7 +87,7 @@ public abstract class AbstractJettyAcceptorFunctionalTestCase extends Functional
                 actual = 0;
                 for (final Thread th : threadSet)
                 {
-                    if (th.getName().contains("qtp") && th.getName().contains("Acceptor"))
+                    if (th.getName().contains("qtp") && th.getName().contains("acceptor"))
                     {
                         actual = actual + 1;
                     }

@@ -71,7 +71,7 @@ public class JettyHttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
         MuleMessage reply = client.send("clientEndpoint2", TEST_MESSAGE, messageProperties);
         assertNotNull(reply);
         assertEquals("200", reply.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
-        assertEquals("text/plain;charset=UTF-8", reply.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE));
+        assertEquals("text/plain; charset=UTF-8", reply.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE));
         assertEquals("UTF-8", reply.getEncoding());
     }
 
