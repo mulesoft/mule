@@ -134,4 +134,20 @@
         </catch-exception-strategy>
     </flow>
 
+    <flow name="exceptionRoutedProperlyWithRepeatedEndpoint">
+        <vm:inbound-endpoint path="in6"/>
+        <smtp:outbound-endpoint host="localhost" responseTimeout="10000" />
+        <catch-exception-strategy>
+            <vm:outbound-endpoint path="out6"/>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="exceptionRoutedProperlyWithRepeatedDynamicEndpoint">
+    <vm:inbound-endpoint path="in7"/>
+    <outbound-endpoint address="smtp://#[message.inboundProperties['host']]"/>
+    <catch-exception-strategy>
+    <vm:outbound-endpoint path="out7"/>
+    </catch-exception-strategy>
+    </flow>
+
 </mule>

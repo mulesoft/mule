@@ -26,6 +26,7 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.Connector;
 import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.transport.AbstractConnector;
+import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
@@ -127,5 +128,11 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         }
         
         return chain;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return  super.hashCode() + ClassUtils.hash(new Object[] {exceptionHandler});
     }
 }
