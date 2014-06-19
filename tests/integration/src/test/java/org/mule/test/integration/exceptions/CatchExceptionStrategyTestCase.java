@@ -6,35 +6,43 @@
  */
 package org.mule.test.integration.exceptions;
 
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.LocalMuleClient;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import javax.jws.WebParam;
+import javax.jws.WebResult;
+import javax.jws.WebService;
+
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
 
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-import javax.jws.WebService;
-import java.util.Arrays;
-import java.util.Collection;
-
-import static org.junit.Assert.assertThat;
-
-public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
+public class CatchExceptionStrategyTestCase extends FunctionalTestCase
 {
     public static final int TIMEOUT = 5000;
     public static final String ERROR_PROCESSING_NEWS = "error processing news";
     public static final String JSON_RESPONSE = "{\"errorMessage\":\"error processing news\",\"userId\":15,\"title\":\"News title\"}";
     public static final String JSON_REQUEST = "{\"userId\":\"15\"}";
+    private static CountDownLatch latch;
 
     @Rule
     public DynamicPort dynamicPort1 = new DynamicPort("port1");
@@ -43,16 +51,10 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
     @Rule
     public DynamicPort dynamicPort3 = new DynamicPort("port3");
 
-    public CatchExceptionStrategyTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{{AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/catch-exception-strategy-use-case-service.xml"},
-                {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/catch-exception-strategy-use-case-flow.xml"}});
+        return "org/mule/test/integration/exceptions/catch-exception-strategy-use-case-flow.xml";
     }
 
     @Test
@@ -82,7 +84,7 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
     @Test
     public void testTcpJsonErrorResponse() throws Exception
     {
-        testJsonErrorResponse(String.format("tcp://localhost:%s",dynamicPort2.getNumber()));
+        testJsonErrorResponse(String.format("tcp://localhost:%s", dynamicPort2.getNumber()));
     }
 
     private void testJsonErrorResponse(String endpointUri) throws Exception
@@ -118,6 +120,60 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
         result = client.send("vm://in3", MESSAGE, null, TIMEOUT);
         assertThat(result,IsNull.<Object>notNullValue());
         assertThat(result.getPayloadAsString(), Is.is(MESSAGE + " apt1 apt2 groovified"));
+    }
+
+    @Test
+    public void testExceptionWithinCatchExceptionStrategy() throws Exception
+    {
+        LocalMuleClient client = muleContext.getClient();
+        latch = spy(new CountDownLatch(2));
+        client.dispatch("vm://in4", MESSAGE, null);
+
+        assertFalse(latch.await(3, TimeUnit.SECONDS));
+        verify(latch).countDown();
+    }
+
+    @Test
+    public void testExceptionWithinCatchExceptionStrategyAndDynamicEndpoint() throws Exception
+    {
+        LocalMuleClient client = muleContext.getClient();
+        latch = spy(new CountDownLatch(2));
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("host", "localhost");
+        client.dispatch("vm://in5", MESSAGE, props);
+
+        assertFalse(latch.await(3, TimeUnit.SECONDS));
+        verify(latch).countDown();
+    }
+
+    @Test
+    public void testExceptionRoutedProperlyWithRepeatedEndpoint() throws Exception
+    {
+        LocalMuleClient client = muleContext.getClient();
+        client.dispatch("vm://in6", MESSAGE, null);
+        MuleMessage response = client.request("vm://out6", 3000);
+        assertNotNull(response);
+    }
+
+    @Test
+    public void testExceptionRoutedProperlyWithRepeatedDynamicEndpoint() throws Exception
+    {
+        LocalMuleClient client = muleContext.getClient();
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("host", "localhost");
+        client.dispatch("vm://in7", MESSAGE, props);
+        MuleMessage response = client.request("vm://out7", 3000);
+        assertNotNull(response);
+    }
+
+    public static class ExecutionCountProcessor implements MessageProcessor {
+
+        @Override
+        public synchronized MuleEvent process(MuleEvent event) throws MuleException
+        {
+            latch.countDown();
+            return event;
+        }
     }
 
     public static class LoadNewsProcessor implements MessageProcessor
