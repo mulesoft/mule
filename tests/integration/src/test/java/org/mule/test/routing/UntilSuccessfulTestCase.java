@@ -27,21 +27,42 @@ import org.mule.util.store.AbstractPartitionedObjectStore;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class UntilSuccessfulTestCase extends FunctionalTestCase
 {
+    private final String configFile;
+
     private MuleClient client;
     private FunctionalTestComponent targetMessageProcessor;
     private FunctionalTestComponent deadLetterQueueProcessor;
 
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"until-successful-test.xml"},
+                {"until-successful-seconds-test.xml"}
+        });
+    }
+
+    public UntilSuccessfulTestCase(String configFile)
+    {
+        this.configFile = configFile;
+    }
+
     @Override
     protected String getConfigFile()
     {
-        return "until-successful-test.xml";
+        return configFile;
     }
 
     @Override
@@ -146,6 +167,24 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
         }
     }
 
+    /**
+     * Verifies that the synchronous wait time is consistent with that requested
+     */
+    @Test
+    public void measureSynchronousWait() throws Exception {
+        final String payload = RandomStringUtils.randomAlphanumeric(20);
+        Flow flow = (Flow) getFlowConstruct("measureSynchronousWait");
+        try
+        {
+            flow.process(getTestEvent(payload));
+            fail("Exception should be thrown");
+        }
+        catch (Exception e)
+        {
+            assertThat(WaitMeasure.totalWait >= 1000, is(true));
+        }
+    }
+
     @Test
     public void executeAsynchronouslyDoingRetries() throws Exception
     {
@@ -247,6 +286,24 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
         {
             count++;
             return null;
+        }
+    }
+
+    static class WaitMeasure implements MessageProcessor {
+
+        public static long totalWait;
+        private long firstAttemptTime = 0;
+
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            if (firstAttemptTime == 0) {
+                firstAttemptTime = System.currentTimeMillis();
+            } else {
+                totalWait = System.currentTimeMillis() - firstAttemptTime;
+            }
+
+            return event;
         }
     }
 }

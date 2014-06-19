@@ -6,12 +6,14 @@
  */
 package org.mule.el.mvel;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
-import org.mule.mvel2.integration.impl.ImmutableDefaultFactory;
+import org.mule.mvel2.integration.VariableResolverFactory;
 
-public class EventVariableResolverFactory extends ImmutableDefaultFactory
+public class EventVariableResolverFactory extends MessageVariableResolverFactory
 {
 
     private static final long serialVersionUID = -6819292692339684915L;
@@ -19,9 +21,28 @@ public class EventVariableResolverFactory extends ImmutableDefaultFactory
     private final String FLOW = "flow";
     private MuleEvent event;
 
-    public EventVariableResolverFactory(MuleEvent event)
+    public EventVariableResolverFactory(ParserConfiguration parserConfiguration,
+                                        MuleContext muleContext,
+                                        MuleEvent event)
     {
+        super(parserConfiguration, muleContext, event.getMessage());
         this.event = event;
+    }
+
+    /**
+     * Convenience constructor to allow for more concise creation of VariableResolverFactory chains without
+     * and performance overhead incurred by using a builder.
+     * 
+     * @param delegate
+     * @param next
+     */
+    public EventVariableResolverFactory(ParserConfiguration parserConfiguration,
+                                        MuleContext muleContext,
+                                        MuleEvent event,
+                                        VariableResolverFactory next)
+    {
+        this(parserConfiguration, muleContext, event);
+        setNextFactory(next);
     }
 
     @Override
@@ -40,19 +61,14 @@ public class EventVariableResolverFactory extends ImmutableDefaultFactory
                     MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE, event, null);
             }
         }
-        return null;
+        return super.getVariableResolver(name);
     }
 
     @Override
     public boolean isTarget(String name)
     {
-        return FLOW.equals(name) || MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE.equals(name);
-    }
-
-    @Override
-    public boolean isResolveable(String name)
-    {
-        return isTarget(name);
+        return FLOW.equals(name) || MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE.equals(name)
+               || super.isTarget(name);
     }
 
     public static class FlowContext

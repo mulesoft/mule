@@ -17,10 +17,16 @@ import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
+import org.mule.api.processor.DynamicPipeline;
+import org.mule.api.processor.DynamicPipelineBuilder;
+import org.mule.api.processor.DynamicPipelineException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
+import org.mule.api.processor.NamedStageNameSource;
 import org.mule.api.processor.ProcessingStrategy;
-import org.mule.api.processor.ProcessingStrategy.StageNameSource;
+import org.mule.api.processor.SequentialStageNameSource;
+import org.mule.api.processor.StageNameSource;
+import org.mule.api.processor.StageNameSourceProvider;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.construct.flow.DefaultFlowProcessingStrategy;
@@ -43,15 +49,17 @@ import org.mule.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
  * transactions message processing in another thread asynchronously.</li>
  * </ul>
  */
-public class Flow extends AbstractPipeline implements MessageProcessor
+public class Flow extends AbstractPipeline implements MessageProcessor, StageNameSourceProvider, DynamicPipeline
 {
     private int stageCount = 0;
-    private int asyncCount = 0;
+    private final StageNameSource sequentialStageNameSource;
+    private DynamicPipelineMessageProcessor dynamicPipelineMessageProcessor;
 
     public Flow(String name, MuleContext muleContext)
     {
         super(name, muleContext);
         processingStrategy = new DefaultFlowProcessingStrategy();
+        this.sequentialStageNameSource = new SequentialStageNameSource(name);
     }
 
     @Override
@@ -72,6 +80,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor
                 public MuleEvent process() throws Exception
                 {
                     MuleEvent result = pipeline.process(newEvent);
+
                     if (result != null && !VoidMuleEvent.getInstance().equals(result))
                     {
                         result.getMessage().release();
@@ -79,6 +88,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor
                     return result;
                 }
             });
+
             if (result != null && !VoidMuleEvent.getInstance().equals(result))
             {
                 result = new DefaultMuleEvent(result, event.getFlowConstruct(), replyToHandler, replyToDestination);
@@ -108,6 +118,9 @@ public class Flow extends AbstractPipeline implements MessageProcessor
         builder.chain(new ProcessIfPipelineStartedMessageProcessor());
         builder.chain(new ProcessingTimeInterceptor());
         builder.chain(new FlowConstructStatisticsMessageProcessor());
+
+        dynamicPipelineMessageProcessor = new DynamicPipelineMessageProcessor(this);
+        builder.chain(dynamicPipelineMessageProcessor);
     }
 
     @Override
@@ -152,7 +165,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor
     protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException
     {
         getProcessingStrategy().configureProcessors(getMessageProcessors(),
-            new ProcessingStrategy.StageNameSource()
+            new StageNameSource()
             {
                 @Override
                 public String getName()
@@ -162,28 +175,27 @@ public class Flow extends AbstractPipeline implements MessageProcessor
             }, builder, muleContext);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public StageNameSource getAsyncStageNameSource()
     {
-        return new ProcessingStrategy.StageNameSource()
-        {
-            @Override
-            public String getName()
-            {
-                return String.format("%s.async%s", Flow.this.getName(), ++asyncCount);
-            }
-        };
+        return this.sequentialStageNameSource;
     }
 
-    public StageNameSource getAsyncStageNameSource(final String asyncName)
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public StageNameSource getAsyncStageNameSource(String asyncName)
     {
-        return new ProcessingStrategy.StageNameSource()
-        {
-            @Override
-            public String getName()
-            {
-                return String.format("%s.%s", Flow.this.getName(), asyncName);
-            }
-        };
+        return new NamedStageNameSource(this.name, asyncName);
     }
 
+    @Override
+    public DynamicPipelineBuilder dynamicPipeline(String id) throws DynamicPipelineException
+    {
+        return dynamicPipelineMessageProcessor.dynamicPipeline(id);
+    }
 }

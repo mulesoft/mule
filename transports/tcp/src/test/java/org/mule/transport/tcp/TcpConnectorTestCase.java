@@ -7,7 +7,11 @@
 package org.mule.transport.tcp;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import org.mule.api.transport.Connector;
+import org.mule.tck.MuleTestUtils.TestCallback;
 import org.mule.transport.AbstractConnectorTestCase;
 
 import org.junit.Test;
@@ -55,4 +59,39 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
         assertEquals(1000, c.getClientSoTimeout());
         assertEquals(1000, c.getConnectionTimeout());
     }
+
+    @Test
+    public void tcpNoDelayDefault() throws Exception
+    {
+        assertFalse(((TcpConnector) getConnector()).isSendTcpNoDelay());
+    }
+
+    @Test
+    public void tcpNoDelayDefaultSystemPropertyTrue() throws Exception
+    {
+        testWithSystemProperty(TcpConnector.SEND_TCP_NO_DELAY_SYSTEM_PROPERTY, "true", new TestCallback()
+        {
+            @Override
+            public void run() throws Exception
+            {
+                assertTrue(((TcpConnector) createConnector()).isSendTcpNoDelay());
+
+            }
+        });
+    }
+
+    @Test
+    public void tcpNoDelayDefaultSystemPropertyFalse() throws Exception
+    {
+        testWithSystemProperty(TcpConnector.SEND_TCP_NO_DELAY_SYSTEM_PROPERTY, "false", new TestCallback()
+        {
+            @Override
+            public void run() throws Exception
+            {
+                assertFalse(((TcpConnector) createConnector()).isSendTcpNoDelay());
+
+            }
+        });
+    }
+
 }

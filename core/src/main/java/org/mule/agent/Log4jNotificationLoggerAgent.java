@@ -46,7 +46,7 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
     @Override
     public String getDescription()
     {
-        StringBuffer buf = new StringBuffer(DEFAULT_DESCRIPTION_BUFFER_SIZE);
+        StringBuilder buf = new StringBuilder(DEFAULT_DESCRIPTION_BUFFER_SIZE);
 
         if (StringUtils.isNotBlank(logName))
         {

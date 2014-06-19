@@ -59,7 +59,7 @@ public class CacheControlHeader
     @Override
     public String toString()
     {
-        StringBuffer cacheControl = new StringBuffer("");
+        StringBuilder cacheControl = new StringBuilder("");
         if(directive != null)
         {
             cacheControl.append(directive).append(",");

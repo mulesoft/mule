@@ -11,7 +11,7 @@ import org.mule.api.context.MuleContextBuilder;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
-import org.mule.module.management.agent.JmxAgent;
+import org.mule.module.management.agent.JmxApplicationAgent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
@@ -46,7 +46,7 @@ public class JmxMissingIdTestCase extends AbstractMuleTestCase
             contextBuilder.setMuleConfiguration(config);
             muleContext = new DefaultMuleContextFactory().createMuleContext(contextBuilder);
 
-            JmxAgent jmxAgent = new JmxAgent();
+            JmxApplicationAgent jmxAgent = new JmxApplicationAgent();
             muleContext.getRegistry().registerAgent(jmxAgent);
 
             muleContext.start();

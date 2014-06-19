@@ -157,7 +157,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleContextTestCase
         };
 
         filterRouter1.setFilter(new PayloadTypeFilter(Exception.class));
-        filterRouter2.setFilter(new PayloadTypeFilter(StringBuffer.class));
+        filterRouter2.setFilter(new PayloadTypeFilter(StringBuilder.class));
         messageRouter.addRoute(filterRouter1);
         messageRouter.addRoute(filterRouter2);
 
@@ -177,7 +177,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleContextTestCase
         assertEquals(0, count1[0]);
         assertEquals(0, count2[0]);
 
-        messageRouter.process(getTestEvent(new StringBuffer()));
+        messageRouter.process(getTestEvent(new StringBuilder()));
         assertEquals(1, catchAllCount[0]);
         assertEquals(0, count1[0]);
         assertEquals(1, count2[0]);

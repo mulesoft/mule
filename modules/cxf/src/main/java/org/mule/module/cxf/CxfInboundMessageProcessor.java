@@ -60,7 +60,6 @@ import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.local.LocalConduit;
 import org.apache.cxf.transports.http.QueryHandler;
-import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.apache.cxf.wsdl.http.AddressType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -89,6 +88,8 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     protected Server server;
 
     private boolean proxy;
+
+    private QueryHandler wsdlQueryHandler;
 
     @Override
     public void initialise() throws InitialisationException
@@ -192,14 +193,11 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         String ct = null;
 
-        for (QueryHandler qh : bus.getExtension(QueryHandlerRegistry.class).getHandlers())
+        if (wsdlQueryHandler.isRecognizedQuery(wsdlUri, ctxUri, ei))
         {
-            if (qh.isRecognizedQuery(wsdlUri, ctxUri, ei))
-            {
-                ct = qh.getResponseContentType(wsdlUri, ctxUri);
-                qh.writeResponse(wsdlUri, ctxUri, ei, out);
-                out.flush();
-            }
+            ct = wsdlQueryHandler.getResponseContentType(wsdlUri, ctxUri);
+            wsdlQueryHandler.writeResponse(wsdlUri, ctxUri, ei, out);
+            out.flush();
         }
 
         String msg;
@@ -536,4 +534,10 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     {
         return proxy;
     }
+
+    public void setWSDLQueryHandler(QueryHandler wsdlQueryHandler)
+    {
+        this.wsdlQueryHandler = wsdlQueryHandler;
+    }
+
 }

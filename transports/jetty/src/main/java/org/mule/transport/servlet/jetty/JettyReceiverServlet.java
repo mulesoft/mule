@@ -6,6 +6,7 @@
  */
 package org.mule.transport.servlet.jetty;
 
+import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.NoReceiverForEndpointException;
@@ -17,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class JettyReceiverServlet extends MuleReceiverServlet
 {
@@ -26,6 +28,11 @@ public class JettyReceiverServlet extends MuleReceiverServlet
     private static final long serialVersionUID = 238326861089137293L;
 
     private ConcurrentMap receivers = new ConcurrentHashMap(4);
+
+    public JettyReceiverServlet(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+    }
 
     @Override
     protected MessageReceiver getReceiverForURI(HttpServletRequest httpServletRequest)
@@ -70,4 +77,11 @@ public class JettyReceiverServlet extends MuleReceiverServlet
         }
         return key;
     }
+
+    @Override
+    protected void processHttpRequest(HttpServletRequest request, HttpServletResponse response, MessageReceiver receiver) throws Exception
+    {
+        ((JettyHttpMessageReceiver)receiver).processMessage(request, response);
+    }
+
 }

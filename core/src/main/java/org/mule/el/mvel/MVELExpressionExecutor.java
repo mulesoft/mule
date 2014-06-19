@@ -14,18 +14,24 @@ import org.mule.mvel2.MVEL;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.optimizers.OptimizerFactory;
+import org.mule.mvel2.optimizers.dynamic.DynamicOptimizer;
+import org.mule.mvel2.optimizers.impl.refl.ReflectiveAccessorOptimizer;
 
-import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 
 import java.io.Serializable;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This MVEL executor uses MVEL {@link ReflectiveAccessorOptimizer} implementation rather than the default
+ * {@link DynamicOptimizer} (which generates byte-code accessors using ASM) because we found that, at least
+ * with JDK7, the {@link ReflectiveAccessorOptimizer} was fastest in typical Mule use cases.
+ */
 public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpressionLanguageContext>
 {
 
@@ -35,17 +41,25 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
 
     protected ParserConfiguration parserConfiguration;
 
-    protected Cache<String, Serializable> compiledExpressionsCache = CacheBuilder.newBuilder()
-        .maximumSize(COMPILED_EXPRESSION_MAX_CACHE_SIZE)
-        .build();
+    protected LoadingCache<String, Serializable> compiledExpressionsCache;
 
-    public MVELExpressionExecutor(ParserConfiguration parserConfiguration)
+    public MVELExpressionExecutor(final ParserConfiguration parserConfiguration)
     {
         this.parserConfiguration = parserConfiguration;
-        System.setProperty("mvel2.compiler.allow_override_all_prophandling", "true");
-        // Use reflective optimizer rather than default to avoid concurrency issues with JIT complication.
-        // See MULE-6630
+
+        MVEL.COMPILER_OPT_PROPERTY_ACCESS_DOESNT_FAIL = true;
         OptimizerFactory.setDefaultOptimizer(OptimizerFactory.SAFE_REFLECTIVE);
+
+        compiledExpressionsCache = CacheBuilder.newBuilder()
+            .maximumSize(COMPILED_EXPRESSION_MAX_CACHE_SIZE)
+            .build(new CacheLoader<String, Serializable>()
+            {
+                @Override
+                public Serializable load(String key) throws Exception
+                {
+                    return MVEL.compileExpression(key, new ParserContext(parserConfiguration));
+                }
+            });
     }
 
     @Override
@@ -75,14 +89,7 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
     {
         try
         {
-            return compiledExpressionsCache.get(expression, new Callable<Serializable>()
-            {
-                @Override
-                public Serializable call()
-                {
-                    return MVEL.compileExpression(expression, new ParserContext(parserConfiguration));
-                }
-            });
+            return compiledExpressionsCache.getUnchecked(expression);
         }
         catch (UncheckedExecutionException e)
         {
@@ -96,10 +103,6 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
             {
                 throw new MuleRuntimeException(e);
             }
-        }
-        catch (ExecutionException e)
-        {
-            throw new MuleRuntimeException(e);
         }
     }
 }

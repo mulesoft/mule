@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:tns="http://consumer.ws.module.mule.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+                  name="TestService"
+                  targetNamespace="http://consumer.ws.module.mule.org/">
+    <wsdl:types>
+        <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://consumer.ws.module.mule.org/"
+                   attributeFormDefault="unqualified" elementFormDefault="unqualified"
+                   targetNamespace="http://consumer.ws.module.mule.org/">
+
+            <xs:element name="noParams" type="tns:INVALID"/>
+
+            <xs:complexType name="noParams">
+                <xs:sequence/>
+            </xs:complexType>
+
+        </xs:schema>
+    </wsdl:types>
+
+    <wsdl:message name="noParams">
+        <wsdl:part element="tns:noParams" name="parameters"/>
+    </wsdl:message>
+
+    <wsdl:portType name="TestParamsService">
+        <wsdl:operation name="noParams">
+            <wsdl:input message="tns:noParams" name="noParams"/>
+            <wsdl:output message="tns:noParams" name="noParams"/>
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <wsdl:binding name="TestServiceSoapBinding" type="tns:TestParamsService">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="noParams">
+            <soap:operation soapAction="noParams" style="document"/>
+            <wsdl:input name="noParams">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="noParams">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+
+    <wsdl:binding name="TestServiceSoap12Binding" type="tns:TestParamsService">
+        <soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="noParams">
+            <soap12:operation soapAction="noParams" style="document"/>
+            <wsdl:input name="noParams">
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="noParams">
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+
+    <wsdl:service name="TestParamsService">
+        <wsdl:port binding="tns:TestServiceSoapBinding" name="TestParamsSoapPort">
+            <soap:address location="http://localhost:5804/services/TestParams"/>
+        </wsdl:port>
+        <wsdl:port binding="tns:TestServiceSoap12Binding" name="TestParamsSoap12Port">
+            <soap12:address location="http://localhost:5804/services/TestParams"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

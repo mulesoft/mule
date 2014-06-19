@@ -17,7 +17,7 @@ public class FilenameUtils extends org.apache.commons.io.FilenameUtils
             return null;
         }
         
-        StringBuffer buf = new StringBuffer(64);
+        StringBuilder buf = new StringBuilder(64);
         for (int i = 0; i < pathComponents.length; i++)
         {
             String component = pathComponents[i];

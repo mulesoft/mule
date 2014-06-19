@@ -364,7 +364,7 @@ fi
 
 checkUser() {
     # $1 touchLock flag
-    # $2 command
+    # $2, $3, etc complete command line received
 
     # Check the configured user.  If necessary rerun this script as the desired user.
     if [ "X$RUN_AS_USER" != "X" ]
@@ -392,7 +392,7 @@ checkUser() {
     then
         # If LOCKPROP and $RUN_AS_USER are defined then the new user will most likely not be
         # able to create the lock file.  The Wrapper will be able to update this file once it
-        # is created but will not be able to delete it on shutdown.  If $2 is defined then
+        # is created but will not be able to delete it on shutdown.  If $1 is defined then
         # the lock file should be created for the current command
         if [ "X$LOCKPROP" != "X" ]
         then
@@ -410,8 +410,10 @@ checkUser() {
         fi
 
         # Still want to change users, recurse.  This means that the user will only be
-        #  prompted for a password once. Variables shifted by 1
-        su -m $RUN_AS_USER -c "\"$REALPATH\" $2"
+        #  prompted for a password once. Variables shifted by 1 in order to remove the touchLock flag.
+        shift
+        RELAUNCH_CMD="$REALPATH $@"
+        su -m $RUN_AS_USER -c "$RELAUNCH_CMD"
 
         # Now that we are the original user again, we may need to clean up the lock file.
         if [ "X$LOCKPROP" != "X" ]
@@ -633,35 +635,35 @@ checkAdditionalJvmParams() {
 case "$1" in
 
     'console')
-        checkUser touchlock $1
+        checkUser touchlock $*
         checkAdditionalJvmParams $*
         console
         ;;
 
     'start')
-        checkUser touchlock $1
+        checkUser touchlock $*
         checkAdditionalJvmParams $*
         start
         ;;
 
     'stop')
-        checkUser "" $1
+        checkUser "" $*
         stopit
         ;;
 
     'restart')
-        checkUser touchlock $1
+        checkUser touchlock $*
         stopit
         start
         ;;
 
     'status')
-        checkUser "" $1
+        checkUser "" $*
         status
         ;;
 
     'dump')
-        checkUser "" $1
+        checkUser "" $*
         dump
         ;;
 

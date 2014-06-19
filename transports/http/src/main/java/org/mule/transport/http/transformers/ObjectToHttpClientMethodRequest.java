@@ -433,7 +433,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             if (headerName.startsWith(MuleProperties.PROPERTY_PREFIX))
             {
                 // Define Mule headers a custom headers
-                headerName = new StringBuffer(30).append("X-").append(headerName).toString();
+                headerName = new StringBuilder(30).append("X-").append(headerName).toString();
                 httpMethod.addRequestHeader(headerName, headerValue);
 
             }

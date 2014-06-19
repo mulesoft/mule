@@ -9,6 +9,7 @@ package org.mule.security.oauth.util;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -64,17 +65,43 @@ public class HttpUtilImpl implements HttpUtil
                 body));
         }
 
+        OutputStreamWriter out = null;
+        InputStream errorStream = null;
         try
         {
-            OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
+            out = new OutputStreamWriter(conn.getOutputStream());
             out.write(body);
-            out.close();
-            return IOUtils.toString(conn.getInputStream());
+            out.flush();
+
+            int responseCode = conn.getResponseCode();
+
+            if (wasSuccessful(responseCode))
+            {
+            	return IOUtils.toString(conn.getInputStream());
+            } 
+            else 
+            {
+                errorStream = conn.getErrorStream();
+                String response = IOUtils.toString(errorStream);
+                String errorMsg = String.format("Received status code [%d] while trying to get OAuth2 verification code. Response body was [%s]", responseCode, response);
+                logger.error(errorMsg);  
+                throw new IOException(errorMsg);
+            }
         }
         catch (IOException e)
         {
             throw new RuntimeException("Error found while consuming http resource at " + url, e);
         }
+        finally
+        {
+            IOUtils.closeQuietly(out);
+            IOUtils.closeQuietly(errorStream);
+        }
+    }
+
+    private boolean wasSuccessful(int responseCode) throws IOException
+    {
+        return responseCode >= 200 && responseCode <= 203;
     }
 
 }

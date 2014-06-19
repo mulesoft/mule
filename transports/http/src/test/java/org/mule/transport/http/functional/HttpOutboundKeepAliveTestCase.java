@@ -155,7 +155,7 @@ public class HttpOutboundKeepAliveTestCase extends AbstractMockHttpServerTestCas
 
                 closeConnection = CONNECTION_CLOSE_VALUE.equals(connectionHeader);
 
-                StringBuffer response = new StringBuffer(HTTP_STATUS_LINE_OK);
+                StringBuilder response = new StringBuilder(HTTP_STATUS_LINE_OK);
 
                 if (closeConnection)
                 {

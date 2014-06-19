@@ -7,16 +7,23 @@
 package org.mule.context;
 
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import org.mule.DefaultMuleContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.registry.ServiceType;
+import org.mule.api.util.StreamCloserService;
 import org.mule.config.ClusterConfiguration;
 import org.mule.config.ExceptionHelper;
+import org.mule.registry.MuleRegistryHelper;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.transport.PollingController;
 import org.mule.util.SpiUtils;
@@ -144,6 +151,26 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase
         });
         context.start();
         assertThat(context.isPrimaryPollingInstance(), is(false));
+    }
+
+    @Test
+    public void getStreamCloserService() throws Exception
+    {
+        DefaultMuleContext context = (DefaultMuleContext) new DefaultMuleContextFactory().createMuleContext();
+        StreamCloserService serviceFromRegistry = context.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE);
+        MuleRegistryHelper registry = spy((MuleRegistryHelper) context.getRegistry());
+        context.setMuleRegistry(registry);
+
+        StreamCloserService streamCloserService = context.getStreamCloserService();
+        assertNotNull(streamCloserService);
+
+        assertSame(serviceFromRegistry, streamCloserService);
+
+        // test that subsequent invocations consistently returns the same object
+        assertSame(streamCloserService, context.getStreamCloserService());
+
+        // verify we're not fetching from registry many times
+        verify(registry, times(1)).lookupObject(MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE);
     }
 
 }

@@ -13,6 +13,8 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.QueueStore;
+import org.mule.util.queue.DefaultQueueConfiguration;
+import org.mule.util.queue.DelegateQueueManager;
 import org.mule.util.queue.QueueConfiguration;
 import org.mule.util.queue.QueueManager;
 
@@ -22,7 +24,6 @@ import java.io.Serializable;
  * <code>QueueProfile</code> determines how an internal queue for a service will
  * behave
  */
-
 public class QueueProfile
 {
     private int maxOutstandingMessages = 0;
@@ -89,7 +90,6 @@ public class QueueProfile
     {
         QueueConfiguration qc = toQueueConfiguration(context);
         queueManager.setQueueConfiguration(component, qc);
-
         return qc;
     }
 
@@ -99,7 +99,11 @@ public class QueueProfile
         {
             ((MuleContextAware) objectStore).setMuleContext(context);
         }
-        return new QueueConfiguration(context, maxOutstandingMessages, objectStore);
+        if (DelegateQueueManager.isOldModeEnabled())
+        {
+            return new org.mule.util.queue.objectstore.QueueConfiguration(context, maxOutstandingMessages, objectStore);
+        }
+        return new DefaultQueueConfiguration(maxOutstandingMessages, objectStore.isPersistent());
     }
 
     public ListableObjectStore<Serializable> getObjectStore()

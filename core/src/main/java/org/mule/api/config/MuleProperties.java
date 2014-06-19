@@ -61,6 +61,7 @@ public class MuleProperties
     public static final String MULE_CORRELATION_SEQUENCE_PROPERTY = PROPERTY_PREFIX + "CORRELATION_SEQUENCE";
     public static final String MULE_REMOTE_SYNC_PROPERTY = PROPERTY_PREFIX + "REMOTE_SYNC";
     public static final String MULE_REMOTE_CLIENT_ADDRESS = PROPERTY_PREFIX + "REMOTE_CLIENT_ADDRESS";
+    public static final String MULE_PROXY_ADDRESS = PROPERTY_PREFIX + "PROXY_ADDRESS";
     public static final String MULE_SOAP_METHOD = PROPERTY_PREFIX + "SOAP_METHOD";
     public static final String MULE_JMS_SESSION = PROPERTY_PREFIX + "JMS_SESSION";
     public static final String MULE_MANAGEMENT_CONTEXT_PROPERTY = PROPERTY_PREFIX + "MANAGEMENT_CONTEXT";
@@ -176,6 +177,8 @@ public class MuleProperties
     public static final String MULE_CONTEXT_PROPERTY = SYSTEM_PROPERTY_PREFIX + "context";
     public static final String MULE_ENCODING_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX + "encoding";
     public static final String MULE_SECURITY_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX + "security.model";
+    public static final String MULE_SECURITY_PROVIDER_PROPERTY = SYSTEM_PROPERTY_PREFIX + "security.provider";
+    public static final String MULE_STREAMING_BUFFER_SIZE = SYSTEM_PROPERTY_PREFIX + "streaming.bufferSize";
 
     public static final String CONTENT_TYPE_PROPERTY = "Content-Type";
 }

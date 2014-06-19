@@ -6,7 +6,6 @@
  */
 package org.mule.module.cxf.builder;
 
-import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
 import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.support.CopyAttachmentInInterceptor;
 import org.mule.module.cxf.support.CopyAttachmentOutInterceptor;
@@ -16,10 +15,12 @@ import org.mule.module.cxf.support.ProxyRPCInInterceptor;
 import org.mule.module.cxf.support.ProxySchemaValidationInInterceptor;
 import org.mule.module.cxf.support.ProxyService;
 import org.mule.module.cxf.support.ProxyServiceFactoryBean;
+import org.mule.module.cxf.support.ProxyWSDLQueryHandler;
 import org.mule.module.cxf.support.ResetStaxInterceptor;
 import org.mule.module.cxf.support.ReversibleStaxInInterceptor;
 import org.mule.module.cxf.support.ReversibleValidatingInterceptor;
 
+import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
 import org.apache.cxf.binding.soap.interceptor.RPCInInterceptor;
 import org.apache.cxf.binding.soap.interceptor.RPCOutInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
@@ -27,9 +28,8 @@ import org.apache.cxf.databinding.stax.StaxDataBinding;
 import org.apache.cxf.databinding.stax.StaxDataBindingFeature;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
-import org.apache.cxf.interceptor.BareInInterceptor;
 import org.apache.cxf.interceptor.BareOutInterceptor;
-import org.apache.cxf.interceptor.DocLiteralInInterceptor;
+import org.apache.cxf.transports.http.QueryHandler;
 
 /**
  * Creates an inbound proxy based on a specially configure CXF Server.
@@ -50,7 +50,11 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
         ServerFactoryBean sfb = new ServerFactoryBean();
         sfb.setDataBinding(new StaxDataBinding());
         sfb.getFeatures().add(new StaxDataBindingFeature());
-        sfb.setServiceFactory(new ProxyServiceFactoryBean());
+
+        ProxyServiceFactoryBean proxyServiceFactoryBean = new ProxyServiceFactoryBean();
+        proxyServiceFactoryBean.setSoapVersion(getSoapVersion());
+        sfb.setServiceFactory(proxyServiceFactoryBean);
+
         sfb.setServiceClass(ProxyService.class);
 
         addProxyInterceptors(sfb);
@@ -62,6 +66,12 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
     protected Class<?> getServiceClass()
     {
         return ProxyService.class;
+    }
+
+    @Override
+    protected QueryHandler getWSDLQueryHandler()
+    {
+        return new ProxyWSDLQueryHandler(getConfiguration().getCxfBus(), getPort());
     }
 
     @Override

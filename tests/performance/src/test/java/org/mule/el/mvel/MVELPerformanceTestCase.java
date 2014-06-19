@@ -34,7 +34,7 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase
         return 180;
     }
 
-    final protected String mel = "StringBuffer sb = new StringBuffer(); fields = payload.split(',\');"
+    final protected String mel = "StringBuilder sb = new StringBuilder(); fields = payload.split(',\');"
                                  + "if (fields.length > 4) {"
                                  + "    sb.append('  <Contact>\n');"
                                  + "    sb.append('    <FirstName>').append(fields[0]).append('</FirstName>\n');"

@@ -34,7 +34,7 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
     @Test
     public void testTransformerException() throws Exception
     {
-        tmpDir = createFolder(".mule/transformerException");
+        tmpDir = createFolder(getFileInsideWorkingDirectory("transformerException").getAbsolutePath());
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {
@@ -60,7 +60,7 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
     @Test
     public void testRouterException() throws Exception
     {
-        tmpDir = createFolder(".mule/routerException");
+        tmpDir = createFolder(getFileInsideWorkingDirectory("routerException").getAbsolutePath());
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {
@@ -86,7 +86,7 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
     public void testFlowRefException() throws Exception
     {
         final Latch exceptionThrownLatch = new Latch();
-        tmpDir = createFolder(".mule/flowRefException");
+        tmpDir = createFolder(getFileInsideWorkingDirectory("flowRefException").getAbsolutePath());
         final File file = createDataFile(tmpDir, "test1.txt");
         FunctionalTestComponent ftc = getFunctionalTestComponent("failingFlow");
         ftc.setEventCallback(new EventCallback()

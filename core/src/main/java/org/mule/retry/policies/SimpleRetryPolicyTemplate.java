@@ -68,7 +68,7 @@ public class SimpleRetryPolicyTemplate extends AbstractPolicyTemplate
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         sb.append("SimpleRetryPolicy");
         sb.append("{frequency=").append(frequency);
         sb.append(", retryCount=").append(count);

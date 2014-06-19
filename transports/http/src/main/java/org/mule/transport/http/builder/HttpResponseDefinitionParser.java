@@ -43,7 +43,7 @@ public class HttpResponseDefinitionParser extends ChildDefinitionParser
     protected String processHeaderName(String elementName)
     {
         String[] words = elementName.split("-");
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
 
         for(int index = 0; index < words.length; index++)
         {

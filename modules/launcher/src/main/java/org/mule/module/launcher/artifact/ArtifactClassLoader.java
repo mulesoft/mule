@@ -6,9 +6,12 @@
  */
 package org.mule.module.launcher.artifact;
 
+import org.mule.module.launcher.DisposableClassLoader;
+import org.mule.module.launcher.LocalResourceLocator;
+
 import java.net.URL;
 
-public interface ArtifactClassLoader
+public interface ArtifactClassLoader extends DisposableClassLoader, LocalResourceLocator
 {
 
     /**
@@ -53,7 +56,9 @@ public interface ArtifactClassLoader
     ClassLoader getClassLoader();
 
     /**
-     * Gets rid of the class loader resources.
+     * Adds a shutdown listener to the class loader. This listener will be invoked synchronously right
+     * before the class loader is disposed and closed.
      */
-    void dispose();
+    void addShutdownListener(ShutdownListener listener);
+
 }

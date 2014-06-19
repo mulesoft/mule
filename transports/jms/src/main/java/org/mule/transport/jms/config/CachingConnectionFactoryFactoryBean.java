@@ -43,6 +43,12 @@ public class CachingConnectionFactoryFactoryBean extends AbstractFactoryBean<Cus
         return cachingConnectionFactory;
     }
 
+    @Override
+    protected void destroyInstance(CustomCachingConnectionFactory instance) throws Exception
+    {
+        instance.destroy();
+    }
+
     public String getName()
     {
         return name;

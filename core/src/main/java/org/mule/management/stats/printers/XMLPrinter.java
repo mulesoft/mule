@@ -109,7 +109,7 @@ public class XMLPrinter extends AbstractTablePrinter
         {
             Iterator it = routed.entrySet().iterator();
 
-            StringBuffer buf = new StringBuffer(40);
+            StringBuilder buf = new StringBuilder(40);
             while (it.hasNext())
             {
                 Map.Entry e = (Map.Entry) it.next();
@@ -221,7 +221,7 @@ public class XMLPrinter extends AbstractTablePrinter
 
         if (st.countTokens() == 0)
         {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             buf.append("<Provider name=\"");
             int i = stats.indexOf("=");
             buf.append(stats.substring(0, i));
@@ -235,7 +235,7 @@ public class XMLPrinter extends AbstractTablePrinter
             String token;
             while (st.hasMoreTokens())
             {
-                StringBuffer buf = new StringBuffer();
+                StringBuilder buf = new StringBuilder();
                 token = st.nextToken();
                 buf.append("<Provider name=\"");
                 int i = token.indexOf("=");

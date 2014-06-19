@@ -23,11 +23,11 @@ import org.junit.Test;
 
 public class FileComparatorTestCase extends FunctionalTestCase
 {
-    public static final String PATH = "./.mule/in/";
     public static final String FILE_CONNECTOR_NAME = "fileConnector";
     public static final int TIMEOUT = 50000;
     public static final String FILE_NAMES[] = {"first", "second"};
     public static final String COMPONENT_NAME = "FolderTO";
+    public static final String INPUT_FOLDER = "in";
 
     @Override
     protected String getConfigFile()
@@ -53,10 +53,10 @@ public class FileComparatorTestCase extends FunctionalTestCase
         ((FunctionalTestComponent) getComponent(COMPONENT_NAME)).setEventCallback(callback);
 
         muleContext.getRegistry().lookupConnector(FILE_CONNECTOR_NAME).stop();
-        File f1 = FileUtils.newFile(PATH + FILE_NAMES[0]);
+        File f1 = FileUtils.newFile(getFileInsideWorkingDirectory(INPUT_FOLDER + File.separator +  FILE_NAMES[0]).getAbsolutePath());
         assertTrue(f1.createNewFile());
         Thread.sleep(1000);
-        File f2 = FileUtils.newFile(PATH + FILE_NAMES[1]);
+        File f2 = FileUtils.newFile(getFileInsideWorkingDirectory(INPUT_FOLDER + File.separator + FILE_NAMES[1]).getAbsolutePath());
         assertTrue(f2.createNewFile());
         Thread.sleep(1000);
         muleContext.getRegistry().lookupConnector(FILE_CONNECTOR_NAME).start();

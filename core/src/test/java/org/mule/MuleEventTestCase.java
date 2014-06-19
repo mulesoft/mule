@@ -14,6 +14,8 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.api.ThreadSafeAccess;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -331,6 +333,63 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
         muleContext.getRegistry().registerEndpointBuilder("epBuilderTest", endpointBuilder);
 
         getTestService();
+    }
+
+    
+    @Test(expected=UnsupportedOperationException.class)
+    public void testFlowVarNamesAddImmutable() throws Exception
+    {
+        MuleEvent event = getTestEvent("whatever");
+        event.setFlowVariable("test", "val");
+        event.getFlowVariableNames().add("other");
+    }
+    
+    public void testFlowVarNamesRemoveMutable() throws Exception
+    {
+        MuleEvent event = getTestEvent("whatever");
+        event.setFlowVariable("test", "val");
+        event.getFlowVariableNames().remove("test");
+        assertNull(event.getFlowVariable("test"));
+    }
+
+    @Test
+    public void testFlowVarsNotShared() throws Exception
+    {
+        MuleEvent event = getTestEvent("whatever");
+        MuleMessage message = event.getMessage();
+        message.setInvocationProperty("foo", "bar");
+
+        MuleEvent copy = new DefaultMuleEvent(
+            (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy(), event, false, false);
+
+        MuleMessage messageCopy = copy.getMessage();
+        messageCopy.setInvocationProperty("foo", "bar2");
+
+        assertEquals("bar", event.getFlowVariable("foo"));
+        assertEquals("bar", message.getInvocationProperty("foo"));
+
+        assertEquals("bar2", copy.getFlowVariable("foo"));
+        assertEquals("bar2", messageCopy.getInvocationProperty("foo"));
+    }
+
+    @Test
+    public void testFlowVarsShared() throws Exception
+    {
+        MuleEvent event = getTestEvent("whatever");
+        MuleMessage message = event.getMessage();
+        message.setInvocationProperty("foo", "bar");
+
+        MuleEvent copy = new DefaultMuleEvent(
+                (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy(), event, false);
+
+        MuleMessage messageCopy = copy.getMessage();
+        messageCopy.setInvocationProperty("foo", "bar2");
+
+        assertEquals("bar2", event.getFlowVariable("foo"));
+        assertEquals("bar2", message.getInvocationProperty("foo"));
+
+        assertEquals("bar2", copy.getFlowVariable("foo"));
+        assertEquals("bar2", messageCopy.getInvocationProperty("foo"));
     }
 
     private static class TestEventTransformer extends AbstractTransformer

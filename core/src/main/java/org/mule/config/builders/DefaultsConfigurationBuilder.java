@@ -6,6 +6,7 @@
  */
 package org.mule.config.builders;
 
+import org.mule.DefaultMuleContext;
 import org.mule.DynamicDataTypeConversionResolver;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -27,8 +28,8 @@ import org.mule.security.MuleSecurityManager;
 import org.mule.util.DefaultStreamCloserService;
 import org.mule.util.lock.MuleLockFactory;
 import org.mule.util.lock.SingleServerLockProvider;
+import org.mule.util.queue.DelegateQueueManager;
 import org.mule.util.queue.QueueManager;
-import org.mule.util.queue.TransactionalQueueManager;
 import org.mule.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.util.store.MuleObjectStoreManager;
 
@@ -68,8 +69,12 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
 
         registry.registerObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME,
             DefaultObjectStoreFactoryBean.createDefaultInMemoryObjectStore());
+
         registry.registerObject(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME,
             DefaultObjectStoreFactoryBean.createDefaultPersistentObjectStore());
+
+        registerLocalObjectStoreManager(muleContext, registry);
+
         registry.registerObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME,
             DefaultObjectStoreFactoryBean.createDefaultInMemoryQueueStore());
         registry.registerObject(MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME,
@@ -86,8 +91,8 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         registry.registerObject(MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE,
             new DefaultStreamCloserService());
 
-        registry.registerObject(MuleProperties.OBJECT_LOCK_FACTORY, new MuleLockFactory());
         registry.registerObject(MuleProperties.OBJECT_LOCK_PROVIDER, new SingleServerLockProvider());
+        registry.registerObject(MuleProperties.OBJECT_LOCK_FACTORY, new MuleLockFactory());
 
         registry.registerObject(MuleProperties.OBJECT_PROCESSING_TIME_WATCHER,
             new DefaultProcessingTimeWatcher());
@@ -104,10 +109,20 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         registry.registerObject(MuleProperties.OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguageWrapper(muleContext));
     }
 
+    private void registerLocalObjectStoreManager(MuleContext muleContext, MuleRegistry registry) throws RegistrationException
+    {
+        MuleObjectStoreManager osm = new MuleObjectStoreManager();
+        osm.setBasePersistentStoreKey(DefaultMuleContext.LOCAL_PERSISTENT_OBJECT_STORE_KEY);
+        osm.setBaseTransientStoreKey(DefaultMuleContext.LOCAL_TRANSIENT_OBJECT_STORE_KEY);
+        osm.setMuleContext(muleContext);
+        registry.registerObject(DefaultMuleContext.LOCAL_PERSISTENT_OBJECT_STORE_KEY, osm);
+    }
+
     protected void configureQueueManager(MuleContext muleContext) throws RegistrationException
     {
-        QueueManager queueManager = new TransactionalQueueManager();
+        QueueManager queueManager = new DelegateQueueManager();
         muleContext.getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager);
+        muleContext.getRegistry().registerObject(DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY, queueManager);
     }
 
     protected void configureThreadingProfiles(MuleRegistry registry) throws RegistrationException

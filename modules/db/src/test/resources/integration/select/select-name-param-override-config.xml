@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <db:template-query name="namedParamsQueryTemplate">
+        <db:parameterized-query>SELECT * FROM PLANET WHERE POSITION = :position and NAME = :name</db:parameterized-query>
+        <db:in-param name="position" defaultValue="4"/>
+        <db:in-param name="name" defaultValue="Venus"/>
+    </db:template-query>
+
+    <db:template-query name="overridenQueryParamByName">
+        <db:template-query-ref name="namedParamsQueryTemplate"/>
+        <db:in-param name="name" defaultValue="Mars"/>
+    </db:template-query>
+
+    <flow name="overriddenParamsByName">
+        <inbound-endpoint address="vm://overriddenParamsByName" exchange-pattern="request-response"/>
+
+        <db:select config-ref="dbConfig">
+            <db:template-query-ref name="overridenQueryParamByName"/>
+        </db:select>
+    </flow>
+
+    <flow name="inlineOverriddenParamByName">
+        <inbound-endpoint address="vm://inlineOverriddenParamsByName" exchange-pattern="request-response"/>
+
+        <db:select config-ref="dbConfig">
+            <db:template-query-ref name="namedParamsQueryTemplate"/>
+            <!-- Note that parameters are in different order-->
+            <db:in-param name="name" value="Earth"/>
+            <db:in-param name="position" value="3"/>
+        </db:select>
+    </flow>
+</mule>

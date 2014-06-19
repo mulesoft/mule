@@ -12,6 +12,7 @@ import org.mule.api.transport.OutputHandler;
 import org.mule.util.SystemUtils;
 import org.mule.util.concurrent.Latch;
 
+import java.io.BufferedInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -89,7 +90,7 @@ public class HttpServerConnection implements HandshakeCompletedListener
             socket.setSoTimeout(connector.getServerSoTimeout());
         }
 
-        this.in = socket.getInputStream();
+        this.in = new BufferedInputStream(socket.getInputStream());
         this.out = new DataOutputStream(socket.getOutputStream());
         this.encoding = encoding;
     }

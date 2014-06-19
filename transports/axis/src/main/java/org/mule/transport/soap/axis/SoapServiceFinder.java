@@ -33,7 +33,7 @@ public class SoapServiceFinder implements ServiceFinder
         Map finders = new TreeMap();
         PropertiesUtils.getPropertiesWithPrefix(props, "finder.class", finders);
 
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (Iterator iterator = finders.entrySet().iterator(); iterator.hasNext();)
         {
             Map.Entry entry = (Map.Entry)iterator.next();

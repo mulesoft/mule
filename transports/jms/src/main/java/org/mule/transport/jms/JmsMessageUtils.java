@@ -83,7 +83,7 @@ public class JmsMessageUtils
         else
         {
             // make a copy, fix up remaining characters
-            StringBuffer sb = new StringBuffer(name);
+            StringBuilder sb = new StringBuilder(name);
             for (int j = i; j < length; j++)
             {
                 if (!Character.isJavaIdentifierPart(sb.charAt(j)))

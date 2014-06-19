@@ -396,7 +396,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
         if (ctor == null)
         {
-            StringBuffer argsString = new StringBuffer(100);
+            StringBuilder argsString = new StringBuilder(100);
             for (Class<?> arg : args)
             {
                 argsString.append(arg.getName()).append(", ");

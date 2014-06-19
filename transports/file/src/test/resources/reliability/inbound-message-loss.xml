@@ -8,45 +8,60 @@
            http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
            http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
 
-    <file:connector name="fileConnector" streaming="false" workDirectory=".mule/tmp"/>
-
-    <flow name="NoException">
-        <file:inbound-endpoint path=".mule/noException"/>
-        <test:component/>
-    </flow>
-
-    <flow name="TransformerException">
-        <file:inbound-endpoint path=".mule/transformerException"/>
-        <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer"/>
-        <test:component/>
-    </flow>
-
-    <flow name="RouterException">
-            <file:inbound-endpoint path=".mule/routerException"/>
-            <custom-processor class="org.mule.tck.testmodels.mule.FailingRouter"/>
-        <test:component/>
-    </flow>
-
-    <flow name="ComponentException">
-        <file:inbound-endpoint path=".mule/componentException"/>
-        <test:component throwException="true"/>
-    </flow>
-
-    <flow name="CatchExceptionStrategy">
-        <file:inbound-endpoint path=".mule/exceptionHandled"/>
-        <test:component throwException="true"/>
-        <catch-exception-strategy/>
-    </flow>
-    <flow name="DefaultExceptionStrategyCommit">
-        <file:inbound-endpoint path=".mule/commitOnException"/>
-        <test:component throwException="true"/>
-        <default-exception-strategy>
-            <commit-transaction exception-pattern="*"/>
-        </default-exception-strategy>
-    </flow>
-    <flow name="RollbackExceptionStrategyCommit">
-        <file:inbound-endpoint path=".mule/rollbackOnException"/>
-        <test:component throwException="true"/>
-        <rollback-exception-strategy maxRedeliveryAttempts="2"/>
-    </flow>
+    <file:connector name="fileConnector" streaming="false" workDirectory="${workingDirectory}/tmp" pollingFrequency="50"/>
+    
+    <model>
+        <service name="NoException">
+            <inbound>
+                <file:inbound-endpoint path="${workingDirectory}/noException" />
+            </inbound>
+            <test:component />
+        </service>
+        <service name="TransformerException">
+            <inbound>
+                <file:inbound-endpoint path="${workingDirectory}/transformerException" />
+                <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer" />
+            </inbound>
+            <test:component />
+        </service>
+        <service name="RouterException">
+            <inbound>
+                <file:inbound-endpoint path="${workingDirectory}/routerException" />
+                <custom-inbound-router class="org.mule.tck.testmodels.mule.FailingRouter" />
+            </inbound>
+            <test:component />
+        </service>
+        <service name="ComponentException">
+            <inbound>
+                <file:inbound-endpoint path="${workingDirectory}/componentException" />
+            </inbound>
+            <test:component throwException="true" />
+        </service>
+        <service name="CatchExceptionStrategy">
+            <inbound>
+                <file:inbound-endpoint path="${workingDirectory}/exceptionHandled" />
+            </inbound>
+            <test:component throwException="true"/>
+            <catch-exception-strategy/>
+            <threading-profile doThreading="false"/>
+        </service>
+        <service name="DefaultExceptionStrategyCommit" >
+            <inbound>
+                <file:inbound-endpoint path="${workingDirectory}/commitOnException" />
+            </inbound>
+            <test:component throwException="true"/>
+            <default-exception-strategy>
+                <commit-transaction exception-pattern="*"/>
+            </default-exception-strategy>
+            <threading-profile doThreading="false"/>
+        </service>
+        <service name="RollbackExceptionStrategyCommit" >
+            <inbound>
+                <file:inbound-endpoint path="${workingDirectory}/rollbackOnException"/>
+            </inbound>
+            <test:component throwException="true"/>
+            <rollback-exception-strategy maxRedeliveryAttempts="2"/>
+            <threading-profile doThreading="false"/>
+        </service>
+    </model>
 </mule>

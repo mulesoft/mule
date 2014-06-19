@@ -11,6 +11,7 @@ import org.mule.module.launcher.domain.Domain;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -39,6 +40,12 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
      * @return the domain with the name domainName, null if there is no domain with domainName
      */
     Domain findDomain(String domainName);
+
+    /**
+     * @param domain name of a deployed domain
+     * @return all the applications deployed in that domain
+     */
+    Collection<Application> findDomainApplications(final String domain);
 
     /**
      * @return list of domains deployed in mule.

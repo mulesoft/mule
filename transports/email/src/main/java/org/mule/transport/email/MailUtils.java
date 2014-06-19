@@ -33,7 +33,7 @@ public class MailUtils
             return StringUtils.EMPTY;
         }
 
-        StringBuffer buf = new StringBuffer(80);
+        StringBuilder buf = new StringBuilder(80);
 
         for (int i = 0; i < addresses.length; i++)
         {
@@ -61,7 +61,7 @@ public class MailUtils
             return StringUtils.EMPTY;
         }
 
-        StringBuffer buf = new StringBuffer(80);
+        StringBuilder buf = new StringBuilder(80);
 
         for (int i = 0; i < addresses.length; i++)
         {

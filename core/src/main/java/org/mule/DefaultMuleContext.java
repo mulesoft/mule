@@ -7,7 +7,6 @@
 package org.mule;
 
 import static org.mule.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
@@ -39,6 +38,7 @@ import org.mule.api.security.SecurityManager;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.transaction.TransactionManagerFactory;
+import org.mule.api.util.StreamCloserService;
 import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.ClusterConfiguration;
 import org.mule.config.DefaultMuleConfiguration;
@@ -65,6 +65,7 @@ import org.mule.util.ServerStartupSplashScreen;
 import org.mule.util.SplashScreen;
 import org.mule.util.SystemUtils;
 import org.mule.util.UUID;
+import org.mule.util.concurrent.Latch;
 import org.mule.util.lock.LockFactory;
 import org.mule.util.queue.QueueManager;
 
@@ -73,6 +74,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.resource.spi.work.WorkListener;
 import javax.transaction.TransactionManager;
@@ -135,6 +137,8 @@ public class DefaultMuleContext implements MuleContext
 
     private ExpressionManager expressionManager;
 
+    private StreamCloserService streamCloserService;
+
     private ClassLoader executionClassLoader;
 
     protected LocalMuleClient localMuleClient;
@@ -159,6 +163,10 @@ public class DefaultMuleContext implements MuleContext
     private ExpressionLanguage expressionLanguage;
 
     private ProcessingTimeWatcher processingTimeWatcher;
+
+    private final Latch startLatch = new Latch();
+
+    private QueueManager queueManager;
 
     /**
      * @deprecated Use empty constructor instead and use setter for dependencies.
@@ -273,6 +281,8 @@ public class DefaultMuleContext implements MuleContext
 
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTED));
 
+        startLatch.release();
+
         if (logger.isInfoEnabled())
         {
             SplashScreen startupScreen = buildStartupSplash();
@@ -288,6 +298,8 @@ public class DefaultMuleContext implements MuleContext
      */
     public synchronized void stop() throws MuleException
     {
+        startLatch.release();
+
         getLifecycleManager().checkPhase(Stoppable.PHASE_NAME);
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STOPPING));
         getLifecycleManager().fireLifecycle(Stoppable.PHASE_NAME);
@@ -531,13 +543,16 @@ public class DefaultMuleContext implements MuleContext
 
     public QueueManager getQueueManager()
     {
-        QueueManager queueManager = (QueueManager) registryBroker.lookupObject(MuleProperties.OBJECT_QUEUE_MANAGER);
         if (queueManager == null)
         {
-            Collection<QueueManager> temp = registryBroker.lookupObjects(QueueManager.class);
-            if (temp.size() > 0)
+            queueManager = registryBroker.lookupObject(MuleProperties.OBJECT_QUEUE_MANAGER);
+            if (queueManager == null)
             {
-                queueManager = temp.iterator().next();
+                Collection<QueueManager> temp = registryBroker.lookupObjects(QueueManager.class);
+                if (temp.size() > 0)
+                {
+                    queueManager = temp.iterator().next();
+                }
             }
         }
         return queueManager;
@@ -579,8 +594,8 @@ public class DefaultMuleContext implements MuleContext
 
     public void setQueueManager(QueueManager queueManager) throws RegistrationException
     {
-        checkLifecycleForPropertySet(MuleProperties.OBJECT_QUEUE_MANAGER, Initialisable.PHASE_NAME);
         registryBroker.registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager);
+        this.queueManager = queueManager;
     }
 
     /**
@@ -685,6 +700,21 @@ public class DefaultMuleContext implements MuleContext
     public ThreadingProfile getDefaultServiceThreadingProfile()
     {
         return (ThreadingProfile) getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public StreamCloserService getStreamCloserService()
+    {
+        if (this.streamCloserService == null)
+        {
+            this.streamCloserService = this.getRegistry().lookupObject(
+                    MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE);
+        }
+
+        return this.streamCloserService;
     }
 
     public ThreadingProfile getDefaultThreadingProfile()
@@ -898,6 +928,12 @@ public class DefaultMuleContext implements MuleContext
         }
 
         return this.processingTimeWatcher;
+    }
+
+    @Override
+    public boolean waitUntilStarted(int timeout) throws InterruptedException
+    {
+        return startLatch.await(timeout, TimeUnit.MILLISECONDS);
     }
 
     private void overrideClusterConfiguration()

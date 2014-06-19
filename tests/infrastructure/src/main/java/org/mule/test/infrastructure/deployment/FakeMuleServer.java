@@ -16,6 +16,7 @@ import static org.mockito.Mockito.verify;
 import org.mule.MuleCoreExtension;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentService;
@@ -35,11 +36,11 @@ import org.mule.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.LogManager;
 
@@ -50,6 +51,7 @@ public class FakeMuleServer
 
     private File muleHome;
     private File appsDir;
+    private File domainsDir;
     private File logsDir;
     private File pluginsDir;
 
@@ -85,7 +87,6 @@ public class FakeMuleServer
         try
         {
             System.setProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, getMuleHome().getCanonicalPath());
-            System.out.println("MULE_HOME: " + getMuleHome().getCanonicalPath());
         }
         catch (IOException e)
         {
@@ -229,7 +230,7 @@ public class FakeMuleServer
         appsDir = createFolder("apps");
         logsDir = createFolder("logs");
         pluginsDir = createFolder("plugins");
-        createFolder("domains");
+        domainsDir = createFolder("domains");
 
         File confDir = createFolder("conf");
         URL log4jFile = getClass().getResource("/log4j.properties");
@@ -314,6 +315,11 @@ public class FakeMuleServer
         return appsDir;
     }
 
+    private File getDomainsDir()
+    {
+        return domainsDir;
+    }
+
     public File getPluginsDir()
     {
         return pluginsDir;
@@ -347,5 +353,46 @@ public class FakeMuleServer
     public Application findApplication(String appName)
     {
         return deploymentService.findApplication(appName);
+    }
+
+    /**
+     * Deploys a Domain from a classpath folder
+     *
+     * @param domainFolder folder in which the domain is defined
+     * @param domainName name of the domain to use as domain artifact name
+     */
+    public void deployDomainFromClasspathFolder(String domainFolder, String domainName)
+    {
+        copyExplodedArtifactFromClasspathFolderToDeployFolder(domainFolder, getDomainsDir(), domainName);
+    }
+
+    /**
+     * Deploys an Application from a classpath folder
+     *
+     * @param appFolder folder in which the app is defined
+     * @param appName name of the domain to use as app artifact name
+     */
+    public void deployAppFromClasspathFolder(String appFolder, String appName)
+    {
+        copyExplodedArtifactFromClasspathFolderToDeployFolder(appFolder, getAppsDir(), appName);
+    }
+
+    private void copyExplodedArtifactFromClasspathFolderToDeployFolder(String artifactFolder, File artifactDirectory, String artifactName)
+    {
+        ReentrantLock lock = this.deploymentService.getLock();
+        lock.lock();
+        try
+        {
+            URL resource = getClass().getClassLoader().getResource(artifactFolder);
+            FileUtils.copyDirectory(new File(resource.getFile()), new File(artifactDirectory, artifactName));
+        }
+        catch (IOException e)
+        {
+            throw new MuleRuntimeException(e);
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 }

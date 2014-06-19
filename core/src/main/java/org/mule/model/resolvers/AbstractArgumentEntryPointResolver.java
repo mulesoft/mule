@@ -158,7 +158,7 @@ public abstract class AbstractArgumentEntryPointResolver extends ReflectionEntry
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         sb.append(ClassUtils.getClassName(getClass()));
         sb.append("{methods=").append(StringMessageUtils.toString(methods));
         sb.append(", acceptVoidMethods=").append(isAcceptVoidMethods());

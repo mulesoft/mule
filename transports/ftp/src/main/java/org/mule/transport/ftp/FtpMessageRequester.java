@@ -79,10 +79,18 @@ public class FtpMessageRequester extends AbstractMessageRequester
         try
         {
             client = connector.createFtpClient(endpoint);
-            FTPFile fileToProcess = findFileToProcess(client);
-            if (fileToProcess == null)
+            FTPFile fileToProcess;
+            if(connector.isFile(endpoint,client))
             {
-                return null;
+                fileToProcess = client.listFiles(endpoint.getEndpointURI().getPath())[0];
+            } 
+            else
+            {
+                fileToProcess = findFileToProcess(client);
+                if (fileToProcess == null)
+                {
+                    return null;
+                }
             }
 
             fileToProcess = prepareFile(client, fileToProcess);
@@ -138,6 +146,8 @@ public class FtpMessageRequester extends AbstractMessageRequester
 
     protected FTPFile findFileToProcess(FTPClient client) throws Exception
     {
+        //Checking if it is a file or a directory
+        boolean isFile = connector.isFile(endpoint, client);
         FTPListParseEngine engine = client.initiateListParsing();
         FTPFile[] files = null;
         while (engine.hasNext())

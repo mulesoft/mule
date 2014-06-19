@@ -19,6 +19,7 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.execution.MessageProcessContext;
 import org.mule.transport.AbstractMessageReceiverTestCase;
+import org.mule.transport.TransportMessageProcessContext;
 import org.mule.transport.http.transformers.MuleMessageToHttpResponse;
 import org.mule.util.CollectionUtils;
 
@@ -79,8 +80,7 @@ public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     @Test
     public void messageSourceIsEndpointNotMessageReceiver()
     {
-        HttpServerConnection mockHttpServerConnection = Mockito.mock(HttpServerConnection.class);
-        MessageProcessContext messageContext = httpMessageReceiver.createMessageContext(mockHttpServerConnection);
+        MessageProcessContext messageContext = httpMessageReceiver.createMessageProcessContext();
         assertThat((InboundEndpoint) messageContext.getMessageSource(), is(httpMessageReceiver.getEndpoint()));
     }
 }

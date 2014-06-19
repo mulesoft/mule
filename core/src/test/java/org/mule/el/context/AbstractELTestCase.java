@@ -15,6 +15,9 @@ import org.mule.api.el.ExpressionLanguage;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.el.mvel.MVELExpressionLanguage;
+import org.mule.mvel2.ImmutableElementException;
+import org.mule.mvel2.PropertyAccessException;
+import org.mule.mvel2.optimizers.OptimizerFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.ExceptionUtils;
 
@@ -25,8 +28,6 @@ import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.mvel2.ImmutableElementException;
-import org.mule.mvel2.PropertyAccessException;
 
 @RunWith(Parameterized.class)
 public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
@@ -35,9 +36,10 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
     protected Variant variant;
     protected ExpressionLanguage expressionLanguage;
 
-    public AbstractELTestCase(Variant variant)
+    public AbstractELTestCase(Variant variant, String mvelOptimizer)
     {
         this.variant = variant;
+        OptimizerFactory.setDefaultOptimizer(mvelOptimizer);
     }
 
     @Before
@@ -84,7 +86,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
             case EVALUATOR_LANGUAGE :
                 return expressionLanguage.evaluate(expression, event);
             case EXPRESSION_MANAGER :
-                return muleContext.getExpressionManager().evaluate(expression, event.getMessage());
+                return muleContext.getExpressionManager().evaluate(expression, event);
         }
         return null;
     }
@@ -97,7 +99,13 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
     @Parameters
     public static List<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{Variant.EVALUATOR_LANGUAGE}, {Variant.EXPRESSION_MANAGER}});
+        return Arrays.asList(new Object[][]
+        {
+            {Variant.EVALUATOR_LANGUAGE, OptimizerFactory.DYNAMIC},
+            {Variant.EVALUATOR_LANGUAGE, OptimizerFactory.SAFE_REFLECTIVE},
+            {Variant.EXPRESSION_MANAGER, OptimizerFactory.DYNAMIC},
+            {Variant.EXPRESSION_MANAGER, OptimizerFactory.SAFE_REFLECTIVE}
+        });
     }
 
     protected ExpressionLanguage getExpressionLanguage() throws Exception

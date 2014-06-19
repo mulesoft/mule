@@ -16,9 +16,9 @@ import org.junit.Test;
 
 public class MuleInstanceContextTestCase extends AbstractELTestCase
 {
-    public MuleInstanceContextTestCase(Variant variant)
+    public MuleInstanceContextTestCase(Variant variant, String mvelOptimizer)
     {
-        super(variant);
+        super(variant, mvelOptimizer);
     }
 
     @Test

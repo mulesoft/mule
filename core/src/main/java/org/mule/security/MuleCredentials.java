@@ -81,7 +81,7 @@ public class MuleCredentials implements Credentials, Serializable
 
     public String getToken()
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append(username).append(TOKEN_DELIM);
         buf.append(password).append(TOKEN_DELIM);
 
@@ -110,7 +110,7 @@ public class MuleCredentials implements Credentials, Serializable
 
     public static String createHeader(String username, char[] password)
     {
-        StringBuffer buf = new StringBuffer(32);
+        StringBuilder buf = new StringBuilder(32);
         buf.append("Plain ");
         buf.append(username).append(TOKEN_DELIM);
         buf.append(password).append(TOKEN_DELIM);
@@ -122,7 +122,7 @@ public class MuleCredentials implements Credentials, Serializable
                                       String encryptionName,
                                       EncryptionStrategy es) throws CryptoFailureException
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append(encryptionName).append(" ");
         String creds = username + TOKEN_DELIM + password;
         byte[] encrypted = es.encrypt(creds.getBytes(), null);

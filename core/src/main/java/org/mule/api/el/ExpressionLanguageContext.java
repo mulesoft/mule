@@ -36,6 +36,11 @@ public interface ExpressionLanguageContext
 
     boolean contains(String name);
 
+    /**
+     *  DEPRECATED: Use addVariable() or addFinalVariable() instead depending if variable should be 
+     *  assignable or not.
+     */
+    @Deprecated
     <T> void addPrivateVariable(String name, T value);
 
 }

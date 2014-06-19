@@ -16,10 +16,10 @@
          we still use the http transport on the client side-->
     <http:endpoint address="http://localhost:${port1}/" name="clientEndpoint" exchange-pattern="request-response"/>
 
-    <jetty:endpoint address="http://localhost:${port1}/" name="serverEndpoint" exchange-pattern="one-way"/>
+    <jetty:endpoint address="http://localhost:${port1}/" name="serverEndpoint" exchange-pattern="request-response"/>
 
     <flow name="testComponent">
-        <inbound-endpoint ref="clientEndpoint"/>
+        <inbound-endpoint ref="serverEndpoint"/>
         <test:component appendString=" Received"/>
     </flow>
 

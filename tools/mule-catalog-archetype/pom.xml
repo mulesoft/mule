@@ -9,7 +9,6 @@
     </parent>
     <packaging>maven-plugin</packaging>
     <artifactId>mule-catalog-archetype</artifactId>
-    <version>4.0-SNAPSHOT</version>
     <name>Mule Configuration Patterns Catalog Archetype</name>
 
     <properties>

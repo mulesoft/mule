@@ -36,7 +36,7 @@ public class AsynchronousProcessingStrategy implements ProcessingStrategy
 
     @Override
     public void configureProcessors(List<MessageProcessor> processors,
-                                    StageNameSource nameSource,
+                                    org.mule.api.processor.StageNameSource nameSource,
                                     MessageProcessorChainBuilder chainBuilder,
                                     MuleContext muleContext)
     {
@@ -48,7 +48,7 @@ public class AsynchronousProcessingStrategy implements ProcessingStrategy
         }
     }
 
-    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(StageNameSource nameSource,
+    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(org.mule.api.processor.StageNameSource nameSource,
                                                                             MuleContext muleContext)
     {
         return new AsyncInterceptingMessageProcessor(createThreadingProfile(muleContext), getThreadPoolName(

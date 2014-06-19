@@ -130,7 +130,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
 
         // Event is copied, but session isn't
         assertNotSame(asyncEvent, event);
-        assertFalse(asyncEvent.equals(event));
+        assertNotSame(asyncEvent, event);
         assertNotSame(asyncEvent.getSession(), event.getSession());
 
         // Session properties available before async are available after too
@@ -164,7 +164,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
 
         // Event and session are both copied
         assertNotSame(deserializedEvent, event);
-        assertFalse(deserializedEvent.equals(event));
+        assertNotSame(deserializedEvent, event);
         assertNotSame(deserializedEvent.getSession(), event.getSession());
         assertFalse(deserializedEvent.getSession().equals(event.getSession()));
 

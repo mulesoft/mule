@@ -21,7 +21,7 @@ public class SynchronousProcessingStrategy implements ProcessingStrategy
 {
     @Override
     public void configureProcessors(List<MessageProcessor> processors,
-                                    StageNameSource nameSource,
+                                    org.mule.api.processor.StageNameSource nameSource,
                                     MessageProcessorChainBuilder chainBuilder,
                                     MuleContext muleContext)
     {

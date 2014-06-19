@@ -6,6 +6,11 @@
  */
 package org.mule.transport.file;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -29,22 +34,8 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCase
 {
-
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-
-        // get rid of a warning that complains about two transformers with the same data type
-        muleContext.getRegistry().unregisterTransformer("_ObjectToByteArray");
-    }
 
     @Test
     @Ignore("MULE-6926: flaky test")
@@ -139,6 +130,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testDeleteOnly() throws Exception
     {
         File inFile = initForRequest();
@@ -196,6 +188,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testNoMoveNoDeleteFilePayload() throws Exception
     {
         File inFile = initForRequest();

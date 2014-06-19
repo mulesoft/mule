@@ -6,7 +6,7 @@
  */
 package org.mule.management.agents;
 
-import org.mule.module.management.agent.JmxAgent;
+import org.mule.module.management.agent.JmxApplicationAgent;
 import org.mule.module.management.agent.Mx4jAgent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -20,7 +20,7 @@ import org.junit.Test;
 public class MuleAgentsTestCase extends AbstractMuleContextTestCase
 {
 
-    protected JmxAgent jmxAgent;
+    protected JmxApplicationAgent jmxAgent;
 
     public MuleAgentsTestCase()
     {
@@ -31,7 +31,7 @@ public class MuleAgentsTestCase extends AbstractMuleContextTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        jmxAgent = muleContext.getRegistry().lookupObject(JmxAgent.class);
+        jmxAgent = muleContext.getRegistry().lookupObject(JmxApplicationAgent.class);
     }
 
     @Test

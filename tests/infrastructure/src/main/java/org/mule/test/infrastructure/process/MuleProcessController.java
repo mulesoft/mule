@@ -7,252 +7,96 @@
 
 package org.mule.test.infrastructure.process;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.ExecuteException;
-import org.apache.commons.exec.ExecuteWatchdog;
-import org.apache.commons.exec.PumpStreamHandler;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.lang.SystemUtils;
 
 public class MuleProcessController
 {
 
-    private static final String ANCHOR_DELETE_ERROR = "Could not delete anchor file [%s] when stopping Mule ESB.";
-    private static final String ADD_LIBRARY_ERROR = "Error copying jar file [%s] to lib directory [%s].";
-    private static final String MULE_HOME_VARIABLE = "MULE_HOME";
-    private static final String ANCHOR_SUFFIX = "-anchor.txt";
-    private static final String STATUS = "Mule Enterprise Edition is running \\(([0-9]+)\\)\\.";
-    private static final Pattern STATUS_PATTERN = Pattern.compile(STATUS);
-    private static final IOFileFilter ANCHOR_FILTER = FileFilterUtils.suffixFileFilter(ANCHOR_SUFFIX);
-    private static final int IS_RUNNING_STATUS_CODE = 0;
-    public static final int TIMEOUT = 30000;
-    private String muleHome;
-    private String muleBin;
-    private File appsDir;
-    private File libsDir;
+    private Controller controller;
+
+    private static final int DEFAULT_TIMEOUT = 60000;
 
     public MuleProcessController(String muleHome)
     {
-        this.muleHome = muleHome;
-        this.muleBin = muleHome + "/bin/mule";
-        this.appsDir = new File(muleHome + "/apps/");
-        this.libsDir = new File(muleHome + "/lib/user");
+        this(muleHome, DEFAULT_TIMEOUT);
+    }
+
+    public MuleProcessController(String muleHome, int timeout)
+    {
+        this.controller = SystemUtils.IS_OS_WINDOWS ? new WindowsController(muleHome, timeout) : new UnixController(muleHome, timeout);
     }
 
     public boolean isRunning()
     {
-        return IS_RUNNING_STATUS_CODE == status();
+        return this.controller.isRunning();
     }
 
     public void start(String... args)
     {
-        int error = runSync("start", args);
-        if (error != 0)
-        {
-            throw new MuleControllerException("The mule instance couldn't be started");
-        }
+        this.controller.start(args);
     }
 
     public void stop(String... args)
     {
-        int error = runSync("stop", args);
-        verify(error == 0, "The mule instance couldn't be stopped");
-        deleteAnchors();
-    }
-
-    private void deleteAnchors()
-    {
-        @SuppressWarnings("unchecked")
-        Collection<File> anchors = FileUtils.listFiles(appsDir, ANCHOR_FILTER, null);
-        for (File anchor : anchors)
-        {
-            try
-            {
-                FileUtils.forceDelete(anchor);
-            }
-            catch (IOException e)
-            {
-                throw new MuleControllerException(String.format(ANCHOR_DELETE_ERROR, anchor), e);
-            }
-        }
+        this.controller.stop(args);
     }
 
     public int status(String... args)
     {
-        return runSync("status", args);
+        return this.controller.status(args);
     }
 
     public int getProcessId()
     {
-        Map<Object, Object> newEnv = this.copyEnvironmentVariables();
-        DefaultExecutor executor = new DefaultExecutor();
-        ExecuteWatchdog watchdog = new ExecuteWatchdog((long) TIMEOUT);
-        executor.setWatchdog(watchdog);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
-        executor.setStreamHandler(streamHandler);
-        if (this.doExecution(executor, new CommandLine(this.muleBin).addArgument("status"), newEnv) == 0)
-        {
-            Matcher matcher = STATUS_PATTERN.matcher(outputStream.toString());
-            if (matcher.find())
-            {
-                return Integer.parseInt(matcher.group(1));
-            }
-            else
-            {
-                throw new MuleControllerException("bin/mule status didn't return the expected pattern: "
-                                                  + STATUS);
-            }
-        }
-        else
-        {
-            throw new MuleControllerException("Mule ESB is not running");
-        }
+        return this.controller.getProcessId();
     }
 
     public void restart(String... args)
     {
-        int error = runSync("restart", args);
-        if (error != 0)
-        {
-            throw new MuleControllerException("The mule instance couldn't be restarted");
-        }
+        this.controller.restart(args);
     }
 
-    protected int runSync(String command, String... args)
-    {
-        Map<Object, Object> newEnv = copyEnvironmentVariables();
-        return executeSyncCommand(command, args, newEnv, TIMEOUT);
-    }
 
-    private int executeSyncCommand(String command, String[] args, Map<Object, Object> newEnv, long timeout)
-        throws MuleControllerException
-    {
-        CommandLine commandLine = new CommandLine(muleBin);
-        commandLine.addArgument(command);
-        commandLine.addArguments(args);
-        DefaultExecutor executor = new DefaultExecutor();
-        ExecuteWatchdog watchdog = new ExecuteWatchdog(timeout);
-        executor.setWatchdog(watchdog);
-        executor.setStreamHandler(new PumpStreamHandler());
-        return doExecution(executor, commandLine, newEnv);
-    }
-
-    private int doExecution(DefaultExecutor executor, CommandLine commandLine, Map<Object, Object> env)
-    {
-        try
-        {
-            return executor.execute(commandLine, env);
-        }
-        catch (ExecuteException e)
-        {
-            return e.getExitValue();
-        }
-        catch (Exception e)
-        {
-            throw new MuleControllerException("Error executing [" + commandLine.getExecutable() + " "
-                                              + commandLine.getArguments() + "]", e);
-        }
-    }
 
     public void deploy(String path)
     {
-        File app = new File(path);
-        verify(app.exists(), "File does not exists: %s", app);
-        verify(app.canRead(), "Cannot read file: %s", app);
-        try
-        {
-            if (app.isFile())
-            {
-                FileUtils.copyFileToDirectory(app, appsDir);
-            }
-            else
-            {
-                FileUtils.copyDirectoryToDirectory(app, appsDir);
-            }
-        }
-        catch (IOException e)
-        {
-            throw new MuleControllerException("Could not deploy app [" + path + "] to [" + appsDir + "]", e);
-        }
+        this.controller.deploy(path);
     }
 
     public boolean isDeployed(String appName)
     {
-        return new File(appsDir, appName + ANCHOR_SUFFIX).exists();
+        return this.controller.isDeployed(appName);
     }
 
-    private Map<Object, Object> copyEnvironmentVariables()
-    {
-        Map<String, String> env = System.getenv();
-        Map<Object, Object> newEnv = new HashMap<Object, Object>();
-        for (Map.Entry<String, String> it : env.entrySet())
-        {
-            newEnv.put(it.getKey(), it.getValue());
-        }
-        newEnv.put(MULE_HOME_VARIABLE, muleHome);
-        return newEnv;
-    }
+
 
     public void undeployAll()
     {
-        for (File file : appsDir.listFiles())
-        {
-            try
-            {
-                FileUtils.forceDelete(file);
-            }
-            catch (IOException e)
-            {
-                throw new MuleControllerException("Could not delete directory [" + file.getAbsolutePath()
-                                                  + "]", e);
-            }
-        }
+        this.controller.undeployAll();
     }
 
     public void installLicense(String path)
     {
-        this.runSync(null, "--installLicense", path);
+        this.controller.installLicense(path);
     }
 
     public void uninstallLicense()
     {
-        this.runSync(null, "-unInstallLicense");
+        this.controller.uninstallLicense();
     }
 
     public void addLibrary(File jar)
     {
-        verify(jar.exists(), "Jar file does not exists: %s", jar);
-        verify("jar".equals(FilenameUtils.getExtension(jar.getAbsolutePath())), "Library [%s] don't have .jar extension.", jar);
-        verify(jar.canRead(), "Cannot read jar file: %s", jar);
-        verify(libsDir.canWrite(), "Cannot write on lib dir: %", libsDir);
-        try
-        {
-            FileUtils.copyFileToDirectory(jar, libsDir);
-        }
-        catch (IOException e)
-        {
-            throw new MuleControllerException(String.format(ADD_LIBRARY_ERROR, jar, libsDir), e);
-        }
+        this.controller.addLibrary(jar);
     }
 
-    private void verify(boolean condition, String message, Object... args)
+    public void deployDomain(String domain)
     {
-        if (!condition)
-        {
-            throw new MuleControllerException(String.format(message, args));
-        }
+        this.controller.deployDomain(domain);
     }
+
+
+
+
 }

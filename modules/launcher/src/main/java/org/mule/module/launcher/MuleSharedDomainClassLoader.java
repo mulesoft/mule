@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher;
 
+import org.mule.module.launcher.artifact.AbstractArtifactClassLoader;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.FileUtils;
@@ -16,16 +17,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Load $MULE_HOME/lib/shared/<domain> libraries.
  */
-public class MuleSharedDomainClassLoader extends GoodCitizenClassLoader implements ArtifactClassLoader
+public class MuleSharedDomainClassLoader extends AbstractArtifactClassLoader implements ArtifactClassLoader
 {
 
-    protected transient Log logger = LogFactory.getLog(getClass());
     public static final String DOMAIN_LIBRARY_FOLDER = "lib";
     public static final String OLD_DOMAIN_LIBRARY_FOLDER = DOMAIN_LIBRARY_FOLDER + File.separator + "shared";
 
@@ -108,12 +105,6 @@ public class MuleSharedDomainClassLoader extends GoodCitizenClassLoader implemen
     }
 
     @Override
-    public void dispose()
-    {
-        //nothing to do.
-    }
-
-    @Override
     public URL findResource(String name)
     {
         URL resource = super.findResource(name);
@@ -165,5 +156,11 @@ public class MuleSharedDomainClassLoader extends GoodCitizenClassLoader implemen
         domainDir = newDomainDir;
         domainLibraryFolder = new File(newDomainDir, DOMAIN_LIBRARY_FOLDER);
         logger.info(String.format("Using domain dir %s for domain %s", domainDir.getAbsolutePath(), domain));
+    }
+
+    @Override
+    protected String[] getLocalResourceLocations()
+    {
+        return new String[] {domainDir.getAbsolutePath(), MuleContainerBootstrapUtils.getMuleConfDir().getAbsolutePath()};
     }
 }

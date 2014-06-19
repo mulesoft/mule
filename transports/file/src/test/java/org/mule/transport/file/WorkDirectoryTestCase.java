@@ -37,7 +37,7 @@ public class WorkDirectoryTestCase extends FunctionalTestCase
     protected void doTearDown() throws Exception
     {
         // clean out the directory tree that's used as basis for this test
-        File outputDir = new File(".mule");
+        File outputDir = getWorkingDirectory();
         assertTrue(FileUtils.deleteTree(outputDir));
 
         super.doTearDown();
@@ -51,7 +51,7 @@ public class WorkDirectoryTestCase extends FunctionalTestCase
         {
             public void eventReceived(MuleEventContext context, Object component) throws Exception
             {
-                File workDir = new File(".mule/work");
+                File workDir = getFileInsideWorkingDirectory("work");
                 String[] filenames = workDir.list();
                 assertTrue(filenames.length > 0);
                 for (String filename : filenames)
@@ -72,7 +72,7 @@ public class WorkDirectoryTestCase extends FunctionalTestCase
 
     private void writeTestMessageToInputDirectory() throws FileNotFoundException, IOException
     {
-        File outFile = new File(".mule/in", TEST_FILENAME);
+        File outFile = new File(getFileInsideWorkingDirectory("in"), TEST_FILENAME);
         FileOutputStream out = new FileOutputStream(outFile);
         out.write(TEST_MESSAGE.getBytes());
         out.close();
@@ -82,7 +82,7 @@ public class WorkDirectoryTestCase extends FunctionalTestCase
     {
         for (int i = 0; i < 30; i++)
         {
-            File outDir = new File(".mule/out");
+            File outDir = getFileInsideWorkingDirectory("out");
             if (outDir.exists())
             {
                 String[] filenames = outDir.list();

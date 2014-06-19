@@ -10,20 +10,26 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.transport.ConnectException;
 import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.transport.http.ntlm.NTLMScheme;
 import org.mule.transport.tcp.TcpConnector;
 import org.mule.util.MapUtils;
+import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -36,6 +42,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.Credentials;
@@ -50,6 +57,7 @@ import org.apache.commons.httpclient.auth.AuthPolicy;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.util.IdleConnectionTimeoutThread;
+import org.apache.commons.lang.BooleanUtils;
 
 /**
  * <code>HttpConnector</code> provides a way of receiving and sending http requests
@@ -73,6 +81,14 @@ public class HttpConnector extends TcpConnector
 
     public static final String HTTP = "http";
     public static final String HTTP_PREFIX = "http.";
+    public static final String DISABLE_STALE_CONNECTION_CHECK_SYSTEM_PROPERTY = MuleProperties.SYSTEM_PROPERTY_PREFIX
+                                                                                + "transport."
+                                                                                + HTTP_PREFIX
+                                                                                + "disableHttpClientStaleConnectionCheck";
+    public static final String SINGLE_DISPATCHER_PER_ENDPOINT_SYSTEM_PROPERTY = MuleProperties.SYSTEM_PROPERTY_PREFIX
+                                                                                + "transport."
+                                                                                + HTTP_PREFIX
+                                                                                + "singleDispatcherPerEndpoint";
 
     /**
      * MuleEvent property to pass back the status for the response
@@ -145,6 +161,8 @@ public class HttpConnector extends TcpConnector
     public static final String HTTP_ENCODE_PARAMVALUE = HTTP_PREFIX + "encode.paramvalue";
 
     public static final Set<String> HTTP_INBOUND_PROPERTIES;
+    
+    protected Map<OutboundEndpoint, MessageDispatcher> endpointDispatchers = new ConcurrentHashMap<OutboundEndpoint, MessageDispatcher>();
 
     static
     {
@@ -194,10 +212,14 @@ public class HttpConnector extends TcpConnector
     private boolean disableCleanupThread;
 
     private org.mule.transport.http.HttpConnectionManager connectionManager;
+    
+    private boolean singleDispatcherPerEndpoint = false;
 
     public HttpConnector(MuleContext context)
     {
         super(context);
+        singleDispatcherPerEndpoint = BooleanUtils.toBoolean(System.getProperty(SINGLE_DISPATCHER_PER_ENDPOINT_SYSTEM_PROPERTY));
+        
     }
 
     @Override
@@ -238,6 +260,7 @@ public class HttpConnector extends TcpConnector
             params.setTcpNoDelay(isSendTcpNoDelay());
             params.setMaxTotalConnections(dispatchers.getMaxTotal());
             params.setDefaultMaxConnectionsPerHost(dispatchers.getMaxTotal());
+            params.setStaleCheckingEnabled(!BooleanUtils.toBoolean(System.getProperty(DISABLE_STALE_CONNECTION_CHECK_SYSTEM_PROPERTY)));
 
             if (getConnectionTimeout() != INT_VALUE_NOT_SET)
             {
@@ -493,7 +516,7 @@ public class HttpConnector extends TcpConnector
                  && endpoint.getProperty(HttpConstants.HEADER_AUTHORIZATION) == null)
         {
             // Add User Creds
-            StringBuffer header = new StringBuffer(128);
+            StringBuilder header = new StringBuilder(128);
             header.append("Basic ");
             header.append(new String(Base64.encodeBase64(endpoint.getEndpointURI().getUserInfo().getBytes(
                     endpoint.getEncoding()))));
@@ -506,9 +529,9 @@ public class HttpConnector extends TcpConnector
             String auth = event.getMessage().getOutboundProperty(HttpConstants.HEADER_AUTHORIZATION);
             httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION, auth);
         }
-        else
+        else if (StringUtils.isEmpty(getProxyUsername()))
         {
-            // don't use preemptive if there are no credentials to send
+            // don't use preemptive if there are no user or proxy credentials to send
             client.getParams().setAuthenticationPreemptive(false);
         }
     }
@@ -673,5 +696,66 @@ public class HttpConnector extends TcpConnector
     {
         logger.warn("keepSendSocketOpen attribute is deprecated, use keepAlive in the outbound endpoint instead");
         super.setKeepSendSocketOpen(keepSendSocketOpen);
+    }
+    
+    @Override
+    public MessageProcessor createDispatcherMessageProcessor(OutboundEndpoint endpoint) throws MuleException
+    {
+        if (singleDispatcherPerEndpoint)
+        {
+            // Avoid lazy initialization of dispatcher in borrow method which would be less performant by
+            // creating the dispatcher instance when DispatcherMessageProcessor is created.
+            MessageDispatcher dispatcher = dispatcherFactory.create(endpoint);
+            applyDispatcherLifecycle(dispatcher);
+            endpointDispatchers.put(endpoint, dispatcher);
+        }
+        return super.createDispatcherMessageProcessor(endpoint);
+    }
+
+    @Override
+    protected MessageDispatcher borrowDispatcher(OutboundEndpoint endpoint) throws MuleException
+    {
+        if (singleDispatcherPerEndpoint)
+        {
+            return endpointDispatchers.get(endpoint);
+        }
+        else
+        {
+            return super.borrowDispatcher(endpoint);
+        }
+    }
+
+    @Override
+    protected void returnDispatcher(OutboundEndpoint endpoint, MessageDispatcher dispatcher)
+    {
+        if (singleDispatcherPerEndpoint)
+        {
+            // Nothing to do because implementation of borrowDispatcher doesn't use dispatcher pool
+        }
+        else
+        {
+            super.returnDispatcher(endpoint, dispatcher);
+        }
+    }
+
+    protected void applyDispatcherLifecycle(MessageDispatcher dispatcher) throws MuleException
+    {
+        String phase = lifecycleManager.getCurrentPhase();
+        if (phase.equals(Startable.PHASE_NAME) && !dispatcher.getLifecycleState().isStarted())
+        {
+            if (!dispatcher.getLifecycleState().isInitialised())
+            {
+                dispatcher.initialise();
+            }
+            dispatcher.start();
+        }
+        else if (phase.equals(Stoppable.PHASE_NAME) && dispatcher.getLifecycleState().isStarted())
+        {
+            dispatcher.stop();
+        }
+        else if (Disposable.PHASE_NAME.equals(phase))
+        {
+            dispatcher.dispose();
+        }
     }
 }

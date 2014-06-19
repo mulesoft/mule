@@ -96,7 +96,7 @@ public class ComponentDelegatingDefinitionParser extends AbstractParallelDelegat
                         if (child instanceof Element
                             && child.getLocalName().endsWith(OBJECT_FACTORY_ELEMENT_CONVENTION_SUFFIX))
                         {
-                            StringBuffer message = new StringBuffer("The child element '");
+                            StringBuilder message = new StringBuilder("The child element '");
                             message.append(child.getLocalName());
                             message.append("' cannot appear with the 'class' attribute");
                             message.append(" in element ");

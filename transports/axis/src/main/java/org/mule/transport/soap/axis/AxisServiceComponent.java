@@ -391,7 +391,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         {
             method = endpointUri.getPath().substring(endpointUri.getPath().lastIndexOf("/") + 1);
         }
-        StringBuffer args = new StringBuffer(64);
+        StringBuilder args = new StringBuilder(64);
 
         Map.Entry entry;
         for (Iterator iterator = params.entrySet().iterator(); iterator.hasNext();)
@@ -600,7 +600,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         while (i.hasNext())
         {
             ServiceDesc sd = (ServiceDesc)i.next();
-            StringBuffer sb = new StringBuffer(512);
+            StringBuilder sb = new StringBuilder(512);
             sb.append("<li>");
             String name = sd.getName();
             sb.append(name);

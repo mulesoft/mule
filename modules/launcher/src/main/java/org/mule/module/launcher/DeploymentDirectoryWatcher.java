@@ -6,8 +6,8 @@
  */
 package org.mule.module.launcher;
 
-import static org.mule.module.launcher.ArchiveDeployer.ARTIFACT_NAME_PROPERTY;
-import static org.mule.module.launcher.ArchiveDeployer.ZIP_FILE_SUFFIX;
+import static org.mule.module.launcher.DefaultArchiveDeployer.ARTIFACT_NAME_PROPERTY;
+import static org.mule.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 import static org.mule.util.SplashScreen.miniSplash;
 
 import org.mule.config.StartupContext;
@@ -38,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.io.filefilter.AndFileFilter;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
@@ -67,7 +68,8 @@ public class DeploymentDirectoryWatcher implements Runnable
     private final ReentrantLock deploymentLock;
     private final ArchiveDeployer<Domain> domainArchiveDeployer;
     private final ArchiveDeployer<Application> applicationArchiveDeployer;
-    private final ApplicationTimestampListener applicationTimestampListener;
+    private final ArtifactTimestampListener<Application> applicationTimestampListener;
+    private final ArtifactTimestampListener<Domain> domainTimestampListener;
     private final ObservableList<Application> applications;
     private final ObservableList<Domain> domains;
     private final File appsDir;
@@ -78,8 +80,8 @@ public class DeploymentDirectoryWatcher implements Runnable
 
     public DeploymentDirectoryWatcher(final ArchiveDeployer<Domain> domainArchiveDeployer, final ArchiveDeployer<Application> applicationArchiveDeployer, ObservableList<Domain> domains, ObservableList<Application> applications, final ReentrantLock deploymentLock)
     {
-        this.appsDir = applicationArchiveDeployer.getArtifactFactory().getArtifactDir();
-        this.domainsDir = domainArchiveDeployer.getArtifactFactory().getArtifactDir();
+        this.appsDir = applicationArchiveDeployer.getDeploymentDirectory();
+        this.domainsDir = domainArchiveDeployer.getDeploymentDirectory();
         this.deploymentLock = deploymentLock;
         this.domainArchiveDeployer = domainArchiveDeployer;
         this.applicationArchiveDeployer = applicationArchiveDeployer;
@@ -113,7 +115,8 @@ public class DeploymentDirectoryWatcher implements Runnable
                 }
             }
         });
-        this.applicationTimestampListener = new ApplicationTimestampListener(applications);
+        this.applicationTimestampListener = new ArtifactTimestampListener(applications);
+        this.domainTimestampListener = new ArtifactTimestampListener(domains);
     }
 
     /**
@@ -123,50 +126,62 @@ public class DeploymentDirectoryWatcher implements Runnable
      */
     public void start()
     {
+        deploymentLock.lock();
         deleteAllAnchors();
 
         // mule -app app1:app2:app3 will restrict deployment only to those specified apps
         final Map<String, Object> options = StartupContext.get().getStartupOptions();
         String appString = (String) options.get("app");
 
-        String[] explodedDomains = domainsDir.list(DirectoryFileFilter.DIRECTORY);
-        String[] packagedDomains = domainsDir.list(ZIP_ARTIFACT_FILTER);
-
-        deployPackedDomains(packagedDomains);
-        deployExplodedDomains(explodedDomains);
-
-        if (appString == null)
+        try
         {
-            String[] explodedApps = appsDir.list(DirectoryFileFilter.DIRECTORY);
-            String[] packagedApps = appsDir.list(ZIP_ARTIFACT_FILTER);
 
-            deployPackedApps(packagedApps);
-            deployExplodedApps(explodedApps);
-        }
-        else
-        {
-            String[] apps = appString.split(":");
-            apps = removeDuplicateAppNames(apps);
+            String[] explodedDomains = domainsDir.list(DirectoryFileFilter.DIRECTORY);
+            String[] packagedDomains = domainsDir.list(ZIP_ARTIFACT_FILTER);
 
-            for (String app : apps)
+            deployPackedDomains(packagedDomains);
+            deployExplodedDomains(explodedDomains);
+
+            if (appString == null)
             {
-                try
-                {
-                    File applicationFile = new File(appsDir, app + ZIP_FILE_SUFFIX);
+                String[] explodedApps = appsDir.list(DirectoryFileFilter.DIRECTORY);
+                String[] packagedApps = appsDir.list(ZIP_ARTIFACT_FILTER);
 
-                    if (applicationFile.exists() && applicationFile.isFile())
-                    {
-                        applicationArchiveDeployer.deployPackagedArtifact(app + ZIP_FILE_SUFFIX);
-                    }
-                    else
-                    {
-                        applicationArchiveDeployer.deployExplodedArtifact(app);
-                    }
-                }
-                catch (Exception e)
+                deployPackedApps(packagedApps);
+                deployExplodedApps(explodedApps);
+            }
+            else
+            {
+                String[] apps = appString.split(":");
+                apps = removeDuplicateAppNames(apps);
+
+                for (String app : apps)
                 {
-                    // Ignore and continue
+                    try
+                    {
+                        File applicationFile = new File(appsDir, app + ZIP_FILE_SUFFIX);
+
+                        if (applicationFile.exists() && applicationFile.isFile())
+                        {
+                            applicationArchiveDeployer.deployPackagedArtifact(app + ZIP_FILE_SUFFIX);
+                        }
+                        else
+                        {
+                            applicationArchiveDeployer.deployExplodedArtifact(app);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        // Ignore and continue
+                    }
                 }
+            }
+        }
+        finally
+        {
+            if (deploymentLock.isHeldByCurrentThread())
+            {
+                deploymentLock.unlock();
             }
         }
 
@@ -317,6 +332,8 @@ public class DeploymentDirectoryWatcher implements Runnable
             String[] domains = domainsDir.list(DirectoryFileFilter.DIRECTORY);
 
             final String[] domainZips = domainsDir.list(ZIP_ARTIFACT_FILTER);
+
+            redeployModifiedDomains();
 
             deployPackedDomains(domainZips);
 
@@ -503,15 +520,40 @@ public class DeploymentDirectoryWatcher implements Runnable
         return appNames.toArray(ArrayUtils.EMPTY_STRING_ARRAY);
     }
 
+    private void redeployModifiedDomains()
+    {
+        redeployModifiedArtifacts(domains, domainTimestampListener, domainArchiveDeployer);
+    }
+
     private void redeployModifiedApplications()
     {
-        for (Application application : applications)
+        Collection redeployableApplications = CollectionUtils.select(applications, new Predicate()
         {
-            if (application.getDescriptor().isRedeploymentEnabled())
+            @Override
+            public boolean evaluate(Object object)
             {
-                if (applicationTimestampListener.isApplicationResourceUpdated(application))
+                return ((Application) object).getDescriptor().isRedeploymentEnabled();
+            }
+        });
+        redeployModifiedArtifacts(redeployableApplications, applicationTimestampListener, applicationArchiveDeployer);
+    }
+
+    private <T extends Artifact> void redeployModifiedArtifacts(Collection<T> artifacts, ArtifactTimestampListener<T> artifactTimestampListener, ArchiveDeployer<T> artifactArchiveDeployer)
+    {
+        for (T artifact : artifacts)
+        {
+            if (artifactTimestampListener.isArtifactResourceUpdated(artifact))
+            {
+                try
                 {
-                    applicationArchiveDeployer.redeploy(application);
+                    artifactArchiveDeployer.redeploy(artifact);
+                }
+                catch (DeploymentException e)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug(e);
+                    }
                 }
             }
         }
@@ -533,14 +575,14 @@ public class DeploymentDirectoryWatcher implements Runnable
         }
     }
 
-    private static class ApplicationTimestampListener implements PropertyChangeListener
+    private static class ArtifactTimestampListener<T extends Artifact> implements PropertyChangeListener
     {
 
-        private Map<String, ApplicationResourcesTimestamp> applicationConfigResourcesTimestaps = new HashMap<String, ApplicationResourcesTimestamp>();
+        private Map<String, ArtifactResourcesTimestamp<T>> artifactConfigResourcesTimestaps = new HashMap<String, ArtifactResourcesTimestamp<T>>();
 
-        public ApplicationTimestampListener(ObservableList<Application> applications)
+        public ArtifactTimestampListener(ObservableList<T> artifacts)
         {
-            applications.addPropertyChangeListener(this);
+            artifacts.addPropertyChangeListener(this);
         }
 
         @Override
@@ -548,40 +590,40 @@ public class DeploymentDirectoryWatcher implements Runnable
         {
             if (event instanceof ElementAddedEvent)
             {
-                Application applicationAdded = (Application) event.getNewValue();
-                applicationConfigResourcesTimestaps.put(applicationAdded.getArtifactName(), new ApplicationResourcesTimestamp(applicationAdded));
+                Artifact artifactAdded = (T) event.getNewValue();
+                artifactConfigResourcesTimestaps.put(artifactAdded.getArtifactName(), new ArtifactResourcesTimestamp<T>(artifactAdded));
             }
             else if (event instanceof ElementRemovedEvent)
             {
-                Application applicationRemoved = (Application) event.getNewValue();
-                applicationConfigResourcesTimestaps.remove(applicationRemoved.getArtifactName());
+                Artifact artifactRemoved = (T) event.getNewValue();
+                artifactConfigResourcesTimestaps.remove(artifactRemoved.getArtifactName());
             }
         }
 
-        public boolean isApplicationResourceUpdated(Application application)
+        public boolean isArtifactResourceUpdated(T artifact)
         {
-            ApplicationResourcesTimestamp applicationResourcesTimestamp = applicationConfigResourcesTimestaps.get(application.getArtifactName());
-            return !applicationResourcesTimestamp.resourcesHaveSameTimestamp(application);
+            ArtifactResourcesTimestamp<T> applicationResourcesTimestamp = artifactConfigResourcesTimestaps.get(artifact.getArtifactName());
+            return !applicationResourcesTimestamp.resourcesHaveSameTimestamp(artifact);
         }
     }
 
-    private static class ApplicationResourcesTimestamp
+    private static class ArtifactResourcesTimestamp<T extends Artifact>
     {
 
         private final Map<String, Long> timestampsPerResource = new HashMap<String, Long>();
 
-        public ApplicationResourcesTimestamp(final Application application)
+        public ArtifactResourcesTimestamp(final Artifact artifact)
         {
-            for (File configResourceFile : application.getResourceFiles())
+            for (File configResourceFile : artifact.getResourceFiles())
             {
                 timestampsPerResource.put(configResourceFile.getAbsolutePath(), configResourceFile.lastModified());
             }
         }
 
-        public boolean resourcesHaveSameTimestamp(final Application application)
+        public boolean resourcesHaveSameTimestamp(final T artifact)
         {
             boolean resourcesHaveSameTimestamp = true;
-            for (File configResourceFile : application.getResourceFiles())
+            for (File configResourceFile : artifact.getResourceFiles())
             {
                 long originalTimestamp = timestampsPerResource.get(configResourceFile.getAbsolutePath());
                 long currentTimestamp = configResourceFile.lastModified();

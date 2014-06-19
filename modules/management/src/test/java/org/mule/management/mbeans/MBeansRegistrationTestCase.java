@@ -8,7 +8,20 @@ package org.mule.management.mbeans;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import org.mule.module.management.agent.JmxAgent;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectInstance;
+
+import org.junit.Test;
+import org.mule.module.management.agent.JmxApplicationAgent;
 import org.mule.module.management.agent.JmxServerNotificationAgent;
 import org.mule.module.management.mbean.ConnectorService;
 import org.mule.module.management.mbean.EndpointService;
@@ -20,17 +33,6 @@ import org.mule.module.management.mbean.MuleService;
 import org.mule.module.management.mbean.StatisticsService;
 import org.mule.module.management.support.JmxSupport;
 import org.mule.tck.junit4.FunctionalTestCase;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
-import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectInstance;
-
-import org.junit.Test;
 
 /**
  * Verify that expected MBeans are registered based on the config.
@@ -52,7 +54,7 @@ public class MBeansRegistrationTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        JmxAgent jmxAgent = (JmxAgent) muleContext.getRegistry().lookupAgent("jmx-agent");
+        JmxApplicationAgent jmxAgent = (JmxApplicationAgent) muleContext.getRegistry().lookupAgent("jmx-agent");
         jmxSupport = jmxAgent.getJmxSupportFactory().getJmxSupport();
         domainName = jmxSupport.getDomainName(muleContext);
         mBeanServer = jmxAgent.getMBeanServer();

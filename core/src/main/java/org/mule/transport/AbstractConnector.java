@@ -1016,7 +1016,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         this.dispatchers.setMaxTotal(20 * maxActive);
     }
 
-    private MessageDispatcher getDispatcher(OutboundEndpoint endpoint) throws MuleException
+    protected MessageDispatcher borrowDispatcher(OutboundEndpoint endpoint) throws MuleException
     {
         if (!isStarted())
         {
@@ -1073,7 +1073,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         }
     }
 
-    private void returnDispatcher(OutboundEndpoint endpoint, MessageDispatcher dispatcher)
+    protected void returnDispatcher(OutboundEndpoint endpoint, MessageDispatcher dispatcher)
     {
         if (endpoint != null && dispatcher != null)
         {
@@ -1442,6 +1442,15 @@ public abstract class AbstractConnector implements Connector, WorkListener
     public ReplyToHandler getReplyToHandler(ImmutableEndpoint endpoint)
     {
         return new DefaultReplyToHandler(endpoint.getMuleContext());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getCanonicalURI(EndpointURI uri)
+    {
+        return uri.toString();
     }
 
     /**
@@ -2401,7 +2410,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer(120);
+        final StringBuilder sb = new StringBuilder(120);
         final String nl = System.getProperty("line.separator");
         sb.append(ClassUtils.getSimpleName(this.getClass()));
         // format message for multi-line output, single-line is not readable
@@ -2613,7 +2622,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
             MessageDispatcher dispatcher = null;
             try
             {
-                dispatcher = getDispatcher(endpoint);
+                dispatcher = borrowDispatcher(endpoint);
                 boolean fireNotification = event.isNotificationsEnabled();
                 EndpointMessageNotification beginNotification = null;
                 if (fireNotification)

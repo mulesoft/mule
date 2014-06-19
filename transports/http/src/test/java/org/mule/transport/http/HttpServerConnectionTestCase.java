@@ -20,6 +20,7 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.size.SmallTest;
 import org.mule.transport.tcp.TcpConnector;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -33,6 +34,7 @@ import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;
 import javax.net.ssl.SSLSocket;
 
+import org.hamcrest.core.IsInstanceOf;
 import org.hamcrest.core.IsNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -84,6 +86,14 @@ public class HttpServerConnectionTestCase extends AbstractMuleContextTestCase
         verify(mockSslSocket, times(1)).addHandshakeCompletedListener(httpServerConnection);
         assertThat(httpServerConnection.getLocalCertificateChain(), is(mockLocalCertificate));
         assertThat(httpServerConnection.getPeerCertificateChain(), is(mockPeerCertificates));
+    }
+
+
+    @Test
+    public void inputStreamIsWrappedWithBufferedInputStream() throws Exception
+    {
+        HttpServerConnection httpServerConnection = new HttpServerConnection(mockSocket, muleContext.getConfiguration().getDefaultEncoding(), mockHttpConnector);
+        assertThat(httpServerConnection.getInputStream(), IsInstanceOf.instanceOf(BufferedInputStream.class));
     }
 
     @Test(expected = IllegalStateException.class)

@@ -6,19 +6,25 @@
  */
 package org.mule.transport.http.functional;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.lifecycle.Callable;
+import org.mule.construct.Flow;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -35,11 +41,25 @@ public class SessionPropertiesWithMessageCollectionTestCase extends FunctionalTe
     }
 
     @Test
-    public void testSessionPropertyAfterSplitterAndAggregator() throws MuleException
+    public void sessionPropertyAfterSplitterAndAggregator() throws MuleException
     {
         final MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/test", TEST_MESSAGE, null);
         assertNotNullAndNotExceptionResponse(response);
+    }
+
+    @Test
+    public void splitterAndAggregatorWithPersistentStore() throws Exception
+    {
+        Flow flow = (Flow) getFlowConstruct("synchronousCollectionAggregatorFlow");
+        List<String> inputData = new ArrayList<String>();
+        int numberOfElements = 10;
+        for (int i = 0; i < numberOfElements; i++)
+        {
+            inputData.add(String.valueOf(i));
+        }
+        MuleEvent responseEvent = flow.process(getTestEvent(inputData));
+        assertThat(responseEvent.<List>getSessionVariable("recordsToUpdate").size(), is(numberOfElements));
     }
 
     private void assertNotNullAndNotExceptionResponse(MuleMessage response)

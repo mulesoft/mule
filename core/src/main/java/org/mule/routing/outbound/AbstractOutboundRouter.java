@@ -262,7 +262,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
 
             if (logger.isDebugEnabled())
             {
-                StringBuffer buf = new StringBuffer();
+                StringBuilder buf = new StringBuilder();
                 buf.append("Setting Correlation info on Outbound router");
                 if (route instanceof OutboundEndpoint)
                 {

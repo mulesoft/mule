@@ -24,7 +24,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.retry.RetryPolicyExhaustedException;
 import org.mule.util.concurrent.ThreadNameHelper;
-import org.mule.util.queue.QueueKey;
+import org.mule.util.queue.objectstore.QueueKey;
 import org.mule.util.store.QueuePersistenceObjectStore;
 
 import java.io.NotSerializableException;
@@ -156,7 +156,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
                 }
                 return null;
             }
-        }, firstTime ? 0 : getUntilSuccessfulConfiguration().getSecondsBetweenRetries(), TimeUnit.SECONDS);
+        }, firstTime ? 0 : getUntilSuccessfulConfiguration().getMillisBetweenRetries(), TimeUnit.MILLISECONDS);
     }
 
     private void incrementProcessAttemptCountAndRescheduleOrRemoveFromStore(final Serializable eventStoreKey) throws Exception
@@ -185,7 +185,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
         }
         catch (final ObjectStoreException ose)
         {
-            logger.error("Failed to increment failure count for event stored with key: " + eventStoreKey);
+            logger.error("Failed to increment failure count for event stored with key: " + eventStoreKey, ose);
         }
     }
 

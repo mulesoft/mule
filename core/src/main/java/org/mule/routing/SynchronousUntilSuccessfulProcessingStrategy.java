@@ -47,7 +47,7 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
                     lastExecutionException = e;
                     if (i < getUntilSuccessfulConfiguration().getMaxRetries())
                     {
-                        Thread.sleep(getUntilSuccessfulConfiguration().getSecondsBetweenRetries());
+                        Thread.sleep(getUntilSuccessfulConfiguration().getMillisBetweenRetries());
                     }
                 }
             }

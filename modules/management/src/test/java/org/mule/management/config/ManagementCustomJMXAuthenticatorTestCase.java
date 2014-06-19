@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.agent.Agent;
 import org.mule.module.management.agent.ConfigurableJMXAuthenticator;
-import org.mule.module.management.agent.JmxAgent;
+import org.mule.module.management.agent.JmxApplicationAgent;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Map;
@@ -33,8 +33,8 @@ public class ManagementCustomJMXAuthenticatorTestCase extends FunctionalTestCase
     {
         Agent agent = muleContext.getRegistry().lookupAgent("jmx-agent");
         assertNotNull(agent);
-        assertEquals(JmxAgent.class, agent.getClass());
-        JmxAgent jmxAgent = (JmxAgent) agent;
+        assertEquals(JmxApplicationAgent.class, agent.getClass());
+        JmxApplicationAgent jmxAgent = (JmxApplicationAgent) agent;
         assertEquals(CustomJMXAuthenticator.class, jmxAgent.getJmxAuthenticator().getClass());
     }
 

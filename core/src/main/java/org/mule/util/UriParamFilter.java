@@ -25,7 +25,7 @@ public class UriParamFilter
         }
         String query = uri.substring(i + 1);
         String base = uri.substring(0, i + 1);
-        StringBuffer newQuery = new StringBuffer();
+        StringBuilder newQuery = new StringBuilder();
 
         TreeMap<String, String> p = getPropertiesFromQueryString(query);
         for (Map.Entry<String, String> entry : p.entrySet())
@@ -52,7 +52,7 @@ public class UriParamFilter
             return props;
         }
 
-        query = new StringBuffer(query.length() + 1).append('&').append(query).toString();
+        query = new StringBuilder(query.length() + 1).append('&').append(query).toString();
 
         int x = 0;
         while ((x = addProperty(query, x, '&', props)) != -1);

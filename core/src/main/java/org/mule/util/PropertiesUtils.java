@@ -272,7 +272,7 @@ public final class PropertiesUtils
             return props;
         }
 
-        query = new StringBuffer(query.length() + 1).append('&').append(query).toString();
+        query = new StringBuilder(query.length() + 1).append('&').append(query).toString();
 
         int x = 0;
         while ((x = addProperty(query, x, '&', props)) != -1);
@@ -289,7 +289,7 @@ public final class PropertiesUtils
             return props;
         }
 
-        query = new StringBuffer(query.length() + 1).append(separator).append(query).toString();
+        query = new StringBuilder(query.length() + 1).append(separator).append(query).toString();
 
         int x = 0;
         while ((x = addProperty(query, x, separator, props)) != -1)

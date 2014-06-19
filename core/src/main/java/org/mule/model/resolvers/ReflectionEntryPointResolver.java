@@ -173,7 +173,7 @@ public class ReflectionEntryPointResolver extends AbstractEntryPointResolver
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         sb.append("ReflectionEntryPointResolver");
         sb.append("{ignoredMethods=").append(StringMessageUtils.toString(ignoredMethods));
         sb.append(", acceptVoidMethods=").append(isAcceptVoidMethods());

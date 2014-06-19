@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <db:template-query name="parameterizedQuery">
+        <db:parameterized-query>
+            SELECT FROM PLANET WHERE ID = :id
+        </db:parameterized-query>
+
+            <!-- Uses a placeholder expression that will be replaced before parsing the XML -->
+        <db:in-param name="id" defaultValue="1" type="${typeName}"/>
+    </db:template-query>
+</mule>

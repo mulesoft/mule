@@ -7,13 +7,12 @@
 
 package org.mule.security.oauth;
 
+import static org.mule.api.store.ObjectStoreManager.UNBOUNDED;
+
 import org.mule.api.MuleContext;
-import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.registry.RegistrationException;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreManager;
-import org.mule.config.i18n.MessageFactory;
 
 import java.util.concurrent.locks.Lock;
 
@@ -28,17 +27,16 @@ import org.apache.commons.lang.StringUtils;
 public class DefaultRefreshTokenManager implements MuleContextAware, RefreshTokenManager
 {
 
-    private static final int DEFAULT_EXPIRATION = 60 * 1000;
-
     private ObjectStore<Boolean> refreshedTokens;
     private MuleContext muleContext;
+    private int minRefreshInterval = DEFAULT_MIN_REFRESH_INTERVAL;
 
     /**
      * {@inheritDoc} This implementation uses a lock to guarantee that no refresh
      * token is consumed more than once
-     * 
+     *
      * @see org.mule.security.oauth.RefreshTokenManager#refreshToken(org.mule.security.oauth.OAuth2Adapter,
-     *      java.lang.String)
+     * java.lang.String)
      */
     @Override
     public void refreshToken(OAuth2Adapter adapter, String accessTokenId) throws Exception
@@ -48,15 +46,15 @@ public class DefaultRefreshTokenManager implements MuleContextAware, RefreshToke
             throw new IllegalArgumentException("Cannot refresh a blank accessTokenId");
         }
 
-        Lock lock = this.muleContext.getLockFactory().createLock(
-            String.format("%s:%s", this.getClass().getCanonicalName(), accessTokenId));
+        String id = String.format("%s:%s:%s", this.getClass().getCanonicalName(), adapter.getName(), accessTokenId);
+        Lock lock = this.muleContext.getLockFactory().createLock(id);
         lock.lock();
         try
         {
-            if (!this.getRefreshedTokens().contains(accessTokenId))
+            if (!this.getRefreshedTokens().contains(id))
             {
                 adapter.refreshAccessToken(accessTokenId);
-                this.getRefreshedTokens().store(accessTokenId, true);
+                this.getRefreshedTokens().store(id, true);
             }
         }
         finally
@@ -66,22 +64,13 @@ public class DefaultRefreshTokenManager implements MuleContextAware, RefreshToke
 
     }
 
-    private ObjectStore<Boolean> getRefreshedTokens()
+    private synchronized ObjectStore<Boolean> getRefreshedTokens()
     {
         if (this.refreshedTokens == null)
         {
-            try
-            {
-                ObjectStoreManager osManager = this.muleContext.getRegistry().lookupObject(
-                    ObjectStoreManager.class);
-                this.refreshedTokens = osManager.getObjectStore("RefreshTokenStore", false, 0,
-                    DEFAULT_EXPIRATION, DEFAULT_EXPIRATION);
-            }
-            catch (RegistrationException e)
-            {
-                throw new MuleRuntimeException(
-                    MessageFactory.createStaticMessage("Could not obtain ObjectStoreManager"), e);
-            }
+            ObjectStoreManager osManager = this.muleContext.getObjectStoreManager();
+            this.refreshedTokens = osManager.getObjectStore("RefreshTokenStore", false, UNBOUNDED,
+                                                            this.minRefreshInterval, this.minRefreshInterval);
         }
         return this.refreshedTokens;
     }
@@ -90,5 +79,11 @@ public class DefaultRefreshTokenManager implements MuleContextAware, RefreshToke
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
+    }
+
+    @Override
+    public void setMinRefreshIntervalInMillis(int minRefreshIntervalInMillis)
+    {
+        this.minRefreshInterval = minRefreshIntervalInMillis;
     }
 }

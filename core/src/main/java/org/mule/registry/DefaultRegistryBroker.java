@@ -9,14 +9,14 @@ package org.mule.registry;
 import org.mule.api.MuleContext;
 import org.mule.api.registry.Registry;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DefaultRegistryBroker extends AbstractRegistryBroker
 {
     private TransientRegistry transientRegistry;
-    private List<Registry> registries = new ArrayList<Registry>();
+    private List<Registry> registries = new CopyOnWriteArrayList<Registry>();
 
     public DefaultRegistryBroker(MuleContext context)
     {

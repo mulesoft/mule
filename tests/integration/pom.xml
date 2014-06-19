@@ -13,7 +13,9 @@
 	<packaging>jar</packaging>
 
     <properties>
+        <skipExportTests>false</skipExportTests>
         <licensePath>../../LICENSE_HEADER.txt</licensePath>
+        <skipTests>${skipIntegrationTests}</skipTests>
     </properties>
 
 	<build>
@@ -22,20 +24,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>-Xms256m -Xmx512m -XX:MaxPermSize=128m</argLine>
+                    <argLine>-Xmx512m -XX:MaxPermSize=128m</argLine>
                 </configuration>
             </plugin>
-            <plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>test-jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 	</build>
 
@@ -86,7 +77,6 @@
 			<type>pom</type>
 			<scope>test</scope>
 		</dependency>
-
 		<!-- Test jars -->
 		<!-- some tests reference cxf test classes -->
 		<dependency>
@@ -144,7 +134,6 @@
 			<artifactId>activemq-core</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 		<!--Database Drivers -->
 		<dependency>
 			<groupId>org.apache.derby</groupId>
@@ -214,5 +203,10 @@
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-infrastructure</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 	</dependencies>
 </project>

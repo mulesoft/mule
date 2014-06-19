@@ -90,7 +90,7 @@ public abstract class AbstractResourceConfigurationBuilder extends AbstractConfi
 
     protected String createConfigResourcesString()
     {
-        StringBuffer configResourcesString = new StringBuffer();
+        StringBuilder configResourcesString = new StringBuilder();
         configResourcesString.append("[");
         for (int i = 0; i < configResources.length; i++)
         {

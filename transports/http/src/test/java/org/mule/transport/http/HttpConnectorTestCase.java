@@ -7,15 +7,22 @@
 package org.mule.transport.http;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.NoReceiverForEndpointException;
+import org.mule.tck.MuleTestUtils.TestCallback;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transport.AbstractConnectorTestCase;
 import org.mule.transport.tcp.TcpConnector;
@@ -215,6 +222,110 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
             {
             }
         }
+    }
+    
+    @Test
+    public void tcpNoDelayDefault() throws Exception
+    {
+        assertFalse(((TcpConnector) getConnector()).isSendTcpNoDelay());
+    }
+    
+    @Test
+    public void tcpNoDelayDefaultSystemPropertyTrue() throws Exception
+    {
+        testWithSystemProperty(TcpConnector.SEND_TCP_NO_DELAY_SYSTEM_PROPERTY, "true", new TestCallback()
+        {
+            @Override
+            public void run() throws Exception
+            {
+                assertTrue(((HttpConnector) createConnector()).isSendTcpNoDelay());
+
+            }
+        });
+    }
+
+    @Test
+    public void tcpNoDelayDefaultSystemPropertyFalse() throws Exception
+    {
+        testWithSystemProperty(TcpConnector.SEND_TCP_NO_DELAY_SYSTEM_PROPERTY, "false", new TestCallback()
+        {
+            @Override
+            public void run() throws Exception
+            {
+                assertFalse(((HttpConnector) createConnector()).isSendTcpNoDelay());
+
+            }
+        });
+    }
+    
+    @Test
+    public void tcpNoDelayHttpClientConnectionManagerConfiguration() throws Exception
+    {
+        HttpConnector httpConnector = (HttpConnector) createConnector();
+        httpConnector.initialise();
+        assertFalse(httpConnector.clientConnectionManager.getParams().getTcpNoDelay());
+
+        httpConnector = (HttpConnector) createConnector();
+        httpConnector.setSendTcpNoDelay(true);
+        httpConnector.initialise();
+        assertTrue(httpConnector.clientConnectionManager.getParams().getTcpNoDelay());
+    }
+    
+    @Test
+    public void httpClientDisableStaleConnectionDefault() throws Exception
+    {
+        assertHttpClientStaleConnectionCheck(getInitialisedHttpConnector(), true);
+    }
+
+    @Test
+    public void httpClientDisableStaleConnectionSystemProperty() throws Exception
+    {
+        testWithSystemProperty(HttpConnector.DISABLE_STALE_CONNECTION_CHECK_SYSTEM_PROPERTY, "true",
+            new TestCallback()
+            {
+                @Override
+                public void run() throws Exception
+                {
+                    assertHttpClientStaleConnectionCheck(getInitialisedHttpConnector(), false);
+                }
+            });
+    }
+
+    protected HttpConnector getInitialisedHttpConnector() throws Exception, InitialisationException
+    {
+        HttpConnector httpConnector = (HttpConnector) createConnector();
+        httpConnector.initialise();
+        return httpConnector;
+    }
+
+    protected void assertHttpClientStaleConnectionCheck(HttpConnector connector, boolean enabled)
+        throws Exception, InitialisationException
+    {
+        assertEquals(enabled, connector.clientConnectionManager.getParams().isStaleCheckingEnabled());
+    }
+
+    public void singleDispatcherPerEndpointSyetemProperty() throws Exception
+    {
+        testWithSystemProperty(HttpConnector.SINGLE_DISPATCHER_PER_ENDPOINT_SYSTEM_PROPERTY, "true",
+            new TestCallback()
+            {
+
+                @Override
+                public void run() throws Exception
+                {
+                    HttpConnector httpConnector = (HttpConnector) createConnector();
+                    httpConnector.initialise();
+
+                    OutboundEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(
+                        "http://localhost:8080");
+                    httpConnector.createDispatcherMessageProcessor(endpoint);
+
+                    assertNotNull(httpConnector.borrowDispatcher(endpoint));
+                    assertEquals(httpConnector.borrowDispatcher(endpoint),
+                        httpConnector.borrowDispatcher(endpoint));
+                    assertEquals(0, httpConnector.getDispatchers().getNumIdle());
+                }
+            });
     }
 
 }

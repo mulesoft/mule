@@ -315,7 +315,10 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
     @Override
     public ThreadSafeAccess newThreadCopy()
     {
-        checkValidPayload();
+        if (invalidatedPayload)
+        {
+            return super.newThreadCopy();
+        }
         return new DefaultMessageCollection(this, muleContext, true);
     }
 

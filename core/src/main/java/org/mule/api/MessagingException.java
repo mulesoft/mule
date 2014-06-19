@@ -131,7 +131,7 @@ public class MessagingException extends MuleException
 
     private String generateMessage(Message message)
     {
-        StringBuffer buf = new StringBuffer(80);
+        StringBuilder buf = new StringBuilder(80);
 
         if (message != null)
         {

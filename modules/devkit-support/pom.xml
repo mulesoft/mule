@@ -16,6 +16,7 @@
     </description>
 
     <properties>
+        <skipExportTests>false</skipExportTests>
         <licensePath>../../LICENSE_HEADER.txt</licensePath>
     </properties>
 
@@ -43,6 +44,13 @@
 			<artifactId>signpost-core</artifactId>
 			<version>1.2.1.2</version>
 		</dependency>
+
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
 		<dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

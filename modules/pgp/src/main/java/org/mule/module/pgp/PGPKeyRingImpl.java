@@ -24,6 +24,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.pgp.i18n.PGPMessages;
 import org.mule.util.IOUtils;
+import org.mule.util.SecurityUtils;
 
 public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
 {
@@ -45,7 +46,10 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
     {
         try
         {
-            java.security.Security.addProvider(new BouncyCastleProvider());
+            if (!SecurityUtils.isFipsSecurityModel())
+            {
+                java.security.Security.addProvider(new BouncyCastleProvider());
+            }
 
             principalsKeyBundleMap = new HashMap<String, PGPPublicKey>();
 
@@ -91,7 +95,7 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
         
         if (secretKey == null)
         {
-            StringBuffer message = new StringBuffer();
+            StringBuilder message = new StringBuilder();
             message.append('\n');
             Iterator iterator = collection.getKeyRings();
             while (iterator.hasNext())

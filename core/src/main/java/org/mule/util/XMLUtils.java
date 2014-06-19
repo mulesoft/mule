@@ -20,7 +20,7 @@ public class XMLUtils
 
     public static String elementToString(Element e)
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append(e.getTagName()).append("{");
         for (int i = 0; i < e.getAttributes().getLength(); i++)
         {

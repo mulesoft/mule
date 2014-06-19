@@ -14,8 +14,8 @@
 
     <jms:activemq-connector name="jmsConnector" specification="1.1" brokerURL="vm://localhost"/>
 
-    <ws:consumer-config serviceAddress="jms://serverQueue?exchangePattern=request-response" wsdlLocation="Echo.wsdl"
-                        service="EchoService" port="EchoPort" name="globalConfig" />
+    <ws:consumer-config serviceAddress="jms://serverQueue?exchangePattern=request-response" wsdlLocation="Test.wsdl"
+                        service="TestService" port="TestPort" name="globalConfig" />
 
     <flow name="client">
         <inbound-endpoint address="vm://in" exchange-pattern="request-response" />
@@ -26,9 +26,9 @@
 
     <flow name="server">
         <inbound-endpoint address="jms://serverQueue" exchange-pattern="request-response">
-            <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.Echo"/>
+            <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService"/>
          </inbound-endpoint>
-        <component class="org.mule.module.ws.consumer.Echo" />
+        <component class="org.mule.module.ws.consumer.TestService" />
     </flow>
 
 </mule>

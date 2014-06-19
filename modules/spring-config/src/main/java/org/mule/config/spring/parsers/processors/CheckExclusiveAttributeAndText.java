@@ -55,7 +55,7 @@ public class CheckExclusiveAttributeAndText implements PreProcessor
 
         if (found && !element.getTextContent().isEmpty())
         {
-            StringBuffer message = new StringBuffer("The attribute '");
+            StringBuilder message = new StringBuilder("The attribute '");
             message.append(attribute);
             message.append("' cannot be used with text content");
             message.append(" in element ");

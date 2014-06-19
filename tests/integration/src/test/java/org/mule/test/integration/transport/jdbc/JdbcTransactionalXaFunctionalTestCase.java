@@ -15,8 +15,9 @@ import javax.sql.DataSource;
 import javax.transaction.TransactionManager;
 
 import org.enhydra.jdbc.standard.StandardXADataSource;
+import org.junit.Ignore;
 
-
+@Ignore
 public class JdbcTransactionalXaFunctionalTestCase extends AbstractJdbcTransactionalFunctionalTestCase
 {
     private TransactionManager txManager;

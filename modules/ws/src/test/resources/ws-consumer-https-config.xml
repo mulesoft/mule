@@ -30,9 +30,9 @@
 
     <flow name="server">
         <inbound-endpoint address="https://localhost:${port}/services/Echo" exchange-pattern="request-response">
-            <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.Echo"/>
+            <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService"/>
         </inbound-endpoint>
-        <component class="org.mule.module.ws.consumer.Echo"/>
+        <component class="org.mule.module.ws.consumer.TestService"/>
     </flow>
 
 </mule>

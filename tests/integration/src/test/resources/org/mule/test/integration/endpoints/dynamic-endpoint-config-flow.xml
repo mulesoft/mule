@@ -13,11 +13,11 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
 
-    <http:endpoint name="out" address="http://localhost:62345/testPath" exchange-pattern="request-response"/>
+    <http:endpoint name="out" address="http://localhost:${port1}/testPath" exchange-pattern="request-response"/>
 
     <flow name="service1A">
         <vm:inbound-endpoint path="in1" exchange-pattern="request-response"/>
-        <outbound-endpoint address="http://localhost:62345/#[header:INBOUND:testProp]"
+        <outbound-endpoint address="http://localhost:${port1}/#[header:INBOUND:testProp]"
             exchange-pattern="request-response"/>
     </flow>
 
@@ -29,19 +29,19 @@
     <flow name="service1C">
         <vm:inbound-endpoint path="in3" exchange-pattern="request-response"/>
         <message-properties-transformer scope="invocation">
-            <add-message-property key="testPort" value="62346"/>
+            <add-message-property key="testPort" value="${port2}"/>
         </message-properties-transformer>
         <http:outbound-endpoint host="localhost" port="#[header:INVOCATION:testPort]" path="xxx#[header:INBOUND:testProp]"
             exchange-pattern="request-response"/>
     </flow>
 
     <flow name="service2">
-        <http:inbound-endpoint host="localhost" port="62345" path="testPath"/>
+        <http:inbound-endpoint host="localhost" port="${port1}" path="testPath"/>
         <test:component appendString=" Received" logMessageDetails="true"/>
     </flow>
 
     <flow name="service3">
-        <http:inbound-endpoint host="localhost" port="62346" path="xxxtestPath"/>
+        <http:inbound-endpoint host="localhost" port="${port2}" path="xxxtestPath"/>
         <test:component appendString=" Also Received" logMessageDetails="true"/>
     </flow>
 

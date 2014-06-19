@@ -24,7 +24,7 @@ public class AxisFaultExceptionReader implements ExceptionReader
     {
         AxisFault e = (AxisFault)t;
         Map<?, ?> props = getInfo(e);
-        StringBuffer msg = new StringBuffer(64);
+        StringBuilder msg = new StringBuilder(64);
         msg.append("(");
         for (Map.Entry<?, ?> entry : props.entrySet())
         {

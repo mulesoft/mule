@@ -10,12 +10,15 @@ import static org.junit.Assert.fail;
 
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.component.Component;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.RegistrationException;
+import org.mule.api.schedule.Scheduler;
+import org.mule.api.schedule.Schedulers;
 import org.mule.api.service.Service;
 import org.mule.component.AbstractJavaComponent;
 import org.mule.config.i18n.MessageFactory;
@@ -23,12 +26,14 @@ import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.construct.AbstractPipeline;
 import org.mule.construct.Flow;
 import org.mule.construct.SimpleService;
+import org.mule.processor.chain.SubflowInterceptingChainLifecycleWrapper;
 import org.mule.tck.functional.FlowAssert;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -244,7 +249,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
      * @return the resulting <code>MuleEvent</code>
      * @throws Exception
      */
-    protected <T> MuleEvent runFlow(String flowName) throws Exception
+    protected MuleEvent runFlow(String flowName) throws Exception
     {
         return this.runFlow(flowName, null);
     }
@@ -303,7 +308,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
      */
     protected <T, U> void runFlowWithPayloadAndExpect(String flowName, T expect, U payload) throws Exception
     {
-        Assert.assertEquals(expect, this.runFlow(flowName).getMessage().getPayload());
+        Assert.assertEquals(expect, this.runFlow(flowName, payload).getMessage().getPayload());
     }
 
     /**
@@ -320,6 +325,30 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     public final void clearFlowAssertions() throws Exception
     {
         FlowAssert.reset();
+    }
+
+    protected void stopFlowSchedulers(String flowName) throws MuleException
+    {
+        final Collection<Scheduler> schedulers = muleContext.getRegistry().lookupScheduler(Schedulers.flowConstructPollingSchedulers(flowName));
+        for (final Scheduler scheduler : schedulers)
+        {
+            scheduler.stop();
+        }
+    }
+
+    protected SubflowInterceptingChainLifecycleWrapper getSubFlow(String subflowName)
+    {
+        return (SubflowInterceptingChainLifecycleWrapper) muleContext.getRegistry().lookupObject(subflowName);
+    }
+
+    protected void runSchedulersOnce(String flowConstructName) throws Exception
+    {
+        final Collection<Scheduler> schedulers = muleContext.getRegistry().lookupScheduler(Schedulers.flowConstructPollingSchedulers(flowConstructName));
+
+        for (final Scheduler scheduler : schedulers)
+        {
+            scheduler.schedule();
+        }
     }
 
 }

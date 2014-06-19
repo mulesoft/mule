@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:ws="http://www.mulesoft.org/schema/mule/ws"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd">
+
+    <flow name="server">
+        <inbound-endpoint address="http://localhost:${port}/services/TestAttachments" exchange-pattern="request-response">
+            <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestAttachments" mtomEnabled="true"/>
+        </inbound-endpoint>
+        <component class="org.mule.module.ws.consumer.TestAttachments"/>
+    </flow>
+
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/TestAttachments" wsdlLocation="TestAttachments.wsdl"
+                        service="TestAttachmentsService" port="TestAttachmentsPort" name="globalConfig"/>
+
+    <flow name="clientUploadAttachment" processingStrategy="synchronous">
+        <ws:consumer operation="uploadAttachment" mtomEnabled="true" config-ref="globalConfig"/>
+    </flow>
+
+    <flow name="clientDownloadAttachment" processingStrategy="synchronous">
+        <ws:consumer operation="downloadAttachment" mtomEnabled="true" config-ref="globalConfig"/>
+    </flow>
+
+    <flow name="clientEchoAttachment" processingStrategy="synchronous">
+        <ws:consumer operation="echoAttachment" mtomEnabled="true" config-ref="globalConfig"/>
+    </flow>
+
+</mule>

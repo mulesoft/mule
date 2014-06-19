@@ -96,7 +96,7 @@ public class TextFileObjectStore extends InMemoryObjectStore<String>
                 output = new FileOutputStream(fileStore, true);
             }
 
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             buf.append(id).append("=").append(item).append(IOUtils.LINE_SEPARATOR);
             output.write(buf.toString().getBytes());
         }

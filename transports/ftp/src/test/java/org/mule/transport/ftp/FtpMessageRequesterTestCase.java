@@ -9,14 +9,23 @@ package org.mule.transport.ftp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.api.transport.ReceiveException;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 public class FtpMessageRequesterTestCase extends AbstractFtpServerTestCase
 {
-
+    private static final String TEST_FILE_NAME = "test.txt";
+    private static final String TEST_FILE_NAME_2 = "_test.txt";
     @Override
     protected String getConfigFile()
     {
@@ -26,7 +35,7 @@ public class FtpMessageRequesterTestCase extends AbstractFtpServerTestCase
     @Test
     public void testMessageRequester() throws Exception
     {
-        createFileOnFtpServer("test.txt");
+        createFileOnFtpServer(TEST_FILE_NAME);
 
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.request(getMuleFtpEndpoint(), getTimeout());
@@ -36,5 +45,59 @@ public class FtpMessageRequesterTestCase extends AbstractFtpServerTestCase
         // verify that the file was deleted
         MuleMessage message2 = client.request(getMuleFtpEndpoint(), getTimeout());
         assertNull(message2);
+    }
+
+    @Test
+    public void testMessageRequesterForSingleFile() throws Exception
+    {
+        createFileOnFtpServer(TEST_FILE_NAME);
+        
+        MuleClient client = muleContext.getClient();
+        MuleMessage message = client.request(getMuleFtpEndpoint() + File.separator + TEST_FILE_NAME, getTimeout());
+        assertNotNull(message);
+        assertEquals(TEST_MESSAGE, message.getPayloadAsString());
+        assertEquals(TEST_FILE_NAME, message.getInboundProperty("originalFilename"));
+
+        // verify that the file was deleted
+        MuleMessage message2 = client.request(getMuleFtpEndpoint(), getTimeout());
+        assertNull(message2);
+    }
+
+    @Test
+    public void testMessageRequesterForSingleFileAmongMultipleFiles() throws Exception
+    {
+        createFileOnFtpServer(TEST_FILE_NAME);
+        createFileOnFtpServer(TEST_FILE_NAME_2);
+        
+        MuleClient client = muleContext.getClient();
+        MuleMessage message = client.request(getMuleFtpEndpoint() + File.separator + TEST_FILE_NAME, getTimeout());
+        assertNotNull(message);
+        assertEquals(TEST_MESSAGE, message.getPayloadAsString());
+        assertEquals(TEST_FILE_NAME, message.getInboundProperty("originalFilename"));
+        
+        // retrieve file 2
+        MuleMessage message2 = client.request(getMuleFtpEndpoint() + File.separator + TEST_FILE_NAME_2, getTimeout());
+        assertNotNull(message2);
+        assertEquals(TEST_MESSAGE, message2.getPayloadAsString());
+        assertEquals(TEST_FILE_NAME_2, message2.getInboundProperty("originalFilename"));
+        
+        // verify that all the files were deleted
+        MuleMessage message3 = client.request(getMuleFtpEndpoint(), getTimeout());
+        assertNull(message3);
+        
+    }
+    @Test
+    public void testMessageRequesterForSingleFileThatDoesNotExist() throws Exception
+    {
+        createFileOnFtpServer(TEST_FILE_NAME);
+        
+        MuleClient client = muleContext.getClient();
+        try{
+            
+            MuleMessage message = client.request(getMuleFtpEndpoint() + File.separator + TEST_FILE_NAME_2, getTimeout());
+        } catch(Exception e){
+            Assert.assertTrue(e instanceof ReceiveException);
+        }
+        
     }
 }

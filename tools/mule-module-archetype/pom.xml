@@ -10,7 +10,6 @@
     <name>Mule Module Archetype</name>
     <!-- Do not specify group here, otherwise deployment will break -->
     <artifactId>mule-module-archetype</artifactId>
-    <version>4.0-SNAPSHOT</version>
     <description>An architype for creating a Mule Module. It provides options for adding certain mule features and configuring the
     module for Muleforge.
     </description>

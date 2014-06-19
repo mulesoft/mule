@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <flow name="bulkUpdateCustomSource">
+        <inbound-endpoint address="vm://bulkUpdateCustomSource" exchange-pattern="request-response"/>
+
+        <set-variable variableName="bulkQuery" value="update PLANET set NAME='Mercury' where POSITION=0;&#10;update PLANET set NAME='Mercury' where POSITION=4"/>
+
+        <db:bulk-execute config-ref="dbConfig" source="#[bulkQuery]">
+            #[payload]
+        </db:bulk-execute>
+    </flow>
+</mule>

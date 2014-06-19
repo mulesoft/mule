@@ -118,7 +118,7 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
                     return;
                 }
 
-                StringBuffer fullBuffer = new StringBuffer(bufferSize);
+                StringBuilder fullBuffer = new StringBuilder(bufferSize);
                 while (len > 0)
                 {
                     fullBuffer.append(new String(inputBuffer, 0, len));

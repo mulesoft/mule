@@ -7,7 +7,6 @@
 package org.mule.module.launcher.application;
 
 import static org.mule.util.SplashScreen.miniSplash;
-
 import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -23,6 +22,7 @@ import org.mule.module.launcher.DeploymentInitException;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentStartException;
 import org.mule.module.launcher.DeploymentStopException;
+import org.mule.module.launcher.DisposableClassLoader;
 import org.mule.module.launcher.InstallException;
 import org.mule.module.launcher.MuleDeploymentService;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
@@ -33,9 +33,7 @@ import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
 
-import java.io.Closeable;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -99,6 +97,12 @@ public class DefaultMuleApplication implements Application
     public ApplicationDescriptor getDescriptor()
     {
         return descriptor;
+    }
+
+    @Override
+    public Domain getDomain()
+    {
+        return domain;
     }
 
     public void setAppName(String appName)
@@ -233,17 +237,9 @@ public class DefaultMuleApplication implements Application
             if (appCl != null)
             {
                 // close classloader to release jar connections in lieu of Java 7's ClassLoader.close()
-                if (appCl instanceof Closeable)
+                if (appCl instanceof DisposableClassLoader)
                 {
-                    Closeable classLoader = (Closeable) appCl;
-                    try
-                    {
-                        classLoader.close();
-                    }
-                    catch (IOException e)
-                    {
-                        // Ignore
-                    }
+                    ((DisposableClassLoader) appCl).dispose();
                 }
             }
         }

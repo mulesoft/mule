@@ -28,7 +28,7 @@ public class AttributeConcatenation implements PreProcessor
 
     public void preProcess(PropertyConfiguration config, Element element)
     {
-        StringBuffer concat = new StringBuffer();
+        StringBuilder concat = new StringBuilder();
         boolean first = true;
         for (int i = 0; i < sources.length; ++i)
         {

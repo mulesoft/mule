@@ -36,8 +36,6 @@ public class VMConnector extends AbstractConnector
     public static final String VM = "vm";
     private QueueProfile queueProfile;
     private Integer queueTimeout;
-    /** The queue manager to use for vm queues only */
-    private QueueManager queueManager;
 
     public VMConnector(MuleContext context)
     {
@@ -50,10 +48,6 @@ public class VMConnector extends AbstractConnector
         if (queueTimeout == null)
         {
             queueTimeout = muleContext.getConfiguration().getDefaultQueueTimeout();
-        }
-        if (queueManager == null)
-        {
-            queueManager = getMuleContext().getQueueManager();
         }
         if (queueProfile == null)
         {
@@ -101,7 +95,7 @@ public class VMConnector extends AbstractConnector
     {
         if (!endpoint.getExchangePattern().hasResponse())
         {
-            queueProfile.configureQueue(endpoint.getMuleContext(), endpoint.getEndpointURI().getAddress(), queueManager);
+            queueProfile.configureQueue(endpoint.getMuleContext(), endpoint.getEndpointURI().getAddress(), getQueueManager());
         }
         return serviceDescriptor.createMessageReceiver(this, flowConstruct, endpoint);
     }
@@ -109,6 +103,26 @@ public class VMConnector extends AbstractConnector
     public String getProtocol()
     {
         return "VM";
+    }
+
+    /**
+     * This implementation returns the default canonical representation
+     * with an added query param specifying the connector name
+     *
+     * @param uri a not null {@link org.mule.api.endpoint.EndpointURI}
+     * @return the canonical representation of the given uri as a {@link java.lang.String}
+     */
+    @Override
+    public String getCanonicalURI(EndpointURI uri)
+    {
+        String canonicalURI = super.getCanonicalURI(uri);
+
+        if (!canonicalURI.contains("?connector="))
+        {
+            canonicalURI = String.format("%s?connector=%s", canonicalURI, getName());
+        }
+
+        return canonicalURI;
     }
 
     public QueueProfile getQueueProfile()
@@ -128,7 +142,7 @@ public class VMConnector extends AbstractConnector
 
     QueueSession getQueueSession() throws InitialisationException
     {
-        return queueManager.getQueueSession();
+        return getQueueManager().getQueueSession();
     }
 
     protected MessageReceiver getReceiverByEndpoint(EndpointURI endpointUri) throws EndpointException
@@ -195,7 +209,7 @@ public class VMConnector extends AbstractConnector
 
     public QueueManager getQueueManager()
     {
-        return queueManager;
+        return getMuleContext().getQueueManager();
     }
 
     @Override

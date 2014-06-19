@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <flow name="deleteMetadataNoParams">
+        <inbound-endpoint address="vm://deleteMetadataNoParams" exchange-pattern="request-response"/>
+
+        <db:delete config-ref="dbConfig">
+            <db:parameterized-query>DELETE FROM PLANET WHERE position = 1 and name = 'Mars'</db:parameterized-query>
+        </db:delete>
+    </flow>
+
+    <flow name="deleteMetadataNotSupportedValueParams">
+        <inbound-endpoint address="vm://deleteMetadataNotSupportedValueParams" exchange-pattern="request-response"/>
+
+        <db:delete config-ref="dbConfig">
+            <db:parameterized-query>DELETE FROM PLANET WHERE position = #[payload.position] and name =
+                #[header:OUTBOUND:name]
+            </db:parameterized-query>
+        </db:delete>
+    </flow>
+
+    <flow name="deleteMetadataBeanParams">
+        <inbound-endpoint address="vm://deleteMetadataBeanParams" exchange-pattern="request-response"/>
+
+        <db:delete config-ref="dbConfig">
+            <db:parameterized-query>DELETE FROM PLANET WHERE position = #[payload.position] and name = #[payload.name]
+            </db:parameterized-query>
+        </db:delete>
+    </flow>
+
+    <flow name="deleteMetadataMapParams">
+        <inbound-endpoint address="vm://deleteMetadataMapParams" exchange-pattern="request-response"/>
+
+        <db:delete config-ref="dbConfig">
+            <db:parameterized-query>DELETE FROM PLANET WHERE position = #[payload['position']] and name =
+                #[payload['name']]
+            </db:parameterized-query>
+        </db:delete>
+    </flow>
+</mule>

@@ -9,6 +9,8 @@ package org.mule.context.notification;
 import static org.junit.Assert.fail;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.probe.JUnitProbe;
+import org.mule.tck.probe.PollingProber;
 
 import java.util.Iterator;
 
@@ -32,11 +34,28 @@ public abstract class AbstractNotificationTestCase extends FunctionalTestCase
         muleContext.dispose();
         // allow shutdown to complete (or get concurrent mod errors and/or miss
         // notifications)
-        Thread.sleep(2000L);
-        logNotifications();
-        RestrictedNode spec = getSpecification();
-        validateSpecification(spec);
-        assertExpectedNotifications(spec);
+
+        PollingProber prober = new PollingProber(30000, 2000);
+        prober.check(new JUnitProbe()
+        {
+
+            @Override
+            protected boolean test() throws Exception
+            {
+                logNotifications();
+                RestrictedNode spec = getSpecification();
+                validateSpecification(spec);
+                assertExpectedNotifications(spec);
+
+                return true;
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "expected notifications not matched";
+            }
+        });
     }
 
     public abstract void doTest() throws Exception;

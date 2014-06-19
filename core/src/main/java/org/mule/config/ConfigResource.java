@@ -100,7 +100,7 @@ public class ConfigResource
 
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         sb.append("ConfigResource");
         sb.append("{resourceName='").append(resourceName).append('\'');
         sb.append('}');

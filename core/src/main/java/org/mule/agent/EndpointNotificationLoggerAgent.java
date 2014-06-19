@@ -113,7 +113,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
     @Override
     public String getDescription()
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append(getName()).append(": ");
         if (endpoint != null)
         {

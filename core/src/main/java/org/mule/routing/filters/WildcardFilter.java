@@ -53,7 +53,7 @@ public class WildcardFilter implements Filter, ObjectFilter
         }
         catch (Exception e)
         {
-            logger.warn("An exception occured while filtering", e);
+            logger.warn("An exception occurred while filtering", e);
             return false;
         }
     }
@@ -118,29 +118,38 @@ public class WildcardFilter implements Filter, ObjectFilter
                 }
                 else if (pattern.endsWith("+") && pattern.length() > 1)
                 {
-                    String className = pattern.substring(0, pattern.length() - 1);
-                    try
-                    {
-                        Class<?> theClass = ClassUtils.loadClass(className, this.getClass());
-                        if (!(object instanceof String))
-                        {
-                            if (theClass.isInstance(object))
-                            {
-                                return true;
-                            }
-                        }
-                        else if (theClass.isAssignableFrom(ClassUtils.loadClass(object.toString(),this.getClass())))
-                        {
-                            return true;
-                        }
-                    }
-                    catch (ClassNotFoundException e)
-                    {
-                    }
+                    logger.warn("wildcard-filter for payload based filtering is deprecated. Use expression" +
+                            "-filter or payload-type-filter instead");
+                    return filterByClassName(object, pattern);
                 }
             }
         }
 
+        return false;
+    }
+
+    @Deprecated
+    private boolean filterByClassName(Object object, String pattern) 
+    {
+        String className = pattern.substring(0, pattern.length() - 1);
+        try
+        {
+            Class<?> theClass = ClassUtils.loadClass(className, this.getClass());
+            if (!(object instanceof String))
+            {
+                if (theClass.isInstance(object))
+                {
+                    return true;
+                }
+            }
+            else if (theClass.isAssignableFrom(ClassUtils.loadClass(object.toString(),this.getClass())))
+            {
+                return true;
+            }
+        }
+        catch (ClassNotFoundException e)
+        {
+        }
         return false;
     }
 
@@ -164,7 +173,7 @@ public class WildcardFilter implements Filter, ObjectFilter
     {
         this.caseSensitive = caseSensitive;
     }
-    
+
     public boolean equals(Object obj)
     {
         if (this == obj) return true;
@@ -172,8 +181,8 @@ public class WildcardFilter implements Filter, ObjectFilter
 
         final WildcardFilter other = (WildcardFilter) obj;
         return equal(pattern, other.pattern)
-            && equal(patterns, other.patterns)
-            && caseSensitive == other.caseSensitive;
+                && equal(patterns, other.patterns)
+                && caseSensitive == other.caseSensitive;
     }
 
     public int hashCode()

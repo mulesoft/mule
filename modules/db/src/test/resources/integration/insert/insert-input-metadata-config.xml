@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <flow name="insertMetadataNoParams">
+        <inbound-endpoint address="vm://insertMetadataNoParams" exchange-pattern="request-response"/>
+
+        <db:insert config-ref="dbConfig">
+            <db:parameterized-query>INSERT INTO PLANET(POSITION, NAME) VALUES (777, 'Pluto')</db:parameterized-query>
+        </db:insert>
+    </flow>
+
+    <flow name="insertMetadataNotSupportedValueParams">
+        <inbound-endpoint address="vm://insertMetadataNotSupportedValueParams" exchange-pattern="request-response"/>
+
+        <db:insert config-ref="dbConfig">
+            <db:parameterized-query>INSERT INTO PLANET(POSITION, NAME) VALUES (#[payload.position],
+                #[header:OUTBOUND:name])
+            </db:parameterized-query>
+        </db:insert>
+    </flow>
+
+    <flow name="insertMetadataBeanParams">
+        <inbound-endpoint address="vm://insertMetadataBeanParams" exchange-pattern="request-response"/>
+
+        <db:insert config-ref="dbConfig">
+            <db:parameterized-query>INSERT INTO PLANET(POSITION, NAME) VALUES (#[payload.position], #[payload.name])
+            </db:parameterized-query>
+        </db:insert>
+    </flow>
+
+    <flow name="insertMetadataMapParams">
+        <inbound-endpoint address="vm://insertMetadataMapParams" exchange-pattern="request-response"/>
+
+        <db:insert config-ref="dbConfig">
+            <db:parameterized-query>INSERT INTO PLANET(POSITION, NAME) VALUES (#[payload['position']],
+                #[payload['name']])
+            </db:parameterized-query>
+        </db:insert>
+    </flow>
+</mule>

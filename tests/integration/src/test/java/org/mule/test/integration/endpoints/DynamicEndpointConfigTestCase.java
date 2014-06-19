@@ -9,15 +9,23 @@ package org.mule.test.integration.endpoints;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DataType;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.FunctionalTestCase;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 public class DynamicEndpointConfigTestCase extends FunctionalTestCase
 {
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
     @Override
     protected String getConfigFile()

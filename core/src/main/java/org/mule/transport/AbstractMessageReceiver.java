@@ -388,7 +388,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer(80);
+        final StringBuilder sb = new StringBuilder(80);
         sb.append(ClassUtils.getSimpleName(this.getClass()));
         sb.append("{this=").append(Integer.toHexString(System.identityHashCode(this)));
         sb.append(", receiverKey=").append(receiverKey);

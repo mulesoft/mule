@@ -6,6 +6,8 @@
  */
 package org.mule.module.xml.transformer;
 
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.AbstractMessageTransformer;
@@ -34,12 +36,13 @@ import org.dom4j.io.DocumentResult;
  * <code>AbstractXmlTransformer</code> offers some XSLT transform on a DOM (or
  * other XML-ish) object.
  */
-public abstract class AbstractXmlTransformer extends AbstractMessageTransformer
+public abstract class AbstractXmlTransformer extends AbstractMessageTransformer implements Initialisable
 {
     private String outputEncoding;
     private XMLInputFactory xmlInputFactory;
     private XMLOutputFactory xmlOutputFactory;
     private boolean useStaxSource = false;
+    private boolean acceptExternalEntities = false;
     
     public AbstractXmlTransformer()
     {
@@ -57,8 +60,27 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer
         registerSourceType(DataTypeFactory.create(org.mule.module.xml.transformer.DelayedResult.class));
         setReturnDataType(DataTypeFactory.BYTE_ARRAY);
         
+    }
+
+    @Override
+    public final void initialise() throws InitialisationException
+    {
         xmlInputFactory = XMLInputFactory.newInstance();
+
+        if (!acceptExternalEntities)
+        {
+            xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+            useStaxSource = true;
+        }
+
         xmlOutputFactory = XMLOutputFactory.newInstance();
+
+        this.doInitialise();
+    }
+
+    protected void doInitialise() throws InitialisationException
+    {
+        // template method
     }
 
     /** Result callback interface used when processing XML through JAXP */
@@ -329,5 +351,14 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer
     {
         this.xmlOutputFactory = xmlOutputFactory;
     }
-    
+
+    public void setAcceptExternalEntities(boolean acceptExternalEntities)
+    {
+        this.acceptExternalEntities = acceptExternalEntities;
+    }
+
+    public boolean getAcceptExternalEntities()
+    {
+        return this.acceptExternalEntities;
+    }
 }

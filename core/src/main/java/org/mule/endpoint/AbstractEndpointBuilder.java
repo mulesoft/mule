@@ -230,12 +230,13 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
         String uri = uriBuilder.getConstructor();
         if(muleContext.getExpressionManager().isExpression(uri))
         {
-            if(muleContext.getExpressionManager().isValidExpression(uriBuilder.getConstructor()))
+            if (muleContext.getExpressionManager().isValidExpression(uri))
             {
                 String dynamicAddress = getDynamicUriFrom(uri);
+                URIBuilder originalBuilder = uriBuilder;
                 uriBuilder = new URIBuilder(dynamicAddress, muleContext);
 
-                return new DynamicOutboundEndpoint(this, uri);
+                return new DynamicOutboundEndpoint(this, new DynamicURIBuilder(originalBuilder));
             }
             else
             {

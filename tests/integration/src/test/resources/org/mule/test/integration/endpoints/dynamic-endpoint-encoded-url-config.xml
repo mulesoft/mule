@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <flow name="dynamicAddress">
+        <vm:inbound-endpoint path="testDynamic" exchange-pattern="request-response"/>
+        <http:outbound-endpoint address="http://admin:admin%40123@localhost:${serverPort}/#[message.inboundProperties['path']]?foo=bar"
+                                exchange-pattern="request-response"/>
+    </flow>
+
+    <flow name="assembledDynamicAddress">
+        <vm:inbound-endpoint path="testAssembledDynamic" exchange-pattern="request-response"/>
+        <http:outbound-endpoint user="admin" password="admin%40123" path="#[message.inboundProperties['path']]?foo=bar" host="localhost"
+                                port="${serverPort}" exchange-pattern="request-response"/>
+    </flow>
+
+    <flow name="staticAddress">
+        <vm:inbound-endpoint path="testStatic" exchange-pattern="request-response"/>
+        <http:outbound-endpoint address="http://admin:admin%40123@localhost:${serverPort}/test?foo=bar"
+                                exchange-pattern="request-response"/>
+    </flow>
+
+    <flow name="assembledStaticAddress">
+        <vm:inbound-endpoint path="testAssembledStatic" exchange-pattern="request-response"/>
+        <http:outbound-endpoint user="admin" password="admin%40123" path="test?foo=bar" host="localhost" port="${serverPort}"
+                                exchange-pattern="request-response"/>
+    </flow>
+</mule>
+

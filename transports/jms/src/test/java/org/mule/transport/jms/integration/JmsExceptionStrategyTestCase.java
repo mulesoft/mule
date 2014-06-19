@@ -57,6 +57,10 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
     public void testInExceptionDoRollbackJmsTx() throws Exception
     {
         muleClient = muleContext.getClient();
+
+        //make sure that target queue is empty to avoid flackyness
+        consumeAllItemsInQueue("out");
+
         muleClient.dispatch("jms://in", MESSAGE, null);
         latch.await(LATCH_AWAIT_TIMEOUT, MILLISECONDS);
         //Stop flow to not consume message again
@@ -178,5 +182,13 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
         //Check outbound-endpoint was not executed
         MuleMessage outboundMessage = muleClient.request("jms://out6", SHORT_TIMEOUT);
         assertThat(outboundMessage, IsNull.<Object>nullValue());
+    }
+
+    private void consumeAllItemsInQueue(String queue) throws Exception
+    {
+        while (muleContext.getClient().request("jms://" + queue, SHORT_TIMEOUT) != null)
+        {
+            // read and discard
+        }
     }
 }

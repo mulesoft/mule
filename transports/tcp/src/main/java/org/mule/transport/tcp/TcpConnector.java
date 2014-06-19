@@ -10,6 +10,7 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.Connector;
@@ -42,6 +43,8 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 public class TcpConnector extends AbstractConnector
 {
     public static final String TCP = "tcp";
+    public static final String SEND_TCP_NO_DELAY_SYSTEM_PROPERTY = MuleProperties.SYSTEM_PROPERTY_PREFIX
+                                                                   + "transport.tcp.defaultSendTcpNoDelay";
 
     /** Property can be set on the endpoint to configure how the socket is managed */
     public static final String KEEP_SEND_SOCKET_OPEN_PROPERTY = "keepSendSocketOpen";
@@ -94,6 +97,8 @@ public class TcpConnector extends AbstractConnector
     public TcpConnector(MuleContext context)
     {
         super(context);
+        // Default tcpNoDelay=false if system property not set.
+        sendTcpNoDelay = Boolean.valueOf(System.getProperty(SEND_TCP_NO_DELAY_SYSTEM_PROPERTY));
         setSocketFactory(new TcpSocketFactory());
         setServerSocketFactory(new TcpServerSocketFactory());
         setTcpProtocol(new SafeProtocol());

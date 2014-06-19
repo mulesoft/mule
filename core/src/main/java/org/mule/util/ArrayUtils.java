@@ -68,7 +68,7 @@ public class ArrayUtils extends org.apache.commons.lang.ArrayUtils
 
         if (Array.getLength(array) > maxElements)
         {
-            StringBuffer buf = new StringBuffer(result);
+            StringBuilder buf = new StringBuilder(result);
             buf.insert(buf.length() - 1, " [..]");
             result = buf.toString();
         }

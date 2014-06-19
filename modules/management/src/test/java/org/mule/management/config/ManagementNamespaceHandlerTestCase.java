@@ -15,7 +15,7 @@ import org.mule.agent.EndpointNotificationLoggerAgent;
 import org.mule.agent.Log4jNotificationLoggerAgent;
 import org.mule.api.agent.Agent;
 import org.mule.api.registry.Registry;
-import org.mule.module.management.agent.JmxAgent;
+import org.mule.module.management.agent.JmxApplicationAgent;
 import org.mule.module.management.agent.JmxServerNotificationAgent;
 import org.mule.module.management.agent.Log4jAgent;
 import org.mule.module.management.agent.Mx4jAgent;
@@ -47,10 +47,10 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testSimpleJmxAgentConfig() throws Exception
     {
-        Agent agent = muleContext.getRegistry().lookupObject(JmxAgent.class);
+        Agent agent = muleContext.getRegistry().lookupObject(JmxApplicationAgent.class);
         assertNotNull(agent);
-        assertEquals(JmxAgent.class, agent.getClass());
-        JmxAgent jmxAgent = (JmxAgent) agent;
+        assertEquals(JmxApplicationAgent.class, agent.getClass());
+        JmxApplicationAgent jmxAgent = (JmxApplicationAgent) agent;
         assertFalse(jmxAgent.isCreateServer());
         assertTrue(jmxAgent.isLocateServer());
         assertTrue(jmxAgent.isEnableStatistics());
@@ -107,7 +107,7 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(agents.size(), 8);
         
         Iterator<Agent> iter = agents.iterator();
-        assertTrue(iter.next() instanceof JmxAgent);
+        assertTrue(iter.next() instanceof JmxApplicationAgent);
         assertTrue(iter.next() instanceof Log4jAgent);
         assertTrue(iter.next() instanceof Mx4jAgent);
         assertTrue(iter.next() instanceof TestAgent);

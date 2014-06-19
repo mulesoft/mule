@@ -6,19 +6,22 @@
  */
 package org.mule.util;
 
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
-
-import java.io.IOException;
-
-import org.junit.Test;
-
+import static org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mule.util.ExceptionUtils.containsType;
 import static org.mule.util.ExceptionUtils.getDeepestOccurenceOfType;
+import static org.mule.util.ExceptionUtils.getFullStackTraceWithoutMessages;
+
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
+
+import java.io.IOException;
+
+import org.junit.Test;
 
 @SmallTest
 public class ExceptionUtilsTestCase extends AbstractMuleTestCase
@@ -74,5 +77,29 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase
         assertNull(getDeepestOccurenceOfType(new Exception(), null));
 
         assertNull(getDeepestOccurenceOfType(null, Exception.class));
+    }
+
+    @Test
+    public void testFullStackTraceWithoutMessage() throws Exception
+    {
+        final String mainMessage = "main message 112312 [][] ''' ... sdfsd blah";
+        final String causeMessage = "cause message 2342998n  fwefoskjdcas  sdcasdhfsadjgsadkgasd \t\nsdfsllki";
+        final String lineSeparator = System.getProperty("line.separator");
+
+        Exception e = new RuntimeException(mainMessage, new RuntimeException(causeMessage));
+        String withoutMessage = getFullStackTraceWithoutMessages(e);
+        String fullStackTrace = getFullStackTrace(e);
+
+        String[] linesWithoutMessage = withoutMessage.split(lineSeparator);
+        String[] lines = fullStackTrace.split(lineSeparator);
+
+        assertEquals(lines.length, linesWithoutMessage.length);
+
+        for (int i = 0; i < lines.length; i++)
+        {
+            assertTrue(lines[i].contains(linesWithoutMessage[i]));
+            assertFalse(linesWithoutMessage[i].contains(mainMessage));
+            assertFalse(linesWithoutMessage[i].contains(causeMessage));
+        }
     }
 }

@@ -507,7 +507,7 @@ public final class XMLEntityCodec
         public String escape(String str)
         {
             // TODO: rewrite to use a Writer
-            StringBuffer buf = new StringBuffer(str.length() * 2);
+            StringBuilder buf = new StringBuilder(str.length() * 2);
             for (int i = 0; i < str.length(); ++i)
             {
                 char ch = str.charAt(i);
@@ -601,7 +601,7 @@ public final class XMLEntityCodec
                 return str;
             }
 
-            StringBuffer buf = new StringBuffer(str.length());
+            StringBuilder buf = new StringBuilder(str.length());
             buf.append(str.substring(0, firstAmp));
             for (int i = firstAmp; i < str.length(); ++i)
             {

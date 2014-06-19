@@ -44,7 +44,7 @@ public class LargeProxyTestCase extends FunctionalTestCase
         int length = 5000;
         final MuleClient client = muleContext.getClient();
 
-        StringBuffer b = new StringBuffer();
+        StringBuilder b = new StringBuilder();
         int counter = 1;
         while (b.length() < length)
         {

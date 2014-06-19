@@ -641,7 +641,7 @@ public final class Base64
             catch (Exception e)
             {
                 // this is not good.
-                StringBuffer msg = new StringBuffer(64);
+                StringBuilder msg = new StringBuilder(64);
                 msg.append(source[srcOffset]).append(": ").append(DECODABET[source[srcOffset]]);
                 msg.append(source[srcOffset + 1]).append(": ").append(DECODABET[source[srcOffset + 1]]);
                 msg.append(source[srcOffset + 2]).append(": ").append(DECODABET[source[srcOffset + 2]]);

@@ -10,6 +10,17 @@ import org.mule.api.exception.SystemExceptionHandler;
 
 import java.util.List;
 
+/**
+ * This class process a message through a set of {@link org.mule.execution.MessageProcessPhase} using
+ * the message content and message processing context provided by {@link org.mule.execution.MessageProcessTemplate} and {@link org.mule.execution.MessageProcessContext}.
+ * 
+ * This class will handle any message processing failure by calling the {@link org.mule.api.exception.SystemExceptionHandler} defined by the application.
+ * 
+ * Each {@link org.mule.execution.MessageProcessPhase} can be executed with a different threading mechanism. 
+ * {@link org.mule.execution.MessageProcessPhase} implementation must guarantee that upon phase completion the method {@link PhaseResultNotifier#phaseSuccessfully()}  is executed,
+ * if there was a failure processing the message then the method {@link PhaseResultNotifier#phaseFailure(Exception)} must be executed and if the phase consumed the message the method
+ * {@link org.mule.execution.PhaseResultNotifier#phaseConsumedMessage()} must be executed.
+ */
 public class PhaseExecutionEngine
 {
 
@@ -91,15 +102,26 @@ public class PhaseExecutionEngine
 
         public void process()
         {
-            for (MessageProcessPhase phase : phaseList)
+            ClassLoader originalClassLoader = null;
+            try
             {
-                if (phase.supportsTemplate(messageProcessTemplate))
+                originalClassLoader = Thread.currentThread().getContextClassLoader();
+                Thread.currentThread().setContextClassLoader(messageProcessContext.getExecutionClassLoader());
+                for (MessageProcessPhase phase : phaseList)
                 {
-                    phase.runPhase(messageProcessTemplate, messageProcessContext, this);
-                    return;
+                    if (phase.supportsTemplate(messageProcessTemplate))
+                    {
+                        phase.runPhase(messageProcessTemplate, messageProcessContext, this);
+                        return;
+                    }
+                    currentPhase++;
                 }
-                currentPhase++;
+            }
+            finally
+            {
+                Thread.currentThread().setContextClassLoader(originalClassLoader);
             }
         }
+
     }
 }

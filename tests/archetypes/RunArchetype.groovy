@@ -11,6 +11,13 @@ import org.apache.commons.lang.SystemUtils
  * Make sure that the archetype can do its job, i.e. remove any leftovers from
  * the last invocation of the archetype
  */
+
+if (project.properties.skipArchetypeTests == "true")
+{
+    log.info("Skipping tests")
+    return
+}
+
 def buildDir = new File(project.build.directory)
 
 if (project.properties.outputDir == null)

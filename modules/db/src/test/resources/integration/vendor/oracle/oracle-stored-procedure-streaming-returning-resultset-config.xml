@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <flow name="messagePerRecordOneWay">
+        <inbound-endpoint address="vm://testOneWay"/>
+
+        <db:stored-procedure config-ref="dbConfig" streaming="true">
+            <db:parameterized-query>{ call getTestRecords(:resultSet1) }</db:parameterized-query>
+            <db:out-param name="resultSet1" type="CURSOR"/>
+        </db:stored-procedure>
+
+        <!-- This is needed because foreach cannot iterator when the expression is iterable/iterator-->
+        <set-payload value="#[payload.get('resultSet1')]"/>
+
+        <foreach>
+            <outbound-endpoint address="vm://testOut"/>
+        </foreach>
+    </flow>
+
+    <flow name="defaultQueryRequestResponse">
+        <inbound-endpoint address="vm://testRequestResponse" exchange-pattern="request-response"/>
+
+        <db:stored-procedure config-ref="dbConfig" streaming="true">
+            <db:parameterized-query>{ call getTestRecords(:resultSet1) }</db:parameterized-query>
+            <db:out-param name="resultSet1" type="CURSOR"/>
+        </db:stored-procedure>
+
+        <set-variable variableName="records" value="#[new ArrayList()]"/>
+
+        <!-- This is needed because foreach cannot iterator when the expression is iterable/iterator-->
+        <set-payload value="#[payload.get('resultSet1')]"/>
+
+        <foreach>
+            <expression-component>flowVars['records'].add(payload)</expression-component>
+        </foreach>
+
+        <set-payload value="#[flowVars['records']]"/>
+    </flow>
+</mule>

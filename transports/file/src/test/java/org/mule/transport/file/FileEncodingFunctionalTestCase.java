@@ -31,7 +31,7 @@ public class FileEncodingFunctionalTestCase extends AbstractFileFunctionalTestCa
     @Test
     public void testReadingFileWithEucJpEncodingGetsTheRightText() throws Exception
     {
-        tmpDir = createFolder(".mule/mule-file-test-EUC-JP");
+        tmpDir = createFolder(getFileInsideWorkingDirectory("mule-file-test-EUC-JP").getAbsolutePath());
         createDataFile(tmpDir, TEST_MESSAGE_EUC_JP_ENCODED, ENCODING);
 
         MuleClient client = muleContext.getClient();

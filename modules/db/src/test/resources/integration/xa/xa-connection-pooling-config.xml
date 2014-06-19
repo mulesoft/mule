@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+            http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <flow name="defaultQueryRequestResponse">
+        <vm:inbound-endpoint path="testIn" exchange-pattern="request-response">
+            <xa-transaction action="ALWAYS_BEGIN"/>
+        </vm:inbound-endpoint>
+
+
+        <db:select config-ref="pooledJdbcConfig" maxRows="2">
+            <db:parameterized-query>select * from PLANET order by ID</db:parameterized-query>
+        </db:select>
+
+        <collection-splitter/>
+
+        <!-- This needs to processStatement a new connection -->
+        <db:delete config-ref="pooledJdbcConfig" transactionalAction="NOT_SUPPORTED">
+                <db:parameterized-query>delete from PLANET where id = #[payload.id]</db:parameterized-query>
+        </db:delete>
+    </flow>
+</mule>

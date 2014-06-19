@@ -52,7 +52,7 @@ public class MuleObjectStoreManager
     @Override
     public <T extends ObjectStore<? extends Serializable>> T getObjectStore(String name, boolean isPersistent)
     {
-        return internalCreateStore(getBaseStore(isPersistent), name, 0, 0, 0);
+        return internalCreateStore(getBaseStore(isPersistent), name, UNBOUNDED, UNBOUNDED, 0);
     }
 
     @Override
@@ -68,7 +68,7 @@ public class MuleObjectStoreManager
     public <T extends ObjectStore<? extends Serializable>> T getUserObjectStore(String name,
                                                                                 boolean isPersistent)
     {
-        return internalCreateStore(getBaseUserStore(isPersistent), name, 0, 0, 0);
+        return internalCreateStore(getBaseUserStore(isPersistent), name, UNBOUNDED, UNBOUNDED, 0);
     }
 
     public <T extends ObjectStore<? extends Serializable>> T getUserObjectStore(String name,
@@ -88,10 +88,22 @@ public class MuleObjectStoreManager
                                                                                               int entryTTL,
                                                                                               int expirationInterval)
     {
+
+        if (maxEntries < UNBOUNDED)
+        {
+            maxEntries = UNBOUNDED;
+        }
+
+        if (entryTTL < UNBOUNDED)
+        {
+            entryTTL = UNBOUNDED;
+        }
+
         if (stores.containsKey(name))
         {
             return (T) stores.get(name);
         }
+
         T store = null;
         try
         {
@@ -103,7 +115,7 @@ public class MuleObjectStoreManager
             // this method must throw object store creation exception
             throw new MuleRuntimeException(e);
         }
-        if (maxEntries == 0)
+        if (maxEntries == UNBOUNDED && entryTTL == UNBOUNDED)
         {
             return putInStoreMap(name, store);
         }

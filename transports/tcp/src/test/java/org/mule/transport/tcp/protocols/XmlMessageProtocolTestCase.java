@@ -21,7 +21,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 /**
- * Test by reading characters from a fixed StringBuffer instead of a TCP port.
+ * Test by reading characters from a fixed StringBuilder instead of a TCP port.
  */
 @SmallTest
 public class XmlMessageProtocolTestCase extends AbstractMuleTestCase
@@ -100,7 +100,7 @@ public class XmlMessageProtocolTestCase extends AbstractMuleTestCase
             "<?xml version=\"1.0\"?><data>eeeeeeeeeeeeee</data>",
             "<?xml version=\"1.0\"?><data>fffffffffffffff</data>"};
 
-        StringBuffer allMsgData = new StringBuffer();
+        StringBuilder allMsgData = new StringBuilder();
 
         for (int i = 0; i < msgData.length; i++)
         {

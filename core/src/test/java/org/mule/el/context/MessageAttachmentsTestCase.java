@@ -28,9 +28,9 @@ import org.mockito.Mockito;
 
 public class MessageAttachmentsTestCase extends AbstractELTestCase
 {
-    public MessageAttachmentsTestCase(Variant variant)
+    public MessageAttachmentsTestCase(Variant variant, String mvelOptimizer)
     {
-        super(variant);
+        super(variant, mvelOptimizer);
     }
 
     @Test

@@ -151,6 +151,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="mtomEnabled" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether or not MTOM (attachment support) is enabled.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -247,7 +254,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="serviceAddress" type="xsd:string" >
+                <xsd:attribute name="serviceAddress" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
                             Specifies the address of the web service.

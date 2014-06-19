@@ -190,7 +190,7 @@ public class MuleHttpServletResponse implements HttpServletResponse
 
     public void setDateHeader(String name, long date)
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(date);
         formatDate(buf, calendar, false);
@@ -206,7 +206,7 @@ public class MuleHttpServletResponse implements HttpServletResponse
      * Format HTTP date "EEE, dd MMM yyyy HH:mm:ss 'GMT'" or "EEE, dd-MMM-yy HH:mm:ss 'GMT'"for
      * cookies
      */
-    public static void formatDate(StringBuffer buf, Calendar calendar, boolean cookie)
+    public static void formatDate(StringBuilder buf, Calendar calendar, boolean cookie)
     {
         // "EEE, dd MMM yyyy HH:mm:ss 'GMT'"
         // "EEE, dd-MMM-yy HH:mm:ss 'GMT'", cookie
@@ -254,7 +254,7 @@ public class MuleHttpServletResponse implements HttpServletResponse
         buf.append(" GMT");
     }
 
-    public static void append2digits(StringBuffer buf, int i) 
+    public static void append2digits(StringBuilder buf, int i)
     {
         if (i >= 100)
             return;

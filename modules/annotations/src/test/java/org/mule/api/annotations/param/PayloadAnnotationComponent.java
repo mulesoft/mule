@@ -26,8 +26,8 @@ public class PayloadAnnotationComponent
         return payload;
     }
 
-    //There is no transformer to go from String to StringBuffer
-    public Object processFailedAutoTransformString(@Payload StringBuffer payload)
+    //There is no transformer to go from String to StringBuilder
+    public Object processFailedAutoTransformString(@Payload StringBuilder payload)
     {
         return payload;
     }

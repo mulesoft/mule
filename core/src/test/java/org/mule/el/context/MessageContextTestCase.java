@@ -7,7 +7,6 @@
 package org.mule.el.context;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
@@ -18,15 +17,15 @@ import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 public class MessageContextTestCase extends AbstractELTestCase
 {
-    public MessageContextTestCase(Variant variant)
+
+    public MessageContextTestCase(Variant variant, String mvelOptimizer)
     {
-        super(variant);
+        super(variant, mvelOptimizer);
     }
 
     @Test

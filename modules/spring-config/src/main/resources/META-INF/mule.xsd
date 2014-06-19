@@ -361,6 +361,7 @@
     <xsd:element name="simple-in-memory-queue-store" type="defaultQueueStoreType" substitutionGroup="abstract-queue-store">
         <xsd:annotation>
             <xsd:documentation>
+                DEPRECATED: simple-in-memory-queue-store is deprecated since Mule 3.5 and will be removed in Mule 4.0. Use default-in-memory-queue-store instead.
                 A simple in-memeory queue store.
             </xsd:documentation>
         </xsd:annotation>
@@ -369,6 +370,7 @@
     <xsd:element name="file-queue-store" type="defaultQueueStoreType" substitutionGroup="abstract-queue-store">
         <xsd:annotation>
             <xsd:documentation>
+                DEPRECATED: file-queue-store is deprecated since Mule 3.5 and will be removed in Mule 4.0. Use default-persistent-queue-store instead.
                 A simple file-based queue store.
             </xsd:documentation>
         </xsd:annotation>
@@ -1312,6 +1314,13 @@
                             </xsd:complexContent>
                         </xsd:complexType>
                     </xsd:element>
+                    <xsd:element ref="abstract-configuration-extension" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Mule application configuration extensions. Extensions can be defined as child of the configuration elements and then accessed by each module that defines it.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="defaultResponseTimeout" type="xsd:string" default="10000">
                     <xsd:annotation>
@@ -1363,6 +1372,19 @@
                     </xsd:annotation>
                 </xsd:attribute>
             </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-configuration-extension" abstract="true" type="abstractConfigurationExtensionType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for arbitrary extensions as children of the 'configuration' element. Other transports and modules can extend this if they need to add elements to the configuration.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractConfigurationExtensionType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType"/>
         </xsd:complexContent>
     </xsd:complexType>
 
@@ -6316,10 +6338,12 @@
         </xsd:annotation>
     </xsd:element>
 
+    <!-- Deprecated -->
     <xsd:element name="all" type="baseMultipleRoutesRoutingMessageProcessorType" substitutionGroup="abstract-routing-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 Sends the same message to multiple message processors or outbound endpoints.
+                @Deprecated since 3.5.0. Use scatter-gather instead
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -6400,11 +6424,21 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
-                    <xsd:attribute name="secondsBetweenRetries" type="substitutableInt" use="optional" default="60">
+                    <xsd:attribute name="millisBetweenRetries" type="substitutableInt" use="optional">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Specifies the minimum time interval between two process retries.
+                                Specifies the minimum time interval between two process retries in milliseconds.
                                 The actual time interval depends on the previous execution but should not exceed twice this number.
+                                Default value is 60000 (one minute)
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="secondsBetweenRetries" type="substitutableInt" use="optional">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Specifies the minimum time interval between two process retries in seconds.
+                                The actual time interval depends on the previous execution but should not exceed twice this number.
+                                THIS ATTRIBUTE IS DEPRECATED. Please use millisBetweenRetries instead
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
@@ -6466,7 +6500,7 @@
                                 </xsd:documentation>
                             </xsd:annotation>
                         </xsd:element>
-                        <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="unbounded"/>
+                        <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="2" maxOccurs="unbounded"/>
                     </xsd:sequence>
                     <xsd:attribute name="timeout" type="substitutableLong" use="optional" default="0">
                         <xsd:annotation>

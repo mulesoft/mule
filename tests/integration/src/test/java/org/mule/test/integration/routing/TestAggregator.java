@@ -31,7 +31,7 @@ public class TestAggregator extends AbstractAggregator
             @Override
             public MuleEvent aggregateEvents(EventGroup events) throws AggregationException
             {
-                StringBuffer buffer = new StringBuffer(128);
+                StringBuilder buffer = new StringBuilder(128);
 
                 try
                 {

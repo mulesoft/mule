@@ -141,7 +141,7 @@ public class FunctionalStreamingTestComponent implements Callable
                             long streamLength, MuleEventContext context) throws Exception
     {
         // make a nice summary of the data
-        StringBuffer result = new StringBuffer("Received stream");
+        StringBuilder result = new StringBuilder("Received stream");
         result.append("; length: ");
         result.append(streamLength);
         result.append("; '");

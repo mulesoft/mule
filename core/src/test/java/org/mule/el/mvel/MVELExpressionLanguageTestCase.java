@@ -6,8 +6,10 @@
  */
 package org.mule.el.mvel;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
@@ -28,9 +30,11 @@ import org.mule.config.MuleManifest;
 import org.mule.el.context.AppContext;
 import org.mule.el.context.MessageContext;
 import org.mule.el.function.RegexExpressionLanguageFuntion;
+import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.PropertyAccessException;
 import org.mule.mvel2.ast.Function;
+import org.mule.mvel2.optimizers.OptimizerFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 
@@ -72,7 +76,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
 
     protected Variant variant;
     protected MVELExpressionLanguage mvel;
-    final String largeExpression = "payload = 'Tom,Fennelly,Male,4,Ireland';StringBuffer sb = new StringBuffer(); fields = payload.split(',\');"
+    final String largeExpression = "payload = 'Tom,Fennelly,Male,4,Ireland';StringBuilder sb = new StringBuilder(); fields = payload.split(',\');"
                                    + "if (fields.length > 4) {"
                                    + "    sb.append('  <Contact>\n');"
                                    + "    sb.append('    <FirstName>').append(fields[0]).append('</FirstName>\n');"
@@ -82,9 +86,10 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
                                    + "    sb.append('    <SIN>').append(fields[4]).append('</SIN>\n');"
                                    + "    sb.append('  </Contact>\n');" + "}" + "sb.toString();";
 
-    public MVELExpressionLanguageTestCase(Variant variant)
+    public MVELExpressionLanguageTestCase(Variant variant, String mvelOptimizer)
     {
         this.variant = variant;
+        OptimizerFactory.setDefaultOptimizer(mvelOptimizer);
     }
 
     @Before
@@ -133,14 +138,14 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     {
         MuleEvent event = createMockEvent();
 
-        // // Literals
-        // assertEquals("hi", evaluate("'hi'", event));
-        // assertEquals(4, evaluate("2*2", event));
-        //
-        // // Static context
-        // assertEquals(Calendar.getInstance().getTimeZone(), evaluate("server.timeZone", event));
-        // assertEquals(MuleManifest.getProductVersion(), evaluate("mule.version", event));
-        // assertEquals(muleContext.getConfiguration().getId(), evaluate("app.name", event));
+        // Literals
+        assertEquals("hi", evaluate("'hi'", event));
+        assertEquals(4, evaluate("2*2", event));
+
+        // Static context
+        assertEquals(Calendar.getInstance().getTimeZone(), evaluate("server.timeZone", event));
+        assertEquals(MuleManifest.getProductVersion(), evaluate("mule.version", event));
+        assertEquals(muleContext.getConfiguration().getId(), evaluate("app.name", event));
 
         // Event context
         assertEquals("myFlow", evaluate("flow.name", event));
@@ -472,10 +477,10 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         catch (Exception e)
         {
             assertEquals(ExpressionRuntimeException.class, e.getClass());
-            assertEquals(PropertyAccessException.class, e.getCause().getClass());
+            assertThat(e.getCause(), instanceOf(CompileException.class));
         }
     }
-    
+
     @Test
     public void propertyAccessException2() throws InitialisationException
     {
@@ -576,8 +581,13 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     @Parameters
     public static List<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{Variant.EXPRESSION_WITH_DELIMITER},
-            {Variant.EXPRESSION_STRAIGHT_UP}});
+        return Arrays.asList(new Object[][]
+        {
+            {Variant.EXPRESSION_WITH_DELIMITER, OptimizerFactory.SAFE_REFLECTIVE},
+            {Variant.EXPRESSION_WITH_DELIMITER, OptimizerFactory.DYNAMIC},
+            {Variant.EXPRESSION_STRAIGHT_UP, OptimizerFactory.SAFE_REFLECTIVE},
+            {Variant.EXPRESSION_STRAIGHT_UP, OptimizerFactory.DYNAMIC}
+        });
     }
 
     private static class HelloWorldFunction extends Function
@@ -651,6 +661,15 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
             }
         }
         return classes;
+    }
+
+    @Test
+    public void collectionAccessPayloadChangedMULE7506() throws Exception
+    {
+        MuleEvent event = getTestEvent(new String[]{"1", "2"});
+        assertEquals("1", mvel.evaluate("payload[0]", event));
+        event.getMessage().setPayload(Collections.singletonList("1"));
+        assertEquals("1", mvel.evaluate("payload[0]", event));
     }
 
 }

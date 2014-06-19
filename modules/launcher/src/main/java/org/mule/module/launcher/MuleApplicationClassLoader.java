@@ -8,6 +8,7 @@ package org.mule.module.launcher;
 
 import org.mule.api.config.MuleProperties;
 import org.mule.module.launcher.application.ApplicationClassLoader;
+import org.mule.module.launcher.artifact.AbstractArtifactClassLoader;
 import org.mule.util.FileUtils;
 import org.mule.util.SystemUtils;
 
@@ -15,17 +16,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-public class MuleApplicationClassLoader extends FineGrainedControlClassLoader implements ApplicationClassLoader
+public class MuleApplicationClassLoader extends AbstractArtifactClassLoader implements ApplicationClassLoader
 {
 
     /**
@@ -49,13 +45,12 @@ public class MuleApplicationClassLoader extends FineGrainedControlClassLoader im
     public static final String PATH_PER_APP = "per-app";
 
     protected static final URL[] CLASSPATH_EMPTY = new URL[0];
-    protected final transient Log logger = LogFactory.getLog(getClass());
-
-    protected List<ShutdownListener> shutdownListeners = new ArrayList<ShutdownListener>();
 
     private String appName;
 
-    private String libraryPath;
+    private File appDir;
+    private File classesDir;
+    private File libDir;
 
     public MuleApplicationClassLoader(String appName, ClassLoader parentCl)
     {
@@ -70,14 +65,13 @@ public class MuleApplicationClassLoader extends FineGrainedControlClassLoader im
         {
             // get lib dir
             final String muleHome = System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
-            String configPath = String.format("%s/apps/%s", muleHome, appName);
-            File parentFile = new File(configPath); 
-            File classesDir = new File(parentFile, PATH_CLASSES);
+            String appPath = String.format("%s/apps/%s", muleHome, appName);
+            appDir = new File(appPath);
+            classesDir = new File(appDir, PATH_CLASSES);
             addURL(classesDir.toURI().toURL());
 
-            File libDir = new File(parentFile, PATH_LIBRARY);
+            libDir = new File(appDir, PATH_LIBRARY);
             addJars(appName, libDir, true);
-            libraryPath = libDir.getAbsolutePath();
 
             // Add per-app mule modules (if any)
             File libs = new File(muleHome, PATH_LIBRARY);
@@ -152,28 +146,6 @@ public class MuleApplicationClassLoader extends FineGrainedControlClassLoader im
         return super.getResources(name);
     }
 
-    @Override
-    public void close()
-    {
-        for (ShutdownListener listener : shutdownListeners)
-        {
-            try
-            {
-                listener.execute();
-            }
-            catch (Exception e)
-            {
-                logger.error(e);
-            }
-        }
-        super.close();
-    }
-
-    public void addShutdownListener(ShutdownListener listener)
-    {
-        this.shutdownListeners.add(listener);
-    }
-
     public String getAppName()
     {
         return appName;
@@ -200,27 +172,13 @@ public class MuleApplicationClassLoader extends FineGrainedControlClassLoader im
     }
 
     @Override
-    public void dispose()
-    {
-        //Nothing to do.
-    }
-
-    /**
-     * Optional hook, invoked synchronously right before the classloader is disposed of and closed.
-     */
-    public interface ShutdownListener
-    {
-        void execute();
-    }
-
-    @Override
     protected String findLibrary(String name)
     {
         String parentResolvedPath = super.findLibrary(name);
 
         if (null == parentResolvedPath)
         {
-            final File library = new File(libraryPath, System.mapLibraryName(name));
+            final File library = new File(libDir, System.mapLibraryName(name));
 
             if (library.exists())
             {
@@ -229,5 +187,11 @@ public class MuleApplicationClassLoader extends FineGrainedControlClassLoader im
         }
 
         return parentResolvedPath;
+    }
+
+    @Override
+    protected String[] getLocalResourceLocations()
+    {
+        return new String[] {classesDir.getAbsolutePath()};
     }
 }

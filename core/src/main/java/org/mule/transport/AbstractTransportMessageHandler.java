@@ -377,7 +377,7 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer(80);
+        final StringBuilder sb = new StringBuilder(80);
         sb.append(ClassUtils.getSimpleName(this.getClass()));
         sb.append("{this=").append(Integer.toHexString(System.identityHashCode(this)));
         sb.append(", endpoint=").append(endpoint.getEndpointURI());

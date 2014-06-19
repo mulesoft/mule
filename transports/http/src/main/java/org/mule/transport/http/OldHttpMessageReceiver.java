@@ -80,7 +80,7 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
 
     protected boolean shouldConnect()
     {
-        StringBuffer requestUri = new StringBuffer(80);
+        StringBuilder requestUri = new StringBuilder(80);
         requestUri.append(endpoint.getProtocol()).append("://");
         requestUri.append(endpoint.getEndpointURI().getHost());
         requestUri.append(':').append(endpoint.getEndpointURI().getPort());
@@ -497,7 +497,7 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
             path = path.substring(0, i);
         }
 
-        StringBuffer requestUri = new StringBuffer(80);
+        StringBuilder requestUri = new StringBuilder(80);
         if (path.indexOf("://") == -1)
         {
             requestUri.append(ep.getProtocol()).append("://");

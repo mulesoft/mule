@@ -72,6 +72,17 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         }
     }
 
+    /**
+     * Cleans a directory without deleting it.
+     *
+     * @param directory directory to clean
+     * @throws IOException in case cleaning is unsuccessful
+     */
+    public static void cleanDirectory(File directory) throws IOException
+    {
+        org.apache.commons.io.FileUtils.cleanDirectory(directory);
+    }
+
     // TODO Document me!
     public static File createFile(String filename) throws IOException
     {

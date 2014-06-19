@@ -387,6 +387,8 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextTestCase
     @Test
     public void testDispatchersLifecycle() throws Exception
     {
+        muleContext.start();
+
         //using sync endpoint so that any calls to 'process()' will be blocking and avoid timing issues
         OutboundEndpoint out = getTestOutboundEndpoint("out",
                                                        "test://out?exchangePattern=request-response", null, null, null, connector);

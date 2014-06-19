@@ -33,7 +33,7 @@ public class ObjectUtils extends org.apache.commons.lang.ObjectUtils
         }
         else
         {
-            return new StringBuffer(40).append(
+            return new StringBuilder(40).append(
                     ClassUtils.getSimpleName(obj.getClass()))
                     .append('@')
                     .append(Integer.toHexString(System.identityHashCode(obj))

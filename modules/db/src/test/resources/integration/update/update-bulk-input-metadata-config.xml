@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <flow name="updateBulkMetadataNoParams">
+        <inbound-endpoint address="vm://updateMetadataNoParams" exchange-pattern="request-response"/>
+
+        <db:update config-ref="dbConfig" bulkMode="true">
+            <db:parameterized-query>update Planet set position = 1 where name = 'Mars'</db:parameterized-query>
+        </db:update>
+    </flow>
+
+    <flow name="updateBulkMetadataNotSupportedValueParams">
+        <inbound-endpoint address="vm://updateMetadataNotSupportedValueParams" exchange-pattern="request-response"/>
+
+        <db:update config-ref="dbConfig" bulkMode="true">
+            <db:parameterized-query>update Planet set position = #[payload.position] where name =
+                #[header:OUTBOUND:name]
+            </db:parameterized-query>
+        </db:update>
+    </flow>
+
+    <flow name="updateBulkMetadataBeanParams">
+        <inbound-endpoint address="vm://updateMetadataBeanParams" exchange-pattern="request-response"/>
+
+        <db:update config-ref="dbConfig" bulkMode="true">
+            <db:parameterized-query>update Planet set position = #[payload.position] where name = #[payload.name]
+            </db:parameterized-query>
+        </db:update>
+    </flow>
+
+    <flow name="updateBulkMetadataMapParams">
+        <inbound-endpoint address="vm://updateMetadataMapParams" exchange-pattern="request-response"/>
+
+        <db:update config-ref="dbConfig" bulkMode="true">
+            <db:parameterized-query>update Planet set position = #[payload['position']] where name = #[payload['name']]
+            </db:parameterized-query>
+        </db:update>
+    </flow>
+</mule>

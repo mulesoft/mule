@@ -14,7 +14,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.callback.SourceCallback;
-import org.mule.api.processor.InternalMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.MessageProcessorContainer;
@@ -59,7 +58,7 @@ public abstract class AbstractListeningMessageProcessor extends DevkitBasedMessa
     }
 
     /**
-     * Implements {@link SourceCallback#process(org.mule.api.MuleEvent)}. This
+     * Implements {@link SourceCallback#process(Object)}. This
      * message source will be passed on to the actual pojo's method as a callback
      * mechanism.
      */
@@ -70,10 +69,11 @@ public abstract class AbstractListeningMessageProcessor extends DevkitBasedMessa
         muleMessage = new DefaultMuleMessage(message, getMuleContext());
         MuleEvent muleEvent;
         muleEvent = new DefaultMuleEvent(muleMessage, MessageExchangePattern.ONE_WAY, getFlowConstruct());
+
         try
         {
             MuleEvent responseEvent;
-            responseEvent = messageProcessor.process(muleEvent);
+            responseEvent = processEvent(muleEvent);
             if ((responseEvent != null) && (responseEvent.getMessage() != null))
             {
                 return responseEvent.getMessage().getPayload();
@@ -84,10 +84,11 @@ public abstract class AbstractListeningMessageProcessor extends DevkitBasedMessa
             throw e;
         }
         return null;
+
     }
 
     /**
-     * Implements {@link SourceCallback#process(org.mule.api.MuleEvent)}. This
+     * Implements {@link SourceCallback#process(Object)}. This
      * message source will be passed on to the actual pojo's method as a callback
      * mechanism.
      */
@@ -98,10 +99,11 @@ public abstract class AbstractListeningMessageProcessor extends DevkitBasedMessa
         muleMessage = new DefaultMuleMessage(message, properties, null, null, getMuleContext());
         MuleEvent muleEvent;
         muleEvent = new DefaultMuleEvent(muleMessage, MessageExchangePattern.ONE_WAY, getFlowConstruct());
+
         try
         {
             MuleEvent responseEvent;
-            responseEvent = messageProcessor.process(muleEvent);
+            responseEvent = processEvent(muleEvent);
             if ((responseEvent != null) && (responseEvent.getMessage() != null))
             {
                 return responseEvent.getMessage().getPayload();
@@ -112,6 +114,7 @@ public abstract class AbstractListeningMessageProcessor extends DevkitBasedMessa
             throw e;
         }
         return null;
+
     }
 
     /**
@@ -124,7 +127,7 @@ public abstract class AbstractListeningMessageProcessor extends DevkitBasedMessa
         try
         {
             MuleEvent responseEvent;
-            responseEvent = messageProcessor.process(RequestContext.getEvent());
+            responseEvent = processEvent(RequestContext.getEvent());
             if ((responseEvent != null) && (responseEvent.getMessage() != null))
             {
                 return responseEvent.getMessage().getPayload();
@@ -144,7 +147,7 @@ public abstract class AbstractListeningMessageProcessor extends DevkitBasedMessa
      */
     public MuleEvent processEvent(MuleEvent event) throws MuleException
     {
-        return messageProcessor.process(event);
+        return messageProcessor != null ? messageProcessor.process(event) : event;
     }
     
     /**

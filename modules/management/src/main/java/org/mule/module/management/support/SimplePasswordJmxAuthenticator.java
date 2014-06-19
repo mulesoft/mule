@@ -7,7 +7,7 @@
 package org.mule.module.management.support;
 
 import org.mule.module.management.agent.ConfigurableJMXAuthenticator;
-import org.mule.module.management.agent.JmxAgent;
+import org.mule.module.management.agent.JmxApplicationAgent;
 import org.mule.util.StringUtils;
 
 import java.security.Principal;
@@ -33,7 +33,7 @@ public class SimplePasswordJmxAuthenticator implements JMXAuthenticator, Configu
     /**
      * Logger used by this class.
      */
-    protected static final Log logger = LogFactory.getLog(JmxAgent.class);
+    protected static final Log logger = LogFactory.getLog(JmxApplicationAgent.class);
 
     /**
      * An in-memory credentials storage.

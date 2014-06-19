@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
@@ -19,10 +20,14 @@ import java.util.Map;
 import org.apache.activemq.broker.BrokerService;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 public class InOptionalOutOutOnlyJMSTestCase extends FunctionalTestCase
 {
+    @ClassRule
+    public static DynamicPort serverPort = new DynamicPort("serverPort");
+
     public static final long TIMEOUT = 3000;
 
     private static BrokerService broker;
@@ -37,7 +42,7 @@ public class InOptionalOutOutOnlyJMSTestCase extends FunctionalTestCase
     public static void startBroker() throws Exception
     {
         broker = new BrokerService();
-        broker.addConnector("tcp://localhost:61616");
+        broker.addConnector("tcp://localhost:" + serverPort.getNumber());
         broker.start();
     }
 

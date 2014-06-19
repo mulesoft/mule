@@ -103,7 +103,7 @@ public class CronsSchedulerTest extends FunctionalTestCase
     private void runSchedulersOnce() throws Exception
     {
         Collection<Scheduler> schedulers = muleContext.getRegistry().lookupScheduler(
-                Schedulers.flowPollingSchedulers("pollfoo"));
+                Schedulers.flowConstructPollingSchedulers("pollfoo"));
 
         for (Scheduler scheduler : schedulers)
         {
@@ -114,7 +114,7 @@ public class CronsSchedulerTest extends FunctionalTestCase
     private void stopSchedulers() throws MuleException
     {
         Collection<Scheduler> schedulers = muleContext.getRegistry().lookupScheduler(
-                Schedulers.flowPollingSchedulers("pollfoo"));
+                Schedulers.flowConstructPollingSchedulers("pollfoo"));
 
         for (Scheduler scheduler : schedulers)
         {

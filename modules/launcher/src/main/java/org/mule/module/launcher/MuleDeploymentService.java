@@ -6,7 +6,7 @@
  */
 package org.mule.module.launcher;
 
-import static org.mule.module.launcher.ArchiveDeployer.ZIP_FILE_SUFFIX;
+import static org.mule.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationClassLoaderFactory;
@@ -21,15 +21,19 @@ import org.mule.module.launcher.domain.DomainFactory;
 import org.mule.module.launcher.domain.MuleDomainClassLoaderRepository;
 import org.mule.module.launcher.util.DebuggableReentrantLock;
 import org.mule.module.launcher.util.ObservableList;
+import org.mule.util.Preconditions;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.io.filefilter.AndFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -58,7 +62,7 @@ public class MuleDeploymentService implements DeploymentService
     private final CompositeDeploymentListener domainDeploymentListener = new CompositeDeploymentListener();
     private final ArchiveDeployer<Domain> domainDeployer;
     private final DeploymentDirectoryWatcher deploymentDirectoryWatcher;
-    private ArchiveDeployer<Application> applicationDeployer;
+    private DefaultArchiveDeployer<Application> applicationDeployer;
 
     public MuleDeploymentService(PluginClassLoaderManager pluginClassLoaderManager)
     {
@@ -72,12 +76,12 @@ public class MuleDeploymentService implements DeploymentService
         DefaultApplicationFactory applicationFactory = new DefaultApplicationFactory(applicationClassLoaderFactory, domainFactory);
         applicationFactory.setDeploymentListener(applicationDeploymentListener);
 
-        DefaultArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<Application>();
-        DefaultArtifactDeployer<Domain> domainMuleDeployer = new DefaultArtifactDeployer<Domain>();
+        ArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<Application>();
+        ArtifactDeployer<Domain> domainMuleDeployer = new DefaultArtifactDeployer<Domain>();
 
-        this.applicationDeployer = new ArchiveDeployer(applicationMuleDeployer, applicationFactory, applications, deploymentLock);
+        this.applicationDeployer = new DefaultArchiveDeployer(applicationMuleDeployer, applicationFactory, applications, deploymentLock);
         this.applicationDeployer.setDeploymentListener(applicationDeploymentListener);
-        this.domainDeployer = new ArchiveDeployer(domainMuleDeployer, domainFactory, domains, deploymentLock);
+        this.domainDeployer = new DomainArchiveDeployer(new DefaultArchiveDeployer(domainMuleDeployer, domainFactory, domains, deploymentLock), applicationDeployer, applicationMuleDeployer, this);
         this.domainDeployer.setDeploymentListener(domainDeploymentListener);
         this.deploymentDirectoryWatcher = new DeploymentDirectoryWatcher(domainDeployer, applicationDeployer, domains, applications, deploymentLock);
     }
@@ -86,9 +90,10 @@ public class MuleDeploymentService implements DeploymentService
     public void start()
     {
         DeploymentStatusTracker deploymentStatusTracker = new DeploymentStatusTracker();
-        addDeploymentListener(deploymentStatusTracker);
+        addDeploymentListener(deploymentStatusTracker.getApplicationDeploymentStatusTracker());
+        addDomainDeploymentListener(deploymentStatusTracker.getDomainDeploymentStatusTracker());
 
-        StartupSummaryDeploymentListener summaryDeploymentListener = new StartupSummaryDeploymentListener(deploymentStatusTracker);
+        StartupSummaryDeploymentListener summaryDeploymentListener = new StartupSummaryDeploymentListener(deploymentStatusTracker, this);
         addStartupListener(summaryDeploymentListener);
 
         deploymentDirectoryWatcher.start();
@@ -122,6 +127,19 @@ public class MuleDeploymentService implements DeploymentService
     public Application findApplication(String appName)
     {
         return deploymentDirectoryWatcher.findArtifact(appName, applications);
+    }
+
+    public Collection<Application> findDomainApplications(final String domain)
+    {
+        Preconditions.checkArgument(domain != null, "Domain name cannot be null");
+        return (Collection<Application>) CollectionUtils.select(applications, new Predicate()
+        {
+            @Override
+            public boolean evaluate(Object object)
+            {
+                return ((Application) object).getDomain().getArtifactName().equals(domain);
+            }
+        });
     }
 
 
@@ -176,7 +194,17 @@ public class MuleDeploymentService implements DeploymentService
     @Override
     public void redeploy(String artifactName)
     {
-        applicationDeployer.redeploy(findApplication(artifactName));
+        try
+        {
+            applicationDeployer.redeploy(findApplication(artifactName));
+        }
+        catch (DeploymentException e)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Failure while redeploying application: " + artifactName, e);
+            }
+        }
     }
 
     @Override

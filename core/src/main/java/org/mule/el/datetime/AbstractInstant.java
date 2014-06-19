@@ -9,7 +9,6 @@ package org.mule.el.datetime;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.el.datetime.Instant;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.el.context.ServerContext;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -48,11 +47,11 @@ public abstract class AbstractInstant implements Instant
         this.calendar = calendar;
         this.locale = locale;
     }
-    
+
     public AbstractInstant()
     {
-        this.calendar = Calendar.getInstance(ServerContext.getLocale());
-        this.locale = ServerContext.getLocale();
+        this.calendar = Calendar.getInstance(Locale.getDefault());
+        this.locale = Locale.getDefault();
     }
 
     @Override
@@ -99,7 +98,8 @@ public abstract class AbstractInstant implements Instant
     @Override
     public Instant changeTimeZone(String newTimezone)
     {
-        // Workaround for issues with java.util.Calendar.  Ensure Calendar is in right state before updating timeZone 
+        // Workaround for issues with java.util.Calendar. Ensure Calendar is in right state before updating
+        // timeZone
         calendar.get(Calendar.ERA);
         calendar.setTimeZone(TimeZone.getTimeZone(newTimezone));
         return this;

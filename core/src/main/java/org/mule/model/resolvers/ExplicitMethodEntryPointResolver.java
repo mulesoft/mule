@@ -93,7 +93,7 @@ public class ExplicitMethodEntryPointResolver extends AbstractEntryPointResolver
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         sb.append("ExplicitMethodEntryPointResolver");
         sb.append("{methods=").append(StringMessageUtils.toString(methods));
         sb.append(", acceptVoidMethods=").append(isAcceptVoidMethods());

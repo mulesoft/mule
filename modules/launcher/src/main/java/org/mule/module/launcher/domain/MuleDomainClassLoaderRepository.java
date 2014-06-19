@@ -10,6 +10,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.module.launcher.DeploymentException;
 import org.mule.module.launcher.MuleSharedDomainClassLoader;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
+import org.mule.module.launcher.artifact.ShutdownListener;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.Preconditions;
 
@@ -81,6 +82,12 @@ public class MuleDomainClassLoaderRepository implements DomainClassLoaderReposit
             }
 
             @Override
+            public URL findLocalResource(String resource)
+            {
+                return classLoader.findLocalResource(resource);
+            }
+
+            @Override
             public ClassLoader getClassLoader()
             {
                 return classLoader.getClassLoader();
@@ -91,6 +98,12 @@ public class MuleDomainClassLoaderRepository implements DomainClassLoaderReposit
             {
                 domainArtifactClassLoaders.remove(classLoader.getArtifactName());
                 classLoader.dispose();
+            }
+
+            @Override
+            public void addShutdownListener(ShutdownListener listener)
+            {
+                classLoader.addShutdownListener(listener);
             }
         };
     }

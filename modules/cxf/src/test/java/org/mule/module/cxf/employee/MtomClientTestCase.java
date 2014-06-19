@@ -6,13 +6,14 @@
  */
 package org.mule.module.cxf.employee;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -28,18 +29,25 @@ public class MtomClientTestCase extends FunctionalTestCase
     }
 
     @Test
-    @Ignore("MULE-6926: flaky test")
     public void testEchoService() throws Exception
     {
-        EmployeeDirectoryImpl svc = (EmployeeDirectoryImpl) getComponent("employeeDirectoryService");
+        final EmployeeDirectoryImpl svc = (EmployeeDirectoryImpl) getComponent("employeeDirectoryService");
 
-        int count = 0;
-        while (svc.getInvocationCount() == 0 && count < 5000) {
-            count += 500;
-            Thread.sleep(500);
-        }
+        Prober prober = new PollingProber(6000, 500);
+        prober.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return (svc.getInvocationCount() == 1);
+            }
 
-        assertEquals(1, svc.getInvocationCount());
+            @Override
+            public String describeFailure()
+            {
+                return "Expected invocation count was 1 but actual one was " + svc.getInvocationCount();
+            }
+        });
 
         // ensure that an attachment was actually sent.
         assertTrue(AttachmentVerifyInterceptor.HasAttachments);

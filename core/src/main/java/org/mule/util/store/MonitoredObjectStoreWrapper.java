@@ -6,6 +6,8 @@
  */
 package org.mule.util.store;
 
+import static org.mule.api.store.ObjectStoreManager.UNBOUNDED;
+
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -180,66 +182,48 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
             final long now = System.nanoTime();
             List<Serializable> keys = allKeys();
             int excess = (allKeys().size() - maxEntries);
-            if (maxEntries > 0 && excess > 0)
+
+            PriorityQueue<StoredObject<T>> sortedMaxEntries = null;
+
+            if (excess > 0)
             {
-                PriorityQueue<StoredObject<T>> q = new PriorityQueue<StoredObject<T>>(excess,
-                    new Comparator<StoredObject<T>>()
-                    {
+                sortedMaxEntries = new PriorityQueue<StoredObject<T>>(excess,
+                      new Comparator<StoredObject<T>>()
+                      {
 
-                        @Override
-                        public int compare(StoredObject<T> paramT1, StoredObject<T> paramT2)
-                        {
-                            return paramT2.timestamp.compareTo(paramT1.timestamp);
-                        }
-                    });
-                long youngest = Long.MAX_VALUE;
-                for (Serializable key : keys)
-                {
-                    StoredObject<T> obj = getStore().retrieve(key);
-                    //TODO extract the entryTTL>0 outside of loop
-                    if (entryTTL>0 && TimeUnit.NANOSECONDS.toMillis(now - obj.getTimestamp()) >= entryTTL)
-                    {
-                        remove(key);
-                        excess--;
-                        if (excess > 0 && q.size() > excess)
-                        {
-                            q.poll();
-                            youngest = q.peek().timestamp;
-                        }
-                    }
-                    else
-                    {
-                        if (excess > 0 && (q.size() < excess || obj.timestamp < youngest))
-                        {
-                            q.offer(obj);
-                            youngest = q.peek().timestamp;
-                        }
-                        if (excess > 0 && q.size() > excess)
-                        {
-                            q.poll();
-                            youngest = q.peek().timestamp;
-                        }
+                          @Override
+                          public int compare(StoredObject<T> paramT1, StoredObject<T> paramT2)
+                          {
+                              return paramT1.timestamp.compareTo(paramT2.timestamp);
+                          }
+                      }
+                );
+            }
 
-                    }
-                }
-                for (int i = 0; i < excess; i++)
+            ListableObjectStore<StoredObject<T>> store = getStore();
+            for (Serializable key : keys)
+            {
+                StoredObject<T> obj = store.retrieve(key);
+
+                if (entryTTL != UNBOUNDED && TimeUnit.NANOSECONDS.toMillis(now - obj.getTimestamp()) >= entryTTL)
                 {
-                    Serializable key = q.poll().key;
                     remove(key);
+                    excess--;
+                }
+                else if (maxEntries != UNBOUNDED && excess > 0)
+                {
+                    sortedMaxEntries.offer(obj);
                 }
             }
-            else
+
+            if (sortedMaxEntries != null)
             {
-                if(entryTTL>0)
+                StoredObject<T> obj = sortedMaxEntries.poll();
+                while (obj != null && excess > 0)
                 {
-                    for (Serializable key : keys)
-                    {
-                        StoredObject<T> obj = getStore().retrieve(key);
-                        if (TimeUnit.NANOSECONDS.toMillis(now - obj.getTimestamp()) >= entryTTL)
-                        {
-                            remove(key);
-                        }
-                    }
+                    remove(obj.getKey());
+                    excess--;
+                    obj = sortedMaxEntries.poll();
                 }
             }
         }

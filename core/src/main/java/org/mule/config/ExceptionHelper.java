@@ -511,7 +511,7 @@ public final class ExceptionHelper
 
     public static String getExceptionStack(Throwable t)
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         // get exception stack
         List<Throwable> exceptions = getExceptionsAsList(t);
 
@@ -594,7 +594,7 @@ public final class ExceptionHelper
     public static String writeException(Throwable t)
     {
         ExceptionReader er = getExceptionReader(t);
-        StringBuffer msg = new StringBuffer();
+        StringBuilder msg = new StringBuilder();
         msg.append(er.getMessage(t)).append(". Type: ").append(t.getClass());
         return msg.toString();
     }

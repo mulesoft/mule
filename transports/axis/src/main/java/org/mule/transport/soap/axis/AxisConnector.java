@@ -421,7 +421,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
 
     private String getCounterEndpointKey(EndpointURI endpointURI)
     {
-        StringBuffer endpointKey = new StringBuffer(64);
+        StringBuilder endpointKey = new StringBuilder(64);
 
         endpointKey.append(endpointURI.getScheme());
         endpointKey.append("://");

@@ -66,7 +66,7 @@ public class FlowUseCaseProcessingStrategyTestCase extends FunctionalTestCase
     
     private File createTempFile(String fileName) throws IOException
     {
-        File directory = new File("./.mule");
+        File directory = getWorkingDirectory();
         File file = File.createTempFile(fileName, ".txt", directory);
         file.deleteOnExit();
         FileOutputStream fos = new FileOutputStream(file);

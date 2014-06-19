@@ -8,7 +8,6 @@ package org.mule.endpoint.outbound;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -75,15 +74,9 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         
         assertMessageSentSame(true);
 
-        // Response message is not the same because we rewrite the response event and
-        // this change the properties
-        // (See: OutboundRewriteResponseEventMessageProcessor)
-        assertNotSame(responseMessage, result.getMessage());
+        assertSame(responseMessage, result.getMessage());
 
-        // Everything else about the message apart from addition of encoding property
-        // is the same though
         assertMessageEqualEncodingPropertyAdded(responseMessage, result.getMessage());
-
     }
 
     @Test
@@ -119,13 +112,8 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
 
         assertMessageSentSame(true);
 
-        // Response message is not the same because we rewrite the response event and
-        // this change the properties
-        // (See: OutboundRewriteResponseEventMessageProcessor)
-        assertNotSame(responseMessage, result.getMessage());
+        assertSame(responseMessage, result.getMessage());
 
-        // Everything else about the message apart from addition of encoding property
-        // is the same though
         assertMessageEqualEncodingPropertyAdded(responseMessage, result.getMessage());
     }
 

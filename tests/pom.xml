@@ -14,6 +14,10 @@
     <modules>
         <module>functional</module>
         <module>infrastructure</module>
+        <module>performance</module>
+        <module>archetypes</module>
+        <module>integration</module>
+        <module>integration-axis</module>
     </modules>
 
     <properties>
@@ -32,37 +36,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>integration-suite</id>
-            <activation>
-                <property>
-                    <name>!skipIntegrationTests</name>
-                </property>
-            </activation>
-            <modules>
-                <module>integration</module>
-                <module>integration-jdk6</module>
-                <module>integration-axis</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>archetype-tests</id>
-            <activation>
-                <property>
-                    <name>!skipArchetypeTests</name>
-                </property>
-            </activation>
-            <modules>
-                <module>archetypes</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>performance</id>
-            <modules>
-                <module>performance</module>
-            </modules>
-        </profile>    
-    </profiles>
 </project>

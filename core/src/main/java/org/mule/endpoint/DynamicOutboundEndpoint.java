@@ -10,15 +10,11 @@ import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.expression.ExpressionManager;
-import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
@@ -28,7 +24,6 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.DispatchException;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.ObjectNameHelper;
@@ -54,34 +49,27 @@ import org.apache.commons.logging.LogFactory;
 public class DynamicOutboundEndpoint implements OutboundEndpoint
 {
 
-    public static final String DYNAMIC_URI_PLACEHOLDER = "dynamic://endpoint";
-
     protected transient final Log logger = LogFactory.getLog(DynamicOutboundEndpoint.class);
 
     private static final long serialVersionUID = 8861985949279708638L;
 
-    /**
-     * The URI template used to construct the actual URI to send the message to.
-     */
-    protected String uriTemplate;
-
-    private final EndpointBuilder builder;
+    private final EndpointBuilder endpointBuilder;
 
     private final OutboundEndpoint prototypeEndpoint;
 
     // Caches resolved static endpoints to improve performance
-    private Map<String, OutboundEndpoint> staticEndpoints = Collections.synchronizedMap(new LRUMap(64));
+    private final Map<String, OutboundEndpoint> staticEndpoints = Collections.synchronizedMap(new LRUMap(64));
 
-    public DynamicOutboundEndpoint(EndpointBuilder builder, String uriTemplate) throws MalformedEndpointException
+    private final DynamicURIBuilder dynamicURIBuilder;
+
+    public DynamicOutboundEndpoint(EndpointBuilder endpointBuilder, DynamicURIBuilder dynamicURIBuilder)
     {
-        validateUriTemplate(uriTemplate);
-
-        this.builder = builder;
-        this.uriTemplate = uriTemplate;
+        this.endpointBuilder = endpointBuilder;
+        this.dynamicURIBuilder = dynamicURIBuilder;
 
         try
         {
-            prototypeEndpoint = builder.buildOutboundEndpoint();
+            prototypeEndpoint = endpointBuilder.buildOutboundEndpoint();
         }
         catch (Exception e)
         {
@@ -89,56 +77,13 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
         }
     }
 
-    protected void validateUriTemplate(String uri) throws MalformedEndpointException
-    {
-        if (uri.indexOf(":") > uri.indexOf(ExpressionManager.DEFAULT_EXPRESSION_PREFIX))
-        {
-            throw new MalformedEndpointException(CoreMessages.dynamicEndpointsMustSpecifyAScheme(), uri);
-        }
-    }
-
-    protected EndpointURI getEndpointURIForMessage(MuleEvent event) throws DispatchException
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Uri before parsing is: " + uriTemplate);
-        }
-
-        String newUriString = uriTemplate;
-        try
-        {
-            newUriString = parseURIString(newUriString, event.getMessage());
-        }
-        catch (final ExpressionRuntimeException e)
-        {
-            throw new DispatchException(event, this, e);
-        }
-
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Uri after parsing is: " + newUriString);
-        }
-
-        try
-        {
-            final MuleEndpointURI resultUri = new MuleEndpointURI(newUriString, getMuleContext(), getServiceOverrides());
-            resultUri.initialise();
-
-            return resultUri;
-        }
-        catch (final Exception e)
-        {
-            throw new DispatchException(CoreMessages.templateCausedMalformedEndpoint(uriTemplate, newUriString), event, this, e);
-        }
-    }
-
     private Properties getServiceOverrides() throws EndpointException
     {
         Properties properties = null;
 
-        if (builder instanceof AbstractEndpointBuilder)
+        if (endpointBuilder instanceof AbstractEndpointBuilder)
         {
-            Connector connector = ((AbstractEndpointBuilder) this.builder).getConnector();
+            Connector connector = ((AbstractEndpointBuilder) this.endpointBuilder).getConnector();
 
             if (connector instanceof AbstractConnector && ((AbstractConnector) connector).getServiceOverrides() != null)
             {
@@ -150,35 +95,47 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
         return properties;
     }
 
-    protected String parseURIString(String uri, MuleMessage message)
-    {
-        return this.getMuleContext().getExpressionManager().parse(uri, message, true);
-    }
-
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        EndpointURI endpointURIForMessage = getEndpointURIForMessage(event);
-        return getStaticEndpointFor(endpointURIForMessage).process(event);
-    }
+        final String uri = resolveUri(event);
 
-    private OutboundEndpoint getStaticEndpointFor(EndpointURI uri) throws EndpointException, InitialisationException
-    {
-        OutboundEndpoint outboundEndpoint = staticEndpoints.get(uri.getAddress());
+        OutboundEndpoint outboundEndpoint = staticEndpoints.get(uri);
 
         if (outboundEndpoint == null)
         {
-            outboundEndpoint = createStaticEndpoint(uri);
-            staticEndpoints.put(uri.getAddress(), outboundEndpoint);
+            final EndpointURI endpointURIForMessage = createEndpointUri(uri);
+            outboundEndpoint = createStaticEndpoint(endpointURIForMessage);
+            staticEndpoints.put(endpointURIForMessage.getAddress(), outboundEndpoint);
         }
 
-        return outboundEndpoint;
+        return outboundEndpoint.process(event);
+    }
+
+    private EndpointURI createEndpointUri(String uri) throws EndpointException, InitialisationException
+    {
+        final MuleEndpointURI endpointUri = new MuleEndpointURI(uri, getMuleContext(), getServiceOverrides());
+        endpointUri.initialise();
+
+        return endpointUri;
+    }
+
+    private String resolveUri(MuleEvent event) throws DispatchException
+    {
+        try
+        {
+            return dynamicURIBuilder.build(event);
+        }
+        catch (Exception e)
+        {
+            throw new DispatchException(event, this, e);
+        }
     }
 
     private OutboundEndpoint createStaticEndpoint(EndpointURI uri) throws EndpointException, InitialisationException
     {
         try
         {
-            EndpointBuilder staticBuilder = (EndpointBuilder) builder.clone();
+            EndpointBuilder staticBuilder = (EndpointBuilder) endpointBuilder.clone();
             staticBuilder.setURIBuilder(new URIBuilder(uri));
             String endpointName = ObjectNameHelper.getEndpointNameFor(uri);
             staticBuilder.setName(endpointName);
@@ -221,7 +178,7 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
 
     public String getAddress()
     {
-        return uriTemplate;
+        return dynamicURIBuilder.getUriTemplate();
     }
 
     public RetryPolicyTemplate getRetryPolicyTemplate()
