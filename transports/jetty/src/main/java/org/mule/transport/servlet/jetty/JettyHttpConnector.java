@@ -93,8 +93,6 @@ public class JettyHttpConnector extends AbstractConnector
 
     private ContextHandlerCollection contexts;
 
-    private Class<? extends Connector> jettyConnectorClass;
-
     public JettyHttpConnector(MuleContext context)
     {
         super(context);
@@ -438,6 +436,7 @@ public class JettyHttpConnector extends AbstractConnector
 
     /**
      * Get the number of "selector" threads Jetty should use. If -1, a default value is used based on the number of processors.
+     * @see org.eclipse.jetty.server.ServerConnector#ServerConnector(org.eclipse.jetty.server.Server, int, int)
      */
     public int getSelectors()
     {
@@ -446,6 +445,9 @@ public class JettyHttpConnector extends AbstractConnector
 
     /**
      * Set the number of "selector" threads Jetty should use. If -1, a default value is used based on the number of processors.
+     * @see org.eclipse.jetty.server.ServerConnector#ServerConnector(org.eclipse.jetty.server.Server, int, int)
+     *
+     * TODO MULE-7689: Allow to configure the number of selector threads through XML.
      */
     public void setSelectors(int selectors)
     {
@@ -648,16 +650,6 @@ public class JettyHttpConnector extends AbstractConnector
     public boolean canHostFullWars()
     {
         return true;
-    }
-
-    public Class<? extends Connector> getJettyConnectorClass()
-    {
-        return jettyConnectorClass;
-    }
-
-    public void setJettyConnectorClass(Class<? extends Connector> jettyConnectorClass)
-    {
-        this.jettyConnectorClass = jettyConnectorClass;
     }
 
 }

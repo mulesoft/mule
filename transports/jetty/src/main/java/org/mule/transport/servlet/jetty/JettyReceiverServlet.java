@@ -20,6 +20,9 @@ import java.util.concurrent.ConcurrentMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/*
+ * TODO: MULE-7690 Replace servlets with handlers in the implementation of inbound endpoints in the Jetty transport
+ */
 public class JettyReceiverServlet extends MuleReceiverServlet
 {
     /**
