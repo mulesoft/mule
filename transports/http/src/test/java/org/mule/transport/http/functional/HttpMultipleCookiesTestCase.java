@@ -28,9 +28,10 @@ import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.eclipse.jetty.server.AbstractNetworkConnector;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.bio.SocketConnector;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.junit.Rule;
@@ -126,7 +127,7 @@ public class HttpMultipleCookiesTestCase extends FunctionalTestCase
     {
         logger.debug("server starting");
         Server server = new Server();
-        Connector connector = new SocketConnector();
+        AbstractNetworkConnector connector = new ServerConnector(server);
         connector.setPort(dynamicPort2.getNumber());
         server.setConnectors(new Connector[]{connector});
 

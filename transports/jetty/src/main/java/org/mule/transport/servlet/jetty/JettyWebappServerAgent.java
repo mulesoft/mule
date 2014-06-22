@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.AbstractNetworkConnector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.webapp.WebAppContext;
 
@@ -94,7 +94,7 @@ public class JettyWebappServerAgent extends AbstractAgent
             // so much for generics :(
             WebAppContext webapp = (WebAppContext) handler;
             // build the full webapp url
-            final Connector c = jetty.getHttpServer().getConnectors()[0];
+            final AbstractNetworkConnector c = (AbstractNetworkConnector) jetty.getHttpServer().getConnectors()[0];
             final String url = String.format("http://%s%s%s",
                                              c.getHost(),
                                              c.getPort() == 80 ? StringUtils.EMPTY : ":" + c.getPort(),
