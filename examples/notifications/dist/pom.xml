@@ -8,7 +8,7 @@
     <version>1.0</version>
 
     <properties>
-        <muleVersion>3.5.1-SNAPSHOT</muleVersion>
+        <muleVersion>3.5.2-SNAPSHOT</muleVersion>
     </properties>
 
     <description>Demonstrates capturing and firing notifications and uses AJAX to send notifications to the browser.</description>

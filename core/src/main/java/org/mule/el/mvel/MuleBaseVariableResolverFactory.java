@@ -49,12 +49,18 @@ public abstract class MuleBaseVariableResolverFactory extends BaseVariableResolv
     {
         if (nextFactory != null)
         {
-            return nextFactory.getVariableResolver(name);
+            if (nextFactory instanceof MuleBaseVariableResolverFactory)
+            {
+                return nextFactory.getVariableResolver(name);
+            }
+            // Handle the case where the nextFactory throws an exception when the variable doesn't exist
+            // given MVEL implementations of getVariableResolver are inconsistent
+            else if (nextFactory.isResolveable(name))
+            {
+                return nextFactory.getVariableResolver(name);
+            }
         }
-        else
-        {
-            return null;
-        }
+        return null;
     }
 
     @Override
