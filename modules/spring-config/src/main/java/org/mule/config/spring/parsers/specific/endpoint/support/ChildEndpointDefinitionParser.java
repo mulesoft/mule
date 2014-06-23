@@ -13,6 +13,7 @@ import org.mule.util.StringUtils;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * A parser for "embedded" endpoints - ie inbound, outbound and response endpoints.
@@ -42,6 +43,8 @@ public class ChildEndpointDefinitionParser extends ChildDefinitionParser
     public BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class<?> beanClass)
     {
         BeanDefinitionBuilder builder = super.createBeanDefinitionBuilder(element, beanClass);
+
+        checkForExceptionStrategyParent(element, builder);
         String global = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF);
         if (StringUtils.isNotBlank(global))
         {
@@ -49,6 +52,20 @@ public class ChildEndpointDefinitionParser extends ChildDefinitionParser
             builder.addDependsOn(global);
         }
         return builder;
+    }
+
+    private void checkForExceptionStrategyParent(Element element, BeanDefinitionBuilder builder)
+    {
+        Node parent = element.getParentNode();
+        while (parent.getParentNode() != null)
+        {
+            if (parent.getLocalName().endsWith("exception-strategy"))
+            {
+                builder.addPropertyValue("isInExceptionStrategy", true);
+                break;
+            }
+            parent = parent.getParentNode();
+        }
     }
 
     @Override

@@ -61,9 +61,9 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
             {
                 messagingException = (MessagingException) e;
             }
-            else 
+            else
             {
-                messagingException = new MessagingException(event, e); 
+                messagingException = new MessagingException(event, e);
             }
             try
             {
