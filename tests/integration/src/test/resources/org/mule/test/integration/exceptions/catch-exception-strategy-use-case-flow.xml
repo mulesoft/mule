@@ -121,7 +121,9 @@
         <test:component throwException="true"/>
         <catch-exception-strategy>
             <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$ExecutionCountProcessor" />
-            <smtp:outbound-endpoint host="localhost" responseTimeout="10000" />
+            <processor-chain>
+                <smtp:outbound-endpoint host="localhost" responseTimeout="10000" />
+            </processor-chain>
         </catch-exception-strategy>
     </flow>
 

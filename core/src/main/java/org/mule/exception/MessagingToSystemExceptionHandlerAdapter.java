@@ -9,7 +9,7 @@ package org.mule.exception;
 import org.mule.api.MuleEvent;
 import org.mule.api.exception.MessagingExceptionHandler;
 
-public class SystemToMessagingExceptionHandlerAdapter implements MessagingExceptionHandler
+public class MessagingToSystemExceptionHandlerAdapter implements MessagingExceptionHandler
 {
 
     @Override
