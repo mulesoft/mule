@@ -15,6 +15,7 @@ import org.mule.module.launcher.artifact.ArtifactClassLoader;
 import org.mule.module.launcher.artifact.ShutdownListener;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.module.reboot.MuleContainerSystemClassLoader;
+import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -151,7 +152,7 @@ public class ArtifactAwareRepositorySelector implements RepositorySelector
         else
         {
             configureFrom(artifactLogConfig, repository);
-            if (artifactLogConfig.toExternalForm().startsWith("file:"))
+            if (FileUtils.isFile(artifactLogConfig))
             {
                 // if it's not a file, no sense in monitoring it for changes
                 configWatchDog = new ConfigWatchDog(artifactClassLoader.getClassLoader(), artifactLogConfig.getFile(), repository);
@@ -166,7 +167,7 @@ public class ArtifactAwareRepositorySelector implements RepositorySelector
             }
 
             // If the artifact logging is configured using the global config file and there is no file appender for the artifact, then configure a default one
-            if (MuleContainerBootstrapUtils.getMuleConfDir() != null && artifactLogConfig.toExternalForm().contains(MuleContainerBootstrapUtils.getMuleConfDir().getAbsolutePath()))
+            if (isUrlInsideDirectory(artifactLogConfig, MuleContainerBootstrapUtils.getMuleConfDir()))
             {
                 if (!hasFileAppender(root, artifactName))
                 {
@@ -176,6 +177,16 @@ public class ArtifactAwareRepositorySelector implements RepositorySelector
             }
         }
         return configWatchDog;
+    }
+
+    private boolean isUrlInsideDirectory(URL url, File directory)
+    {
+        if (directory != null && FileUtils.isFile(url))
+        {
+            File urlFile = new File(url.getFile());
+            return directory.equals(urlFile.getParentFile());
+        }
+        return false;
     }
 
     private void removeConsoleAppenders(RootLogger root)
