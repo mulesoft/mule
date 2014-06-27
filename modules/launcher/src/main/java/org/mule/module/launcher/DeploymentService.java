@@ -83,125 +83,136 @@ public class DeploymentService
 
     public void start()
     {
-        // install phase
-        final Map<String, Object> options = StartupContext.get().getStartupOptions();
-        String appString = (String) options.get("app");
-
-        final File appsDir = MuleContainerBootstrapUtils.getMuleAppsDir();
-
-        // delete any leftover anchor files from previous unclean shutdowns
-        String[] appAnchors = appsDir.list(new SuffixFileFilter(APP_ANCHOR_SUFFIX));
-        for (String anchor : appAnchors)
+        lock.lock();
+        try
         {
-            // ignore result
-            new File(appsDir, anchor).delete();
-        }
+            // install phase
+            final Map<String, Object> options = StartupContext.get().getStartupOptions();
+            String appString = (String) options.get("app");
 
-        String[] apps = ArrayUtils.EMPTY_STRING_ARRAY;
+            final File appsDir = MuleContainerBootstrapUtils.getMuleAppsDir();
 
-        // mule -app app1:app2:app3 will restrict deployment only to those specified apps
-        final boolean explicitAppSet = appString != null;
-
-        DeploymentStatusTracker deploymentStatusTracker = new DeploymentStatusTracker();
-        addDeploymentListener(deploymentStatusTracker);
-
-        StartupSummaryDeploymentListener summaryDeploymentListener = new StartupSummaryDeploymentListener(deploymentStatusTracker);
-        addStartupListener(summaryDeploymentListener);
-
-        if (!explicitAppSet)
-        {
-            String[] dirApps = appsDir.list(DirectoryFileFilter.DIRECTORY);
-            apps = (String[]) ArrayUtils.addAll(apps, dirApps);
-
-            String[] zipApps = appsDir.list(ZIP_APPS_FILTER);
-            for (int i = 0; i < zipApps.length; i++)
+            // delete any leftover anchor files from previous unclean shutdowns
+            String[] appAnchors = appsDir.list(new SuffixFileFilter(APP_ANCHOR_SUFFIX));
+            for (String anchor : appAnchors)
             {
-                zipApps[i] = StringUtils.removeEndIgnoreCase(zipApps[i], ZIP_FILE_SUFFIX);
+                // ignore result
+                new File(appsDir, anchor).delete();
             }
 
-            // TODO this is a place to put a FQN of the custom sorter (use AND filter)
-            // Add string shortcuts for bundled ones
-            apps = (String[]) ArrayUtils.addAll(dirApps, zipApps);
-            Arrays.sort(apps);
-        }
-        else
-        {
-            apps = appString.split(":");
-        }
+            String[] apps = ArrayUtils.EMPTY_STRING_ARRAY;
 
-        apps = removeDuplicateAppNames(apps);
+            // mule -app app1:app2:app3 will restrict deployment only to those specified apps
+            final boolean explicitAppSet = appString != null;
 
-        for (String app : apps)
-        {
-            final Application a;
-            String appMarker = app;
-            File applicationFile = null;
-            try
+            DeploymentStatusTracker deploymentStatusTracker = new DeploymentStatusTracker();
+            addDeploymentListener(deploymentStatusTracker);
+
+            StartupSummaryDeploymentListener summaryDeploymentListener = new StartupSummaryDeploymentListener(deploymentStatusTracker);
+            addStartupListener(summaryDeploymentListener);
+
+            if (!explicitAppSet)
             {
-                // if there's a zip, explode and install it
-                applicationFile = new File(appsDir, app + ".zip");
-                if (applicationFile.exists() && applicationFile.isFile())
+                String[] dirApps = appsDir.list(DirectoryFileFilter.DIRECTORY);
+                apps = (String[]) ArrayUtils.addAll(apps, dirApps);
+
+                String[] zipApps = appsDir.list(ZIP_APPS_FILTER);
+                for (int i = 0; i < zipApps.length; i++)
                 {
-                    appMarker = app + ZIP_FILE_SUFFIX;
-                    a = deployer.installFromAppDir(applicationFile.getName());
+                    zipApps[i] = StringUtils.removeEndIgnoreCase(zipApps[i], ZIP_FILE_SUFFIX);
                 }
-                else
+
+                // TODO this is a place to put a FQN of the custom sorter (use AND filter)
+                // Add string shortcuts for bundled ones
+                apps = (String[]) ArrayUtils.addAll(dirApps, zipApps);
+                Arrays.sort(apps);
+            }
+            else
+            {
+                apps = appString.split(":");
+            }
+
+            apps = removeDuplicateAppNames(apps);
+
+            for (String app : apps)
+            {
+                final Application a;
+                String appMarker = app;
+                File applicationFile = null;
+                try
                 {
-                    // otherwise just create an app object from a deployed app
-                    applicationFile = new File(appsDir, appMarker);
-                    a = appFactory.createApp(app);
+                    // if there's a zip, explode and install it
+                    applicationFile = new File(appsDir, app + ".zip");
+                    if (applicationFile.exists() && applicationFile.isFile())
+                    {
+                        appMarker = app + ZIP_FILE_SUFFIX;
+                        a = deployer.installFromAppDir(applicationFile.getName());
+                    }
+                    else
+                    {
+                        // otherwise just create an app object from a deployed app
+                        applicationFile = new File(appsDir, appMarker);
+                        a = appFactory.createApp(app);
+                    }
+                    applications.add(a);
                 }
-                applications.add(a);
+                catch (Throwable t)
+                {
+                    fireOnDeploymentFailure(appMarker, t);
+                    addZombie(applicationFile);
+                    logger.error(String.format("Failed to create application [%s]", appMarker), t);
+                }
             }
-            catch (Throwable t)
+
+            for (Application application : applications)
             {
-                fireOnDeploymentFailure(appMarker, t);
-                addZombie(applicationFile);
-                logger.error(String.format("Failed to create application [%s]", appMarker), t);
+                try
+                {
+                    fireOnDeploymentStart(application.getAppName());
+                    deployer.deploy(application);
+                    fireOnDeploymentSuccess(application.getAppName());
+                }
+                catch (Throwable t)
+                {
+                    fireOnDeploymentFailure(application.getAppName(), t);
+
+                    // error text has been created by the deployer already
+                    final String msg = miniSplash(String.format("Failed to deploy app '%s', see below", application.getAppName()));
+                    logger.error(msg, t);
+                }
+            }
+
+            for (StartupListener listener : startupListeners)
+            {
+                try
+                {
+                    listener.onAfterStartup();
+                }
+                catch (Throwable t)
+                {
+                    logger.error(t);
+                }
+            }
+
+            // only start the monitor thread if we launched in default mode without explicitly
+            // stated applications to launch
+            if (!explicitAppSet)
+            {
+                scheduleChangeMonitor(appsDir);
+            }
+            else
+            {
+                if (logger.isInfoEnabled())
+                {
+                    logger.info(miniSplash("Mule is up and running in a fixed app set mode"));
+                }
             }
         }
-
-        for (Application application : applications)
+        finally
         {
-            try
+            if (lock.isHeldByCurrentThread())
             {
-                fireOnDeploymentStart(application.getAppName());
-                deployer.deploy(application);
-                fireOnDeploymentSuccess(application.getAppName());
-            }
-            catch (Throwable t)
-            {
-                fireOnDeploymentFailure(application.getAppName(), t);
-
-                // error text has been created by the deployer already
-                final String msg = miniSplash(String.format("Failed to deploy app '%s', see below", application.getAppName()));
-                logger.error(msg, t);
-            }
-        }
-
-        for (StartupListener listener : startupListeners)
-        {
-            try
-            {
-                listener.onAfterStartup();
-            }
-            catch (Throwable t)
-            {
-                logger.error(t);
-            }
-        }
-
-        // only start the monitor thread if we launched in default mode without explicitly
-        // stated applications to launch
-        if (!explicitAppSet)
-        {
-            scheduleChangeMonitor(appsDir);
-        }
-        else
-        {
-            if (logger.isInfoEnabled())
-            {
-                logger.info(miniSplash("Mule is up and running in a fixed app set mode"));
+                lock.unlock();
             }
         }
     }
