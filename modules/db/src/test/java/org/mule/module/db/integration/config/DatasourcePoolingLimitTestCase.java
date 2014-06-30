@@ -7,31 +7,22 @@
 
 package org.mule.module.db.integration.config;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
-import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 
-import java.util.List;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
-public class DatasourcePoolingLimitTestCase extends AbstractDbIntegrationTestCase
+public class DatasourcePoolingLimitTestCase extends AbstractDatasourcePoolingTestCase
 {
 
     public DatasourcePoolingLimitTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
     {
         super(dataSourceConfigResource, testDatabase);
-    }
-
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getDerbyResource();
     }
 
     @Override
@@ -48,7 +39,6 @@ public class DatasourcePoolingLimitTestCase extends AbstractDbIntegrationTestCas
         MuleMessage response = client.send("vm://testIn", TEST_MESSAGE, null);
 
         assertTrue(response.getExceptionPayload().getException() instanceof MessagingException);
-        MessagingException exception = (MessagingException) response.getExceptionPayload().getException();
-        assertTrue(exception.getMessage().contains("An attempt by a client to checkout a Connection has timed out"));
+        assertThat(counter, equalTo(1));
     }
 }
