@@ -41,30 +41,37 @@ import org.apache.commons.collections.map.CaseInsensitiveMap;
  */
 public interface ThreadingProfile extends MuleContextAware
 {
+
+    public static final String MAX_THREADS_ACTIVE_PROPERTY = "mule.threadingProfile.maxThreadsActive";
+    public static final String MAX_THREADS_IDLE_PROPERTY = "mule.threadingProfile.maxThreadsIdle";
+    public static final String MAX_BUFFER_SIZE_PROPERTY = "mule.threadingProfile.maxBufferSize";
+    public static final String MAX_THREAD_TTL_PROPERTY = "mule.threadingProfile.maxThreadTTL";
+    public static final String MAX_WAIT_TIMEOUT_PROPERTY = "mule.threadingProfile.maxWaitTimeout";
+
     /**
      * Default value for MAX_THREADS_ACTIVE
      */
-    int DEFAULT_MAX_THREADS_ACTIVE = 16;
+    int DEFAULT_MAX_THREADS_ACTIVE = Integer.parseInt(System.getProperty(MAX_THREADS_ACTIVE_PROPERTY, "16"));
 
     /**
      * Default value for MAX_THREADS_IDLE
      */
-    int DEFAULT_MAX_THREADS_IDLE = 1;
+    int DEFAULT_MAX_THREADS_IDLE = Integer.parseInt(System.getProperty(MAX_THREADS_IDLE_PROPERTY, "1"));
 
     /**
      * Default value for MAX_BUFFER_SIZE
      */
-    int DEFAULT_MAX_BUFFER_SIZE = 0;
+    int DEFAULT_MAX_BUFFER_SIZE = Integer.parseInt(System.getProperty(MAX_BUFFER_SIZE_PROPERTY, "0"));
 
     /**
      * Default value for MAX_THREAD_TTL
      */
-    long DEFAULT_MAX_THREAD_TTL = 60000;
+    long DEFAULT_MAX_THREAD_TTL = Integer.parseInt(System.getProperty(MAX_THREAD_TTL_PROPERTY, "60000"));
 
     /**
      * Default value for DEFAULT_THREAD_WAIT_TIMEOUT
      */
-    long DEFAULT_THREAD_WAIT_TIMEOUT = 30000L;
+    long DEFAULT_THREAD_WAIT_TIMEOUT = Long.parseLong(System.getProperty(MAX_WAIT_TIMEOUT_PROPERTY, "30000"));
 
     /**
      * Default value for do threading
