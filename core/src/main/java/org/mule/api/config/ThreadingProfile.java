@@ -42,11 +42,11 @@ import org.apache.commons.collections.map.CaseInsensitiveMap;
 public interface ThreadingProfile extends MuleContextAware
 {
 
-    public static final String MAX_THREADS_ACTIVE_PROPERTY = "mule.threadingProfile.maxThreadsActive";
-    public static final String MAX_THREADS_IDLE_PROPERTY = "mule.threadingProfile.maxThreadsIdle";
-    public static final String MAX_BUFFER_SIZE_PROPERTY = "mule.threadingProfile.maxBufferSize";
-    public static final String MAX_THREAD_TTL_PROPERTY = "mule.threadingProfile.maxThreadTTL";
-    public static final String MAX_WAIT_TIMEOUT_PROPERTY = "mule.threadingProfile.maxWaitTimeout";
+    public static final String MAX_THREADS_ACTIVE_PROPERTY = MuleProperties.SYSTEM_PROPERTY_PREFIX + "defaultThreadingProfile.maxThreadsActive";
+    public static final String MAX_THREADS_IDLE_PROPERTY = MuleProperties.SYSTEM_PROPERTY_PREFIX + "defaultThreadingProfile.maxThreadsIdle";
+    public static final String MAX_BUFFER_SIZE_PROPERTY = MuleProperties.SYSTEM_PROPERTY_PREFIX + "defaultThreadingProfile.maxBufferSize";
+    public static final String MAX_THREAD_TTL_PROPERTY = MuleProperties.SYSTEM_PROPERTY_PREFIX + "defaultThreadingProfile.maxThreadTTL";
+    public static final String MAX_WAIT_TIMEOUT_PROPERTY = MuleProperties.SYSTEM_PROPERTY_PREFIX + "defaultThreadingProfile.maxWaitTimeout";
 
     /**
      * Default value for MAX_THREADS_ACTIVE
