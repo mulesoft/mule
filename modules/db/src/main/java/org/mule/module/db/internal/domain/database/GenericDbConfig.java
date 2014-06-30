@@ -22,13 +22,15 @@ import org.mule.module.db.internal.domain.transaction.TransactionCoordinationDbT
 import org.mule.module.db.internal.domain.type.DbTypeManager;
 import org.mule.module.db.internal.domain.xa.CompositeDataSourceDecorator;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.mchange.v2.c3p0.DataSources;
 
 import java.beans.PropertyVetoException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -198,21 +200,18 @@ public class GenericDbConfig implements DbConfig, Initialisable
         }
     }
 
-    private DataSource createPooledStandardDataSource() throws PropertyVetoException
+    private DataSource createPooledStandardDataSource() throws PropertyVetoException, SQLException
     {
-        ComboPooledDataSource dataSource = new ComboPooledDataSource();
-        dataSource.setDriverClass(driverClassName);
-        dataSource.setJdbcUrl(url);
-        dataSource.setUser(username);
-        dataSource.setPassword(password);
-        dataSource.setInitialPoolSize(poolingProfile.getMinPoolSize());
-        dataSource.setMinPoolSize(poolingProfile.getMinPoolSize());
-        dataSource.setMaxPoolSize(poolingProfile.getMaxPoolSize());
-        dataSource.setAcquireIncrement(poolingProfile.getAcquireIncrement());
-        dataSource.setMaxStatements(0);
-        dataSource.setMaxStatementsPerConnection(poolingProfile.getPreparedStatementCacheSize());
-        dataSource.setCheckoutTimeout(poolingProfile.getMaxWaitMillis());
-        return dataSource;
+        Map<String, Object> config = new HashMap<String, Object>();
+        config.put("maxPoolSize", poolingProfile.getMaxPoolSize());
+        config.put("minPoolSize", poolingProfile.getMinPoolSize());
+        config.put("initialPoolSize", poolingProfile.getMinPoolSize());
+        config.put("checkoutTimeout", poolingProfile.getMaxWaitMillis());
+        config.put("acquireIncrement", poolingProfile.getAcquireIncrement());
+        config.put("maxStatements", 0);
+        config.put("maxStatementsPerConnection", poolingProfile.getPreparedStatementCacheSize());
+
+        return DataSources.pooledDataSource(createSingleDataSource(), config);
     }
 
     private DataSource createPooledXaDataSource() throws SQLException

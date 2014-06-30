@@ -7,12 +7,10 @@
 
 package org.mule.module.db.integration.config;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.client.LocalMuleClient;
-import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 
@@ -21,7 +19,7 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class DatasourcePoolingTestCase extends AbstractDbIntegrationTestCase
+public class DatasourcePoolingTestCase extends AbstractDatasourcePoolingTestCase
 {
 
     public DatasourcePoolingTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
@@ -48,8 +46,7 @@ public class DatasourcePoolingTestCase extends AbstractDbIntegrationTestCase
 
         MuleMessage response = client.send("vm://testIn", TEST_MESSAGE, null);
 
-        assertTrue(response instanceof MuleMessageCollection);
-        MuleMessageCollection messageCollection = (MuleMessageCollection) response;
-        assertEquals(2, messageCollection.size());
+        assertThat(response.getExceptionPayload(), equalTo(null));
+        assertThat(counter, equalTo(2));
     }
 }
