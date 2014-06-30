@@ -42,36 +42,30 @@ import org.apache.commons.collections.map.CaseInsensitiveMap;
 public interface ThreadingProfile extends MuleContextAware
 {
 
-    public static final String MAX_THREADS_ACTIVE_PROPERTY = MuleProperties.SYSTEM_PROPERTY_PREFIX + "defaultThreadingProfile.maxThreadsActive";
-    public static final String MAX_THREADS_IDLE_PROPERTY = MuleProperties.SYSTEM_PROPERTY_PREFIX + "defaultThreadingProfile.maxThreadsIdle";
-    public static final String MAX_BUFFER_SIZE_PROPERTY = MuleProperties.SYSTEM_PROPERTY_PREFIX + "defaultThreadingProfile.maxBufferSize";
-    public static final String MAX_THREAD_TTL_PROPERTY = MuleProperties.SYSTEM_PROPERTY_PREFIX + "defaultThreadingProfile.maxThreadTTL";
-    public static final String MAX_WAIT_TIMEOUT_PROPERTY = MuleProperties.SYSTEM_PROPERTY_PREFIX + "defaultThreadingProfile.maxWaitTimeout";
-
     /**
      * Default value for MAX_THREADS_ACTIVE
      */
-    int DEFAULT_MAX_THREADS_ACTIVE = Integer.parseInt(System.getProperty(MAX_THREADS_ACTIVE_PROPERTY, "16"));
+    int DEFAULT_MAX_THREADS_ACTIVE = DefaultThreadingProfileConfig.DEFAULT_MAX_THREADS_ACTIVE;
 
     /**
      * Default value for MAX_THREADS_IDLE
      */
-    int DEFAULT_MAX_THREADS_IDLE = Integer.parseInt(System.getProperty(MAX_THREADS_IDLE_PROPERTY, "1"));
+    int DEFAULT_MAX_THREADS_IDLE = DefaultThreadingProfileConfig.DEFAULT_MAX_THREADS_IDLE;
 
     /**
      * Default value for MAX_BUFFER_SIZE
      */
-    int DEFAULT_MAX_BUFFER_SIZE = Integer.parseInt(System.getProperty(MAX_BUFFER_SIZE_PROPERTY, "0"));
+    int DEFAULT_MAX_BUFFER_SIZE = DefaultThreadingProfileConfig.DEFAULT_MAX_BUFFER_SIZE;
 
     /**
      * Default value for MAX_THREAD_TTL
      */
-    long DEFAULT_MAX_THREAD_TTL = Integer.parseInt(System.getProperty(MAX_THREAD_TTL_PROPERTY, "60000"));
+    long DEFAULT_MAX_THREAD_TTL = DefaultThreadingProfileConfig.DEFAULT_MAX_THREAD_TTL;
 
     /**
      * Default value for DEFAULT_THREAD_WAIT_TIMEOUT
      */
-    long DEFAULT_THREAD_WAIT_TIMEOUT = Long.parseLong(System.getProperty(MAX_WAIT_TIMEOUT_PROPERTY, "30000"));
+    long DEFAULT_THREAD_WAIT_TIMEOUT = DefaultThreadingProfileConfig.DEFAULT_THREAD_WAIT_TIMEOUT;
 
     /**
      * Default value for do threading
