@@ -41,30 +41,31 @@ import org.apache.commons.collections.map.CaseInsensitiveMap;
  */
 public interface ThreadingProfile extends MuleContextAware
 {
+
     /**
      * Default value for MAX_THREADS_ACTIVE
      */
-    int DEFAULT_MAX_THREADS_ACTIVE = 16;
+    int DEFAULT_MAX_THREADS_ACTIVE = DefaultThreadingProfileConfig.DEFAULT_MAX_THREADS_ACTIVE;
 
     /**
      * Default value for MAX_THREADS_IDLE
      */
-    int DEFAULT_MAX_THREADS_IDLE = 1;
+    int DEFAULT_MAX_THREADS_IDLE = DefaultThreadingProfileConfig.DEFAULT_MAX_THREADS_IDLE;
 
     /**
      * Default value for MAX_BUFFER_SIZE
      */
-    int DEFAULT_MAX_BUFFER_SIZE = 0;
+    int DEFAULT_MAX_BUFFER_SIZE = DefaultThreadingProfileConfig.DEFAULT_MAX_BUFFER_SIZE;
 
     /**
      * Default value for MAX_THREAD_TTL
      */
-    long DEFAULT_MAX_THREAD_TTL = 60000;
+    long DEFAULT_MAX_THREAD_TTL = DefaultThreadingProfileConfig.DEFAULT_MAX_THREAD_TTL;
 
     /**
      * Default value for DEFAULT_THREAD_WAIT_TIMEOUT
      */
-    long DEFAULT_THREAD_WAIT_TIMEOUT = 30000L;
+    long DEFAULT_THREAD_WAIT_TIMEOUT = DefaultThreadingProfileConfig.DEFAULT_THREAD_WAIT_TIMEOUT;
 
     /**
      * Default value for do threading
