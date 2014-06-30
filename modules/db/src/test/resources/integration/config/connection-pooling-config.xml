@@ -2,27 +2,24 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:db="http://www.mulesoft.org/schema/mule/db"
-      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
-            http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-            http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-            ">
+            http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
     <flow name="defaultQueryRequestResponse">
         <vm:inbound-endpoint path="testIn" exchange-pattern="request-response"/>
 
-        <db:select config-ref="pooledJdbcConfig" maxRows="2" >
+        <db:select config-ref="pooledJdbcConfig" maxRows="1" >
             <db:parameterized-query>select * from PLANET order by ID</db:parameterized-query>
         </db:select>
 
-        <collection-splitter/>
+        <component class="org.mule.module.db.integration.config.AbstractDatasourcePoolingTestCase$Counter"/>
 
-        <db:delete config-ref="pooledJdbcConfig">
+        <db:delete config-ref="pooledJdbcConfig" bulkMode="true">
             <db:parameterized-query>delete from PLANET where id = #[payload.id]</db:parameterized-query>
         </db:delete>
 
-        <test:component waitTime="100"/>
+        <component class="org.mule.module.db.integration.config.AbstractDatasourcePoolingTestCase$Counter"/>
     </flow>
 </mule>
