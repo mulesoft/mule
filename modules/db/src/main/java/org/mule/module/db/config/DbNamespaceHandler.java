@@ -13,13 +13,15 @@ import static org.mule.module.db.internal.config.domain.database.DbConfigDefinit
 import static org.mule.module.db.internal.config.domain.database.DbConfigDefinitionParser.DRIVER_ATTRIBUTE;
 import static org.mule.module.db.internal.config.domain.database.DbConfigDefinitionParser.HOST_ATTRIBUTE;
 import static org.mule.module.db.internal.config.domain.database.DbConfigDefinitionParser.LOGIN_TIMEOUT_ATTRIBUTE;
+import static org.mule.module.db.internal.config.domain.database.DbConfigDefinitionParser.PASSWORD_ATTRIBUTE;
 import static org.mule.module.db.internal.config.domain.database.DbConfigDefinitionParser.PORT_ATTRIBUTE;
 import static org.mule.module.db.internal.config.domain.database.DbConfigDefinitionParser.TRANSACTION_ISOLATION_ATTRIBUTE;
 import static org.mule.module.db.internal.config.domain.database.DbConfigDefinitionParser.URL_ATTRIBUTE;
+import static org.mule.module.db.internal.config.domain.database.DbConfigDefinitionParser.USER_ATTRIBUTE;
 import static org.mule.module.db.internal.config.domain.database.DbConfigDefinitionParser.USE_XA_TRANSACTIONS_ATTRIBUTE;
-
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributeAndText;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
+import org.mule.config.spring.parsers.processors.CheckRequiredAttributes;
 import org.mule.module.db.internal.config.domain.connection.PoolingProfileBeanDefinitionParser;
 import org.mule.module.db.internal.config.domain.database.DbConfigDefinitionParser;
 import org.mule.module.db.internal.config.domain.database.DbConfigFactoryBean;
@@ -81,6 +83,7 @@ public class DbNamespaceHandler extends NamespaceHandlerSupport
         DbConfigDefinitionParser oracleDbConfigFactoryBean = new DbConfigDefinitionParser(OracleConfigFactoryBean.class, new CheckExclusiveAttributes(new String[][] {
                 new String[] {URL_ATTRIBUTE, LOGIN_TIMEOUT_ATTRIBUTE, TRANSACTION_ISOLATION_ATTRIBUTE, USE_XA_TRANSACTIONS_ATTRIBUTE},
                 new String[] {DATA_SOURCE_REF_ATTRIBUTE}}));
+        oracleDbConfigFactoryBean.registerPreProcessor(new CheckRequiredAttributes(new String[][] {{DATA_SOURCE_REF_ATTRIBUTE}, {USER_ATTRIBUTE, PASSWORD_ATTRIBUTE}}));
         oracleDbConfigFactoryBean.addAlias("instance", "database");
         registerBeanDefinitionParser("oracle-config", oracleDbConfigFactoryBean);
 
