@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.module.db.integration.config;
 
 import static org.mule.module.db.integration.TestRecordUtil.assertMessageContains;
@@ -11,21 +12,20 @@ import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
+import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
-import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.module.db.integration.model.OracleTestDatabase;
 
-import org.junit.Rule;
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.Test;
+import org.junit.runners.Parameterized;
 
-public abstract class AbstractHostPortConfigTestCase extends AbstractDbIntegrationTestCase
+public class OracleDatasourceConfigTestCase extends AbstractDbIntegrationTestCase
 {
 
-    @Rule
-    public SystemProperty databasePort = new SystemProperty("database.port", getDatabasePortPropertyValue());
-
-    protected abstract String getDatabasePortPropertyValue();
-
-    public AbstractHostPortConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
+    public OracleDatasourceConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
     {
         super(dataSourceConfigResource, testDatabase);
     }
@@ -36,8 +36,21 @@ public abstract class AbstractHostPortConfigTestCase extends AbstractDbIntegrati
         return new String[] {"integration/config/simple-select-config.xml"};
     }
 
+    @Parameterized.Parameters
+    public static List<Object[]> parameters()
+    {
+        if (TestDbConfig.getOracleResource().isEmpty())
+        {
+            return Collections.emptyList();
+        }
+        else
+        {
+            return Collections.singletonList(new Object[] {"integration/config/oracle-datasource-config.xml", new OracleTestDatabase()});
+        }
+    }
+
     @Test
-    public void usesDatasourceConfig() throws Exception
+    public void acceptsDatasourceWithoutUserAndPassword() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
 
