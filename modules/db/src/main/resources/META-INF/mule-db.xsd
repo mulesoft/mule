@@ -746,7 +746,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:complexType name="abstractOptionalUserAndPasswordDatabaseConfigType">
+    <xsd:complexType name="abstractUserAndPasswordDatabaseConfigType">
         <xsd:complexContent>
             <xsd:extension base="DatabaseConfigType">
                 <xsd:attribute name="user" type="xsd:string" use="optional">
@@ -767,35 +767,14 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="abstractMandatoryUserAndPasswordDatabaseConfigType">
-        <xsd:complexContent>
-            <xsd:extension base="DatabaseConfigType">
-                <xsd:attribute name="user" type="xsd:string" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The user that is used for authentication against the database.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="password" type="xsd:string" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The password that is used for authentication against the database.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="derby-config" type="abstractOptionalUserAndPasswordDatabaseConfigType"
+    <xsd:element name="derby-config" type="abstractUserAndPasswordDatabaseConfigType"
                  substitutionGroup="abstract-config"/>
 
     <xsd:element name="oracle-config" type="oracleDatabaseConfigType" substitutionGroup="abstract-config"/>
 
     <xsd:complexType name="oracleDatabaseConfigType">
         <xsd:complexContent>
-            <xsd:extension base="abstractMandatoryUserAndPasswordDatabaseConfigType">
+            <xsd:extension base="abstractUserAndPasswordDatabaseConfigType">
                 <xsd:attribute name="host" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -825,7 +804,7 @@
 
     <xsd:complexType name="mySqlDatabaseConfigType">
         <xsd:complexContent>
-            <xsd:extension base="abstractOptionalUserAndPasswordDatabaseConfigType">
+            <xsd:extension base="abstractUserAndPasswordDatabaseConfigType">
                 <xsd:attribute name="database" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
