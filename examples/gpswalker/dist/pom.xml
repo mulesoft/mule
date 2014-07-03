@@ -8,7 +8,7 @@
     <version>1.0</version>
 
     <properties>
-        <muleVersion>3.5.1-SNAPSHOT</muleVersion>
+        <muleVersion>3.5.1</muleVersion>
     </properties>
 
     <description>Simulates plotting GPS coordinates</description>
