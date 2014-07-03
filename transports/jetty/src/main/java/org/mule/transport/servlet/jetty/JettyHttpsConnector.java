@@ -261,9 +261,15 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
         {
             sslContextFactory.setKeyStorePath(tls.getKeyStore());
         }
+        // added as per Jira MULE-7714
+        if (tls.getKeyStorePassword() != null)
+        {
+            sslContextFactory.setKeyStorePassword(tls.getKeyStorePassword());
+        }
         if (tls.getKeyPassword() != null)
         {
-            sslContextFactory.setKeyStorePassword(tls.getKeyPassword());
+            // modified as per Jira MULE-7714
+            sslContextFactory.setKeyManagerPassword(tls.getKeyPassword());
         }
         if (tls.getKeyStoreType() != null)
         {
