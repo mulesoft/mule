@@ -10,7 +10,7 @@
 
     <jetty-ssl:connector name="jettyConnector">
         <jetty-ssl:tls-client path="clientKeystore" storePassword="mulepassword"/>
-        <jetty-ssl:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
+        <jetty-ssl:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="storepassword"/>
         <jetty-ssl:tls-server path="trustStore" storePassword="mulepassword" requireClientAuthentication="true"/>
     </jetty-ssl:connector>
 
@@ -23,7 +23,7 @@
 
     <https:connector name="httpConnectorWithAuthentication">
         <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
-        <https:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
+        <https:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="storepassword"/>
     </https:connector>
 
     <https:connector name="httpConnectorWithoutAuthentication"/>
