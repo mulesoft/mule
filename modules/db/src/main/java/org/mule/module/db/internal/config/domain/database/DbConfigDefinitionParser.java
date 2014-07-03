@@ -49,6 +49,8 @@ public class DbConfigDefinitionParser extends MuleOrphanDefinitionParser
 
     public static final String TRANSACTION_ISOLATION_ATTRIBUTE = "transactionIsolation";
     public static final String URL_ATTRIBUTE = "url";
+    public static final String USER_ATTRIBUTE = "user";
+    public static final String PASSWORD_ATTRIBUTE = "password";
     public static final String DRIVER_ATTRIBUTE = "driver";
     public static final String HOST_ATTRIBUTE = "host";
     public static final String PORT_ATTRIBUTE = "port";
