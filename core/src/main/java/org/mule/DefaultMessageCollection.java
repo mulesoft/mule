@@ -70,9 +70,10 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
 
         if (!msg.invalidatedPayload)
         {
-            for (int i = 0; i < msg.getMessagesAsArray().length; i++)
+            MuleMessage[] messagesAsArray = msg.getMessagesAsArray();
+            for (int i = 0; i < messagesAsArray.length; i++)
             {
-                MuleMessage currentMsg = msg.getMessagesAsArray()[i];
+                MuleMessage currentMsg = messagesAsArray[i];
                 if (deepMessageCopy)
                 {
                     if (currentMsg instanceof MuleMessageCollection)
