@@ -12,6 +12,7 @@ import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import org.junit.Before;
 import org.junit.runners.Parameterized;
@@ -19,7 +20,8 @@ import org.junit.runners.Parameterized;
 public abstract class AbstractDatasourcePoolingTestCase extends AbstractDbIntegrationTestCase
 {
 
-    protected static int counter;
+    protected static final int TOTAL_CONCURRENT_REQUESTS = 2;
+    protected static CountDownLatch connectionLatch;
 
     public AbstractDatasourcePoolingTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
     {
@@ -35,15 +37,25 @@ public abstract class AbstractDatasourcePoolingTestCase extends AbstractDbIntegr
     @Before
     public void setUp() throws Exception
     {
-        counter = 0;
+        connectionLatch = new CountDownLatch(TOTAL_CONCURRENT_REQUESTS);
     }
 
-    public static class Counter
+    public static class JoinRequests
     {
 
-        public static synchronized Object process(Object payload)
+        public static Object process(Object payload)
         {
-            counter++;
+            connectionLatch.countDown();
+
+            try
+            {
+                connectionLatch.await();
+            }
+            catch (InterruptedException e)
+            {
+                Thread.currentThread().interrupt();
+            }
+
             return payload;
         }
     }
