@@ -19,6 +19,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.MessageInfoMapping;
@@ -37,6 +38,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +74,8 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     private DefaultMessageCollection mockMessageCollection;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private MuleEvent mockMuleEvent;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private FlowConstruct mockFlowConstruct;
 
     private ListableObjectStore<EventGroup> memoryObjectStore = new SimpleMemoryObjectStore<EventGroup>();
 
@@ -179,6 +183,15 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
+    public void avoidCreateMessageEventToGetExceptionListener() throws Exception
+    {
+        doExpiredGroupMonitoringTest(true);
+
+        Mockito.verify(mockFlowConstruct, Mockito.times(1)).getExceptionListener();
+        Mockito.verify(mockEventGroup, Mockito.times(1)).getMessageCollectionEvent();
+    }
+
     private EventCorrelator createEventCorrelator() throws Exception
     {
         when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
@@ -188,7 +201,8 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
         memoryObjectStore.store(TEST_GROUP_ID, mockEventGroup);
         when(mockEventGroup.getGroupId()).thenReturn(TEST_GROUP_ID);
         when(mockEventGroup.toMessageCollection()).thenReturn(null);
-        return new EventCorrelator(mockEventCorrelatorCallback, mockTimeoutMessageProcessor, mockMessagingInfoMapping, mockMuleContext, "flowName", USE_PERSISTENT_STORE, OBJECT_STOR_NAME_PREFIX);
+        when(mockFlowConstruct.getName()).thenReturn("flowName");
+        return new EventCorrelator(mockEventCorrelatorCallback, mockTimeoutMessageProcessor, mockMessagingInfoMapping, mockMuleContext, mockFlowConstruct, USE_PERSISTENT_STORE, OBJECT_STOR_NAME_PREFIX);
     }
 
     public interface DisposableListableObjectStore extends ListableObjectStore, Disposable

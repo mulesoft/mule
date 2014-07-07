@@ -60,7 +60,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
                 flowConstruct.getName(), this.getClass().getName());
         }
         eventCorrelator = new EventCorrelator(getCorrelatorCallback(muleContext), next, messageInfoMapping,
-            muleContext, flowConstruct.getName(), persistentStores, storePrefix);
+            muleContext, flowConstruct, persistentStores, storePrefix);
 
         // Inherit failOnTimeout from async-reply if this aggregator is being used
         // for async-reply

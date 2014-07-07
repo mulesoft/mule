@@ -98,12 +98,13 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
 
     private final boolean persistentStores;
     private final String storePrefix;
+    private final FlowConstruct flowConstruct;
 
     public EventCorrelator(EventCorrelatorCallback callback,
                            MessageProcessor timeoutMessageProcessor,
                            MessageInfoMapping messageInfoMapping,
                            MuleContext muleContext,
-                           String flowConstructName,
+                           FlowConstruct flowConstruct,
                            boolean persistentStores,
                            String storePrefix)
     {
@@ -127,7 +128,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
         this.persistentStores = persistentStores;
         this.storePrefix = storePrefix;
         name = String.format("%s%s.event.correlator", ThreadNameHelper.getPrefix(muleContext),
-                             flowConstructName);
+                             flowConstruct.getName());
         ObjectStoreManager objectStoreManager = muleContext.getRegistry().get(
                 MuleProperties.OBJECT_STORE_MANAGER);
         expiredAndDispatchedGroups = (ListableObjectStore<Long>) objectStoreManager.getObjectStore(
@@ -138,6 +139,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
         eventGroups = (ListableObjectStore<EventGroup>) objectStoreManager.getObjectStore(storePrefix
                                                                                           + ".eventGroups",
                                                                                           persistentStores);
+        this.flowConstruct = flowConstruct;
     }
 
     public void forceGroupExpiry(String groupId) throws MessagingException
@@ -555,7 +557,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                 for (Object anExpired : expired)
                 {
                     final EventGroup group = (EventGroup) anExpired;
-                    ExecutionTemplate<MuleEvent> executionTemplate = ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate(muleContext, group.getMessageCollectionEvent().getFlowConstruct().getExceptionListener());
+                    ExecutionTemplate<MuleEvent> executionTemplate = ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate(muleContext, flowConstruct.getExceptionListener());
                     try
                     {
                         executionTemplate.execute(new ExecutionCallback<MuleEvent>()
