@@ -7,8 +7,7 @@
 
 package org.mule.module.db.integration.config;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleMessage;
@@ -46,9 +45,13 @@ public class DatasourcePoolingTestCase extends AbstractDatasourcePoolingTestCase
     {
         LocalMuleClient client = muleContext.getClient();
 
-        MuleMessage response = client.send("vm://testIn", TEST_MESSAGE, null);
+        client.dispatch("vm://testIn", TEST_MESSAGE, null);
+        client.dispatch("vm://testIn", TEST_MESSAGE, null);
 
+        MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
         assertThat(response.getExceptionPayload(), is(nullValue()));
-        assertThat(counter, equalTo(2));
+
+        response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+        assertThat(response.getExceptionPayload(), is(nullValue()));
     }
 }
