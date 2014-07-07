@@ -8,18 +8,20 @@
             http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
     <flow name="defaultQueryRequestResponse">
-        <vm:inbound-endpoint path="testIn" exchange-pattern="request-response"/>
+        <vm:inbound-endpoint path="testIn" exchange-pattern="one-way"/>
 
-        <db:select config-ref="pooledJdbcConfig" maxRows="1" >
-            <db:parameterized-query>select * from PLANET order by ID</db:parameterized-query>
-        </db:select>
+        <transactional>
+            <db:delete config-ref="pooledJdbcConfig">
+                <db:parameterized-query>delete from PLANET where id = #[payload.id]</db:parameterized-query>
+            </db:delete>
 
-        <component class="org.mule.module.db.integration.config.AbstractDatasourcePoolingTestCase$Counter"/>
+            <component class="org.mule.module.db.integration.config.AbstractDatasourcePoolingTestCase$JoinRequests"/>
+        </transactional>
 
-        <db:delete config-ref="pooledJdbcConfig" bulkMode="true">
-            <db:parameterized-query>delete from PLANET where id = #[payload.id]</db:parameterized-query>
-        </db:delete>
+        <vm:outbound-endpoint path="testOut" exchange-pattern="one-way"/>
 
-        <component class="org.mule.module.db.integration.config.AbstractDatasourcePoolingTestCase$Counter"/>
+        <catch-exception-strategy>
+            <vm:outbound-endpoint path="connectionError" exchange-pattern="one-way"/>
+        </catch-exception-strategy>
     </flow>
 </mule>
