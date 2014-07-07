@@ -33,10 +33,15 @@
         <!-- Refer to http://www.mulesoft.org/display/MULE/Mailing+Lists -->
     </mailingLists>
     <developers>
-        <!-- Refer to http://www.mulesoft.org/display/MULE/Team -->
+        <developer>
+            <id>rrinaudo</id>
+            <name>Ramiro Rinaudo</name>
+            <url>http://mulesoft.org</url>
+            <organization>MuleSoft</organization>
+        </developer>
     </developers>
     <contributors>
-        <!-- Refer to http://www.mulesoft.org/display/MULE/Team -->
+        <!-- https://github.com/mulesoft/mule/graphs/contributors -->
     </contributors>
     <issueManagement>
         <system>jira</system>
