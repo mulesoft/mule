@@ -186,7 +186,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
             }
             catch (MuleException e)
             {
-                event.getFlowConstruct().getExceptionListener().handleException(e, event);
+                event.getExceptionHandler().handleException(e, event);
             }
         }
     }

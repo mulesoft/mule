@@ -2095,7 +2095,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         if (e instanceof MessagingException)
         {
             MuleEvent failedEvent = ((MessagingException) e).getEvent();
-            failedEvent.getFlowConstruct().getExceptionListener().handleException((MessagingException) e, failedEvent);
+            failedEvent.getExceptionHandler().handleException((MessagingException) e, failedEvent);
         }
         else if (e instanceof Exception)
         {

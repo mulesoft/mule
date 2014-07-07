@@ -12,6 +12,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
@@ -40,6 +41,19 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
             fireNotification(exception);
             logException(exception);
             processStatistics(event);
+            // Now we are in an exception exception strategy, use the SystemExceptionStrategy to handle
+            // exceptions, otherwise we get infinite loops. Note: there is no need to reset the
+            // MessagingExceptionHandler in MuleEvent because normal flow processing never continues once we
+            // are in a exception strategy
+            event.setExceptionHandler(new MessagingExceptionHandler()
+            {
+                @Override
+                public MuleEvent handleException(Exception exception, MuleEvent event)
+                {
+                    muleContext.getExceptionListener().handleException(exception);
+                    return event;
+                }
+            });
             event.getMessage().setExceptionPayload(new DefaultExceptionPayload(exception));
             event = beforeRouting(exception, event);
             event = route(event, exception);

@@ -15,6 +15,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
@@ -342,4 +343,16 @@ public class OutboundRoutingTestEvent implements MuleEvent
     public void setEnableNotifications(boolean enabled)
     {
     }
+    
+    @Override
+    public MessagingExceptionHandler getExceptionHandler()
+    {
+        return null;
+    }
+    
+    @Override
+    public void setExceptionHandler(MessagingExceptionHandler exceptionHandler)
+    {
+    }
+
 }

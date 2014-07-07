@@ -16,6 +16,7 @@ import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.processor.ProcessingDescriptor;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
@@ -93,6 +94,8 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
 
     private CopyOnWriteCaseInsensitiveMap<String, Object> flowVariables = new CopyOnWriteCaseInsensitiveMap<String, Object>();
 
+    private MessagingExceptionHandler exceptionHandler;
+    
     // Constructors
 
     /**
@@ -330,6 +333,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this.flowConstruct = flowConstruct;
         this.session = session;
 
+        this.exceptionHandler = rewriteEvent.getExceptionHandler();
         this.credentials = rewriteEvent.getCredentials();
         this.encoding = rewriteEvent.getEncoding();
         this.exchangePattern = rewriteEvent.getExchangePattern();
@@ -1234,4 +1238,17 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     {
         notificationsEnabled = enabled;
     }
+
+    public MessagingExceptionHandler getExceptionHandler()
+    {
+        return exceptionHandler != null
+                                       ? exceptionHandler
+                                       : (flowConstruct != null ? flowConstruct.getExceptionListener() : null);
+    }
+
+    public void setExceptionHandler(MessagingExceptionHandler exceptionHandler)
+    {
+        this.exceptionHandler = exceptionHandler;
+    }
+
 }
