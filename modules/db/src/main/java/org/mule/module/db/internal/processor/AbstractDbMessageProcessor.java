@@ -65,6 +65,18 @@ public abstract class AbstractDbMessageProcessor extends AbstractInterceptingMes
 
             Object result = executeQuery(connection, muleEvent);
 
+            if (mustCloseConnection())
+            {
+                try
+                {
+                    dbConfig.getConnectionFactory().releaseConnection(connection);
+                }
+                finally
+                {
+                    connection = null;
+                }
+            }
+
             if (target == null || "".equals(target) || "#[payload]".equals(target))
             {
                 muleEvent.getMessage().setPayload(result);

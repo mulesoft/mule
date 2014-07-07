@@ -7,9 +7,9 @@
 
 package org.mule.module.db.integration.config;
 
-import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
@@ -34,11 +34,19 @@ public class DatasourcePoolingLimitTestCase extends AbstractDatasourcePoolingTes
     @Test
     public void limitsConnections() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        try
+        {
+            LocalMuleClient client = muleContext.getClient();
 
-        MuleMessage response = client.send("vm://testIn", TEST_MESSAGE, null);
+            client.dispatch("vm://testIn", TEST_MESSAGE, null);
+            client.dispatch("vm://testIn", TEST_MESSAGE, null);
 
-        assertTrue(response.getExceptionPayload().getException() instanceof MessagingException);
-        assertThat(counter, equalTo(1));
+            MuleMessage response = client.request("vm://connectionError", RECEIVE_TIMEOUT);
+            assertThat(response.getExceptionPayload().getException(), is(instanceOf(MessagingException.class)));
+        }
+        finally
+        {
+            connectionLatch.countDown();
+        }
     }
 }
