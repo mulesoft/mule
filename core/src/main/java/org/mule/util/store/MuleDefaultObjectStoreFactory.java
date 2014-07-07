@@ -17,7 +17,7 @@ public class MuleDefaultObjectStoreFactory implements DefaultObjectStoreFactory
     @Override
     public ObjectStore<Serializable> createDefaultInMemoryObjectStore()
     {
-        return new SimpleMemoryObjectStore<Serializable>();
+        return new PartitionedInMemoryObjectStore<Serializable>();
     }
 
     @Override
@@ -47,6 +47,6 @@ public class MuleDefaultObjectStoreFactory implements DefaultObjectStoreFactory
     @Override
     public ObjectStore<Serializable> createDefaultUserTransientObjectStore()
     {
-        return new SimpleMemoryObjectStore<Serializable>();
+        return new PartitionedInMemoryObjectStore<Serializable>();
     }
 }
