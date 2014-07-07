@@ -33,10 +33,51 @@
         <!-- Refer to http://www.mulesoft.org/display/MULE/Mailing+Lists -->
     </mailingLists>
     <developers>
-        <!-- Refer to http://www.mulesoft.org/display/MULE/Team -->
+        <developer>
+            <id>rrinaudo</id>
+            <name>Ramiro Rinaudo</name>
+            <url>http://mulesoft.org</url>
+            <organization>MuleSoft</organization>
+            <roles>
+                <role>Project Manager</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>Pablo Abad</name>
+        </developer>
+        <developer>
+            <name>Daniel Feist</name>
+        </developer>
+        <developer>
+            <name>Ana Felisatti</name>
+        </developer>
+        <developer>
+            <name>Andres Gregoire</name>
+        </developer>
+        <developer>
+            <name>Luciano Gandini</name>
+        </developer>
+        <developer>
+            <name>Mariano Gonzalez</name>
+        </developer>
+        <developer>
+            <name>Pablo Kraan</name>
+        </developer>
+        <developer>
+            <name>Pablo La Greca</name>
+        </developer>
+        <developer>
+            <name>Marcos Nunez Cortes</name>
+        </developer>
+        <developer>
+            <name>Victor Romero</name>
+        </developer>
+        <developer>
+            <name>Alejandro Sequeira</name>
+        </developer>
     </developers>
     <contributors>
-        <!-- Refer to http://www.mulesoft.org/display/MULE/Team -->
+        <!-- Refer to https://github.com/mulesoft/mule/graphs/contributors -->
     </contributors>
     <issueManagement>
         <system>jira</system>
