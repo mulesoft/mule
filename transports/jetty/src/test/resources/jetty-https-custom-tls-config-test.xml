@@ -7,7 +7,7 @@
 
     <jetty-ssl:connector name="jettyConnector">
         <jetty-ssl:tls-client path="clientKeystore" storePassword="mulepassword"/>
-        <jetty-ssl:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
+        <jetty-ssl:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="storepassword"/>
         <jetty-ssl:tls-server path="trustStore" storePassword="mulepassword"/>
     </jetty-ssl:connector>
 
