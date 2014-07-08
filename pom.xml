@@ -112,6 +112,7 @@
         <commonsCliVersion>1.2</commonsCliVersion>
         <commonsCodecVersion>1.3</commonsCodecVersion>
         <commonsCollectionsVersion>3.2.1</commonsCollectionsVersion>
+        <commonsDbcpVersion>1.4</commonsDbcpVersion>
         <commonsDbUtilsVersion>1.2</commonsDbUtilsVersion>
         <commonsHttpClientVersion>3.1</commonsHttpClientVersion>
         <commonsIoVersion>2.4</commonsIoVersion>
@@ -1276,6 +1277,13 @@
                 <artifactId>guava</artifactId>
                 <version>${guavaVersion}</version>        
             </dependency>
+
+            <dependency>
+                <groupId>commons-dbcp</groupId>
+                <artifactId>commons-dbcp</artifactId>
+                <version>${commonsDbcpVersion}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

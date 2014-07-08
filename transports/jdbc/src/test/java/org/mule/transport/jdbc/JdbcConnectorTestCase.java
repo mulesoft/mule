@@ -6,18 +6,22 @@
  */
 package org.mule.transport.jdbc;
 
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import org.mule.api.MuleException;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.Connector;
 import org.mule.common.TestResult;
 import org.mule.common.Testable;
+import org.mule.tck.MuleTestUtils.TestCallback;
 import org.mule.tck.util.MuleDerbyTestUtils;
 import org.mule.transport.AbstractConnectorTestCase;
 import org.mule.transport.jdbc.xa.DataSourceWrapper;
@@ -31,7 +35,6 @@ import javax.sql.XADataSource;
 import org.apache.derby.jdbc.EmbeddedDataSource;
 import org.enhydra.jdbc.standard.StandardDataSource;
 import org.junit.Test;
-import org.mockito.Answers;
 
 public class JdbcConnectorTestCase extends AbstractConnectorTestCase
 {
@@ -138,6 +141,50 @@ public class JdbcConnectorTestCase extends AbstractConnectorTestCase
         DataSource mockDataSource = mock(TestXADataSource.class);
         DataSource dataSource = getDataSourceAfterInitialization(mockDataSource);
         assertThat(dataSource, instanceOf(DataSourceWrapper.class));
+    }
+
+    @Test
+    public void dispatcherPoolDisabled() throws Exception
+    {
+        testWithSystemProperty(JdbcConnector.USE_DISPATCHER_POOL_SYSTEM_PROPERTY, "false",
+                               new TestCallback()
+                               {
+                                   @Override
+                                   public void run() throws Exception
+                                   {
+                                       JdbcConnector jdbcConnector = (JdbcConnector) createConnector();
+                                       jdbcConnector.initialise();
+                                       jdbcConnector.start();
+
+                                       OutboundEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint("jdbc://test");
+                                       jdbcConnector.createDispatcherMessageProcessor(endpoint);
+
+                                       assertThat(jdbcConnector.borrowDispatcher(endpoint), notNullValue());
+                                       assertThat(jdbcConnector.borrowDispatcher(endpoint), is(jdbcConnector.borrowDispatcher(endpoint)));
+
+                                   }
+                               });
+    }
+
+    @Test
+    public void dispatcherPoolEnabled() throws Exception
+    {
+        testWithSystemProperty(JdbcConnector.USE_DISPATCHER_POOL_SYSTEM_PROPERTY, "true",
+                               new TestCallback()
+                               {
+                                   @Override
+                                   public void run() throws Exception
+                                   {
+                                       JdbcConnector jdbcConnector = (JdbcConnector) createConnector();
+                                       jdbcConnector.initialise();
+                                       jdbcConnector.start();
+
+                                       OutboundEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint("jdbc://test");
+                                       jdbcConnector.createDispatcherMessageProcessor(endpoint);
+
+                                       assertThat(jdbcConnector.borrowDispatcher(endpoint), not(jdbcConnector.borrowDispatcher(endpoint)));
+                                   }
+                               });
     }
 
     private DataSource getDataSourceAfterInitialization(DataSource mockDataSource) throws InitialisationException
