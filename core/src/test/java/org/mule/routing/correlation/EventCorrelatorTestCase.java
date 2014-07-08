@@ -18,6 +18,8 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.store.ListableObjectStore;
@@ -33,6 +35,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
@@ -68,6 +71,8 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     private DefaultMessageCollection mockMessageCollection;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private MuleEvent mockMuleEvent;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private FlowConstruct mockFlowConstruct;
 
     @Test(expected = CorrelationTimeoutException.class)
     public void initAfterDeserializationAfterForceGroupExpiry() throws Exception
@@ -145,6 +150,14 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
+    public void avoidCreateMessageEventToGetExceptionListener() throws Exception
+    {
+        doExpiredGroupMonitoringTest(true);
+
+        Mockito.verify(mockFlowConstruct, Mockito.times(1)).getExceptionListener();
+        Mockito.verify(mockEventGroup, Mockito.times(1)).getMessageCollectionEvent();
+    }
 
     private EventCorrelator createEventCorrelator() throws Exception
     {
@@ -155,6 +168,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
         when(mockObjectStore.retrieve(TEST_GROUP_ID)).thenReturn(mockEventGroup);
         when(mockEventGroup.getGroupId()).thenReturn(TEST_GROUP_ID);
         when(mockEventGroup.toMessageCollection()).thenReturn(null);
-        return new EventCorrelator(mockEventCorrelatorCallback, mockTimeoutMessageProcessor, mockMessagingInfoMapping, mockMuleContext, "flowName", USE_PERSISTENT_STORE, OBJECT_STOR_NAME_PREFIX);
+        when(mockFlowConstruct.getName()).thenReturn("flowName");
+        return new EventCorrelator(mockEventCorrelatorCallback, mockTimeoutMessageProcessor, mockMessagingInfoMapping, mockMuleContext, mockFlowConstruct, USE_PERSISTENT_STORE, OBJECT_STOR_NAME_PREFIX);
     }
 }
