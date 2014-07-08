@@ -48,7 +48,7 @@ public class JettyNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(connector.getKeyStore().endsWith("/serverKeystore"));
         assertEquals("muleserver", connector.getKeyAlias());
         assertEquals("mulepassword", connector.getKeyPassword());
-        assertEquals("mulepassword", connector.getKeyStorePassword());
+        assertEquals("storepassword", connector.getKeyStorePassword());
         //The full path gets resolved, we're just checking that the property got set
         assertTrue(connector.getClientKeyStore().endsWith("/clientKeystore"));
         assertEquals("mulepassword", connector.getClientKeyStorePassword());
