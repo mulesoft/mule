@@ -112,8 +112,9 @@ public class DefaultMessageCollectionTestCase extends AbstractMuleTestCase
     @Test
     public void ensureOnlyOneArrayConversionOnCopy()
     {
-        DefaultMessageCollection original = Mockito.mock(DefaultMessageCollection.class);
-        Mockito.when(original.getMessagesAsArray()).thenReturn(new MuleMessage[]{Mockito.mock(MuleMessage.class)});
+        DefaultMessageCollection original = new DefaultMessageCollection(muleContext);
+        original.addMessage(new DefaultMuleMessage("Test Data", muleContext));
+        original = Mockito.spy(original);
 
         new DefaultMessageCollection(original, muleContext, true);
 
