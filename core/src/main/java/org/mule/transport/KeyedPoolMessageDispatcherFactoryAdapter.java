@@ -8,9 +8,6 @@ package org.mule.transport;
 
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageDispatcherFactory;
 import org.mule.config.i18n.CoreMessages;
@@ -108,23 +105,7 @@ public class KeyedPoolMessageDispatcherFactoryAdapter
 
     protected void applyLifecycle(MessageDispatcher dispatcher) throws MuleException
     {
-        String phase = ((AbstractConnector)dispatcher.getConnector()).getLifecycleManager().getCurrentPhase();
-        if(phase.equals(Startable.PHASE_NAME) && !dispatcher.getLifecycleState().isStarted())
-        {
-            if(!dispatcher.getLifecycleState().isInitialised())
-            {
-                dispatcher.initialise();
-            }
-            dispatcher.start();
-        }
-        else if(phase.equals(Stoppable.PHASE_NAME) && dispatcher.getLifecycleState().isStarted())
-        {
-            dispatcher.stop();
-        }
-        else if(Disposable.PHASE_NAME.equals(phase))
-        {
-            dispatcher.dispose();
-        }
+        MessageDispatcherUtils.applyLifecycle(dispatcher);
     }
 
 }

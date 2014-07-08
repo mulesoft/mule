@@ -10,16 +10,20 @@ import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
+import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.common.DefaultTestResult;
 import org.mule.common.FailureType;
@@ -30,6 +34,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectException;
+import org.mule.transport.MessageDispatcherUtils;
 import org.mule.transport.jdbc.sqlstrategy.DefaultSqlStatementStrategyFactory;
 import org.mule.transport.jdbc.sqlstrategy.SqlStatementStrategyFactory;
 import org.mule.transport.jdbc.xa.CompositeDataSourceDecorator;
@@ -41,6 +46,7 @@ import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,6 +54,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
+import org.apache.commons.lang.BooleanUtils;
 
 public class JdbcConnector extends AbstractConnector implements Testable
 {
@@ -59,6 +66,10 @@ public class JdbcConnector extends AbstractConnector implements Testable
     public static final long DEFAULT_POLLING_FREQUENCY = 1000;
 
     private static final Pattern STATEMENT_ARGS = TemplateParser.WIGGLY_MULE_TEMPLATE_PATTERN;
+
+    public static final String USE_DISPATCHER_POOL_SYSTEM_PROPERTY = MuleProperties.SYSTEM_PROPERTY_PREFIX
+                                                                                + "transport."
+                                                                                + JDBC + ".useDispatcherPool";
 
     private final CompositeDataSourceDecorator databaseDecorator = new CompositeDataSourceDecorator();
     private SqlStatementStrategyFactory sqlStatementStrategyFactory = new DefaultSqlStatementStrategyFactory();
@@ -84,9 +95,13 @@ public class JdbcConnector extends AbstractConnector implements Testable
      */
     protected boolean transactionPerMessage = true;
 
+    private boolean useDispatcherPool = false;
+    protected Map<OutboundEndpoint, MessageDispatcher> endpointDispatchers = new ConcurrentHashMap<OutboundEndpoint, MessageDispatcher>();
+
     public JdbcConnector(MuleContext context)
     {
         super(context);
+        useDispatcherPool = BooleanUtils.toBoolean(System.getProperty(USE_DISPATCHER_POOL_SYSTEM_PROPERTY));
     }
 
     @Override
@@ -632,6 +647,51 @@ public class JdbcConnector extends AbstractConnector implements Testable
                 }
             }
         }
+    }
+
+    @Override
+    public MessageProcessor createDispatcherMessageProcessor(OutboundEndpoint endpoint) throws MuleException
+    {
+        if (!useDispatcherPool)
+        {
+            // Avoid lazy initialization of dispatcher in borrow method which would be less performant by
+            // creating the dispatcher instance when DispatcherMessageProcessor is created.
+            MessageDispatcher dispatcher = dispatcherFactory.create(endpoint);
+            applyDispatcherLifecycle(dispatcher);
+            endpointDispatchers.put(endpoint, dispatcher);
+        }
+        return super.createDispatcherMessageProcessor(endpoint);
+    }
+
+    @Override
+    protected MessageDispatcher borrowDispatcher(OutboundEndpoint endpoint) throws MuleException
+    {
+        if (useDispatcherPool)
+        {
+            return super.borrowDispatcher(endpoint);
+        }
+        else
+        {
+            return endpointDispatchers.get(endpoint);
+        }
+    }
+
+    @Override
+    protected void returnDispatcher(OutboundEndpoint endpoint, MessageDispatcher dispatcher)
+    {
+        if (useDispatcherPool)
+        {
+            super.returnDispatcher(endpoint, dispatcher);
+        }
+        else
+        {
+            // Nothing to do because implementation of borrowDispatcher doesn't use dispatcher pool
+        }
+    }
+
+    protected void applyDispatcherLifecycle(MessageDispatcher dispatcher) throws MuleException
+    {
+        MessageDispatcherUtils.applyLifecycle(dispatcher);
     }
 
 }
