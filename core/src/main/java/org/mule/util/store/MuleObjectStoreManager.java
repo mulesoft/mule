@@ -38,6 +38,7 @@ public class MuleObjectStoreManager
     ConcurrentMap<String, ObjectStore<?>> stores = new ConcurrentHashMap<String, ObjectStore<?>>();
     protected ScheduledThreadPoolExecutor scheduler;
     private static Log logger = LogFactory.getLog(MuleObjectStoreManager.class);
+    private String baseTransientUserStoreKey = MuleProperties.DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME;
 
     @Override
     public <T extends ObjectStore<? extends Serializable>> T getObjectStore(String name)
@@ -108,8 +109,7 @@ public class MuleObjectStoreManager
         }
         else
         {
-            baseStore = (T) muleContext.getRegistry().lookupObject(
-                    MuleProperties.DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME);
+            baseStore = (T) muleContext.getRegistry().lookupObject(baseTransientUserStoreKey);
         }
         return baseStore;
     }
@@ -316,4 +316,10 @@ public class MuleObjectStoreManager
             ((Disposable) store).dispose();
         }
     }
+
+    public void setBaseTransientUserStoreKey(String baseTransientUserStoreKey)
+    {
+        this.baseTransientUserStoreKey = baseTransientUserStoreKey;
+    }
+
 }

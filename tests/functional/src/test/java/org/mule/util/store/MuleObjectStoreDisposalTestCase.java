@@ -15,6 +15,8 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.store.ObjectStore;
 import org.mule.tck.junit4.FunctionalTestCase;
 
+import java.io.Serializable;
+
 import org.junit.Test;
 
 public class MuleObjectStoreDisposalTestCase extends FunctionalTestCase
@@ -37,7 +39,7 @@ public class MuleObjectStoreDisposalTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         osm = muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_MANAGER);
-        muleContext.getRegistry().registerObject(DISPOSABLE_TRANSIENT_USER_STORE_KEY, new SimpleMemoryObjectStore<>());
+        muleContext.getRegistry().registerObject(DISPOSABLE_TRANSIENT_USER_STORE_KEY, new SimpleMemoryObjectStore<Serializable>());
         osm.setBaseTransientUserStoreKey(DISPOSABLE_TRANSIENT_USER_STORE_KEY);
     }
 
