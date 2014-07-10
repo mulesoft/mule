@@ -9,7 +9,6 @@ package org.mule.module.db.internal.domain.connection;
 
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
-import org.mule.module.db.internal.domain.database.DbConfig;
 import org.mule.module.db.internal.domain.transaction.DbTransactionManager;
 import org.mule.module.db.internal.domain.transaction.TransactionalAction;
 import org.mule.module.db.internal.domain.type.DbTypeManager;
@@ -17,6 +16,8 @@ import org.mule.module.db.internal.resolver.param.GenericParamTypeResolverFactor
 
 import java.sql.Connection;
 import java.sql.SQLException;
+
+import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,15 +30,17 @@ public class TransactionalDbConnectionFactory implements DbConnectionFactory
 
     protected final Log logger = LogFactory.getLog(getClass());
 
-    protected final DbConfig dbConfig;
     protected final DbTransactionManager dbTransactionManager;
     protected final DbTypeManager dbTypeManager;
+    private final ConnectionFactory connectionFactory;
+    private final DataSource dataSource;
 
-    public TransactionalDbConnectionFactory(DbConfig dbConfig, DbTransactionManager dbTransactionManager, DbTypeManager dbTypeManager)
+    public TransactionalDbConnectionFactory(DbTransactionManager dbTransactionManager, DbTypeManager dbTypeManager, ConnectionFactory connectionFactory, DataSource dataSource)
     {
-        this.dbConfig = dbConfig;
         this.dbTransactionManager = dbTransactionManager;
         this.dbTypeManager = dbTypeManager;
+        this.connectionFactory = connectionFactory;
+        this.dataSource = dataSource;
     }
 
     @Override
@@ -55,23 +58,23 @@ public class TransactionalDbConnectionFactory implements DbConnectionFactory
             }
             else
             {
-                connection = getConnectionFromTransaction(dbConfig, tx);
+                connection = getConnectionFromTransaction(tx, dataSource);
             }
         }
         else if (transactionalAction == TransactionalAction.JOIN_IF_POSSIBLE)
         {
             if (tx == null)
             {
-                connection = getConnectionFromDataSource(dbConfig);
+                connection = connectionFactory.create(dataSource);
             }
             else
             {
-                connection = getConnectionFromTransaction(dbConfig, tx);
+                connection = getConnectionFromTransaction(tx, dataSource);
             }
         }
         else if (transactionalAction == TransactionalAction.NOT_SUPPORTED)
         {
-            connection = getConnectionFromDataSource(dbConfig);
+            connection = connectionFactory.create(dataSource);
         }
         else
         {
@@ -86,42 +89,25 @@ public class TransactionalDbConnectionFactory implements DbConnectionFactory
         return new DefaultDbConnection(connection, transactionalAction, new DefaultDbConnectionReleaser(this), new GenericParamTypeResolverFactory(dbTypeManager));
     }
 
-    private Connection getConnectionFromDataSource(DbConfig config)
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Retrieving new connection from data source");
-        }
-
-        try
-        {
-            return config.getDataSource().getConnection();
-        }
-        catch (Exception e)
-        {
-            throw new ConnectionCreationException(e);
-        }
-    }
-
-    private Connection getConnectionFromTransaction(DbConfig config, Transaction tx) throws SQLException
+    private Connection getConnectionFromTransaction(Transaction tx, DataSource dataSource) throws SQLException
     {
         Connection con;
 
-        if (tx.hasResource(config.getDataSource()))
+        if (tx.hasResource(dataSource))
         {
             if (logger.isDebugEnabled())
             {
                 logger.debug("Retrieving connection from current transaction: " + tx);
             }
-            con = (Connection) tx.getResource(config.getDataSource());
+            con = (Connection) tx.getResource(dataSource);
         }
         else
         {
-            con = getConnectionFromDataSource(config);
+            con = connectionFactory.create(dataSource);
 
             try
             {
-                tx.bindResource(config.getDataSource(), con);
+                tx.bindResource(dataSource, con);
             }
             catch (TransactionException e)
             {
