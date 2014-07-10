@@ -19,14 +19,18 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstructInvalidException;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.exception.MessagingExceptionHandlerAware;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.exception.MessagingExceptionHandlerToSystemAdapter;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.ExpressionArgument;
 import org.mule.expression.transformers.ExpressionTransformer;
@@ -97,7 +101,7 @@ public class Validator extends AbstractConfigurationPattern
         final ResponseMessageProcessorAdapter ackResponseMessageProcessor = new ResponseMessageProcessorAdapter();
         ackResponseMessageProcessor.setListener(outboundMessageProcessor);
         ackResponseMessageProcessor.setProcessor(getExpressionTransformer(getName() + "-ack-expression",
-            ackExpression));
+                                                                          ackExpression));
 
         MessageProcessor validRouteMessageProcessor = ackResponseMessageProcessor;
 
@@ -270,5 +274,23 @@ public class Validator extends AbstractConfigurationPattern
     public String getConstructType()
     {
         return "Validator";
+    }
+
+    @Override
+    protected void doInitialise() throws MuleException
+    {
+        if (outboundEndpoint instanceof MuleContextAware)
+        {
+            ((MuleContextAware) outboundEndpoint).setMuleContext(getMuleContext());
+        }
+        if (outboundEndpoint instanceof MessagingExceptionHandlerAware)
+        {
+            ((MessagingExceptionHandlerAware) outboundEndpoint).setMessagingExceptionHandler(new MessagingExceptionHandlerToSystemAdapter());
+        }
+        if (outboundEndpoint instanceof Initialisable)
+        {
+            ((Initialisable) outboundEndpoint).initialise();
+        }
+        super.doInitialise();
     }
 }

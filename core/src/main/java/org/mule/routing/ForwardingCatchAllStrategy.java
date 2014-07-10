@@ -6,8 +6,14 @@
  */
 package org.mule.routing;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.MessagingExceptionHandlerAware;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.CoreMessages;
@@ -19,11 +25,13 @@ import org.mule.config.i18n.CoreMessages;
  * a dead letter/error queue.
  *
  */
-public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
+public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy implements MessagingExceptionHandlerAware, Initialisable, MuleContextAware
 {
     private boolean sendTransformed = false;
 
     protected OutboundEndpoint endpoint;
+    private MessagingExceptionHandler messagingExceptionHandler;
+    private MuleContext muleContext;
 
     public void setEndpoint(OutboundEndpoint endpoint)
     {
@@ -77,5 +85,34 @@ public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
     public void setSendTransformed(boolean sendTransformed)
     {
         this.sendTransformed = sendTransformed;
+    }
+
+    @Override
+    public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler)
+    {
+        this.messagingExceptionHandler = messagingExceptionHandler;
+    }
+
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        if (endpoint instanceof MuleContextAware)
+        {
+            ((MuleContextAware) endpoint).setMuleContext(muleContext);
+        }
+        if (endpoint instanceof MessagingExceptionHandlerAware)
+        {
+            ((MessagingExceptionHandlerAware) endpoint).setMessagingExceptionHandler(messagingExceptionHandler);
+        }
+        if (endpoint instanceof Initialisable)
+        {
+            ((Initialisable) endpoint).initialise();
+        }
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
     }
 }

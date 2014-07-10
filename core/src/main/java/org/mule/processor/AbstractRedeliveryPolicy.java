@@ -6,10 +6,13 @@
  */
 package org.mule.processor;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.MessagingExceptionHandlerAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -26,13 +29,14 @@ import org.mule.routing.MessageProcessorFilterPair;
  * fails too often, the message is sent to the failedMessageProcessor MP, whence success is force to be returned, to allow
  * the message to be considered "consumed".
  */
-public abstract class AbstractRedeliveryPolicy extends AbstractInterceptingMessageProcessor implements MessageProcessor, Lifecycle, MuleContextAware, FlowConstructAware
+public abstract class AbstractRedeliveryPolicy extends AbstractInterceptingMessageProcessor implements MessageProcessor, Lifecycle, MuleContextAware, FlowConstructAware, MessagingExceptionHandlerAware
 {
 
     protected FlowConstruct flowConstruct;
     protected int maxRedeliveryCount;
     protected MessageProcessor deadLetterQueue;
     public static final int REDELIVERY_FAIL_ON_FIRST = 0;
+    private MessagingExceptionHandler messagingExceptionHandler;
 
     @Override
     public void setFlowConstruct(FlowConstruct flowConstruct)
@@ -105,5 +109,24 @@ public abstract class AbstractRedeliveryPolicy extends AbstractInterceptingMessa
     public void setDeadLetterQueue(MessageProcessorFilterPair failedMessageProcessorPair)
     {
         this.deadLetterQueue = failedMessageProcessorPair.getMessageProcessor();
+    }
+
+    public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler)
+    {
+        this.messagingExceptionHandler = messagingExceptionHandler;
+        if (deadLetterQueue instanceof MessagingExceptionHandlerAware)
+        {
+            ((MessagingExceptionHandlerAware) deadLetterQueue).setMessagingExceptionHandler(messagingExceptionHandler);
+        }
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        super.setMuleContext(context);
+        if (deadLetterQueue instanceof MuleContextAware)
+        {
+            ((MuleContextAware) deadLetterQueue).setMuleContext(context);
+        }
     }
 }

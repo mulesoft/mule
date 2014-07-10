@@ -117,11 +117,11 @@ public class HttpProxy extends AbstractConfigurationPattern
                 }
             }));
 
-            final DynamicOutboundEndpoint dynamicOutboundEndpoint;
+            final OutboundEndpoint dynamicOutboundEndpoint;
 
-            if (outboundEndpoint instanceof DynamicOutboundEndpoint)
+            if (outboundEndpoint.isDynamic())
             {
-                dynamicOutboundEndpoint = (DynamicOutboundEndpoint) outboundEndpoint;
+                dynamicOutboundEndpoint = outboundEndpoint;
             }
             else
             {

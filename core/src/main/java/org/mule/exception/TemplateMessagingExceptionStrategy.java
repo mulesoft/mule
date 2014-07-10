@@ -12,6 +12,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
@@ -201,6 +202,12 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
     protected MuleEvent beforeRouting(Exception exception, MuleEvent event)
     {
         return event;
+    }
+
+    @Override
+    public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler)
+    {
+        return;
     }
 
     public void setHandleException(boolean handleException)

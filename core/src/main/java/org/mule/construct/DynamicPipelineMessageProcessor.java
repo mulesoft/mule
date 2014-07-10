@@ -129,6 +129,7 @@ public class DynamicPipelineMessageProcessor extends AbstractInterceptingMessage
             if (chain != null)
             {
                 flow.injectFlowConstructMuleContext(chain);
+                flow.injectExceptionHandler(chain);
                 flow.initialiseIfInitialisable(chain);
                 flow.startIfStartable(chain);
             }

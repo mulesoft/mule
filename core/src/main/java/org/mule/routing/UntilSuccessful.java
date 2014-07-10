@@ -13,6 +13,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
+import org.mule.api.exception.MessagingExceptionHandlerAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
@@ -67,7 +68,6 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
     private boolean synchronous = false;
     private ThreadingProfile threadingProfile;
     private UntilSuccessfulProcessingStrategy untilSuccessfulStrategy;
-
 
     @Override
     public void initialise() throws InitialisationException
@@ -146,6 +146,7 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
                 threadingProfile = muleContext.getDefaultThreadingProfile();
             }
             this.untilSuccessfulStrategy = new AsynchronousUntilSuccessfulProcessingStrategy();
+            ((MessagingExceptionHandlerAware) this.untilSuccessfulStrategy).setMessagingExceptionHandler(messagingExceptionHandler);
         }
         this.untilSuccessfulStrategy.setUntilSuccessfulConfiguration(this);
 
@@ -322,4 +323,5 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
     {
         this.synchronous = synchronous;
     }
+
 }
