@@ -16,6 +16,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.notification.ServerNotification;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
@@ -78,6 +79,12 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     {
         this.globalName = globalName;
     }
+
+    public AbstractExceptionListener()
+    {
+        super.setMessagingExceptionHandler(new MessagingExceptionHandlerToSystemAdapter());
+    }
+
 
     protected boolean isRollback(Throwable t)
     {
@@ -407,6 +414,12 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     protected List<MessageProcessor> getOwnedMessageProcessors()
     {
         return messageProcessors;
+    }
+
+    @Override
+    public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler)
+    {
+        return;
     }
 
     /*

@@ -11,9 +11,13 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.config.ImmutableThreadingProfile;
+import org.mule.processor.LaxAsyncInterceptingMessageProcessor;
+import org.mule.processor.chain.SimpleMessageProcessorChain;
+import org.mule.processor.chain.SimpleMessageProcessorChainBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestMessageDispatcher;
@@ -199,12 +203,18 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleContextTestC
         connector.setDispatcherFactory(new DelayTestMessageDispatcherFactory());
     }
 
-    private void dispatchTwoAsyncEvents() throws DispatchException, Exception
+    private void dispatchTwoAsyncEvents() throws Exception
     {
         OutboundEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(
-            "test://test");
-        endpoint.process(getTestEvent("data", getTestInboundEndpoint(MessageExchangePattern.ONE_WAY)));
-        endpoint.process(getTestEvent("data", getTestInboundEndpoint(MessageExchangePattern.ONE_WAY)));
+                "test://test");
+
+        final LaxAsyncInterceptingMessageProcessor laxAsyncInterceptingMessageProcessor = new LaxAsyncInterceptingMessageProcessor(new DispatcherWorkManagerSource((AbstractConnector) endpoint.getConnector()));
+        final SimpleMessageProcessorChainBuilder simpleMessageProcessorChainBuilder = new SimpleMessageProcessorChainBuilder();
+        simpleMessageProcessorChainBuilder.chain(laxAsyncInterceptingMessageProcessor, endpoint);
+        final MessageProcessorChain messageProcessor = simpleMessageProcessorChainBuilder.build();
+
+        messageProcessor.process(getTestEvent("data", getTestInboundEndpoint(MessageExchangePattern.ONE_WAY)));
+        messageProcessor.process(getTestEvent("data", getTestInboundEndpoint(MessageExchangePattern.ONE_WAY)));
     }
 
     public class DelayTestMessageDispatcher extends TestMessageDispatcher

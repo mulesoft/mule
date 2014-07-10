@@ -7,6 +7,7 @@
 package org.mule.config.spring.factories;
 
 import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.MessagingExceptionHandlerAware;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.transaction.TransactionFactory;
@@ -61,6 +62,10 @@ public class TransactionalMessageProcessorsFactoryBean implements FactoryBean
             {
                 throw new IllegalArgumentException(
                     "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
+            }
+            if (processor instanceof MessagingExceptionHandlerAware)
+            {
+                ((MessagingExceptionHandlerAware) processor).setMessagingExceptionHandler(exceptionListener);
             }
         }
         return builder.build();

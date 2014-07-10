@@ -199,6 +199,12 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
         return endpoint.getResponseProperties();
     }
 
+    @Override
+    public boolean isDynamic()
+    {
+        return true;
+    }
+
     public String getEndpointBuilderName()
     {
         return endpoint.getEndpointBuilderName();

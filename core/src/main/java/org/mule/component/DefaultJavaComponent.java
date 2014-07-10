@@ -89,6 +89,15 @@ public class DefaultJavaComponent extends AbstractJavaComponent
     }
 
     @Override
+    protected void doInitialise() throws InitialisationException
+    {
+        for (InterfaceBinding binding : bindings)
+        {
+            applyLifecycleAndDependencyInjection(binding);
+        }
+    }
+
+    @Override
     protected void doStop() throws MuleException
     {
         super.doStop();

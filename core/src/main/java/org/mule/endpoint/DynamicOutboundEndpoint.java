@@ -95,7 +95,7 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
         return properties;
     }
 
-    public MuleEvent process(MuleEvent event) throws MuleException
+    public OutboundEndpoint getStaticEndpoint(MuleEvent event)  throws MuleException
     {
         final String uri = resolveUri(event);
 
@@ -108,7 +108,7 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
             staticEndpoints.put(endpointURIForMessage.getAddress(), outboundEndpoint);
         }
 
-        return outboundEndpoint.process(event);
+        return outboundEndpoint;
     }
 
     private EndpointURI createEndpointUri(String uri) throws EndpointException, InitialisationException
@@ -291,6 +291,12 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
         return prototypeEndpoint.getResponseProperties();
     }
 
+    @Override
+    public boolean isDynamic()
+    {
+        return true;
+    }
+
     public String getEndpointBuilderName()
     {
         return prototypeEndpoint.getEndpointBuilderName();
@@ -304,5 +310,11 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
     public boolean isDisableTransportTransformer()
     {
         return prototypeEndpoint.isDisableTransportTransformer();
+    }
+
+    @Override
+    public MuleEvent process(MuleEvent event) throws MuleException
+    {
+        return getStaticEndpoint(event).process(event);
     }
 }

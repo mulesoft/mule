@@ -19,6 +19,8 @@ import org.mule.api.component.Component;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.notification.ServerNotificationHandler;
+import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.MessagingExceptionHandlerAware;
 import org.mule.api.interceptor.Interceptor;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -54,7 +56,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Abstract {@link Component} to be used by all {@link Component} implementations.
  */
-public abstract class AbstractComponent implements Component, MuleContextAware, Lifecycle, AnnotatedObject
+public abstract class AbstractComponent implements Component, MuleContextAware, Lifecycle, AnnotatedObject, MessagingExceptionHandlerAware
 {
 
     /**
@@ -69,6 +71,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
     protected MessageProcessorChain interceptorChain;
     protected MuleContext muleContext;
     protected ComponentLifecycleManager lifecycleManager;
+    private MessagingExceptionHandler messagingExceptionHandler;
     private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
     public void setMuleContext(MuleContext context)
@@ -238,19 +241,27 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
                         return invokeInternal(event);
                     }
                 });
-
                 interceptorChain = chainBuilder.build();
-                if (interceptorChain instanceof MuleContextAware)
-                {
-                    ((MuleContextAware) interceptorChain).setMuleContext(muleContext);
-                }
-                if (interceptorChain instanceof Initialisable)
-                {
-                    ((Initialisable) interceptorChain).initialise();
-                }
+                applyLifecycleAndDependencyInjection(interceptorChain);
                 doInitialise();
             }
         });
+    }
+
+    protected void applyLifecycleAndDependencyInjection(Object object) throws InitialisationException
+    {
+        if (object instanceof MuleContextAware)
+        {
+            ((MuleContextAware) object).setMuleContext(muleContext);
+        }
+        if (object instanceof MessagingExceptionHandlerAware)
+        {
+            ((MessagingExceptionHandlerAware) object).setMessagingExceptionHandler(messagingExceptionHandler);
+        }
+        if (object instanceof Initialisable)
+        {
+            ((Initialisable) object).initialise();
+        }
     }
 
     protected void doInitialise() throws InitialisationException
@@ -358,5 +369,10 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
     {
         annotations.clear();
         annotations.putAll(newAnnotations);
+    }
+
+    public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler)
+    {
+        this.messagingExceptionHandler = messagingExceptionHandler;
     }
 }

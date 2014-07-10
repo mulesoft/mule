@@ -11,6 +11,8 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.MessagingExceptionHandlerAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -40,7 +42,7 @@ import org.apache.commons.logging.LogFactory;
  * routers meaning that the message will get sent over all matching routers.
  */
 
-public class DefaultOutboundRouterCollection implements OutboundRouterCollection
+public class DefaultOutboundRouterCollection implements OutboundRouterCollection, MessagingExceptionHandlerAware
 {
     /**
      * logger used by this class
@@ -53,6 +55,7 @@ public class DefaultOutboundRouterCollection implements OutboundRouterCollection
 
     protected RouterStatistics statistics = new RouterStatistics(RouterStatistics.TYPE_OUTBOUND);
     protected MuleContext muleContext;
+    private MessagingExceptionHandler messagingExceptionHandler;
 
     @Override
     public MuleEvent process(final MuleEvent event) throws MessagingException
@@ -145,6 +148,10 @@ public class DefaultOutboundRouterCollection implements OutboundRouterCollection
     {
         for (MatchableMessageProcessor router : routers)
         {
+            if (router instanceof MessagingExceptionHandlerAware)
+            {
+                ((MessagingExceptionHandlerAware) router).setMessagingExceptionHandler(messagingExceptionHandler);
+            }
             if (router instanceof Initialisable)
             {
                 ((Initialisable) router).initialise();
@@ -260,5 +267,11 @@ public class DefaultOutboundRouterCollection implements OutboundRouterCollection
     public String toString()
     {
         return ObjectUtils.toString(this);
+    }
+
+    @Override
+    public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler)
+    {
+        this.messagingExceptionHandler = messagingExceptionHandler;
     }
 }

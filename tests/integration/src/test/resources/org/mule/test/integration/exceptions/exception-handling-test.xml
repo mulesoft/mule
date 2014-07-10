@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/smtp http://www.mulesoft.org/schema/mule/smtp/current/mule-smtp.xsd">
+
+    <spring:bean id="objectStore" class="org.mule.util.store.PartitionedPersistentObjectStore" />
+    <spring:bean id="objectStore2" class="org.mule.util.store.PartitionedPersistentObjectStore" />
+
+    <flow name="customProcessorInFlow">
+        <vm:inbound-endpoint path="inFlow1" exchange-pattern="request-response"/>
+        <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExceptionHandlerVerifierProcessor" />
+    </flow>
+
+    <flow name="outboundEndpointInFlow">
+        <vm:inbound-endpoint path="inFlow2"/>
+        <smtp:outbound-endpoint host="localhost" responseTimeout="10000" />
+        <catch-exception-strategy>
+            <vm:outbound-endpoint path="outFlow2"/>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="outboundDynamicEndpointInFlow">
+        <vm:inbound-endpoint path="inFlow3"/>
+        <outbound-endpoint address="smtp://#[message.inboundProperties['host']]"/>
+        <catch-exception-strategy>
+            <vm:outbound-endpoint path="outFlow3"/>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="asyncInFlow">
+        <vm:inbound-endpoint path="inFlow4"/>
+        <async>
+            <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExceptionHandlerVerifierProcessor" />
+            <test:component throwException="true"/>
+        </async>
+        <catch-exception-strategy>
+            <vm:outbound-endpoint path="outFlow4"/>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="untilSuccessfulInFlow">
+        <vm:inbound-endpoint path="inFlow5"/>
+        <until-successful objectStore-ref="objectStore" maxRetries="1" millisBetweenRetries="1000">
+            <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExceptionHandlerVerifierProcessor" />
+        </until-successful>
+        <until-successful objectStore-ref="objectStore" maxRetries="1" millisBetweenRetries="1000">
+            <test:component throwException="true"/>
+        </until-successful>
+        <catch-exception-strategy>
+            <vm:outbound-endpoint path="outFlow5"/>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="customProcessorInScope">
+        <vm:inbound-endpoint path="inScope1" exchange-pattern="request-response"/>
+        <foreach>
+            <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExceptionHandlerVerifierProcessor" />
+        </foreach>
+        <rollback-exception-strategy/>
+    </flow>
+
+    <flow name="outboundEndpointInScope">
+        <vm:inbound-endpoint path="inScope2"/>
+        <foreach>
+            <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExceptionHandlerVerifierProcessor" />
+            <smtp:outbound-endpoint host="localhost" responseTimeout="10000" />
+        </foreach>
+        <rollback-exception-strategy>
+            <vm:outbound-endpoint path="outScope2"/>
+        </rollback-exception-strategy>
+    </flow>
+
+    <flow name="outboundDynamicEndpointInScope">
+        <vm:inbound-endpoint path="inScope3"/>
+        <foreach>
+            <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExceptionHandlerVerifierProcessor" />
+            <outbound-endpoint address="smtp://#[message.inboundProperties['host']]"/>
+        </foreach>
+        <rollback-exception-strategy>
+            <vm:outbound-endpoint path="outScope3"/>
+        </rollback-exception-strategy>
+    </flow>
+
+    <flow name="customProcessorInTransactionalScope">
+        <vm:inbound-endpoint path="inTransactional1"/>
+        <transactional>
+            <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExceptionHandlerVerifierProcessor" />
+            <test:component throwException="true"/>
+            <catch-exception-strategy>
+                <vm:outbound-endpoint path="outTransactional1"/>
+            </catch-exception-strategy>
+        </transactional>
+    </flow>
+
+    <flow name="outboundEndpointInTransactionalScope">
+        <vm:inbound-endpoint path="inTransactional2"/>
+        <transactional>
+            <smtp:outbound-endpoint host="localhost" responseTimeout="10000" />
+            <catch-exception-strategy>
+                <vm:outbound-endpoint path="outTransactional2"/>
+            </catch-exception-strategy>
+        </transactional>
+    </flow>
+
+    <flow name="outboundDynamicEndpointInTransactionalScope">
+        <vm:inbound-endpoint path="inTransactional3"/>
+        <transactional>
+            <outbound-endpoint address="smtp://#[message.inboundProperties['host']]"/>
+            <catch-exception-strategy>
+                <vm:outbound-endpoint path="outTransactional3"/>
+            </catch-exception-strategy>
+        </transactional>
+    </flow>
+
+    <flow name="asyncInTransactionalScope">
+        <vm:inbound-endpoint path="inTransactional4"/>
+        <transactional>
+            <async>
+                <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExceptionHandlerVerifierProcessor" />
+                <test:component throwException="true"/>
+            </async>
+            <catch-exception-strategy>
+                <vm:outbound-endpoint path="outTransactional4"/>
+            </catch-exception-strategy>
+        </transactional>
+    </flow>
+
+    <flow name="untilSuccessfulInTransactionalScope">
+        <vm:inbound-endpoint path="inTransactional5"/>
+        <transactional>
+            <until-successful objectStore-ref="objectStore" maxRetries="1" millisBetweenRetries="1000">
+                <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExceptionHandlerVerifierProcessor" />
+            </until-successful>
+            <until-successful objectStore-ref="objectStore2" maxRetries="1" millisBetweenRetries="1000">
+                <test:component throwException="true"/>
+            </until-successful>
+            <catch-exception-strategy>
+                <vm:outbound-endpoint path="outTransactional5"/>
+            </catch-exception-strategy>
+        </transactional>
+    </flow>
+
+    <flow name="customProcessorInExceptionStrategy">
+        <vm:inbound-endpoint path="inStrategy1"/>
+        <test:component throwException="true"/>
+        <catch-exception-strategy>
+            <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExceptionHandlerVerifierProcessor" />
+            <vm:outbound-endpoint path="outStrategy1"/>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="outboundEndpointInExceptionStrategy">
+        <vm:inbound-endpoint path="inStrategy2"/>
+        <test:component throwException="true"/>
+        <catch-exception-strategy>
+            <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExecutionCountProcessor" />
+            <smtp:outbound-endpoint host="localhost" responseTimeout="10000" />
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="outboundDynamicEndpointInExceptionStrategy">
+        <vm:inbound-endpoint path="inStrategy3"/>
+        <test:component throwException="true"/>
+        <catch-exception-strategy>
+            <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExecutionCountProcessor" />
+            <outbound-endpoint address="smtp://#[message.inboundProperties['host']]"/>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="asyncInExceptionStrategy">
+        <vm:inbound-endpoint path="inStrategy4"/>
+        <test:component throwException="true"/>
+        <catch-exception-strategy>
+            <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExecutionCountProcessor" />
+            <async>
+                <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExceptionHandlerVerifierProcessor" />
+                <test:component throwException="true"/>
+            </async>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="untilSuccessfulInExceptionStrategy">
+        <vm:inbound-endpoint path="inStrategy5"/>
+        <test:component throwException="true"/>
+        <catch-exception-strategy>
+            <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExecutionCountProcessor" />
+            <until-successful objectStore-ref="objectStore" maxRetries="1" millisBetweenRetries="1000">
+                <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExceptionHandlerVerifierProcessor" />
+            </until-successful>
+            <until-successful objectStore-ref="objectStore" maxRetries="1" millisBetweenRetries="1000">
+                <test:component throwException="true"/>
+            </until-successful>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="untilSuccessfulInExceptionStrategyRollback">
+        <vm:inbound-endpoint path="inStrategy6"/>
+        <test:component throwException="true"/>
+        <rollback-exception-strategy>
+            <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExecutionCountProcessor" />
+            <until-successful objectStore-ref="objectStore" maxRetries="1" millisBetweenRetries="1000">
+                <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExceptionHandlerVerifierProcessor" />
+            </until-successful>
+            <until-successful objectStore-ref="objectStore" maxRetries="1" millisBetweenRetries="1000">
+                <test:component throwException="true"/>
+            </until-successful>
+        </rollback-exception-strategy>
+    </flow>
+
+</mule>
