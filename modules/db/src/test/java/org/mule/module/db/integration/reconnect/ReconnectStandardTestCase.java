@@ -51,11 +51,11 @@ public class ReconnectStandardTestCase extends AbstractDbIntegrationTestCase
     }
 
     @Test
-    public void testRequestResponse() throws Exception
+    public void reconnectsAfterConnectionFailure() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
 
-        MuleMessage response = client.send("vm://testRequestResponse", TEST_MESSAGE, null);
+        MuleMessage response = client.send("vm://testReconnection", TEST_MESSAGE, null);
 
         assertMessageContains(response, getAllPlanetRecords());
 
