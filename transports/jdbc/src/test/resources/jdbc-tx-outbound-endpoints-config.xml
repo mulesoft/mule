@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/current/mule-jdbc.xsd">
+
+    <spring:bean id="connectionRequestedLatch" class="org.mule.util.concurrent.Latch"/>
+    <spring:bean id="firstQueryExecutedLatch" class="org.mule.util.concurrent.Latch"/>
+    <spring:bean id="finishedLatch" class="java.util.concurrent.CountDownLatch">
+        <spring:constructor-arg index="0" value="2"/>
+    </spring:bean>
+
+    <spring:bean id="jdbcDataSource"
+                 class="org.mule.transport.jdbc.functional.JdbcTxOutboundEndpointsTestCase.LatchReleasingDataSource">
+        <spring:property name="driverClassName" value="org.apache.derby.jdbc.EmbeddedDriver"/>
+        <spring:property name="url" value="jdbc:derby:muleEmbeddedDB"/>
+        <spring:property name="maxActive" value="1"/>
+        <spring:property name="maxIdle" value="1"/>
+        <spring:property name="minIdle" value="1"/>
+
+        <!--
+        Custom latch that will be released after 3 connections are requested to this pool. The first connection is needed
+        to set up the test. The second one is requested by the first thread, and the third one is requested by the
+        second thread, that may generate a deadlock.
+        -->
+        <spring:property name="latch" ref="connectionRequestedLatch"/>
+        <spring:property name="connectionRequestsUntilRelease" value="3"/>
+    </spring:bean>
+
+    <jdbc:connector name="jdbcConnector" dataSource-ref="jdbcDataSource">
+        <dispatcher-threading-profile maxThreadsActive="1" poolExhaustedAction="WAIT"/>
+        <jdbc:query key="query" value="SELECT * FROM TEST"/>
+    </jdbc:connector>
+
+
+    <!--
+    Two threads will concurrently execute this flow, simulating the deadlock that may happen when we are
+    using a dispatcher pool. The DB pool has only one connection, and the dispatcher pool one dispatcher.
+    The test starts with thread 1 sending one event through the flow.
+    -->
+
+    <flow name="test">
+
+        <transactional action="ALWAYS_BEGIN">
+
+            <choice>
+                <when expression="#[executeFirstQuery]">
+
+                    <!--
+                    Thread 1 will execute this outbound endpoint (borrows a dispatcher, borrows a connection,
+                    then returns the dispatcher but holds the connection because of the transaction).
+                     -->
+                    <jdbc:outbound-endpoint queryKey="query" exchange-pattern="request-response">
+                        <jdbc:transaction action="ALWAYS_JOIN"/>
+                    </jdbc:outbound-endpoint>
+
+                    <!--
+                    When this latch is released, the test will start a second thread with executeFirstQuery=false.
+                    -->
+                    <invoke object-ref="firstQueryExecutedLatch" method="release"/>
+
+                    <!--
+                    Wait until thread 2 tries to borrow a connection from the DB pool
+                    -->
+                    <invoke object-ref="connectionRequestedLatch" method="await"/>
+
+                </when>
+                <otherwise>
+                    <!-- Do nothing (thread 2). -->
+                    <echo-component/>
+                </otherwise>
+            </choice>
+
+            <!--
+            At this point thread 1 and 2 enter in a deadlock if there is a dispatcher pool. Thread 1 is holding the only
+            connection and is waiting for a dispatcher to execute this endpoint. Thread 2 already borrowed the dispatcher
+            for this endpoint and is waiting for a connection.
+            -->
+            <jdbc:outbound-endpoint queryKey="query" exchange-pattern="request-response">
+                <jdbc:transaction action="ALWAYS_JOIN"/>
+            </jdbc:outbound-endpoint>
+
+        </transactional>
+
+        <invoke object-ref="finishedLatch" method="countDown"/>
+    </flow>
+
+</mule>
