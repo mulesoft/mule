@@ -4,32 +4,6 @@ MIGRATION GUIDE
 The following is a list of changes you have to execute to migrate from Mule ESB Community edition version 3.4.x to version 3.5.0.
 Please check http://www.mulesoft.org/documentation/display/current/Mule+Release+Notes for more details.
 
-MULE-6968: In the previous version, requests to "/" were only received by an HTTP endpoint when no path was defined, and rejected if path was set to "" or "/". Now requests are received by the endpoint in any of the three cases.
-MULE-7013: keepSendSocketOpen attribute in the HTTP/S connector is deprecated. It is inherited from TCP Connector but has no effect on outbound HTTP connections and will be removed in the future.
-MULE-7023: The keep-alive attribute in inbound and outbound HTTP/S endpoints is renamed to keepAlive.
-MULE-7011: org.mule.util.queue.Queue class now has a clear() method to discard all elements in the queue while leaving the queue still usable. If you have your own implementation of a Mule Queue you'll need to implement it
-MULE-7010: ObjectStore class now has a clear() method which discards all elements while leaving the store still usable. If you have your own implementation of ObjectStore you'll need to implement this method
-MULE-7090: Mule will use the default security provider and TLSv1 as default algorithm for secure socket connections
-           tlsProtocolHandler attribute from TLS configuration in SSL/TLS/smtps/jettry https transports is deprecated and will
-           be ignored. Mule uses the default settings defined in the JVM platform. This parameter is no longer needed in
-           supported JDKs.
-MULE-7061: Jetty transport is now using Jetty 8. Applications using a custom jetty.xml configuration file must update the Jetty classes referenced in this file due to package names changed from version 6 to 7, as explained here: http://wiki.eclipse.org/Jetty/Starting/Porting_to_Jetty_7/Packages_and_Classes
-MULE-7138: MD5MuleEventKeyGenerator is now deprecated, a new implementation is provided: SHA256MuleEventKeyGenerator.
-MULE-7097: A new configuration file 'conf/tls-default.conf' has been added. This file defines two properties, that allow to limit the cipher suites and protocols used by Mule in SSL sockets.
-MULE-7103: There is now a new system property 'mule.security.model' that may be used to alter the security setup of Mule and its modules. If not defined, or defined with the value 'default',
-            no restrictions will apply and Mule will read the TLS configuration from the file 'conf/tls-default.conf'.
-            If defined with the value 'fips140-2' Mule will work with a Fips compliant security model: any cryptographic modes of operation not approved in the standard will be disabled
-            (the pgp module will be disabled, and the TLS configuration properties will be read from 'conf/tls-fips140-2.conf'). Note that full compliance also requires a certified JCE provider installed.
-MULE-7390: The following transformers no longer support external entities out of the box: xslt-transformer, dom-to-xml-transformer, xml-to-dom-transformer
-            dom-to-output-handler-transformer, xquery-transformer. For cases in which external entities processing is needed, the attribute acceptExternalEntities has been added
-            as optional (defaults to false). Use this attribute with extreme care in cases in which you trust the source only.
-MULE-7425: xpath() MEL function no longer changes the message payload when a source is provided. So for example, the expression xpath('catalog/cd/title') may change the message payload, while xpath('catalog/cd/title', flowVars['xml']) will never do
-MULE-7439: org.mule.transport.http.servlet.MuleHttpServletResponse.formatDate now receives a StringBuilder instead of a StringBuffer
-MULE-7428: Mule queues underlying implementation has changed. To get previous behaviour you can set system property mule.queue.objectstoremode=true. Old classes were deprecated and moved to package org.mule.util.queue.objectstore
-MULE-7362: MEL expressions now propagate nulls instead of raising an exception. For example a.b.c would previously raise a NPE if a.b was null. It will return null now.
-MULE-7513: Attribute secondsBetweenRetries has been deprecated in favor of a new attribute called millisBetweenRetries. This change is backwards compatible, you can still use secondsBetweenRetries although it's not recommended. Setting both attributes at the same time will result in a configuration error
-MULE-7386: Class org.mule.module.management.agent.JmxAgent has been renamed to org.mule.module.management.agent.JmxApplicationAgent
-MULE-7536: Mule distribution does not provide a lib/shared/default domain for sharing class loading. Now we provide a default mule domains under domains/default which serves the same purpose and more. You can still use the old shared class loading mechanism by creating the folder lib/shared/default
-MULE-7524: Encoded mule expressions in dynamic endpoints address components are not supported anymore (ie: %23[expression] must be #[expression])
-MULE-7546: Implementations of org.mule.api.MuleMessage now need to implement clearAttachments() which was added to the interface. Implementations that extend org.mule.el.context.AbstractMapContext must now implement clear() given this method has been removed from the abstract implementation.
-MULE-7612: maps returned by queries using the Database connector can have different keys as now column's aliases are used instead of column's names
+MULE-7620: org.mule.api.endpoint.EndpointFactory.getOutboundEndpoint(..) now returns an outbound endpoint without the behaviour of execution the endpoint in the current thread or a dispatcher thread.
+To make it work as in previous version you must use org.mule.api.endpoint.OutboundEndpointExecutorFactory.getOutboundEndpointExecutor(..) that's return an outbound endpoint with the execution context logic.
+You must provide an ExceptionHandler as a parameter. You can get the exception handler using dependency injection by implementing org.mule.api.exception.MessagingExceptionHandlerAware
