@@ -10,17 +10,22 @@ package org.mule.module.db.internal.domain.database;
 import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.common.DefaultResult;
 import org.mule.common.DefaultTestResult;
 import org.mule.common.Result;
 import org.mule.common.TestResult;
 import org.mule.common.metadata.MetaData;
 import org.mule.common.metadata.MetaDataKey;
+import org.mule.module.db.internal.domain.connection.ConnectionFactory;
 import org.mule.module.db.internal.domain.connection.DbPoolingProfile;
+import org.mule.module.db.internal.domain.connection.RetryConnectionFactory;
+import org.mule.module.db.internal.domain.connection.SimpleConnectionFactory;
 import org.mule.module.db.internal.domain.connection.TransactionalDbConnectionFactory;
 import org.mule.module.db.internal.domain.transaction.TransactionCoordinationDbTransactionManager;
 import org.mule.module.db.internal.domain.type.DbTypeManager;
 import org.mule.module.db.internal.domain.xa.CompositeDataSourceDecorator;
+import org.mule.retry.policies.NoRetryPolicyTemplate;
 
 import com.mchange.v2.c3p0.DataSources;
 
@@ -46,7 +51,7 @@ public class GenericDbConfig implements DbConfig, Initialisable
 
     private DataSource dataSource;
     private final String name;
-    private final TransactionalDbConnectionFactory dbConnectionFactory;
+    private TransactionalDbConnectionFactory dbConnectionFactory;
     private final DbTypeManager dbTypeManager;
 
     private final CompositeDataSourceDecorator databaseDecorator = new CompositeDataSourceDecorator();
@@ -59,18 +64,13 @@ public class GenericDbConfig implements DbConfig, Initialisable
     private String driverClassName;
     private MuleContext muleContext;
     private String url;
+    private RetryPolicyTemplate retryPolicyTemplate;
 
     public GenericDbConfig(DataSource dataSource, String name, DbTypeManager dbTypeManager)
     {
         this.dataSource = dataSource;
         this.name = name;
         this.dbTypeManager = dbTypeManager;
-        this.dbConnectionFactory = doCreateConnectionFactory();
-    }
-
-    protected TransactionalDbConnectionFactory doCreateConnectionFactory()
-    {
-        return new TransactionalDbConnectionFactory(this, new TransactionCoordinationDbTransactionManager(), dbTypeManager);
     }
 
     @Override
@@ -157,6 +157,18 @@ public class GenericDbConfig implements DbConfig, Initialisable
             }
         }
         dataSource = decorateDataSourceIfRequired(dataSource);
+
+        ConnectionFactory connectionFactory;
+        if (retryPolicyTemplate == null)
+        {
+            connectionFactory = new SimpleConnectionFactory();
+        }
+        else
+        {
+            connectionFactory = new RetryConnectionFactory(retryPolicyTemplate, new SimpleConnectionFactory());
+        }
+
+        dbConnectionFactory = new TransactionalDbConnectionFactory(new TransactionCoordinationDbTransactionManager(), dbTypeManager, connectionFactory, this.getDataSource());
     }
 
     protected DataSource createDataSource() throws Exception
@@ -270,4 +282,8 @@ public class GenericDbConfig implements DbConfig, Initialisable
         this.muleContext = muleContext;
     }
 
+    public void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate)
+    {
+        this.retryPolicyTemplate = retryPolicyTemplate;
+    }
 }
