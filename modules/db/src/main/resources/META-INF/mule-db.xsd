@@ -568,6 +568,7 @@
                     <xsd:element ref="pooling-profile"  minOccurs="0" maxOccurs="1"/>
                     <xsd:element ref="connection-properties" minOccurs="0" maxOccurs="1" />
                     <xsd:element ref="data-types" minOccurs="0" maxOccurs="1" />
+                    <xsd:element ref="mule:abstract-reconnection-strategy" minOccurs="0" maxOccurs="1"/>
                 </xsd:sequence>
                 <xsd:attribute name="name" type="mule:substitutableName" use="required">
                     <xsd:annotation>

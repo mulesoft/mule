@@ -11,6 +11,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.module.db.internal.domain.connection.DbPoolingProfile;
 import org.mule.module.db.internal.domain.database.DbConfig;
 import org.mule.module.db.internal.domain.database.GenericDbConfig;
@@ -48,6 +49,7 @@ public class DbConfigFactoryBean extends AbstractFactoryBean<DbConfig> implement
     private GenericDbConfig dbConfig;
     private Map<String, String> connectionProperties;
     private List<DbType> customDataTypes;
+    private RetryPolicyTemplate retryPolicyTemplate;
 
     @Override
     public Class<?> getObjectType()
@@ -71,6 +73,7 @@ public class DbConfigFactoryBean extends AbstractFactoryBean<DbConfig> implement
         dbConfig.setTransactionIsolation(transactionIsolation);
         dbConfig.setDriverClassName(driverClassName);
         dbConfig.setMuleContext(muleContext);
+        dbConfig.setRetryPolicyTemplate(retryPolicyTemplate);
 
         return dbConfig;
     }
@@ -220,5 +223,15 @@ public class DbConfigFactoryBean extends AbstractFactoryBean<DbConfig> implement
     public void setCustomDataTypes(List<DbType> customDataTypes)
     {
         this.customDataTypes = customDataTypes;
+    }
+
+    public RetryPolicyTemplate getRetryPolicyTemplate()
+    {
+        return retryPolicyTemplate;
+    }
+
+    public void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate)
+    {
+        this.retryPolicyTemplate = retryPolicyTemplate;
     }
 }
