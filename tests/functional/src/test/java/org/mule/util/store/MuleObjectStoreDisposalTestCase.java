@@ -7,7 +7,7 @@
 package org.mule.util.store;
 
 import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import org.mule.api.config.MuleProperties;
@@ -23,6 +23,7 @@ public class MuleObjectStoreDisposalTestCase extends FunctionalTestCase
     private static final String TEST_OS_NAME = "disposalTest";
     private static final int MAX_ENTRIES = 100;
     private static final int TIMEOUT = 9999;
+    private static final String DISPOSABLE_TRANSIENT_USER_STORE_KEY = "DISPOSABLE_TRANSIENT_USER_STORE_KEY";
 
     private MuleObjectStoreManager osm;
 
@@ -36,6 +37,8 @@ public class MuleObjectStoreDisposalTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         osm = muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_MANAGER);
+        muleContext.getRegistry().registerObject(DISPOSABLE_TRANSIENT_USER_STORE_KEY, new SimpleMemoryObjectStore<>());
+        osm.setBaseTransientUserStoreKey(DISPOSABLE_TRANSIENT_USER_STORE_KEY);
     }
 
     @Test
@@ -45,7 +48,6 @@ public class MuleObjectStoreDisposalTestCase extends FunctionalTestCase
         doDispose();
         verify(osm.scheduler).shutdown();
     }
-
 
     @Test
     public void disposeMonitoredObjectStores() throws Exception
@@ -58,7 +60,6 @@ public class MuleObjectStoreDisposalTestCase extends FunctionalTestCase
 
         managedObjectStore = spy(managedObjectStore);
         osm.stores.put(TEST_OS_NAME, managedObjectStore);
-
 
         doDispose();
         verify((Disposable) managedObjectStore).dispose();
