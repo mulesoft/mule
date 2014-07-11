@@ -346,7 +346,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
             else
             {
                 this.flowVariables.putAll(((DefaultMuleEvent) rewriteEvent).flowVariables);
-                this.session = (session == null) ? null : new DefaultMuleSession(session);
+                this.session = new DefaultMuleSession(session);
             }
         }
         else
@@ -820,7 +820,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         if (message instanceof ThreadSafeAccess)
         {
             DefaultMuleEvent copy = new DefaultMuleEvent(
-                (MuleMessage) ((ThreadSafeAccess) message).newThreadCopy(), this, this.isSynchronous(), false);
+                (MuleMessage) ((ThreadSafeAccess) message).newThreadCopy(), this);
             copy.resetAccessControl();
             return copy;
         }
