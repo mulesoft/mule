@@ -18,7 +18,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
-
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -209,6 +208,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
             }
         };
         processingStrategy.setUntilSuccessfulConfiguration(mockUntilSuccessfulConfiguration);
+        processingStrategy.setMessagingExceptionHandler(mockEvent.getFlowConstruct().getExceptionListener());
         processingStrategy.initialise();
         processingStrategy.start();
         return processingStrategy;

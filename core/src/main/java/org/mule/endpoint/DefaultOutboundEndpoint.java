@@ -35,7 +35,6 @@ import java.util.Map;
 public class DefaultOutboundEndpoint extends AbstractEndpoint implements OutboundEndpoint
 {
     private static final long serialVersionUID = 8860985949279708638L;
-
     private List<String> responseProperties;
 
     public DefaultOutboundEndpoint(Connector connector,
@@ -87,6 +86,12 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         return responseProperties;
     }
 
+    @Override
+    public boolean isDynamic()
+    {
+        return false;
+    }
+
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         MuleEvent result = getMessageProcessorChain(event.getFlowConstruct()).process(event);
@@ -105,7 +110,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
     protected MessageProcessor createMessageProcessorChain(FlowConstruct flowContruct) throws MuleException
     {
         EndpointMessageProcessorChainFactory factory = getMessageProcessorsFactory();
-        MessageProcessor chain = factory.createOutboundMessageProcessorChain(this, flowContruct,
+        MessageProcessor chain = factory.createOutboundMessageProcessorChain(this,
             ((AbstractConnector) getConnector()).createDispatcherMessageProcessor(this));
 
         if (chain instanceof MuleContextAware)
@@ -120,7 +125,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         {
             ((Initialisable) chain).initialise();
         }
-        
+
         return chain;
     }
 }

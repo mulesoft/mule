@@ -13,6 +13,8 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.MessagingExceptionHandlerAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -40,7 +42,7 @@ import org.apache.commons.logging.LogFactory;
  * the first in the nested chain.
  */
 public abstract class AbstractMessageProcessorChain
-        implements MessageProcessorChain, Lifecycle, FlowConstructAware, MuleContextAware, EndpointAware, MessageProcessorContainer
+        implements MessageProcessorChain, Lifecycle, FlowConstructAware, MuleContextAware, EndpointAware, MessageProcessorContainer, MessagingExceptionHandlerAware
 {
 
     protected final transient Log log = LogFactory.getLog(getClass());
@@ -203,7 +205,19 @@ public abstract class AbstractMessageProcessorChain
         NotificationUtils.addMessageProcessorPathElements(getMessageProcessors(), pathElement);
 
     }
-    
+
+    @Override
+    public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler)
+    {
+        for (MessageProcessor processor : processors)
+        {
+            if (processor instanceof MessagingExceptionHandlerAware)
+            {
+                ((MessagingExceptionHandlerAware) processor).setMessagingExceptionHandler(messagingExceptionHandler);
+            }
+        }
+    }
+
     @Override
     public void setMuleContext(MuleContext context)
     {

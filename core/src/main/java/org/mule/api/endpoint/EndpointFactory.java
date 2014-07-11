@@ -39,6 +39,9 @@ public interface EndpointFactory extends MuleContextAware
      * (global) endpoint identifier or name. <br/><br/> The {@link OutboundEndpoint} interface is
      * currently used as the return type but this will be replaces by and more specific interface. SEE
      * MULE-2292
+     *
+     *  To add an outbound endpoint in a pipeline an honor the execution context of an endpoint a {@link org.mule.api.endpoint.OutboundEndpointExecutorFactory} must
+     * be used to wrap the outbound endpoint.
      * 
      * @param uri endpoint identifier or uri
      * @throws MuleException
@@ -55,6 +58,9 @@ public interface EndpointFactory extends MuleContextAware
 
     /**
      * Creates an endpoint with the "OUTBOUND" role using the builder provided.
+     *
+     * To add an outbound endpoint in a pipeline an {@link org.mule.api.endpoint.OutboundEndpointExecutorFactory} must
+     * be used to wrap the outbound endpoint.
      * 
      * @param builder
      * @throws MuleException

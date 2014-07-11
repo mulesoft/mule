@@ -210,7 +210,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         }
 
         injectFlowConstructMuleContext(messageSource);
+        injectExceptionHandler(messageSource);
         injectFlowConstructMuleContext(pipeline);
+        injectExceptionHandler(pipeline);
         initialiseIfInitialisable(messageSource);
         initialiseIfInitialisable(pipeline);
     }

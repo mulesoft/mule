@@ -136,6 +136,7 @@ public class MuleProperties
     public static final String OBJECT_STORE_FILE_NAME = "_fileQueueStore";
     public static final String OBJECT_MULE_APPLICATION_PROPERTIES = "_muleProperties";
     public static final String OBJECT_MULE_ENDPOINT_FACTORY = "_muleEndpointFactory";
+    public static final String OBJECT_MULE_OUTBOUND_ENDPOINT_EXECUTOR_FACTORY = "_muleOutboundEndpointExecutorFactory";
     public static final String OBJECT_MULE_STREAM_CLOSER_SERVICE = "_muleStreamCloserService";
     public static final String OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP = "_muleSimpleRegistryBootstrap";
     public static final String OBJECT_DEFAULT_THREADING_PROFILE = "_defaultThreadingProfile";

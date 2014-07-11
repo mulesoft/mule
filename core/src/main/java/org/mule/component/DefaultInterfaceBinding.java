@@ -8,12 +8,18 @@ package org.mule.component;
 
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.component.InterfaceBinding;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.MessagingExceptionHandlerAware;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.config.i18n.CoreMessages;
@@ -24,13 +30,15 @@ import java.lang.reflect.Proxy;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class DefaultInterfaceBinding implements InterfaceBinding
+public class DefaultInterfaceBinding implements InterfaceBinding, MessagingExceptionHandlerAware, Initialisable
 {
     protected static final Log logger = LogFactory.getLog(DefaultInterfaceBinding.class);
 
     private Class<?> interfaceClass;
 
     private String methodName;
+
+    private MessagingExceptionHandler messagingExceptionHandler;
 
     // The router used to actually dispatch the message
     protected OutboundRouter outboundRouter;
@@ -122,5 +130,24 @@ public class DefaultInterfaceBinding implements InterfaceBinding
         {
             return null;
         }
+    }
+
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        if (outboundRouter instanceof MessagingExceptionHandlerAware)
+        {
+            ((MessagingExceptionHandlerAware) outboundRouter).setMessagingExceptionHandler(messagingExceptionHandler);
+        }
+        if (outboundRouter instanceof Initialisable)
+        {
+            outboundRouter.initialise();
+        }
+    }
+
+    @Override
+    public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler)
+    {
+        this.messagingExceptionHandler = messagingExceptionHandler;
     }
 }

@@ -15,6 +15,8 @@ import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.MessagingExceptionHandlerAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
@@ -47,10 +49,11 @@ import org.apache.commons.logging.LogFactory;
  * will be routed to the defined dead letter queue route or in case there is no dead letter
  * queue route then it will be handled by the flow exception strategy.
  */
-public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilSuccessfulProcessingStrategy implements Initialisable, Startable, Stoppable
+public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilSuccessfulProcessingStrategy implements Initialisable, Startable, Stoppable, MessagingExceptionHandlerAware
 {
 
     protected transient Log logger = LogFactory.getLog(getClass());
+    private MessagingExceptionHandler messagingExceptionHandler;
     private ScheduledExecutorService scheduledPool;
 
     @Override
@@ -224,9 +227,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
             logger.info("Retry attempts exhausted and no DLQ defined");
             RetryPolicyExhaustedException retryPolicyExhaustedException = new RetryPolicyExhaustedException(
                     CoreMessages.createStaticMessage("until-successful retries exhausted"), this);
-            event.getFlowConstruct()
-                    .getExceptionListener()
-                    .handleException(new MessagingException(event, retryPolicyExhaustedException), event);
+            messagingExceptionHandler.handleException(new MessagingException(event, retryPolicyExhaustedException), event);
             return;
         }
 
@@ -237,13 +238,11 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
         }
         catch (MessagingException e)
         {
-            event.getFlowConstruct().getExceptionListener().handleException(e, event);
+            messagingExceptionHandler.handleException(e, event);
         }
         catch (Exception e)
         {
-            event.getFlowConstruct()
-                    .getExceptionListener()
-                    .handleException(new MessagingException(event, e), event);
+            messagingExceptionHandler.handleException(new MessagingException(event, e), event);
         }
     }
 
@@ -296,6 +295,12 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
         {
             message.getPayloadAsBytes();
         }
+    }
+
+    @Override
+    public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler)
+    {
+        this.messagingExceptionHandler = messagingExceptionHandler;
     }
 
 }
