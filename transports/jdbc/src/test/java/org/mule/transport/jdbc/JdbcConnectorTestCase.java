@@ -6,13 +6,20 @@
  */
 package org.mule.transport.jdbc;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 import org.mule.api.MuleException;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.Connector;
 import org.mule.common.TestResult;
 import org.mule.common.Testable;
+import org.mule.tck.MuleTestUtils.TestCallback;
 import org.mule.tck.util.MuleDerbyTestUtils;
 import org.mule.transport.AbstractConnectorTestCase;
 
@@ -112,6 +119,50 @@ public class JdbcConnectorTestCase extends AbstractConnectorTestCase
         System.out.println(((Testable) getConnector()).test().getMessage());
         assertFalse(getConnector().isStarted());
         assertFalse(getConnector().isConnected());
+    }
+
+    @Test
+    public void dispatcherPoolDisabled() throws Exception
+    {
+        testWithSystemProperty(JdbcConnector.SINGLE_DISPATCHER_PER_ENDPOINT_SYSTEM_PROPERTY, "true",
+                               new TestCallback()
+                               {
+                                   @Override
+                                   public void run() throws Exception
+                                   {
+                                       JdbcConnector jdbcConnector = (JdbcConnector) createConnector();
+                                       jdbcConnector.initialise();
+                                       jdbcConnector.start();
+
+                                       OutboundEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint("jdbc://test");
+                                       jdbcConnector.createDispatcherMessageProcessor(endpoint, null);
+
+                                       assertThat(jdbcConnector.borrowDispatcher(endpoint), notNullValue());
+                                       assertThat(jdbcConnector.borrowDispatcher(endpoint), is(jdbcConnector.borrowDispatcher(endpoint)));
+
+                                   }
+                               });
+    }
+
+    @Test
+    public void dispatcherPoolEnabled() throws Exception
+    {
+        testWithSystemProperty(JdbcConnector.SINGLE_DISPATCHER_PER_ENDPOINT_SYSTEM_PROPERTY, "false",
+                               new TestCallback()
+                               {
+                                   @Override
+                                   public void run() throws Exception
+                                   {
+                                       JdbcConnector jdbcConnector = (JdbcConnector) createConnector();
+                                       jdbcConnector.initialise();
+                                       jdbcConnector.start();
+
+                                       OutboundEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint("jdbc://test");
+                                       jdbcConnector.createDispatcherMessageProcessor(endpoint, null);
+
+                                       assertThat(jdbcConnector.borrowDispatcher(endpoint), not(jdbcConnector.borrowDispatcher(endpoint)));
+                                   }
+                               });
     }
 
 }
