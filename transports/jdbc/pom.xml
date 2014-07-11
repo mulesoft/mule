@@ -74,6 +74,11 @@
             <version>1.8.0.7</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <profiles>
