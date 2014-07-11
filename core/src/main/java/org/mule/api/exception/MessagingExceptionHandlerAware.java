@@ -7,7 +7,7 @@
 package org.mule.api.exception;
 
 /**
- * Object that need a messaging exception should implement this interface.
+ * Objects that need access to the messaging exception handler of the execution context should implement this interface.
  */
 public interface MessagingExceptionHandlerAware
 {
