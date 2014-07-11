@@ -17,15 +17,13 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transport.MessageDispatcherUtils;
 import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.transport.http.ntlm.NTLMScheme;
 import org.mule.transport.tcp.TcpConnector;
@@ -741,22 +739,6 @@ public class HttpConnector extends TcpConnector
 
     protected void applyDispatcherLifecycle(MessageDispatcher dispatcher) throws MuleException
     {
-        String phase = lifecycleManager.getCurrentPhase();
-        if (phase.equals(Startable.PHASE_NAME) && !dispatcher.getLifecycleState().isStarted())
-        {
-            if (!dispatcher.getLifecycleState().isInitialised())
-            {
-                dispatcher.initialise();
-            }
-            dispatcher.start();
-        }
-        else if (phase.equals(Stoppable.PHASE_NAME) && dispatcher.getLifecycleState().isStarted())
-        {
-            dispatcher.stop();
-        }
-        else if (Disposable.PHASE_NAME.equals(phase))
-        {
-            dispatcher.dispose();
-        }
+        MessageDispatcherUtils.applyLifecycle(dispatcher);
     }
 }
