@@ -292,33 +292,6 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
         assertThat((String) messageCopy.getInvocationProperty(FLOW_KEY), is(equalTo(FLOW_DIFFERENT_VALUE)));
     }
 
-    @Test
-    public void testThreadCopyDontShareVars() throws Exception
-    {
-        DefaultMuleEvent event = (DefaultMuleEvent) getTestEvent(TEST_PAYLOAD);
-        MuleMessage message = event.getMessage();
-        message.setInvocationProperty(FLOW_KEY, FLOW_VALUE);
-        event.setSessionVariable(SESSION_KEY, SESSION_VALUE);
-
-        MuleEvent copy = (MuleEvent) event.newThreadCopy();
-
-        MuleMessage messageCopy = copy.getMessage();
-        messageCopy.setInvocationProperty(FLOW_KEY, FLOW_DIFFERENT_VALUE);
-        copy.setSessionVariable(SESSION_KEY, SESSION_DIFFERENT_VALUE);
-
-        assertThat((String) event.getSessionVariable(SESSION_KEY), is(equalTo(SESSION_VALUE)));
-        assertThat((String) message.getSessionProperty(SESSION_KEY), is(equalTo(SESSION_VALUE)));
-        assertThat((String) event.getFlowVariable(FLOW_KEY), is(equalTo(FLOW_VALUE)));
-        assertThat((String) message.getInvocationProperty(FLOW_KEY), is(equalTo(FLOW_VALUE)));
-
-        assertThat((String) copy.getSessionVariable(SESSION_KEY), is(equalTo(SESSION_DIFFERENT_VALUE)));
-        assertThat((String) messageCopy.getSessionProperty(SESSION_KEY), is(equalTo(SESSION_DIFFERENT_VALUE)));
-        assertThat((String) copy.getFlowVariable(FLOW_KEY), is(equalTo(FLOW_DIFFERENT_VALUE)));
-        assertThat((String) messageCopy.getInvocationProperty(FLOW_KEY), is(equalTo(FLOW_DIFFERENT_VALUE)));
-    }
-
-
-
     private static class TestEventTransformer extends AbstractTransformer
     {
         @Override
