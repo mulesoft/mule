@@ -186,24 +186,17 @@ public class URIBuilder implements AnnotatedObject
     public void setPath(String path)
     {
         assertNotUsed();
-        if (null != path)
+        if (null != path && path.contains(BACKSLASH))
         {
-            if (path.indexOf(DOTS_SLASHES) > -1)
+            // Windows syntax.  convert it to URI syntax
+            try
             {
-                throw new IllegalArgumentException("Unusual syntax in path: '" + path + "' contains " + DOTS_SLASHES);
+                URI pathUri = new File(path).toURI();
+                path = pathUri.getPath();
             }
-            else if (path.contains(BACKSLASH))
+            catch (Exception ex)
             {
-                // Windows syntax.  convert it to URI syntax
-                try
-                {
-                    URI pathUri = new File(path).toURI();
-                    path = pathUri.getPath();
-                }
-                catch (Exception ex)
-                {
-                    throw new IllegalArgumentException("Illegal syntax in path: " + path, ex);
-                }
+                throw new IllegalArgumentException("Illegal syntax in path: " + path, ex);
             }
         }
         this.path = path;
