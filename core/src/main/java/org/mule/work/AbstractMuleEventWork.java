@@ -14,10 +14,9 @@ import javax.resource.spi.work.Work;
 
 /**
  * Abstract implementation of Work to be used whenever Work needs to be scheduled
- * that operates on a MuleEvent. The abstract implementation ensures that a copy of
- * MuleEvent is used and that this copy is available in the RequestContext for this
- * new thread. Implementations of AbstractMuleEventWork should be run/scheduled only
- * once. NOTE: This approach does not attempt to resolve MULE-4409 so this work may
+ * that operates on a MuleEvent. Implementations of AbstractMuleEventWork should be
+ * run/scheduled only once.
+ * NOTE: This approach does not attempt to resolve MULE-4409 so this work may
  * need to be reverted to correctly fix MULE-4409 in future releases.
  */
 public abstract class AbstractMuleEventWork implements Work
@@ -27,9 +26,7 @@ public abstract class AbstractMuleEventWork implements Work
 
     public AbstractMuleEventWork(MuleEvent event)
     {
-        // Event must be copied here rather than once work is executed, so main flow can't mutate the message
-        // before work execution
-        this.event = DefaultMuleEvent.copy(event);
+        this.event = event;
     }
 
     public final void run()

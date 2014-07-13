@@ -44,39 +44,11 @@ public class MuleEventWorkTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void testScheduleMuleEventWork() throws Exception
-    {
-        muleContext.getWorkManager().scheduleWork(new TestMuleEventWork(originalEvent));
-
-        assertTrue("Timed out waiting for latch", latch.await(2000, TimeUnit.MILLISECONDS));
-
-        assertSame(originalEvent, RequestContext.getEvent());
-
-        try
-        {
-            // Ensure that even after Work has been created, scheduled and executed
-            // the original event instance is still owned by this thread and still
-            // mutable.
-            ((DefaultMuleMessage) originalEvent.getMessage()).assertAccess(ThreadSafeAccess.WRITE);
-        }
-        catch (Exception e)
-        {
-            fail(e.getMessage());
-        }
-    }
-
-    @Test
     public void testRunMuleEventWork() throws Exception
     {
         new TestMuleEventWork(originalEvent).run();
 
-        // NOTE: This assertion documents/tests current behaviour but does not seem
-        // correct.
-        // In scenarios where Work implementations are run in the same thread rather
-        // than being scheduled then the RequestContext ThreadLocal value is
-        // overwritten with a new copy which is not desirable.
-        // See: MULE-4409
-        assertNotSame(originalEvent, RequestContext.getEvent());
+        assertSame(originalEvent, RequestContext.getEvent());
 
         try
         {
@@ -103,7 +75,7 @@ public class MuleEventWorkTestCase extends AbstractMuleContextTestCase
         @Override
         protected void doRun()
         {
-            assertNotSame("MuleEvent", event, originalEvent);
+            assertSame("MuleEvent", event, originalEvent);
             assertNotNull("RequestContext.getEvent() is null", RequestContext.getEvent());
 
             try
