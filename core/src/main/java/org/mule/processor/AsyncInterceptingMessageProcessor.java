@@ -6,6 +6,7 @@
  */
 package org.mule.processor;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -143,7 +144,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
     {
         try
         {
-            workManagerSource.getWorkManager().scheduleWork(new AsyncMessageProcessorWorker(event),
+            workManagerSource.getWorkManager().scheduleWork(new AsyncMessageProcessorWorker(DefaultMuleEvent.copy(event)),
                 WorkManager.INDEFINITE, null, new AsyncWorkListener(next));
             fireAsyncScheduledNotification(event);
         }
