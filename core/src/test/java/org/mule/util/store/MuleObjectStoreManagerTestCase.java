@@ -7,9 +7,16 @@
 
 package org.mule.util.store;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.matchers.JUnitMatchers.hasItem;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.MuleProperties;
@@ -24,34 +31,35 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.size.SmallTest;
-import org.mule.util.FileUtils;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 
-import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 
 @SmallTest
 public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase
 {
 
+    public static final String TEST_PARTITION_NAME = "partition";
     private MuleObjectStoreManager storeManager = new MuleObjectStoreManager();
-    private File tempWorkDir;
+
+    @Rule
+    public TemporaryFolder tempWorkDir = new TemporaryFolder();
 
     @Test
     public void disposeDisposableStore() throws ObjectStoreException
     {
         @SuppressWarnings("unchecked")
-        ObjectStore<Serializable> store = Mockito.mock(ObjectStore.class, Mockito.withSettings()
-            .extraInterfaces(Disposable.class));
+        ObjectStore<Serializable> store = mock(ObjectStore.class, withSettings()
+                .extraInterfaces(Disposable.class));
 
         this.storeManager.disposeStore(store);
 
-        Mockito.verify(store).clear();
-        Mockito.verify((Disposable) store).dispose();
+        verify(store).clear();
+        verify((Disposable) store).dispose();
     }
 
     @Test
@@ -60,18 +68,18 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase
         String partitionName = "partition";
 
         @SuppressWarnings("unchecked")
-        ObjectStorePartition<Serializable> store = Mockito.mock(ObjectStorePartition.class,
-            Mockito.withSettings()
-                .extraInterfaces(Disposable.class)
-                .defaultAnswer(Mockito.RETURNS_DEEP_STUBS));
+        ObjectStorePartition<Serializable> store = mock(ObjectStorePartition.class,
+                                                        withSettings()
+                                                                .extraInterfaces(Disposable.class)
+                                                                .defaultAnswer(Mockito.RETURNS_DEEP_STUBS));
 
-        Mockito.when(store.getPartitionName()).thenReturn(partitionName);
+        when(store.getPartitionName()).thenReturn(partitionName);
 
         storeManager.disposeStore(store);
 
-        Mockito.verify(store.getBaseStore()).disposePartition(partitionName);
-        Mockito.verify(store, Mockito.never()).clear();
-        Mockito.verify((Disposable) store).dispose();
+        verify(store.getBaseStore()).disposePartition(partitionName);
+        verify(store, never()).clear();
+        verify((Disposable) store).dispose();
     }
 
     @Test
@@ -88,22 +96,17 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase
 
     private void ensurePartitionIsCleared(boolean isPersistent) throws ObjectStoreException, InitialisationException
     {
-        String partitionName = "partition";
         try
         {
-            ObjectStorePartition<Serializable> store = createStorePartition(partitionName, isPersistent);
+            ObjectStorePartition<Serializable> store = createStorePartition(TEST_PARTITION_NAME, isPersistent);
 
-            store.getBaseStore().store("Some Key", "Some Value", partitionName);
+            store.getBaseStore().store("Some Key", "Some Value", TEST_PARTITION_NAME);
 
-            assertEquals(1, store.allKeys().size());
+            assertThat(store.allKeys().size(), is(1));
 
             storeManager.disposeStore(store);
 
-            assertEquals(0, store.allKeys().size());
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
+            assertThat(store.allKeys().size(), is(0));
         }
         finally
         {
@@ -125,16 +128,15 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase
 
     private void removeStoreAndMonitor(boolean isPersistent) throws ObjectStoreException, InitialisationException
     {
-        String partitionName = "partition";
         try
         {
-            ObjectStorePartition<Serializable> store = createStorePartition(partitionName, isPersistent);
+            ObjectStorePartition<Serializable> store = createStorePartition(TEST_PARTITION_NAME, isPersistent);
 
-            assertEquals(1, storeManager.scheduler.getActiveCount());
+            assertThat(storeManager.scheduler.getActiveCount(), is(1));
 
             storeManager.disposeStore(store);
 
-            assertFalse(storeManager.stores.containsKey(partitionName));
+            assertThat(storeManager.stores.keySet(), not(hasItem(TEST_PARTITION_NAME)));
 
             new PollingProber(1000, 60).check(new Probe()
             {
@@ -157,18 +159,9 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase
         }
     }
 
-    @After
-    public void deleteTempWorkDir() throws IOException
-    {
-        if(tempWorkDir!=null && tempWorkDir.exists())
-        {
-            FileUtils.deleteDirectory(tempWorkDir);
-        }
-    }
-
     private ObjectStorePartition<Serializable> createStorePartition(String partitionName, boolean isPersistent) throws InitialisationException
     {
-        MuleContext muleContext = Mockito.mock(MuleContext.class);
+        MuleContext muleContext = mock(MuleContext.class);
 
         createRegistryAndBaseStore(muleContext, isPersistent);
 
@@ -178,28 +171,28 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase
         ObjectStorePartition<Serializable> store = storeManager
                 .getObjectStore(partitionName, isPersistent, ObjectStoreManager.UNBOUNDED, 10000, 50);
 
-        assertTrue(storeManager.stores.containsKey(partitionName));
+        assertThat(storeManager.stores.keySet(), hasItem(partitionName));
 
         return store;
     }
 
     private void createRegistryAndBaseStore(MuleContext muleContext, boolean isPersistent)
     {
-        MuleRegistry muleRegistry = Mockito.mock(MuleRegistry.class);
+        MuleRegistry muleRegistry = mock(MuleRegistry.class);
         if (isPersistent)
         {
             PartitionableObjectStore<?> store = createPersistentPartitionableObjectStore(muleContext);
-            Mockito.when(muleRegistry.lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME))
+            when(muleRegistry.lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME))
                     .thenReturn(store);
         }
         else
         {
             PartitionableObjectStore<?> store = createTransientPartitionableObjectStore();
-            Mockito.when(muleRegistry.lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME))
+            when(muleRegistry.lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME))
                     .thenReturn(store);
         }
 
-        Mockito.when(muleContext.getRegistry()).thenReturn(muleRegistry);
+        when(muleContext.getRegistry()).thenReturn(muleRegistry);
     }
 
     private PartitionableObjectStore<?> createTransientPartitionableObjectStore()
@@ -209,10 +202,9 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase
 
     private PartitionableObjectStore<?> createPersistentPartitionableObjectStore(MuleContext muleContext)
     {
-        MuleConfiguration muleConfiguration = Mockito.mock(MuleConfiguration.class);
-        tempWorkDir = new File("TempWorkDir" + System.currentTimeMillis());
-        Mockito.when(muleConfiguration.getWorkingDirectory()).thenReturn(tempWorkDir.getAbsolutePath());
-        Mockito.when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
+        MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
+        when(muleConfiguration.getWorkingDirectory()).thenReturn(tempWorkDir.getRoot().getAbsolutePath());
+        when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
 
         return new PartitionedPersistentObjectStore<>(muleContext);
     }
@@ -221,15 +213,15 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase
     public void dontFailIfUnsupported() throws ObjectStoreException
     {
         @SuppressWarnings("unchecked")
-        ObjectStore<Serializable> store = Mockito.mock(ObjectStore.class, Mockito.withSettings()
-            .extraInterfaces(Disposable.class));
+        ObjectStore<Serializable> store = mock(ObjectStore.class, withSettings()
+                .extraInterfaces(Disposable.class));
 
-        Mockito.doThrow(UnsupportedOperationException.class).when(store).clear();
+        doThrow(UnsupportedOperationException.class).when(store).clear();
 
         storeManager.disposeStore(store);
 
-        Mockito.verify(store).clear();
-        Mockito.verify((Disposable) store).dispose();
+        verify(store).clear();
+        verify((Disposable) store).dispose();
     }
 
 }
