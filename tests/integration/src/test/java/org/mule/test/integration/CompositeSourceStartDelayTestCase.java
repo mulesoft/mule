@@ -119,11 +119,11 @@ public class CompositeSourceStartDelayTestCase extends FunctionalTestCase
             {
                 InboundEndpointWrapper wrappedEndpoint = new DelayedStartInboundEndpointWrapper(endpoint);
 
-                return (InboundEndpoint) registerEndpoint(wrappedEndpoint);
+                return wrappedEndpoint;
             }
             else
             {
-                return (InboundEndpoint) registerEndpoint(endpoint);
+                return endpoint;
             }
         }
     }

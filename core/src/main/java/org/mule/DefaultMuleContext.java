@@ -21,7 +21,6 @@ import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.api.el.ExpressionLanguage;
 import org.mule.api.endpoint.EndpointFactory;
-import org.mule.api.endpoint.OutboundEndpointExecutorFactory;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.exception.SystemExceptionHandler;
@@ -935,12 +934,6 @@ public class DefaultMuleContext implements MuleContext
     public boolean waitUntilStarted(int timeout) throws InterruptedException
     {
         return startLatch.await(timeout, TimeUnit.MILLISECONDS);
-    }
-
-    @Override
-    public OutboundEndpointExecutorFactory getOutboundEndpointExecutorFactory()
-    {
-        return (OutboundEndpointExecutorFactory) registryBroker.lookupObject(MuleProperties.OBJECT_MULE_OUTBOUND_ENDPOINT_EXECUTOR_FACTORY);
     }
 
     private void overrideClusterConfiguration()

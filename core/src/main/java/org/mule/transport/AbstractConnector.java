@@ -2544,7 +2544,27 @@ public abstract class AbstractConnector implements Connector, WorkListener
 
     public MessageProcessor createDispatcherMessageProcessor(OutboundEndpoint endpoint) throws MuleException
     {
-        return new DispatcherMessageProcessor(endpoint);
+        if (endpoint.getExchangePattern().hasResponse() || !getDispatcherThreadingProfile().isDoThreading())
+        {
+            return new DispatcherMessageProcessor(endpoint);
+        }
+        else
+        {
+            SimpleMessageProcessorChainBuilder builder = new SimpleMessageProcessorChainBuilder();
+            builder.setName("dispatcher processor chain for '" + endpoint.getAddress() + "'");
+            LaxAsyncInterceptingMessageProcessor async = new LaxAsyncInterceptingMessageProcessor(
+                new WorkManagerSource()
+            {
+                @Override
+                public WorkManager getWorkManager() throws MuleException
+                {
+                    return getDispatcherWorkManager();
+                }
+            });
+            builder.chain(async);
+            builder.chain(new DispatcherMessageProcessor(endpoint));
+            return builder.build();
+        }
     }
 
     @Override
