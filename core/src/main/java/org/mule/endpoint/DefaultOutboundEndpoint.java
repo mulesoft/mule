@@ -18,13 +18,18 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.MessagingExceptionHandlerAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.Connector;
 import org.mule.processor.AbstractRedeliveryPolicy;
+import org.mule.processor.LaxAsyncInterceptingMessageProcessor;
+import org.mule.processor.chain.SimpleMessageProcessorChainBuilder;
 import org.mule.transport.AbstractConnector;
+import org.mule.transport.DispatcherWorkManagerSource;
 import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
@@ -36,6 +41,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
 {
     private static final long serialVersionUID = 8860985949279708638L;
     private List<String> responseProperties;
+    private MessagingExceptionHandler exceptionHandler;
 
     public DefaultOutboundEndpoint(Connector connector,
                                    EndpointURI endpointUri,
@@ -125,7 +131,22 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         {
             ((Initialisable) chain).initialise();
         }
+        if (chain instanceof MessagingExceptionHandlerAware)
+        {
+            MessagingExceptionHandler chainExceptionHandler = this.exceptionHandler;
+            if (chainExceptionHandler == null)
+            {
+                chainExceptionHandler = flowContruct != null ? flowContruct.getExceptionListener() : null;
+            }
+            ((MessagingExceptionHandlerAware) chain).setMessagingExceptionHandler(chainExceptionHandler);
+        }
 
         return chain;
+    }
+
+    @Override
+    public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler)
+    {
+       this.exceptionHandler = messagingExceptionHandler;
     }
 }
