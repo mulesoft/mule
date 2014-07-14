@@ -11,13 +11,17 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.exception.MessagingExceptionHandlerAware;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.ModelNotification;
 import org.mule.context.notification.MuleContextNotification;
+import org.mule.exception.MessagingExceptionHandlerToSystemAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +58,18 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
             if (endpoint == null)
             {
                 throw new InitialisationException(CoreMessages.propertiesNotSet("endpoint"), this);
+            }
+            if (endpoint instanceof MuleContextAware)
+            {
+                ((MuleContextAware) endpoint).setMuleContext(muleContext);
+            }
+            if (endpoint instanceof MessagingExceptionHandlerAware)
+            {
+                ((MessagingExceptionHandlerAware) endpoint).setMessagingExceptionHandler(new MessagingExceptionHandlerToSystemAdapter());
+            }
+            if (endpoint instanceof Initialisable)
+            {
+                ((Initialisable) endpoint).initialise();
             }
         }
         catch (Exception e)
