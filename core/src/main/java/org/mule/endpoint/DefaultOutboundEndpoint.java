@@ -18,13 +18,18 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.MessagingExceptionHandlerAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.Connector;
 import org.mule.processor.AbstractRedeliveryPolicy;
+import org.mule.processor.LaxAsyncInterceptingMessageProcessor;
+import org.mule.processor.chain.SimpleMessageProcessorChainBuilder;
 import org.mule.transport.AbstractConnector;
+import org.mule.transport.DispatcherWorkManagerSource;
 import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
@@ -36,6 +41,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
 {
     private static final long serialVersionUID = 8860985949279708638L;
     private List<String> responseProperties;
+    private MessagingExceptionHandler exceptionHandler;
 
     public DefaultOutboundEndpoint(Connector connector,
                                    EndpointURI endpointUri,
@@ -109,9 +115,21 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
     @Override
     protected MessageProcessor createMessageProcessorChain(FlowConstruct flowContruct) throws MuleException
     {
+        SimpleMessageProcessorChainBuilder builder = new SimpleMessageProcessorChainBuilder();
+        builder.setName("dispatcher processor chain for '" + getAddress() + "'");
+        
+        if (getExchangePattern() == MessageExchangePattern.ONE_WAY)
+        {
+            LaxAsyncInterceptingMessageProcessor async = new LaxAsyncInterceptingMessageProcessor(
+                new DispatcherWorkManagerSource((AbstractConnector) getConnector()));
+            async.setMessagingExceptionHandler(exceptionHandler);
+            async.setMuleContext(getMuleContext());
+            builder.chain(async);
+        }
+        builder.chain(((AbstractConnector) getConnector()).createDispatcherMessageProcessor(this));
+
         EndpointMessageProcessorChainFactory factory = getMessageProcessorsFactory();
-        MessageProcessor chain = factory.createOutboundMessageProcessorChain(this,
-            ((AbstractConnector) getConnector()).createDispatcherMessageProcessor(this));
+        MessageProcessor chain = factory.createOutboundMessageProcessorChain(this, builder.build());
 
         if (chain instanceof MuleContextAware)
         {
@@ -127,5 +145,11 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         }
 
         return chain;
+    }
+
+    @Override
+    public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler)
+    {
+       this.exceptionHandler = messagingExceptionHandler;
     }
 }
