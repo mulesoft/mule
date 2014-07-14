@@ -13,6 +13,7 @@ import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
@@ -274,6 +275,12 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         return endpoint.process(event);
+    }
+
+    @Override
+    public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler)
+    {
+        endpoint.setMessagingExceptionHandler(messagingExceptionHandler);
     }
 
 }

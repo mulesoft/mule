@@ -6,10 +6,6 @@ Please check http://www.mulesoft.org/documentation/display/current/Mule+Release+
 
 Migration changes from 3.5.x to 3.6.x
 
-MULE-7620: org.mule.api.endpoint.EndpointFactory.getOutboundEndpoint(..) now returns an outbound endpoint without the behaviour of execution on the endpoint in the current thread or a dispatcher thread.
-To make it work as in previous version you must use org.mule.api.endpoint.OutboundEndpointExecutorFactory.getOutboundEndpointExecutor(..) that returns an outbound endpoint with the execution context logic.
-You must provide an ExceptionHandler as a parameter. You can get the exception handler using dependency injection by implementing org.mule.api.exception.MessagingExceptionHandlerAware.
-
 Migration changes from 3.4.x to 3.5.x
 
 MULE-6968: In the previous version, requests to "/" were only received by an HTTP endpoint when no path was defined, and rejected if path was set to "" or "/". Now requests are received by the endpoint in any of the three cases.
