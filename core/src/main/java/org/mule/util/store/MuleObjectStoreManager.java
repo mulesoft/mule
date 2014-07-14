@@ -25,6 +25,7 @@ import org.mule.util.concurrent.DaemonThreadFactory;
 import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -38,6 +39,7 @@ public class MuleObjectStoreManager
     protected ScheduledThreadPoolExecutor scheduler;
     MuleContext muleContext;
     ConcurrentMap<String, ObjectStore<?>> stores = new ConcurrentHashMap<String, ObjectStore<?>>();
+    private final ConcurrentMap<String, ScheduledFuture<?>> monitors = new ConcurrentHashMap<>();
     private String baseTransientStoreKey = MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
     private String basePersistentStoreKey = MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
     private String baseTransientUserStoreKey = MuleProperties.DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME;
@@ -205,9 +207,9 @@ public class MuleObjectStoreManager
             T previous = (T) stores.putIfAbsent(name, store);
             if (previous == null)
             {
-                Monitor m = new Monitor(name, (PartitionableExpirableObjectStore) baseStore, entryTTL,
-                    maxEntries);
-                scheduler.scheduleWithFixedDelay(m, 0, expirationInterval, TimeUnit.MILLISECONDS);
+                Monitor m = new Monitor(name, (PartitionableExpirableObjectStore) baseStore, entryTTL, maxEntries);
+                ScheduledFuture<?> future = scheduler.scheduleWithFixedDelay(m, 0, expirationInterval, TimeUnit.MILLISECONDS);
+                monitors.put(name, future);
                 return store;
             }
             else
@@ -282,7 +284,15 @@ public class MuleObjectStoreManager
         if (store instanceof ObjectStorePartition)
         {
             ObjectStorePartition partition = (ObjectStorePartition) store;
-            partition.getBaseStore().disposePartition(partition.getPartitionName());
+            String partitionName = partition.getPartitionName();
+            partition.getBaseStore().disposePartition(partitionName);
+
+            ScheduledFuture<?> future = monitors.remove(partitionName);
+            if(future!=null)
+            {
+                future.cancel(false);
+            }
+            stores.remove(partitionName);
         }
         else
         {
@@ -294,6 +304,14 @@ public class MuleObjectStoreManager
             {
                 logger.warn(String.format("ObjectStore of class %s does not support clearing",
                     store.getClass().getCanonicalName()), e);
+            }
+            try
+            {
+                stores.values().remove(store);
+            }
+            catch(Exception e)
+            {
+                logger.warn("Can not remove object store" + store.toString(), e);
             }
         }
 
