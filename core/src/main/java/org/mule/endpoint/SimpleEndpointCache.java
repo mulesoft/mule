@@ -13,6 +13,7 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointCache;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.exception.DefaultMessagingExceptionStrategy;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -50,6 +51,7 @@ public class SimpleEndpointCache implements EndpointCache
                 endpointBuilder.setResponseTimeout(responseTimeout.intValue());
             }
             endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
+            endpoint = muleContext.getOutboundEndpointExecutorFactory().getOutboundEndpointExecutor(endpoint, new DefaultMessagingExceptionStrategy(muleContext));
             OutboundEndpoint concurrentlyAddedEndpoint = outboundEndpointCache.putIfAbsent(key, endpoint);
             if (concurrentlyAddedEndpoint != null)
             {

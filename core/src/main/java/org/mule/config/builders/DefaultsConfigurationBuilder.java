@@ -20,6 +20,7 @@ import org.mule.config.ChainedThreadingProfile;
 import org.mule.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.el.mvel.MVELExpressionLanguageWrapper;
 import org.mule.endpoint.DefaultEndpointFactory;
+import org.mule.endpoint.DefaultOutboundEndpointExecutorFactory;
 import org.mule.execution.MuleMessageProcessingManager;
 import org.mule.management.stats.DefaultProcessingTimeWatcher;
 import org.mule.model.seda.SedaModel;
@@ -88,6 +89,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
             new MuleMessageProcessingManager());
 
         registry.registerObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY, new DefaultEndpointFactory());
+        registry.registerObject(MuleProperties.OBJECT_MULE_OUTBOUND_ENDPOINT_EXECUTOR_FACTORY, new DefaultOutboundEndpointExecutorFactory());
         registry.registerObject(MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE,
             new DefaultStreamCloserService());
 

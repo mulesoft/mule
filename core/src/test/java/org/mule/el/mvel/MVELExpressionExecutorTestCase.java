@@ -118,6 +118,12 @@ public class MVELExpressionExecutorTestCase extends AbstractELTestCase
     }
 
     @Test(expected = RuntimeException.class)
+    public void nestedMapAccessFailsCorrectly()
+    {
+        assertNull(mvel.execute("['test1' : null]['test2']['test2']", context));
+    }
+
+    @Test(expected = RuntimeException.class)
     public void safeNestedBeanPropertyAccessMaintainsNullSafeBehavior()
     {
         assertNull(mvel.execute("new Object().doesntExist.other", context));

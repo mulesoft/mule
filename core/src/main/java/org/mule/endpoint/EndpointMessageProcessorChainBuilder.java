@@ -23,6 +23,11 @@ public class EndpointMessageProcessorChainBuilder extends SimpleMessageProcessor
         this.endpoint = endpoint;
     }
 
+    public EndpointMessageProcessorChainBuilder(ImmutableEndpoint endpoint)
+    {
+        this.endpoint = endpoint;
+    }
+
     @Override
     protected MessageProcessor initializeMessageProcessor(Object processor) throws MuleException
     {

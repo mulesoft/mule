@@ -14,7 +14,7 @@ public interface EndpointMessageProcessorChainFactory
 {
     public MessageProcessor createInboundMessageProcessorChain(InboundEndpoint endpoint, FlowConstruct flowConstruct, MessageProcessor target) throws MuleException;
     
-    public MessageProcessor createOutboundMessageProcessorChain(OutboundEndpoint endpoint, FlowConstruct flowConstruct, MessageProcessor target) throws MuleException;
+    public MessageProcessor createOutboundMessageProcessorChain(OutboundEndpoint endpoint, MessageProcessor target) throws MuleException;
 }
 
 

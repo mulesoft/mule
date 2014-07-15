@@ -9,7 +9,7 @@
 
     <jetty:connector name="connector-ten-acceptors" acceptors="10">
         <jetty:tls-client path="clientKeystore" storePassword="mulepassword"/>
-        <jetty:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
+        <jetty:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="storepassword"/>
         <jetty:tls-server path="trustStore" storePassword="mulepassword"/>
     </jetty:connector>
 

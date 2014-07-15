@@ -7,31 +7,22 @@
 
 package org.mule.module.db.integration.config;
 
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
-import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 
-import java.util.List;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
-public class DatasourcePoolingLimitTestCase extends AbstractDbIntegrationTestCase
+public class DatasourcePoolingLimitTestCase extends AbstractDatasourcePoolingTestCase
 {
 
     public DatasourcePoolingLimitTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
     {
         super(dataSourceConfigResource, testDatabase);
-    }
-
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getDerbyResource();
     }
 
     @Override
@@ -43,12 +34,19 @@ public class DatasourcePoolingLimitTestCase extends AbstractDbIntegrationTestCas
     @Test
     public void limitsConnections() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        try
+        {
+            LocalMuleClient client = muleContext.getClient();
 
-        MuleMessage response = client.send("vm://testIn", TEST_MESSAGE, null);
+            client.dispatch("vm://testIn", TEST_MESSAGE, null);
+            client.dispatch("vm://testIn", TEST_MESSAGE, null);
 
-        assertTrue(response.getExceptionPayload().getException() instanceof MessagingException);
-        MessagingException exception = (MessagingException) response.getExceptionPayload().getException();
-        assertTrue(exception.getMessage().contains("An attempt by a client to checkout a Connection has timed out"));
+            MuleMessage response = client.request("vm://connectionError", RECEIVE_TIMEOUT);
+            assertThat(response.getExceptionPayload().getException(), is(instanceOf(MessagingException.class)));
+        }
+        finally
+        {
+            connectionLatch.countDown();
+        }
     }
 }

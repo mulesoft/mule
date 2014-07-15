@@ -17,6 +17,11 @@ public interface OutboundEndpoint extends ImmutableEndpoint, MessageProcessor
      * in the case of a synchronous call.
      */
     List<String> getResponseProperties();
+
+    /**
+     * @return true if the destination is compute in every request, false if the destination is always the same.
+     */
+    boolean isDynamic();
 }
 
 

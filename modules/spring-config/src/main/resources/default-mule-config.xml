@@ -24,6 +24,8 @@
 
     <bean name="_muleEndpointFactory" class="org.mule.endpoint.DefaultEndpointFactory"/>
 
+    <bean name="_muleOutboundEndpointExecutorFactory" class="org.mule.endpoint.DefaultOutboundEndpointExecutorFactory"/>
+
     <bean name="_muleStreamCloserService" class="org.mule.util.DefaultStreamCloserService"/>
     
     <bean name="_defaultThreadingProfile" class="org.mule.config.ChainedThreadingProfile"/>

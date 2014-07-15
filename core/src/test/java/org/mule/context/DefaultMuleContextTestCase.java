@@ -31,6 +31,7 @@ import org.mule.util.store.MuleObjectStoreManager;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URL;
 
 import junit.framework.Assert;
@@ -52,29 +53,38 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase
     @Test
     public void testClearExceptionHelperCacheForAppWhenDispose() throws Exception
     {
+        URL baseUrl = DefaultMuleContextTestCase.class.getClassLoader().getResource(".");
+        File file = new File(baseUrl.getFile() + SpiUtils.SERVICE_ROOT + ServiceType.EXCEPTION.getPath()+ "/" + TEST_PROTOCOL + "-exception-mappings.properties");
+        createExceptionMappingFile(file, INITIAL_VALUE);
+
         MuleContext ctx = new DefaultMuleContextFactory().createMuleContext();
         String value = ExceptionHelper.getErrorMapping(TEST_PROTOCOL, IllegalArgumentException.class, ctx);
         assertThat(value,is(INITIAL_VALUE));
         ctx.dispose();
-        URL url = DefaultMuleContextTestCase.class.getClassLoader().getResource(SpiUtils.SERVICE_ROOT + ServiceType.EXCEPTION.getPath()+ "/" + TEST_PROTOCOL + "-exception-mappings.properties");
-        File exceptionMappingFile = new File(url.getFile());
+
+        createExceptionMappingFile(file, VALUE_AFTER_REDEPLOY);
+
+        ctx = new DefaultMuleContextFactory().createMuleContext();
+        ctx.setExecutionClassLoader(getClass().getClassLoader());
+        value = ExceptionHelper.getErrorMapping(TEST_PROTOCOL, IllegalArgumentException.class, ctx);
+        assertThat(value, is(VALUE_AFTER_REDEPLOY));
+    }
+
+    private void createExceptionMappingFile(File exceptionMappingFile, String value) throws IOException
+    {
         FileWriter fileWriter = null;
-        try 
+        try
         {
             fileWriter = new FileWriter(exceptionMappingFile);
-            fileWriter.append("\njava.lang.IllegalArgumentException=" + VALUE_AFTER_REDEPLOY);
+            fileWriter.append("\njava.lang.IllegalArgumentException=" + value);
         }
-        finally 
+        finally
         {
             if (fileWriter != null)
             {
                 fileWriter.close();
             }
         }
-        ctx = new DefaultMuleContextFactory().createMuleContext();
-        ctx.setExecutionClassLoader(getClass().getClassLoader());
-        value = ExceptionHelper.getErrorMapping(TEST_PROTOCOL, IllegalArgumentException.class, ctx);
-        assertThat(value, is(VALUE_AFTER_REDEPLOY));
     }
 
     @Test

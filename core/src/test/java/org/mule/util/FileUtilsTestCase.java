@@ -56,7 +56,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
 
             file = FileUtils.stringToFile(TEST_FILE, " and this is appended content", true);
 
-            String content = FileUtils.readFileToString(FileUtils.newFile(TEST_FILE), null);
+            String content = FileUtils.readFileToString(FileUtils.newFile(TEST_FILE), (String) null);
 
             assertNotNull(content);
             assertTrue(content.indexOf("this is a test file") > -1);

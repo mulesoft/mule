@@ -44,7 +44,7 @@ public class AtomEntryBuilderTransformer extends AbstractExpressionTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(final MuleMessage message, String outputEncoding) throws TransformerException
     {
         Factory factory = Abdera.getInstance().getFactory();
         Entry entry = factory.newEntry();
@@ -195,7 +195,7 @@ public class AtomEntryBuilderTransformer extends AbstractExpressionTransformer
                 public void write(MuleEvent event, OutputStream out) throws IOException
                 {
                     FOMWriterOptions opts = new FOMWriterOptions();
-                    opts.setCharset(event.getEncoding());
+                    opts.setCharset(message.getEncoding());
                     e.writeTo(out, opts);
                 }
             };

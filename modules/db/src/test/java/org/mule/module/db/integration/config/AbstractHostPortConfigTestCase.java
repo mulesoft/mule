@@ -41,7 +41,7 @@ public abstract class AbstractHostPortConfigTestCase extends AbstractDbIntegrati
     {
         LocalMuleClient client = muleContext.getClient();
 
-        MuleMessage response = client.send("vm://usesHostPortConfig", TEST_MESSAGE, null);
+        MuleMessage response = client.send("vm://simpleSelect", TEST_MESSAGE, null);
 
         assertMessageContains(response, getAllPlanetRecords());
     }

@@ -8,7 +8,7 @@
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.4/mule.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.6/mule.xsd"/>
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"/>
 
@@ -568,6 +568,7 @@
                     <xsd:element ref="pooling-profile"  minOccurs="0" maxOccurs="1"/>
                     <xsd:element ref="connection-properties" minOccurs="0" maxOccurs="1" />
                     <xsd:element ref="data-types" minOccurs="0" maxOccurs="1" />
+                    <xsd:element ref="mule:abstract-reconnection-strategy" minOccurs="0" maxOccurs="1"/>
                 </xsd:sequence>
                 <xsd:attribute name="name" type="mule:substitutableName" use="required">
                     <xsd:annotation>
@@ -746,7 +747,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:complexType name="abstractOptionalUserAndPasswordDatabaseConfigType">
+    <xsd:complexType name="abstractUserAndPasswordDatabaseConfigType">
         <xsd:complexContent>
             <xsd:extension base="DatabaseConfigType">
                 <xsd:attribute name="user" type="xsd:string" use="optional">
@@ -767,35 +768,14 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="abstractMandatoryUserAndPasswordDatabaseConfigType">
-        <xsd:complexContent>
-            <xsd:extension base="DatabaseConfigType">
-                <xsd:attribute name="user" type="xsd:string" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The user that is used for authentication against the database.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="password" type="xsd:string" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The password that is used for authentication against the database.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="derby-config" type="abstractOptionalUserAndPasswordDatabaseConfigType"
+    <xsd:element name="derby-config" type="abstractUserAndPasswordDatabaseConfigType"
                  substitutionGroup="abstract-config"/>
 
     <xsd:element name="oracle-config" type="oracleDatabaseConfigType" substitutionGroup="abstract-config"/>
 
     <xsd:complexType name="oracleDatabaseConfigType">
         <xsd:complexContent>
-            <xsd:extension base="abstractMandatoryUserAndPasswordDatabaseConfigType">
+            <xsd:extension base="abstractUserAndPasswordDatabaseConfigType">
                 <xsd:attribute name="host" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -825,7 +805,7 @@
 
     <xsd:complexType name="mySqlDatabaseConfigType">
         <xsd:complexContent>
-            <xsd:extension base="abstractOptionalUserAndPasswordDatabaseConfigType">
+            <xsd:extension base="abstractUserAndPasswordDatabaseConfigType">
                 <xsd:attribute name="database" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>

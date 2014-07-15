@@ -30,13 +30,67 @@
         </license>
     </licenses>
     <mailingLists>
-        <!-- Refer to http://www.mulesoft.org/display/MULE/Mailing+Lists -->
+        <mailingList>
+            <name>developers</name>
+            <post>mule-esb@mulesoft.com</post>
+        </mailingList>
     </mailingLists>
     <developers>
-        <!-- Refer to http://www.mulesoft.org/display/MULE/Team -->
+        <developer>
+            <id>rrinaudo</id>
+            <name>Ramiro Rinaudo</name>
+            <email>ramiro.rinaudo@mulesoft.com</email>
+            <roles>
+                <role>Project Manager</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>pabad</id>
+            <name>Pablo Abad</name>
+        </developer>
+        <developer>
+            <id>dfeist</id>
+            <name>Daniel Feist</name>
+        </developer>
+        <developer>
+            <id>afelisatti</id>
+            <name>Ana Felisatti</name>
+        </developer>
+        <developer>
+            <id>andresgregoire</id>
+            <name>Andres Gregoire</name>
+        </developer>
+        <developer>
+            <id>LucianoGandini</id>
+            <name>Luciano Gandini</name>
+        </developer>
+        <developer>
+            <id>marianogonzalez</id>
+            <name>Mariano Gonzalez</name>
+        </developer>
+        <developer>
+            <id>pablokraan</id>
+            <name>Pablo Kraan</name>
+        </developer>
+        <developer>
+            <id>pablolagreca</id>
+            <name>Pablo La Greca</name>
+        </developer>
+        <developer>
+            <id>marcosnc</id>
+            <name>Marcos Nunez Cortes</name>
+        </developer>
+        <developer>
+            <id>vromero</id>
+            <name>Victor Romero</name>
+        </developer>
+        <developer>
+            <id>asequeira</id>
+            <name>Alejandro Sequeira</name>
+        </developer>
     </developers>
     <contributors>
-        <!-- Refer to http://www.mulesoft.org/display/MULE/Team -->
+        <!-- Refer to https://github.com/mulesoft/mule/graphs/contributors -->
     </contributors>
     <issueManagement>
         <system>jira</system>
@@ -111,9 +165,10 @@
         <commonsCliVersion>1.2</commonsCliVersion>
         <commonsCodecVersion>1.3</commonsCodecVersion>
         <commonsCollectionsVersion>3.2.1</commonsCollectionsVersion>
+        <commonsDbcpVersion>1.4</commonsDbcpVersion>
         <commonsDbUtilsVersion>1.2</commonsDbUtilsVersion>
         <commonsHttpClientVersion>3.1</commonsHttpClientVersion>
-        <commonsIoVersion>1.4</commonsIoVersion>
+        <commonsIoVersion>2.4</commonsIoVersion>
         <commonsJxpathVersion>1.3</commonsJxpathVersion>
         <commonsLangVersion>2.4</commonsLangVersion>
         <commonsNetVersion>2.0</commonsNetVersion>
@@ -156,7 +211,7 @@
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <!-- TODO EE-1395 -->
         <mqSeriesVersion>6.0</mqSeriesVersion>
-        <muleMvelVersion>2.1.9-MULE-003</muleMvelVersion>
+        <muleMvelVersion>2.1.9-MULE-004</muleMvelVersion>
         <mx4jVersion>2.1.1</mx4jVersion>
         <ognlVersion>2.7.3</ognlVersion>
         <oroVersion>2.0.8</oroVersion>
@@ -1286,6 +1341,13 @@
                 <artifactId>guava</artifactId>
                 <version>${guavaVersion}</version>        
             </dependency>
+
+            <dependency>
+                <groupId>commons-dbcp</groupId>
+                <artifactId>commons-dbcp</artifactId>
+                <version>${commonsDbcpVersion}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -1306,48 +1368,17 @@
 
     <repositories>
         <repository>
-            <id>mule-releases</id>
-            <name>Mule Dependencies</name>
-            <url>https://repository.mulesoft.org/nexus/content/repositories/releases/</url>
-        </repository>
-        <repository>
-            <id>mule-snapshots</id>
-            <name>Mule snapshots</name>
-            <url>https://repository.mulesoft.org/nexus/content/repositories/snapshots/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-        <repository>
-            <id>mule-deps</id>
-            <name>Mule dependencies</name>
-            <url>http://dist.codehaus.org/mule/dependencies/maven2/</url>
-        </repository>
-        <repository>
-            <id>java-net</id>
-            <name>Java net repository</name>
-            <url>http://download.java.net/maven/2</url>
-        </repository>
-        <repository>
-            <id>public-jboss</id>
-            <name>JBoss Public Repository</name>
-            <url>http://repository.jboss.org/nexus/content/groups/public-jboss</url>
-        </repository>
-        <repository>
-            <id>codehaus</id>
-            <name>Codehaus Maven Repository</name>
-            <url>http://repository.codehaus.org</url>
+            <id>mule</id>
+            <name>Mule Repository</name>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
         </repository>
     </repositories>
 
     <pluginRepositories>
         <pluginRepository>
-            <id>mule-plugin-deps</id>
-            <name>Mule Dependencies</name>
-            <url>https://repository.mulesoft.org/nexus/content/repositories/releases/</url>
+            <id>mule-plugin</id>
+            <name>Mule Repository</name>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
         </pluginRepository>
     </pluginRepositories>
 
@@ -1840,35 +1871,6 @@
             <properties>
                 <vmtype>org.eclipse.jdt.internal.launching.macosx.MacOSXType</vmtype>
             </properties>
-        </profile>
-        <profile>
-            <id>nexus</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <distributionManagement>
-                <repository>
-                    <id>mule-ee-releases</id>
-                    <name>Mule Release Repository</name>
-                    <url>https://repository-master.mulesoft.org/nexus/content/repositories/ci-releases</url>
-                </repository>
-                <snapshotRepository>
-                    <id>mule-ee-snapshots</id>
-                    <name>Mule Snapshot Repository</name>
-                    <url>https://repository-master.mulesoft.org/nexus/content/repositories/ci-snapshots</url>
-                    <uniqueVersion>false</uniqueVersion>
-                </snapshotRepository>
-            </distributionManagement>
-        </profile>
-        <profile>
-            <id>nexus-ee</id>
-            <distributionManagement>
-                <repository>
-                    <id>mule-ee-customer-releases</id>
-                    <name>Mule Release Repository</name>
-                    <url>https://repository-master.mulesoft.org/nexus/content/repositories/releases-ee</url>
-                </repository>
-            </distributionManagement>
         </profile>
 
         <!-- C.I. staged build profiles -->

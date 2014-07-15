@@ -6,6 +6,7 @@
  */
 package org.mule.processor;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -15,6 +16,7 @@ import org.mule.api.construct.MessageProcessorPathResolver;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.MessagingExceptionHandlerAware;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.Startable;
@@ -36,7 +38,7 @@ import org.mule.work.MuleWorkManager;
  * present then an exception is thrown.
  */
 public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
-    implements Startable, Stoppable
+    implements Startable, Stoppable, MessagingExceptionHandlerAware
 {
 
     public static final String SYNCHRONOUS_EVENT_ERROR_MESSAGE = "Unable to process a synchronous event asynchronously";
@@ -44,6 +46,8 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
     protected WorkManagerSource workManagerSource;
     protected boolean doThreading = true;
     protected WorkManager workManager;
+
+    private MessagingExceptionHandler messagingExceptionHandler;
 
     public AsyncInterceptingMessageProcessor(WorkManagerSource workManagerSource)
     {
@@ -140,7 +144,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
     {
         try
         {
-            workManagerSource.getWorkManager().scheduleWork(new AsyncMessageProcessorWorker(event),
+            workManagerSource.getWorkManager().scheduleWork(new AsyncMessageProcessorWorker(DefaultMuleEvent.copy(event)),
                 WorkManager.INDEFINITE, null, new AsyncWorkListener(next));
             fireAsyncScheduledNotification(event);
         }
@@ -162,6 +166,15 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
 
     }
 
+    @Override
+    public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler)
+    {
+        if (this.messagingExceptionHandler == null)
+        {
+            this.messagingExceptionHandler = messagingExceptionHandler;
+        }
+    }
+
     class AsyncMessageProcessorWorker extends AbstractMuleEventWork
     {
         public AsyncMessageProcessorWorker(MuleEvent event)
@@ -172,7 +185,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         @Override
         protected void doRun()
         {
-            MessagingExceptionHandler exceptionHandler = event.getFlowConstruct() != null ? event.getFlowConstruct().getExceptionListener() : null;
+            MessagingExceptionHandler exceptionHandler = messagingExceptionHandler;
             ExecutionTemplate<MuleEvent> executionTemplate = TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate(
                     muleContext, new MuleTransactionConfig(), exceptionHandler);
 
