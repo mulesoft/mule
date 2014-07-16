@@ -15,6 +15,7 @@ import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
@@ -61,6 +62,8 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
     private final Map<String, OutboundEndpoint> staticEndpoints = Collections.synchronizedMap(new LRUMap(64));
 
     private final DynamicURIBuilder dynamicURIBuilder;
+    
+    private MessagingExceptionHandler exceptionHandler;
 
     public DynamicOutboundEndpoint(EndpointBuilder endpointBuilder, DynamicURIBuilder dynamicURIBuilder)
     {
@@ -139,7 +142,9 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
             staticBuilder.setURIBuilder(new URIBuilder(uri));
             String endpointName = ObjectNameHelper.getEndpointNameFor(uri);
             staticBuilder.setName(endpointName);
-            return staticBuilder.buildOutboundEndpoint();
+            OutboundEndpoint endpoint = staticBuilder.buildOutboundEndpoint();
+            endpoint.setMessagingExceptionHandler(exceptionHandler);
+            return endpoint;
         }
         catch (CloneNotSupportedException e)
         {
@@ -316,5 +321,11 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         return getStaticEndpoint(event).process(event);
+    }
+
+    @Override
+    public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler)
+    {
+        this.exceptionHandler = messagingExceptionHandler;
     }
 }
