@@ -6,18 +6,16 @@
  */
 package org.mule.transport;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.processor.MessageProcessorChain;
-import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.config.ImmutableThreadingProfile;
-import org.mule.processor.LaxAsyncInterceptingMessageProcessor;
-import org.mule.processor.chain.SimpleMessageProcessorChain;
-import org.mule.processor.chain.SimpleMessageProcessorChainBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestMessageDispatcher;
@@ -26,10 +24,8 @@ import org.mule.tck.testmodels.mule.TestMessageDispatcherFactory;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 /**
  * This test case tests the both dispatcher threading profile and it's rejection
@@ -208,13 +204,8 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleContextTestC
         OutboundEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(
                 "test://test");
 
-        final LaxAsyncInterceptingMessageProcessor laxAsyncInterceptingMessageProcessor = new LaxAsyncInterceptingMessageProcessor(new DispatcherWorkManagerSource((AbstractConnector) endpoint.getConnector()));
-        final SimpleMessageProcessorChainBuilder simpleMessageProcessorChainBuilder = new SimpleMessageProcessorChainBuilder();
-        simpleMessageProcessorChainBuilder.chain(laxAsyncInterceptingMessageProcessor, endpoint);
-        final MessageProcessorChain messageProcessor = simpleMessageProcessorChainBuilder.build();
-
-        messageProcessor.process(getTestEvent("data", getTestInboundEndpoint(MessageExchangePattern.ONE_WAY)));
-        messageProcessor.process(getTestEvent("data", getTestInboundEndpoint(MessageExchangePattern.ONE_WAY)));
+        endpoint.process(getTestEvent("data", getTestInboundEndpoint(MessageExchangePattern.ONE_WAY)));
+        endpoint.process(getTestEvent("data", getTestInboundEndpoint(MessageExchangePattern.ONE_WAY)));
     }
 
     public class DelayTestMessageDispatcher extends TestMessageDispatcher
