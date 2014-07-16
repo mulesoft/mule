@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.launcher;
 
 import static org.junit.Assert.fail;
@@ -28,7 +24,7 @@ public class DefaultMuleDeployerTestCase extends AbstractMuleTestCase
     @Test
     public void disposesAppOnDeployFailure() throws Exception
     {
-        DefaultMuleDeployer deployer = new DefaultMuleDeployer();
+        DefaultArtifactDeployer deployer = new DefaultArtifactDeployer();
         Application app = mock(Application.class);
         doThrow(new IllegalStateException()).when(app).init();
 

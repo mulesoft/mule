@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <vm:endpoint path="foo" exchange-pattern="request-response" name="foo"/>
+
+    <spring:beans>
+        <spring:bean class="org.mule.test.integration.watermark.WatermarkPollingTestCase$PollStopper"/>
+    </spring:beans>
+
+
+    <flow name="echo">
+        <inbound-endpoint ref="foo"/>
+        <static-component>
+            <return-data>foo</return-data>
+        </static-component>
+    </flow>
+    
+    <sub-flow name="fruits">
+    	<set-payload value="#[['Apple', 'Banana', 'Coconut']]" />
+    </sub-flow>
+    
+    <sub-flow name="fruitsIterator">
+    	<flow-ref name="fruits" />
+    	<set-payload value="#[payload.iterator()]" />
+    </sub-flow>
+    
+    <flow name="pollWithoutWatermark">
+        <poll frequency="1000">
+            <processor-chain>
+                <set-payload value="pollWithoutWatermark"/>
+                <outbound-endpoint ref="foo"/>
+            </processor-chain>
+        </poll>
+        <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
+    </flow>
+
+    <flow name="nameNotDefinedWatermarkObjectStoreFlow" processingStrategy="synchronous">
+        <poll frequency="1000">
+            <watermark variable="test1" default-expression="#[string:noKey]"/>
+            <outbound-endpoint ref="foo"/>
+        </poll>
+        <logger message="Executed With watermark"/>
+    </flow>
+
+    <flow name="changeWatermarkWihtNotDefinedWatermarkObjectStoreFlow" processingStrategy="synchronous">
+        <poll frequency="1000">
+            <watermark variable="test2" default-expression="#[string:noKey]"/>
+            <outbound-endpoint ref="foo"/>
+        </poll>
+        <set-variable variableName="test2" value="keyPresent"/>
+        <logger level="ERROR" message="Executed With watermark #[test2]"/>
+    </flow>
+
+
+    <flow name="usingWatermarkFlow" processingStrategy="synchronous">
+        <poll frequency="1000">
+            <watermark variable="test3" default-expression="#[string:noKey]"/>
+            <outbound-endpoint ref="foo"/>
+        </poll>
+        <set-payload value="#[test3]"/>
+        <set-variable variableName="test3" value="keyPresent"/>
+        <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
+    </flow>
+
+
+    <flow name="usingWatermarkFlowWithNullValue" processingStrategy="synchronous">
+        <poll frequency="1000">
+            <watermark variable="testNull" default-expression="#[null]" update-expression="#[string:noWatermark]"/>
+            <outbound-endpoint ref="foo"/>
+        </poll>
+        <choice>
+            <when expression="#[testNull != null]">
+                <set-payload value="#[testNull]"/>
+                <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
+            </when>
+            <otherwise>
+                <logger level="ERROR" message="Watermark value is null as expected"/>
+            </otherwise>
+        </choice>
+
+    </flow>
+
+    <flow name="usingWatermarkFlowWithNullUpdateValue" processingStrategy="synchronous">
+        <poll frequency="1000">
+            <watermark variable="testUpdateAsNull" default-expression="#[string:defaultValue]" update-expression="#[null]"/>
+            <outbound-endpoint ref="foo"/>
+        </poll>
+
+        <set-payload value="#[testUpdateAsNull]"/>
+        <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
+    </flow>
+
+    <flow name="watermarkWithKeyAsAnExpression" processingStrategy="synchronous">
+        <poll frequency="1000">
+            <watermark variable="#['test4']" default-expression="#[string:noKey]"/>
+            <outbound-endpoint ref="foo"/>
+        </poll>
+        <set-variable variableName="test4" value="keyPresent"/>
+    </flow>
+
+
+    <flow name="watermarkWithUpdateExpression" processingStrategy="synchronous">
+        <poll frequency="1000">
+            <watermark variable="test5" default-expression="#[string:noKey]" update-expression="#[payload]"/>
+            <outbound-endpoint ref="foo"/>
+        </poll>
+        <set-payload value="#[string:valueUpdated]"/>
+        <set-variable variableName="test5" value="keyPresent"/>
+        <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
+    </flow>
+
+
+    <flow name="watermarkWithAnnotations" processingStrategy="synchronous">
+        <poll frequency="1000">
+            <watermark variable="test6" default-expression="#[string:noKey]" doc:name="watermark"/>
+            <outbound-endpoint ref="foo"/>
+        </poll>
+        <set-payload value="#[string:valueUpdated]"/>
+    </flow>
+
+    <flow name="watermarkWithAsyncProcessing">
+        <poll frequency="1000">
+            <watermark variable="test6" default-expression="#[string:noKey]"/>
+            <outbound-endpoint ref="foo"/>
+        </poll>
+        <set-payload value="#[string:valueUpdated]"/>
+        <set-variable variableName="test6" value="keyPresent"/>
+        <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
+    </flow>
+
+    <flow name="watermarkWithObjectStore" processingStrategy="synchronous">
+        <poll frequency="1000">
+            <watermark variable="test8" default-expression="#[string:noKey]" update-expression="#[payload]" object-store-ref="_defaultInMemoryObjectStore"/>
+            <outbound-endpoint ref="foo"/>
+        </poll>
+        <set-payload value="#[string:valueUpdated]"/>
+        <set-variable variableName="test8" value="keyPresent"/>
+        <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
+    </flow>
+
+    <flow name="failingFlowWithWatermark" processingStrategy="synchronous">
+        <poll frequency="1000">
+            <watermark variable="test6" default-expression="#[string:noKey]" update-expression="#[payload]"/>
+            <outbound-endpoint ref="foo"/>
+        </poll>
+        <set-payload value="#[string:valueUpdated]"/>
+        <set-payload value="#[sing:valueU]"/>
+        <set-variable variableName="test6" value="keyPresent"/>
+        <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
+    </flow>
+
+    <flow name="failingFlowCachedExceptionWatermark" processingStrategy="synchronous">
+        <poll frequency="1000">
+            <watermark variable="test7" default-expression="#[string:noKey]"/>
+            <outbound-endpoint ref="foo"/>
+        </poll>
+        <set-payload value="#[sing:valueU]"/>
+        <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
+        <catch-exception-strategy>
+            <logger level="ERROR" message="FAILED"/>
+            <set-variable variableName="test7" value="catchedException"/>
+            <logger level="ERROR" message="#[test7]"/>
+        </catch-exception-strategy>
+
+    </flow>
+
+	<flow name="minSelectorWithList" processingStrategy="synchronous">
+		<poll frequency="1000">
+            <watermark variable="minSelectorWithList" default-expression="#[string:noKey]" selector="MIN" selector-expression="#[payload.charAt(0)]"/>
+    		<flow-ref name="fruits" />
+        </poll>
+        
+        <flow-ref name="consume" />
+	</flow>
+	
+	<flow name="maxSelectorWithList" processingStrategy="synchronous">
+		<poll frequency="1000">
+            <watermark variable="maxSelectorWithList" default-expression="#[string:noKey]" selector="MAX" selector-expression="#[payload.charAt(0)]"/>
+    		<flow-ref name="fruits" />
+        </poll>
+        
+        <flow-ref name="consume" />
+	</flow>
+	
+	<flow name="firstSelectorWithList" processingStrategy="synchronous">
+		<poll frequency="1000">
+            <watermark variable="firstSelectorWithList" default-expression="#[string:noKey]" selector="FIRST" />
+    		<flow-ref name="fruits" />
+        </poll>
+        
+        <flow-ref name="consume" />
+	</flow>
+	
+	<flow name="lastSelectorWithList" processingStrategy="synchronous">
+		<poll frequency="1000">
+            <watermark variable="lastSelectorWithList" default-expression="#[string:noKey]" selector="LAST" />
+    		<flow-ref name="fruits" />
+        </poll>
+        
+        <flow-ref name="consume" />
+	</flow>
+	
+	<flow name="minSelectorWithIterator" processingStrategy="synchronous">
+		<poll frequency="1000">
+            <watermark variable="minSelectorWithIterator" default-expression="#[string:noKey]" selector="MIN" selector-expression="#[payload.charAt(0)]"/>
+    		<flow-ref name="fruitsIterator" />
+        </poll>
+        
+        <flow-ref name="consume" />
+	</flow>
+	
+	<flow name="maxSelectorWithIterator" processingStrategy="synchronous">
+		<poll frequency="1000">
+            <watermark variable="maxSelectorWithIterator" default-expression="#[string:noKey]" selector="MAX" selector-expression="#[payload.charAt(0)]"/>
+    		<flow-ref name="fruitsIterator" />
+        </poll>
+        
+        <flow-ref name="consume" />
+	</flow>
+	
+	<flow name="firstSelectorWithIterator" processingStrategy="synchronous">
+		<poll frequency="1000">
+            <watermark variable="firstSelectorWithIterator" default-expression="#[string:noKey]" selector="FIRST" />
+    		<flow-ref name="fruitsIterator" />
+        </poll>
+        
+        <flow-ref name="consume" />
+	</flow>
+	
+	<flow name="lastSelectorWithIterator" processingStrategy="synchronous">
+		<poll frequency="1000">
+            <watermark variable="lastSelectorWithIterator" default-expression="#[string:noKey]" selector="LAST" />
+    		<flow-ref name="fruitsIterator" />
+        </poll>
+        
+        <flow-ref name="consume" />
+	</flow>
+	
+	<sub-flow name="consume">
+		<foreach>
+			<logger message="selecting from #[payload]" />
+		</foreach>
+	</sub-flow>
+
+</mule>

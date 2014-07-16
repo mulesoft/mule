@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.api;
 
 import java.io.PrintWriter;
@@ -169,7 +165,7 @@ public abstract class MuleException extends Exception
         {
             return getMessage();
         }
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         buf.append(SystemUtils.LINE_SEPARATOR).append(StringUtils.repeat('*', 80)).append(
             SystemUtils.LINE_SEPARATOR);
         buf.append("Message               : ").append(message).append(SystemUtils.LINE_SEPARATOR);
@@ -219,7 +215,7 @@ public abstract class MuleException extends Exception
         {
             return getMessage();
         }
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         buf.append(SystemUtils.LINE_SEPARATOR).append(StringUtils.repeat('*', 80)).append(
             SystemUtils.LINE_SEPARATOR);
         buf.append("Message               : ").append(message).append(SystemUtils.LINE_SEPARATOR);

@@ -4,12 +4,16 @@
     <parent>
         <groupId>org.mule</groupId>
         <artifactId>mule</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <groupId>org.mule.transports</groupId>
     <artifactId>mule-transports</artifactId>
     <packaging>pom</packaging>
     <name>Mule Transports</name>
+
+    <properties>
+        <licensePath>../LICENSE_HEADER.txt</licensePath>
+    </properties>
 
     <modules>
         <module>all-transports</module>

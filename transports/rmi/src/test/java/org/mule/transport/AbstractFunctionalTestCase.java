@@ -1,30 +1,26 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.Message;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.transport.rmi.i18n.RmiMessages;
 
 import java.util.HashMap;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public abstract class AbstractFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -33,7 +29,6 @@ public abstract class AbstractFunctionalTestCase extends AbstractServiceAndFlowT
     public AbstractFunctionalTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
-
     }
 
     // from earlier multiple target test case
@@ -41,7 +36,7 @@ public abstract class AbstractFunctionalTestCase extends AbstractServiceAndFlowT
     @Test
     public void testCase() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         // send Echo String
         MuleMessage message = client.send("vm://testin", 12, null);
@@ -70,8 +65,8 @@ public abstract class AbstractFunctionalTestCase extends AbstractServiceAndFlowT
 
     private MuleMessage send(String uri, String message) throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        return client.send(prefix + uri, message, new HashMap());
+        MuleClient client = muleContext.getClient();
+        return client.send(prefix + uri, message, new HashMap<String, Object>());
     }
 
     @Test
@@ -137,7 +132,8 @@ public abstract class AbstractFunctionalTestCase extends AbstractServiceAndFlowT
     @Test
     public void testCorrectMethodType() throws Exception
     {
-        MuleMessage message = new MuleClient(muleContext).send("GoodType", "hello", null);
+        MuleClient client = muleContext.getClient();
+        MuleMessage message = client.send("GoodType", "hello", null);
         assertNotNull(message);
         assertEquals("olleh", message.getPayloadAsString());
     }

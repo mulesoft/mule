@@ -1,24 +1,21 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.test;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.endpoint.DynamicOutboundEndpoint;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.HashMap;
@@ -26,16 +23,11 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class EndpointURITestCase extends AbstractMuleContextTestCase
 {
-
     @Test
     public void testEndpoints() throws Exception
     {
-        Client client = new Client(muleContext);
-
         EndpointUri[] uris =
         {
             new EndpointUri("vm://#[header:INBOUND:prop1]/#[header:INBOUND:prop2]", "vm://apple/orange"),
@@ -50,38 +42,21 @@ public class EndpointURITestCase extends AbstractMuleContextTestCase
         {
             if (!uri.isDynamic())
             {
-                InboundEndpoint ei = client.getInboundEndpoint(uri.getUri());
+                InboundEndpoint ei = muleContext.getEndpointFactory().getInboundEndpoint(uri.getUri());
                 uri.checkResultUri(ei);
             }
             if (!uri.getUri().startsWith("imap:"))
             {
-                OutboundEndpoint oi = client.getOutboundEndpoint(uri.getUri());
+                EndpointBuilder endpointBuilder =
+                    muleContext.getEndpointFactory().getEndpointBuilder(uri.getUri());
+                endpointBuilder.setExchangePattern(MessageExchangePattern.ONE_WAY);
+                OutboundEndpoint oi =muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
                 uri.checkResultUri(oi);
             }
         }
     }
 
-    static class Client extends MuleClient
-    {
-        Client(MuleContext context) throws MuleException
-        {
-            super(context);
-        }
-
-        @Override
-        public InboundEndpoint getInboundEndpoint(String uri) throws MuleException
-        {
-            return super.getInboundEndpoint(uri);
-        }
-
-        public OutboundEndpoint getOutboundEndpoint(String uri) throws MuleException
-        {
-            MessageExchangePattern mep = MessageExchangePattern.ONE_WAY;
-            return getOutboundEndpoint(uri, mep, 0);
-        }
-    }
-
-    static class EndpointUri
+    private static class EndpointUri
     {
         private String uri;
         private boolean isDynamic;
@@ -95,17 +70,16 @@ public class EndpointURITestCase extends AbstractMuleContextTestCase
             message = new DefaultMuleMessage("Hello, world", inbound, null, null, muleContext);
         }
 
-        EndpointUri(String uri, String resultUri)
+        public EndpointUri(String uri, String resultUri)
         {
             this.uri = uri;
             this.resultUri = resultUri;
             this.isDynamic = true;
         }
 
-        EndpointUri(String uri)
+        public EndpointUri(String uri)
         {
-            this.uri = uri;
-            this.resultUri = uri;
+            this(uri, uri);
             this.isDynamic = false;
         }
 
@@ -119,17 +93,12 @@ public class EndpointURITestCase extends AbstractMuleContextTestCase
             return isDynamic;
         }
 
-        public String getResultUri()
-        {
-            return resultUri;
-        }
-
         public void checkResultUri(ImmutableEndpoint ep)
         {
             String epUri;
             if (ep instanceof DynamicOutboundEndpoint)
             {
-                epUri = muleContext.getExpressionManager().parse(ep.getAddress(), message, true);   
+                epUri = muleContext.getExpressionManager().parse(ep.getAddress(), message, true);
             }
             else
             {

@@ -1,16 +1,12 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.management.agents;
 
-import org.mule.module.management.agent.JmxAgent;
+import org.mule.module.management.agent.JmxApplicationAgent;
 import org.mule.module.management.agent.Mx4jAgent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -24,7 +20,7 @@ import org.junit.Test;
 public class MuleAgentsTestCase extends AbstractMuleContextTestCase
 {
 
-    protected JmxAgent jmxAgent;
+    protected JmxApplicationAgent jmxAgent;
 
     public MuleAgentsTestCase()
     {
@@ -35,7 +31,7 @@ public class MuleAgentsTestCase extends AbstractMuleContextTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        jmxAgent = muleContext.getRegistry().lookupObject(JmxAgent.class);
+        jmxAgent = muleContext.getRegistry().lookupObject(JmxApplicationAgent.class);
     }
 
     @Test

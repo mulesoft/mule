@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.api.annotations.param;
 
 import static org.junit.Assert.assertEquals;
@@ -18,8 +14,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.expression.RequiredValueException;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ExceptionUtils;
@@ -67,7 +63,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
 
     protected MuleMessage createMessage(Map<String, Object> headers, Map<String, DataHandler> attachments) throws Exception
     {
-        if(headers==null)
+        if (headers==null)
         {
             headers = new HashMap<String, Object>();
             headers.put("foo", "fooValue");
@@ -75,15 +71,14 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
             headers.put("baz", "bazValue");
         }
 
-        if(attachments==null)
+        if (attachments==null)
         {
             attachments = new HashMap<String, DataHandler>();
             attachments.put("foo", new DataHandler(new StringDataSource("fooValue")));
             attachments.put("bar", new DataHandler(new StringDataSource("barValue")));
             attachments.put("baz", new DataHandler(new StringDataSource("bazValue")));
         }
-        MuleMessage message;
-        message = new DefaultMuleMessage("test", muleContext);
+        MuleMessage message = new DefaultMuleMessage("test", muleContext);
         for (Map.Entry<String, DataHandler> attachment : attachments.entrySet())
         {
             message.addOutboundAttachment(attachment.getKey(), attachment.getValue());
@@ -98,7 +93,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
     @Test
     public void testSingleAttachment() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://attachment", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue(message.getPayload() instanceof DataHandler);
@@ -108,7 +103,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
     @Test
     public void testSingleAttachmentWithType() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://attachmentWithType", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue(message.getPayload() instanceof String);
@@ -118,7 +113,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
     @Test
     public void testSingleAttachmentOptional() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://attachmentOptional", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertEquals("faz not set", message.getPayload());
@@ -127,8 +122,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
     @Test
     public void testSingleAttachmentWithTypeNoMatchingTransform() throws Exception
     {
-        //TODO this test still works because
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://attachmentWithType", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue(message.getPayload() instanceof String);
@@ -138,7 +132,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
     @Test
     public void testMapAttachments() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://attachments", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
@@ -154,7 +148,8 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
     {
         // clear attachments
         muleMessage = createMessage(null, new HashMap<String, DataHandler>());
-        MuleMessage message = muleContext.getClient().send("vm://attachments", muleMessage);
+        MuleClient client = muleContext.getClient();
+        MuleMessage message = client.send("vm://attachments", muleMessage);
         assertNotNull(message);
         assertNotNull(message.getExceptionPayload());
         assertEquals(RequiredValueException.class,
@@ -164,7 +159,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
     @Test
     public void testMapSingleAttachment() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://singleAttachmentMap", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
@@ -184,7 +179,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
         attachments.put("bar", new DataHandler(new StringDataSource("barValue")));
         muleMessage = createMessage(null, attachments);
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://attachmentsOptional", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
@@ -201,7 +196,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
         //clear attachments
         muleMessage = createMessage(null, new HashMap<String, DataHandler>());
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://attachmentsAllOptional", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
@@ -212,7 +207,8 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
     @Test
     public void testMapAttachmentsUnmodifiable() throws Exception
     {
-        MuleMessage message = muleContext.getClient().send("vm://attachmentsUnmodifiable", muleMessage);
+        MuleClient client = muleContext.getClient();
+        MuleMessage message = client.send("vm://attachmentsUnmodifiable", muleMessage);
         assertNotNull(message);
         assertNotNull(message.getExceptionPayload());
         assertEquals(UnsupportedOperationException.class,
@@ -222,7 +218,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
     @Test
     public void testMapAttachmentsAll() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://attachmentsAll", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
@@ -237,7 +233,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
     @Test
     public void testMapAttachmentsWildcard() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://attachmentsWildcard", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
@@ -252,7 +248,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
     @Test
     public void testMapAttachmentsMultiWildcard() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://attachmentsMultiWildcard", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
@@ -268,7 +264,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
     @Test
     public void testListAttachments() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://attachmentsList", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
@@ -288,7 +284,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
         attachments.put("bar", new DataHandler(new StringDataSource("barValue")));
         muleMessage = createMessage(null, attachments);
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://attachmentsListOptional", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
@@ -304,7 +300,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
         //clear attachments
         muleMessage = createMessage(null, new HashMap<String, DataHandler>());
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://attachmentsListAllOptional", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
@@ -320,7 +316,9 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
         attachments.put("foo", new DataHandler(new StringDataSource("fooValue")));
         attachments.put("baz", new DataHandler(new StringDataSource("bazValue")));
         muleMessage = createMessage(null, attachments);
-        MuleMessage result = muleContext.getClient().send("vm://attachmentsListOptional", muleMessage);
+
+        MuleClient client = muleContext.getClient();
+        MuleMessage result = client.send("vm://attachmentsListOptional", muleMessage);
         assertNotNull(result);
         assertNotNull(result.getExceptionPayload());
         assertEquals(RequiredValueException.class,
@@ -331,7 +329,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
     @Test
     public void testSingleListAttachment() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://singleAttachmentList", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
@@ -343,7 +341,8 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
     @Test
     public void testListAttachmentsUnmodifiable() throws Exception
     {
-        MuleMessage result = muleContext.getClient().send("vm://attachmentsListUnmodifiable", muleMessage);
+        MuleClient client = muleContext.getClient();
+        MuleMessage result = client.send("vm://attachmentsListUnmodifiable", muleMessage);
         assertNotNull(result);
         assertNotNull(result.getExceptionPayload());
         assertEquals(UnsupportedOperationException.class,
@@ -353,7 +352,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
     @Test
     public void testListAttachmentsAll() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://attachmentsListAll", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
@@ -368,7 +367,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
     @Test
     public void testListAttachmentsWilcard() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://attachmentsListWildcard", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
@@ -384,7 +383,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
     @Test
     public void testListAttachmentsMultiWilcard() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://attachmentsListMultiWildcard", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);

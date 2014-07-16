@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.config;
 
 import static org.junit.Assert.assertEquals;
@@ -37,7 +33,6 @@ import org.junit.Test;
  */
 public class IdempotentMessageFilterNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     public IdempotentMessageFilterNamespaceHandlerTestCase()
     {
         // we just test the wiring of the objects, no need to start the MuleContext
@@ -45,7 +40,7 @@ public class IdempotentMessageFilterNamespaceHandlerTestCase extends FunctionalT
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/config/idempotent-message-filter-config.xml";
     }

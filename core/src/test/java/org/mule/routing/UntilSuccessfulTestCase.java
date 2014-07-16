@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.routing;
 
 import static org.junit.Assert.assertEquals;
@@ -29,6 +25,7 @@ import org.mule.util.store.SimpleMemoryObjectStore;
 
 import java.io.ByteArrayInputStream;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
@@ -76,18 +73,28 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
+        untilSuccessful = buildUntiSuccessful(1000L);
+    }
 
-        untilSuccessful = new UntilSuccessful();
+    private UntilSuccessful buildUntiSuccessful(Long millisBetweenRetries) throws Exception
+    {
+        UntilSuccessful untilSuccessful = new UntilSuccessful();
         untilSuccessful.setMuleContext(muleContext);
         untilSuccessful.setFlowConstruct(getTestService());
         untilSuccessful.setMaxRetries(2);
-        untilSuccessful.setSecondsBetweenRetries(1);
+
+        if (millisBetweenRetries != null)
+        {
+            untilSuccessful.setMillisBetweenRetries(millisBetweenRetries);
+        }
 
         objectStore = new SimpleMemoryObjectStore<MuleEvent>();
         untilSuccessful.setObjectStore(objectStore);
 
         targetMessageProcessor = new ConfigurableMessageProcessor();
         untilSuccessful.addRoute(targetMessageProcessor);
+
+        return untilSuccessful;
     }
 
     @Override
@@ -119,6 +126,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testSuccessfulDeliveryAckExpression() throws Exception
     {
         untilSuccessful.setAckExpression("#[string:ACK]");
@@ -203,11 +211,52 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
     public void testPreExistingEvents() throws Exception
     {
         final MuleEvent testEvent = getTestEvent("test_data");
-        objectStore.store(UntilSuccessful.buildQueueKey(testEvent), testEvent);
+        objectStore.store(new AsynchronousUntilSuccessfulProcessingStrategy().buildQueueKey(testEvent), testEvent);
         untilSuccessful.initialise();
         untilSuccessful.start();
         ponderUntilEventProcessed(testEvent);
     }
+
+    @Test
+    public void testDefaultMillisWait() throws Exception
+    {
+        untilSuccessful = buildUntiSuccessful(null);
+        untilSuccessful.initialise();
+        untilSuccessful.start();
+        assertEquals(60 * 1000, untilSuccessful.getMillisBetweenRetries());
+    }
+
+    @Test
+    public void testMillisWait() throws Exception
+    {
+        final long millis = 10;
+        untilSuccessful.setMillisBetweenRetries(millis);
+        untilSuccessful.initialise();
+        untilSuccessful.start();
+
+        assertEquals(millis, untilSuccessful.getMillisBetweenRetries());
+    }
+
+    @Test
+    public void testSecondsWait() throws Exception
+    {
+        final long seconds = 10;
+        untilSuccessful = buildUntiSuccessful(null);
+        untilSuccessful.setSecondsBetweenRetries(seconds);
+        untilSuccessful.initialise();
+        untilSuccessful.start();
+
+        assertEquals(seconds * 1000, untilSuccessful.getMillisBetweenRetries());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMillisAndSecondsWait() throws Exception
+    {
+        untilSuccessful.setMillisBetweenRetries(1000L);
+        untilSuccessful.setSecondsBetweenRetries(1000);
+        untilSuccessful.initialise();
+    }
+
 
     private void ponderUntilEventProcessed(final MuleEvent testEvent)
         throws InterruptedException, MuleException

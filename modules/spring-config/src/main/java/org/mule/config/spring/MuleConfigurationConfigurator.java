@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
@@ -20,6 +16,8 @@ import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
+
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -70,6 +68,7 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
             defaultConfig.setFlowEndingWithOneWayEndpointReturnsNull(config.isFlowEndingWithOneWayEndpointReturnsNull());
             defaultConfig.setDefaultExceptionStrategyName(config.getDefaultExceptionStrategyName());
             defaultConfig.setEnricherPropagatesSessionVariableChanges(config.isEnricherPropagatesSessionVariableChanges());
+            defaultConfig.setExtensions(config.getExtensions());
             validateDefaultExceptionStrategy();
             return configuration;
         }
@@ -151,6 +150,11 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
     public void setEnricherPropagatesSessionVariableChanges(boolean enricherPropagatesSessionVariableChanges)
     {
         config.setEnricherPropagatesSessionVariableChanges(enricherPropagatesSessionVariableChanges);
+    }
+
+    public void setExtensions(List<Object> extensions)
+    {
+        config.setExtensions(extensions);
     }
 
 }

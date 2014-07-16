@@ -1,18 +1,16 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.integration.routing;
 
+import static org.junit.Assert.assertTrue;
+
+import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.RoutingNotificationListener;
 import org.mule.context.notification.RoutingNotification;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -22,8 +20,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertTrue;
 
 public class InboundAggregationWithTimeoutTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -59,7 +55,7 @@ public class InboundAggregationWithTimeoutTestCase extends AbstractServiceAndFlo
         });
 
         String message = "test";
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://distributor.queue", message, null);
 
         assertTrue(latch.await(5000, TimeUnit.MILLISECONDS));

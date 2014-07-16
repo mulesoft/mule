@@ -1,17 +1,16 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms.reliability;
 
-import org.hamcrest.core.Is;
-import org.hamcrest.core.IsNull;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.exception.DefaultSystemExceptionStrategy;
@@ -22,12 +21,8 @@ import org.mule.util.concurrent.Latch;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.hamcrest.core.IsNull;
 import org.junit.Test;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Verify that no inbound messages are lost when exceptions occur.
@@ -43,9 +38,9 @@ public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase
     protected final int latchTimeout = 5000;
 
     @Override
-    protected String getConfigResources()
+    protected String[] getConfigFiles()
     {
-        return "reliability/activemq-config.xml, reliability/inbound-message-loss.xml";
+        return new String[] { "reliability/activemq-config.xml", "reliability/inbound-message-loss.xml" };
     }
 
     @Override

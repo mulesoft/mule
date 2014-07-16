@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -41,6 +38,7 @@ import javax.activation.MimetypesFileTypeMap;
 public class StaticResourceMessageProcessor implements MessageProcessor, Initialisable
 {
     public static final String DEFAULT_MIME_TYPE = "application/octet-stream";
+    public static final String ROOT_PATH = "/";
 
     private String resourceBase;
     private String defaultFile = "index.html";
@@ -65,8 +63,11 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
         String path = event.getMessage().getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY);
         String contextPath = event.getMessage().getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
 
-        // Remove the contextPath from the endpoint from the request as this isn't part of the path.
-        path = path.substring(contextPath.length());
+        if (!ROOT_PATH.equals(contextPath))
+        {
+            // Remove the contextPath from the endpoint from the request as this isn't part of the path.
+            path = path.substring(contextPath.length());
+        }
 
         File file = new File(resourceBase + path);
         MuleEvent resultEvent = event;

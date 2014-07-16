@@ -1,19 +1,14 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.file.transformers;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.types.DataTypeFactory;
 
-import java.io.File;
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -24,9 +19,6 @@ public class FileToString extends FileToByteArray
 
     public FileToString()
     {
-        registerSourceType(DataTypeFactory.create(File.class));
-        registerSourceType(DataTypeFactory.INPUT_STREAM);
-        registerSourceType(DataTypeFactory.BYTE_ARRAY);
         setReturnDataType(DataTypeFactory.STRING);
     }
 
@@ -43,14 +35,7 @@ public class FileToString extends FileToByteArray
     {
         byte[] bytes;
 
-        if (src instanceof byte[])
-        {
-            bytes = (byte[])src;
-        }
-        else
-        {
-            bytes = (byte[]) super.doTransform(src, encoding);
-        }
+        bytes = (byte[]) super.doTransform(src, encoding);
 
         try
         {

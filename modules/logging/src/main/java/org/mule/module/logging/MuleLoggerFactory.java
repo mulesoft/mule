@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.logging;
 
 import java.lang.ref.PhantomReference;
@@ -23,6 +19,9 @@ import org.slf4j.Logger;
 
 public class MuleLoggerFactory implements ILoggerFactory
 {
+
+    public static final String LOG_HANDLER_THREAD_NAME = "Mule.log.slf4j.ref.handler";
+
     protected static final Integer NO_CCL_CLASSLOADER = 0;
 
     protected ConcurrentMap<Integer, ConcurrentMap<String, Logger>> repository = new ConcurrentHashMap<Integer, ConcurrentMap<String, Logger>>();
@@ -33,7 +32,15 @@ public class MuleLoggerFactory implements ILoggerFactory
 
     public MuleLoggerFactory()
     {
-        new LoggerReferenceHandler("Mule.log.slf4j.ref.handler", referenceQueue, refs, repository);
+        if (MuleUtils.isStandalone())
+        {
+            createLoggerReferenceHandler();
+        }
+    }
+
+    protected void createLoggerReferenceHandler()
+    {
+        new LoggerReferenceHandler(LOG_HANDLER_THREAD_NAME, referenceQueue, refs, repository);
     }
 
     @Override

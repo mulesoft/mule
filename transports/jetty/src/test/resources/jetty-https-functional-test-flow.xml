@@ -14,13 +14,13 @@
 
     <https:connector name="httpConnector">
         <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
-        <https:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
+        <https:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="storepassword"/>
         <https:tls-server path="trustStore" storePassword="mulepassword"/>
     </https:connector>
 
     <jetty:connector name="jettyConnector">
         <jetty:tls-client path="clientKeystore" storePassword="mulepassword"/>
-        <jetty:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
+        <jetty:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="storepassword"/>
         <jetty:tls-server path="trustStore" storePassword="mulepassword"/>
     </jetty:connector>
 

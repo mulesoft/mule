@@ -22,5 +22,5 @@
         <jetty:inbound-endpoint address="http://localhost:${port2}/foo/bestmatch" exchange-pattern="request-response"/>
         <test:component appendString=" World Best Match 2"/>
     </flow>
-    
+
 </mule>

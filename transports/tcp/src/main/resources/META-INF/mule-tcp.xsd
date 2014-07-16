@@ -9,9 +9,9 @@
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.4/mule.xsd" />
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.5/mule.xsd" />
     <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
-                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.4/mule-schemadoc.xsd"/>
+                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.5/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>
@@ -103,6 +103,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="connectionTimeout" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Number of milliseconds to wait until an outbound connection to a remote server is successfully created. No timeout is configured by default.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="clientSoTimeout" type="mule:substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -145,6 +152,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="failOnUnresolvedHost" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If set (the default), it will fail during socket creation if the host set on the endpoint cannot be resolved. However, it can be set to false to allow unresolved hosts (this is useful on some circumstances like connecting through a proxy). 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>                
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

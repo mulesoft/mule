@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.pgp;
 
 import org.mule.RequestContext;
@@ -15,11 +11,12 @@ import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.CredentialsAccessor;
 import org.mule.api.security.CryptoFailureException;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.module.pgp.i18n.PGPMessages;
 import org.mule.security.AbstractNamedEncryptionStrategy;
+import org.mule.util.SecurityUtils;
 
 import java.io.InputStream;
+import java.security.Provider;
 import java.util.Calendar;
 
 import org.apache.commons.logging.Log;
@@ -37,18 +34,15 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
     private PGPKeyRing keyManager;
     private CredentialsAccessor credentialsAccessor;
     private boolean checkKeyExpirity = false;
+    private Provider provider;
 
     public void initialise() throws InitialisationException
     {
-        try
+        if (!SecurityUtils.isFipsSecurityModel())
         {
             java.security.Security.addProvider(new BouncyCastleProvider());
         }
-        catch (Exception e)
-        {
-            throw new InitialisationException(CoreMessages.failedToCreate("KeyBasedEncryptionStrategy"), e,
-                this);
-        }
+        provider = SecurityUtils.getDefaultSecurityProvider();
     }
 
     public InputStream encrypt(InputStream data, Object cryptInfo) throws CryptoFailureException
@@ -57,7 +51,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
         {
             PGPCryptInfo pgpCryptInfo = this.safeGetCryptInfo(cryptInfo);
             PGPPublicKey publicKey = pgpCryptInfo.getPublicKey();
-            StreamTransformer transformer = new EncryptStreamTransformer(data, publicKey);
+            StreamTransformer transformer = new EncryptStreamTransformer(data, publicKey, provider);
             return new LazyTransformedInputStream(new TransformContinuouslyPolicy(), transformer);
         }
         catch (Exception e)
@@ -73,7 +67,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
             PGPCryptInfo pgpCryptInfo = this.safeGetCryptInfo(cryptInfo);
             PGPPublicKey publicKey = pgpCryptInfo.getPublicKey();
             StreamTransformer transformer = new DecryptStreamTransformer(data, publicKey,
-                this.keyManager.getSecretKey(), this.keyManager.getSecretPassphrase());
+                this.keyManager.getSecretKey(), this.keyManager.getSecretPassphrase(), provider);
             return new LazyTransformedInputStream(new TransformContinuouslyPolicy(), transformer);
         }
         catch (Exception e)

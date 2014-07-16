@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -210,9 +207,10 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
     private void configureMocks() throws CreateException
     {
         when(mockInboundEndpoint.getConnector()).thenReturn(mockFileConnector);
+        when(mockInboundEndpoint.getMuleContext()).thenReturn(mockMuleContext);
         when(mockInboundEndpoint.getFilter()).thenReturn(null);
         when(mockFileConnector.createMuleMessageFactory()).thenReturn(mockMessageFactory);
-        mockMessageFactory = new FileMuleMessageFactory(mockMuleContext) {
+        mockMessageFactory = new FileMuleMessageFactory() {
             @Override
             public MuleMessage create(Object transportMessage, String encoding) throws Exception
             {
@@ -242,8 +240,8 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
                 }
             }
         });
-        when(mockFileConnector.getMuleContext().getRegistry().get(MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER)).thenReturn(mockMessageManager);
-        when(mockFileConnector.getMuleContext().getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
+        when(mockInboundEndpoint.getMuleContext().getRegistry().get(MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER)).thenReturn(mockMessageManager);
+        when(mockInboundEndpoint.getMuleContext().getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
     }
 
     private void configureWorkingDirectory(String workingDirectory)

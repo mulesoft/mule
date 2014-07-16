@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.http;
 
 import org.mule.api.MuleContext;
@@ -16,8 +12,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.TlsDirectKeyStore;
 import org.mule.api.security.TlsDirectTrustStore;
 import org.mule.api.security.TlsIndirectKeyStore;
-import org.mule.api.security.TlsProtocolHandler;
-import org.mule.api.security.provider.SecurityProviderFactory;
 import org.mule.api.security.tls.TlsConfiguration;
 import org.mule.transport.ssl.SslServerSocketFactory;
 import org.mule.transport.ssl.SslSocketFactory;
@@ -26,7 +20,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URI;
 import java.security.GeneralSecurityException;
-import java.security.Provider;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLServerSocket;
@@ -38,7 +31,7 @@ import javax.net.ssl.TrustManagerFactory;
  * already provided with the Mule {@link org.mule.transport.http.HttpConnector}.
  */
 public class HttpsConnector extends HttpConnector implements TlsDirectKeyStore,
-    TlsIndirectKeyStore, TlsDirectTrustStore, TlsProtocolHandler
+    TlsIndirectKeyStore, TlsDirectTrustStore
 {
 
     public static final String HTTPS = "https";
@@ -137,21 +130,6 @@ public class HttpsConnector extends HttpConnector implements TlsDirectKeyStore,
         return tls.getKeyStoreType();
     }
 
-    public String getProtocolHandler()
-    {
-        return tls.getProtocolHandler();
-    }
-
-    public Provider getProvider()
-    {
-        return tls.getProvider();
-    }
-
-    public SecurityProviderFactory getSecurityProviderFactory()
-    {
-        return tls.getSecurityProviderFactory();
-    }
-
     public String getSslType()
     {
         return tls.getSslType();
@@ -242,24 +220,9 @@ public class HttpsConnector extends HttpConnector implements TlsDirectKeyStore,
         tls.setKeyStoreType(keystoreType);
     }
 
-    public void setProtocolHandler(String protocolHandler)
-    {
-        tls.setProtocolHandler(protocolHandler);
-    }
-
-    public void setProvider(Provider provider)
-    {
-        tls.setProvider(provider);
-    }
-
     public void setRequireClientAuthentication(boolean requireClientAuthentication)
     {
         tls.setRequireClientAuthentication(requireClientAuthentication);
-    }
-
-    public void setSecurityProviderFactory(SecurityProviderFactory spFactory)
-    {
-        tls.setSecurityProviderFactory(spFactory);
     }
 
     public void setSslType(String sslType)

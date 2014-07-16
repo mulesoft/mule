@@ -1,14 +1,13 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms.integration;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.mule.RequestContext;
 import org.mule.tck.testmodels.fruit.Orange;
@@ -36,20 +35,16 @@ import javax.jms.TextMessage;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 /**
  * <code>JmsTransformersTestCase</code> Tests the JMS transformer implementations.
  */
 
 public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
 {
-
     private Session session = null;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/jms-transformers.xml";
     }
@@ -199,7 +194,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
         String text = "Test Text";
         int i = 97823;
         double d = 0923.2143E124;
-        List list = new ArrayList();
+        List<Object> list = new ArrayList<Object>();
         list.add(new Integer(i));
         list.add(new Double(d));
         list.add(text);
@@ -214,7 +209,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
         Object transformedObject = trans.transform(message);
         assertTrue("Transformed object should be a List", transformedObject instanceof List);
 
-        final List result = (List) transformedObject;
+        final List<?> result = (List<?>) transformedObject;
         String newText = (String) result.get(0);
         Integer newI = (Integer) result.get(1);
         Double newD = (Double) result.get(2);

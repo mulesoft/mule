@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:pgp="http://www.mulesoft.org/schema/mule/pgp"
-    xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:spring="http://www.springframework.org/schema/beans"
-
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:pgp="http://www.mulesoft.org/schema/mule/pgp"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:spring="http://www.springframework.org/schema/beans"
     xsi:schemaLocation="
-    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-    http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-    http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
-    http://www.mulesoft.org/schema/mule/pgp http://www.mulesoft.org/schema/mule/pgp/current/mule-pgp.xsd
-    http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/pgp http://www.mulesoft.org/schema/mule/pgp/current/mule-pgp.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
     <spring:bean id="pgpKeyManager" class="org.mule.module.pgp.PGPKeyRingImpl"
         init-method="initialise">
@@ -35,31 +35,21 @@
             checkKeyExpirity="true" />
     </pgp:security-manager>
 
-    <vm:connector name="vmConnector" />
-
-
     <flow name="pgpEncryptProcessor">
-
         <vm:inbound-endpoint path="in" />
-
         <vm:outbound-endpoint path="encrypted">
-            <encrypt-transformer name="pgpEncrypt"
-                strategy-ref="keyBasedEncryptionStrategy" />
+            <encrypt-transformer name="pgpEncrypt" strategy-ref="keyBasedEncryptionStrategy" />
         </vm:outbound-endpoint>
 
+        <catch-exception-strategy>
+            <custom-processor class="org.mule.module.pgp.PGPExpiredIntegrationTestCase$ExceptionSaver"/>
+        </catch-exception-strategy>
     </flow>
 
     <flow name="pgpDecryptProcessor">
-
         <vm:inbound-endpoint path="encrypted" />
-
-
         <vm:outbound-endpoint path="out">
-            <decrypt-transformer name="pgpDecrypt"
-                strategy-ref="keyBasedEncryptionStrategy" />
+            <decrypt-transformer name="pgpDecrypt" strategy-ref="keyBasedEncryptionStrategy" />
         </vm:outbound-endpoint>
-
     </flow>
-
-
 </mule>

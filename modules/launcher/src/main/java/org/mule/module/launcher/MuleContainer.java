@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.launcher;
 
 import org.mule.api.DefaultMuleException;
@@ -18,7 +14,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.module.launcher.coreextension.DefaultMuleCoreExtensionManager;
 import org.mule.module.launcher.coreextension.MuleCoreExtensionManager;
-import org.mule.module.launcher.log4j.ApplicationAwareRepositorySelector;
+import org.mule.module.launcher.log4j.ArtifactAwareRepositorySelector;
 import org.mule.util.MuleUrlStreamHandlerFactory;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
@@ -71,7 +67,7 @@ public class MuleContainer
         if (System.getProperty("mule.simpleLog") == null)
         {
             // TODO save this guard ref for later
-            LogManager.setRepositorySelector(new ApplicationAwareRepositorySelector(), new Object());
+            LogManager.setRepositorySelector(new ArtifactAwareRepositorySelector(), new Object());
         }
         logger = LogFactory.getLog(MuleContainer.class);
     }
@@ -145,11 +141,7 @@ public class MuleContainer
         {
             registerShutdownHook();
         }
-
-        final MuleContainerStartupSplashScreen splashScreen = new MuleContainerStartupSplashScreen();
-        splashScreen.doBody();
-        logger.info(splashScreen.toString());
-
+        showSplashScreen();
         try
         {
             coreExtensionManager.setDeploymentService(deploymentService);
@@ -163,6 +155,13 @@ public class MuleContainer
         {
             shutdown(e);
         }
+    }
+
+    protected void showSplashScreen()
+    {
+        final MuleContainerStartupSplashScreen splashScreen = new MuleContainerStartupSplashScreen();
+        splashScreen.doBody();
+        logger.info(splashScreen.toString());
     }
 
     /**

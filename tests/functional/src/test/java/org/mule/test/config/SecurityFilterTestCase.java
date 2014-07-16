@@ -1,14 +1,13 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.config;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -29,17 +28,13 @@ import java.util.List;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 /**
  * Test configuration of security filters
  */
 public class SecurityFilterTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/config/security-filter-config.xml";
     }
@@ -79,7 +74,7 @@ public class SecurityFilterTestCase extends FunctionalTestCase
             }
         }
         assertEquals(1, count);
-        assertEquals(MuleEncryptionEndpointSecurityFilter.class, securityMp.getFilter().getClass());        
+        assertEquals(MuleEncryptionEndpointSecurityFilter.class, securityMp.getFilter().getClass());
     }
 
     /**

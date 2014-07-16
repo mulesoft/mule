@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.xmpp;
 
 import static org.junit.Assert.assertTrue;
@@ -38,9 +34,12 @@ public class XmppDynamicEndpointTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String[] getConfigFiles()
     {
-        return AbstractXmppTestCase.COMMON_CONFIG + ", xmpp-dynamic-endpoint-config.xml";
+        return new String[] {
+            AbstractXmppTestCase.COMMON_CONFIG,
+            "xmpp-dynamic-endpoint-config.xml"
+        };
     }
 
     @Test

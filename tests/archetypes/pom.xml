@@ -4,12 +4,16 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-tests</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <groupId>org.mule.tests.archetypes</groupId>
     <artifactId>mule-tests-archetypes</artifactId>
     <packaging>pom</packaging>
     <name>Mule Tests for Maven Archetypes</name>
+
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
 
     <modules>
         <module>catalog-archetype</module>
@@ -19,47 +23,32 @@
         <module>transport-archetype</module>
     </modules>
 
-    <profiles>
-        <profile>
-            <id>skipTests</id>
-            <activation>
-                <property>
-                    <!--
-                        This is a trick so that when Surefire's -DskipTests is specified on the command-line,
-                        the archetype test isn't executed, as expected by a user. This part is missing
-                        from the default maven behavior.
-                    -->
-                    <name>!skipTests</name>
-                </property>
-            </activation>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.codehaus.gmaven</groupId>
-                            <artifactId>gmaven-plugin</artifactId>
-                            <executions>
-                                <execution>
-                                    <phase>generate-test-sources</phase>
-                                    <goals>
-                                        <goal>execute</goal>
-                                    </goals>
-                                    <configuration>
-                                        <classpath>
-                                            <element>
-                                                <groupId>commons-io</groupId>
-                                                <artifactId>commons-io</artifactId>
-                                                <version>1.3.1</version>
-                                            </element>
-                                        </classpath>
-                                        <source>${pom.basedir}/../RunArchetype.groovy</source>
-                                    </configuration>
-                                </execution>
-                            </executions>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
-    </profiles>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.gmaven</groupId>
+                    <artifactId>gmaven-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <phase>generate-test-sources</phase>
+                            <goals>
+                                <goal>execute</goal>
+                            </goals>
+                            <configuration>
+                                <classpath>
+                                    <element>
+                                        <groupId>commons-io</groupId>
+                                        <artifactId>commons-io</artifactId>
+                                        <version>1.3.1</version>
+                                    </element>
+                                </classpath>
+                                <source>${pom.basedir}/../RunArchetype.groovy</source>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>

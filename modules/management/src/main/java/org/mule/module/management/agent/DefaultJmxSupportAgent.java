@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.management.agent;
 
 import org.mule.AbstractAgent;
@@ -23,10 +19,14 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.management.remote.rmi.RMIConnectorServer;
 
 public class DefaultJmxSupportAgent extends AbstractAgent
 {
+    private static final Logger logger = LoggerFactory.getLogger(DefaultJmxSupportAgent.class);
 
     public static final String DEFAULT_HOST = "localhost";
     public static final String DEFAULT_PORT = "1099";
@@ -110,7 +110,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
             // any existing jmx agent will be modified with remote connector settings
             agent = createJmxAgent();
             // there must be only one jmx agent, so lookup by type instead
-            if (registry.lookupObject(JmxAgent.class) == null)
+            if (registry.lookupObject(AbstractJmxAgent.class) == null)
             {
                 registry.registerAgent(agent);
             }
@@ -167,17 +167,12 @@ public class DefaultJmxSupportAgent extends AbstractAgent
         }
     }
 
-    public JmxAgent createJmxAgent()
+    public AbstractJmxAgent createJmxAgent()
     {
-        JmxAgent agent;
+        AbstractJmxAgent agent;
         try
         {
-            agent = muleContext.getRegistry().lookupObject(JmxAgent.class);
-            if (agent == null)
-            {
-                // nothing registered yet
-                agent = new JmxAgent();
-            }
+            agent = muleContext.getRegistry().lookupObject(AbstractJmxAgent.class);
         }
         catch (RegistrationException e)
         {
@@ -189,7 +184,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
         String remotingUri = null;
         if (StringUtils.isBlank(host) && StringUtils.isBlank(port))
         {
-            remotingUri = JmxAgent.DEFAULT_REMOTING_URI;
+            remotingUri = AbstractJmxAgent.DEFAULT_REMOTING_URI;
         }
         else if (StringUtils.isNotBlank(host))
         {
@@ -310,13 +305,17 @@ public class DefaultJmxSupportAgent extends AbstractAgent
         this.port = port;
     }
 
+    @Deprecated
     public String getHost()
     {
         return host;
     }
 
+    @Deprecated
     public void setHost(final String host)
     {
+        logger.warn("The host attribute for jmx-default-config is deprecated, for multi-homed hosts consider using " +
+                "instead the Java system property java.rmi.server.hostname");
         this.host = host;
     }
 

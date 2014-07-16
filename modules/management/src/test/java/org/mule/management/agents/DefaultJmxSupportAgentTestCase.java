@@ -1,18 +1,18 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.management.agents;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import org.mule.module.management.agent.AbstractJmxAgent;
 import org.mule.module.management.agent.DefaultJmxSupportAgent;
 import org.mule.module.management.agent.FixedHostRmiClientSocketFactory;
-import org.mule.module.management.agent.JmxAgent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Map;
@@ -20,10 +20,6 @@ import java.util.Map;
 import javax.management.remote.rmi.RMIConnectorServer;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class DefaultJmxSupportAgentTestCase extends AbstractMuleContextTestCase
 {
@@ -33,7 +29,7 @@ public class DefaultJmxSupportAgentTestCase extends AbstractMuleContextTestCase
         DefaultJmxSupportAgent agent = new DefaultJmxSupportAgent();
         agent.setMuleContext(muleContext);
         agent.setHost("127.0.0.1");
-        JmxAgent jmxAgent = agent.createJmxAgent();
+        AbstractJmxAgent jmxAgent = agent.createJmxAgent();
         Map props = jmxAgent.getConnectorServerProperties();
         assertNotNull(props);
         assertEquals("JMX ConnectorServer properties should've been merged",

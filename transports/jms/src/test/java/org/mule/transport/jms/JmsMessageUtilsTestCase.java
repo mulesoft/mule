@@ -1,14 +1,22 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.BananaFactory;
@@ -45,18 +53,6 @@ import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.iterators.IteratorEnumeration;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
 {
@@ -126,7 +122,7 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
         when(session.createStreamMessage()).thenReturn(new ActiveMQStreamMessage());
 
         // Creates a test list with data
-        List data = new ArrayList();
+        List<Object> data = new ArrayList<Object>();
         data.add(Boolean.TRUE);
         data.add(new Byte("1"));
         data.add(new Short("2"));
@@ -166,7 +162,7 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
         when(session.createStreamMessage()).thenReturn(new ActiveMQStreamMessage());
 
         // Creates a test list with data
-        List data = new ArrayList();
+        List<Object> data = new ArrayList<Object>();
         data.add(new Object());
 
         JmsMessageUtils.toMessage(data, session);

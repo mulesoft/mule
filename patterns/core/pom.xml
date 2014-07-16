@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.patterns</groupId>
         <artifactId>mule-patterns</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-pattern-core</artifactId>
     <packaging>jar</packaging>
@@ -12,6 +12,10 @@
     <description>
         Mule Core Configuration Patterns.
     </description>
+
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -22,6 +26,16 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-ws</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-http</artifactId>
             <version>${project.version}</version>
         </dependency>
 

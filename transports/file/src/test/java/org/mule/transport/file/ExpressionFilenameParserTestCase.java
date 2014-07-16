@@ -1,27 +1,23 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.file;
-
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import java.util.Date;
-
-import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import java.util.Date;
+
+import org.junit.Test;
 
 /**
  * Test the syntax of the SimpleFilename parser
@@ -41,8 +37,8 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleContextTestCas
 
         message = new DefaultMuleMessage("hello", muleContext);
         message.setOutboundProperty("foo", "bar");
-        message.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, "originalName");
-        message.setOutboundProperty(FileConnector.PROPERTY_FILENAME, "newName");
+        message.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, "originalName", PropertyScope.INBOUND);
+        message.setProperty(FileConnector.PROPERTY_FILENAME, "newName", PropertyScope.INBOUND);
     }
 
     @Test
@@ -66,7 +62,7 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleContextTestCas
         result = parser.getFilename(message, "Test6_#[function:count].txt");
         assertEquals("Test6_1.txt", result);
 
-        result = parser.getFilename(message, "Test7_#[header:originalFilename].txt");
+        result = parser.getFilename(message, "Test7_#[header:inbound:originalFilename].txt");
         assertEquals("Test7_originalName.txt", result);
 
         result = parser.getFilename(message, "Test8_#[header:foo].txt");
@@ -107,7 +103,7 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleContextTestCas
         result = parser.getFilename(message, "Test6_[function:count].txt");
         assertEquals("Test6_1.txt", result);
 
-        result = parser.getFilename(message, "Test7_[header:originalFilename].txt");
+        result = parser.getFilename(message, "Test7_[header:inbound:originalFilename].txt");
         assertEquals("Test7_originalName.txt", result);
 
         result = parser.getFilename(message, "Test8_[header:foo].txt");

@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.service;
 
 import org.mule.MessageExchangePattern;
@@ -159,8 +155,23 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
 
         try
         {
-            final Object[] args = new Object[] { muleContext };
-            return (MuleMessageFactory) ClassUtils.instanciateClass(messageFactory, args, classLoader);
+            return (MuleMessageFactory) ClassUtils.instanciateClass(messageFactory, null, classLoader);
+        }
+        catch (NoSuchMethodException nsme)
+        {
+            //For backward compatibility keep trying to use deprecated constructor for custom message factories.
+            logger.warn(String.format("Couldn't not find %s empty constructor. " +
+                                      "%s must be updated to have an empty constructor in order to work properly within domains.",
+                                      messageFactory, messageFactory));
+            try
+            {
+                final Object[] args = new Object[] { muleContext };
+                return (MuleMessageFactory) ClassUtils.instanciateClass(messageFactory, args, classLoader);
+            }
+            catch (Exception e)
+            {
+                throw new TransportServiceException(CoreMessages.failedToCreate("Message Factory"), e);
+            }
         }
         catch (Exception e)
         {

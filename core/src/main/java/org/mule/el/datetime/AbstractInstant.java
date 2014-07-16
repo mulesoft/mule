@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.el.datetime;
 
 import org.mule.api.MuleRuntimeException;
@@ -50,6 +46,12 @@ public abstract class AbstractInstant implements Instant
     {
         this.calendar = calendar;
         this.locale = locale;
+    }
+
+    public AbstractInstant()
+    {
+        this.calendar = Calendar.getInstance(Locale.getDefault());
+        this.locale = Locale.getDefault();
     }
 
     @Override
@@ -96,7 +98,8 @@ public abstract class AbstractInstant implements Instant
     @Override
     public Instant changeTimeZone(String newTimezone)
     {
-        // Workaround for issues with java.util.Calendar.  Ensure Calendar is in right state before updating timeZone 
+        // Workaround for issues with java.util.Calendar. Ensure Calendar is in right state before updating
+        // timeZone
         calendar.get(Calendar.ERA);
         calendar.setTimeZone(TimeZone.getTimeZone(newTimezone));
         return this;

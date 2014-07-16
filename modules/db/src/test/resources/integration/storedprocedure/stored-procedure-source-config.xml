@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <flow name="storedProcedureCustomSource">
+        <inbound-endpoint address="vm://storedProcedureCustomSource" exchange-pattern="request-response"/>
+
+        <set-variable variableName="name" value="Pluto"/>
+
+        <db:stored-procedure config-ref="dbConfig" source="#[name]">
+            <db:parameterized-query>{ call updateParamTestType1(:type) }</db:parameterized-query>
+            <db:in-param name="type" value="#[payload]"/>
+        </db:stored-procedure>
+    </flow>
+</mule>

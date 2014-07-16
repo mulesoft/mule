@@ -4,12 +4,16 @@
     <parent>
         <groupId>org.mule.transports</groupId>
         <artifactId>mule-transports</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-ejb</artifactId>
     <packaging>jar</packaging>
     <name>EJB Transport</name>
     <description>A Mule transport for Ejb Connectivity that allows you to invoke an ejb object using an endpoint.</description>
+
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -26,12 +30,6 @@
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

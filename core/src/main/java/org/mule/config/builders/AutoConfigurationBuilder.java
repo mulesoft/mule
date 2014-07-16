@@ -1,41 +1,35 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.config.builders;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.config.DomainMuleContextAwareConfigurationBuilder;
 import org.mule.config.ConfigResource;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Configures Mule from a configuration resource or comma seperated list of configuration resources by
  * auto-detecting the ConfigurationBuilder to use for each resource. This is resolved by either checking the
  * classpath for config modules e.g. spring-config or by using the file extention or a combination.
  */
-public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuilder
+public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuilder implements DomainMuleContextAwareConfigurationBuilder
 {
-    protected static final Log logger = LogFactory.getLog(AutoConfigurationBuilder.class);
+    private MuleContext domainContext;
 
     public AutoConfigurationBuilder(String resource) throws ConfigurationException
     {
@@ -52,27 +46,27 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
         super(resources);
     }
 
+    @Override
     protected void doConfigure(MuleContext muleContext) throws ConfigurationException
     {
         autoConfigure(muleContext, configResources);
     }
 
-    protected void autoConfigure(MuleContext muleContext, ConfigResource[] configResources) throws ConfigurationException
+    protected void autoConfigure(MuleContext muleContext, ConfigResource[] resources) throws ConfigurationException
     {
+        Map<String, List<ConfigResource>> configsMap = new LinkedHashMap<String, List<ConfigResource>>();
 
-        Map configsMap = new LinkedHashMap();
-
-        for (int i = 0; i < configResources.length; i++)
+        for (int i = 0; i < resources.length; i++)
         {
             String configExtension = StringUtils.substringAfterLast(
-                (configResources[i]).getUrl().getFile(), ".");
-            List configs = (List) configsMap.get(configExtension);
+                (resources[i]).getUrl().getFile(), ".");
+            List<ConfigResource> configs = configsMap.get(configExtension);
             if (configs == null)
             {
-                configs = new ArrayList();
+                configs = new ArrayList<ConfigResource>();
                 configsMap.put(configExtension, configs);
             }
-            configs.add(configResources[i]);
+            configs.add(resources[i]);
         }
 
         try
@@ -80,12 +74,10 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
             Properties props = new Properties();
             props.load(ClassUtils.getResource("configuration-builders.properties", this.getClass()).openStream());
 
-            Iterator iterator = configsMap.entrySet().iterator();
-            while (iterator.hasNext())
+            for (Map.Entry<String, List<ConfigResource>> e : configsMap.entrySet())
             {
-                Map.Entry e = (Map.Entry) iterator.next();
-                String extension = (String) e.getKey();
-                List configs = (List) e.getValue();
+                String extension = e.getKey();
+                List<ConfigResource> configs = e.getValue();
 
                 String className = (String) props.get(extension);
 
@@ -98,6 +90,14 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
                 ConfigResource[] constructorArg = new ConfigResource[configs.size()];
                 System.arraycopy(configs.toArray(), 0, constructorArg, 0, configs.size());
                 ConfigurationBuilder cb = (ConfigurationBuilder) ClassUtils.instanciateClass(className, new Object[] {constructorArg});
+                if (domainContext != null && cb instanceof DomainMuleContextAwareConfigurationBuilder)
+                {
+                    ((DomainMuleContextAwareConfigurationBuilder) cb).setDomainContext(domainContext);
+                }
+                else if (domainContext != null)
+                {
+                    throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("ConfigurationBuilder %s does not support domain context", cb.getClass().getCanonicalName())));
+                }
                 cb.configure(muleContext);
             }
         }
@@ -111,4 +111,9 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
         }
     }
 
+    @Override
+    public void setDomainContext(MuleContext domainContext)
+    {
+        this.domainContext  = domainContext;
+    }
 }

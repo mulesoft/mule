@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.config.pool;
 
 import org.mule.api.config.ThreadingProfile;
@@ -25,9 +21,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
-*
-*/
 public class DefaultThreadPoolFactory extends ThreadPoolFactory
 {
     // deliberately shadow the superclass' static logger as to avoid log congestion on it
@@ -89,7 +82,7 @@ public class DefaultThreadPoolFactory extends ThreadPoolFactory
     public ScheduledThreadPoolExecutor createScheduledPool(String name, ThreadingProfile tp)
     {
         ScheduledThreadPoolExecutor pool = internalCreateScheduledPool(tp);
-        configureThreadFactory(name, tp, pool);
+        configureThreadPoolExecutor(name, tp, pool);
         return pool;
     }
 

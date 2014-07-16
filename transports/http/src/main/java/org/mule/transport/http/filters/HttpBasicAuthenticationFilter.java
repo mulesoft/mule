@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.http.filters;
 
 import org.mule.api.MuleEvent;
@@ -218,7 +214,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
             }
         }
 
-        StringBuffer header = new StringBuffer(128);
+        StringBuilder header = new StringBuilder(128);
         header.append("Basic ");
         String token = auth.getCredentials().toString();
         header.append(new String(Base64.encodeBase64(token.getBytes())));

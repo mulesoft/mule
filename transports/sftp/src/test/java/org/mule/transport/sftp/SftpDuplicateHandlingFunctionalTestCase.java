@@ -1,18 +1,17 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.sftp;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.transport.DispatchException;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,16 +19,12 @@ import java.util.Collection;
 import org.apache.commons.lang.NotImplementedException;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.transport.DispatchException;
-import org.mule.module.client.MuleClient;
 
 /**
  * Test the archive features.
  */
 public class SftpDuplicateHandlingFunctionalTestCase extends AbstractSftpTestCase
 {
-    
     private static final long TIMEOUT = 10000;
 
     // Size of the generated stream - 2 Mb
@@ -38,7 +33,7 @@ public class SftpDuplicateHandlingFunctionalTestCase extends AbstractSftpTestCas
     public SftpDuplicateHandlingFunctionalTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
-        
+
         // Only start mule once for all tests below, save a lot of time..., if test3
         // starts failing, comment this out
         setDisposeContextPerClass(true);
@@ -48,7 +43,7 @@ public class SftpDuplicateHandlingFunctionalTestCase extends AbstractSftpTestCas
         System.setProperty(TEST_TIMEOUT_SYSTEM_PROPERTY, "300000");
         logger.info("Timeout is now set to: " + System.getProperty(TEST_TIMEOUT_SYSTEM_PROPERTY, "-1"));
     }
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -138,8 +133,7 @@ public class SftpDuplicateHandlingFunctionalTestCase extends AbstractSftpTestCas
         executeBaseTest("inboundEndpoint4", "vm://test.upload4", "file4.txt", SEND_SIZE, "receiving4",
             TIMEOUT, "receiving4");
 
-        MuleClient muleClient = new MuleClient(muleContext);
-        ImmutableEndpoint endpoint = getImmutableEndpoint(muleClient, "send4outbound");
+        ImmutableEndpoint endpoint = getImmutableEndpoint("send4outbound");
         SftpUtil util = new SftpUtil(endpoint);
 
         assertEquals("The value on the connector should be used", "addSeqNo", util.getDuplicateHandling());
@@ -152,7 +146,7 @@ public class SftpDuplicateHandlingFunctionalTestCase extends AbstractSftpTestCas
     /*
      * @Test
     public void testDuplicateHandlingAddSeqNoWithNoFileExtension() throws
-     * Exception { MuleClient muleClient = new MuleClient(); HashMap<String, String>
+     * Exception { MuleClient muleClient = muleContext.getClient(); HashMap<String, String>
      * txtProps = new HashMap<String, String>(1);
      * txtProps.put(SftpConnector.PROPERTY_FILENAME, "file5");
      * muleClient.dispatch("vm://test.upload5", TEST_MESSAGE, txtProps); // TODO:

@@ -1,16 +1,13 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util.timer;
 
 import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.List;
 import java.util.TimerTask;
 
@@ -24,7 +21,7 @@ public class EventTimerTask extends TimerTask
     /**
      * A list of listeners on this task
      */
-    private List listeners = null;
+    private List<EventListener> listeners = null;
 
     /**
      * The name of the task
@@ -38,7 +35,7 @@ public class EventTimerTask extends TimerTask
 
     /**
      * Constructs a EventTimeTask and registers a listener with it
-     * 
+     *
      * @param listener the listener to register
      */
     public EventTimerTask(TimeEventListener listener)
@@ -50,7 +47,7 @@ public class EventTimerTask extends TimerTask
 
     /**
      * Constructs a EventTimeTask and registers a listener with it
-     * 
+     *
      * @param listener the listener to register
      * @param name the name for the task
      */
@@ -65,6 +62,7 @@ public class EventTimerTask extends TimerTask
      * The action to be performed by this timer task. The fireTime event method is
      * called.
      */
+    @Override
     public void run()
     {
 
@@ -74,7 +72,7 @@ public class EventTimerTask extends TimerTask
 
     /**
      * Gets the task name (this is also the timer thread name)
-     * 
+     *
      * @return the task name
      */
     public String getName()
@@ -92,14 +90,14 @@ public class EventTimerTask extends TimerTask
 
     public void removeAllListeners()
     {
-        listeners = new ArrayList();
+        listeners = new ArrayList<EventListener>();
     }
 
     public void addListener(TimeEventListener listener)
     {
         if (listeners == null)
         {
-            listeners = new ArrayList();
+            listeners = new ArrayList<EventListener>();
             listeners.add(listener);
         }
         else if (!listeners.contains(listener))

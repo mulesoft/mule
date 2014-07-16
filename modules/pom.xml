@@ -5,13 +5,17 @@
     <parent>
         <groupId>org.mule</groupId>
         <artifactId>mule</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <groupId>org.mule.modules</groupId>
     <artifactId>mule-modules</artifactId>
     <packaging>pom</packaging>
     <name>Mule Modules</name>
     <description>Modules which extend the Mule Core but do not qualify as Transports</description>
+
+    <properties>
+        <licensePath>../LICENSE_HEADER.txt</licensePath>
+    </properties>
 
     <modules>
         <module>atom</module>
@@ -21,6 +25,7 @@
         <module>boot</module>
         <module>bpm</module>
         <module>cxf</module>
+        <module>db</module>
         <module>devkit-support</module>
         <module>drools</module>
         <module>launcher</module>
@@ -37,12 +42,14 @@
         <module>pgp</module>
         <module>reboot</module>
         <module>rss</module>
+        <module>schedulers</module>
         <module>scripting</module>
         <module>spring-extras</module>
         <module>spring-config</module>
         <module>spring-security</module>
         <module>sxc</module>
         <module>tomcat</module>
+        <module>ws</module>
         <module>xml</module>
     </modules>
 

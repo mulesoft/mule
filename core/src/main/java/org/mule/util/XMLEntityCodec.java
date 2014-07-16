@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util;
 
 import java.io.IOException;
@@ -511,7 +507,7 @@ public final class XMLEntityCodec
         public String escape(String str)
         {
             // TODO: rewrite to use a Writer
-            StringBuffer buf = new StringBuffer(str.length() * 2);
+            StringBuilder buf = new StringBuilder(str.length() * 2);
             for (int i = 0; i < str.length(); ++i)
             {
                 char ch = str.charAt(i);
@@ -605,7 +601,7 @@ public final class XMLEntityCodec
                 return str;
             }
 
-            StringBuffer buf = new StringBuffer(str.length());
+            StringBuilder buf = new StringBuilder(str.length());
             buf.append(str.substring(0, firstAmp));
             for (int i = firstAmp; i < str.length(); ++i)
             {

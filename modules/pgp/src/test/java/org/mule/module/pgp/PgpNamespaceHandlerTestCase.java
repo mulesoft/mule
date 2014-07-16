@@ -1,14 +1,13 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.pgp;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.mule.api.EncryptionStrategy;
 import org.mule.api.security.SecurityManager;
@@ -17,14 +16,10 @@ import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class PgpNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "pgp-namespace-config.xml";
     }
@@ -41,10 +36,10 @@ public class PgpNamespaceHandlerTestCase extends FunctionalTestCase
         knownProperties(getEncryptionStrategy("keyBasedEncryptionStrategy"));
     }
 
-    protected SecurityProvider getProvider(String name)
+    protected SecurityProvider getProvider(String securityProviderName)
     {
         SecurityManager securityManager = muleContext.getSecurityManager();
-        return securityManager.getProvider(name);
+        return securityManager.getProvider(securityProviderName);
     }
 
     protected void knownProperties(SecurityProvider provider)
@@ -56,10 +51,10 @@ public class PgpNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(pgpProvider.getKeyManager() instanceof PGPKeyRingImpl);
     }
     
-    protected EncryptionStrategy getEncryptionStrategy(String name)
+    protected EncryptionStrategy getEncryptionStrategy(String encryptionStrategyName)
     {
         SecurityManager securityManager = muleContext.getSecurityManager();
-        return securityManager.getEncryptionStrategy(name);
+        return securityManager.getEncryptionStrategy(encryptionStrategyName);
     }
     
     protected void knownProperties(EncryptionStrategy encryptionStrategy)

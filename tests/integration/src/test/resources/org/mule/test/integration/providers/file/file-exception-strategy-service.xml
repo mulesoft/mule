@@ -14,7 +14,7 @@
 
         <service name="FolderToVM">
             <inbound>
-                <inbound-endpoint address="file://./.mule/in" exchange-pattern="one-way">
+                <inbound-endpoint address="file://${workingDirectory}/in" exchange-pattern="one-way">
                     <custom-transformer name="failPoint" class="org.mule.test.transformers.FailingTransformer"/>
                 </inbound-endpoint>
                 <forwarding-router/>
@@ -22,11 +22,11 @@
 
             <outbound>
                 <chaining-router>
-                    <outbound-endpoint address="file://./.mule/out" exchange-pattern="one-way"/>
+                    <outbound-endpoint address="file://${workingDirectory}/out" exchange-pattern="one-way"/>
                 </chaining-router>
             </outbound>
         <default-exception-strategy>
-            <outbound-endpoint address="file://./.mule/errors" exchange-pattern="one-way"/>
+            <outbound-endpoint address="file://${workingDirectory}/errors" exchange-pattern="one-way"/>
         </default-exception-strategy>
         </service>
     </model>

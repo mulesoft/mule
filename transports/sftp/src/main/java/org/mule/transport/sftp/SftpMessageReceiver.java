@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.sftp;
 
 import org.mule.api.MessagingException;
@@ -19,6 +15,7 @@ import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.transport.AbstractPollingMessageReceiver;
@@ -51,7 +48,12 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
 
         this.setFrequency(frequency);
 
-        sftpRRUtil = new SftpReceiverRequesterUtil(endpoint);
+        sftpRRUtil = createSftpReceiverRequesterUtil(endpoint);
+    }
+
+    protected SftpReceiverRequesterUtil createSftpReceiverRequesterUtil(InboundEndpoint endpoint)
+    {
+        return new SftpReceiverRequesterUtil(endpoint);
     }
 
     public SftpMessageReceiver(SftpConnector connector, FlowConstruct flow, InboundEndpoint endpoint) throws CreateException
@@ -116,7 +118,7 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
         catch (Exception e)
         {
             logger.error("Error in poll", e);
-            connector.getMuleContext().getExceptionListener().handleException(e);
+            getEndpoint().getMuleContext().getExceptionListener().handleException(e);
             throw e;
         }
     }
@@ -124,7 +126,7 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
     @Override
     protected void doInitialise() throws InitialisationException
     {
-        this.lockFactory = getConnector().getMuleContext().getLockFactory();
+        this.lockFactory = getEndpoint().getMuleContext().getLockFactory();
         boolean synchronousProcessing = false;
         if (getFlowConstruct() instanceof Flow)
         {
@@ -161,8 +163,8 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
 
                 MuleMessage message = createMuleMessage(inputStream);
 
-                message.setOutboundProperty(SftpConnector.PROPERTY_FILENAME, path);
-                message.setOutboundProperty(SftpConnector.PROPERTY_ORIGINAL_FILENAME, path);
+                message.setProperty(SftpConnector.PROPERTY_FILENAME, path, PropertyScope.INBOUND);
+                message.setProperty(SftpConnector.PROPERTY_ORIGINAL_FILENAME, path, PropertyScope.INBOUND);
 
                 // Now we have access to the message, update the notifier with the message
                 notifier.setMessage(message);

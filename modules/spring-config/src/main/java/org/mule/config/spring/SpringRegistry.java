@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
@@ -25,6 +21,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.beans.FatalBeanException;
+import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -86,7 +83,7 @@ public class SpringRegistry extends AbstractRegistry
     {
         if (applicationContext instanceof ConfigurableApplicationContext)
         {
-            ((ConfigurableApplicationContext) applicationContext).refresh();
+                ((ConfigurableApplicationContext) applicationContext).refresh();
         }
         //This is used to track the Spring context lifecycle since there is no way to confirm the lifecycle phase from the application context
         springContextInitialised.set(true);
@@ -156,13 +153,19 @@ public class SpringRegistry extends AbstractRegistry
         return lookupByType(type).values();
     }
 
+    @Override
+    public <T> Collection<T> lookupLocalObjects(Class<T> type)
+    {
+        return internalLookupByTypeWithoutAncestors(type, true, true).values();
+    }
+
     /**
      * For lifecycle we only want spring to return singleton objects from it's application context
      */
     @Override
     public <T> Collection<T> lookupObjectsForLifecycle(Class<T> type)
     {
-        return internalLookupByType(type, false, false).values();
+        return internalLookupByTypeWithoutAncestors(type, false, false).values();
     }
 
     @Override
@@ -172,6 +175,25 @@ public class SpringRegistry extends AbstractRegistry
     }
 
     protected <T> Map<String, T> internalLookupByType(Class<T> type, boolean nonSingletons, boolean eagerInit)
+    {
+        try
+        {
+            return BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, type, nonSingletons, eagerInit);
+        }
+        catch (FatalBeanException fbex)
+        {
+            // FBE is a result of a broken config, propagate it (see MULE-3297 for more details)
+            String message = String.format("Failed to lookup beans of type %s from the Spring registry", type);
+            throw new MuleRuntimeException(MessageFactory.createStaticMessage(message), fbex);
+        }
+        catch (Exception e)
+        {
+            logger.debug(e);
+            return Collections.emptyMap();
+        }
+    }
+
+    protected <T> Map<String, T> internalLookupByTypeWithoutAncestors(Class<T> type, boolean nonSingletons, boolean eagerInit)
     {
         try
         {

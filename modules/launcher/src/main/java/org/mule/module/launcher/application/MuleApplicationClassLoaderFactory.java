@@ -1,22 +1,17 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.launcher.application;
 
-import org.mule.module.launcher.DefaultMuleSharedDomainClassLoader;
 import org.mule.module.launcher.MuleApplicationClassLoader;
-import org.mule.module.launcher.MuleSharedDomainClassLoader;
+import org.mule.module.launcher.artifact.ArtifactClassLoader;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
+import org.mule.module.launcher.domain.DomainClassLoaderRepository;
 import org.mule.module.launcher.plugin.MulePluginsClassLoader;
 import org.mule.module.launcher.plugin.PluginDescriptor;
-import org.mule.util.StringUtils;
 
 import java.util.Set;
 
@@ -27,22 +22,26 @@ import java.util.Set;
 public class MuleApplicationClassLoaderFactory implements ApplicationClassLoaderFactory
 {
 
+    private final DomainClassLoaderRepository domainClassLoaderRepository;
+
+    public MuleApplicationClassLoaderFactory(DomainClassLoaderRepository domainClassLoaderRepository)
+    {
+        this.domainClassLoaderRepository = domainClassLoaderRepository;
+    }
+
     @Override
-    public ClassLoader create(ApplicationDescriptor descriptor)
+    public ArtifactClassLoader create(ApplicationDescriptor descriptor)
     {
         final String domain = descriptor.getDomain();
         ClassLoader parent;
-
-        if (StringUtils.isBlank(domain) || DefaultMuleSharedDomainClassLoader.DEFAULT_DOMAIN_NAME.equals(domain))
+        if (domain == null)
         {
-            parent = new DefaultMuleSharedDomainClassLoader(getClass().getClassLoader());
+            parent = domainClassLoaderRepository.getDefaultDomainClassLoader().getClassLoader();
         }
         else
         {
-            // TODO handle non-existing domains with an exception
-            parent = new MuleSharedDomainClassLoader(domain, getClass().getClassLoader());
+            parent = domainClassLoaderRepository.getDomainClassLoader(domain).getClassLoader();
         }
-
         final Set<PluginDescriptor> plugins = descriptor.getPlugins();
         if (!plugins.isEmpty())
         {

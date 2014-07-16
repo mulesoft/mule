@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.servlet;
 
 import static org.mockito.Matchers.anyBoolean;
@@ -52,7 +48,7 @@ public class MockHttpServletRequestBuilder
         HttpServletRequest mockRequest = mock(HttpServletRequest.class);
         when(mockRequest.getMethod()).thenReturn(method);
 
-        Enumeration<?> emptyEnumeration = new Hashtable<Object, Object>().elements();
+        Enumeration<String> emptyEnumeration = new Hashtable<String, String>().elements();
         when(mockRequest.getParameterNames()).thenReturn(emptyEnumeration);
 
         when(mockRequest.getRequestURI()).thenReturn(requestUri);
@@ -75,7 +71,7 @@ public class MockHttpServletRequestBuilder
 
     private void addParameterExpectations(HttpServletRequest mockRequest)
     {
-        Enumeration<?> nameEnum = null;
+        Enumeration<String> nameEnum = null;
 
         if (parameters != null)
         {
@@ -97,7 +93,7 @@ public class MockHttpServletRequestBuilder
 
     private void addAttributeExpectations(HttpServletRequest mockRequest)
     {
-        Enumeration<?> nameEnum = null;
+        Enumeration<String> nameEnum = null;
 
         if (attributes != null)
         {
@@ -117,7 +113,7 @@ public class MockHttpServletRequestBuilder
 
     private void addHeaderExpectations(HttpServletRequest mockRequest)
     {
-        Enumeration<?> nameEnum = null;
+        Enumeration<String> nameEnum = null;
         if (headers != null)
         {
             nameEnum = keyEnumeration(headers);
@@ -127,14 +123,14 @@ public class MockHttpServletRequestBuilder
                 String key = entry.getKey();
                 Object value = entry.getValue();
 
-                Enumeration<?> valueAsEnumeration = null;
-                if ((value instanceof Enumeration<?>) == false)
+                Enumeration<String> valueAsEnumeration = null;
+                if (value instanceof Enumeration)
                 {
-                    valueAsEnumeration = new SingleElementEnumeration(value);
+                    valueAsEnumeration = (Enumeration<String>) value;
                 }
                 else
                 {
-                    valueAsEnumeration = (Enumeration<?>) value;
+                    valueAsEnumeration = new SingleElementEnumeration((String) value);
                 }
 
                 when(mockRequest.getHeaders(eq(key))).thenReturn(valueAsEnumeration);
@@ -144,17 +140,17 @@ public class MockHttpServletRequestBuilder
         when(mockRequest.getHeaderNames()).thenReturn(nameEnum);
     }
 
-    private Enumeration<?> keyEnumeration(Map<?, ?> map)
+    private Enumeration<String> keyEnumeration(Map<?, ?> map)
     {
         Set<?> keys = map.keySet();
         return new IteratorEnumeration(keys.iterator());
     }
 
-    private static class SingleElementEnumeration implements Enumeration<Object>
+    private static class SingleElementEnumeration implements Enumeration<String>
     {
-        private Object element;
+        private String element;
 
-        public SingleElementEnumeration(Object singleElement)
+        public SingleElementEnumeration(String singleElement)
         {
             super();
             element = singleElement;
@@ -165,9 +161,9 @@ public class MockHttpServletRequestBuilder
             return (element != null);
         }
 
-        public Object nextElement()
+        public String nextElement()
         {
-            Object retValue = element;
+            String retValue = element;
             if (element != null)
             {
                 element = null;

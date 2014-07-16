@@ -1,19 +1,13 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.expression;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-
-import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.lifecycle.InitialisationException;
@@ -21,7 +15,6 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 public class ExpressionConfigTestCase extends AbstractMuleContextTestCase
 {
@@ -32,7 +25,7 @@ public class ExpressionConfigTestCase extends AbstractMuleContextTestCase
     public void setup() throws InitialisationException
     {
         expressionManager = new DefaultExpressionManager();
-        expressionManager.setMuleContext(Mockito.mock(MuleContext.class));
+        expressionManager.setMuleContext(muleContext);
         expressionManager.registerEvaluator(new MessageHeaderExpressionEvaluator());
         expressionManager.registerEvaluator(new MessageHeadersExpressionEvaluator());
         expressionManager.registerEvaluator(new MessageAttachmentExpressionEvaluator());

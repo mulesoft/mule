@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.tcp.protocols;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -25,7 +21,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 /**
- * Test by reading characters from a fixed StringBuffer instead of a TCP port.
+ * Test by reading characters from a fixed StringBuilder instead of a TCP port.
  */
 @SmallTest
 public class XmlMessageProtocolTestCase extends AbstractMuleTestCase
@@ -104,7 +100,7 @@ public class XmlMessageProtocolTestCase extends AbstractMuleTestCase
             "<?xml version=\"1.0\"?><data>eeeeeeeeeeeeee</data>",
             "<?xml version=\"1.0\"?><data>fffffffffffffff</data>"};
 
-        StringBuffer allMsgData = new StringBuffer();
+        StringBuilder allMsgData = new StringBuilder();
 
         for (int i = 0; i < msgData.length; i++)
         {

@@ -1,14 +1,12 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util.store;
+
+import static org.mule.api.store.ObjectStoreManager.UNBOUNDED;
 
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
@@ -31,8 +29,8 @@ import java.util.PriorityQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The MonitoredObjectStoreWrapper wraps an ObjectStore which does not support direct
@@ -41,10 +39,11 @@ import org.apache.commons.logging.LogFactory;
 public class MonitoredObjectStoreWrapper<T extends Serializable>
     implements ListableObjectStore<T>, Runnable, MuleContextAware, Initialisable, Disposable
 {
+    private static Logger logger = LoggerFactory.getLogger(MonitoredObjectStoreWrapper.class);
+
     protected MuleContext context;
     protected ScheduledThreadPoolExecutor scheduler;
     ListableObjectStore<StoredObject<T>> baseStore;
-    private static Log logger = LogFactory.getLog(MonitoredObjectStoreWrapper.class);
 
     /**
      * the maximum number of entries that this store keeps around. Specify
@@ -105,6 +104,12 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
     public T retrieve(Serializable key) throws ObjectStoreException
     {
         return getStore().retrieve(key).getItem();
+    }
+    
+    @Override
+    public void clear() throws ObjectStoreException
+    {
+        this.getStore().clear();
     }
 
     @Override
@@ -177,66 +182,48 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
             final long now = System.nanoTime();
             List<Serializable> keys = allKeys();
             int excess = (allKeys().size() - maxEntries);
-            if (maxEntries > 0 && excess > 0)
+
+            PriorityQueue<StoredObject<T>> sortedMaxEntries = null;
+
+            if (excess > 0)
             {
-                PriorityQueue<StoredObject<T>> q = new PriorityQueue<StoredObject<T>>(excess,
-                    new Comparator<StoredObject<T>>()
-                    {
+                sortedMaxEntries = new PriorityQueue<StoredObject<T>>(excess,
+                      new Comparator<StoredObject<T>>()
+                      {
 
-                        @Override
-                        public int compare(StoredObject<T> paramT1, StoredObject<T> paramT2)
-                        {
-                            return paramT2.timestamp.compareTo(paramT1.timestamp);
-                        }
-                    });
-                long youngest = Long.MAX_VALUE;
-                for (Serializable key : keys)
-                {
-                    StoredObject<T> obj = getStore().retrieve(key);
-                    //TODO extract the entryTTL>0 outside of loop
-                    if (entryTTL>0 && TimeUnit.NANOSECONDS.toMillis(now - obj.getTimestamp()) >= entryTTL)
-                    {
-                        remove(key);
-                        excess--;
-                        if (excess > 0 && q.size() > excess)
-                        {
-                            q.poll();
-                            youngest = q.peek().timestamp;
-                        }
-                    }
-                    else
-                    {
-                        if (excess > 0 && (q.size() < excess || obj.timestamp < youngest))
-                        {
-                            q.offer(obj);
-                            youngest = q.peek().timestamp;
-                        }
-                        if (excess > 0 && q.size() > excess)
-                        {
-                            q.poll();
-                            youngest = q.peek().timestamp;
-                        }
+                          @Override
+                          public int compare(StoredObject<T> paramT1, StoredObject<T> paramT2)
+                          {
+                              return paramT1.timestamp.compareTo(paramT2.timestamp);
+                          }
+                      }
+                );
+            }
 
-                    }
-                }
-                for (int i = 0; i < excess; i++)
+            ListableObjectStore<StoredObject<T>> store = getStore();
+            for (Serializable key : keys)
+            {
+                StoredObject<T> obj = store.retrieve(key);
+
+                if (entryTTL != UNBOUNDED && TimeUnit.NANOSECONDS.toMillis(now - obj.getTimestamp()) >= entryTTL)
                 {
-                    Serializable key = q.poll().key;
                     remove(key);
+                    excess--;
+                }
+                else if (maxEntries != UNBOUNDED && excess > 0)
+                {
+                    sortedMaxEntries.offer(obj);
                 }
             }
-            else
+
+            if (sortedMaxEntries != null)
             {
-                if(entryTTL>0)
+                StoredObject<T> obj = sortedMaxEntries.poll();
+                while (obj != null && excess > 0)
                 {
-                    for (Serializable key : keys)
-                    {
-                        StoredObject<T> obj = getStore().retrieve(key);
-                        if (TimeUnit.NANOSECONDS.toMillis(now - obj.getTimestamp()) >= entryTTL)
-                        {
-                            remove(key);
-                        }
-                    }
+                    remove(obj.getKey());
+                    excess--;
+                    obj = sortedMaxEntries.poll();
                 }
             }
         }

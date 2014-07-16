@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -43,7 +40,7 @@ public abstract class EventProcessingThread extends Thread
      */
     public void stopProcessing()
     {
-        logger.debug("Stopping expiring group monitoring");
+        logger.debug("Stopping " + getName());
         stopRequested = true;
         processNow();
         
@@ -82,14 +79,23 @@ public abstract class EventProcessingThread extends Thread
                 logger.debug("Received request to stop processing events");
                 break;
             }
-            doRun();
+
+            try
+            {
+                doRun();
+            }
+            catch (RuntimeException e)
+            {
+                logger.warn(String.format("Caught exception on event processing thread '%s'", getName()), e);
+            }
+
             if (delay(delayTime))
             {
                 break;
             }
         }
 
-        logger.debug("Expiring group monitoring fully stopped");
+        logger.debug(getName() + " fully stopped");
     }
 
     /**

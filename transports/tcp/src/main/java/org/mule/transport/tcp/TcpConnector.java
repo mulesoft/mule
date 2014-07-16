@@ -1,19 +1,16 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.tcp;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.Connector;
@@ -46,6 +43,8 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 public class TcpConnector extends AbstractConnector
 {
     public static final String TCP = "tcp";
+    public static final String SEND_TCP_NO_DELAY_SYSTEM_PROPERTY = MuleProperties.SYSTEM_PROPERTY_PREFIX
+                                                                   + "transport.tcp.defaultSendTcpNoDelay";
 
     /** Property can be set on the endpoint to configure how the socket is managed */
     public static final String KEEP_SEND_SOCKET_OPEN_PROPERTY = "keepSendSocketOpen";
@@ -61,6 +60,7 @@ public class TcpConnector extends AbstractConnector
 
     private int clientSoTimeout = DEFAULT_SOCKET_TIMEOUT;
     private int serverSoTimeout = DEFAULT_SOCKET_TIMEOUT;
+    private int connectionTimeout = DEFAULT_SOCKET_TIMEOUT;
     private int socketMaxWait = DEFAULT_WAIT_TIMEOUT;
     private int sendBufferSize = DEFAULT_BUFFER_SIZE;
     private int receiveBufferSize = DEFAULT_BUFFER_SIZE;
@@ -74,6 +74,7 @@ public class TcpConnector extends AbstractConnector
     private GenericKeyedObjectPool socketsPool = new GenericKeyedObjectPool();
     private int keepAliveTimeout = 0;
     private ExpiryMonitor keepAliveMonitor;
+    private Boolean failOnUnresolvedHost = Boolean.TRUE;
 
     /** 
      * If set, the socket is not closed after sending a message.  This attribute 
@@ -96,6 +97,8 @@ public class TcpConnector extends AbstractConnector
     public TcpConnector(MuleContext context)
     {
         super(context);
+        // Default tcpNoDelay=false if system property not set.
+        sendTcpNoDelay = Boolean.valueOf(System.getProperty(SEND_TCP_NO_DELAY_SYSTEM_PROPERTY));
         setSocketFactory(new TcpSocketFactory());
         setServerSocketFactory(new TcpServerSocketFactory());
         setTcpProtocol(new SafeProtocol());
@@ -151,6 +154,8 @@ public class TcpConnector extends AbstractConnector
     @Override
     protected void doInitialise() throws InitialisationException
     {
+        socketFactory.setConnectionTimeout(getConnectionTimeout());
+
         socketsPool.setFactory(getSocketFactory());
         socketsPool.setTestOnBorrow(true);
         socketsPool.setTestOnReturn(true);
@@ -317,6 +322,16 @@ public class TcpConnector extends AbstractConnector
     public void setClientSoTimeout(int timeout)
     {
         this.clientSoTimeout = valueOrDefault(timeout, 0, DEFAULT_SOCKET_TIMEOUT);
+    }
+
+    public int getConnectionTimeout()
+    {
+        return this.connectionTimeout;
+    }
+
+    public void setConnectionTimeout(int timeout)
+    {
+        this.connectionTimeout= valueOrDefault(timeout, 0, DEFAULT_SOCKET_TIMEOUT);
     }
 
     public int getServerSoTimeout()
@@ -555,6 +570,16 @@ public class TcpConnector extends AbstractConnector
     public long getSocketsPoolMaxWait()
     {
         return socketsPool.getMaxWait();
+    }
+
+    public Boolean isFailOnUnresolvedHost() 
+    {
+        return failOnUnresolvedHost;
+    }
+
+    public void setFailOnUnresolvedHost(Boolean failOnUnresolvedHost) 
+    {
+        this.failOnUnresolvedHost = failOnUnresolvedHost;
     }
 
 }

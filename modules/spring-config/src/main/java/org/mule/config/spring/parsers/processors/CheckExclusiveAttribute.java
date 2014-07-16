@@ -1,13 +1,9 @@
 /*
- * $Id:CheckExclusiveAttributes.java 8321 2007-09-10 19:22:52Z acooke $
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.config.spring.parsers.processors;
 
 import org.mule.config.spring.parsers.PreProcessor;
@@ -60,7 +56,7 @@ public class CheckExclusiveAttribute implements PreProcessor
 
         if (found && foundAttributes.size() > 0)
         {
-            StringBuffer message = new StringBuffer("The attribute '");
+            StringBuilder message = new StringBuilder("The attribute '");
             message.append(attribute);
             message.append("' cannot appear with the attribute");
             if (foundAttributes.size() > 1)

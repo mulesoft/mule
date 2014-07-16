@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -16,6 +13,8 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.QueueStore;
+import org.mule.util.queue.DefaultQueueConfiguration;
+import org.mule.util.queue.DelegateQueueManager;
 import org.mule.util.queue.QueueConfiguration;
 import org.mule.util.queue.QueueManager;
 
@@ -25,17 +24,25 @@ import java.io.Serializable;
  * <code>QueueProfile</code> determines how an internal queue for a service will
  * behave
  */
-
 public class QueueProfile
 {
     private int maxOutstandingMessages = 0;
     private QueueStore<Serializable> objectStore;
-    
+
     public static QueueProfile newInstancePersistingToDefaultMemoryQueueStore(MuleContext muleContext)
     {
-        QueueStore<Serializable> defaultMemoryObjectStore =
-            muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME);
-        return new QueueProfile(defaultMemoryObjectStore);
+        return newInstance(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME, muleContext);
+    }
+
+    public static QueueProfile newInstanceWithPersistentQueueStore(MuleContext muleContext)
+    {
+        return newInstance(MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME, muleContext);
+    }
+
+    private static QueueProfile newInstance(String objectStoreKey, MuleContext muleContext)
+    {
+        QueueStore<Serializable> objectStore = muleContext.getRegistry().lookupObject(objectStoreKey);
+        return new QueueProfile(objectStore);
     }
 
     public QueueProfile(QueueStore<Serializable> objectStore)
@@ -55,7 +62,7 @@ public class QueueProfile
         this.maxOutstandingMessages = maxOutstandingMessages;
         this.objectStore = objectStore;
     }
-    
+
     /**
      * This specifies the number of messages that can be queued before it starts
      * blocking.
@@ -78,15 +85,25 @@ public class QueueProfile
         this.maxOutstandingMessages = maxOutstandingMessages;
     }
 
-    public QueueConfiguration configureQueue(MuleContext context, String component, QueueManager queueManager) throws InitialisationException
+    public QueueConfiguration configureQueue(MuleContext context, String component, QueueManager queueManager)
+        throws InitialisationException
+    {
+        QueueConfiguration qc = toQueueConfiguration(context);
+        queueManager.setQueueConfiguration(component, qc);
+        return qc;
+    }
+
+    public QueueConfiguration toQueueConfiguration(MuleContext context)
     {
         if (objectStore instanceof MuleContextAware)
         {
             ((MuleContextAware) objectStore).setMuleContext(context);
         }
-        QueueConfiguration qc = new QueueConfiguration(context, maxOutstandingMessages, objectStore);
-        queueManager.setQueueConfiguration(component, qc);
-        return qc;
+        if (DelegateQueueManager.isOldModeEnabled())
+        {
+            return new org.mule.util.queue.objectstore.QueueConfiguration(context, maxOutstandingMessages, objectStore);
+        }
+        return new DefaultQueueConfiguration(maxOutstandingMessages, objectStore.isPersistent());
     }
 
     public ListableObjectStore<Serializable> getObjectStore()

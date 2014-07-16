@@ -1,16 +1,13 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.config.spring.factories;
 
 import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.MessagingExceptionHandlerAware;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.transaction.TransactionFactory;
@@ -65,6 +62,10 @@ public class TransactionalMessageProcessorsFactoryBean implements FactoryBean
             {
                 throw new IllegalArgumentException(
                     "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
+            }
+            if (processor instanceof MessagingExceptionHandlerAware)
+            {
+                ((MessagingExceptionHandlerAware) processor).setMessagingExceptionHandler(exceptionListener);
             }
         }
         return builder.build();

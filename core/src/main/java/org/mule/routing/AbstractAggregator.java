@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.routing;
 
 import org.mule.VoidMuleEvent;
@@ -64,7 +60,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
                 flowConstruct.getName(), this.getClass().getName());
         }
         eventCorrelator = new EventCorrelator(getCorrelatorCallback(muleContext), next, messageInfoMapping,
-            muleContext, flowConstruct.getName(), persistentStores, storePrefix);
+            muleContext, flowConstruct, persistentStores, storePrefix);
 
         // Inherit failOnTimeout from async-reply if this aggregator is being used
         // for async-reply

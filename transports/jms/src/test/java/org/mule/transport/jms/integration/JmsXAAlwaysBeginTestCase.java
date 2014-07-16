@@ -1,14 +1,12 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms.integration;
+
+import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -23,17 +21,14 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
 {
-
-    private static final List committedTx = new CopyOnWriteArrayList();
-    private static final List rolledbackTx = new CopyOnWriteArrayList();
+    private static final List<Xid> committedTx = new CopyOnWriteArrayList<Xid>();
+    private static final List<Xid> rolledbackTx = new CopyOnWriteArrayList<Xid>();
     protected static final Log logger = LogFactory.getLog(JmsXAAlwaysBeginTestCase.class);
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/jms-xa-tx-ALWAYS_BEGIN.xml";
     }
@@ -55,6 +50,7 @@ public class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testAlwaysBeginTx() throws Exception
     {
         send(scenarioNoTx);
@@ -83,33 +79,38 @@ public class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
     @Ignore
     public static class TestResource implements XAResource
     {
-
+        @Override
         public void commit(Xid id, boolean onePhase) throws XAException
         {
             committedTx.add(id);
             logger.debug("XA_COMMIT[" + id + "]");
         }
 
+        @Override
         public void end(Xid xid, int flags) throws XAException
         {
             logger.debug("XA_END[" + xid + "] Flags=" + flags);
         }
 
+        @Override
         public void forget(Xid xid) throws XAException
         {
             logger.debug("XA_FORGET[" + xid + "]");
         }
 
+        @Override
         public int getTransactionTimeout() throws XAException
         {
             return (_timeout);
         }
 
+        @Override
         public boolean isSameRM(XAResource xares) throws XAException
         {
             return (xares.equals(this));
         }
 
+        @Override
         public int prepare(Xid xid) throws XAException
         {
             logger.debug("XA_PREPARE[" + xid + "]");
@@ -117,24 +118,28 @@ public class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
             return (XA_OK);
         }
 
+        @Override
         public Xid[] recover(int flag) throws XAException
         {
             logger.debug("RECOVER[" + flag + "]");
             return (null);
         }
 
+        @Override
         public void rollback(Xid xid) throws XAException
         {
             rolledbackTx.add(xid);
             logger.debug("XA_ROLLBACK[" + xid + "]");
         }
 
+        @Override
         public boolean setTransactionTimeout(int seconds) throws XAException
         {
             _timeout = seconds;
             return (true);
         }
 
+        @Override
         public void start(Xid xid, int flags) throws XAException
         {
             logger.debug("XA_START[" + xid + "] Flags=" + flags);

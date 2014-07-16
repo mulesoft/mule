@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:jersey="http://www.mulesoft.org/schema/mule/jersey"
+       xsi:schemaLocation="
+             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+             http://www.mulesoft.org/schema/mule/jersey http://www.mulesoft.org/schema/mule/jersey/current/mule-jersey.xsd">
+
+    <flow name="test">
+        <inbound-endpoint address="http://localhost:${port}" exchange-pattern="request-response"/>
+
+        <jersey:resources>
+            <component class="org.mule.module.jersey.HelloWorldResource"/>
+            <jersey:context-resolver class="org.mule.module.jersey.contextresolver.NullContextResolver" />
+            <jersey:context-resolver class="org.mule.module.jersey.contextresolver.JaxbCustomContextResolver" />
+        </jersey:resources>
+    </flow>
+</mule>

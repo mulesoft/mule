@@ -1,18 +1,18 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.integration.transport.file;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.context.notification.EndpointMessageNotification;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
@@ -26,10 +26,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class FileAppendConnectorTestCase extends AbstractServiceAndFlowTestCase implements EndpointMessageNotificationListener<EndpointMessageNotification>
 {
@@ -78,7 +74,7 @@ public class FileAppendConnectorTestCase extends AbstractServiceAndFlowTestCase 
             File myFile = FileUtils.newFile(myDir, OUTPUT_FILE);
             assertFalse(myFile.exists());
 
-            MuleClient client = new MuleClient(muleContext);
+            MuleClient client = muleContext.getClient();
             client.send("vm://fileappend", "Hello1", null);
             client.send("vm://fileappend", "Hello2", null);
 

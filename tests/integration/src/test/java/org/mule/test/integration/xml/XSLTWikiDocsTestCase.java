@@ -1,18 +1,20 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.integration.xml;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.ForceXalanTransformerFactory;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.IOUtils;
 
 import java.util.Arrays;
@@ -21,16 +23,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-//START SNIPPET: test-code
 public class XSLTWikiDocsTestCase extends AbstractServiceAndFlowTestCase
 {
+
+    @Rule
+    public SystemProperty useXalan = new ForceXalanTransformerFactory();
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -60,7 +62,7 @@ public class XSLTWikiDocsTestCase extends AbstractServiceAndFlowTestCase
                 "org/mule/test/integration/xml/cd-catalog-result-with-params.xml", getClass());
 
         //Create a new Mule Client
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         //These are the message roperties that will get passed into the XQuery context
         Map<String, Object> props = new HashMap<String, Object>();
@@ -74,7 +76,5 @@ public class XSLTWikiDocsTestCase extends AbstractServiceAndFlowTestCase
         //Compare results
 
         assertTrue(XMLUnit.compareXML(message.getPayloadAsString(), resultData).similar());
-
     }
 }
-//END SNIPPET: test-code

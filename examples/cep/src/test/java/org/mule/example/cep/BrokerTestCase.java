@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.example.cep;
 
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -17,18 +13,18 @@ import org.junit.Test;
 public class BrokerTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "mule-config.xml";
     }
 
     @Test
     public void testBroker() throws Exception
-    {       
+    {
         Thread.sleep(20000); //don't set this too high without adjusting the test timeout first
         
 //        MuleClient client = new MuleClient();
-//        
+//
 //        client.send("vm://stock.tick", new StockTick("SAP", 110, 0), null);
 //        Thread.sleep(1000);
 //        client.send("vm://stock.tick", new StockTick("SAP", 115, 2000), null);

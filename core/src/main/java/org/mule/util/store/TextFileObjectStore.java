@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -99,7 +96,7 @@ public class TextFileObjectStore extends InMemoryObjectStore<String>
                 output = new FileOutputStream(fileStore, true);
             }
 
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             buf.append(id).append("=").append(item).append(IOUtils.LINE_SEPARATOR);
             output.write(buf.toString().getBytes());
         }
@@ -107,6 +104,12 @@ public class TextFileObjectStore extends InMemoryObjectStore<String>
         {
             throw new ObjectStoreException(iox);
         }
+    }
+    
+    @Override
+    public void clear()
+    {
+        throw new UnsupportedOperationException();
     }
 
     public String getDirectory()

@@ -1,18 +1,18 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.issues;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.module.xml.functional.AbstractXmlFunctionalTestCase;
 
 import java.util.Arrays;
@@ -20,10 +20,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * This is a simplified version of
@@ -55,7 +51,7 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
 
     protected MuleClient sendObject() throws MuleException
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("object-in", new Parent(new Child()), null);
         return client;
     }
@@ -93,7 +89,7 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
             // otherwise we get
             // OutOfMemoryExceptions during stress tests when these results build up
             // in queue.
-            request(new MuleClient(muleContext), "xml-object-out", Parent.class);
+            request(muleContext.getClient(), "xml-object-out", Parent.class);
 
             if (i % tenth == 0)
             {

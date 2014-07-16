@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope
+        xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+        xmlns:ns2="http://consumer.ws.module.mule.org/"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <soapenv:Body>
+        <ns2:echoResponse>
+            <text xsi:nil="false">Hello</text>
+        </ns2:echoResponse>
+    </soapenv:Body>
+</soapenv:Envelope>
+

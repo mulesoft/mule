@@ -1,90 +1,117 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 @SmallTest
 public class StringMessageUtilsTestCase extends AbstractMuleTestCase
 {
+    @Test
+    public void toStringOnStringShouldReturnTheString()
+    {
+        String input = "Oscar";
+        String result = StringMessageUtils.toString(input);
+        assertEquals(input, result);
+    }
 
     @Test
-    public void testToString() throws Exception
+    public void toStringOnClassShouldReturnClassName()
     {
-        Object test = "Oscar";
-        Object result = StringMessageUtils.toString(test);
-        assertEquals("Oscar", result);
-
-        test = getClass();
-        result = StringMessageUtils.toString(test);
+        Object test = getClass();
+        String result = StringMessageUtils.toString(test);
         assertEquals(getClass().getName(), result);
+    }
 
-        test = new TestObject("Ernie");
-        result = StringMessageUtils.toString(test);
+    @Test
+    public void toStringOnObjectShouldReturnObjectsToStringRepresentation()
+    {
+        // this class uses the default toString implementation
+        Object test = new TestObject("Ernie");
+        String result = StringMessageUtils.toString(test);
         assertEquals(test.toString(), result);
 
+        // this class has a custom toString implementation
         test = new AnotherTestObject("Bert");
         result = StringMessageUtils.toString(test);
         assertEquals("Bert", result);
+    }
 
-        test = new String[]{"foo", "bar"};
-        result = StringMessageUtils.toString(test);
+    @Test
+    public void toStringOnStringArrayShouldReturnStringRepresentation()
+    {
+        Object test = new String[]{"foo", "bar"};
+        String result = StringMessageUtils.toString(test);
         assertEquals("{foo,bar}", result);
+    }
 
-        test = new byte[]{1, 2};
-        result = StringMessageUtils.toString(test);
+    @Test
+    public void toStringOnByteArrayShouldReturnStringRepresentation()
+    {
+        Object test = new byte[]{1, 2};
+        String result = StringMessageUtils.toString(test);
         assertEquals("{1,2}", result);
+    }
 
+    @Test
+    public void toStringOnByteArrayLargerThanMaximumOutputLengthShouldReturnAbbreviatedStringRepresentation()
+    {
         // create an array that is too long to be printed
-        test = new byte[StringMessageUtils.MAX_ELEMENTS + 100];
-        for (int i = 0; i < ((byte[]) test).length; i++)
+        byte[] test = new byte[StringMessageUtils.MAX_ELEMENTS + 100];
+        for (int i = 0; i < test.length; i++)
         {
-            ((byte[]) test)[i] = (byte) i;
+            test[i] = (byte) i;
         }
 
         // the String will contain not more than exactly MAX_ARRAY_LENGTH elements
-        result = StringMessageUtils.toString(test);
-        assertTrue(((String) result).endsWith("[..]}"));
-        assertEquals(StringMessageUtils.MAX_ELEMENTS - 1, StringUtils.countMatches((String) result, ","));
+        String result = StringMessageUtils.toString(test);
+        assertTrue(result.endsWith("[..]}"));
+        assertEquals(StringMessageUtils.MAX_ELEMENTS - 1, StringUtils.countMatches(result, ","));
+    }
 
-        test = new long[]{5068875495743534L, 457635546759674L};
-        result = StringMessageUtils.toString(test);
+    @Test
+    public void toStringOnLongArrayShouldReturnStringRepresentation()
+    {
+        long[] test = new long[] { 5068875495743534L, 457635546759674L };
+        Object result = StringMessageUtils.toString(test);
         assertEquals("{5068875495743534,457635546759674}", result);
+    }
 
-        test = new double[] {1.1, 2.02};
-        result = StringMessageUtils.toString(test);
+    @Test
+    public void toStringOnDoubleArrayShouldReturnStringRepresentation()
+    {
+        double[] test = new double[] { 1.1, 2.02 };
+        String result = StringMessageUtils.toString(test);
         assertEquals("{1.1,2.02}", result);
+    }
 
+    @Test
+    public void toStringOnListLargerThanMaximumOutputLengthShouldReturnAbbreviatedStringRepresentation()
+    {
         // create a Collection that is too long to be printed
-        test = new ArrayList(100);
+        List<Integer> list = new ArrayList<Integer>(100);
         for (int i = 0; i < 100; i++)
         {
-            ((Collection) test).add(new Integer(i));
+            list.add(new Integer(i));
         }
 
         // the String will contain not more than exactly MAX_ARRAY_LENGTH elements
-        result = StringMessageUtils.toString(test);
-        assertTrue(((String) result).endsWith("[..]]"));
-        assertEquals(StringMessageUtils.MAX_ELEMENTS - 1, StringUtils.countMatches((String) result, ","));
-
+        String result = StringMessageUtils.toString(list);
+        assertTrue(result.endsWith("[..]]"));
+        assertEquals(StringMessageUtils.MAX_ELEMENTS - 1, StringUtils.countMatches(result, ","));
     }
 
     @Test
@@ -116,7 +143,7 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase
     @Test
     public void testBoilerPlate() throws Exception
     {
-        List msgs = new ArrayList();
+        List<String> msgs = new ArrayList<String>();
         msgs.add("This");
         msgs.add("is a");
         msgs.add("Boiler Plate");
@@ -132,7 +159,7 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase
     @Test
     public void testBoilerPlate2() throws Exception
     {
-        List msgs = new ArrayList();
+        List<String> msgs = new ArrayList<String>();
         msgs.add("This");
         msgs.add("is a");
         msgs.add("Boiler Plate Message that should get wrapped to the next line if it is working properly");
@@ -168,16 +195,16 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase
 
     private class TestObject
     {
-        private String name;
+        private String myName;
 
         public TestObject(String name)
         {
-            this.name = name;
+            this.myName = name;
         }
 
         public String getName()
         {
-            return name;
+            return myName;
         }
     }
 
@@ -188,10 +215,10 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase
             super(name);
         }
 
+        @Override
         public String toString()
         {
             return getName();
         }
     }
-
 }

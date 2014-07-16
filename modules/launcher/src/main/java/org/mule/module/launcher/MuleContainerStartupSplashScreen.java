@@ -1,19 +1,16 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.launcher;
 
 import org.mule.api.MuleContext;
 import org.mule.api.agent.Agent;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.util.SecurityUtils;
 import org.mule.util.SplashScreen;
 import org.mule.util.StringUtils;
 
@@ -70,6 +67,10 @@ public class MuleContainerStartupSplashScreen extends SplashScreen
         catch (UnknownHostException e)
         {
             // ignore
+        }
+        if (!SecurityUtils.isDefaultSecurityModel())
+        {
+            doBody("Security model: " + SecurityUtils.getSecurityModel());
         }
     }
 

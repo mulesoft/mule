@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.ftp;
 
 import org.mule.api.MessagingException;
@@ -288,7 +284,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         {
             FTPClient client = null;
             MuleMessage muleMessage = null;
-            Lock lock = connector.getMuleContext().getLockFactory().createLock(file.getName());
+            Lock lock = getEndpoint().getMuleContext().getLockFactory().createLock(file.getName());
             if (lock.tryLock())
             {
                 try
@@ -301,7 +297,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
                         return;
                     }
                     FtpMuleMessageFactory muleMessageFactory = createMuleMessageFactory(finalClient);
-                    final MuleMessage finalMessage = muleMessageFactory.create(file, endpoint.getEncoding());
+                    final MuleMessage finalMessage = muleMessageFactory.create(file, endpoint.getEncoding(), endpoint.getMuleContext());
                     muleMessage = finalMessage;
                     ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
                     executionTemplate.execute(new ExecutionCallback<MuleEvent>()
@@ -332,7 +328,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
                 }
                 catch (Exception e)
                 {
-                    getConnector().getMuleContext().getExceptionListener().handleException(e);
+                    getEndpoint().getMuleContext().getExceptionListener().handleException(e);
                 }
                 finally
                 {

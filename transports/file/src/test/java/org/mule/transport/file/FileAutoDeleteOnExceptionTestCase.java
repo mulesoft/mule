@@ -1,16 +1,13 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.file;
 
 import static org.junit.Assert.assertFalse;
+
 import org.mule.api.construct.FlowConstruct;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
@@ -26,9 +23,8 @@ import org.junit.Test;
 
 public class FileAutoDeleteOnExceptionTestCase extends FunctionalTestCase
 {
-
-    public static final String TEST_FOLDER1 = ".mule/testData1";
-    public static final String TEST_FOLDER2 = ".mule/testData2";
+    public String testFolder1;
+    public String testFolder2;
 
     private Prober prober;
 
@@ -38,7 +34,7 @@ public class FileAutoDeleteOnExceptionTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "file-auto-delete-on-exception-config.xml";
     }
@@ -47,6 +43,8 @@ public class FileAutoDeleteOnExceptionTestCase extends FunctionalTestCase
     public void setUp() throws IOException
     {
         prober = new PollingProber(10000, 100);
+        testFolder1 = getFileInsideWorkingDirectory("testData1").getAbsolutePath();
+        testFolder2 = getFileInsideWorkingDirectory("testData2").getAbsolutePath();
     }
 
     private File createTestFile(String folder) throws IOException
@@ -64,7 +62,7 @@ public class FileAutoDeleteOnExceptionTestCase extends FunctionalTestCase
     @Test
     public void testDoesNotAutoDeleteFileOnException() throws Exception
     {
-        File target = createTestFile(TEST_FOLDER1);
+        File target = createTestFile(testFolder1);
         // Starts file endpoint polling
         muleContext.start();
 
@@ -79,7 +77,7 @@ public class FileAutoDeleteOnExceptionTestCase extends FunctionalTestCase
     @Test
     public void testAutoDeletesFileOnExceptionIfFileWasTransformed() throws Exception
     {
-        File target = createTestFile(TEST_FOLDER2);
+        File target = createTestFile(testFolder2);
 
         // Starts file endpoint polling
         muleContext.start();

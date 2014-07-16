@@ -1,29 +1,27 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.test.integration.transaction;
 
-import org.hamcrest.core.IsNull;
-import org.junit.Test;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.lifecycle.Callable;
 import org.mule.construct.Flow;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import org.hamcrest.core.IsNull;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /*
 EE-2430 - Check that JMS SubReceiver executes concurrently.
@@ -34,22 +32,22 @@ One of the latch.await(..) will fail in that case.
  */
 public class JmsConcurrentConsumerExecutionTestCase extends FunctionalTestCase
 {
-
     public static final String MESSAGE = "some message";
     public static final int TIMEOUT = 10000;
     private static final Latch messageSuccessfulReceived = new Latch();
     private static final Latch messageFailureReceived = new Latch();
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/transaction/jms-concurrent-in-transaction.xml";
     }
 
     @Test
+    @Ignore("MULE-6926") 
     public void testTwoMessagesOneRollbackOneCommit() throws Exception
     {
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient muleClient = muleContext.getClient();
         muleClient.dispatch("jms://in", "success", null);
         muleClient.dispatch("jms://in", "failure", null);
         if (!messageSuccessfulReceived.await(TIMEOUT, TimeUnit.MILLISECONDS))

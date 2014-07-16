@@ -1,22 +1,9 @@
-/**
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations
- * under the License.
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
-
 package org.mule.config.spring.util;
 
 import java.io.ByteArrayInputStream;
@@ -128,7 +115,7 @@ public class ClassReader extends ByteArrayInputStream {
     protected static String getSignature(Member method, Class[] paramTypes) {
         // compute the method descriptor
 
-        StringBuffer b = new StringBuffer((method instanceof Method) ? method.getName() : "<init>");
+        StringBuilder b = new StringBuilder((method instanceof Method) ? method.getName() : "<init>");
         b.append('(');
 
         for (int i = 0; i < paramTypes.length; i++) {
@@ -145,7 +132,7 @@ public class ClassReader extends ByteArrayInputStream {
         return b.toString();
     }
 
-    private static void addDescriptor(StringBuffer b, Class c) {
+    private static void addDescriptor(StringBuilder b, Class c) {
         if (c.isPrimitive()) {
             if (c == void.class) {
                 b.append('V');

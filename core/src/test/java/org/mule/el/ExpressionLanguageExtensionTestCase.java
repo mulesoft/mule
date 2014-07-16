@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.el;
 
 import org.mule.DefaultMuleMessage;
@@ -41,9 +37,9 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
     private String a = "hi";
     private String b = "hi";
 
-    public ExpressionLanguageExtensionTestCase(Variant variant)
+    public ExpressionLanguageExtensionTestCase(Variant variant, String mvelOptimizer)
     {
-        super(variant);
+        super(variant, mvelOptimizer);
     }
 
     @Override
@@ -58,7 +54,7 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
         MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
         return mvel;
     }
-
+    
     @Test
     public void importClass() throws RegistrationException, InitialisationException
     {
@@ -141,6 +137,17 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
     }
 
     @Test
+    public void testMuleMessageAvailableAsVariable() throws Exception
+    {
+        MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
+        mvel.initialise();
+
+        MuleMessage message = new DefaultMuleMessage("foo", muleContext);
+        mvel.evaluate("p=m.uniqueId",message);
+        Assert.assertEquals(message.getUniqueId(),message.getPayload());
+    }
+
+    @Test
     public void testFunction() throws RegistrationException, InitialisationException
     {
         MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
@@ -203,9 +210,17 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
                     b = newValue;
                 }
             });
-            context.addVariable("appShortcut", context.getVariable("app"));
+            context.addAlias("appShortcut", "app");
             context.addFinalVariable("final", "final");
             context.addAlias("p", "message.payload");
+            try
+            {
+                context.addAlias("m","_muleMessage");
+            }
+            catch (Exception e)
+            {
+                //continue - test will fail.
+            }
             context.declareFunction("f", new ExpressionLanguageFunction()
             {
                 @Override

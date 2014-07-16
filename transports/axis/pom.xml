@@ -4,15 +4,24 @@
     <parent>
         <groupId>org.mule.transports</groupId>
         <artifactId>mule-transports</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-axis</artifactId>
     <packaging>jar</packaging>
-    <name>SOAP Transport: Axis</name>
+    <name>SOAP Transport - Axis</name>
     <description>A Mule transport for Soap Connectivity using Axis.</description>
+
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
 
     <dependencies>
         <!-- we use some common classes from the CXF module -->
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-cxf</artifactId>
@@ -46,7 +55,7 @@
         <dependency>
             <groupId>org.apache.axis</groupId>
             <artifactId>axis</artifactId>
-            <version>1.4-osgi</version>
+            <version>1.4</version>
             <exclusions>
                 <!-- we like slf4j -->
                 <exclusion>
@@ -58,7 +67,7 @@
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jaxrpc_1.1_spec</artifactId>
-            <version>${geronimoSpecsVersion}-osgi</version>
+            <version>${geronimoSpecsVersion}</version>
         </dependency>
          <dependency>
             <groupId>javax.mail</groupId>
@@ -67,7 +76,7 @@
         <dependency>
             <groupId>commons-discovery</groupId>
             <artifactId>commons-discovery</artifactId>
-            <version>0.4-osgi</version>
+            <version>0.4</version>
             <exclusions>
                 <exclusion>
                     <artifactId>commons-logging</artifactId>
@@ -84,12 +93,6 @@
             <groupId>wsdl4j</groupId>
             <artifactId>wsdl4j</artifactId>
             <version>1.6.1</version>
-        </dependency>
-        <!-- needed by the Axis Service component -->
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <!-- Unit tests -->

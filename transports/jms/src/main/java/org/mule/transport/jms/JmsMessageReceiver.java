@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms;
 
 import org.mule.api.MuleException;
@@ -72,6 +68,7 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
         }
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         createConsumer();
@@ -81,6 +78,7 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
         }
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         closeConsumer();
@@ -108,11 +106,11 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
     {
         public JmsWorker(Message message, AbstractMessageReceiver receiver)
         {
-            super(new ArrayList(1), receiver);
+            super(new ArrayList<Object>(1), receiver);
             messages.add(message);
         }
 
-        public JmsWorker(List messages, AbstractMessageReceiver receiver)
+        public JmsWorker(List<Object> messages, AbstractMessageReceiver receiver)
         {
             super(messages, receiver);
         }
@@ -152,6 +150,7 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
 
         }
 
+        @Override
         protected void bindTransaction(Transaction tx) throws TransactionException
         {
             if(tx instanceof JmsTransaction)
@@ -169,6 +168,7 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
         }
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
         try
@@ -195,6 +195,7 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
         }
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         super.doStop();
@@ -212,6 +213,7 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
         }
     }
 
+    @Override
     protected void doDispose()
     {
         // template method
@@ -282,5 +284,4 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
             throw new ConnectException(e, this);
         }
     }
-
 }

@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.ftp;
 
 import static org.junit.Assert.assertFalse;
@@ -194,5 +190,24 @@ public abstract class AbstractFtpServerTestCase extends AbstractServiceAndFlowTe
     public void fileMoveCompleted()
     {
         // subclasses can override this method
+    }
+
+    protected File getFtpServerBaseDir()
+    {
+        return new File(FTP_SERVER_BASE_DIR);
+    }
+    protected File createDataFile(File folder, final String testMessage) throws Exception
+    {
+        return createDataFile(folder, "UTF-8", testMessage);
+
+    }
+
+    protected File createDataFile(File folder, String encoding, final String testMessage) throws Exception
+    {
+        File target = File.createTempFile("mule-file-test-", ".txt", folder);
+        target.deleteOnExit();
+        FileUtils.writeStringToFile(target, testMessage, encoding);
+
+        return target;
     }
 }

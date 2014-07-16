@@ -1,8 +1,5 @@
 /*
- * $Id: NotificationUtils.java 24925 2012-10-03 17:43:02Z svacas $
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -30,8 +27,10 @@ public class NotificationUtils
 
     public static void addMessageProcessorPathElements(List<MessageProcessor> processors, MessageProcessorPathElement parentElement)
     {
-
-
+        if (processors == null)
+        {
+            return;
+        }
         for (MessageProcessor mp : processors)
         {
             if (!(mp instanceof InternalMessageProcessor))

@@ -1,18 +1,18 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.integration.routing.outbound;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -22,10 +22,6 @@ import java.util.List;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class ExpressionSplitterXPathTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -49,7 +45,7 @@ public class ExpressionSplitterXPathTestCase extends AbstractServiceAndFlowTestC
             "        <Amount>40000</Amount>\n" +
             "        <Currency>USD</Currency>\n" +
             "        <Date>28102008</Date>\n" +
-            "        <Received>ServiceOne</Received>\n" +
+            "        <Received/>\n" +
             "    </Trade>";
 
     private final String EXPECTED_MESSAGE_2 = "<Trade xmlns=\"http://acme.com\">\n" +
@@ -57,7 +53,7 @@ public class ExpressionSplitterXPathTestCase extends AbstractServiceAndFlowTestC
             "        <Amount>2000</Amount>\n" +
             "        <Currency>GBP</Currency>\n" +
             "        <Date>28102008</Date>\n" +
-            "        <Received>ServiceTwo</Received>\n" +
+            "        <Received/>\n" +
             "    </Trade>";
 
 
@@ -80,7 +76,7 @@ public class ExpressionSplitterXPathTestCase extends AbstractServiceAndFlowTestC
     @Test
     public void testRecipientList() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://distributor.queue", MESSAGE, null);
 
         assertNotNull(result);
@@ -89,7 +85,7 @@ public class ExpressionSplitterXPathTestCase extends AbstractServiceAndFlowTestC
         assertEquals(2, coll.size());
         List<?> results = (List<?>) coll.getPayload();
 
-        XMLUnit.compareXML(EXPECTED_MESSAGE_1, results.get(0).toString());
-        XMLUnit.compareXML(EXPECTED_MESSAGE_2, results.get(1).toString());
+        assertTrue(XMLUnit.compareXML(EXPECTED_MESSAGE_1, results.get(0).toString()).identical());
+        assertTrue(XMLUnit.compareXML(EXPECTED_MESSAGE_2, results.get(1).toString()).identical());
     }
 }

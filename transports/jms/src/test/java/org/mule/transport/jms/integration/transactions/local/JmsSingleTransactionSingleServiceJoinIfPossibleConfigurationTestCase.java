@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms.integration.transactions.local;
 
 import org.mule.transport.jms.integration.AbstractJmsSingleTransactionSingleServiceTestCase;
@@ -23,11 +19,12 @@ public class JmsSingleTransactionSingleServiceJoinIfPossibleConfigurationTestCas
 {
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/transactions/local/jms-single-tx-single-service-join-if-possible.xml";
     }
 
+    @Override
     @Test
     public void testAlwaysJoin() throws Exception
     {

@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.soap.axis;
 
 import org.mule.api.config.ExceptionReader;
@@ -28,7 +24,7 @@ public class AxisFaultExceptionReader implements ExceptionReader
     {
         AxisFault e = (AxisFault)t;
         Map<?, ?> props = getInfo(e);
-        StringBuffer msg = new StringBuffer(64);
+        StringBuilder msg = new StringBuilder(64);
         msg.append("(");
         for (Map.Entry<?, ?> entry : props.entrySet())
         {

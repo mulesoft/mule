@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:ws="http://www.mulesoft.org/schema/mule/ws"
+      xmlns:https="http://www.mulesoft.org/schema/mule/https"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+               http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd">
+
+    <https:connector name="httpsConnector">
+        <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
+        <https:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
+        <https:tls-server path="trustStore" storePassword="mulepassword"/>
+    </https:connector>
+
+    <ws:consumer-config serviceAddress="https://localhost:${port}/services/Echo" wsdlLocation="Echo.wsdl"
+                        service="EchoService" port="EchoPort" name="globalConfig" />
+
+
+    <flow name="client">
+        <inbound-endpoint address="vm://in" exchange-pattern="request-response"/>
+
+        <ws:consumer operation="echo"/>
+    </flow>
+
+    <flow name="server">
+        <inbound-endpoint address="https://localhost:${port}/services/Echo" exchange-pattern="request-response">
+            <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService"/>
+        </inbound-endpoint>
+        <component class="org.mule.module.ws.consumer.TestService"/>
+    </flow>
+
+</mule>

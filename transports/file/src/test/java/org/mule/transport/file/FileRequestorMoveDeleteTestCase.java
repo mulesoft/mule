@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.file;
 
 import static org.junit.Assert.assertEquals;
@@ -17,8 +13,8 @@ import static org.junit.Assert.assertTrue;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.model.streaming.DelegatingInputStream;
-import org.mule.module.client.MuleClient;
 import org.mule.util.IOUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -31,7 +27,6 @@ import org.junit.Test;
 
 public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestCase
 {
-
     public FileRequestorMoveDeleteTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -202,7 +197,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
 
     protected MuleMessage request(File file) throws MuleException, MalformedURLException
     {
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient muleClient = muleContext.getClient();
         return muleClient.request(fileToUrl(file) + "?connector=moveDeleteConnector", 2000);
     }
 }

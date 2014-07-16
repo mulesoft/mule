@@ -1,13 +1,14 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.transport.ftp;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.mule.api.endpoint.EndpointException;
 import org.mule.endpoint.MuleEndpointURI;
@@ -18,18 +19,13 @@ import org.mule.transport.file.FilenameParser;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 /**
  * Load a mule config and verify that the parameters are set as expected
  */
 public class FtpNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "ftp-namespace-config.xml";
     }
@@ -55,7 +51,7 @@ public class FtpNamespaceHandlerTestCase extends FunctionalTestCase
     }
     
     @Test
-    public void testReceiverFtpConnector() throws EndpointException 
+    public void testReceiverFtpConnector() throws EndpointException
     {
         FtpConnector c = (FtpConnector)muleContext.getRegistry().lookupConnector("receiverFtpConnector");
         assertNotNull(c);

@@ -1,13 +1,15 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.transport.tcp;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.mule.ResponseOutputStream;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -21,16 +23,10 @@ import java.net.Socket;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "tcp-namespace-config.xml";
     }
@@ -47,6 +43,7 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         // this is what we want - i was worried that the client was used as default if the server
         // wasn't set, but that's not the case
         assertEquals(-1, c.getServerSoTimeout());
+        assertEquals(-1, c.getConnectionTimeout());
         assertEquals(3000, c.getClientSoTimeout());
         assertEquals(3000, c.getSocketMaxWait());
         assertTrue(c.isKeepAlive());
@@ -64,6 +61,7 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(c);
         assertEquals(4000, c.getServerSoTimeout());
         assertEquals(3000, c.getClientSoTimeout());
+        assertEquals(2000, c.getConnectionTimeout());
         assertEquals(-1, c.getSocketMaxWait());
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());

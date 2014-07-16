@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.exception;
 
 import org.mule.RequestContext;
@@ -19,6 +15,8 @@ import org.mule.message.DefaultExceptionPayload;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectException;
+
+import javax.resource.spi.work.Work;
 
 /**
  * Fire a notification, log exception, clean up transaction if any, and trigger reconnection strategy 
@@ -79,7 +77,7 @@ public class AbstractSystemExceptionStrategy extends AbstractExceptionListener i
     
     protected void handleReconnection(ConnectException ex)
     {
-        AbstractConnector connector = (AbstractConnector) ex.getFailed();
+        final AbstractConnector connector = (AbstractConnector) ex.getFailed();
 
         // Make sure the connector is not already being reconnected by another receiver thread.
         if (connector.isConnecting())
@@ -104,14 +102,41 @@ public class AbstractSystemExceptionStrategy extends AbstractExceptionListener i
         // Reconnect (retry policy will go into effect here if configured)
         try
         {
-            logger.debug("Reconnecting " + connector.getName());
-            connector.connect();
-            connector.start();
+            connector.getMuleContext().getWorkManager().scheduleWork(new Work()
+            {
+                @Override
+                public void release()
+                {
+                }
+
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        logger.debug("Reconnecting " + connector.getName());
+                        connector.start();
+                    }
+                    catch (Exception e)
+                    {
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Error reconnecting", e);
+                        }
+                        logger.error(e.getMessage());
+                    }
+                }
+            });
         }
-        catch (Exception e2)
+        catch (Exception e)
         {
-            logger.error(e2.getMessage());
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Error executing reconnect work", e);
+            }
+            logger.error(e.getMessage());
         }
+
     }
 }
 

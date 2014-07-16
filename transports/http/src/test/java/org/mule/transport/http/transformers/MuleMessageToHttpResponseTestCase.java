@@ -1,19 +1,18 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.http.transformers;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.transport.http.HttpConstants;
@@ -21,8 +20,10 @@ import org.mule.transport.http.HttpResponse;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.httpclient.Cookie;
@@ -97,5 +98,36 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
             }
         }
         Assert.assertTrue("Missing 'Date' header", hasDateHeader);
+    }
+    
+    @Test
+    public void testContentTypeOnOutbound() throws Exception
+    {
+        MuleMessageToHttpResponse transformer = new MuleMessageToHttpResponse();
+        final String contentType = "text/xml";
+        final String wrongContentType = "text/json";
+        Map<String, Object> outboundProperties =  new HashMap<String, Object>();
+        outboundProperties.put(HttpConstants.HEADER_CONTENT_TYPE, wrongContentType);
+        MuleContext muleContext = mock(MuleContext.class);
+        MuleMessage msg = new DefaultMuleMessage(null,outboundProperties, muleContext);
+        //Making sure that the outbound property overrides both invocation and inbound
+        msg.setInvocationProperty(HttpConstants.HEADER_CONTENT_TYPE, wrongContentType);
+        msg.setProperty(HttpConstants.HEADER_CONTENT_TYPE, wrongContentType, PropertyScope.INBOUND);
+        
+        msg.setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, contentType);
+
+        HttpResponse response = transformer.createResponse(null, "UTF-8", msg);
+        Header[] headers = response.getHeaders();
+
+        boolean hasContentTypeHeader = false;
+        for (Header header : headers)
+        {
+            if (HttpConstants.HEADER_CONTENT_TYPE.equals(header.getName()))
+            {
+                hasContentTypeHeader = true;
+                Assert.assertEquals(contentType, header.getValue());
+            }
+        }
+        Assert.assertTrue("Missing "+HttpConstants.HEADER_CONTENT_TYPE+" header", hasContentTypeHeader);
     }
 }

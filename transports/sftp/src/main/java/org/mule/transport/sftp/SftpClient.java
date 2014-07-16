@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.sftp;
 
 import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_DELETE_ACTION;
@@ -17,6 +13,7 @@ import static org.mule.transport.sftp.notification.SftpTransportNotification.SFT
 
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.transport.sftp.notification.SftpNotifier;
+import org.mule.util.StringUtils;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
@@ -45,11 +42,12 @@ import org.apache.commons.logging.LogFactory;
 
 public class SftpClient
 {
-    private Log logger = LogFactory.getLog(getClass());
 
     public static final String CHANNEL_SFTP = "sftp";
-
     public static final String STRICT_HOST_KEY_CHECKING = "StrictHostKeyChecking";
+    public static final String PREFERRED_AUTHENTICATION_METHODS = "PreferredAuthentications";
+
+    private Log logger = LogFactory.getLog(getClass());
 
     private ChannelSftp channelSftp;
 
@@ -68,6 +66,8 @@ public class SftpClient
     private String currentDirectory = "";
 
     private static final Object lock = new Object();
+
+    private String preferredAuthenticationMethods;
 
     public SftpClient(String host)
     {
@@ -127,6 +127,10 @@ public class SftpClient
         {
             Properties hash = new Properties();
             hash.put(STRICT_HOST_KEY_CHECKING, "no");
+            if (!StringUtils.isEmpty(preferredAuthenticationMethods))
+            {
+                hash.put(PREFERRED_AUTHENTICATION_METHODS, preferredAuthenticationMethods);
+            }
 
             session = jsch.getSession(user, host);
             session.setConfig(hash);
@@ -171,6 +175,10 @@ public class SftpClient
 
             Properties hash = new Properties();
             hash.put(STRICT_HOST_KEY_CHECKING, "no");
+            if (!StringUtils.isEmpty(preferredAuthenticationMethods))
+            {
+                hash.put(PREFERRED_AUTHENTICATION_METHODS, preferredAuthenticationMethods);
+            }
 
             session = jsch.getSession(user, host);
             session.setConfig(hash);
@@ -368,6 +376,11 @@ public class SftpClient
 
     public void storeFile(String fileName, InputStream stream) throws IOException
     {
+        storeFile(fileName, stream, WriteMode.OVERWRITE);
+    }
+
+    public void storeFile(String fileName, InputStream stream, WriteMode mode) throws IOException
+    {
         try
         {
 
@@ -382,7 +395,7 @@ public class SftpClient
                 logger.debug("Sending to SFTP service: Stream = " + stream + " , filename = " + fileName);
             }
 
-            channelSftp.put(stream, fileName);
+            channelSftp.put(stream, fileName, mode.intValue());
         }
         catch (SftpException e)
         {
@@ -393,9 +406,14 @@ public class SftpClient
 
     public void storeFile(String fileNameLocal, String fileNameRemote) throws IOException
     {
+        storeFile(fileNameLocal, fileNameRemote, WriteMode.OVERWRITE);
+    }
+
+    public void storeFile(String fileNameLocal, String fileNameRemote, WriteMode mode) throws IOException
+    {
         try
         {
-            channelSftp.put(fileNameLocal, fileNameRemote);
+            channelSftp.put(fileNameLocal, fileNameRemote, mode.intValue());
         }
         catch (SftpException e)
         {
@@ -679,5 +697,32 @@ public class SftpClient
         }
         this.changeWorkingDirectory("..");
         this.deleteDirectory(dir);
+    }
+
+    public void setPreferredAuthenticationMethods(String preferredAuthenticationMethods)
+    {
+        this.preferredAuthenticationMethods = preferredAuthenticationMethods;
+    }
+
+    public enum WriteMode
+    {
+        APPEND
+        {
+            @Override
+            public int intValue() 
+            {
+                return ChannelSftp.APPEND;
+            }
+        },
+        OVERWRITE
+        {
+            @Override
+            public int intValue() 
+            {
+                return ChannelSftp.OVERWRITE;
+            }
+        };
+
+        public abstract int intValue();
     }
 }

@@ -1,17 +1,12 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.soap.axis;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
 import org.mule.module.cxf.MuleSoapHeaders;
 import org.mule.transport.AbstractMuleMessageFactory;
 import org.mule.util.StringUtils;
@@ -28,11 +23,6 @@ import org.apache.commons.logging.LogFactory;
 public class AxisMuleMessageFactory extends AbstractMuleMessageFactory
 {
     private static Log log = LogFactory.getLog(AxisMuleMessageFactory.class);
-    
-    public AxisMuleMessageFactory(MuleContext context)
-    {
-        super(context);
-    }
 
     @Override
     protected Class<?>[] getSupportedTransportMessageTypes()

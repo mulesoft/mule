@@ -1,18 +1,17 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.routing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.RoutingNotificationListener;
 import org.mule.context.notification.RoutingNotification;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
 
@@ -23,9 +22,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class CollectionAggregatorRouterTimeoutTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -62,7 +58,7 @@ public class CollectionAggregatorRouterTimeoutTestCase extends AbstractServiceAn
         FunctionalTestComponent vortex = (FunctionalTestComponent) getComponent("vortex");
         FunctionalTestComponent aggregator = (FunctionalTestComponent) getComponent("aggregator");
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         List<String> list = Arrays.asList("first", "second");
         client.dispatch("vm://splitter", list, null);
 

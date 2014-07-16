@@ -1,15 +1,11 @@
 /*
- * $Id: HttpsHandshakeTimingTestCase.java 25119 2012-12-10 21:20:57Z pablo.lagreca $
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.transport;
 
-import org.mule.MessageExchangePattern;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -32,31 +28,23 @@ import java.io.OutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverType extends AbstractMessageReceiver, ConnectorType extends AbstractConnector> implements FlowProcessingPhaseTemplate, ValidationPhaseTemplate, MessageProcessContext
+public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverType extends AbstractMessageReceiver, ConnectorType extends AbstractConnector> implements FlowProcessingPhaseTemplate, ValidationPhaseTemplate
 {
 
     protected transient Log logger = LogFactory.getLog(getClass());
 
     private final MessageReceiverType messageReceiver;
     private Object rawMessage;
-    private WorkManager flowExecutionWorkManager;
 
-    public AbstractTransportMessageProcessTemplate(MessageReceiverType messageReceiver, WorkManager flowExecutionWorkManager)
+    public AbstractTransportMessageProcessTemplate(MessageReceiverType messageReceiver)
     {
         this.messageReceiver = messageReceiver;
-        this.flowExecutionWorkManager = flowExecutionWorkManager;
     }
 
     public MuleEvent getMuleEvent() throws MuleException
     {
         MuleMessage messageFromSource = createMessageFromSource(getOriginalMessage());
         return createEventFromMuleMessage(messageFromSource);
-    }
-
-    @Override
-    public MessageSource getMessageSource()
-    {
-        return this.messageReceiver.getEndpoint();
     }
 
     @Override
@@ -84,23 +72,8 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
         return messageReceiver.routeEvent(muleEvent);
     }
 
-    protected void sendResponseMessage(MuleEvent responseMuleEvent) throws MessagingException
-    {
-    }
-
     public void afterSuccessfulProcessingFlow(MuleEvent response) throws MuleException
     {
-        if (messageReceiver.getEndpoint().getExchangePattern().equals(MessageExchangePattern.REQUEST_RESPONSE))
-        {
-            try
-            {
-                sendResponseMessage(response);
-            }
-            catch (MessagingException e)
-            {
-                throw new ResponseDispatchMessagingException(response,e);
-            }
-        }
     }
 
     /**
@@ -196,12 +169,6 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
     }
 
     @Override
-    public boolean supportsAsynchronousProcessing()
-    {
-        return true;
-    }
-
-    @Override
     public MuleEvent beforeRouteEvent(MuleEvent muleEvent) throws MuleException
     {
         return muleEvent;
@@ -213,16 +180,5 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
         return muleEvent;
     }
 
-    @Override
-    public WorkManager getFlowExecutionWorkManager()
-    {
-        return flowExecutionWorkManager;
-    }
-
-    @Override
-    public TransactionConfig getTransactionConfig()
-    {
-        return getInboundEndpoint().getTransactionConfig();
-    }
 }
 

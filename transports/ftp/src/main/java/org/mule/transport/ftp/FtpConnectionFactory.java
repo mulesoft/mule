@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.ftp;
 
 import org.mule.api.endpoint.EndpointURI;
@@ -30,7 +26,8 @@ public class FtpConnectionFactory implements PoolableObjectFactory
 
     public Object makeObject() throws Exception
     {
-        FTPClient client = new FTPClient();
+        FTPClient client = createFtpClient();
+
         if (uri.getPort() > 0)
         {
             client.connect(uri.getHost(), uri.getPort());
@@ -52,6 +49,11 @@ public class FtpConnectionFactory implements PoolableObjectFactory
             throw new IOException("Ftp error. Couldn't set BINARY transfer type: " + client.getReplyCode());
         }
         return client;
+    }
+
+    protected FTPClient createFtpClient()
+    {
+        return new FTPClient();
     }
 
     public void destroyObject(Object obj) throws Exception

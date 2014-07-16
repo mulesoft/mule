@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.http.functional;
 
 import static org.junit.Assert.assertEquals;
@@ -26,7 +22,7 @@ public class HttpEndpointConstructTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "http-endpoint-construct-conf.xml";
     }
@@ -37,8 +33,5 @@ public class HttpEndpointConstructTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/testA", TEST_MESSAGE, null);
         assertEquals(TEST_MESSAGE, response.getPayloadAsString());
-
     }
-
-
 }

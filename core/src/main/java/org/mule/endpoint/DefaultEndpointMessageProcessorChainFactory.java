@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.endpoint;
 
 import org.mule.api.MuleException;
@@ -29,7 +25,6 @@ import org.mule.endpoint.outbound.OutboundEndpointPropertyMessageProcessor;
 import org.mule.endpoint.outbound.OutboundEventTimeoutMessageProcessor;
 import org.mule.endpoint.outbound.OutboundLoggingMessageProcessor;
 import org.mule.endpoint.outbound.OutboundResponsePropertiesMessageProcessor;
-import org.mule.endpoint.outbound.OutboundRewriteResponseEventMessageProcessor;
 import org.mule.endpoint.outbound.OutboundRootMessageIdPropertyMessageProcessor;
 import org.mule.endpoint.outbound.OutboundSessionHandlerMessageProcessor;
 import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
@@ -39,6 +34,7 @@ import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class DefaultEndpointMessageProcessorChainFactory implements EndpointMessageProcessorChainFactory
@@ -95,11 +91,7 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
     /** Override this method to change the default MessageProcessors. */
     protected List<MessageProcessor> createOutboundResponseMessageProcessors(OutboundEndpoint endpoint) throws MuleException
     {
-        List<MessageProcessor> list = new ArrayList<MessageProcessor>();
-
-        list.add(new OutboundRewriteResponseEventMessageProcessor());
-
-        return list;
+        return Collections.emptyList();
     }
     
     public MessageProcessor createInboundMessageProcessorChain(InboundEndpoint endpoint, FlowConstruct flowConstruct, MessageProcessor target) throws MuleException
@@ -148,10 +140,10 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
         }
     }
 
-    public MessageProcessor createOutboundMessageProcessorChain(OutboundEndpoint endpoint, FlowConstruct flowConstruct, MessageProcessor target) throws MuleException
+    public MessageProcessor createOutboundMessageProcessorChain(OutboundEndpoint endpoint, MessageProcessor target) throws MuleException
     {
         // -- REQUEST CHAIN --
-        DefaultMessageProcessorChainBuilder requestChainBuilder = new EndpointMessageProcessorChainBuilder(endpoint, flowConstruct);
+        DefaultMessageProcessorChainBuilder requestChainBuilder = new EndpointMessageProcessorChainBuilder(endpoint);
         requestChainBuilder.setName("OutboundEndpoint '" + endpoint.getEndpointURI().getUri() + "' request chain");
         // Default MPs
         requestChainBuilder.chain(createOutboundMessageProcessors(endpoint));
@@ -172,7 +164,7 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
         else
         {
             // -- RESPONSE CHAIN --
-            DefaultMessageProcessorChainBuilder responseChainBuilder = new EndpointMessageProcessorChainBuilder(endpoint, flowConstruct);
+            DefaultMessageProcessorChainBuilder responseChainBuilder = new EndpointMessageProcessorChainBuilder(endpoint);
             responseChainBuilder.setName("OutboundEndpoint '" + endpoint.getEndpointURI().getUri() + "' response chain");
             // Default MPs
             responseChainBuilder.chain(createOutboundResponseMessageProcessors(endpoint));
@@ -181,7 +173,7 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
     
             // Compose request and response chains. We do this so that if the request
             // chain returns early the response chain is still invoked.
-            DefaultMessageProcessorChainBuilder compositeChainBuilder = new EndpointMessageProcessorChainBuilder(endpoint, flowConstruct);
+            DefaultMessageProcessorChainBuilder compositeChainBuilder = new EndpointMessageProcessorChainBuilder(endpoint);
             compositeChainBuilder.setName("OutboundEndpoint '" + endpoint.getEndpointURI().getUri() + "' composite request/response chain");
             compositeChainBuilder.chain(requestChainBuilder.build(), responseChainBuilder.build());
             return compositeChainBuilder.build();

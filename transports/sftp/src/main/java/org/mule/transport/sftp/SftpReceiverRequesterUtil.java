@@ -1,17 +1,11 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.sftp;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.transport.sftp.notification.SftpNotifier;
 import org.mule.util.FileUtils;
@@ -22,6 +16,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Contains reusable methods not directly related to usage of the jsch sftp library
@@ -113,7 +110,7 @@ public class SftpReceiverRequesterUtil
                 {
                     // See if the file is still growing (either by age or size),
                     // leave it alone if it is
-                    if (!hasChanged(file, client, fileAge, sizeCheckDelayMs))
+                    if (canProcessFile(file, client, fileAge, sizeCheckDelayMs))
                     {
                         // logger.debug("marking file [" + files[i] +
                         // "] as in transit.");
@@ -317,19 +314,72 @@ public class SftpReceiverRequesterUtil
      * @return true if the file has changed
      * @throws Exception Error
      */
-    private boolean hasChanged(String fileName, SftpClient client, long fileAge, long sizeCheckDelayMs)
+    protected boolean canProcessFile(String fileName, SftpClient client, long fileAge, long sizeCheckDelayMs)
         throws Exception
     {
-        // Perform fileAge test if configured
-        // Note that for this to work it is required that the system clock on the
-        // mule server
-        // is synchronized with the system clock on the sftp server
-        if (fileAge > 0)
+        if (fileAge > 0 && !isOldFile(fileName, client, fileAge))
+        {
+            return false;
+        }
+
+        if (sizeCheckDelayMs > 0 && isSizeModified(fileName, client, sizeCheckDelayMs))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean isSizeModified(String fileName, SftpClient client, long sizeCheckDelayMs) throws IOException, InterruptedException
+    {
+        try
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Perform size check with a delay of: " + sizeCheckDelayMs + " ms.");
+            }
+
+            long fileSize1 = client.getSize(fileName);
+            Thread.sleep(sizeCheckDelayMs);
+            long fileSize2 = client.getSize(fileName);
+
+            if (fileSize1 == fileSize2)
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("File is stable (not growing), ready for retrieval: " + fileName);
+                }
+            }
+            else
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("File is growing, deferring retrieval: " + fileName);
+                }
+                return true;
+            }
+            return false;
+        }
+        catch (IOException e)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(String.format("Cannot check if size of file '%s' was modified or not", fileName));
+            }
+
+            // Assumes the file size has changed
+            return true;
+        }
+    }
+
+    private boolean isOldFile(String fileName, SftpClient client, long fileAge) throws IOException
+    {
+        try
         {
             long lastModifiedTime = client.getLastModifiedTime(fileName);
-            // TODO Can we get the current time from the other server?
             long now = System.currentTimeMillis();
             long diff = now - lastModifiedTime;
+
             // If the diff is negative it's a sign that the time on the test server
             // and the ftps-server is not synchronized
             if (diff < fileAge)
@@ -339,37 +389,25 @@ public class SftpReceiverRequesterUtil
                     logger.debug("The file has not aged enough yet, will return nothing for: " + fileName
                                  + ". The file must be " + (fileAge - diff) + "ms older, was " + diff);
                 }
-                return true;
+
+                return false;
             }
+
             if (logger.isDebugEnabled())
             {
                 logger.debug("The file " + fileName + " has aged enough. Was " + diff);
             }
+            return true;
         }
-
-        // Perform a size check with a short configurable latencey between the
-        // size-calls
-        // Take consecutive file size snapshots to determine if file is still being
-        // written
-        if (sizeCheckDelayMs > 0)
+        catch (IOException e)
         {
-            logger.info("Perform size check with a delay of: " + sizeCheckDelayMs + " ms.");
-            long fileSize1 = client.getSize(fileName);
-            Thread.sleep(sizeCheckDelayMs);
-            long fileSize2 = client.getSize(fileName);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(String.format("Cannot check if age of file '%s' is old enough", fileName));
+            }
 
-            if (fileSize1 == fileSize2)
-            {
-                logger.info("File is stable (not growing), ready for retrieval: " + fileName);
-            }
-            else
-            {
-                logger.info("File is growing, deferring retrieval: " + fileName);
-                return true;
-            }
+            // Assumes the file is not old enough
+            return false;
         }
-
-        // None of file-change tests faile so we can retrieve this file
-        return false;
     }
 }

@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.spring.security;
 
 import static org.junit.Assert.assertEquals;
@@ -32,7 +28,7 @@ public class SecurityContextSerializationTestCase extends FunctionalTestCase
     public DynamicPort httpPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "security-context-serialization-test-case.xml";
     }
@@ -68,12 +64,12 @@ public class SecurityContextSerializationTestCase extends FunctionalTestCase
             int status = client.executeMethod(get);
             if (status == HttpConstants.SC_UNAUTHORIZED && handshake == true)
             {
-                // doAuthentication = true means that if the request returns 401, 
+                // doAuthentication = true means that if the request returns 401,
                 // the HttpClient will resend the request with credentials
                 status = client.executeMethod(get);
                 if (status == HttpConstants.SC_UNAUTHORIZED && handshake == true)
                 {
-                    // doAuthentication = true means that if the request returns 401, 
+                    // doAuthentication = true means that if the request returns 401,
                     // the HttpClient will resend the request with credentials
                     status = client.executeMethod(get);
                 }

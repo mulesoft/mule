@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:context="http://www.springframework.org/schema/context"
+      xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/current/mule-jdbc.xsd">
+
+    <spring:beans>
+        <spring:import resource="../derby-xa-beans.xml"/>
+    </spring:beans>
+
+    <jdbc:connector name="jdbcConnector" pollingFrequency="1000" dataSource-ref="jdbcDataSource" transactionPerMessage="false">
+        <receiver-threading-profile maxThreadsActive="2" maxThreadsIdle="2" maxBufferSize="1" doThreading="false" poolExhaustedAction="WAIT"/>
+        <dispatcher-threading-profile maxThreadsActive="2" maxThreadsIdle="2" maxBufferSize="1" doThreading="false" poolExhaustedAction="WAIT"/>
+
+        <jdbc:query key="getTest" value="SELECT ID, TYPE, DATA FROM TEST WHERE TYPE = 1"/>
+        <jdbc:query key="getTest.ack" value="UPDATE TEST SET TYPE = 3 WHERE ID = #[payload['id']]" />
+        <jdbc:query key="writeTest" value="INSERT INTO TEST(TYPE, DATA) VALUES(2, 'value')" />
+    </jdbc:connector>
+
+    <jdbc:endpoint name="inbound" queryKey="getTest" connector-ref="jdbcConnector">
+        <xa-transaction action="ALWAYS_BEGIN"/>
+        <property key="receiveMessagesInXaTransaction" value="true"/>
+        <property key="receiveMessageInTransaction" value="true"/>
+    </jdbc:endpoint>
+
+    <jms:activemq-xa-connector name="jmsConnector" maxRedelivery="-1" specification="1.1" numberOfConsumers="1" brokerURL="tcp://localhost:${port1}"/>
+    <jms:activemq-connector name="jmsConnector2" maxRedelivery="-1" specification="1.1"/>
+
+    <jms:endpoint name="outbound" queue="out" connector-ref="jmsConnector">
+        <xa-transaction action="ALWAYS_JOIN"/>
+    </jms:endpoint>
+
+</mule>

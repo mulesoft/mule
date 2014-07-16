@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms;
 
 import org.mule.api.MuleMessage;
@@ -88,7 +84,7 @@ public class JmsMessageRequester extends AbstractMessageRequester
             {
                 // register a session close listener
                 final Session finalSession = session;
-                getConnector().getMuleContext().registerListener(new TransactionNotificationListener<TransactionNotification>()
+                getEndpoint().getMuleContext().registerListener(new TransactionNotificationListener<TransactionNotification>()
                 {
                     public void onNotification(TransactionNotification txNotification)
                     {
@@ -114,7 +110,7 @@ public class JmsMessageRequester extends AbstractMessageRequester
                 final String expressionTemplate = selectorFilter.getExpression();
                 if (StringUtils.isNotBlank(expressionTemplate))
                 {
-                    selector = connector.getMuleContext().getExpressionManager().parse(expressionTemplate, (MuleMessage) null);
+                    selector = getEndpoint().getMuleContext().getExpressionManager().parse(expressionTemplate, (MuleMessage) null);
                 }
             }
             else if (endpoint.getProperties() != null)
@@ -124,7 +120,7 @@ public class JmsMessageRequester extends AbstractMessageRequester
                 final String expressionTemplate = (String) endpoint.getProperty(JmsConstants.JMS_SELECTOR_PROPERTY);
                 if (StringUtils.isNotBlank(expressionTemplate))
                 {
-                    selector = connector.getMuleContext().getExpressionManager().parse(expressionTemplate, (MuleMessage) null);
+                    selector = getEndpoint().getMuleContext().getExpressionManager().parse(expressionTemplate, (MuleMessage) null);
                 }
             }
             String tempDurable = (String) endpoint.getProperties().get(JmsConstants.DURABLE_PROPERTY);

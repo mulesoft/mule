@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.http;
 
 import org.mule.api.MuleEvent;
@@ -540,7 +536,7 @@ enum CookieStorageType
             if (cookies != null && cookies.length > 0)
             {
                 String host = destinationUri.getHost();
-                String path = destinationUri.getPath();
+                String path = destinationUri.getRawPath();
                 for (Cookie cookie : cookies)
                 {
                     client.getState().addCookie(
@@ -660,7 +656,7 @@ enum CookieStorageType
             client.getParams().setCookiePolicy(CookieHelper.getCookiePolicy(policy));
 
             String host = destinationUri.getHost();
-            String path = destinationUri.getPath();
+            String path = destinationUri.getRawPath();
             Iterator<String> keyIter = cookieMap.keySet().iterator();
             while (keyIter.hasNext())
             {

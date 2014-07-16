@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -24,7 +21,7 @@ public class DefaultMessageProcessorPathElement implements MessageProcessorPathE
     public DefaultMessageProcessorPathElement(MessageProcessor messageProcessor, String name)
     {
         this.messageProcessor = messageProcessor;
-        this.name = name;
+        this.name = escape(name);
         this.children = new ArrayList<MessageProcessorPathElement>();
     }
 
@@ -85,5 +82,17 @@ public class DefaultMessageProcessorPathElement implements MessageProcessorPathE
     public String getPath()
     {
         return parent == null ? "/" + getName() : parent.getPath() + "/" + getName();
+    }
+
+    private String escape(String name)
+    {
+        StringBuilder builder = new StringBuilder(name.length() * 2);
+        char previous = ' ';
+        for (char c : name.toCharArray())
+        {
+            builder.append(c == '/' && previous != '\\' ? "\\/" : c);
+            previous = c;
+        }
+        return builder.toString();
     }
 }

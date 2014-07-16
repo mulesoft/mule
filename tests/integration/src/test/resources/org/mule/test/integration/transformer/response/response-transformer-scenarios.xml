@@ -29,7 +29,7 @@
 
         <service name="CxfSync">
             <inbound>
-                <inbound-endpoint address="http://localhost:4444/services/CxfSync" 
+                <inbound-endpoint address="http://localhost:${port1}/services/CxfSync"
                     exchange-pattern="request-response" responseTransformer-refs="customResponse">
                     <cxf:simple-service />    
                 </inbound-endpoint>
@@ -54,14 +54,14 @@
 
         <service name="HttpSync">
             <inbound>
-                <inbound-endpoint address="http://localhost:4446" exchange-pattern="request-response" />
+                <inbound-endpoint address="http://localhost:${port2}" exchange-pattern="request-response" />
             </inbound>
             <echo-component />
         </service>
 
         <service name="HttpSyncResponseTransformer">
             <inbound>
-                <inbound-endpoint address="http://localhost:4447" exchange-pattern="request-response"
+                <inbound-endpoint address="http://localhost:${port3}" exchange-pattern="request-response"
                     responseTransformer-refs="customResponse" />
             </inbound>
             <echo-component />

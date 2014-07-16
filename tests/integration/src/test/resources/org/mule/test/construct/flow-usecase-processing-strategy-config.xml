@@ -23,7 +23,7 @@
     </flow>
 
     <flow name="FileSync" processingStrategy="synchronous">
-        <file:inbound-endpoint path="./.mule">
+        <file:inbound-endpoint path="${workingDirectory}">
             <file:filename-wildcard-filter pattern="mule-file-test-sync-*"/> 
         </file:inbound-endpoint>
         <smtp:outbound-endpoint ref="smtpEndpoint" />
@@ -33,7 +33,7 @@
     </flow>
 
     <flow name="FileAsync">
-        <file:inbound-endpoint path="./.mule">
+        <file:inbound-endpoint path="${workingDirectory}">
             <file:filename-wildcard-filter pattern="mule-file-test-async-*"/> 
         </file:inbound-endpoint>
         <smtp:outbound-endpoint ref="smtpEndpoint" />

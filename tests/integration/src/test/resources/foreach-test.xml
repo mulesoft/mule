@@ -342,5 +342,36 @@
         <vm:inbound-endpoint path="middle" exchange-pattern="one-way"/>
         <vm:outbound-endpoint path="in" exchange-pattern="one-way"/>
     </flow>
+    
+    <flow name="foreachWithAsync">
+		<foreach>
+			<async>
+				<flow-ref name="setTestProperties" />
+			</async>
+		</foreach>
+		<flow-ref name="setTestProperties" />
+	</flow>
+
+	<sub-flow name="setTestProperties">
+		<set-variable variableName="value1" value="value1" />
+		<set-variable variableName="value2" value="value2" />
+
+		<set-session-variable variableName="value1" value="value1" />
+		<set-session-variable variableName="value2" value="value2" />
+
+		<set-property propertyName="value1" value="value1" />
+		<set-property propertyName="value2" value="value2" />
+		
+		<test:assert expression="#[flowVars['value1'] == 'value1']" />
+		<test:assert expression="#[flowVars['value2'] == 'value2']" />
+		
+		<test:assert expression="#[sessionVars['value1'] == 'value1']" />
+		<test:assert expression="#[sessionVars['value2'] == 'value2']" />
+		
+		<test:assert expression="#[message.outboundProperties['value1'] == 'value1']" />
+		<test:assert expression="#[message.outboundProperties['value2'] == 'value2']" />
+		
+		<expression-component>flowVars['latch'].countDown()</expression-component>
+	</sub-flow>
 
 </mule>

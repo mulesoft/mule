@@ -1,11 +1,9 @@
-<?xml version="1.0"  encoding="ISO-8859-1"?>
-<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
 
-<Configure id="Server" class="org.mortbay.jetty.Server">
-    <Set name="ThreadPool">
-     <New class="org.mortbay.thread.QueuedThreadPool">
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
+    <Get name="ThreadPool">
       <Set name="minThreads">10</Set>
       <Set name="maxThreads">255</Set>
-     </New>
-    </Set>
+    </Get>
 </Configure>

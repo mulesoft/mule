@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.routing.outbound;
 
 import org.mule.api.MuleEvent;
@@ -29,7 +25,7 @@ public class ExpressionRecipientList extends AbstractRecipientList
     protected ExpressionConfig expressionConfig = new ExpressionConfig();
 
     @Override
-    protected List getRecipients(MuleEvent event) throws CouldNotRouteOutboundMessageException
+    protected List<Object> getRecipients(MuleEvent event) throws CouldNotRouteOutboundMessageException
     {
         String expr = getFullExpression();
         if (!muleContext.getExpressionManager().isValidExpression(expr))
@@ -46,11 +42,12 @@ public class ExpressionRecipientList extends AbstractRecipientList
         }
         else if (msgRecipients instanceof String)
         {
-            return Arrays.asList(StringUtils.splitAndTrim(msgRecipients.toString(), " ,;:"));
+            Object[] recipients = StringUtils.splitAndTrim(msgRecipients.toString(), " ,;:");
+            return Arrays.asList(recipients);
         }
         else if (msgRecipients instanceof List)
         {
-            return new ArrayList((List) msgRecipients);
+            return new ArrayList<Object>((List<?>) msgRecipients);
         }
         else
         {

@@ -16,15 +16,11 @@
          we still use the http transport on the client side-->
     <http:endpoint address="http://localhost:${port1}/" name="clientEndpoint" exchange-pattern="request-response"/>
 
-    <jetty:endpoint address="http://localhost:${port1}/" name="serverEndpoint" exchange-pattern="one-way"/>
+    <jetty:endpoint address="http://localhost:${port1}/" name="serverEndpoint" exchange-pattern="request-response"/>
 
-    <model name="main">
-        <custom-service name="testComponent" class="org.mule.tck.testmodels.mule.TestSedaService">
-            <inbound>
-                <inbound-endpoint ref="serverEndpoint"/>
-            </inbound>
-            <test:component appendString=" Received"/>
-        </custom-service>
-    </model>
+    <flow name="testComponent">
+        <inbound-endpoint ref="serverEndpoint"/>
+        <test:component appendString=" Received"/>
+    </flow>
 
 </mule>

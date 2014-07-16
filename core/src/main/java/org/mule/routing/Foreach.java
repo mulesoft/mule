@@ -1,13 +1,9 @@
 /*
- * $Id: Foreach.java 25169 2013-01-07 17:03:30Z svacas $
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.routing;
 
 import org.mule.DefaultMuleMessage;
@@ -18,6 +14,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorPathElement;
+import org.mule.api.routing.filter.Filter;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.expression.ExpressionConfig;
@@ -141,8 +138,8 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     @Override
     public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
     {
-        //skip the splitter that is added at the beginning
-        List<MessageProcessor> mps = getOwnedMessageProcessors().subList(1, getOwnedMessageProcessors().size());
+        //skip the splitter that is added at the beginning and the filter at the end
+        List<MessageProcessor> mps = getOwnedMessageProcessors().subList(1, getOwnedMessageProcessors().size() - 1);
         NotificationUtils.addMessageProcessorPathElements(mps, pathElement);
     }
 
@@ -176,6 +173,16 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
         splitter.setCounterVariableName(counterVariableName);
         splitter.setMuleContext(muleContext);
         messageProcessors.add(0, splitter);
+        messageProcessors.add(new MessageFilter(new Filter()
+        {
+
+            @Override
+            public boolean accept(MuleMessage message)
+            {
+                return false;
+            }
+        }));
+
         try
         {
             this.ownedMessageProcessor = new DefaultMessageProcessorChainBuilder().chain(messageProcessors)

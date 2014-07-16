@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.management.stats.printers;
 
 import org.mule.management.stats.RouterStatistics;
@@ -113,7 +109,7 @@ public class XMLPrinter extends AbstractTablePrinter
         {
             Iterator it = routed.entrySet().iterator();
 
-            StringBuffer buf = new StringBuffer(40);
+            StringBuilder buf = new StringBuilder(40);
             while (it.hasNext())
             {
                 Map.Entry e = (Map.Entry) it.next();
@@ -225,7 +221,7 @@ public class XMLPrinter extends AbstractTablePrinter
 
         if (st.countTokens() == 0)
         {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             buf.append("<Provider name=\"");
             int i = stats.indexOf("=");
             buf.append(stats.substring(0, i));
@@ -239,7 +235,7 @@ public class XMLPrinter extends AbstractTablePrinter
             String token;
             while (st.hasMoreTokens())
             {
-                StringBuffer buf = new StringBuffer();
+                StringBuilder buf = new StringBuilder();
                 token = st.nextToken();
                 buf.append("<Provider name=\"");
                 int i = token.indexOf("=");

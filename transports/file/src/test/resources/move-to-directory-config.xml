@@ -5,10 +5,10 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
 
-    <file:connector name="fileConnector" moveToDirectory=".mule/files/processed" streaming="true"
-        pollingFrequency="100" workDirectory=".mule/work" moveToPattern="test/file.txt"/>
+    <file:connector name="fileConnector" moveToDirectory="${workingDirectory}/files/processed" streaming="true"
+        pollingFrequency="100" workDirectory="${workingDirectory}/work" moveToPattern="test/file.txt"/>
 
-    <file:endpoint path=".mule/files" name="get" connector-ref="fileConnector" />
+    <file:endpoint path="${workingDirectory}/files" name="get" connector-ref="fileConnector" />
 
     <flow name="relay" >
         <inbound-endpoint ref="get" />

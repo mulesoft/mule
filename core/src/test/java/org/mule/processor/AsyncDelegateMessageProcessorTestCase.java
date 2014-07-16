@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.processor;
 
 import static org.junit.Assert.assertEquals;
@@ -40,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 
 public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTestCase
-    implements ExceptionListener
+        implements ExceptionListener
 {
 
     protected AsyncDelegateMessageProcessor messageProcessor;
@@ -79,13 +75,16 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
         assertSame(VoidMuleEvent.getInstance(), result);
         assertNull(exceptionThrown);
         assertNotSame(Thread.currentThread(), target.thread);
+
+        messageProcessor.stop();
+        messageProcessor.dispose();
     }
 
     @Test
     public void testProcessRequestResponse() throws Exception
     {
         MuleEvent event = getTestEvent(TEST_MESSAGE,
-            getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
+                                       getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
 
         MuleEvent result = messageProcessor.process(event);
 
@@ -99,13 +98,16 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
         assertSame(VoidMuleEvent.getInstance(), result);
         assertNull(exceptionThrown);
         assertNotSame(Thread.currentThread(), target.thread);
+
+        messageProcessor.stop();
+        messageProcessor.dispose();
     }
 
     @Test
     public void testProcessOneWayWithTx() throws Exception
     {
         MuleEvent event = getTestEvent(TEST_MESSAGE,
-            getTestTransactedInboundEndpoint(MessageExchangePattern.ONE_WAY));
+                                       getTestTransactedInboundEndpoint(MessageExchangePattern.ONE_WAY));
         Transaction transaction = new TestTransaction(muleContext);
         TransactionCoordination.getInstance().bindTransaction(transaction);
 
@@ -129,7 +131,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
     public void testProcessRequestResponseWithTx() throws Exception
     {
         MuleEvent event = getTestEvent(TEST_MESSAGE,
-            getTestTransactedInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
+                                       getTestTransactedInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
         Transaction transaction = new TestTransaction(muleContext);
         TransactionCoordination.getInstance().bindTransaction(transaction);
 
@@ -156,7 +158,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
     }
 
     protected void assertAsync(MessageProcessor processor, MuleEvent event)
-        throws MuleException, InterruptedException
+            throws MuleException, InterruptedException
     {
         MuleEvent result = processor.process(event);
 
@@ -172,10 +174,10 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
     }
 
     protected AsyncDelegateMessageProcessor createAsyncDelegatMessageProcessor(MessageProcessor listener)
-        throws Exception
+            throws Exception
     {
         AsyncDelegateMessageProcessor mp = new AsyncDelegateMessageProcessor(listener,
-            new AsynchronousProcessingStrategy(), "thread");
+                                                                             new AsynchronousProcessingStrategy(), "thread");
         mp.setMuleContext(muleContext);
         mp.setFlowConstruct(new Flow("flow", muleContext));
         mp.initialise();
@@ -184,6 +186,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
 
     class TestListener implements MessageProcessor
     {
+
         MuleEvent sensedEvent;
         Thread thread;
 
@@ -205,6 +208,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
 
     class TestWorkManagerSource implements WorkManagerSource
     {
+
         @Override
         public WorkManager getWorkManager() throws MuleException
         {

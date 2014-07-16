@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.registry;
 
 import org.mule.api.MuleContext;
@@ -29,6 +25,8 @@ import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.ObjectToString;
 import org.mule.transformer.types.SimpleDataType;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -153,33 +151,24 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
             {
                 logger.debug("Comparing transformers for best match: input = " + input + " output = " + output + " Possible transformers = " + trans);
             }
-            TransformerWeighting weighting = null;
-            for (Transformer transformer : trans)
+
+            List<TransformerWeighting> weightings = calculateTransformerWeightings(trans, input, output);
+
+            TransformerWeighting maxWeighting = weightings.get(weightings.size() - 1);
+
+            for (int index = weightings.size() - 2; index >= 0 && maxWeighting.compareTo(weightings.get(index)) == 0; index--)
             {
-                TransformerWeighting current = new TransformerWeighting(input, output, transformer);
-                if (weighting == null)
+                //We may have two transformers that are exactly the same, in which case we can use either i.e. use the current
+                TransformerWeighting current = weightings.get(index);
+
+                if (!maxWeighting.getTransformer().getClass().equals(current.getTransformer().getClass()))
                 {
-                    weighting = current;
-                }
-                else
-                {
-                    int compare = current.compareTo(weighting);
-                    if (compare == 1)
-                    {
-                        weighting = current;
-                    }
-                    else if (compare == 0)
-                    {
-                        //We may have two transformers that are exactly the same, in which case we can use either i.e. use the current
-                        if (!weighting.getTransformer().getClass().equals(current.getTransformer().getClass()))
-                        {
-                            throw new ResolverException(CoreMessages.transformHasMultipleMatches(input, output,
-                                    current.getTransformer(), weighting.getTransformer()));
-                        }
-                    }
+                    throw new ResolverException(CoreMessages.transformHasMultipleMatches(input, output,
+                                                                                         current.getTransformer(), maxWeighting.getTransformer()));
                 }
             }
-            return weighting.getTransformer();
+
+            return maxWeighting.getTransformer();
         }
         else if (trans.size() == 0)
         {
@@ -189,6 +178,21 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
         {
             return trans.get(0);
         }
+    }
+
+    private List<TransformerWeighting> calculateTransformerWeightings(List<Transformer> transformers, Class input, Class output)
+    {
+        List<TransformerWeighting> weightings = new ArrayList<TransformerWeighting>(transformers.size());
+
+        for (Transformer transformer : transformers)
+        {
+            TransformerWeighting transformerWeighting = new TransformerWeighting(input, output, transformer);
+            weightings.add(transformerWeighting);
+        }
+
+        Collections.sort(weightings);
+
+        return weightings;
     }
 
     public void dispose()

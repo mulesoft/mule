@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -14,13 +11,15 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mule.api.context.WorkManager;
 import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
 import org.mule.tck.size.SmallTest;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectorLifecycleManager;
@@ -123,7 +122,28 @@ public class HttpRequestDispatcherTestCase extends AbstractMuleTestCase
             {
                 fail("retry template should be executed");
             }
-            verify(mockExceptionListener, Mockito.atLeast(1)).handleException(Mockito.isA(Exception.class));
+
+            Prober prober = new PollingProber(100, 1);
+            prober.check(new Probe()
+            {
+                public boolean isSatisfied()
+                {
+                    try
+                    {
+                        verify(mockExceptionListener, Mockito.atLeast(1)).handleException(Mockito.isA(Exception.class));
+                        return true;
+                    }
+                    catch (AssertionError e)
+                    {
+                        return false;
+                    }
+                }
+
+                public String describeFailure()
+                {
+                    return "Exception listener was not invoked";
+                }
+            });
         }
         finally
         {

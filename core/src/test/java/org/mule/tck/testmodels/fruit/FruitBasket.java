@@ -1,26 +1,23 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.tck.testmodels.fruit;
 
-import java.util.Map;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * TODO
  */
 public class FruitBasket
 {
-    private final Map basket = Collections.synchronizedMap(new HashMap());
+    private final Map<Class<? extends Fruit>, Fruit> basket = Collections.synchronizedMap(new HashMap<Class<? extends Fruit>, Fruit>());
 
     public boolean hasApple()
     {
@@ -40,14 +37,14 @@ public class FruitBasket
         }
     }
 
-    public void setFruit(List fruit)
+    public void setFruit(List<Fruit> fruit)
     {
-        this.setFruit((Fruit[]) fruit.toArray(new Fruit[fruit.size()]));
+        this.setFruit(fruit.toArray(new Fruit[fruit.size()]));
     }
 
-    public List getFruit()
+    public List<Fruit> getFruit()
     {
-        return new ArrayList(basket.values());
+        return new ArrayList<Fruit>(basket.values());
     }
 
     public Apple getApple()

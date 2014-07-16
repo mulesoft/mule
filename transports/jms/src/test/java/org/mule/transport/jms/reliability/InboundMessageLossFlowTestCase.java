@@ -1,18 +1,14 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms.reliability;
 
-import java.util.concurrent.TimeUnit;
-
 import static org.junit.Assert.assertFalse;
+
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -26,11 +22,15 @@ import static org.junit.Assert.assertFalse;
 public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String[] getConfigFiles()
     {
-        return "reliability/activemq-config.xml, reliability/inbound-message-loss-flow.xml";
+        return new String[] {
+            "reliability/activemq-config.xml",
+            "reliability/inbound-message-loss-flow.xml"
+        };
     }
 
+    @Override
     public void testTransformerException() throws Exception
     {
         putMessageOnQueue("transformerException");
@@ -43,6 +43,7 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
             messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
     }
 
+    @Override
     public void testRouterException() throws Exception
     {
         putMessageOnQueue("routerException");

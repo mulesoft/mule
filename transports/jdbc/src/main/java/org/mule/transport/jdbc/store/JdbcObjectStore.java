@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jdbc.store;
 
 import java.io.Serializable;
@@ -15,6 +11,8 @@ import java.sql.SQLException;
 
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.ArrayHandler;
+
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.store.ObjectAlreadyExistsException;
@@ -26,7 +24,7 @@ import org.mule.execution.TransactionalExecutionTemplate;
 import org.mule.transport.jdbc.JdbcConnector;
 import org.mule.util.store.AbstractMonitoredObjectStore;
 
-public class JdbcObjectStore<T extends Serializable> extends AbstractMonitoredObjectStore<T>
+public class JdbcObjectStore<T extends Serializable> extends AbstractMonitoredObjectStore<T> implements MuleContextAware
 {
 
     private JdbcConnector jdbcConnector;
@@ -34,6 +32,7 @@ public class JdbcObjectStore<T extends Serializable> extends AbstractMonitoredOb
     private String insertQueryKey;
     private String selectQueryKey;
     private String deleteQueryKey;
+    private String clearQueryKey;
 
     private ArrayHandler arrayHandler;
 
@@ -46,6 +45,7 @@ public class JdbcObjectStore<T extends Serializable> extends AbstractMonitoredOb
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isPersistent()
     {
         return true;
@@ -54,6 +54,7 @@ public class JdbcObjectStore<T extends Serializable> extends AbstractMonitoredOb
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void expire()
     {
         // DO NOTHING
@@ -62,6 +63,7 @@ public class JdbcObjectStore<T extends Serializable> extends AbstractMonitoredOb
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean contains(Serializable key) throws ObjectStoreException
     {
         this.notNullKey(key);
@@ -72,6 +74,7 @@ public class JdbcObjectStore<T extends Serializable> extends AbstractMonitoredOb
     /**
      * {@inheritDoc}
      */
+    @Override
     public T remove(Serializable key) throws ObjectStoreException
     {
         this.notNullKey(key);
@@ -80,9 +83,17 @@ public class JdbcObjectStore<T extends Serializable> extends AbstractMonitoredOb
         return value;
     }
 
+    @Override
+    public void clear() throws ObjectStoreException
+    {
+        this.update(this.getClearQuery(), new Object[]{});
+    }
+
     /**
      * {@inheritDoc}
      */
+    @Override
+    @SuppressWarnings("unchecked")
     public T retrieve(Serializable key) throws ObjectStoreException
     {
         Object[] row = (Object[]) this.query(this.getSelectQuery(), this.arrayHandler, key);
@@ -114,6 +125,7 @@ public class JdbcObjectStore<T extends Serializable> extends AbstractMonitoredOb
     /**
      * {@inheritDoc}
      */
+    @Override
     public void store(Serializable key, T value) throws ObjectStoreException
     {
         this.notNullKey(key);
@@ -205,9 +217,11 @@ public class JdbcObjectStore<T extends Serializable> extends AbstractMonitoredOb
         }
     }
 
-    private Object executeInTransactionTemplate(ExecutionCallback<Object> processingCallback) throws Exception
+    private Object executeInTransactionTemplate(ExecutionCallback<Object> processingCallback)
+        throws Exception
     {
-        ExecutionTemplate<Object> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(this.jdbcConnector.getMuleContext(), this.transactionConfig);
+        ExecutionTemplate<Object> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(
+            getMuleContext(), this.transactionConfig);
         return executionTemplate.execute(processingCallback);
     }
 
@@ -245,6 +259,10 @@ public class JdbcObjectStore<T extends Serializable> extends AbstractMonitoredOb
     {
         return (String) this.jdbcConnector.getQueries().get(this.deleteQueryKey);
     }
+    
+    public String getClearQuery() {
+        return (String) this.jdbcConnector.getQueries().get(this.clearQueryKey);
+    }
 
     public String getInsertQueryKey()
     {
@@ -275,4 +293,15 @@ public class JdbcObjectStore<T extends Serializable> extends AbstractMonitoredOb
     {
         this.deleteQueryKey = deleteQueryKey;
     }
+
+    public String getClearQueryKey()
+    {
+        return clearQueryKey;
+    }
+
+    public void setClearQueryKey(String clearQueryKey)
+    {
+        this.clearQueryKey = clearQueryKey;
+    }
+
 }

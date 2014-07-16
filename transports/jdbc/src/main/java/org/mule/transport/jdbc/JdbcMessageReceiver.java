@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jdbc;
 
 import org.mule.DefaultMuleMessage;
@@ -35,15 +31,14 @@ import java.util.List;
  */
 public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
 {
-
     public static final String RECEIVE_MESSAGE_IN_TRANSCTION = "receiveMessageInTransaction";
     public static final String RECEIVE_MESSAGES_IN_XA_TRANSCTION = "receiveMessagesInXaTransaction";
 
     protected JdbcConnector connector;
     protected String readStmt;
     protected String ackStmt;
-    protected List<?> readParams;
-    protected List<?> ackParams;
+    protected List<String> readParams;
+    protected List<String> ackParams;
     public boolean receiveMessagesInXaTransaction = false;
     private volatile boolean aggregateResult;
 
@@ -94,9 +89,9 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
      */
     protected void parseStatements(String readStmt, String ackStmt)
     {
-        this.readParams = new ArrayList<Object>();
+        this.readParams = new ArrayList<String>();
         this.readStmt = this.connector.parseStatement(readStmt, this.readParams);
-        this.ackParams = new ArrayList<Object>();
+        this.ackParams = new ArrayList<String>();
         this.ackStmt = this.connector.parseStatement(ackStmt, this.ackParams);
     }
 
@@ -191,7 +186,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         List<MuleMessage> messages = new LinkedList<MuleMessage>();
         for (Object record : records)
         {
-            messages.add(new DefaultMuleMessage(record, connector.getMuleContext()));
+            messages.add(new DefaultMuleMessage(record, getEndpoint().getMuleContext()));
         }
 
         return messages;

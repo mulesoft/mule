@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.cxf;
 
 import static org.junit.Assert.assertNotNull;
@@ -16,11 +12,11 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.custommonkey.xmlunit.XMLAssert;
@@ -36,7 +32,7 @@ public class CxfWsdlTestCase extends AbstractMuleContextTestCase
     @Test
     public void testCxfWsdlService() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         MuleMessage message = new DefaultMuleMessage("test1", muleContext);
         MuleMessage reply = client.send(TEST_URL, message);
@@ -60,7 +56,7 @@ public class CxfWsdlTestCase extends AbstractMuleContextTestCase
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(TEST_URL_NOWSDL, muleContext);
         endpointBuilder.setProperty("wsdlUrl", TEST_URL_WSDL);
 
-        OutboundEndpoint endpoint = 
+        OutboundEndpoint endpoint =
             muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
 
         MuleMessage message = new DefaultMuleMessage("test1", muleContext);

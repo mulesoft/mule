@@ -1,16 +1,10 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.el.context;
-
-import org.mule.api.MuleRuntimeException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,22 +23,6 @@ public abstract class AbstractMapContext<K, V> implements Map<K, V>
         for (Map.Entry<? extends K, ? extends V> entry : m.entrySet())
         {
             put(entry.getKey(), entry.getValue());
-        }
-    }
-
-    @Override
-    public void clear()
-    {
-        for (K key : keySet())
-        {
-            try
-            {
-                remove(key);
-            }
-            catch (Exception e)
-            {
-                throw new MuleRuntimeException(e);
-            }
         }
     }
 

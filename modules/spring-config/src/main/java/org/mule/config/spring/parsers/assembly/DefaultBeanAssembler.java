@@ -1,18 +1,14 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.config.spring.parsers.assembly;
 
 import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
-import org.mule.config.spring.MuleApplicationContext;
+import org.mule.config.spring.MuleArtifactContext;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.config.spring.parsers.assembly.configuration.SingleProperty;
@@ -133,7 +129,7 @@ public class DefaultBeanAssembler implements BeanAssembler
             }
             Object value = beanConfig.translateValue(oldName, oldValue);
             addAnnotationValue(beanDefinition.getPropertyValues(), name, value);
-            MuleContext muleContext = MuleApplicationContext.getCurrentMuleContext().get();
+            MuleContext muleContext = MuleArtifactContext.getCurrentMuleContext().get();
             if (muleContext != null)
             {
                 Map<QName, Set<Object>> annotations = muleContext.getConfigurationAnnotations();

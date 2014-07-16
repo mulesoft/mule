@@ -1,21 +1,18 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms.activemq;
 
 import org.mule.api.MuleContext;
 import org.mule.transport.ConnectException;
 import org.mule.transport.jms.JmsConnector;
-import org.mule.transport.jms.xa.TargetInvocationHandler;
 import org.mule.util.ClassUtils;
+import org.mule.util.proxy.TargetInvocationHandler;
 
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -87,18 +84,35 @@ public class ActiveMQJmsConnector extends JmsConnector
             }
 
             final Class clazz = connection.getClass();
-            Method cleanupMethod;
+            Method cleanupMethod = null;
             if (Proxy.isProxyClass(clazz))
             {
-                TargetInvocationHandler handler =
-                        (TargetInvocationHandler) Proxy.getInvocationHandler(connection);
-                // this is really an XA connection, bypass the java.lang.reflect.Proxy as it
-                // can't delegate to non-interfaced methods (like proprietary 'cleanup' one)
-                // TODO check if CGlib will manage to enhance the AMQ connection class,
-                // there are no final methods, but a number of private ones, though
-                connection = (Connection) handler.getTargetObject();
-                Class realConnectionClass = connection.getClass();
-                cleanupMethod = realConnectionClass.getMethod("cleanup", (Class[])null);
+                InvocationHandler invocationHandler = Proxy.getInvocationHandler(connection);
+
+                // When using caching-connection-factory, the connections are proxy objects that do nothing on the
+                // close and stop methods so that they remain open when returning to the cache. In that case, we don't
+                // need to do any custom cleanup, as the connections will be closed when destroying the cache. The
+                // type of the invocation handler for these connections is SharedConnectionInvocationHandler.
+
+                if (invocationHandler instanceof TargetInvocationHandler)
+                {
+                    // this is really an XA connection, bypass the java.lang.reflect.Proxy as it
+                    // can't delegate to non-interfaced methods (like proprietary 'cleanup' one)
+                    // TODO check if CGlib will manage to enhance the AMQ connection class,
+                    // there are no final methods, but a number of private ones, though
+                    TargetInvocationHandler targetInvocationHandler = (TargetInvocationHandler) invocationHandler;
+                    connection = (Connection) targetInvocationHandler.getTargetObject();
+                    Class realConnectionClass = connection.getClass();
+                    cleanupMethod = realConnectionClass.getMethod("cleanup", (Class[])null);
+                }
+                else
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug(String.format("InvocationHandler of the JMS connection proxy is of type %s, not doing " +
+                                                   "any extra cleanup", invocationHandler.getClass().getName()));
+                    }
+                }
             }
             else
             {

@@ -1,14 +1,13 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.email.transformers;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -26,14 +25,10 @@ import javax.mail.internet.MimeMessage;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 public class Rfc822ByteArrayTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "rfc822-byte-array-test.xml";
     }
@@ -60,7 +55,7 @@ public class Rfc822ByteArrayTestCase extends FunctionalTestCase
     protected MimeMessage byteArrayToMimeMessage(byte[] bytes) throws MuleException
     {
         Rfc822ByteArraytoMimeMessage transformer = new Rfc822ByteArraytoMimeMessage();
-        ImmutableEndpoint endpoint = 
+        ImmutableEndpoint endpoint =
             muleContext.getEndpointFactory().getOutboundEndpoint(SmtpConnector.SMTP);
         transformer.setEndpoint(endpoint);
         Object result = transformer.transform(bytes);

@@ -8,10 +8,10 @@
             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
-    <file:connector name="GenericFileConnector" streaming="false" workDirectory=".mule/work"/>
+    <file:connector name="GenericFileConnector" streaming="false" workDirectory="${workingDirectory}/work"/>
 
     <flow name="testFLow">
-        <file:inbound-endpoint connector-ref="GenericFileConnector" path=".mule/data" responseTimeout="60000"/>
+        <file:inbound-endpoint connector-ref="GenericFileConnector" path="${workingDirectory}/data" responseTimeout="60000"/>
 
         <set-payload value="#[['sourceDirectory': message.inboundProperties['sourceDirectory'], 'sourceFileName': message.inboundProperties['sourceFileName']]]"/>
 

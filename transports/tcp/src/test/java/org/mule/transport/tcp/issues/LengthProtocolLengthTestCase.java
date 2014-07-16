@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.tcp.issues;
 
 import static org.junit.Assert.assertNotNull;
@@ -15,7 +11,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -28,7 +24,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class LengthProtocolLengthTestCase extends AbstractServiceAndFlowTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
@@ -47,7 +42,7 @@ public class LengthProtocolLengthTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "length-protocol-length-test-service.xml"},
             {ConfigVariant.FLOW, "length-protocol-length-test-flow.xml"}
         });
-    }      
+    }
 
     @Test
     public void testLength() throws Exception
@@ -70,7 +65,8 @@ public class LengthProtocolLengthTestCase extends AbstractServiceAndFlowTestCase
         {
             message[i] = (byte)(i % 255);
         }
-        MuleClient client = new MuleClient(muleContext);
+
+        MuleClient client = muleContext.getClient();
         if (ok)
         {
             MuleMessage response = client.send(endpoint, message, null);

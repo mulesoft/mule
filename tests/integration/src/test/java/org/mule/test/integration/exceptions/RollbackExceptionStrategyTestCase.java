@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -18,6 +15,7 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.hamcrest.core.IsNull;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
@@ -88,6 +86,7 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
         }
     }
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testAlwaysRollbackJmsNoTransaction() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(EXPECTED_DELIVERED_TIMES);
@@ -107,6 +106,7 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testRedeliveryExhaustedTransactional() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(EXPECTED_DELIVERED_TIMES);
@@ -268,6 +268,7 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testRedeliveryPolicyRedefinition() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(EXPECTED_DELIVERED_TIMES);
@@ -290,6 +291,7 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testInboundEndpointMaxRedeliveryTakesPrecendence() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(EXPECTED_DELIVERED_TIMES);

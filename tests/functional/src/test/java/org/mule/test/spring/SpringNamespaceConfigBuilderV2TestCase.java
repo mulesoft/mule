@@ -1,14 +1,15 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.spring;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
@@ -31,11 +32,6 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 /**
  * This is an extended version of the same test covered in
  * {@link org.mule.test.spring.SpringNamespaceConfigBuilderTestCase}.  Both are translations of an
@@ -48,7 +44,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilderTestCase
 {
-
     public SpringNamespaceConfigBuilderV2TestCase()
     {
         super(true);
@@ -56,17 +51,19 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
     }
 
     @Override
-    public String getConfigResources()
+    public String[] getConfigFiles()
     {
-        return "org/mule/test/spring/config2/test-xml-mule2-config.xml," +
-                "org/mule/test/spring/config2/test-xml-mule2-config-split.xml," +
-                "org/mule/test/spring/config2/test-xml-mule2-config-split-properties.xml";
+        return new String[] {
+            "org/mule/test/spring/config2/test-xml-mule2-config.xml",
+            "org/mule/test/spring/config2/test-xml-mule2-config-split.xml",
+            "org/mule/test/spring/config2/test-xml-mule2-config-split-properties.xml"
+        };
     }
 
     @Override
     public ConfigurationBuilder getBuilder() throws ConfigurationException
     {
-        return new SpringXmlConfigurationBuilder(getConfigResources());
+        return new SpringXmlConfigurationBuilder(getConfigFiles());
     }
 
     @Test
@@ -94,8 +91,8 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
         Object obj = getComponent(c);
         assertNotNull(obj);
         assertTrue(obj instanceof Apple);
-        assertTrue(((Apple) obj).isBitten()); 
-        assertTrue(((Apple) obj).isWashed()); 
+        assertTrue(((Apple) obj).isBitten());
+        assertTrue(((Apple) obj).isWashed());
     }
 
     @Test

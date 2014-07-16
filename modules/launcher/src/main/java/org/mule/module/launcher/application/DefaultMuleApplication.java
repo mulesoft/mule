@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.launcher.application;
 
 import static org.mule.util.SplashScreen.miniSplash;
@@ -16,68 +12,55 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.config.builders.AutoConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.context.DefaultMuleContextFactory;
-import org.mule.context.notification.MuleContextNotification;
-import org.mule.context.notification.NotificationException;
-import org.mule.module.launcher.AbstractFileWatcher;
-import org.mule.module.launcher.ApplicationMuleContextBuilder;
-import org.mule.module.launcher.ConfigChangeMonitorThreadFactory;
+import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.module.launcher.DeploymentInitException;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentStartException;
 import org.mule.module.launcher.DeploymentStopException;
+import org.mule.module.launcher.DisposableClassLoader;
 import org.mule.module.launcher.InstallException;
 import org.mule.module.launcher.MuleDeploymentService;
+import org.mule.module.launcher.artifact.ArtifactClassLoader;
+import org.mule.module.launcher.artifact.MuleContextDeploymentListener;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
+import org.mule.module.launcher.domain.Domain;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
-import org.mule.util.FileUtils;
-import org.mule.util.StringUtils;
 
-import java.io.Closeable;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class DefaultMuleApplication implements Application
 {
-    protected static final int DEFAULT_RELOAD_CHECK_INTERVAL_MS = 3000;
-    protected static final String ANCHOR_FILE_BLURB = "Delete this file while Mule is running to undeploy this app in a clean way.";
 
     protected transient final Log logger = LogFactory.getLog(getClass());
     protected transient final Log deployLogger = LogFactory.getLog(MuleDeploymentService.class);
 
-    protected ScheduledExecutorService watchTimer;
-
-    protected MuleContext muleContext;
-    protected ClassLoader deploymentClassLoader;
-    protected ApplicationDescriptor descriptor;
+    protected final ApplicationDescriptor descriptor;
     protected final ApplicationClassLoaderFactory applicationClassLoaderFactory;
 
-    protected String[] absoluteResourcePaths;
-
+    protected MuleContext muleContext;
+    protected ArtifactClassLoader deploymentClassLoader;
+    private Domain domain;
     protected DeploymentListener deploymentListener;
 
-    protected DefaultMuleApplication(ApplicationDescriptor appDesc, ApplicationClassLoaderFactory applicationClassLoaderFactory)
+    public DefaultMuleApplication(ApplicationDescriptor descriptor, ApplicationClassLoaderFactory applicationClassLoaderFactory, Domain domain)
     {
-        this.descriptor = appDesc;
+        this.descriptor = descriptor;
         this.applicationClassLoaderFactory = applicationClassLoaderFactory;
         this.deploymentListener = new NullDeploymentListener();
+        this.domain = domain;
     }
 
     public void setDeploymentListener(DeploymentListener deploymentListener)
@@ -98,37 +81,28 @@ public class DefaultMuleApplication implements Application
             logger.info(miniSplash(String.format("New app '%s'", descriptor.getAppName())));
         }
 
-        createAnchorFile(getAppName());
-
-        // convert to absolute paths
-        final String[] configResources = descriptor.getConfigResources();
-        absoluteResourcePaths = new String[configResources.length];
-        for (int i = 0; i < configResources.length; i++)
+        for (String configResourceAbsolutePatch : this.descriptor.getAbsoluteResourcePaths())
         {
-            String resource = configResources[i];
-            final File file = toAbsoluteFile(resource);
-            if (!file.exists())
+            File configResource = new File(configResourceAbsolutePatch);
+            if (!configResource.exists())
             {
-                String message = String.format("Config for app '%s' not found: %s", getAppName(), file);
+                String message = String.format("Config for app '%s' not found: %s", getArtifactName(), configResource);
                 throw new InstallException(MessageFactory.createStaticMessage(message));
             }
-
-            absoluteResourcePaths[i] = file.getAbsolutePath();
         }
-
         deploymentClassLoader = applicationClassLoaderFactory.create(descriptor);
-    }
-
-    @Override
-    public String getAppName()
-    {
-        return descriptor.getAppName();
     }
 
     @Override
     public ApplicationDescriptor getDescriptor()
     {
         return descriptor;
+    }
+
+    @Override
+    public Domain getDomain()
+    {
+        return domain;
     }
 
     public void setAppName(String appName)
@@ -149,7 +123,7 @@ public class DefaultMuleApplication implements Application
             this.muleContext.start();
 
             // null CCL ensures we log at 'system' level
-            // TODO create a more usable wrapper for any logger to be logged at sys level
+            // TODO getDomainClassLoader a more usable wrapper for any logger to be logged at sys level
             final ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
             try
             {
@@ -180,7 +154,7 @@ public class DefaultMuleApplication implements Application
 
         try
         {
-            ConfigurationBuilder cfgBuilder = createConfigurationBuilder();
+            ConfigurationBuilder cfgBuilder = domain.createApplicationConfigurationBuilder(this);
             if (!cfgBuilder.isConfigured())
             {
                 List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(3);
@@ -194,14 +168,10 @@ public class DefaultMuleApplication implements Application
                 DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
                 if (deploymentListener != null)
                 {
-                    muleContextFactory.addListener(new MuleContextDeploymentListener(getAppName(), deploymentListener));
+                    muleContextFactory.addListener(new MuleContextDeploymentListener(getArtifactName(), deploymentListener));
                 }
-                this.muleContext = muleContextFactory.createMuleContext(builders, new ApplicationMuleContextBuilder(descriptor));
-
-                if (descriptor.isRedeploymentEnabled())
-                {
-                    createRedeployMonitor();
-                }
+                ApplicationMuleContextBuilder applicationContextBuilder = new ApplicationMuleContextBuilder(descriptor);
+                this.muleContext = muleContextFactory.createMuleContext(builders, applicationContextBuilder);
             }
         }
         catch (Exception e)
@@ -212,41 +182,16 @@ public class DefaultMuleApplication implements Application
         }
     }
 
-    protected ConfigurationBuilder createConfigurationBuilder() throws Exception
-    {
-        String configBuilderClassName = determineConfigBuilderClassName();
-        return (ConfigurationBuilder) ClassUtils.instanciateClass(configBuilderClassName,
-            new Object[] { absoluteResourcePaths }, getDeploymentClassLoader());
-    }
-
-    protected String determineConfigBuilderClassName()
-    {
-        // Provide a shortcut for Spring: "-builder spring"
-        final String builderFromDesc = descriptor.getConfigurationBuilder();
-        if ("spring".equalsIgnoreCase(builderFromDesc))
-        {
-            return ApplicationDescriptor.CLASSNAME_SPRING_CONFIG_BUILDER;
-        }
-        else if (builderFromDesc == null)
-        {
-            return AutoConfigurationBuilder.class.getName();
-        }
-        else
-        {
-            return builderFromDesc;
-        }
-    }
-
     protected ConfigurationBuilder createConfigurationBuilderFromApplicationProperties()
     {
         // Load application properties first since they may be needed by other configuration builders
-        final Map<String,String> appProperties = descriptor.getAppProperties();
+        final Map<String, String> appProperties = descriptor.getAppProperties();
 
         // Add the app.home variable to the context
-        File appPath = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), getAppName());
+        File appPath = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), getArtifactName());
         appProperties.put(MuleProperties.APP_HOME_DIRECTORY_PROPERTY, appPath.getAbsolutePath());
 
-        appProperties.put(MuleProperties.APP_NAME_PROPERTY, getAppName());
+        appProperties.put(MuleProperties.APP_NAME_PROPERTY, getArtifactName());
 
         return new SimpleConfigurationBuilder(appProperties);
     }
@@ -258,7 +203,7 @@ public class DefaultMuleApplication implements Application
         if (ClassUtils.isClassOnPath(MuleServer.CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, getClass()))
         {
             Object configBuilder = ClassUtils.instanciateClass(
-                MuleServer.CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, ClassUtils.NO_ARGS, getClass());
+                    MuleServer.CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, ClassUtils.NO_ARGS, getClass());
             builders.add((ConfigurationBuilder) configBuilder);
         }
     }
@@ -270,19 +215,17 @@ public class DefaultMuleApplication implements Application
     }
 
     @Override
-    public ClassLoader getDeploymentClassLoader()
-    {
-        return this.deploymentClassLoader;
-    }
-
-    @Override
     public void dispose()
     {
         // moved wrapper logic into the actual implementation, as redeploy() invokes it directly, bypassing
         // classloader cleanup
         try
         {
-            ClassLoader appCl = getDeploymentClassLoader();
+            ClassLoader appCl = null;
+            if (getArtifactClassLoader() != null)
+            {
+                appCl = getArtifactClassLoader().getClassLoader();
+            }
             // if not initialized yet, it can be null
             if (appCl != null)
             {
@@ -294,17 +237,9 @@ public class DefaultMuleApplication implements Application
             if (appCl != null)
             {
                 // close classloader to release jar connections in lieu of Java 7's ClassLoader.close()
-                if (appCl instanceof Closeable)
+                if (appCl instanceof DisposableClassLoader)
                 {
-                    Closeable classLoader = (Closeable) appCl;
-                    try
-                    {
-                        classLoader.close();
-                    }
-                    catch (IOException e)
-                    {
-                        // Ignore
-                    }
+                    ((DisposableClassLoader) appCl).dispose();
                 }
             }
         }
@@ -316,56 +251,31 @@ public class DefaultMuleApplication implements Application
     }
 
     @Override
-    public void redeploy()
+    public String getArtifactName()
     {
-        if (logger.isInfoEnabled())
-        {
-            logger.info(miniSplash(String.format("Redeploying app '%s'", descriptor.getAppName())));
-        }
+        return descriptor.getAppName();
+    }
 
-        String appName = getAppName();
+    @Override
+    public File[] getResourceFiles()
+    {
+        return descriptor.getConfigResourcesFile();
+    }
 
-        deploymentListener.onUndeploymentStart(appName);
-        try
-        {
-            dispose();
-
-            deploymentListener.onUndeploymentSuccess(appName);
-        }
-        catch (RuntimeException e)
-        {
-            deploymentListener.onUndeploymentFailure(appName, e);
-
-            throw e;
-        }
-
-        install();
-
-        // update thread with the fresh new classloader just created during the install phase
-        final ClassLoader cl = getDeploymentClassLoader();
-        Thread.currentThread().setContextClassLoader(cl);
-
-        deploymentListener.onDeploymentStart(appName);
-        try
-        {
-            init();
-            start();
-
-            deploymentListener.onDeploymentSuccess(appName);
-        }
-        catch(Throwable cause)
-        {
-            logger.error("Application deployment error", cause);
-            deploymentListener.onDeploymentFailure(appName, cause);
-        }
-
-        // release the ref
-        Thread.currentThread().setContextClassLoader(null);
+    @Override
+    public ArtifactClassLoader getArtifactClassLoader()
+    {
+        return deploymentClassLoader;
     }
 
     @Override
     public void stop()
     {
+        if (this.muleContext == null || !this.muleContext.getLifecycleManager().isDirectTransition(Stoppable.PHASE_NAME))
+        {
+            return;
+        }
+
         if (this.muleContext == null)
         {
             // app never started, maybe due to a previous error
@@ -391,6 +301,19 @@ public class DefaultMuleApplication implements Application
         {
             // TODO add app name to the exception field
             throw new DeploymentStopException(MessageFactory.createStaticMessage(descriptor.getAppName()), e);
+        }
+    }
+
+    @Override
+    public ApplicationStatus getStatus()
+    {
+        if (muleContext != null)
+        {
+            return ApplicationStatusMapper.getApplicationStatus(muleContext.getLifecycleManager().getCurrentPhase());
+        }
+        else
+        {
+            return ApplicationStatusMapper.getApplicationStatus(NotInLifecyclePhase.PHASE_NAME);
         }
     }
 
@@ -432,123 +355,6 @@ public class DefaultMuleApplication implements Application
 
         muleContext.dispose();
         muleContext = null;
-    }
-
-    protected void createRedeployMonitor() throws NotificationException
-    {
-        if (logger.isInfoEnabled())
-        {
-            logger.info("Monitoring for hot-deployment: " + StringUtils.join(absoluteResourcePaths, ';'));
-        }
-
-        List<File> configFiles = new ArrayList<File>();
-        for (String path : absoluteResourcePaths)
-        {
-            configFiles.add(new File(path));
-        }
-
-        // register a config monitor only after context has started, as it may take some time
-        new ConfigFileWatcher(configFiles).register();
-    }
-
-    protected void scheduleConfigMonitor(AbstractFileWatcher watcher)
-    {
-        final int reloadIntervalMs = DEFAULT_RELOAD_CHECK_INTERVAL_MS;
-        watchTimer = Executors.newSingleThreadScheduledExecutor(new ConfigChangeMonitorThreadFactory(descriptor.getAppName()));
-
-        watchTimer.scheduleWithFixedDelay(watcher, reloadIntervalMs, reloadIntervalMs, TimeUnit.MILLISECONDS);
-
-        if (logger.isInfoEnabled())
-        {
-            logger.info("Reload interval: " + reloadIntervalMs);
-        }
-    }
-
-    /**
-     * Resolve a resource relative to an application root.
-     * @param path the relative path to resolve
-     * @return absolute path, may not actually exist (check with File.exists())
-     */
-    protected File toAbsoluteFile(String path)
-    {
-        final String muleHome = System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
-        String configPath = String.format("%s/apps/%s/%s", muleHome, getAppName(), path);
-        return new File(configPath);
-    }
-
-    private void createAnchorFile(String appName)
-    {
-        try
-        {
-            File marker = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), String.format("%s-anchor.txt", appName));
-            FileUtils.writeStringToFile(marker, ANCHOR_FILE_BLURB);
-        }
-        catch (IOException e)
-        {
-            // log it here so it ends up in app log, sys log will only log a message without stacktrace
-            logger.error(null, ExceptionUtils.getRootCause(e));
-            // TODO add app name to the exception field
-            throw new DeploymentInitException(CoreMessages.createStaticMessage(ExceptionUtils.getRootCauseMessage(e)), e);
-        }
-    }
-
-    protected class ConfigFileWatcher extends AbstractFileWatcher
-    {
-        public ConfigFileWatcher(List<File> watchedResources)
-        {
-            super(watchedResources);
-        }
-
-        public void register() throws NotificationException
-        {
-            muleContext.registerListener(new FileWatcherNotificationListener(this));
-        }
-
-        @Override
-        protected synchronized void onChange(File file)
-        {
-            if (logger.isInfoEnabled())
-            {
-                logger.info("================== Reloading " + file);
-            }
-
-            // grab the proper classloader for our context
-            final ClassLoader cl = getDeploymentClassLoader();
-            Thread.currentThread().setContextClassLoader(cl);
-            redeploy();
-        }
-    }
-
-    protected class FileWatcherNotificationListener implements MuleContextNotificationListener<MuleContextNotification>
-    {
-        private AbstractFileWatcher watcher;
-
-        public FileWatcherNotificationListener(AbstractFileWatcher watcher)
-        {
-            this.watcher = watcher;
-        }
-
-        @Override
-        public void onNotification(MuleContextNotification notification)
-        {
-            final int action = notification.getAction();
-            switch (action)
-            {
-                case MuleContextNotification.CONTEXT_STARTED :
-                    scheduleConfigMonitor(watcher);
-                    break;
-
-                case MuleContextNotification.CONTEXT_STOPPING :
-                    if (watchTimer != null)
-                    {
-                        // edge case when app startup was interrupted and we haven't
-                        // started monitoring it yet
-                        watchTimer.shutdownNow();
-                    }
-                    muleContext.unregisterListener(this);
-                    break;
-            }
-        }
     }
 
 }

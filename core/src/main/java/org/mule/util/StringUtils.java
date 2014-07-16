@@ -1,17 +1,15 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.CharUtils;
 
@@ -21,10 +19,9 @@ import org.apache.commons.lang.CharUtils;
 // @ThreadSafe
 public class StringUtils extends org.apache.commons.lang.StringUtils
 {
-
     /**
-     * Like {@link org.mule.util.StringUtils#split(String, String)}, but
-     * additionally trims whitespace from the result tokens.
+     * Like {@link org.mule.util.StringUtils#split(String, String)}, but additionally
+     * trims whitespace from the result tokens.
      */
     public static String[] splitAndTrim(String string, String delim)
     {
@@ -39,13 +36,12 @@ public class StringUtils extends org.apache.commons.lang.StringUtils
         }
 
         String[] rawTokens = split(string, delim);
-        List tokens = new ArrayList();
-        String token;
+        List<String> tokens = new ArrayList<String>();
         if (rawTokens != null)
         {
             for (int i = 0; i < rawTokens.length; i++)
             {
-                token = trim(rawTokens[i]);
+                String token = trim(rawTokens[i]);
                 if (isNotEmpty(token))
                 {
                     tokens.add(token);
@@ -119,7 +115,7 @@ public class StringUtils extends org.apache.commons.lang.StringUtils
         }
 
         int numBytes = bytes.length;
-        StringBuffer str = new StringBuffer(numBytes * 2);
+        StringBuilder str = new StringBuilder(numBytes * 2);
 
         String table = (uppercase ? HEX_CHARACTERS_UC : HEX_CHARACTERS);
 
@@ -132,8 +128,33 @@ public class StringUtils extends org.apache.commons.lang.StringUtils
         return str.toString();
     }
 
+    /**
+     * Matches the given value to the given pattern. Then returns the group at
+     * matchIndex.
+     * 
+     * @param pattern the pattern to use as regexp
+     * @param value the value to evaluate
+     * @param matchIndex the group index to be returned
+     * @return the value of the group at the given index. <code>null</code> if no
+     *         match found
+     * @throws IllegalArgumentException if pattern or value are null.
+     */
+    public static String match(Pattern pattern, String value, int matchIndex) throws IllegalArgumentException
+    {
+        if (value == null || pattern == null)
+        {
+            throw new IllegalArgumentException("pattern and value cannot be null");
+        }
+        Matcher matcher = pattern.matcher(value);
+        if (matcher.find() && (matcher.groupCount() >= matchIndex))
+        {
+            return matcher.group(matchIndex);
+        }
+
+        return null;
+    }
+
     // lookup tables needed for toHexString(byte[], boolean)
     private static final String HEX_CHARACTERS = "0123456789abcdef";
     private static final String HEX_CHARACTERS_UC = HEX_CHARACTERS.toUpperCase();
-
 }

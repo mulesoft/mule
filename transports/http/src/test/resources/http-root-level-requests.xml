@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <flow name="noPath">
+        <http:inbound-endpoint port="${port1}" host="localhost"/>
+        <echo-component/>
+    </flow>
+
+    <flow name="emptyPath">
+        <http:inbound-endpoint port="${port2}" host="localhost" path=""/>
+        <echo-component/>
+    </flow>
+
+    <flow name="rootPath">
+        <http:inbound-endpoint port="${port3}" host="localhost" path="/"/>
+        <echo-component/>
+    </flow>
+
+    <flow name="addressWithoutTrailingSlash">
+        <http:inbound-endpoint address="http://localhost:${port4}"/>
+        <echo-component/>
+    </flow>
+
+    <flow name="addressWithTrailingSlash">
+        <http:inbound-endpoint address="http://localhost:${port5}/"/>
+        <echo-component/>
+    </flow>
+
+</mule>

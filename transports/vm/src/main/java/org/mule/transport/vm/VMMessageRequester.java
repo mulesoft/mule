@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.vm;
 
 import org.mule.api.MuleEvent;
@@ -48,7 +44,7 @@ public class VMMessageRequester extends AbstractMessageRequester
     {
         try
         {
-            QueueSession queueSession = connector.getQueueSession();
+            QueueSession queueSession = connector.getTransactionalResource(endpoint);
             Queue queue = queueSession.getQueue(endpoint.getEndpointURI().getAddress());
 
             if (queue == null)
@@ -112,7 +108,7 @@ public class VMMessageRequester extends AbstractMessageRequester
     {
         // use the default queue profile to configure this queue.
         connector.getQueueProfile().configureQueue(
-            connector.getMuleContext(), endpoint.getEndpointURI().getAddress(),
+            getEndpoint().getMuleContext(), endpoint.getEndpointURI().getAddress(),
             connector.getQueueManager());
     }
 

@@ -1,14 +1,12 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.transport.tcp;
 
+import org.mule.api.transport.Connector;
 import org.mule.util.MapUtils;
 
 import java.io.IOException;
@@ -29,6 +27,8 @@ public abstract class AbstractTcpSocketFactory implements KeyedPoolableObjectFac
      * logger used by this class
      */
     private static final Log logger = LogFactory.getLog(TcpSocketFactory.class);
+
+    private int connectionTimeout = Connector.INT_VALUE_NOT_SET;
 
     public Object makeObject(Object key) throws Exception
     {
@@ -89,4 +89,13 @@ public abstract class AbstractTcpSocketFactory implements KeyedPoolableObjectFac
         }
     }
 
+    public int getConnectionTimeout()
+    {
+        return connectionTimeout;
+    }
+
+    public void setConnectionTimeout(int connectionTimeout)
+    {
+        this.connectionTimeout = connectionTimeout;
+    }
 }

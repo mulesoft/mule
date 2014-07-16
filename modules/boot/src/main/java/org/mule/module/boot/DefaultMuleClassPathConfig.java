@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.boot;
 
 import java.io.File;
@@ -18,7 +14,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -31,7 +26,7 @@ public class DefaultMuleClassPathConfig
     protected static final String USER_DIR = "/lib/user";
     protected static final String OPT_DIR = "/lib/opt";
 
-    private List urls = new ArrayList();
+    private List<URL> urls = new ArrayList<URL>();
 
     /**
      * Constructs a new DefaultMuleClassPathConfig.
@@ -72,25 +67,23 @@ public class DefaultMuleClassPathConfig
     }
 
     /**
-     * Getter for property 'urls'.
-     *
-     * @return A copy of 'urls'. Items are java.net.URL
+     * @return A copy of 'urls'.
      */
-    public List getURLs()
+    public List<URL> getURLs()
     {
-        return new ArrayList(this.urls);
+        return new ArrayList<URL>(this.urls);
     }
 
     /**
      * Setter for property 'urls'.
      *
-     * @param urls Value to set for property 'urls'.
+     * @param newUrls Value to set for property 'urls'.
      */
-    public void addURLs(List urls)
+    public void addURLs(List<URL> newUrls)
     {
-        if (urls != null && !urls.isEmpty())
+        if (newUrls != null && !newUrls.isEmpty())
         {
-            this.urls.addAll(urls);
+            this.urls.addAll(newUrls);
         }
     }
 
@@ -104,11 +97,11 @@ public class DefaultMuleClassPathConfig
         this.urls.add(url);
     }
 
-    public void addFiles(List files)
+    public void addFiles(List<File> files)
     {
-        for (Iterator i = files.iterator(); i.hasNext();)
+        for (File file : files)
         {
-            this.addFile((File)i.next());
+            this.addFile(file);
         }
     }
 
@@ -129,10 +122,11 @@ public class DefaultMuleClassPathConfig
      *
      * @return a list of {@link File}s
      */
-    protected List listJars(File path)
+    protected List<File> listJars(File path)
     {
         File[] jars = path.listFiles(new FileFilter()
         {
+            @Override
             public boolean accept(File pathname)
             {
                 try
@@ -146,7 +140,13 @@ public class DefaultMuleClassPathConfig
             }
         });
 
-        return jars == null ? Collections.EMPTY_LIST : Arrays.asList(jars);
+        if (jars == null)
+        {
+            return Collections.emptyList();
+        }
+        else
+        {
+            return Arrays.<File>asList(jars);
+        }
     }
-
 }

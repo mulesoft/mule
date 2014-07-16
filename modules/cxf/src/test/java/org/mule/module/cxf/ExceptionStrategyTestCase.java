@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.cxf;
 
 import static org.junit.Assert.assertEquals;
@@ -19,18 +15,18 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transport.NullPayload;
-import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpConnector;
+import org.mule.transport.http.HttpConstants;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -84,12 +80,11 @@ public class ExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
         });
     }
 
-
     @Test
     public void testFaultInCxfService() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String,Object>)null, muleContext);
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         latch = new CountDownLatch(1);
         muleContext.registerListener(new ExceptionNotificationListener() {
             @Override
@@ -109,7 +104,7 @@ public class ExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
     public void testExceptionInCxfService() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String,Object>)null, muleContext);
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         latch = new CountDownLatch(1);
         muleContext.registerListener(new ExceptionNotificationListener() {
             @Override
@@ -129,7 +124,7 @@ public class ExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
     public void testClientWithTransformerExceptionDefaultException() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage("hello", (Map<String,Object>)null, muleContext);
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://testClientTransformerExceptionDefaultException", request);
         assertNotNull(response);
         assertTrue(response.getExceptionPayload() != null);
@@ -141,7 +136,7 @@ public class ExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
     public void testClientWithFaultDefaultException() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage("hello", (Map<String,Object>)null, muleContext);
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://testClientWithFaultDefaultException", request);
         assertNotNull(response);
         assertTrue(response.getExceptionPayload() != null);
@@ -152,9 +147,10 @@ public class ExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testServerClientProxyDefaultException() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         latch = new CountDownLatch(1);
-        muleContext.registerListener(new ExceptionNotificationListener() {
+        muleContext.registerListener(new ExceptionNotificationListener()
+        {
             @Override
             public void onNotification(ServerNotification notification)
             {

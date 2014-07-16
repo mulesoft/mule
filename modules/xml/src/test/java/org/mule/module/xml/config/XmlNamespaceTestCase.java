@@ -1,13 +1,15 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.module.xml.config;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -30,21 +32,15 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class XmlNamespaceTestCase extends FunctionalTestCase
 {
-
     public XmlNamespaceTestCase()
     {
         setDisposeContextPerClass(true);
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "xml-namespace-config.xml";
     }
@@ -134,7 +130,7 @@ public class XmlNamespaceTestCase extends FunctionalTestCase
     
     private static class MockResourceResolver implements LSResourceResolver
     {
-        public LSInput resolveResource(String type, String namespaceURI, String publicId, 
+        public LSInput resolveResource(String type, String namespaceURI, String publicId,
             String systemId, String baseURI)
         {
             return null;

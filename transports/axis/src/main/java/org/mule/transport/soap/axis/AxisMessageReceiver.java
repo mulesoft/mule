@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.soap.axis;
 
 import org.mule.api.MuleException;
@@ -165,7 +161,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         if (methods != null)
         {
             Iterator<?> i = methods.keySet().iterator();
-            StringBuffer buf = new StringBuffer(64);
+            StringBuilder buf = new StringBuilder(64);
             while (i.hasNext())
             {
                 String name = (String) i.next();
@@ -173,7 +169,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
                 SoapMethod method;
                 if (m instanceof List)
                 {
-                    method = new SoapMethod(name, (List<?>) m);
+                    method = new SoapMethod(name, (List<String>) m);
                 }
                 else
                 {
@@ -208,7 +204,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         else
         {
             String[] methodNamesArray = AxisServiceProxy.getMethodNames(interfaces);
-            StringBuffer buf = new StringBuffer(64);
+            StringBuilder buf = new StringBuilder(64);
             for (int i = 0; i < methodNamesArray.length; i++)
             {
                 buf.append(methodNamesArray[i]).append(",");

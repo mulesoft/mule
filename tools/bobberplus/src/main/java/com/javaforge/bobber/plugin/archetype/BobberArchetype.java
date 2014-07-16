@@ -430,7 +430,7 @@ public class BobberArchetype
             if (interactiveMode)
             {
 
-                StringBuffer message = new StringBuffer();
+                StringBuilder message = new StringBuilder();
                 message.append(var.getName()).append(": ")
                         .append(NEW_LINE)
                         .append(StringUtils.repeat("*", MESSAGE_LINE_LENGTH))

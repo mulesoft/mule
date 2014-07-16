@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.integration.service;
 
 import org.mule.api.MuleException;
@@ -28,7 +24,7 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
     protected TestJMSMessageListener listener;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/service/service-inflight-messages-jms.xml";
     }
@@ -40,6 +36,7 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
         listener = createTestJMSConsumer();
     }
 
+    @Override
     protected void stopService(Service service) throws Exception
     {
         service.stop();
@@ -47,6 +44,7 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
         Thread.sleep(WAIT_TIME_MILLIS);
     }
 
+    @Override
     protected void startService(Service service) throws Exception
     {
         service.start();
@@ -70,11 +68,13 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
         return consumer;
     }
 
+    @Override
     protected int getOutSize() throws Exception
     {
         return (int) (500 - listener.countdownLatch.getCount());
     }
 
+    @Override
     protected void recreateAndStartMuleContext() throws Exception, MuleException
     {
         muleContext = createMuleContext();

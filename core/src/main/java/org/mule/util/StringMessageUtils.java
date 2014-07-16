@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util;
 
 import org.mule.api.MuleMessage;
@@ -60,13 +56,15 @@ public final class StringMessageUtils
 
     public static String getBoilerPlate(String message, char c, int maxlength)
     {
-        return getBoilerPlate(new ArrayList(Arrays.asList(new String[]{message})), c, maxlength);
+        List<String> messages = Arrays.asList(new String[]{message});
+        messages = new ArrayList<String>(messages);
+        return getBoilerPlate(messages, c, maxlength);
     }
 
-    public static String getBoilerPlate(List messages, char c, int maxlength)
+    public static String getBoilerPlate(List<String> messages, char c, int maxlength)
     {
         int size;
-        StringBuffer buf = new StringBuffer(messages.size() * maxlength);
+        StringBuilder buf = new StringBuilder(messages.size() * maxlength);
         int trimLength = maxlength - (c == ' ' ? 2 : 4);
 
         for (int i = 0; i < messages.size(); i++)
@@ -210,13 +208,13 @@ public final class StringMessageUtils
         {
             return "null";
         }
-        else if (o instanceof Class)
+        else if (o instanceof Class<?>)
         {
-            return ((Class) o).getName();
+            return ((Class<?>) o).getName();
         }
         else if (o instanceof Map)
         {
-            return MapUtils.toString((Map) o, false);
+            return MapUtils.toString((Map<?, ?>) o, false);
         }
         else if (o.getClass().isArray())
         {
@@ -224,7 +222,7 @@ public final class StringMessageUtils
         }
         else if (o instanceof Collection)
         {
-            return CollectionUtils.toString((Collection) o, MAX_ELEMENTS);
+            return CollectionUtils.toString((Collection<?>) o, MAX_ELEMENTS);
         }
         else
         {
@@ -246,7 +244,7 @@ public final class StringMessageUtils
             PropertyScope scope = PropertyScope.ALL_SCOPES[i];
             try
             {
-                Set names = new TreeSet(m.getPropertyNames(scope));
+                Set<Object> names = new TreeSet<Object>(m.getPropertyNames(scope));
                 buf.append("  ").append(scope.getScopeName().toUpperCase()).append(" scoped properties:").append(SystemUtils.LINE_SEPARATOR);
 
                 for (Object name : names)

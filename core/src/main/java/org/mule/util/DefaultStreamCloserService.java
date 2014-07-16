@@ -1,41 +1,43 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util;
 
+import org.mule.api.Closeable;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.util.StreamCloser;
 import org.mule.api.util.StreamCloserService;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
+import java.util.Collection;
 
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 
 /**
  * Closes streams of different types by looking up available {@link StreamCloser}'s
- * from the Mule registry.
+ * from the Mule registry. {@link org.mule.api.util.StreamCloser} instances are only fetched
+ * from the registry the first time the {@link #closeStream(Object)} method is called
+ * with a steam that cannot be closed by {@lnk CoreStreamTypesCloser}. Any other closers
+ * added to the registry after that will be ignored
  */
 public class DefaultStreamCloserService implements StreamCloserService
 {
 
-    private static final Log log = LogFactory.getLog(DefaultStreamCloserService.class);
+    private static final Logger log = LoggerFactory.getLogger(DefaultStreamCloserService.class);
 
     private MuleContext muleContext;
     private StreamCloser coreStreamTypesCloser = new CoreStreamTypesCloser();
+    private Collection<StreamCloser> allStreamClosers = null;
 
     public void closeStream(Object stream)
     {
@@ -47,27 +49,50 @@ public class DefaultStreamCloserService implements StreamCloserService
             }
             else
             {
-                Iterator closers = muleContext.getRegistry().lookupObjects(StreamCloser.class).iterator();
-                while (closers.hasNext())
+                for (StreamCloser closer : getAllStreamClosers())
                 {
-                    StreamCloser closer = (StreamCloser) closers.next();
                     if (closer.canClose(stream.getClass()))
                     {
                         closer.close(stream);
+                        return;
                     }
-                    else
-                    {
-                        log.debug("Unable to find an StreamCloser for the stream type: " + stream.getClass()
-                                  + ", the stream: " + stream + " will not be closed.");
-                    }
+                }
+
+                if (log.isDebugEnabled())
+                {
+                    log.debug(String.format("Unable to find a StreamCloser for the stream type: %s " +
+                                            ", the stream will not be closed.", stream.getClass()));
                 }
             }
         }
         catch (Exception e)
         {
-            log.debug("Exception closing stream: " + stream, e);
+            if (log.isDebugEnabled())
+            {
+                log.debug(String.format("Exception closing stream of class %s", stream.getClass()), e);
+            }
         }
 
+    }
+
+    /**
+     * Lazyly fetches and keeps all the registered {@link org.mule.api.util.StreamCloser}
+     * instances from the registry. Because there're not too many of them, this is
+     * the most efficient option to avoid accessing the registry continuosly.
+     * If we get to a situation in which we have many of them, considering using a
+     * {@link java.util.Map} guarded by a {@link java.util.concurrent.locks.ReadWriteLock}
+     *
+     * @return all {@link org.mule.api.util.StreamCloser} instances in the registry
+     * @throws Exception
+     */
+    private Collection<StreamCloser> getAllStreamClosers() throws Exception
+    {
+        if (allStreamClosers == null)
+        {
+            allStreamClosers = muleContext.getRegistry().lookupObjects(StreamCloser.class);
+        }
+
+        return allStreamClosers;
     }
 
     public void setMuleContext(MuleContext context)
@@ -83,6 +108,7 @@ public class DefaultStreamCloserService implements StreamCloserService
             return InputStream.class.isAssignableFrom(streamType)
                    || InputSource.class.isAssignableFrom(streamType)
                    || StreamSource.class.isAssignableFrom(streamType)
+                   || Closeable.class.isAssignableFrom(streamType)
                    || (SAXSource.class.isAssignableFrom(streamType) && !streamType.getName().endsWith(
                        "StaxSource"));
         }
@@ -97,7 +123,7 @@ public class DefaultStreamCloserService implements StreamCloserService
                 }
                 catch (IOException e)
                 {
-                    // no-op
+                    this.logCloseException(stream, e);
                 }
             }
             else if (stream instanceof InputSource)
@@ -116,6 +142,18 @@ public class DefaultStreamCloserService implements StreamCloserService
                 }
                 catch (IOException e)
                 {
+                    this.logCloseException(stream, e);
+                }
+            }
+            else if (stream instanceof Closeable)
+            {
+                try
+                {
+                    ((Closeable) stream).close();
+                }
+                catch (MuleException e)
+                {
+                    this.logCloseException(stream, e);
                 }
             }
         }
@@ -131,7 +169,16 @@ public class DefaultStreamCloserService implements StreamCloserService
                 payload.getCharacterStream().close();
             }
         }
-        
+
+        private void logCloseException(Object stream, Throwable e)
+        {
+            if (log.isWarnEnabled())
+            {
+                log.warn("Exception was found trying to close resource of class "
+                         + stream.getClass().getCanonicalName(), e);
+            }
+        }
+
     }
 
 }

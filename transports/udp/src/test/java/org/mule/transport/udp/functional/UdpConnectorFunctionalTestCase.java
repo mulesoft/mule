@@ -1,16 +1,16 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.udp.functional;
 
 import static org.junit.Assert.fail;
+
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,9 +19,6 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 public class UdpConnectorFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -31,12 +28,12 @@ public class UdpConnectorFunctionalTestCase extends AbstractServiceAndFlowTestCa
     public static final long MAX_PAUSE_PERIOD = 2000;
     public static final long MIN_PAUSE_PERIOD = 10;
     public static final long BETWEEN_BATCH_PAUSE = 5000;
-    
+
     public UdpConnectorFunctionalTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
     }
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -75,7 +72,7 @@ public class UdpConnectorFunctionalTestCase extends AbstractServiceAndFlowTestCa
                 {
                     // ignore
                 }
-                MuleClient client = new MuleClient(muleContext);
+                MuleClient client = muleContext.getClient();
                 int dropped = 0;
                 while (null != client.request("vm://foo", MAX_PAUSE_PERIOD))
                 {
@@ -106,10 +103,10 @@ public class UdpConnectorFunctionalTestCase extends AbstractServiceAndFlowTestCa
     protected boolean doTestSome(int numberOfMessages, int burst) throws Exception
     {
         logger.info("Trying " + numberOfMessages + " messages in batches of " + burst);
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         int burstCount = 0;
-        Set receivedMessages = new HashSet(numberOfMessages);
+        Set<String> receivedPayloads = new HashSet<String>(numberOfMessages);
         for (int sentPackets = 0; sentPackets < numberOfMessages; sentPackets++)
         {
             burstCount++;
@@ -127,19 +124,18 @@ public class UdpConnectorFunctionalTestCase extends AbstractServiceAndFlowTestCa
                     pause = Math.max(MIN_PAUSE_PERIOD, pause / 2);
                     if (null != message)
                     {
-                        receivedMessages.add(message.getPayloadAsString());
+                        receivedPayloads.add(message.getPayloadAsString());
                     }
                 }
                 burstCount = 0;
             }
         }
 
-        boolean ok = receivedMessages.size() == numberOfMessages;
+        boolean ok = receivedPayloads.size() == numberOfMessages;
         if (!ok)
         {
-            logger.info("Received " + receivedMessages.size() + " messages");
+            logger.info("Received " + receivedPayloads.size() + " messages");
         }
         return ok;
     }
-
 }

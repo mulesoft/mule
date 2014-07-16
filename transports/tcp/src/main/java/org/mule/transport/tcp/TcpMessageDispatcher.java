@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.tcp;
 
 import org.mule.DefaultMuleMessage;
@@ -82,7 +78,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                     Object result = receiveFromSocket(socket, event.getTimeout(), endpoint);
                     if (result == null)
                     {
-                        return new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
+                        return new DefaultMuleMessage(NullPayload.getInstance(), getEndpoint().getMuleContext());
                     }
                     
                     if (result instanceof MuleMessage)
@@ -97,12 +93,12 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                     // we don't necessarily expect to receive a response here
                     logger.info("Socket timed out normally while doing a synchronous receive on endpointUri: "
                         + endpoint.getEndpointURI());
-                    return new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
+                    return new DefaultMuleMessage(NullPayload.getInstance(), getEndpoint().getMuleContext());
                 }
             }
             else
             {
-                return new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
+                return new DefaultMuleMessage(NullPayload.getInstance(), getEndpoint().getMuleContext());
             }
         }
         finally
@@ -157,9 +153,10 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
 
         };
 
-        if (timeout >= 0)
+        int soTimeout = endpoint.getResponseTimeout() != 0 ? endpoint.getResponseTimeout() : timeout;
+        if (soTimeout >= 0)
         {
-            socket.setSoTimeout(timeout);
+            socket.setSoTimeout(soTimeout);
         }
 
         try

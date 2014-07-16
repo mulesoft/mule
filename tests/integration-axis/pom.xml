@@ -6,13 +6,30 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-tests</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <groupId>com.mulesoft.muleesb.tests</groupId>
     <artifactId>mule-tests-integration-axis</artifactId>
     <packaging>jar</packaging>
     <name>Integration Tests for the Axis transport</name>
     <description>Integration Tests for the Axis transport</description>
+
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+        <skipTests>${skipIntegrationTests}</skipTests>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>-Xmx512m -XX:MaxPermSize=128m</argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencies>
         <dependency>
@@ -47,6 +64,11 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-extras</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-client</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

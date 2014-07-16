@@ -1,20 +1,15 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.el;
 
 import static org.junit.Assert.fail;
 
 import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -22,9 +17,8 @@ import org.junit.Test;
 
 public class ExpressionLanguageConcurrencyTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/el/expression-language-concurrency-config.xml";
     }
@@ -46,19 +40,13 @@ public class ExpressionLanguageConcurrencyTestCase extends FunctionalTestCase
                     try
                     {
                         start.await();
-                        // System.out.println("...evaluating thread " + Thread.currentThread().getName() +
-                        // "...");
-                        System.out.println(String.format(">>>>>>>> before thread %s -> %s",
-                            Thread.currentThread().getName(), new Date()));
                         testFlow("slowRequestHandler", getTestEvent("foo"));
-                        System.out.println(String.format("+++++++++ after thread %s -> %s",
-                            Thread.currentThread().getName(), new Date()));
                     }
                     catch (Exception e)
                     {
-                        e.printStackTrace();
+                        // A NullPointerException is thrown when a lookup is performed when a registry is
+                        // added or removed concurrently
                         errors.incrementAndGet();
-                        System.out.println("\n\n incremented error count to " + errors.get());
                     }
                     finally
                     {
@@ -69,8 +57,6 @@ public class ExpressionLanguageConcurrencyTestCase extends FunctionalTestCase
         }
         start.countDown();
         end.await();
-        System.out.println(String.format("end loop -> %s", new Date()));
-        System.out.println("\n\n final error count " + errors.get());
         if (errors.get() > 0)
         {
             fail();

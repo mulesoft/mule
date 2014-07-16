@@ -4,11 +4,15 @@
     <parent>
         <groupId>org.mule.examples</groupId>
         <artifactId>mule-example-loanbroker-parent</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-example-loanbroker-common</artifactId>
     <packaging>jar</packaging>
-    <name>Loan Broker Example: Shared classes</name>
+    <name>Loan Broker Example - Shared classes</name>
+
+    <properties>
+        <licensePath>../../../LICENSE_HEADER.txt</licensePath>
+    </properties>
 
     <dependencies>
         <dependency>

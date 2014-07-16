@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+                   http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+
+    <flow name="inbound-to-outbound-with-xa">
+        <inbound-endpoint ref="inbound"/>
+        <custom-processor class="org.mule.test.integration.transaction.xa.FailureGeneratorMessageProcessor"/>
+        <wire-tap>
+            <outbound-endpoint ref="outbound"/>
+        </wire-tap>
+    </flow>
+
+</mule>
+
+

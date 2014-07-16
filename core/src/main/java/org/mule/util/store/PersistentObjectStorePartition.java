@@ -1,14 +1,13 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.util.store;
 
+import static org.mule.api.store.ObjectStoreManager.UNBOUNDED;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.store.ExpirableObjectStore;
@@ -19,6 +18,7 @@ import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreNotAvaliableException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.util.FileUtils;
 import org.mule.util.SerializationUtils;
 
@@ -43,13 +43,17 @@ import org.apache.commons.collections.bidimap.TreeBidiMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class PersistentObjectStorePartition<T extends Serializable> implements ListableObjectStore<T>, ExpirableObjectStore<T>
+public class PersistentObjectStorePartition<T extends Serializable>
+    implements ListableObjectStore<T>, ExpirableObjectStore<T>
 {
 
     private static final String OBJECT_FILE_EXTENSION = ".obj";
     private static final String PARTITION_DESCRIPTOR_FILE = "partition-descriptor";
     protected final Log logger = LogFactory.getLog(this.getClass());
     private final MuleContext muleContext;
+
+    private boolean loaded = false;
+
 
     private File partitionDirectory;
     private String partitionName;
@@ -62,9 +66,10 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
         this.partitionDirectory = partitionDirectory;
     }
 
-    PersistentObjectStorePartition(MuleContext muleContext, File partitionDirectory) throws ObjectStoreNotAvaliableException
+    PersistentObjectStorePartition(MuleContext muleContext, File partitionDirectory)
+        throws ObjectStoreNotAvaliableException
     {
-        this.muleContext= muleContext;
+        this.muleContext = muleContext;
         this.partitionDirectory = partitionDirectory;
         this.partitionName = readPartitionFileName(partitionDirectory);
     }
@@ -87,7 +92,6 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
     {
         createDirectory(partitionDirectory);
         createOrRetrievePartitionDescriptorFile();
-        loadStoredKeysAndFileNames();
     }
 
     @Override
@@ -98,18 +102,22 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
     @Override
     public List<Serializable> allKeys() throws ObjectStoreException
     {
+        assureLoaded();
         return Collections.unmodifiableList(new ArrayList<Serializable>(realKeyToUUIDIndex.keySet()));
     }
 
     @Override
     public boolean contains(Serializable key) throws ObjectStoreException
     {
+        assureLoaded();
         return realKeyToUUIDIndex.containsKey(key);
     }
 
     @Override
     public void store(Serializable key, T value) throws ObjectStoreException
     {
+        assureLoaded();
+
         if (realKeyToUUIDIndex.containsKey(key))
         {
             throw new ObjectAlreadyExistsException();
@@ -120,11 +128,33 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
     }
 
     @Override
+    public void clear() throws ObjectStoreException
+    {
+        try
+        {
+            FileUtils.cleanDirectory(this.partitionDirectory);
+        }
+        catch (IOException e)
+        {
+            throw new ObjectStoreException(MessageFactory.createStaticMessage("Could not clear ObjectStore"),
+                e);
+        }
+
+        if (realKeyToUUIDIndex != null)
+        {
+            realKeyToUUIDIndex.clear();
+        }
+    }
+
+    @Override
     public T retrieve(Serializable key) throws ObjectStoreException
     {
+        assureLoaded();
+
         if (!realKeyToUUIDIndex.containsKey(key))
         {
-            throw new ObjectDoesNotExistException();
+            String message = "Key does not exist: " + key;
+            throw new ObjectDoesNotExistException(CoreMessages.createStaticMessage(message));
         }
         String filename = (String) realKeyToUUIDIndex.get(key);
         File file = getValueFile(filename);
@@ -134,19 +164,24 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
     @Override
     public T remove(Serializable key) throws ObjectStoreException
     {
+        assureLoaded();
+
         T value = retrieve(key);
         deleteStoreFile(getValueFile((String) realKeyToUUIDIndex.get(key)));
         return value;
     }
 
     @Override
-    public boolean isPersistent() {
+    public boolean isPersistent()
+    {
         return true;
     }
 
     @Override
     public void expire(int entryTTL, int maxEntries) throws ObjectStoreException
     {
+        assureLoaded();
+
         File[] files = listValuesFiles();
         Arrays.sort(files, new Comparator<File>()
         {
@@ -161,6 +196,12 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
             }
         });
         int startIndex = trimToMaxSize(files, maxEntries);
+
+        if (entryTTL == UNBOUNDED)
+        {
+            return;
+        }
+
         final long now = System.currentTimeMillis();
         for (int i = startIndex; i < files.length; i++)
         {
@@ -176,8 +217,27 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
         }
     }
 
-    private void loadStoredKeysAndFileNames() throws ObjectStoreException
+    private void assureLoaded() throws ObjectStoreException
     {
+        if (!loaded)
+        {
+            loadStoredKeysAndFileNames();
+        }
+    }
+
+    private synchronized void loadStoredKeysAndFileNames() throws ObjectStoreException
+    {
+        /*
+        by re-checking this condition here we can avoid contention in
+        {@link #assureLoaded}. The amount of times that this condition
+        should evaluate to {@code true} is really limited, which provides
+        better performance in the long run
+        */
+        if (loaded)
+        {
+            return;
+        }
+
         try
         {
             File[] files = listValuesFiles();
@@ -188,10 +248,13 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
                 StoreValue<T> storeValue = deserialize(file);
                 realKeyToUUIDIndex.put(storeValue.getKey(), file.getName());
             }
+
+            loaded = true;
         }
         catch (Exception e)
         {
-            String message = String.format("Could not restore object store data from %1s", partitionDirectory.getAbsolutePath());
+            String message = String.format("Could not restore object store data from %1s",
+                partitionDirectory.getAbsolutePath());
             throw new ObjectStoreException(CoreMessages.createStaticMessage(message));
         }
     }
@@ -217,12 +280,13 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
     {
         try
         {
-            // To support concurrency we need to check if directory exists again inside
+            // To support concurrency we need to check if directory exists again
+            // inside
             // synchronized method
             if (!directory.exists() && !directory.mkdirs())
             {
                 Message message = CoreMessages.failedToCreate("object store directory "
-                        + directory.getAbsolutePath());
+                                                              + directory.getAbsolutePath());
                 throw new MuleRuntimeException(message);
             }
         }
@@ -260,7 +324,7 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
                 this.partitionName = readPartitionFileName(partitionDirectory);
                 return partitionDescriptorFile;
             }
-            FileWriter fileWriter = new FileWriter(partitionDescriptorFile.getAbsolutePath(),false);
+            FileWriter fileWriter = new FileWriter(partitionDescriptorFile.getAbsolutePath(), false);
             try
             {
                 fileWriter.write(partitionName);
@@ -314,10 +378,11 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
         try
         {
             objectInputStream = new ObjectInputStream(new FileInputStream(file));
-            StoreValue<T> storedValue = (StoreValue<T>) SerializationUtils.deserialize(objectInputStream, muleContext);
+            StoreValue<T> storedValue = (StoreValue<T>) SerializationUtils.deserialize(objectInputStream,
+                muleContext);
             if (storedValue.getValue() instanceof DeserializationPostInitialisable)
             {
-                DeserializationPostInitialisable.Implementation.init(storedValue.getValue(),muleContext);
+                DeserializationPostInitialisable.Implementation.init(storedValue.getValue(), muleContext);
             }
             return storedValue;
         }
@@ -352,7 +417,7 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
             if (!file.delete())
             {
                 Message message = CoreMessages.createStaticMessage("Deleting " + file.getAbsolutePath()
-                        + " failed");
+                                                                   + " failed");
                 throw new ObjectStoreException(message);
             }
             realKeyToUUIDIndex.removeValue(file.getName());
@@ -365,7 +430,7 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
 
     private int trimToMaxSize(File[] files, int maxEntries) throws ObjectStoreException
     {
-        if (maxEntries < 0)
+        if (maxEntries == UNBOUNDED)
         {
             return 0;
         }

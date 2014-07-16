@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.lifecycle.phases;
 
 import org.mule.api.MuleContext;
@@ -25,6 +21,7 @@ import org.mule.api.source.MessageSource;
 import org.mule.api.transport.Connector;
 import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.NotificationLifecycleObject;
+import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.TransactionalQueueManager;
 
 import java.util.LinkedHashSet;
@@ -61,7 +58,7 @@ public class MuleContextStartPhase extends DefaultLifecyclePhase
         super(Startable.PHASE_NAME, Startable.class, Stoppable.PHASE_NAME);
 
         Set<LifecycleObject> startOrderedObjects = new LinkedHashSet<LifecycleObject>();
-        startOrderedObjects.add(new NotificationLifecycleObject(TransactionalQueueManager.class));
+        startOrderedObjects.add(new NotificationLifecycleObject(QueueManager.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Model.class));

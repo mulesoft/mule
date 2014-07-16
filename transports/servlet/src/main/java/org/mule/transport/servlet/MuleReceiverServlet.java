@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.servlet;
 
 import org.mule.api.MessagingException;
@@ -26,7 +22,6 @@ import org.mule.endpoint.MuleEndpointURI;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
-import org.mule.transport.http.HttpMessageReceiver;
 import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.transport.service.TransportFactory;
 import org.mule.transport.servlet.i18n.ServletMessages;
@@ -149,6 +144,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         }
 
         requestMessage.setProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY, path, PropertyScope.INBOUND);
+        requestMessage.setProperty(HttpConnector.HTTP_CONTEXT_URI_PROPERTY, receiver.getEndpointURI().getAddress(), PropertyScope.INBOUND);
 
         // Call this to keep API compatability
         setupRequestMessage(request, requestMessage);
@@ -240,19 +236,24 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
             }
             MessageReceiver receiver = getReceiverForURI(request);
 
-            MuleMessage requestMessage = receiver.createMuleMessage(request);
-            requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, request.getMethod(), PropertyScope.INBOUND);
-
-            setupRequestMessage(request, requestMessage, receiver);
-
-            MuleEvent event = routeMessage(receiver, requestMessage, request);
-            MuleMessage result = event == null ? null : event.getMessage();
-            writeResponse(response, result);
+            processHttpRequest(request, response, receiver);
         }
         catch (Exception e)
         {
             handleException(e, ServletMessages.failedToProcessRequest().getMessage(), response);
         }
+    }
+
+    protected void processHttpRequest(HttpServletRequest request, HttpServletResponse response, MessageReceiver receiver) throws Exception
+    {
+        MuleMessage requestMessage = receiver.createMuleMessage(request);
+        requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, request.getMethod(), PropertyScope.INBOUND);
+
+        setupRequestMessage(request, requestMessage, receiver);
+
+        MuleEvent event = routeMessage(receiver, requestMessage, request);
+        MuleMessage result = event == null ? null : event.getMessage();
+        writeResponse(response, result);
     }
 
     protected MuleEvent routeMessage(MessageReceiver receiver, MuleMessage requestMessage, HttpServletRequest request)
@@ -332,7 +333,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
 
     protected String getRequestUrl(HttpServletRequest httpServletRequest)
     {
-        StringBuffer url = new StringBuffer();
+        StringBuilder url = new StringBuilder();
 
         url.append(httpServletRequest.getScheme());
         url.append("://");
@@ -418,7 +419,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         }
         else if (t instanceof Exception)
         {
-            connector.getMuleContext().getExceptionListener().handleException((Exception) t);
+            muleContext.getExceptionListener().handleException((Exception) t);
         }
 
         super.handleException(t, message, response);

@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -176,7 +173,7 @@ public class ReflectionEntryPointResolver extends AbstractEntryPointResolver
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         sb.append("ReflectionEntryPointResolver");
         sb.append("{ignoredMethods=").append(StringMessageUtils.toString(ignoredMethods));
         sb.append(", acceptVoidMethods=").append(isAcceptVoidMethods());

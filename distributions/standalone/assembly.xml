@@ -11,6 +11,7 @@
             <directory>src/main/resources</directory>
             <outputDirectory></outputDirectory>
             <excludes>
+                <exclude>**/IGNORE</exclude>
                 <exclude>bin/**</exclude>
                 <exclude>lib/boot/exec/**</exclude>
             </excludes>
@@ -224,6 +225,7 @@
                 <include>org.mule.modules:mule-module-builders</include>
                 <include>org.mule.modules:mule-module-client</include>
                 <include>org.mule.modules:mule-module-cxf</include>
+                <include>org.mule.modules:mule-module-db</include>
                 <include>org.mule.modules:mule-module-devkit-support</include>
                 <include>org.mule.modules:mule-module-drools</include>
                 <include>org.mule.modules:mule-module-jaas</include>
@@ -236,17 +238,20 @@
                 <include>org.mule.modules:mule-module-pgp</include>
                 <include>org.mule.modules:mule-module-rss</include>
                 <include>org.mule.modules:mule-module-scripting</include>
+                <include>org.mule.modules:mule-module-schedulers</include>
                 <include>org.mule.modules:mule-module-spring-config</include>
                 <include>org.mule.modules:mule-module-spring-extras</include>
                 <include>org.mule.modules:mule-module-spring-security</include>
                 <include>org.mule.modules:mule-module-sxc</include>
                 <include>org.mule.modules:mule-module-tomcat</include>
+                <include>org.mule.modules:mule-module-ws</include>
                 <include>org.mule.modules:mule-module-xml</include>
                 <include>org.mule.patterns:mule-pattern-core</include>
                 <!-- Tools -->
                 <include>org.mule.tools:mule-tools-anttasks</include>
                 <!-- Shared libs -->
                 <include>org.mule.common:mule-common</include>
+                <include>org.mule.mvel:mule-mvel2</include>
             </includes>
         </dependencySet>
 
@@ -262,6 +267,7 @@
             <excludes>
                 <!-- lib/mule -->
                 <exclude>org.mule.common:mule-common</exclude>
+                <exclude>org.mule.mvel:mule-mvel2</exclude>
                 <exclude>org.mule:mule-core</exclude>
                 <exclude>org.mule.transports:mule-transports-all</exclude>
                 <exclude>org.mule.transports:mule-transport-ajax</exclude>
@@ -292,6 +298,7 @@
                 <exclude>org.mule.modules:mule-module-builders</exclude>
                 <exclude>org.mule.modules:mule-module-client</exclude>
                 <exclude>org.mule.modules:mule-module-cxf</exclude>
+                <exclude>org.mule.modules:mule-module-db</exclude>
                 <exclude>org.mule.modules:mule-module-devkit-support</exclude>
                 <exclude>org.mule.modules:mule-module-drools</exclude>
                 <exclude>org.mule.modules:mule-module-jaas</exclude>
@@ -307,11 +314,13 @@
                 <exclude>org.mule.modules:mule-module-reboot</exclude>
                 <exclude>org.mule.modules:mule-module-rss</exclude>
                 <exclude>org.mule.modules:mule-module-scripting</exclude>
+                <exclude>org.mule.modules:mule-module-schedulers</exclude>
                 <exclude>org.mule.modules:mule-module-spring-config</exclude>
                 <exclude>org.mule.modules:mule-module-spring-extras</exclude>
                 <exclude>org.mule.modules:mule-module-spring-security</exclude>
                 <exclude>org.mule.modules:mule-module-sxc</exclude>
                 <exclude>org.mule.modules:mule-module-tomcat</exclude>
+                <exclude>org.mule.modules:mule-module-ws</exclude>
                 <exclude>org.mule.modules:mule-module-xml</exclude>
                 <exclude>org.mule.patterns:mule-patterns-all</exclude>
                 <exclude>org.mule.patterns:mule-pattern-core</exclude>

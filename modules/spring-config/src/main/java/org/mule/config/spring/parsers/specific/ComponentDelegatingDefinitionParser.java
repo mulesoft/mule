@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
@@ -100,7 +96,7 @@ public class ComponentDelegatingDefinitionParser extends AbstractParallelDelegat
                         if (child instanceof Element
                             && child.getLocalName().endsWith(OBJECT_FACTORY_ELEMENT_CONVENTION_SUFFIX))
                         {
-                            StringBuffer message = new StringBuffer("The child element '");
+                            StringBuilder message = new StringBuilder("The child element '");
                             message.append(child.getLocalName());
                             message.append("' cannot appear with the 'class' attribute");
                             message.append(" in element ");

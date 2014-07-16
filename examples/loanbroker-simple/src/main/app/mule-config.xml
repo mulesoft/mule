@@ -4,15 +4,19 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:context="http://www.springframework.org/schema/context"
       xsi:schemaLocation="
           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
           http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
-          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd " version="EE-3.3.0">
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd" version="EE-3.3.0">
 
     <description>
         This Synchronous variant of loan broker example is modeled on the Enterprise integration Patterns book sample.
         See: http://www.eaipatterns.com/ComposedMessagingExample.html
     </description>
+    
+    <context:property-placeholder location="loanbroker-simple.properties"/>
 
     <flow name="loan-broker-sync" doc:name="loan-broker-sync">
         <description>
@@ -25,8 +29,8 @@
             vi) Returns the response to the client
         </description>
 
-        <http:inbound-endpoint address="http://0.0.0.0:11081" exchange-pattern="request-response" doc:name="HTTP"/>
-
+        <http:inbound-endpoint address="http://0.0.0.0:${loan.broker.sync.port}" exchange-pattern="request-response" doc:name="HTTP"/>
+        
         <http:body-to-parameter-map-transformer doc:name="Body to Parameter Map"/>
 
         <choice doc:name="Choice">
@@ -76,7 +80,7 @@
 
         <processor-chain>
             <cxf:jaxws-client serviceClass="org.mule.example.loanbroker.creditagency.CreditAgencyService" operation="getCreditProfile" doc:name="getCreditProfile"/>
-            <http:outbound-endpoint address="http://localhost:18080/mule/TheCreditAgencyService" doc:name="HTTP"/>
+            <http:outbound-endpoint address="http://localhost:${lookup.customer.credit.profile.port}/mule/TheCreditAgencyService" doc:name="HTTP"/>
         </processor-chain>
 
         <logger level="INFO" message="Credit profile: #[payload]" doc:name="creditProfile"/>
@@ -89,13 +93,13 @@
 
         <choice doc:name="Choice">
             <when expression="payload.getLoanAmount() &gt;= 20000">
-                <expression-component doc:name="Bank1, Bank2">payload=[new java.net.URI('http://localhost:10080/mule/TheBank1'), new java.net.URI('http://localhost:20080/mule/TheBank2')]</expression-component>
+                <expression-component doc:name="Bank1, Bank2">payload=[new java.net.URI('http://localhost:${bank.1.port}/mule/TheBank1'), new java.net.URI('http://localhost:${bank.2.port}/mule/TheBank2')]</expression-component>
             </when>
             <when expression="payload.getLoanAmount() &gt;= 10000 || payload.getLoanAmount() &lt;= 19999">
-                <expression-component doc:name="Bank3, Bank4">payload=[new java.net.URI('http://localhost:30080/mule/TheBank3'), new java.net.URI('http://localhost:40080/mule/TheBank4')]</expression-component>
+                <expression-component doc:name="Bank3, Bank4">payload=[new java.net.URI('http://localhost:${bank.3.port}/mule/TheBank3'), new java.net.URI('http://localhost:${bank.4.port}/mule/TheBank4')]</expression-component>
             </when>
             <otherwise>
-                <expression-component doc:name="Bank5">payload=[new java.net.URI('http://localhost:50080/mule/TheBank5')]</expression-component>
+                <expression-component doc:name="Bank5">payload=[new java.net.URI('http://localhost:${bank.5.port}/mule/TheBank5')]</expression-component>
             </otherwise>
         </choice>
 
@@ -163,7 +167,7 @@
             The credit agency service will get the credit profile for a customer
         </description>
 
-        <http:inbound-endpoint address="http://localhost:18080/mule/TheCreditAgencyService" exchange-pattern="request-response" doc:name="HTTP"/>
+        <http:inbound-endpoint address="http://localhost:${lookup.customer.credit.profile.port}/mule/TheCreditAgencyService" exchange-pattern="request-response" doc:name="HTTP"/>
         <cxf:jaxws-service serviceClass="org.mule.example.loanbroker.creditagency.DefaultCreditAgency" doc:name="SOAP"/>
         <component doc:name="creditAgency">
             <singleton-object class="org.mule.example.loanbroker.creditagency.DefaultCreditAgency"/>
@@ -175,7 +179,7 @@
             Mock flow representing Bank 1
         </description>
 
-        <http:inbound-endpoint address="http://localhost:10080/mule/TheBank1" exchange-pattern="request-response" doc:name="HTTP"/>
+        <http:inbound-endpoint address="http://localhost:${bank.1.port}/mule/TheBank1" exchange-pattern="request-response" doc:name="HTTP"/>
         <cxf:jaxws-service serviceClass="org.mule.example.loanbroker.bank.Bank" doc:name="SOAP"/>
         <component doc:name="Bank 1">
             <singleton-object class="org.mule.example.loanbroker.bank.Bank">
@@ -189,7 +193,7 @@
             Mock flow representing Bank 2
         </description>
 
-        <http:inbound-endpoint address="http://localhost:20080/mule/TheBank2" exchange-pattern="request-response" doc:name="HTTP"/>
+        <http:inbound-endpoint address="http://localhost:${bank.2.port}/mule/TheBank2" exchange-pattern="request-response" doc:name="HTTP"/>
         <cxf:jaxws-service serviceClass="org.mule.example.loanbroker.bank.Bank" doc:name="SOAP"/>
 
         <component doc:name="Bank 2">
@@ -204,7 +208,7 @@
             Mock flow representing Bank 3
         </description>
 
-        <http:inbound-endpoint address="http://localhost:30080/mule/TheBank3" exchange-pattern="request-response" doc:name="HTTP"/>
+        <http:inbound-endpoint address="http://localhost:${bank.3.port}/mule/TheBank3" exchange-pattern="request-response" doc:name="HTTP"/>
         <cxf:jaxws-service serviceClass="org.mule.example.loanbroker.bank.Bank" doc:name="SOAP"/>
         <component doc:name="Bank 3">
             <singleton-object class="org.mule.example.loanbroker.bank.Bank">
@@ -218,7 +222,7 @@
             Mock flow representing Bank 4
         </description>
 
-        <http:inbound-endpoint address="http://localhost:40080/mule/TheBank4" exchange-pattern="request-response" doc:name="HTTP"/>
+        <http:inbound-endpoint address="http://localhost:${bank.4.port}/mule/TheBank4" exchange-pattern="request-response" doc:name="HTTP"/>
         <cxf:jaxws-service serviceClass="org.mule.example.loanbroker.bank.Bank" doc:name="SOAP"/>
         <component doc:name="Bank 4">
             <singleton-object class="org.mule.example.loanbroker.bank.Bank">
@@ -232,7 +236,7 @@
             Mock flow representing Bank 5
         </description>
 
-        <http:inbound-endpoint address="http://localhost:50080/mule/TheBank5" exchange-pattern="request-response" doc:name="HTTP"/>
+        <http:inbound-endpoint address="http://localhost:${bank.5.port}/mule/TheBank5" exchange-pattern="request-response" doc:name="HTTP"/>
         <cxf:jaxws-service serviceClass="org.mule.example.loanbroker.bank.Bank" doc:name="SOAP"/>
         <component doc:name="Bank 5">
             <singleton-object class="org.mule.example.loanbroker.bank.Bank">

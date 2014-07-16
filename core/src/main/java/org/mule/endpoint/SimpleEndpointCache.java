@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.endpoint;
 
 import org.mule.MessageExchangePattern;
@@ -17,6 +13,7 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointCache;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.exception.DefaultMessagingExceptionStrategy;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -29,20 +26,21 @@ import java.util.concurrent.ConcurrentMap;
 public class SimpleEndpointCache implements EndpointCache
 {
     protected MuleContext muleContext;
-    private ConcurrentMap inboundEndpointCache = new ConcurrentHashMap();
-    private ConcurrentMap outboundEndpointCache = new ConcurrentHashMap();
+    private ConcurrentMap<String, InboundEndpoint> inboundEndpointCache = new ConcurrentHashMap<String, InboundEndpoint>();
+    private ConcurrentMap<String, OutboundEndpoint> outboundEndpointCache = new ConcurrentHashMap<String, OutboundEndpoint>();
 
     public SimpleEndpointCache(MuleContext muleContext)
     {
         this.muleContext = muleContext;
     }
 
+    @Override
     public OutboundEndpoint getOutboundEndpoint(String uri,
-                                                   MessageExchangePattern mep,
-                                                   Long responseTimeout) throws MuleException
+                                                MessageExchangePattern mep,
+                                                Long responseTimeout) throws MuleException
     {
-        OutboundEndpoint endpoint = (OutboundEndpoint) outboundEndpointCache.get(uri + ":" + mep.toString()
-                                                                                 + ":" + responseTimeout);
+        String key = uri + ":" + mep.toString() + ":" + responseTimeout;
+        OutboundEndpoint endpoint = outboundEndpointCache.get(key);
         if (endpoint == null)
         {
             EndpointBuilder endpointBuilder = muleContext.getEndpointFactory()
@@ -53,8 +51,8 @@ public class SimpleEndpointCache implements EndpointCache
                 endpointBuilder.setResponseTimeout(responseTimeout.intValue());
             }
             endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
-            OutboundEndpoint concurrentlyAddedEndpoint = (OutboundEndpoint) outboundEndpointCache.putIfAbsent(
-                uri + ":" + mep.toString() + ":" + responseTimeout, endpoint);
+            endpoint = muleContext.getOutboundEndpointExecutorFactory().getOutboundEndpointExecutor(endpoint, new DefaultMessagingExceptionStrategy(muleContext));
+            OutboundEndpoint concurrentlyAddedEndpoint = outboundEndpointCache.putIfAbsent(key, endpoint);
             if (concurrentlyAddedEndpoint != null)
             {
                 return concurrentlyAddedEndpoint;
@@ -63,17 +61,18 @@ public class SimpleEndpointCache implements EndpointCache
         return endpoint;
     }
 
+    @Override
     public InboundEndpoint getInboundEndpoint(String uri, MessageExchangePattern mep) throws MuleException
     {
-        InboundEndpoint endpoint = (InboundEndpoint) inboundEndpointCache.get(uri + ":" + mep.toString());
+        String key = uri + ":" + mep.toString();
+        InboundEndpoint endpoint = inboundEndpointCache.get(key);
         if (endpoint == null)
         {
             EndpointBuilder endpointBuilder = muleContext.getEndpointFactory()
                 .getEndpointBuilder(uri);
             endpointBuilder.setExchangePattern(mep);
             endpoint = muleContext.getEndpointFactory().getInboundEndpoint(endpointBuilder);
-            InboundEndpoint concurrentlyAddedEndpoint = (InboundEndpoint) inboundEndpointCache.putIfAbsent(
-                uri + ":" + mep.toString(), endpoint);
+            InboundEndpoint concurrentlyAddedEndpoint = inboundEndpointCache.putIfAbsent(key, endpoint);
             if (concurrentlyAddedEndpoint != null)
             {
                 return concurrentlyAddedEndpoint;

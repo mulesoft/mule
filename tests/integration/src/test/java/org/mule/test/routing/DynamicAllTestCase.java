@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -17,81 +14,67 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.construct.Flow;
-import org.mule.tck.junit4.FunctionalTestCase;
 
-import org.junit.Before;
 import org.junit.Test;
 
-public class DynamicAllTestCase extends FunctionalTestCase
+public class DynamicAllTestCase extends DynamicRouterTestCase
 {
+    private static final String DYNAMIC_ALL = "dynamicAll";
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/routing/dynamic-all-config.xml";
     }
 
-    @Before
-    public void clearRoutes()
+    @Override
+    public String getFlowName()
     {
-        CustomRouteResolver.routes.clear();
-    }
-
-    @Test(expected = MessagingException.class)
-    public void noRoutes() throws Exception
-    {
-        Flow flow = getTestFlow();
-        flow.process(getTestEvent("message"));
+        return "dynamicAll";
     }
 
     @Test
     public void withRoutes() throws Exception
     {
-        CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor("a"));
-        CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor("b"));
-        runFlowAndAssertResponse(getTestFlow(),"a","b");
+        CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_A));
+        CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_B));
+        runFlowAndAssertResponse(getTestFlow(DYNAMIC_ALL), LETTER_A, LETTER_B);
     }
 
     @Test(expected = MessagingException.class)
     public void worksWithFirstFailingRouteAndSecondGood() throws Exception
     {
         CustomRouteResolver.routes.add(new CustomRouteResolver.FailingMessageProcessor());
-        CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor("b"));
-        runFlowAndAssertResponse(getTestFlow(),"doesnotmatter");
+        CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_B));
+        runFlowAndAssertResponse(getTestFlow(DYNAMIC_ALL), DOES_NOT_MATTER);
     }
 
     @Test(expected = MessagingException.class)
     public void worksWithFirstRouteGoodAndSecondFails() throws Exception
     {
         CustomRouteResolver.routes.add(new CustomRouteResolver.FailingMessageProcessor());
-        CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor("b"));
-        runFlowAndAssertResponse(getTestFlow(),"doesnotmatter");
+        CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_B));
+        runFlowAndAssertResponse(getTestFlow(DYNAMIC_ALL), DOES_NOT_MATTER);
     }
 
     @Test
     public void oneRoute() throws Exception
     {
-        CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor("a"));
-        MuleEvent result = getTestFlow().process(getTestEvent(""));
-        assertThat(result.getMessage().getPayloadAsString(), is("a"));
+        CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_A));
+        MuleEvent result = getTestFlow(DYNAMIC_ALL).process(getTestEvent(TEST_MESSAGE));
+        assertThat(result.getMessage().getPayloadAsString(), is(LETTER_A));
     }
 
     @Test
     public void oneRouteWithCustomResultAggregator() throws Exception
     {
-        CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor("a"));
-        runFlowAndAssertResponse((Flow) getFlowConstruct("dynamicAllResultAggregator"),getTestEvent(""),"a");
-    }
-
-
-    private Flow getTestFlow() throws Exception
-    {
-        return (Flow) getFlowConstruct("dynamicAll");
+        CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_A));
+        runFlowAndAssertResponse((Flow) getFlowConstruct("dynamicAllResultAggregator"), getTestEvent(TEST_MESSAGE), LETTER_A);
     }
 
     private MuleEvent runFlowAndAssertResponse(Flow flow, String... letters) throws Exception
     {
-        return runFlowAndAssertResponse(flow, getTestEvent(""), letters);
+        return runFlowAndAssertResponse(flow, getTestEvent(TEST_MESSAGE), letters);
     }
 
     private MuleEvent runFlowAndAssertResponse(Flow flow, MuleEvent event, String... letters) throws Exception

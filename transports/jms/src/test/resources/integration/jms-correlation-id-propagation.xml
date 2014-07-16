@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <endpoint name="in" address="${inbound.destination}" exchange-pattern="one-way" connector-ref="jmsConnector" />
+    <endpoint name="out" address="${outbound.destination}" exchange-pattern="one-way" connector-ref="jmsConnector"/>
+
+    <flow name="sendToQueueIn">
+        <vm:inbound-endpoint path="in" exchange-pattern="one-way" />
+        <outbound-endpoint ref="in" />
+    </flow>
+
+    <flow name="passFromQueueInToQueueOut">
+        <inbound-endpoint ref="in" />
+        <outbound-endpoint ref="out" />
+    </flow>
+
+    <flow name="consumeFromQueueOut">
+        <inbound-endpoint ref="out" />
+        <vm:outbound-endpoint path="out" exchange-pattern="one-way" />
+    </flow>
+
+</mule>

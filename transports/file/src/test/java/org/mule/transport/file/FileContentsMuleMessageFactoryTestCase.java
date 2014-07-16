@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.file;
 
 import org.mule.api.MuleMessage;
@@ -43,7 +39,7 @@ public class FileContentsMuleMessageFactoryTestCase extends AbstractFileMuleMess
     @Override
     protected MuleMessageFactory doCreateMuleMessageFactory()
     {
-        return new FileContentsMuleMessageFactory(muleContext);
+        return new FileContentsMuleMessageFactory();
     }
 
     @Override
@@ -52,7 +48,7 @@ public class FileContentsMuleMessageFactoryTestCase extends AbstractFileMuleMess
         MuleMessageFactory factory = createMuleMessageFactory();
         
         Object payload = getValidTransportMessage();
-        MuleMessage message = factory.create(payload, encoding);
+        MuleMessage message = factory.create(payload, encoding, muleContext);
         assertNotNull(message);
         assertPayload(message);
     }
@@ -66,7 +62,7 @@ public class FileContentsMuleMessageFactoryTestCase extends AbstractFileMuleMess
         try
         {
             stream = new ReceiverFileInputStream(tempFile, false, null);
-            MuleMessage message = factory.create(stream, encoding);
+            MuleMessage message = factory.create(stream, encoding, muleContext);
             assertNotNull(message);
             
             // delete the file before accessing the payload to make sure it was properly converted

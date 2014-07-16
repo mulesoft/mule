@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jetty="http://www.mulesoft.org/schema/mule/jetty"
+      xsi:schemaLocation="
+      http://www.mulesoft.org/schema/mule/jetty http://www.mulesoft.org/schema/mule/jetty/current/mule-jetty.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <jetty:connector name="jettyConnector">
+        <jetty:webapps directory="${baseDir}/target/webapps" host="localhost" port="${port1}"/>
+    </jetty:connector>
+
+    <flow name="contextA">
+        <jetty:inbound-endpoint address="http://localhost:${port2}/contextA" exchange-pattern="request-response"/>
+        <echo-component/>
+    </flow>
+
+    <flow name="contextB">
+        <jetty:inbound-endpoint address="http://localhost:${port3}/contextB" exchange-pattern="request-response"/>
+        <echo-component/>
+    </flow>
+
+</mule>

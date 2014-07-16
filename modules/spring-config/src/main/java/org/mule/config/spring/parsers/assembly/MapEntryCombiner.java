@@ -1,15 +1,12 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.config.spring.parsers.assembly;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +22,7 @@ import java.util.Set;
  * {@link org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration#isCollection(String)}
  * so that several entries can be combined.
  */
-public class MapEntryCombiner implements Map
+public class MapEntryCombiner implements Map, Serializable
 {
 
     public static final String KEY = "key";

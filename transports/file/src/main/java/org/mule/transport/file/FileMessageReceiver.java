@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.file;
 
 import org.mule.DefaultMuleMessage;
@@ -19,6 +15,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.store.ObjectAlreadyExistsException;
@@ -27,8 +25,6 @@ import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.PropertyScope;
-import org.mule.api.execution.ExecutionCallback;
-import org.mule.api.execution.ExecutionTemplate;
 import org.mule.construct.Flow;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.transport.AbstractPollingMessageReceiver;
@@ -138,14 +134,14 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     @Override
     protected void doInitialise() throws InitialisationException
     {
-        this.lockFactory = getConnector().getMuleContext().getLockFactory();
+        this.lockFactory = getEndpoint().getMuleContext().getLockFactory();
         boolean synchronousProcessing = false;
         if (getFlowConstruct() instanceof Flow)
         {
             synchronousProcessing = ((Flow)getFlowConstruct()).getProcessingStrategy() instanceof SynchronousProcessingStrategy;
         }
         this.poolOnPrimaryInstanceOnly = Boolean.valueOf(System.getProperty(MULE_TRANSPORT_FILE_SINGLEPOLLINSTANCE,"false")) || !synchronousProcessing;
-        ObjectStoreManager objectStoreManager = getConnector().getMuleContext().getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER);
+        ObjectStoreManager objectStoreManager = getEndpoint().getMuleContext().getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER);
         filesBeingProcessingObjectStore = objectStoreManager.getObjectStore(getEndpoint().getName(),false,1000,60000,20000);
     }
 
@@ -220,16 +216,17 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                             try
                             {
                                 filesBeingProcessingObjectStore.store(fileAbsolutePath, fileAbsolutePath);
+
                                 if (logger.isDebugEnabled())
                                 {
-                                    logger.debug(String.format("Flag for $ stored successfully.", fileAbsolutePath));
+                                    logger.debug(String.format("Flag for '%s' stored successfully.", fileAbsolutePath));
                                 }
                             }
                             catch (ObjectAlreadyExistsException e)
                             {
                                 if (logger.isDebugEnabled())
                                 {
-                                    logger.debug(String.format("Flag for %s being processed is on. Skipping file.", fileAbsolutePath));
+                                    logger.debug(String.format("Flag for '%s' being processed is on. Skipping file.", fileAbsolutePath));
                                 }
                                 continue;
                             }
@@ -248,7 +245,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
         catch (Exception e)
         {
-            getConnector().getMuleContext().getExceptionListener().handleException(e);
+            getEndpoint().getMuleContext().getExceptionListener().handleException(e);
         }
     }
 
@@ -263,21 +260,11 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         //TODO RM*: This can be put in a Filter. Also we can add an AndFileFilter/OrFileFilter to allow users to
         //combine file filters (since we can only pass a single filter to File.listFiles, we would need to wrap
         //the current And/Or filters to extend {@link FilenameFilter}
-        boolean checkFileAge = fileConnector.getCheckFileAge();
-        if (checkFileAge)
+        if (fileConnector.getCheckFileAge() && !isAgedFile(file, fileConnector.getFileAge()))
         {
-            long fileAge = fileConnector.getFileAge();
-            long lastMod = file.lastModified();
-            long now = System.currentTimeMillis();
-            long thisFileAge = now - lastMod;
-            if (thisFileAge < fileAge)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("The file has not aged enough yet, will return nothing for: " + file);
-                }
-                return;
-            }
+            removeProcessingMark(file.getAbsolutePath());
+
+            return;
         }
 
         // Perform some quick checks to make sure file can be processed
@@ -296,20 +283,21 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             logger.info("Lock obtained on file: " + file.getAbsolutePath());
         }
 
+        // The file may get moved/renamed here so store the original file info.
+        final String originalSourceFilePath = file.getAbsolutePath();
+        final String originalSourceFileName = file.getName();
+        final String originalSourceDirectory = file.getParent();
+
         // This isn't nice but is needed as MuleMessage is required to resolve
         // destination file name
-        DefaultMuleMessage fileParserMessasge = new DefaultMuleMessage(null, connector.getMuleContext());
-        fileParserMessasge.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
+        DefaultMuleMessage fileParserMessasge = new DefaultMuleMessage(null, getEndpoint().getMuleContext());
+        fileParserMessasge.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
+        fileParserMessasge.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory);
 
-        // The file may get moved/renamed here so store the original file info.
-        final String originalSourceFile = file.getAbsolutePath();
-        final String originalSourceFileName = file.getName();
         final File sourceFile;
         if (workDir != null)
         {
-            String workFileName = file.getName();
-
-            workFileName = fileConnector.getFilenameParser().getFilename(fileParserMessasge, workFileNamePattern);
+            String workFileName = fileConnector.getFilenameParser().getFilename(fileParserMessasge, workFileNamePattern);
             // don't use new File() directly, see MULE-1112
             File workFile = FileUtils.newFile(workDir, workFileName);
 
@@ -329,8 +317,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             String destinationFileName = originalSourceFileName;
             if (moveToPattern != null)
             {
-                destinationFileName = fileConnector.getFilenameParser().getFilename(fileParserMessasge,
-                    moveToPattern);
+                destinationFileName = fileConnector.getFilenameParser().getFilename(fileParserMessasge, moveToPattern);
             }
             // don't use new File() directly, see MULE-1112
             destinationFile = FileUtils.newFile(moveDir, destinationFileName);
@@ -347,18 +334,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                     @Override
                     public void fileClose(File file)
                     {
-                        try
-                        {
-                            if (logger.isDebugEnabled())
-                            {
-                                logger.debug(String.format("Removing processing flag for $ ", file.getAbsolutePath()));
-                            }
-                            filesBeingProcessingObjectStore.remove(file.getAbsolutePath());
-                        }
-                        catch (ObjectStoreException e)
-                        {
-                            logger.warn("Failure trying to remove file " + originalSourceFile + " from list of files under processing");
-                        }
+                        removeProcessingMark(file.getAbsolutePath());
                     }
                 });
                 message = createMuleMessage(payload, encoding);
@@ -381,7 +357,12 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             message.setProperty(FileConnector.PROPERTY_SOURCE_FILENAME, file.getName(), PropertyScope.INBOUND);
         }
 
-        message.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
+        message.setProperty(FileConnector.PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory, PropertyScope.INBOUND);
+        message.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalSourceFileName, PropertyScope.INBOUND);
+
+        message.setInvocationProperty(FileConnector.PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory);
+        message.setInvocationProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
+
         if (forceSync)
         {
             message.setProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY, Boolean.TRUE, PropertyScope.INBOUND);
@@ -398,11 +379,54 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
         else
         {
-            processWithoutStreaming(originalSourceFile, originalSourceFileName, sourceFile, destinationFile, executionTemplate, finalMessage);
+            processWithoutStreaming(originalSourceFilePath, originalSourceFileName, originalSourceDirectory, sourceFile, destinationFile, executionTemplate, finalMessage);
         }
     }
 
-    private void processWithoutStreaming(String originalSourceFile, final String originalSourceFileName, final File sourceFile,final File destinationFile, ExecutionTemplate<MuleEvent> executionTemplate, final MuleMessage finalMessage) throws DefaultMuleException
+    /**
+     * Indicates whether or not file is older than the specified age
+     *
+     * @param file    file to check
+     * @param fileAge target file age in milliseconds
+     * @return true if the file is older than the fileAge, false otherwise
+     */
+    protected boolean isAgedFile(File file, long fileAge)
+    {
+        final long lastMod = file.lastModified();
+        final long now = System.currentTimeMillis();
+        final long thisFileAge = now - lastMod;
+
+        if (thisFileAge < fileAge)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("The file has not aged enough yet, will return nothing for: " + file);
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private void removeProcessingMark(String fileAbsolutePath)
+    {
+        try
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(String.format("Removing processing flag for '%s'", fileAbsolutePath));
+            }
+
+            filesBeingProcessingObjectStore.remove(fileAbsolutePath);
+        }
+        catch (ObjectStoreException e)
+        {
+            logger.warn(String.format("Failure trying to remove file '%s' from list of files under processing", fileAbsolutePath));
+        }
+    }
+
+    private void processWithoutStreaming(String originalSourceFile, final String originalSourceFileName, final String originalSourceDirectory, final File sourceFile,final File destinationFile, ExecutionTemplate<MuleEvent> executionTemplate, final MuleMessage finalMessage) throws DefaultMuleException
     {
         try
         {
@@ -411,7 +435,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                 @Override
                 public MuleEvent process() throws Exception
                 {
-                    moveAndDelete(sourceFile, destinationFile, originalSourceFileName, finalMessage);
+                    moveAndDelete(sourceFile, destinationFile, originalSourceFileName, originalSourceDirectory, finalMessage);
                     return null;
                 }
             });
@@ -431,22 +455,11 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         catch (Exception e)
         {
             rollbackFileMoveIfRequired(originalSourceFile, sourceFile);
-            connector.getMuleContext().getExceptionListener().handleException(e);
+            getEndpoint().getMuleContext().getExceptionListener().handleException(e);
         }
         finally
         {
-            try
-            {
-                filesBeingProcessingObjectStore.remove(originalSourceFile);
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug(String.format("Removing processing flag for $ ", originalSourceFile));
-                }
-            }
-            catch (ObjectStoreException e)
-            {
-                logger.warn("Failure trying to remove file " + originalSourceFile + " from list of files under processing");
-            }
+            removeProcessingMark(originalSourceFile);
         }
     }
 
@@ -502,7 +515,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
         catch (Exception e)
         {
-            connector.getMuleContext().getExceptionListener().handleException(e);
+            getEndpoint().getMuleContext().getExceptionListener().handleException(e);
         }
     }
 
@@ -535,7 +548,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     }
 
     private void moveAndDelete(final File sourceFile, File destinationFile,
-        String sourceFileOriginalName, MuleMessage message) throws MuleException
+                               String originalSourceFileName, String originalSourceDirectory, MuleMessage message) throws MuleException
     {
         // If we are moving the file to a read directory, move it there now and
         // hand over a reference to the
@@ -551,13 +564,14 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             {
                 // move didn't work - bail out (will attempt rollback)
                 throw new DefaultMuleException(FileMessages.failedToMoveFile(
-                    sourceFile.getAbsolutePath(), destinationFile.getAbsolutePath()));
+                        sourceFile.getAbsolutePath(), destinationFile.getAbsolutePath()));
             }
 
             // create new Message for destinationFile
             message = createMuleMessage(destinationFile, endpoint.getEncoding());
-            message.setOutboundProperty(FileConnector.PROPERTY_FILENAME, destinationFile.getName());
-            message.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
+            message.setProperty(FileConnector.PROPERTY_FILENAME, destinationFile.getName(), PropertyScope.INBOUND);
+            message.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalSourceFileName, PropertyScope.INBOUND);
+            message.setProperty(FileConnector.PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory, PropertyScope.INBOUND);
         }
 
         // finally deliver the file message
@@ -674,15 +688,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
     protected void basicListFiles(File currentDirectory, List<File> discoveredFiles)
     {
-        File[] files;
-        if (fileFilter != null)
-        {
-            files = currentDirectory.listFiles(fileFilter);
-        }
-        else
-        {
-            files = currentDirectory.listFiles(filenameFilter);
-        }
+        File[] files = currentDirectory.listFiles();
 
         // the listFiles calls above may actually return null (check the JDK code).
         if (files == null)
@@ -692,15 +698,26 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
         for (File file : files)
         {
-            if (!file.isDirectory())
+            if (file.isDirectory())
             {
-                discoveredFiles.add(file);
+                basicListFiles(file, discoveredFiles);
             }
             else
             {
-                if (fileConnector.isRecursive())
+                boolean addFile = true;
+
+                if (fileFilter != null)
                 {
-                    this.basicListFiles(file, discoveredFiles);
+                    addFile = fileFilter.accept(file);
+                }
+                else if (filenameFilter != null)
+                {
+                    addFile = filenameFilter.accept(currentDirectory, file.getName());
+                }
+
+                if (addFile)
+                {
+                    discoveredFiles.add(file);
                 }
             }
         }

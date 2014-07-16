@@ -1,19 +1,18 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.integration.transport.cxf;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.endpoint.AbstractEndpointBuilder;
-import org.mule.module.client.MuleClient;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.config.FlowConfiguringMessageProcessor;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -24,14 +23,10 @@ import java.util.Map;
 import org.apache.cxf.endpoint.Client;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class CxfClientPassivateTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/transport/cxf/cxf-memoryleak-config.xml";
     }
@@ -46,7 +41,7 @@ public class CxfClientPassivateTestCase extends FunctionalTestCase
     @Test
     public void testPassivateCleansClientRequestAndResponseContext() throws Exception
     {
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient muleClient = muleContext.getClient();
 
         // Sends data to process
         muleClient.send("vm://in", TEST_MESSAGE, null);
@@ -69,9 +64,8 @@ public class CxfClientPassivateTestCase extends FunctionalTestCase
     private CxfOutboundMessageProcessor getOutboundMessageProcessor()
     {
         AbstractEndpointBuilder epbuilder = (AbstractEndpointBuilder) muleContext.getRegistry().lookupEndpointBuilder("clientEndpoint");
-        
+
         List<MessageProcessor> mps = epbuilder.getMessageProcessors();
         return (CxfOutboundMessageProcessor) ((FlowConfiguringMessageProcessor)mps.get(0)).getWrappedMessageProcessor();
     }
-
 }

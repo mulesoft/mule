@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transformer.compression;
 
 import org.mule.api.transformer.DataType;
@@ -52,9 +48,20 @@ public class GZipUncompressTransformer extends AbstractCompressionTransformer
                 DataType<?> returnDataType = getReturnDataType();
 
                 // If a return type has been specified, then deserialize the uncompressed byte array.
-                if (!DataTypeFactory.OBJECT.equals(returnDataType) && !DataTypeFactory.BYTE_ARRAY.equals(returnDataType))
+                if (DataTypeFactory.STRING.equals(returnDataType))
                 {
-                    return SerializationUtils.deserialize(buffer, muleContext);
+                    return new String(buffer, outputEncoding);
+                }
+                else if (!DataTypeFactory.OBJECT.equals(returnDataType) && !DataTypeFactory.BYTE_ARRAY.equals(returnDataType))
+                {
+                    try
+                    {
+                        return SerializationUtils.deserialize(buffer, muleContext);
+                    }
+                    catch (SerializationException e)
+                    {
+                        throw new TransformerException(this, e);
+                    }
                 }
                 else
                 {

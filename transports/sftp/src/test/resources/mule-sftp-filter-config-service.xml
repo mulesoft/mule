@@ -37,7 +37,7 @@
                     <sftp:outbound-endpoint
                         connector-ref="sftp" name="outboundEndpoint"
                         address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/data2"
-                        outputPattern="#[header:originalFilename]" />
+                        outputPattern="#[header:inbound:originalFilename]" />
                 </pass-through-router>
             </outbound>
         </service>

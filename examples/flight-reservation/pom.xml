@@ -4,12 +4,16 @@
     <parent>
         <groupId>org.mule.examples</groupId>
         <artifactId>mule-examples</artifactId>
-    <version>3.5.0-M1-SNAPSHOT</version>
+    <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-example-flight-reservation</artifactId>
     <packaging>mule</packaging>
     <name>Flight Reservation Example</name>
     <description>This example simulates a flight reservation system using some of the new features added in Mule 3.3.</description>
+
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
 
     <dependencies>
         <dependency>

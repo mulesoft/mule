@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -38,6 +35,7 @@ public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
     @Override
     public void init()
     {
+        logger.warn(getDeprecationWarning());
         registerStandardTransportEndpoints(JdbcConnector.JDBC, ADDRESS_ATTRIBUTES).addAlias(QUERY_KEY, URIBuilder.PATH);
         registerConnectorDefinitionParser(JdbcConnector.class, JdbcConnector.JDBC);
         registerBeanDefinitionParser("dataSource", new ObjectFactoryWrapper("dataSourceFactory"));
@@ -50,6 +48,11 @@ public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("transaction", new TransactionDefinitionParser(JdbcTransactionFactory.class));
         registerBeanDefinitionParser("object-store", new ChildDefinitionParser("store", JdbcObjectStore.class));
         registerDataSourceDefinitionParsers();
+    }
+
+    protected String getDeprecationWarning()
+    {
+        return "JDBC transport is deprecated and will be removed in Mule 4.0. Use the DB module instead";
     }
 
     protected void registerDataSourceDefinitionParsers()

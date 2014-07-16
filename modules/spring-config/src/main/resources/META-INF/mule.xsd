@@ -123,11 +123,14 @@
             <xsd:element ref="configuration"/>
             <xsd:element ref="notifications"/>
             <xsd:element ref="abstract-extension"/>
+            <xsd:element ref="abstract-shared-extension"/>
             <xsd:element ref="abstract-mixed-content-extension"/>
             <xsd:element ref="abstract-agent"/>
             <xsd:element ref="abstract-security-manager"/>
             <xsd:element ref="abstract-transaction-manager"/>
+            <xsd:element ref="abstract-shared-transaction-manager"/>
             <xsd:element ref="abstract-connector"/>
+            <xsd:element ref="abstract-shared-connector"/>
             <xsd:element ref="abstract-global-endpoint"/>
             <xsd:element ref="abstract-exception-strategy"/>
             <xsd:element ref="abstract-flow-construct" />
@@ -176,6 +179,13 @@
                 </xsd:annotation>
             </xsd:element>
 
+    <xsd:element name="abstract-shared-extension" abstract="true" type="abstractExtensionType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for arbitrary extensions as children of the 'mule' element or 'mule-domain'. Other transports and modules can extend this if they need to add global elements to the configuration (but consider the more specific elements like abstract-connector first).
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:element name="abstract-extension" abstract="true" type="abstractExtensionType">
         <xsd:annotation>
             <xsd:documentation>
@@ -211,7 +221,14 @@
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
-    
+
+    <xsd:element name="abstract-shared-connector" abstract="true" type="abstractConnectorType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for connector elements. Connector elements allow properties to be configured across all endpoints that use the same transport. If multiple connectors are defined for the same transport, each endpoint must name which connector is being used.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:element name="abstract-connector" abstract="true" type="abstractConnectorType">
         <xsd:annotation>
             <xsd:documentation>
@@ -344,6 +361,7 @@
     <xsd:element name="simple-in-memory-queue-store" type="defaultQueueStoreType" substitutionGroup="abstract-queue-store">
         <xsd:annotation>
             <xsd:documentation>
+                DEPRECATED: simple-in-memory-queue-store is deprecated since Mule 3.5 and will be removed in Mule 4.0. Use default-in-memory-queue-store instead.
                 A simple in-memeory queue store.
             </xsd:documentation>
         </xsd:annotation>
@@ -352,6 +370,7 @@
     <xsd:element name="file-queue-store" type="defaultQueueStoreType" substitutionGroup="abstract-queue-store">
         <xsd:annotation>
             <xsd:documentation>
+                DEPRECATED: file-queue-store is deprecated since Mule 3.5 and will be removed in Mule 4.0. Use default-persistent-queue-store instead.
                 A simple file-based queue store.
             </xsd:documentation>
         </xsd:annotation>
@@ -808,6 +827,80 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="abstract-poll-override" abstract="true" type="abstractPollOverrideType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for poll overrides
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractPollOverrideType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
+    <xsd:element name="watermark" type="watermarkType" substitutionGroup="abstract-poll-override">
+        <xsd:annotation>
+            <xsd:documentation>
+                Defines watermark based synchronization parameters
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="watermarkType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractPollOverrideType">
+                <xsd:attribute name="variable" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The key that is going to be used to store/retrieve the watermark
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="default-expression" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The default value to be used for the watermark
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="update-expression" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The expression to be used to update the watermark
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="selector" use="optional">
+                	<xsd:simpleType>
+						<xsd:restriction base="substitutableName">
+							<xsd:enumeration value="MIN"/>
+							<xsd:enumeration value="MAX"/>
+							<xsd:enumeration value="FIRST"/>
+							<xsd:enumeration value="LAST"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+                </xsd:attribute>
+                <xsd:attribute name="selector-expression" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The expression to retrieve the values the selector will evaluate
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="object-store-ref" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The object store where the watermark is going to be stored
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
     <xsd:element name="logger" type="loggerType" substitutionGroup="abstract-observer-message-processor">
         <xsd:annotation>
     <xsd:documentation>
@@ -1136,6 +1229,13 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
+    <xsd:element name="abstract-shared-transaction-manager" abstract="true" type="abstractTransactionManagerType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for transaction manager elements that can be defined as shared resource, which are used to coordinate transactions.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="abstractTransactionManagerType">
         <xsd:complexContent>
             <xsd:extension base="annotatedType"/>
@@ -1214,6 +1314,13 @@
                             </xsd:complexContent>
                         </xsd:complexType>
                     </xsd:element>
+                    <xsd:element ref="abstract-configuration-extension" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Mule application configuration extensions. Extensions can be defined as child of the configuration elements and then accessed by each module that defines it.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="defaultResponseTimeout" type="xsd:string" default="10000">
                     <xsd:annotation>
@@ -1265,6 +1372,19 @@
                     </xsd:annotation>
                 </xsd:attribute>
             </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-configuration-extension" abstract="true" type="abstractConfigurationExtensionType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for arbitrary extensions as children of the 'configuration' element. Other transports and modules can extend this if they need to add elements to the configuration.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractConfigurationExtensionType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType"/>
         </xsd:complexContent>
     </xsd:complexType>
 
@@ -3362,6 +3482,58 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="abstract-scheduler" abstract="true" type="abstractSchedulerType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for shedulers
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractSchedulerType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="fixedSchedulerType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractSchedulerType">
+                <xsd:attribute name="frequency" type="substitutableLong" default="1000">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Polling frequency in milliseconds. Default frequency is 1000ms (1s).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="timeUnit" default="MILLISECONDS">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The time unit for the frequency value
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="MILLISECONDS"/>
+                            <xsd:enumeration value="SECONDS"/>
+                            <xsd:enumeration value="MINUTES"/>
+                            <xsd:enumeration value="DAYS"/>
+                            <xsd:enumeration value="HOURS"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+                <xsd:attribute name="startDelay" type="substitutableLong" default="0">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The delay time in time units that sheduler needs to wait before start
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="fixed-frequency-scheduler" type="fixedSchedulerType" substitutionGroup="abstract-scheduler"/>
+
     <xsd:element name="poll" type="pollInboundEndpointType" substitutionGroup="abstract-message-source">
         <xsd:annotation>
             <xsd:documentation>
@@ -3372,11 +3544,15 @@
     <xsd:complexType name="pollInboundEndpointType">
         <xsd:complexContent>
             <xsd:extension base="abstractMessageSourceType">
-                <xsd:group ref="messageProcessorOrOutboundEndpoint"/>
+                <xsd:sequence>
+                    <xsd:element ref="abstract-scheduler" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element ref="abstract-poll-override" minOccurs="0" maxOccurs="1"/>
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint"/>
+                </xsd:sequence>
                 <xsd:attribute name="frequency"  type="substitutableLong" default="1000">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Polling frequency in milliseconds. Default frequency is 1000ms (1s).
+                            Polling frequency in milliseconds. Default frequency is 1000ms (1s). Deprecated since 3.5.0. use fixed-frequency-scheduler instead
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -4928,8 +5104,8 @@
                         An empty holder that can be extended by modules that want to provide security managers. Typically it will contain elements called 'module:type-security-provider', which extend securityProviderType where "module" might be "spring-security" and "type" might de "delegate", for example. It can also contain encryption strategies, which should follow a similar scheme and extend encryptionStrategyType.
                     </xsd:documentation>
                 </xsd:annotation>
-                <xsd:attribute name="id" fixed="_muleSecurityManager"/>
-                <xsd:attribute name="name" fixed="_muleSecurityManager"/>
+                <xsd:attribute name="id" default="_muleSecurityManager"/>
+                <xsd:attribute name="name" default="_muleSecurityManager"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -5104,6 +5280,20 @@
     <!-- this is a general threading type used by various elements here -->
     <xsd:complexType name="threadingProfileType">
         <xsd:complexContent>
+            <xsd:extension base="asynchronousThreadingProfileType">
+                <xsd:attribute name="doThreading" type="substitutableBoolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether threading should be used (default is true).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="asynchronousThreadingProfileType">
+        <xsd:complexContent>
             <!-- this is a hack that allows us to use this general threading profile as a component threading profile
                  without retyping everything -->
             <xsd:extension base="abstractServiceThreadingProfileType">
@@ -5118,13 +5308,6 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             The maximum number of idle or inactive threads that can be in the pool before they are destroyed.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="doThreading" type="substitutableBoolean" default="true">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Whether threading should be used (default is true).
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -6155,10 +6338,12 @@
         </xsd:annotation>
     </xsd:element>
 
+    <!-- Deprecated -->
     <xsd:element name="all" type="baseMultipleRoutesRoutingMessageProcessorType" substitutionGroup="abstract-routing-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 Sends the same message to multiple message processors or outbound endpoints.
+                @Deprecated since 3.5.0. Use scatter-gather instead
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -6214,8 +6399,18 @@
         </xsd:annotation>
         <xsd:complexType>
             <xsd:complexContent>
-                <xsd:extension base="processorWithExactlyOneTargetType">
-                    <xsd:attribute name="objectStore-ref" type="xsd:string" use="required">
+                <xsd:extension base="abstractRoutingMessageProcessorType">
+                    <xsd:sequence>
+                        <xsd:element name="threading-profile" type="asynchronousThreadingProfileType" minOccurs="0">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    Threading profile used to process the message processors inside the until-successful.
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="1"/>
+                    </xsd:sequence>
+                    <xsd:attribute name="objectStore-ref" type="xsd:string" use="optional">
                         <xsd:annotation>
                             <xsd:documentation>
                                 Reference to the org.mule.api.store.ListableObjectStore that will be used to store events pending (re)processing.
@@ -6229,11 +6424,21 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
-                    <xsd:attribute name="secondsBetweenRetries" type="substitutableInt" use="optional" default="60">
+                    <xsd:attribute name="millisBetweenRetries" type="substitutableInt" use="optional">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Specifies the minimum time interval between two process retries.
+                                Specifies the minimum time interval between two process retries in milliseconds.
                                 The actual time interval depends on the previous execution but should not exceed twice this number.
+                                Default value is 60000 (one minute)
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="secondsBetweenRetries" type="substitutableInt" use="optional">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Specifies the minimum time interval between two process retries in seconds.
+                                The actual time interval depends on the previous execution but should not exceed twice this number.
+                                THIS ATTRIBUTE IS DEPRECATED. Please use millisBetweenRetries instead
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
@@ -6259,11 +6464,81 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
+                    <xsd:attribute name="synchronous" type="substitutableBoolean" use="optional" default="false">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Defines if the route inside until-successful should be executed asynchronously or synchronously within the caller thread.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
-
+    
+    <xsd:element name="scatter-gather" substitutionGroup="abstract-routing-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Sends the same message to multiple message processors or outbound endpoints in parallel.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="abstractRoutingMessageProcessorType">
+                    <xsd:sequence>
+                        <xsd:element name="custom-aggregation-strategy" type="aggregationStrategyType" minOccurs="0" maxOccurs="1">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    Allows customizing the logic used for aggregation the events back together.
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:element name="threading-profile" type="asynchronousThreadingProfileType" minOccurs="0">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    Threading profile used to process the message processors inside the until-successful.
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="2" maxOccurs="unbounded"/>
+                    </xsd:sequence>
+                    <xsd:attribute name="timeout" type="substitutableLong" use="optional" default="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Sets a timeout in milliseconds for each route. Values lower or equals than zero means no timeout. 
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+    
+    <xsd:complexType name="aggregationStrategyType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:attribute name="class" type="substitutableClass" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The canonical name of a class that implements org.mule.routing.AggregationStrategy.
+                            Such a class is required to have a default constructor.
+                            This property cannot be set at the same time as 'ref'
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="ref" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A reference to a registered bean that implements org.mule.routing.AggregationStrategy.
+                            This property cannot be set at the same time as 'class'
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+	
     <xsd:element name="round-robin" substitutionGroup="abstract-routing-message-processor"
                  type="processorWithAtLeastOneTargetType">
         <xsd:annotation>
@@ -6289,6 +6564,19 @@
                     <xsd:attributeGroup ref="expressionAttributes"/>
                     <!--  See MULE-5069 <xsd:attributeGroup ref="allExchangePatterns" />-->
                 </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="dynamic-round-robin" substitutionGroup="abstract-routing-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Sends each message received to the next message processor in the circular list of targets. The list of message processors is obtained dynamically using the configured route resolver
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="abstractDynamicRoutingMessageProcessor"/>
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
@@ -7649,17 +7937,18 @@
         </xsd:union>
     </xsd:simpleType>
 
-    <!-- corresponds to TlsProtocolHandler, named as tls-protocol-handler -->
+    <!-- corresponds to TlsProtocolHandler, named as tls-protocol-handler.
+         DEPRECATED since 3.5 - This property will be ignored -->
     <xsd:complexType name="tlsProtocolHandler">
         <xsd:annotation>
             <xsd:documentation>
-                Configures the global Java protocol handler. WARNING - Untested.
+                Configures the global Java protocol handler. DEPRECATED since 3.5 - This is no longer necessary and will be ignored
             </xsd:documentation>
         </xsd:annotation>
         <xsd:attribute name="property" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    Sets the java.protocol.handler.pkgs system property.
+                    Sets the java.protocol.handler.pkgs system property. DEPRECATED since 3.5 - This is no longer necessary and will be ignored
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>

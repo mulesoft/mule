@@ -1,24 +1,19 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.tcp.issues;
 
 import org.mule.api.MuleException;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.transport.tcp.protocols.SafeProtocolTestCase;
 
 import org.junit.Test;
 
 public class SafeProtocolMule2227TestCase extends SafeProtocolTestCase
 {
-
     // this actually "works" much of the time, in that a response is received that looks reasonable.
     // that's just because the test is so simple that the length encoded string is read by the
     // server as a literal chunk of text (including the cookies and lengths!).  on the return these
@@ -41,7 +36,7 @@ public class SafeProtocolMule2227TestCase extends SafeProtocolTestCase
     @Test
     public void testSafeToUnsafe() throws MuleException
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         // this may fail, but should not crash
         try
         {
@@ -52,5 +47,4 @@ public class SafeProtocolMule2227TestCase extends SafeProtocolTestCase
             // an error is ok - we were losing the JVM before
         }
     }
-
 }

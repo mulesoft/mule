@@ -1,17 +1,14 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
- * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
- *
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.pgp;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.Provider;
 
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.openpgp.PGPPublicKey;
@@ -25,10 +22,11 @@ public class SignedMessage implements Message
     public SignedMessage(InputStream toBeDecrypted,
                          PGPPublicKey publicKey,
                          PGPSecretKey secretKey,
-                         String password) throws IOException
+                         String password,
+                         Provider provider) throws IOException
     {
         StreamTransformer transformer = new DecryptStreamTransformer(toBeDecrypted, publicKey, secretKey,
-            password);
+            password, provider);
         this.encryptedMessage = new LazyTransformedInputStream(new TransformContinuouslyPolicy(), transformer);
     }
 

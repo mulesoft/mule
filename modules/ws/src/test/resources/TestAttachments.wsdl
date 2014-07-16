@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://consumer.ws.module.mule.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="TestAttachmentsService" targetNamespace="http://consumer.ws.module.mule.org/">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://consumer.ws.module.mule.org/" elementFormDefault="unqualified" targetNamespace="http://consumer.ws.module.mule.org/" version="1.0">
+   <xs:element name="downloadAttachment" type="tns:downloadAttachment"/>
+   <xs:element name="downloadAttachmentResponse" type="tns:downloadAttachmentResponse"/>
+   <xs:element name="echoAttachment" type="tns:echoAttachment"/>
+   <xs:element name="echoAttachmentResponse" type="tns:echoAttachmentResponse"/>
+   <xs:element name="uploadAttachment" type="tns:uploadAttachment"/>
+   <xs:element name="uploadAttachmentResponse" type="tns:uploadAttachmentResponse"/>
+   <xs:complexType name="echoAttachment">
+      <xs:sequence>
+         <xs:element minOccurs="0" name="attachment" type="xs:base64Binary"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="echoAttachmentResponse">
+      <xs:sequence>
+         <xs:element minOccurs="0" name="attachment" type="xs:base64Binary"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="downloadAttachment">
+      <xs:sequence>
+         <xs:element minOccurs="0" name="fileName" type="xs:string"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="downloadAttachmentResponse">
+      <xs:sequence>
+         <xs:element minOccurs="0" name="attachment" type="xs:base64Binary"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="uploadAttachment">
+      <xs:sequence>
+         <xs:element minOccurs="0" name="fileName" type="xs:string"/>
+         <xs:element minOccurs="0" name="attachment" type="xs:base64Binary"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="uploadAttachmentResponse">
+      <xs:sequence>
+         <xs:element minOccurs="0" name="result" type="xs:string"/>
+      </xs:sequence>
+   </xs:complexType>
+</xs:schema>  </wsdl:types>
+  <wsdl:message name="uploadAttachment">
+    <wsdl:part element="tns:uploadAttachment" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="downloadAttachment">
+    <wsdl:part element="tns:downloadAttachment" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="downloadAttachmentResponse">
+    <wsdl:part element="tns:downloadAttachmentResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="echoAttachment">
+    <wsdl:part element="tns:echoAttachment" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="uploadAttachmentResponse">
+    <wsdl:part element="tns:uploadAttachmentResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="echoAttachmentResponse">
+    <wsdl:part element="tns:echoAttachmentResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="TestAttachments">
+    <wsdl:operation name="echoAttachment">
+      <wsdl:input message="tns:echoAttachment" name="echoAttachment">
+    </wsdl:input>
+      <wsdl:output message="tns:echoAttachmentResponse" name="echoAttachmentResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="downloadAttachment">
+      <wsdl:input message="tns:downloadAttachment" name="downloadAttachment">
+    </wsdl:input>
+      <wsdl:output message="tns:downloadAttachmentResponse" name="downloadAttachmentResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="uploadAttachment">
+      <wsdl:input message="tns:uploadAttachment" name="uploadAttachment">
+    </wsdl:input>
+      <wsdl:output message="tns:uploadAttachmentResponse" name="uploadAttachmentResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="TestAttachmentsServiceSoapBinding" type="tns:TestAttachments">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="downloadAttachment">
+      <soap:operation soapAction="downloadAttachment" style="document"/>
+      <wsdl:input name="downloadAttachment">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="downloadAttachmentResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="echoAttachment">
+      <soap:operation soapAction="echoAttachment" style="document"/>
+      <wsdl:input name="echoAttachment">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="echoAttachmentResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="uploadAttachment">
+      <soap:operation soapAction="uploadAttachment" style="document"/>
+      <wsdl:input name="uploadAttachment">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="uploadAttachmentResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="TestAttachmentsService">
+    <wsdl:port binding="tns:TestAttachmentsServiceSoapBinding" name="TestAttachmentsPort">
+      <soap:address location="http://localhost:39663/services/TestAttachments"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

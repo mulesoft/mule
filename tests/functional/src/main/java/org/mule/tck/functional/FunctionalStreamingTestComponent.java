@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.tck.functional;
 
 import org.mule.api.MuleEventContext;
@@ -145,7 +141,7 @@ public class FunctionalStreamingTestComponent implements Callable
                             long streamLength, MuleEventContext context) throws Exception
     {
         // make a nice summary of the data
-        StringBuffer result = new StringBuffer("Received stream");
+        StringBuilder result = new StringBuilder("Received stream");
         result.append("; length: ");
         result.append(streamLength);
         result.append("; '");

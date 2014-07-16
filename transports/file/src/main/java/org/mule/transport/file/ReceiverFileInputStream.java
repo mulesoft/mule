@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.file;
 
 import org.mule.api.DefaultMuleException;
@@ -18,6 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,6 +32,8 @@ class ReceiverFileInputStream extends FileInputStream
     private File moveToOnClose;
     private boolean streamProcessingError;
     private InputStreamCloseListener closeListener;
+    private AtomicBoolean alreadyClosed = new AtomicBoolean(false);
+    private AtomicBoolean alreadyNotified = new AtomicBoolean(false);
 
     public ReceiverFileInputStream(File currentFile, boolean deleteOnClose, File moveToOnClose)
         throws FileNotFoundException
@@ -56,7 +55,7 @@ class ReceiverFileInputStream extends FileInputStream
     {
         super.close();
 
-        if (!streamProcessingError)
+        if (!isStreamProcessingError() && !alreadyClosed.getAndSet(true))
         {
             if (moveToOnClose != null)
             {
@@ -69,20 +68,12 @@ class ReceiverFileInputStream extends FileInputStream
             {
                 if (!currentFile.delete())
                 {
-                    try
-                    {
-                        throw new DefaultMuleException(FileMessages.failedToDeleteFile(currentFile));
-                    }
-                    catch (DefaultMuleException e)
-                    {
-                        IOException e2 = new IOException();
-                        e2.initCause(e);
-                        throw e2;
-                    }
+                    throw new IOException(new DefaultMuleException(FileMessages.failedToDeleteFile(currentFile)));
                 }
             }
         }
-        if (closeListener != null)
+
+        if (closeListener != null && !alreadyNotified.getAndSet(true))
         {
             closeListener.fileClose(currentFile);
         }

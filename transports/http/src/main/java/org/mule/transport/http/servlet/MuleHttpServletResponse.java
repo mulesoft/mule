@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -20,6 +17,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -192,7 +190,7 @@ public class MuleHttpServletResponse implements HttpServletResponse
 
     public void setDateHeader(String name, long date)
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(date);
         formatDate(buf, calendar, false);
@@ -208,7 +206,7 @@ public class MuleHttpServletResponse implements HttpServletResponse
      * Format HTTP date "EEE, dd MMM yyyy HH:mm:ss 'GMT'" or "EEE, dd-MMM-yy HH:mm:ss 'GMT'"for
      * cookies
      */
-    public static void formatDate(StringBuffer buf, Calendar calendar, boolean cookie)
+    public static void formatDate(StringBuilder buf, Calendar calendar, boolean cookie)
     {
         // "EEE, dd MMM yyyy HH:mm:ss 'GMT'"
         // "EEE, dd-MMM-yy HH:mm:ss 'GMT'", cookie
@@ -256,7 +254,7 @@ public class MuleHttpServletResponse implements HttpServletResponse
         buf.append(" GMT");
     }
 
-    public static void append2digits(StringBuffer buf, int i) 
+    public static void append2digits(StringBuilder buf, int i)
     {
         if (i >= 100)
             return;
@@ -294,4 +292,27 @@ public class MuleHttpServletResponse implements HttpServletResponse
         message.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, sc);
     }
 
+    @Override
+    public Collection<String> getHeaderNames()
+    {
+        return null;
+    }
+
+    @Override
+    public int getStatus()
+    {
+        return 0;
+    }
+
+    @Override
+    public Collection<String> getHeaders(String s)
+    {
+        return null;
+    }
+
+    @Override
+    public String getHeader(String s)
+    {
+        return null;
+    }
 }

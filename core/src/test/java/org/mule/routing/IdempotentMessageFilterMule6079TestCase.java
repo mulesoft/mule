@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.routing;
 
 import static org.junit.Assert.assertEquals;
@@ -142,7 +138,7 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
             }
             return containsKey;
         }
-
+        
         @Override
         public void store(Serializable key, String value) throws ObjectStoreException
         {
@@ -190,6 +186,12 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
         public boolean isPersistent()
         {
             return false;
+        }
+        
+        @Override
+        public void clear() throws ObjectStoreException
+        {
+            this.map.clear();
         }
     }
 }

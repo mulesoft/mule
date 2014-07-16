@@ -10,11 +10,11 @@
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.4/mule.xsd" />
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.5/mule.xsd" />
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/ws"
-                schemaLocation="http://www.mulesoft.org/schema/mule/ws/3.4/mule-ws.xsd" />
+                schemaLocation="http://www.mulesoft.org/schema/mule/ws/3.5/mule-ws.xsd" />
     <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
-                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.4/mule-schemadoc.xsd"/>
+                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.5/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>
@@ -33,7 +33,7 @@
     <xsd:element name="web-service-proxy" type="ws:proxyType" substitutionGroup="mule:abstract-flow-construct">
         <xsd:annotation>
             <xsd:documentation>
-                A simple web-service proxy, which handles WSDL rewriting.
+                Deprecated: use ws:proxy instead.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

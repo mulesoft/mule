@@ -1,18 +1,14 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.context.notification;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,7 +17,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class PipelineMessageNotificationTestCase extends AbstractNotificationTestCase
 {
-
     public PipelineMessageNotificationTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -30,7 +25,7 @@ public class PipelineMessageNotificationTestCase extends AbstractNotificationTes
     @Override
     public void doTest() throws Exception
     {
-        final MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         assertNotNull(client.send("vm://rr", "hello sweet world", null));
         assertNotNull(client.send("vm://rrException", "hello sweet world", null));
         assertNotNull(client.send("vm://rrResponseException", "hello sweet world", null));

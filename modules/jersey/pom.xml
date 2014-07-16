@@ -4,12 +4,16 @@
     <parent>
         <groupId>org.mule.modules</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-jersey</artifactId>
     <packaging>jar</packaging>
     <name>Jersey Module</name>
     <description>A module for Jersey, the JAX-RS RI.</description>
+
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -79,20 +83,14 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-        
-        <!-- 
-            for using json with natural configuration, we need at least jaxb 2.1.12 
+
+        <!--
+            for using json with natural configuration, we need at least jaxb 2.1.12
             this is used in the context resolver test case
         -->
         <dependency>
@@ -102,12 +100,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>java.net</id>
-            <name>java.net Repository</name>
-            <url>http://download.java.net/maven/2/</url>
-        </repository>
-    </repositories>
 </project>

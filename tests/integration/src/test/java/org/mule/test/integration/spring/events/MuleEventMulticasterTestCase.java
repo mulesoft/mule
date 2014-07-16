@@ -1,35 +1,31 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.integration.spring.events;
-
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.functional.EventCallback;
-
-import java.util.concurrent.atomic.AtomicInteger;
-import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.api.MuleEventContext;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.functional.EventCallback;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.junit.Test;
+
 public class MuleEventMulticasterTestCase extends FunctionalTestCase
 {
-
     private final AtomicInteger eventCount = new AtomicInteger(0);
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/spring/events/mule-events-example-app-context.xml";
     }
@@ -50,6 +46,7 @@ public class MuleEventMulticasterTestCase extends FunctionalTestCase
         // invoked
         EventCallback callback = new EventCallback()
         {
+            @Override
             public void eventReceived(MuleEventContext context, Object o) throws Exception
             {
                 eventCount.incrementAndGet();
@@ -57,7 +54,7 @@ public class MuleEventMulticasterTestCase extends FunctionalTestCase
         };
         subscriptionBean.setEventCallback(callback);
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Order order = new Order("Sausage and Mash");
         client.dispatch("jms://orders.queue", order, null);
         Thread.sleep(2000);

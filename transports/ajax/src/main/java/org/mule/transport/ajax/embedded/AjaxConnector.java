@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -34,15 +31,14 @@ import java.util.Map;
 
 import javax.servlet.Servlet;
 
+import org.eclipse.jetty.server.AbstractNetworkConnector;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.servlet.DefaultServlet;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.mortbay.cometd.AbstractBayeux;
 import org.mortbay.cometd.continuation.ContinuationCometdServlet;
-import org.mortbay.jetty.AbstractConnector;
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.handler.ContextHandlerCollection;
-import org.mortbay.jetty.nio.SelectChannelConnector;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.DefaultServlet;
-import org.mortbay.jetty.servlet.ServletHolder;
 
 /**
  * Creates an 'embedded' Ajax server using Jetty and allows Mule to receiver and send
@@ -208,15 +204,14 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
     @Override
     public ReplyToHandler getReplyToHandler(ImmutableEndpoint endpoint)
     {
-        return new AjaxReplyToHandler(this);
+        return new AjaxReplyToHandler(this, endpoint.getMuleContext());
     }
 
     void createEmbeddedServer() throws MuleException
     {
-        Connector connector = createJettyConnector();
+        AbstractNetworkConnector connector = createJettyConnector();
 
-        connector.setPort(serverUrl.getPort());
-        connector.setHost(serverUrl.getHost());
+        configureConnector(connector, serverUrl.getHost(), serverUrl.getPort());
 
         getHttpServer().addConnector(connector);
         EndpointBuilder builder = muleContext.getEndpointFactory().getEndpointBuilder(serverUrl.toString());
@@ -225,7 +220,7 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
     }
 
     @Override
-    public Servlet createServlet(Connector connector, ImmutableEndpoint endpoint)
+    public Servlet createServlet(AbstractNetworkConnector connector, ImmutableEndpoint endpoint)
     {
         ContinuationCometdServlet ajaxServlet = new MuleAjaxServlet();
 
@@ -236,13 +231,13 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
         }
 
         ContextHandlerCollection handlerCollection = new ContextHandlerCollection();
-        Context root = new Context(handlerCollection, ROOT, Context.NO_SECURITY);
-        root.setConnectorNames(new String[]{connector.getName()});
+        ServletContextHandler root = new ServletContextHandler(handlerCollection, ROOT, ServletContextHandler.NO_SECURITY);
+        root.setVirtualHosts(new String[] { getVirtualHostName(connector) });
         root.addEventListener(new MuleServletContextListener(muleContext, getName()));
 
         if (!ROOT.equals(path))
         {
-            Context resourceContext = new Context(handlerCollection, path, Context.NO_SECURITY);
+            ServletContextHandler resourceContext = new ServletContextHandler(handlerCollection, path, ServletContextHandler.NO_SECURITY);
             populateContext(resourceContext);
 
         }
@@ -266,11 +261,11 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
         holder.setInitParameter("requestAvailable", Boolean.toString(isRequestAvailable()));
 
 
-        this.getHttpServer().addHandler(handlerCollection);
+        this.addHandler(handlerCollection);
         return ajaxServlet;
     }
 
-    protected void populateContext(Context context)
+    protected void populateContext(ServletContextHandler context)
     {
         context.addServlet(DefaultServlet.class, ROOT);
         context.addServlet(JarResourceServlet.class, JarResourceServlet.DEFAULT_PATH_SPEC);
@@ -283,7 +278,7 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
     }
 
     @Override
-    protected AbstractConnector createJettyConnector()
+    protected AbstractNetworkConnector createJettyConnector()
     {
         if (serverUrl.getProtocol().equals("https"))
         {
@@ -291,7 +286,9 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
         }
         else
         {
-            return new SelectChannelConnector();
+            ServerConnector serverConnector = new ServerConnector(getHttpServer());
+            serverConnector.setName(getName());
+            return serverConnector;
         }
     }
 

@@ -1,33 +1,28 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.integration.endpoints;
-
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
 public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
 {
-
     private static final int TIMEOUT = 5000;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/endpoints/endpoint-message-processors.xml";
     }
@@ -35,8 +30,8 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
     @Test
     public void testSynchronousOutbound() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        
+        MuleClient client = muleContext.getClient();
+
         MuleMessage response = client.send("vm://in1", "input", null);
         assertNotNull(response);
         assertEquals("input:A:B:service1:E:F:service2:G:H:C:D", response.getPayload());
@@ -45,8 +40,8 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
     @Test
     public void testAsynchronousOutbound() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        
+        MuleClient client = muleContext.getClient();
+
         MuleMessage response = client.send("vm://in2", "input", null);
         assertNotNull(response);
         assertEquals("input:A:B:service1:C:D", response.getPayload());
@@ -59,8 +54,8 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
     @Test
     public void testLegacyAttributes() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        
+        MuleClient client = muleContext.getClient();
+
         MuleMessage response = client.send("vm://in3", "input", null);
         assertNotNull(response);
         assertEquals("input:A:B:service1:E:F:service2:G:H:C:D", response.getPayload());
@@ -69,8 +64,8 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
     @Test
     public void testRouters() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        
+        MuleClient client = muleContext.getClient();
+
         client.dispatch("vm://in4", "input1,input2,input3", null);
 
         MuleMessage response = client.request("vm://wiretap1", TIMEOUT);

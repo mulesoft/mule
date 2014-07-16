@@ -8,7 +8,7 @@
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.4/mule.xsd" />
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.5/mule.xsd" />
 
     <xsd:element name="security-manager" type="securityManagerType" substitutionGroup="mule:abstract-security-manager"/>
     <xsd:complexType name="securityManagerType">
@@ -63,6 +63,13 @@
     <xsd:complexType name="httpSecurityFilterType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractSecurityFilterType">
+                <xsd:attribute name="securityManager-ref" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A reference to the security manager. If not specified uses the default one.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="realm" type="xsd:string" use="required"/>
                 <xsd:attribute name="securityProviders" type="xsd:string">
                     <xsd:annotation>

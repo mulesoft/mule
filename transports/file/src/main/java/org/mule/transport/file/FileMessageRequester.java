@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.file;
 
 import org.mule.DefaultMuleMessage;
@@ -17,6 +13,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.routing.filter.Filter;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transport.AbstractMessageRequester;
 import org.mule.transport.file.i18n.FileMessages;
 import org.mule.util.FileUtils;
@@ -129,12 +126,13 @@ public class FileMessageRequester extends AbstractMessageRequester
                 }
 
                 // Don't we need to try to obtain a file lock as we do with receiver
-                String sourceFileOriginalName = result.getName();
+                String originalSourceFileName = result.getName();
+                String originalSourceDirectory = result.getParent();
 
                 File workFile = null;
                 if (workDir != null)
                 {
-                    String workFileName = formatUsingFilenameParser(sourceFileOriginalName, workFileNamePattern);
+                    String workFileName = formatUsingFilenameParser(originalSourceFileName, originalSourceDirectory, workFileNamePattern);
 
                     // don't use new File() directly, see MULE-1112
                     workFile = FileUtils.newFile(workDir, workFileName);
@@ -150,11 +148,11 @@ public class FileMessageRequester extends AbstractMessageRequester
                 String movDir = getMoveDirectory();
                 if (movDir != null)
                 {
-                    String destinationFileName = sourceFileOriginalName;
+                    String destinationFileName = originalSourceFileName;
                     String moveToPattern = getMoveToPattern();
                     if (moveToPattern != null)
                     {
-                        destinationFileName = formatUsingFilenameParser(sourceFileOriginalName, moveToPattern);
+                        destinationFileName = formatUsingFilenameParser(originalSourceFileName, originalSourceDirectory, moveToPattern);
                     }
                     // don't use new File() directly, see MULE-1112
                     destinationFile = FileUtils.newFile(movDir, destinationFileName);
@@ -182,7 +180,8 @@ public class FileMessageRequester extends AbstractMessageRequester
                     logger.error("File being read disappeared!", e);
                     return null;
                 }
-                returnMessage.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
+                returnMessage.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalSourceFileName, PropertyScope.INBOUND);
+                returnMessage.setProperty(FileConnector.PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory, PropertyScope.INBOUND);
 
                 if (!fileConnector.isStreaming())
                 {
@@ -197,13 +196,13 @@ public class FileMessageRequester extends AbstractMessageRequester
         return null;
     }
 
-    protected String formatUsingFilenameParser(String originalName, String pattern)
+    protected String formatUsingFilenameParser(String originalFileName, String originalDirectory, String pattern)
     {
         // This isn't nice but is needed as MuleMessage is required to resolve
         // destination file name
-        DefaultMuleMessage fileParserMessasge = new DefaultMuleMessage(null, fileConnector.getMuleContext());
-        fileParserMessasge.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME,
-            originalName);
+        DefaultMuleMessage fileParserMessasge = new DefaultMuleMessage(null, getEndpoint().getMuleContext());
+        fileParserMessasge.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalFileName);
+        fileParserMessasge.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_DIRECTORY, originalDirectory);
 
         return fileConnector.getFilenameParser().getFilename(fileParserMessasge, pattern);
     }

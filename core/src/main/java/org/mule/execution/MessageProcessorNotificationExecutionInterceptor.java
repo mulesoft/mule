@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -13,7 +10,7 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.Pipeline;
+import org.mule.api.construct.MessageProcessorPathResolver;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.context.notification.MessageProcessorNotification;
 import org.mule.context.notification.ServerNotificationManager;
@@ -87,7 +84,7 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
         if (serverNotificationManager != null
             && serverNotificationManager.isNotificationEnabled(MessageProcessorNotification.class))
         {
-            if (flowConstruct instanceof Pipeline && ((Pipeline) flowConstruct).getProcessorPath(processor) != null)
+            if (flowConstruct instanceof MessageProcessorPathResolver && ((MessageProcessorPathResolver) flowConstruct).getProcessorPath(processor) != null)
             {
                 serverNotificationManager.fireNotification(new MessageProcessorNotification(flowConstruct, event, processor, exceptionThrown, action));
             }

@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.servlet.jetty;
 
 import org.mule.AbstractAgent;
@@ -19,9 +15,9 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.server.AbstractNetworkConnector;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.webapp.WebAppContext;
 
 /**
  * A 'proxy' agent that displays info about any webapps deployed together
@@ -98,7 +94,7 @@ public class JettyWebappServerAgent extends AbstractAgent
             // so much for generics :(
             WebAppContext webapp = (WebAppContext) handler;
             // build the full webapp url
-            final Connector c = jetty.getHttpServer().getConnectors()[0];
+            final AbstractNetworkConnector c = (AbstractNetworkConnector) jetty.getHttpServer().getConnectors()[0];
             final String url = String.format("http://%s%s%s",
                                              c.getHost(),
                                              c.getPort() == 80 ? StringUtils.EMPTY : ":" + c.getPort(),

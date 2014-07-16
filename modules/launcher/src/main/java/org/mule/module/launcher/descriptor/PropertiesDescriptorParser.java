@@ -1,15 +1,12 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.launcher.descriptor;
 
+import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.StringUtils;
 
@@ -34,7 +31,7 @@ public class PropertiesDescriptorParser implements DescriptorParser
     protected static final String PROPERTY_LOADER_OVERRIDE = "loader.override";
     protected static final String PROPERTY_SCAN_PACKAGES = "scan.packages";
 
-    public ApplicationDescriptor parse(File descriptor) throws IOException
+    public ApplicationDescriptor parse(File descriptor, String applicationName) throws IOException
     {
         final Properties p = PropertiesUtils.loadProperties(new FileInputStream(descriptor));
 
@@ -56,6 +53,10 @@ public class PropertiesDescriptorParser implements DescriptorParser
         }
         d.setConfigResources(urls);
 
+        String[] absoluteResourcePaths = convertConfigResourcesToAbsolutePatch(urls, applicationName);
+        d.setAbsoluteResourcePaths(absoluteResourcePaths);
+        d.setConfigResourcesFile(convertConfigResourcesToFile(absoluteResourcePaths));
+
         // supports true (case insensitive), yes, on as positive values
         d.setRedeploymentEnabled(BooleanUtils.toBoolean(p.getProperty(PROPERTY_REDEPLOYMENT_ENABLED, Boolean.TRUE.toString())));
 
@@ -69,6 +70,38 @@ public class PropertiesDescriptorParser implements DescriptorParser
         }
 
         return d;
+    }
+
+    private File[] convertConfigResourcesToFile(String[] absoluteResourcePaths)
+    {
+        File[] configResourcesFile = new File[absoluteResourcePaths.length];
+        for (int i = 0; i < absoluteResourcePaths.length; i++)
+        {
+            configResourcesFile[i] = new File(absoluteResourcePaths[i]);
+        }
+        return configResourcesFile;
+    }
+
+    private String[] convertConfigResourcesToAbsolutePatch(final String[] configResources, String appName)
+    {
+        String[] absoluteResourcePaths = new String[configResources.length];
+        for (int i = 0; i < configResources.length; i++)
+        {
+            String resource = configResources[i];
+            absoluteResourcePaths[i] = toAbsoluteFile(resource, appName);
+        }
+        return absoluteResourcePaths;
+    }
+
+    /**
+     * Resolve a resource relative to an application root.
+     *
+     * @param path the relative path to resolve
+     * @return absolute path, may not actually exist (check with File.exists())
+     */
+    protected String toAbsoluteFile(String path, String appName)
+    {
+        return MuleContainerBootstrapUtils.getMuleAppDir(appName).getAbsolutePath() + File.separator + path;
     }
 
     public String getSupportedFormat()

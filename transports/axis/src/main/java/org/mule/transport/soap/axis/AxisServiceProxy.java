@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.soap.axis;
 
 import org.mule.RequestContext;
@@ -44,7 +40,6 @@ import java.util.Map;
 
 public class AxisServiceProxy
 {
-
     private static ThreadLocal properties = new ThreadLocal();
 
     public static Object createProxy(AbstractMessageReceiver receiver, boolean synchronous, Class[] classes)
@@ -74,7 +69,7 @@ public class AxisServiceProxy
             MuleMessage messageToRoute = receiver.createMuleMessage(args,
                 receiver.getEndpoint().getEncoding());
             messageToRoute.setProperty(MuleProperties.MULE_METHOD_PROPERTY, method, PropertyScope.INVOCATION);
-            
+
             // add all custom headers, filter out all mule headers (such as
             // MULE_SESSION) except
             // for MULE_USER header. Filter out other headers like "soapMethods" and
@@ -164,7 +159,7 @@ public class AxisServiceProxy
             {
                 throw new ClassNotFoundException("Unable to retrieve class from service factory");
             }
-            
+
 
             // get all implemented interfaces from superclasses as well
             final List intfList = ClassUtils.getAllInterfaces(implementationClass);
@@ -186,22 +181,22 @@ public class AxisServiceProxy
         return interfaces;
     }
 
-    public static Class[] removeInterface(Class[] interfaces, Class iface)
+    public static Class<?>[] removeInterface(Class<?>[] interfaces, Class<?> iface)
     {
         if (interfaces == null)
         {
             return null;
         }
-        List results = new ArrayList();
+        List<Class<?>> results = new ArrayList<Class<?>>();
         for (int i = 0; i < interfaces.length; i++)
         {
-            Class anInterface = interfaces[i];
+            Class<?> anInterface = interfaces[i];
             if (!anInterface.equals(iface))
             {
                 results.add(anInterface);
             }
         }
-        Class[] arResults = new Class[results.size()];
+        Class<?>[] arResults = new Class[results.size()];
         if (arResults.length == 0)
         {
             return arResults;
@@ -213,7 +208,7 @@ public class AxisServiceProxy
         }
     }
 
-    public static Method[] getMethods(Class[] interfaces)
+    public static Method[] getMethods(Class<?>[] interfaces)
     {
         List methodNames = new ArrayList();
         for (int i = 0; i < interfaces.length; i++)
@@ -225,7 +220,7 @@ public class AxisServiceProxy
 
     }
 
-    public static String[] getMethodNames(Class[] interfaces)
+    public static String[] getMethodNames(Class<?>[] interfaces)
     {
         Method[] methods = getMethods(interfaces);
 
@@ -236,5 +231,4 @@ public class AxisServiceProxy
         }
         return results;
     }
-
 }

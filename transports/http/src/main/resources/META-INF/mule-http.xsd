@@ -10,11 +10,11 @@
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.4/mule.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.5/mule.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/tcp"
-                schemaLocation="http://www.mulesoft.org/schema/mule/tcp/3.4/mule-tcp.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/tcp/3.5/mule-tcp.xsd"/>
     <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
-                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.4/mule-schemadoc.xsd"/>
+                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.5/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>The HTTP transport provides support for exposing services over HTTP and making HTTP client requests from Mule services to external services as part of service event flows. Mule supports inbound, outbound, and polling HTTP endpooints. These endpoints support all common features of the HTTP spec, such as ETag processing, cookies, and keepalive. Both HTTP 1.0 and 1.1 are supported.</xsd:documentation>
@@ -29,7 +29,7 @@
         </xsd:appinfo>
     </xsd:annotation>
 
-    <xsd:element name="connector" type="httpConnectorType" substitutionGroup="mule:abstract-connector">
+    <xsd:element name="connector" type="httpConnectorType" substitutionGroup="mule:abstract-shared-connector">
         <xsd:annotation>
             <xsd:documentation>
                 Allows Mule to communicate over HTTP. All parts of the HTTP spec are covered by Mule, so you can expect ETags to be honored as well as keep alive semantics and cookies.
@@ -297,12 +297,19 @@
                 <xsd:attribute name="followRedirects" type="xsd:boolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            If a request if made using GET that responds with a redirectLocation header, setting this to true will
+                            If a request is made using GET that responds with a redirectLocation header, setting this to true will
                             make the request on the redirect URL.  This only works when using GET since you cannot automatically follow
                             redirects when perfroming a POST (a restriction according to RFC 2616).
                         </xsd:documentation>
                     </xsd:annotation>
-                    </xsd:attribute>
+                </xsd:attribute>
+                <xsd:attribute name="exceptionOnMessageError" type="xsd:boolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If a request returns a status code greater or equal than 400 an exception will be thrown.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -323,12 +330,19 @@
                 <xsd:attribute name="followRedirects" type="xsd:boolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            If a request if made using GET that responds with a redirectLocation header, setting this to true will
+                            If a request is made using GET that responds with a redirectLocation header, setting this to true will
                             make the request on the redirect URL.  This only works when using GET since you cannot automatically follow
                             redirects when perfroming a POST (a restriction according to RFC 2616).
                         </xsd:documentation>
                     </xsd:annotation>
-                    </xsd:attribute>
+                </xsd:attribute>
+                <xsd:attribute name="exceptionOnMessageError" type="xsd:boolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If a request returns a status code greater or equal than 400 an exception will be thrown.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -376,9 +390,12 @@
         </xsd:attribute>
         <xsd:attribute name="keep-alive" type="mule:substitutableBoolean">
             <xsd:annotation>
-                <xsd:documentation>Controls if the socket connection is kept alive. If set to true,
-                a keep-alive header with the connection timeout specified in the connector will be
-                returned. If set to false, a "Connection: close" header will be returned.</xsd:documentation>
+                <xsd:documentation>DEPRECATED: Use keepAlive attribute instead.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="keepAlive" type="mule:substitutableBoolean">
+            <xsd:annotation>
+                <xsd:documentation>Controls if the connection is kept alive.</xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
     </xsd:attributeGroup>

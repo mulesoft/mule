@@ -1,19 +1,21 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.spring.events;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transformer.AbstractMessageTransformer;
@@ -30,12 +32,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.AbstractApplicationContext;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class SpringEventsTestCase extends FunctionalTestCase
 {
@@ -55,7 +51,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "mule-events-app-context.xml";
     }
@@ -83,7 +79,8 @@ public class SpringEventsTestCase extends FunctionalTestCase
         subscriptionBean.setEventCallback(new CountingEventCallback(eventCounter1, 1, whenFinished));
 
         multicaster.removeApplicationListener(subscriptionBean);
-        MuleClient client = new MuleClient(muleContext);
+
+        MuleClient client = muleContext.getClient();
         client.send("vm://event.multicaster", "Test Spring MuleEvent", null);
 
         assertEquals(0, eventCounter1.get());
@@ -115,7 +112,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         Latch whenFinished = new Latch();
         bean.setEventCallback(new CountingEventCallback(eventCounter1, 1, whenFinished));
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.send("vm://event.multicaster", "Test Spring MuleEvent", null);
 
         whenFinished.await(DEFAULT_LATCH_TIMEOUT, TimeUnit.MILLISECONDS);
@@ -132,6 +129,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         final Latch whenFinished = new Latch();
         EventCallback callback = new EventCallback()
         {
+            @Override
             public void eventReceived(MuleEventContext context, Object o) throws Exception
             {
                 assertNull(context);
@@ -164,7 +162,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         Latch whenFinished = new Latch();
         bean.setEventCallback(new CountingEventCallback(eventCounter1, 2, whenFinished));
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.send("vm://event.multicaster", "Test Spring MuleEvent", null);
         ApplicationContext context = ((MuleEventMulticaster) muleContext.getRegistry().lookupObject(
             "applicationEventMulticaster")).applicationContext;
@@ -184,7 +182,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         Latch whenFinished = new Latch();
         subscriptionBean.setEventCallback(new CountingEventCallback(eventCounter1, 1, whenFinished));
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.send("vm://event.multicaster", "Test Spring MuleEvent", null);
 
         whenFinished.await(DEFAULT_LATCH_TIMEOUT, TimeUnit.MILLISECONDS);
@@ -201,6 +199,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         final Latch whenFinished1 = new Latch();
         EventCallback callback = new EventCallback()
         {
+            @Override
             public void eventReceived(MuleEventContext context, Object o) throws Exception
             {
                 MuleApplicationEvent returnEvent = new MuleApplicationEvent("MuleEvent from a spring bean",
@@ -283,6 +282,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
     {
         Runnable publisher = new Runnable()
         {
+            @Override
             public void run()
             {
                 for (int i = 0; i < count; i++)
@@ -294,15 +294,9 @@ public class SpringEventsTestCase extends FunctionalTestCase
                             "applicationEventMulticaster")).applicationContext;
                         context.publishEvent(event);
                     }
-                    catch (IllegalArgumentException e)
+                    catch (Exception e)
                     {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    catch (SecurityException e)
-                    {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        fail(e.getMessage());
                     }
                 }
             }
@@ -316,11 +310,12 @@ public class SpringEventsTestCase extends FunctionalTestCase
     {
         Runnable sender = new Runnable()
         {
+            @Override
             public void run()
             {
                 try
                 {
-                    MuleClient client = new MuleClient(muleContext);
+                    MuleClient client = muleContext.getClient();
                     for (int i = 0; i < count; i++)
                     {
                         client.send(url, payload, null);
@@ -357,6 +352,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
             this.finished = whenFinished;
         }
 
+        @Override
         public void eventReceived(MuleEventContext context, Object o) throws Exception
         {
             // apparently beans get an extra ContextRefreshedEvent during
@@ -432,5 +428,4 @@ public class SpringEventsTestCase extends FunctionalTestCase
             super(source);
         }
     }
-
 }

@@ -1,17 +1,18 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.soap.axis;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.services.Person;
 import org.mule.transport.NullPayload;
@@ -24,11 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
 {
@@ -55,7 +51,7 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testRequestResponse() throws Throwable
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         List<Object> results = new ArrayList<Object>();
         int number = 1;
         Map<String, Object> props = new HashMap<String, Object>();
@@ -77,7 +73,7 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testRequest() throws Throwable
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.request(getReceiveEndpoint(), 0);
         assertNotNull(result);
         assertNotNull(result.getPayload());
@@ -87,7 +83,7 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testReceiveComplex() throws Throwable
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.request(getReceiveComplexEndpoint(), 0);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
@@ -104,13 +100,13 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testSendAndReceiveComplex() throws Throwable
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send(getSendReceiveComplexEndpoint1(), new Person("Dino", "Flintstone"), null);
         assertEquals(NullPayload.getInstance(), result.getPayload());
 
         result = client.request(getSendReceiveComplexEndpoint2(), 0);
         assertNotNull(result);
-        
+
         assertTrue(result.getPayload() instanceof Person);
         assertEquals("Dino", ((Person)result.getPayload()).getFirstName());
         assertEquals("Flintstone", ((Person)result.getPayload()).getLastName());
@@ -119,7 +115,7 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testReceiveComplexCollection() throws Throwable
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.request(getReceiveComplexCollectionEndpoint(), 0);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person[]);
@@ -129,7 +125,7 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testDispatchAsyncComplex() throws Throwable
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         //TODO MULE-4951 Dispatch no longer works (fails with class cast exception, probably need to configure AXIS.OneWay)
         //switching to send() does work
@@ -167,7 +163,8 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
     {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
-        MuleClient client = new MuleClient(muleContext);
+
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send(getWsdlEndpoint(), null, props);
         assertNotNull(result);
         if (logger.isDebugEnabled())
@@ -198,5 +195,4 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
 
         assertTrue(result.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE, "").startsWith("text/xml"));
     }
-
 }

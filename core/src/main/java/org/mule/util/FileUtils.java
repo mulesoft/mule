@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util;
 
 import org.mule.api.MuleRuntimeException;
@@ -74,6 +70,17 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         {
             IOUtils.closeQuietly(input);
         }
+    }
+
+    /**
+     * Cleans a directory without deleting it.
+     *
+     * @param directory directory to clean
+     * @throws IOException in case cleaning is unsuccessful
+     */
+    public static void cleanDirectory(File directory) throws IOException
+    {
+        org.apache.commons.io.FileUtils.cleanDirectory(directory);
     }
 
     // TODO Document me!
@@ -965,7 +972,15 @@ public class FileUtils extends org.apache.commons.io.FileUtils
 
         if (isFile(url))
         {
-            timeStamp = new File(url.getFile()).lastModified();
+            try
+            {
+                String file = URLDecoder.decode(url.getFile(), "UTF-8");
+                timeStamp = new File(file).lastModified();
+            }
+            catch (UnsupportedEncodingException e)
+            {
+                // Ignore
+            }
         }
 
         return timeStamp;

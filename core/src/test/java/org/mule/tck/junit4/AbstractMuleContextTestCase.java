@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.tck.junit4;
 
 import org.mule.MessageExchangePattern;
@@ -40,12 +36,14 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.TestingWorkListener;
 import org.mule.tck.TriggerableMessageSource;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.concurrent.Latch;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +54,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 
 /**
  * Extends {@link AbstractMuleTestCase} providing access to a {@link MuleContext}
@@ -63,6 +63,10 @@ import org.junit.Before;
  */
 public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
 {
+
+    public static final String WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY = "workingDirectory";
+
+    public TemporaryFolder workingDirectory = new TemporaryFolder();
 
     /**
      * Top-level directories under <code>.mule</code> which are not deleted on each
@@ -130,14 +134,36 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     @Before
     public final void setUpMuleContext() throws Exception
     {
-        muleContext = createMuleContext();
-
-        if (isStartContext() && muleContext != null && !muleContext.isStarted())
+        workingDirectory.create();
+        String workingDirectoryOldValue = System.setProperty(WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY, workingDirectory.getRoot().getAbsolutePath());
+        try
         {
-            startMuleContext();
-        }
+            doSetUpBeforeMuleContextCreation();
 
-        doSetUp();
+            muleContext = createMuleContext();
+
+            if (isStartContext() && muleContext != null && !muleContext.isStarted())
+            {
+                startMuleContext();
+            }
+
+            doSetUp();
+        }
+        finally
+        {
+            if (workingDirectoryOldValue != null)
+            {
+                System.setProperty(WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY, workingDirectoryOldValue);
+            }
+            else
+            {
+                System.clearProperty(WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY);
+            }
+        }
+    }
+
+    protected void doSetUpBeforeMuleContextCreation() throws Exception
+    {
     }
 
     private void startMuleContext() throws MuleException, InterruptedException
@@ -199,6 +225,11 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
             builders.add(getBuilder());
             addBuilders(builders);
             MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
+            DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
+            String workingDirectory = this.workingDirectory.getRoot().getAbsolutePath();
+            logger.info("Using working directory for test: " + workingDirectory);
+            muleConfiguration.setWorkingDirectory(workingDirectory);
+            contextBuilder.setMuleConfiguration(muleConfiguration);
             configureMuleContext(contextBuilder);
             context = muleContextFactory.createMuleContext(builders, contextBuilder);
             if (!isGracefulShutdown())
@@ -248,7 +279,18 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         if (!isDisposeContextPerClass())
         {
             disposeContext();
+            doTearDownAfterMuleContextDispose();
         }
+
+        //When an Assumption fails then junit doesn't call @Before methods so we need to avoid executing delete if there's no root folder.
+        if (workingDirectory.getRoot() != null)
+        {
+            workingDirectory.delete();
+        }
+    }
+
+    protected void doTearDownAfterMuleContextDispose() throws Exception
+    {
     }
 
     @AfterClass
@@ -358,6 +400,11 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     public static MuleEvent getTestEvent(Object data, FlowConstruct service, MessageExchangePattern mep) throws Exception
     {
         return MuleTestUtils.getTestEvent(data, service, mep, muleContext);
+    }
+
+    public static MuleEvent getTestEvent(Object data, MuleContext muleContext) throws Exception
+    {
+        return MuleTestUtils.getTestEvent(data, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
     }
 
     public static MuleEvent getTestEvent(Object data) throws Exception
@@ -521,5 +568,22 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     public TriggerableMessageSource getTriggerableMessageSource()
     {
         return new TriggerableMessageSource();
+    }
+
+    /**
+     * @return the mule application working directory where the app data is stored
+     */
+    protected File getWorkingDirectory()
+    {
+        return workingDirectory.getRoot();
+    }
+
+    /**
+     * @param fileName name of the file. Can contain subfolders separated by {@link java.io.File#separator}
+     * @return a File inside the working directory of the application.
+     */
+    protected File getFileInsideWorkingDirectory(String fileName)
+    {
+        return new File(getWorkingDirectory(), fileName);
     }
 }

@@ -1,4 +1,10 @@
 /*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+/*
 * $Id$
 * --------------------------------------------------------------------------------------
 * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
@@ -96,7 +102,15 @@ public class SftpMessageDispatcher extends AbstractMessageDispatcher
             }
 
             // send file over sftp
-            client.storeFile(transferFilename, inputStream);
+            // choose appropriate writing mode
+            if (sftpUtil.getDuplicateHandling().equals(SftpConnector.PROPERTY_DUPLICATE_HANDLING_APPEND))
+            {
+                client.storeFile(transferFilename, inputStream, SftpClient.WriteMode.APPEND);
+            }
+            else
+            {
+                client.storeFile(transferFilename, inputStream);
+            }
 
             if (useTempDir)
             {

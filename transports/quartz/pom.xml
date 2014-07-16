@@ -4,12 +4,16 @@
     <parent>
         <groupId>org.mule.transports</groupId>
         <artifactId>mule-transports</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-quartz</artifactId>
     <packaging>jar</packaging>
     <name>Quartz Transport</name>
     <description>A Mule transport for Quartz. This transport supplies a receiver for jobs scheduled with Quartz.</description>
+
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -17,10 +21,14 @@
             <artifactId>quartz</artifactId>
             <version>${quartzVersion}</version>
         </dependency>
-        <!-- The Mule client is needed for EndpointPollingJob and ScheduledDispatchJob -->
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
+            <artifactId>mule-module-spring-config</artifactId>
             <version>${project.version}</version>
         </dependency>
 

@@ -1,15 +1,12 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.servlet.jetty;
 
+import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.NoReceiverForEndpointException;
@@ -21,7 +18,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+/*
+ * TODO: MULE-7690 Replace servlets with handlers in the implementation of inbound endpoints in the Jetty transport
+ */
 public class JettyReceiverServlet extends MuleReceiverServlet
 {
     /**
@@ -30,6 +31,11 @@ public class JettyReceiverServlet extends MuleReceiverServlet
     private static final long serialVersionUID = 238326861089137293L;
 
     private ConcurrentMap receivers = new ConcurrentHashMap(4);
+
+    public JettyReceiverServlet(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+    }
 
     @Override
     protected MessageReceiver getReceiverForURI(HttpServletRequest httpServletRequest)
@@ -74,4 +80,11 @@ public class JettyReceiverServlet extends MuleReceiverServlet
         }
         return key;
     }
+
+    @Override
+    protected void processHttpRequest(HttpServletRequest request, HttpServletResponse response, MessageReceiver receiver) throws Exception
+    {
+        ((JettyHttpMessageReceiver)receiver).processMessage(request, response);
+    }
+
 }

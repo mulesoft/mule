@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util.xa;
 
 import org.mule.config.i18n.CoreMessages;
@@ -15,7 +11,6 @@ import org.mule.config.i18n.CoreMessages;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 
 import javax.transaction.Status;
 
@@ -29,7 +24,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractResourceManager
 {
-
     /**
      * Shutdown mode: Wait for all transactions to complete
      */
@@ -54,7 +48,7 @@ public abstract class AbstractResourceManager
     protected static final int DEFAULT_TIMEOUT_MSECS = 5000;
     protected static final int DEFAULT_COMMIT_TIMEOUT_FACTOR = 2;
 
-    protected Collection globalTransactions = Collections.synchronizedCollection(new ArrayList());
+    protected Collection<AbstractTransactionContext> globalTransactions = Collections.synchronizedCollection(new ArrayList<AbstractTransactionContext>());
     protected int operationMode = OPERATION_MODE_STOPPED;
     protected long defaultTimeout = DEFAULT_TIMEOUT_MSECS;
 
@@ -150,32 +144,12 @@ public abstract class AbstractResourceManager
 
     /**
      * Sets the default transaction timeout.
-     * 
+     *
      * @param timeout timeout in <em>milliseconds</em>
      */
     public void setDefaultTransactionTimeout(long timeout)
     {
         defaultTimeout = timeout;
-    }
-
-    /**
-     * Starts a new transaction and associates it with the current thread. All
-     * subsequent changes in the same thread made to the map are invisible from other
-     * threads until {@link #commitTransaction(AbstractTransactionContext)} is called. Use
-     * {@link #rollbackTransaction(AbstractTransactionContext)} to discard your changes. After 
-     * calling either method there will be no transaction associated to the current thread any
-     * longer. <br>
-     * <br>
-     * <em>Caution:</em> Be careful to finally call one of those methods, as
-     * otherwise the transaction will lurk around for ever.
-     * 
-     * @see #prepareTransaction(AbstractTransactionContext)
-     * @see #commitTransaction(AbstractTransactionContext)
-     * @see #rollbackTransaction(AbstractTransactionContext)
-     */
-    public AbstractTransactionContext startTransaction(Object session) throws ResourceManagerException
-    {
-        return createTransactionContext(session);
     }
 
     public void beginTransaction(AbstractTransactionContext context) throws ResourceManagerException
@@ -197,26 +171,6 @@ public abstract class AbstractResourceManager
             }
         }
         globalTransactions.add(context);
-    }
-
-    public int prepareTransaction(AbstractTransactionContext context) throws ResourceManagerException
-    {
-        assureReady();
-        synchronized (context)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Preparing transaction " + context);
-            }
-            context.status = Status.STATUS_PREPARING;
-            int status = doPrepare(context);
-            context.status = Status.STATUS_PREPARED;
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Prepared transaction " + context);
-            }
-            return status;
-        }
     }
 
     public void rollbackTransaction(AbstractTransactionContext context) throws ResourceManagerException
@@ -322,11 +276,7 @@ public abstract class AbstractResourceManager
         }
     }
 
-    protected abstract AbstractTransactionContext createTransactionContext(Object session);
-
     protected abstract void doBegin(AbstractTransactionContext context);
-
-    protected abstract int doPrepare(AbstractTransactionContext context);
 
     protected abstract void doCommit(AbstractTransactionContext context) throws ResourceManagerException;
 
@@ -348,12 +298,12 @@ public abstract class AbstractResourceManager
         // registered
         // after operation level has been set to stopping
 
-        Collection transactionsToStop;
+        Collection<AbstractTransactionContext> transactionsToStop;
         synchronized (globalTransactions)
         {
-            transactionsToStop = new ArrayList(globalTransactions);
+            transactionsToStop = new ArrayList<AbstractTransactionContext>(globalTransactions);
         }
-        for (Iterator it = transactionsToStop.iterator(); it.hasNext();)
+        for (AbstractTransactionContext context : transactionsToStop)
         {
             long remainingTimeout = startTime - System.currentTimeMillis() + timeoutMSecs;
 
@@ -362,7 +312,6 @@ public abstract class AbstractResourceManager
                 return false;
             }
 
-            AbstractTransactionContext context = (AbstractTransactionContext) it.next();
             synchronized (context)
             {
                 if (!context.finished)
@@ -399,7 +348,7 @@ public abstract class AbstractResourceManager
     /**
      * Flag this resource manager as dirty. No more operations will be allowed until
      * a recovery has been successfully performed.
-     * 
+     *
      * @param context
      * @param t
      */
@@ -412,7 +361,7 @@ public abstract class AbstractResourceManager
 
     /**
      * Check that the FileManager is started.
-     * 
+     *
      * @throws FileManagerSystemException if the FileManager is not started.
      */
     protected void assureStarted() throws ResourceManagerSystemException
@@ -431,7 +380,7 @@ public abstract class AbstractResourceManager
 
     /**
      * Check that the FileManager is ready.
-     * 
+     *
      * @throws FileManagerSystemException if the FileManager is neither started not
      *             stopping.
      */

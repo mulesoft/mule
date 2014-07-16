@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.properties;
 
 import static org.junit.Assert.assertEquals;
@@ -15,7 +11,7 @@ import static org.junit.Assert.assertNull;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -46,7 +42,7 @@ public class PropertiesTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testProperties() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         MuleMessage msg1 = createOutboundMessage();
         MuleMessage response = client.send("vm://in", msg1);
@@ -64,8 +60,7 @@ public class PropertiesTestCase extends AbstractServiceAndFlowTestCase
 
         MuleMessage msg2 = createOutboundMessage();
         client.dispatch("vm://inQueue", msg2);
-        Thread.sleep(1000);
-        response = client.request("vm://outQueue", 0);
+        response = client.request("vm://outQueue", RECEIVE_TIMEOUT);
         assertEquals(response.getPayloadAsString(), "OK");
         assertEquals("yes", response.getInboundProperty("outbound1"));
         assertEquals("no", response.getInboundProperty("outbound2"));

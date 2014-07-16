@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.file;
 
 import org.mule.api.DefaultMuleException;
@@ -54,7 +50,7 @@ public class FileConnector extends AbstractConnector
     private static Log logger = LogFactory.getLog(FileConnector.class);
 
     public static final String FILE = "file";
-    private static final String DEFAULT_WORK_FILENAME_PATTERN = "#[function:uuid].#[function:systime].#[header:originalFilename]";
+    private static final String DEFAULT_WORK_FILENAME_PATTERN = "#[function:uuid].#[function:systime].#[header:inbound:originalFilename]";
 
     // These are properties that can be overridden on the Receiver by the endpoint declaration
     // inbound only
@@ -68,8 +64,9 @@ public class FileConnector extends AbstractConnector
     // message properties
     public static final String PROPERTY_FILENAME = "filename";
     public static final String PROPERTY_ORIGINAL_FILENAME = "originalFilename";
-    public static final String PROPERTY_SOURCE_FILENAME = "sourceFileName";
+    public static final String PROPERTY_ORIGINAL_DIRECTORY = "originalDirectory";
     public static final String PROPERTY_DIRECTORY = "directory";
+    public static final String PROPERTY_SOURCE_FILENAME = "sourceFileName";
     public static final String PROPERTY_SOURCE_DIRECTORY = "sourceDirectory";
     public static final String PROPERTY_WRITE_TO_DIRECTORY = "writeToDirectoryName";
     public static final String PROPERTY_FILE_SIZE = "fileSize";
@@ -615,7 +612,7 @@ public class FileConnector extends AbstractConnector
         // See MULE-3209, MULE-3199
         if (isStreaming())
         {
-            return new FileMuleMessageFactory(muleContext);
+            return new FileMuleMessageFactory();
         }
         else
         {

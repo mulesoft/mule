@@ -12,9 +12,9 @@
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.4/mule.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.5/mule.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/schemadoc"
-                schemaLocation="http://www.mulesoft.org/schema/mule/schemadoc/3.4/mule-schemadoc.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/schemadoc/3.5/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>
@@ -197,7 +197,7 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
                 <xsd:attribute name="resourceResolver-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Reference to a Spring bean that implements <code>org.w3c.dom.ls.LSResourceResolver</code>.
+                            Reference to a Spring bean that implements <code>org.w3c.dom.ls.LSResourceResolver</code>. By default a <code>oorg.mule.module.xml.util.MuleResourceResolver</code> instance will be used to resolve from the file system, from a URL, or from the classpath, in that specific order.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -221,6 +221,15 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
                 <xsd:attribute name="outputEncoding" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>The encoding to use for the resulting XML/Text.</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="acceptExternalEntities" type="mule:substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to accept XML documents with references to external files.
+                            Default value is false. Setting this value to true will make your application
+                            vulnerable to XXE attacks. Use with extreme care.
+                        </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
             </xsd:extension>

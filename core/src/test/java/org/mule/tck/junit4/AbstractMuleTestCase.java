@@ -1,17 +1,12 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.tck.junit4;
 
 import static org.junit.Assume.assumeThat;
-
 import org.mule.RequestContext;
 import org.mule.tck.junit4.rule.WarningTimeout;
 import org.mule.util.ClassUtils;
@@ -25,7 +20,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.IteratorUtils;
@@ -37,6 +35,7 @@ import org.hamcrest.Description;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.junit.rules.TestRule;
@@ -128,6 +127,7 @@ public abstract class AbstractMuleTestCase
 
     /**
      * Reads the mule-exclusion file for the current test class and
+     *
      * @param test
      */
     protected boolean isTestIncludedInExclusionFile(AbstractMuleTestCase test)
@@ -266,9 +266,9 @@ public abstract class AbstractMuleTestCase
     @Before
     public final void initializeMuleTest()
     {
-        printTestHeader();
         skipTestWhenExcluded();
         skipTestWhenDisabledInCurrentEnvironment();
+        printTestHeader();
     }
 
     private void printTestHeader()
@@ -346,4 +346,85 @@ public abstract class AbstractMuleTestCase
     {
         excluded = null;
     }
+
+    private static List<String> collectThreadNames()
+    {
+        List<String> threadNames = new ArrayList<String>();
+        for (Thread t : Thread.getAllStackTraces().keySet())
+        {
+            if (t.isAlive())
+            {
+                threadNames.add(t.getName() + " - " + t.getId());
+            }
+        }
+        Collections.sort(threadNames);
+        return threadNames;
+    }
+
+
+    private static String testCaseName;
+
+    @BeforeClass
+    public static void clearTestCaseName()
+    {
+        testCaseName = null;
+    }
+
+    @Before
+    public void takeTestCaseName()
+    {
+        if (testCaseName == null)
+        {
+            testCaseName = this.getClass().getName();
+        }
+    }
+
+    @AfterClass
+    public static void dumpFilteredThreadsInTest()
+    {
+        List<String> currentThreads = collectThreadNames();
+        int filteredThreads = 0;
+        StringBuilder builder = new StringBuilder();
+        for (String threadName : currentThreads)
+        {
+            if (!nameIn(threadName, "Finalizer", "Monitor Ctrl-Break", "Reference Handler", "Signal Dispatcher", "main"))
+            {
+                builder.append("\n-> ").append(threadName);
+                filteredThreads++;
+            }
+        }
+        if (filteredThreads > 0)
+        {
+            logThreadsResult(String.format("Hung threads count: %d. Test case: %s. Thread names:%s", filteredThreads, testCaseName, builder.toString()));
+        }
+        else
+        {
+            logThreadsResult(String.format("No hung threads. Test case: %s", testCaseName));
+        }
+    }
+
+    private static boolean nameIn(String threadName, String... values)
+    {
+        String threadNameLowercase = threadName.toLowerCase();
+        if (values != null)
+        {
+            for (String value : values)
+            {
+                if (threadNameLowercase.startsWith(value.toLowerCase()))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static final transient String THREAD_RESULT_LINE = StringUtils.repeat('-', 80);
+    private static final transient Log LOGGER = LogFactory.getLog(AbstractMuleTestCase.class);
+
+    private static void logThreadsResult(String result)
+    {
+        LOGGER.warn(String.format("\n%s\n%s\n%s\n", THREAD_RESULT_LINE, result, THREAD_RESULT_LINE));
+    }
+
 }

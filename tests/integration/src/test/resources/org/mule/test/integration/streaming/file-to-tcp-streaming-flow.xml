@@ -15,7 +15,7 @@
     </tcp:connector>
 
     <flow name="bridge1">
-        <file:inbound-endpoint path=".mule/test-data/in" moveToDirectory=".mule/test-data/processing"
+        <file:inbound-endpoint path="${workingDirectory}/test-data/in" moveToDirectory=".mule/test-data/processing"
                                pollingFrequency="10000000"/>
         <tcp:outbound-endpoint host="localhost" port="${port1}" exchange-pattern="one-way"/>
     </flow>
@@ -27,7 +27,7 @@
             <stdio:outbound-endpoint system="OUT" exchange-pattern="one-way">
                 <auto-transformer returnClass="java.lang.String"/>
             </stdio:outbound-endpoint>
-            <file:outbound-endpoint path=".mule/test-data/out" encoding="UTF8" outputPattern="foo.txt.processed"/>
+            <file:outbound-endpoint path="${workingDirectory}/test-data/out" encoding="UTF8" outputPattern="foo.txt.processed"/>
         </all>
     </flow>
 

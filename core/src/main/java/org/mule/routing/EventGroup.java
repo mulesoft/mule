@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.routing;
 
 import org.mule.DefaultMessageCollection;
@@ -64,6 +60,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     private String commonRootId = null;
     private static boolean hasNoCommonRootId = false;
     private int arrivalOrderCounter = 0;
+    private Serializable lastStoredEventKey;
 
     public static final String DEFAULT_STORE_PREFIX = "DEFAULT_STORE";
 
@@ -79,7 +76,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
                       String storePrefix)
     {
         super();
-        this.created = System.nanoTime();
+        this.created = System.currentTimeMillis();
         this.muleContext = muleContext;
         this.storePrefix = storePrefix;
 
@@ -263,6 +260,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
             //when an event is split up, the same event IDs are used.
             Serializable key=event.getId()+event.getMessage().getCorrelationSequence();
             event.getMessage().setInvocationProperty(MULE_ARRIVAL_ORDER_PROPERTY, ++arrivalOrderCounter);
+            lastStoredEventKey = key;
             events.store(key, event);
 
             if (!hasNoCommonRootId)
@@ -297,7 +295,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     }
 
     /**
-     * Return the creation timestamp of the current group in nanoseconds.
+     * Return the creation timestamp of the current group in milliseconds.
      *
      * @return the timestamp when this group was instantiated.
      */
@@ -351,7 +349,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     @Override
     public String toString()
     {
-        StringBuffer buf = new StringBuffer(80);
+        StringBuilder buf = new StringBuilder(80);
         buf.append(ClassUtils.getSimpleName(this.getClass()));
         buf.append(" {");
         buf.append("id=").append(groupId);
@@ -433,8 +431,9 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
             if (size() > 0)
             {
 
+                MuleEvent lastEvent = retrieveLastStoredEvent();
                 DefaultMuleEvent muleEvent = new DefaultMuleEvent(toMessageCollection(),
-                    events.retrieve(events.allKeys().get(0)), getMergedSession());
+                                                                  lastEvent, getMergedSession());
                 if (getCommonRootId() != null)
                 {
                     muleEvent.getMessage().setMessageRootId(commonRootId);
@@ -453,27 +452,42 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         }
     }
 
+    private MuleEvent retrieveLastStoredEvent() throws ObjectStoreException
+    {
+        return events.retrieve(lastStoredEventKey);
+    }
+
     protected MuleSession getMergedSession() throws ObjectStoreException
     {
+        MuleEvent lastStoredEvent = retrieveLastStoredEvent();
         MuleSession session = new DefaultMuleSession(
-            events.retrieve(events.allKeys().get(0)).getSession());
+                lastStoredEvent.getSession());
         for (Serializable key : events.allKeys())
         {
-            MuleEvent event = events.retrieve(key);
-            for (String name : event.getSession().getPropertyNamesAsSet())
+            if (!key.equals(lastStoredEventKey))
             {
-                session.setProperty(name, event.getSession().getProperty(name));
+                MuleEvent event = events.retrieve(key);
+                addAndOverrideSessionProperties(session, event);
             }
         }
+        addAndOverrideSessionProperties(session, lastStoredEvent);
         return session;
+    }
+
+    private void addAndOverrideSessionProperties(MuleSession session, MuleEvent event)
+    {
+        for (String name : event.getSession().getPropertyNamesAsSet())
+        {
+            session.setProperty(name, event.getSession().getProperty(name));
+        }
     }
 
     private ObjectStoreManager getObjectStoreManager()
     {
         if (objectStoreManager == null)
         {
-            objectStoreManager = (ObjectStoreManager) muleContext.getRegistry().get(
-                MuleProperties.OBJECT_STORE_MANAGER);
+            objectStoreManager = muleContext.getRegistry().get(
+                    MuleProperties.OBJECT_STORE_MANAGER);
         }
         return objectStoreManager;
     }

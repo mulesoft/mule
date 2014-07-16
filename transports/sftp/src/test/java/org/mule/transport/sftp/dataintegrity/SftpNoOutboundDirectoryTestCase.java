@@ -1,17 +1,18 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.sftp.dataintegrity;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import org.mule.api.client.MuleClient;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.transport.DispatchException;
+import org.mule.transport.sftp.SftpClient;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -19,10 +20,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.transport.DispatchException;
-import org.mule.module.client.MuleClient;
-import org.mule.transport.sftp.SftpClient;
 
 /**
  * Verify that the original file is not lost if the outbound directory doesn't exist
@@ -57,7 +54,7 @@ public class SftpNoOutboundDirectoryTestCase extends AbstractSftpDataIntegrityTe
     @Test
     public void testNoOutboundDirectory() throws Exception
     {
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient muleClient = muleContext.getClient();
 
         // Send an file to the SFTP server, which the inbound-outboundEndpoint then
         // can pick up
@@ -76,10 +73,10 @@ public class SftpNoOutboundDirectoryTestCase extends AbstractSftpDataIntegrityTe
             .getMessage()
             .endsWith("/DIRECTORY-MISSING'."));
 
-        SftpClient sftpClient = getSftpClient(muleClient, ENDPOINT_NAME);
+        SftpClient sftpClient = getSftpClient(ENDPOINT_NAME);
         try
         {
-            ImmutableEndpoint endpoint = (ImmutableEndpoint) muleClient.getProperty(ENDPOINT_NAME);
+            ImmutableEndpoint endpoint = muleContext.getRegistry().lookupObject(ENDPOINT_NAME);
             assertTrue("The inbound file should still exist",
                 super.verifyFileExists(sftpClient, endpoint.getEndpointURI(), FILENAME));
         }

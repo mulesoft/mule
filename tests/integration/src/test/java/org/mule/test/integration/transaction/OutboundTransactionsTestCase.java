@@ -1,30 +1,25 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.integration.transaction;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 public class OutboundTransactionsTestCase extends FunctionalTestCase
 {
-
     private static final int TIMEOUT = 2000;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/transaction/outbound-transactions.xml";
     }
@@ -74,5 +69,4 @@ public class OutboundTransactionsTestCase extends FunctionalTestCase
         assertNull(client.request("jms://my.queue3", TIMEOUT));
         assertNull(client.request("jms://my.queue4", TIMEOUT));
     }
-
 }

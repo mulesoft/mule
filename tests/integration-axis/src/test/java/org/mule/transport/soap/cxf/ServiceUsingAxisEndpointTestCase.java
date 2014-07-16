@@ -1,18 +1,17 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.soap.cxf;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -26,19 +25,15 @@ import org.dom4j.Element;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class ServiceUsingAxisEndpointTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
-    
+
     @Test
     public void testCXF() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage reply = client.send("vm://cxf.in", new DefaultMuleMessage("Testing String", muleContext));
 
         assertNotNull(reply);
@@ -49,8 +44,8 @@ public class ServiceUsingAxisEndpointTestCase extends FunctionalTestCase
     @Test
     public void testRequestWsdl() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        Map<String, String> props = new HashMap<String, String>();
+        MuleClient client = muleContext.getClient();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("http.method", "GET");
         MuleMessage reply = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/CxfService?wsdl",
             "/services/CxfService?wsdl", props);
@@ -59,15 +54,14 @@ public class ServiceUsingAxisEndpointTestCase extends FunctionalTestCase
         assertNotNull(reply.getPayload());
 
         Document document = DocumentHelper.parseText(reply.getPayloadAsString());
-        
+
         List<?> nodes = document.selectNodes("//wsdl:definitions/wsdl:service");
         assertEquals("CxfService", ((Element) nodes.get(0)).attribute("name").getStringValue());
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "using-axis-conf.xml";
     }
-
 }

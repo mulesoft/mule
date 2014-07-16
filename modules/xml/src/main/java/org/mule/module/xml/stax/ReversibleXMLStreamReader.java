@@ -1,28 +1,13 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.xml.stax;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-
-import javanet.staxutils.events.AttributeEvent;
-import javanet.staxutils.events.CDataEvent;
-import javanet.staxutils.events.CharactersEvent;
-import javanet.staxutils.events.CommentEvent;
-import javanet.staxutils.events.EndDocumentEvent;
-import javanet.staxutils.events.EndElementEvent;
-import javanet.staxutils.events.NamespaceEvent;
-import javanet.staxutils.events.StartDocumentEvent;
-import javanet.staxutils.events.StartElementEvent;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
@@ -34,19 +19,31 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.XMLEvent;
 
+import javanet.staxutils.events.AbstractCharactersEvent;
+import javanet.staxutils.events.AttributeEvent;
+import javanet.staxutils.events.CDataEvent;
+import javanet.staxutils.events.CharactersEvent;
+import javanet.staxutils.events.CommentEvent;
+import javanet.staxutils.events.EndDocumentEvent;
+import javanet.staxutils.events.EndElementEvent;
+import javanet.staxutils.events.NamespaceEvent;
+import javanet.staxutils.events.StartDocumentEvent;
+import javanet.staxutils.events.StartElementEvent;
+
 public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 {
-    private List events;
+    private List<XMLEvent> events;
     private XMLEvent current;
     private int replayIndex;
     private boolean tracking = false;
     private boolean replay = false;
-    
+
     public ReversibleXMLStreamReader(XMLStreamReader reader)
     {
         super(reader);
     }
 
+    @Override
     public int nextTag() throws XMLStreamException
     {
         int eventType = next();
@@ -80,18 +77,19 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
     public void setTracking(boolean tracking)
     {
         this.tracking = tracking;
-        
+
         if (tracking)
         {
             replayIndex = 0;
-            
+
             if (events == null)
             {
-                events = new ArrayList();
+                events = new ArrayList<XMLEvent>();
             }
         }
     }
 
+    @Override
     public int next() throws XMLStreamException
     {
         int event;
@@ -112,8 +110,8 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         {
             event = super.next();
         }
-        
-        if (tracking && !replay) 
+
+        if (tracking && !replay)
         {
             capture(event);
         }
@@ -123,7 +121,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     private int getReplayEvent()
     {
-        current = (XMLEvent) events.get(replayIndex);
+        current = events.get(replayIndex);
         replayIndex++;
 
         return current.getEventType();
@@ -131,7 +129,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     /**
      * Capture the current event;
-     * 
+     *
      * @param event
      */
     private void capture(int event)
@@ -177,7 +175,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     private StartElementEvent createStartElementEvent()
     {
-        List attributes = new ArrayList();
+        List<AttributeEvent> attributes = new ArrayList<AttributeEvent>();
         for (int i = 0; i < getAttributeCount(); i++)
         {
             attributes.add(new AttributeEvent(getAttributeName(i), getAttributeValue(i)));
@@ -199,9 +197,9 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         return ctx;
     }
 
-    private List getNamespaces()
+    private List<Namespace> getNamespaces()
     {
-        List namespaces = new ArrayList();
+        List<Namespace> namespaces = new ArrayList<Namespace>();
         for (int i = 0; i < getNamespaceCount(); i++)
         {
             namespaces.add(new NamespaceEvent(getNamespacePrefix(i), getNamespaceURI(i), getLocation()));
@@ -209,6 +207,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         return namespaces;
     }
 
+    @Override
     public String getElementText() throws XMLStreamException
     {
         if (getEventType() != XMLStreamConstants.START_ELEMENT)
@@ -217,7 +216,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
 
         int eventType = next();
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         while (eventType != XMLStreamConstants.END_ELEMENT)
         {
             if (eventType == XMLStreamConstants.CHARACTERS || eventType == XMLStreamConstants.CDATA
@@ -249,6 +248,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     }
 
+    @Override
     public int getAttributeCount()
     {
         if (replay)
@@ -261,6 +261,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public String getAttributeLocalName(int i)
     {
 
@@ -269,12 +270,13 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
             Attribute att = (Attribute) ((StartElementEventX) current).getAttributeList().get(i);
             return att.getName().getLocalPart();
         }
-        else 
+        else
         {
             return super.getAttributeLocalName(i);
         }
     }
 
+    @Override
     public QName getAttributeName(int i)
     {
 
@@ -289,6 +291,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public String getAttributeNamespace(int i)
     {
 
@@ -303,6 +306,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public String getAttributePrefix(int i)
     {
         if (replay)
@@ -316,6 +320,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public String getAttributeType(int i)
     {
         if (replay)
@@ -329,6 +334,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public String getAttributeValue(int i)
     {
         if (replay)
@@ -342,6 +348,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public String getAttributeValue(String ns, String local)
     {
         if (replay)
@@ -362,6 +369,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public int getEventType()
     {
         if (replay)
@@ -378,6 +386,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public String getLocalName()
     {
         if (replay)
@@ -386,7 +395,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
             {
                 return ((StartElementEventX) current).getName().getLocalPart();
             }
-            else 
+            else
             {
                 return ((EndElementEvent) current).getName().getLocalPart();
             }
@@ -397,6 +406,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public Location getLocation()
     {
         if (replay)
@@ -409,6 +419,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public QName getName()
     {
         if (replay)
@@ -417,7 +428,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
             {
                 return ((StartElementEventX) current).getName();
             }
-            else 
+            else
             {
                 return ((EndElementEvent) current).getName();
             }
@@ -428,6 +439,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public NamespaceContext getNamespaceContext()
     {
         if (replay)
@@ -440,6 +452,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public int getNamespaceCount()
     {
         if (replay)
@@ -459,6 +472,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public String getNamespacePrefix(int arg0)
     {
         if (replay)
@@ -482,6 +496,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public String getNamespaceURI()
     {
         if (replay)
@@ -490,7 +505,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
             {
                 return ((StartElementEventX) current).getName().getNamespaceURI();
             }
-            else 
+            else
             {
                 return ((EndElementEvent) current).getName().getNamespaceURI();
             }
@@ -501,12 +516,13 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public String getNamespaceURI(int arg0)
     {
         if (replay)
         {
             Namespace ns = (Namespace) ((StartElementEventX) current).getNamespaceList().get(arg0);
-            
+
             return ns.getNamespaceURI();
         }
         else
@@ -515,6 +531,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public String getNamespaceURI(String prefix)
     {
         if (replay)
@@ -527,6 +544,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public String getPIData()
     {
         if (replay)
@@ -539,6 +557,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public String getPITarget()
     {
         if (replay)
@@ -551,6 +570,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public String getPrefix()
     {
         if (replay)
@@ -559,7 +579,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
             {
                 return ((StartElementEventX) current).getName().getPrefix();
             }
-            else 
+            else
             {
                 return ((EndElementEvent) current).getName().getPrefix();
             }
@@ -570,6 +590,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public String getText()
     {
         if (replay)
@@ -580,7 +601,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
             }
             else
             {
-                return ((CharactersEvent) current).getData();
+                return ((AbstractCharactersEvent) current).getData();
             }
         }
         else
@@ -589,6 +610,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public char[] getTextCharacters()
     {
         if (replay)
@@ -601,6 +623,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public int getTextCharacters(int sourceStart, char[] target, int targetStart, int length) throws XMLStreamException
     {
         if (replay)
@@ -623,6 +646,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public int getTextLength()
     {
         if (replay)
@@ -635,6 +659,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public int getTextStart()
     {
         if (replay)
@@ -647,6 +672,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public boolean hasName()
     {
         if (replay)
@@ -659,11 +685,12 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public boolean hasNext() throws XMLStreamException
     {
         if (replay)
         {
-            if (replayIndex == events.size()) 
+            if (replayIndex == events.size())
             {
                 return super.hasNext();
             }
@@ -678,6 +705,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public boolean hasText()
     {
         if (replay)
@@ -692,6 +720,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public boolean isAttributeSpecified(int i)
     {
         if (replay)
@@ -705,6 +734,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public boolean isCharacters()
     {
         if (replay)
@@ -717,6 +747,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public boolean isEndElement()
     {
         if (replay)
@@ -730,6 +761,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
     }
 
 
+    @Override
     public boolean isStartElement()
     {
         if (replay)
@@ -742,6 +774,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         }
     }
 
+    @Override
     public boolean isWhiteSpace()
     {
         if (replay)

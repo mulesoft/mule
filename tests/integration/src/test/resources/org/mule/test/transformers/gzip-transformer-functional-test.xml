@@ -16,4 +16,9 @@
         <gzip-uncompress-transformer/>
     </flow>
 
+    <flow name="decompressInputString">
+        <vm:inbound-endpoint path="decompressInputString" exchange-pattern="request-response"/>
+        <gzip-uncompress-transformer returnClass="java.lang.String"/>
+    </flow>
+
 </mule>

@@ -1,20 +1,16 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util.store;
 
 import org.mule.api.MuleContext;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectStoreException;
-import org.mule.util.queue.QueueKey;
+import org.mule.util.queue.objectstore.QueueKey;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -59,6 +55,14 @@ public class PartitionedObjectStoreWrapper<T extends Serializable> implements Li
     public T retrieve(Serializable key) throws ObjectStoreException
     {
         return getStore().retrieve(new QueueKey(partitionName, key));
+    }
+    
+    @Override
+    public void clear() throws ObjectStoreException
+    {
+        for (Serializable key : this.allKeys()) {
+            this.remove(key);
+        }
     }
 
     @Override

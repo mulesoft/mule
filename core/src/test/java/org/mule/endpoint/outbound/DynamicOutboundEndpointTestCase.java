@@ -1,18 +1,13 @@
 /*
- * $Id$
- * -------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.endpoint.outbound;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -21,6 +16,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.MessageExchangePattern;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
@@ -40,6 +36,8 @@ import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.endpoint.AbstractMessageProcessorTestCase;
 import org.mule.endpoint.DynamicOutboundEndpoint;
+import org.mule.endpoint.DynamicURIBuilder;
+import org.mule.endpoint.URIBuilder;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
@@ -83,13 +81,8 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
 
         assertEventSent();
 
-        // Response message is not the same because we rewrite the response event and
-        // this change the properties
-        // (See: OutboundRewriteResponseEventMessageProcessor)
-        assertNotSame(responseMessage, result.getMessage());
+        assertSame(responseMessage, result.getMessage());
 
-        // Everything else about the message apart from addition of encoding property
-        // is the same though
         assertMessageEqualEncodingPropertyAdded(responseMessage, result.getMessage());
     }
 
@@ -119,13 +112,8 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         assertEventSent();
         assertMessageSentEqual(MyMessageDispatcherFactory.dispatcher.sensedSendEvent);
 
-        // Response message is not the same because we rewrite the response event and
-        // this change the properties
-        // (See: OutboundRewriteResponseEventMessageProcessor)
-        assertNotSame(responseMessage, result.getMessage());
+        assertSame(responseMessage, result.getMessage());
 
-        // Everything else about the message apart from addition of encoding property
-        // is the same though
         assertMessageEqualEncodingPropertyAdded(responseMessage, result.getMessage());
     }
 
@@ -268,7 +256,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         when(endpointBuilder.buildOutboundEndpoint()).thenReturn(prototypeEndpoint);
         when(endpointBuilder.clone()).thenReturn(staticEndpointBuilder);
 
-        DynamicOutboundEndpoint dynamicOutboundEndpoint = new DynamicOutboundEndpoint(endpointBuilder, "test://localhost:#[header:port]");
+        DynamicOutboundEndpoint dynamicOutboundEndpoint = new DynamicOutboundEndpoint(endpointBuilder, new DynamicURIBuilder(new URIBuilder("test://localhost:#[header:port]", muleContext)));
 
         testOutboundEvent = createTestOutboundEvent();
         dynamicOutboundEndpoint.process(testOutboundEvent);

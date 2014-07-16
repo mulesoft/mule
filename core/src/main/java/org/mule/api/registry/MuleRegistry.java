@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.api.registry;
 
 import org.mule.api.MuleContext;
@@ -18,11 +14,13 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.model.Model;
+import org.mule.api.schedule.Scheduler;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
+import org.mule.util.Predicate;
 
 import java.util.Collection;
 import java.util.List;
@@ -217,6 +215,13 @@ public interface MuleRegistry extends Registry
     void registerAgent(Agent agent) throws MuleException;
 
     void unregisterAgent(String agentName) throws MuleException;
+
+
+    void registerScheduler(Scheduler scheduler) throws MuleException;
+
+    void unregisterScheduler(Scheduler scheduler) throws MuleException;
+
+    Collection<Scheduler> lookupScheduler(Predicate<String> schedulerNamePredicate);
 
     /**
      * Will execute any processors on an object and fire any lifecycle methods according to the current lifecycle without actually

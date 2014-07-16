@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -18,6 +15,7 @@ import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.api.el.ExpressionLanguage;
 import org.mule.api.endpoint.EndpointFactory;
+import org.mule.api.endpoint.OutboundEndpointExecutorFactory;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.exception.SystemExceptionHandler;
@@ -30,6 +28,8 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.store.ListableObjectStore;
+import org.mule.api.store.ObjectStoreManager;
+import org.mule.api.util.StreamCloserService;
 import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
@@ -186,6 +186,8 @@ public interface MuleContext extends Lifecycle
      * service queues.
      */
     QueueManager getQueueManager();
+    
+    ObjectStoreManager getObjectStoreManager();
 
     AllStatistics getStatistics();
 
@@ -204,6 +206,14 @@ public interface MuleContext extends Lifecycle
     ThreadingProfile getDefaultServiceThreadingProfile();
 
     ThreadingProfile getDefaultThreadingProfile();
+
+    /**
+     * Returns the configured {@link org.mule.api.util.StreamCloserService}
+     *
+     * @return a {@link org.mule.api.util.StreamCloserService}
+     * @since 3.5.0
+     */
+    public StreamCloserService getStreamCloserService();
 
     // TODO This should ideally only be available via an Admin interface
     void addRegistry(Registry registry);
@@ -316,5 +326,21 @@ public interface MuleContext extends Lifecycle
      * @return {@link {ProcessingTimeWatcher} used to compute processing time of finalized events
      */
     ProcessingTimeWatcher getProcessorTimeWatcher();
+
+    /**
+     * Makes the caller wait until the {@link MuleContext} was started
+     *
+     * @param timeout maximum number of milliseconds that will be waiting
+     * @return true if the context started before the timeout, false otherwise
+     * @throws InterruptedException if the current thread is interrupted while waiting
+     */
+    boolean waitUntilStarted(int timeout) throws InterruptedException;
+
+    /**
+     * @return factory for creating a message processor outbound endpoint
+     * ready to be executed in the context of a pipeline. }
+     */
+    OutboundEndpointExecutorFactory getOutboundEndpointExecutorFactory();
+
 }
 

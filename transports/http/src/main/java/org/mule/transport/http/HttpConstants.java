@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.http;
 
 import org.mule.api.config.MuleProperties;
@@ -55,6 +51,9 @@ public class HttpConstants
 
     // The default content type
     public static final String DEFAULT_CONTENT_TYPE = "text/plain";
+
+    //form-urlencoded content type
+    public static final String FORM_URLENCODED_CONTENT_TYPE = "application/x-www-form-urlencoded";
 
     // Headers
     public static final String HEADER_ACCEPT = "Accept"; // [Request]
@@ -109,6 +108,7 @@ public class HttpConstants
     public static final String HEADER_VIA = "Via"; // [General]
     public static final String HEADER_WARNING = "Warning"; // [General]
     public static final String HEADER_WWW_AUTHENTICATE = "WWW-Authenticate"; // [Response]
+    public static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For"; // [Request]
 
     // This is a POST-related request header value
     public static final String HEADER_EXPECT_CONTINUE_REQUEST_VALUE = "100-continue"; // [Request]
@@ -187,7 +187,7 @@ public class HttpConstants
             HEADER_ACCEPT_LANGUAGE, HEADER_AUTHORIZATION, HEADER_COOKIE, HEADER_EXPECT, HEADER_FROM,
             HEADER_HOST, HEADER_IF_MATCH, HEADER_IF_MODIFIED_SINCE, HEADER_IF_NONE_MATCH,
             HEADER_IF_RANGE, HEADER_IF_UNMODIFIED_SINCE, HEADER_MAX_FORWARDS, HEADER_PROXY_AUTHORIZATION,
-            HEADER_RANGE, HEADER_REFERER, HEADER_TE, HEADER_USER_AGENT, HEADER_SLUG};
+            HEADER_RANGE, HEADER_REFERER, HEADER_TE, HEADER_USER_AGENT, HEADER_SLUG, HEADER_X_FORWARDED_FOR};
 
         REQUEST_HEADER_NAMES = Collections.unmodifiableMap(MapUtils.mapWithKeysAndValues(
             CaseInsensitiveMap.class, strings, strings));

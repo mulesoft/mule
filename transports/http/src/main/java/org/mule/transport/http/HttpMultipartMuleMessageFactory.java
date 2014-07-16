@@ -1,17 +1,12 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.http;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
 import org.mule.transport.http.multipart.MultiPartInputStream;
 import org.mule.transport.http.multipart.Part;
 import org.mule.transport.http.multipart.PartDataSource;
@@ -26,11 +21,6 @@ public class HttpMultipartMuleMessageFactory extends HttpMuleMessageFactory
 {
 
     private Collection<Part> parts;
-
-    public HttpMultipartMuleMessageFactory(MuleContext context)
-    {
-        super(context);
-    }
 
     @Override
     protected Object extractPayloadFromHttpRequest(HttpRequest httpRequest) throws IOException
@@ -50,10 +40,6 @@ public class HttpMultipartMuleMessageFactory extends HttpMuleMessageFactory
                     body = part.getInputStream();
                     break;
                 }
-            }
-            if (body == null)
-            {
-                throw new IllegalArgumentException("no part named \"payload\" found");
             }
         }
         else

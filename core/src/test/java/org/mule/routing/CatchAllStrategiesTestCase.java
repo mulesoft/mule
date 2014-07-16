@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.routing;
 
 import static org.junit.Assert.assertEquals;
@@ -161,7 +157,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleContextTestCase
         };
 
         filterRouter1.setFilter(new PayloadTypeFilter(Exception.class));
-        filterRouter2.setFilter(new PayloadTypeFilter(StringBuffer.class));
+        filterRouter2.setFilter(new PayloadTypeFilter(StringBuilder.class));
         messageRouter.addRoute(filterRouter1);
         messageRouter.addRoute(filterRouter2);
 
@@ -181,7 +177,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleContextTestCase
         assertEquals(0, count1[0]);
         assertEquals(0, count2[0]);
 
-        messageRouter.process(getTestEvent(new StringBuffer()));
+        messageRouter.process(getTestEvent(new StringBuilder()));
         assertEquals(1, catchAllCount[0]);
         assertEquals(0, count1[0]);
         assertEquals(1, count2[0]);

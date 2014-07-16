@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.cxf.support;
 
 import java.io.OutputStream;
@@ -26,6 +22,7 @@ import javax.wsdl.Import;
 import javax.wsdl.Port;
 import javax.wsdl.Service;
 import javax.wsdl.Types;
+import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.schema.Schema;
 import javax.wsdl.extensions.schema.SchemaImport;
@@ -62,7 +59,7 @@ import org.xml.sax.InputSource;
  */
 public class WSDLQueryHandler implements StemMatchingQueryHandler {
     private static final Logger LOG = LogUtils.getL7dLogger(WSDLQueryHandler.class);
-    private Bus bus;
+    protected Bus bus;
 
     public WSDLQueryHandler(Bus b) {
         bus = b;
@@ -152,7 +149,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
             }
 
             if (!mp.containsKey("")) {
-                Definition def = new ServiceWSDLBuilder(bus, endpointInfo.getService()).build();
+                Definition def = getDefinition(endpointInfo);
 
                 mp.put("", def);
                 updateDefinition(def, mp, smp, base, endpointInfo);
@@ -242,6 +239,12 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
         }
     }
 
+
+    protected Definition getDefinition(EndpointInfo endpointInfo) throws WSDLException
+    {
+        return new ServiceWSDLBuilder(bus, endpointInfo.getService()).build();
+    }
+
     protected void updateDoc(Document doc, String base,
                            Map<String, Definition> mp,
                            Map<String, SchemaReference> smp,
@@ -256,7 +259,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
             for (Element el : elementList) {
                 String sl = el.getAttribute("schemaLocation");
                 if (smp.containsKey(URLDecoder.decode(sl, "utf-8"))) {
-                    el.setAttribute("schemaLocation", base + "?xsd=" + sl.replace(" ", "%20"));
+                    el.setAttribute("schemaLocation", rewriteSchemaLocation(base, sl));
                 }
             }
 
@@ -266,7 +269,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
             for (Element el : elementList) {
                 String sl = el.getAttribute("schemaLocation");
                 if (smp.containsKey(URLDecoder.decode(sl, "utf-8"))) {
-                    el.setAttribute("schemaLocation", base + "?xsd=" + sl.replace(" ", "%20"));
+                    el.setAttribute("schemaLocation", rewriteSchemaLocation(base, sl));
                 }
             }
             elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
@@ -275,7 +278,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
             for (Element el : elementList) {
                 String sl = el.getAttribute("schemaLocation");
                 if (smp.containsKey(URLDecoder.decode(sl, "utf-8"))) {
-                    el.setAttribute("schemaLocation", base + "?xsd=" + sl.replace(" ", "%20"));
+                    el.setAttribute("schemaLocation", rewriteSchemaLocation(base, sl));
                 }
             }
             elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
@@ -284,7 +287,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
             for (Element el : elementList) {
                 String sl = el.getAttribute("location");
                 if (mp.containsKey(URLDecoder.decode(sl, "utf-8"))) {
-                    el.setAttribute("location", base + "?wsdl=" + sl.replace(" ", "%20"));
+                    el.setAttribute("location", rewriteSchemaLocation(base, sl));
                 }
             }
         } catch (UnsupportedEncodingException e) {
@@ -293,12 +296,29 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                                                       base), e);
         }
 
+        rewriteOperationAddress(ei, doc, base);
+
+        try {
+            doc.setXmlStandalone(true);
+        } catch (Exception ex) {
+            //likely not DOM level 3
+        }
+    }
+
+    protected String rewriteSchemaLocation(String base, String schemaLocation)
+    {
+        return base + "?xsd=" + schemaLocation.replace(" ", "%20");
+    }
+
+    protected void rewriteOperationAddress(EndpointInfo ei, Document doc, String base)
+    {
         Boolean rewriteSoapAddress = ei.getProperty("autoRewriteSoapAddress", Boolean.class);
+        List<Element> elementList = null;
 
         if (rewriteSoapAddress != null && rewriteSoapAddress.booleanValue()) {
             List<Element> serviceList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
-                                                              "http://schemas.xmlsoap.org/wsdl/",
-                                                              "service");
+                                                                            "http://schemas.xmlsoap.org/wsdl/",
+                                                                            "service");
             for (Element serviceEl : serviceList) {
                 String serviceName = serviceEl.getAttribute("name");
                 if (serviceName.equals(ei.getService().getName().getLocalPart())) {
@@ -309,19 +329,14 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                         String name = el.getAttribute("name");
                         if (name.equals(ei.getName().getLocalPart())) {
                             Element soapAddress = DOMUtils.findAllElementsByTagNameNS(el,
-                                                                 "http://schemas.xmlsoap.org/wsdl/soap/",
-                                                                 "address")
-                                                                       .iterator().next();
+                                                                                      "http://schemas.xmlsoap.org/wsdl/soap/",
+                                                                                      "address")
+                                    .iterator().next();
                             soapAddress.setAttribute("location", base);
                         }
                     }
                 }
             }
-        }
-        try {
-            doc.setXmlStandalone(true);
-        } catch (Exception ex) {
-            //likely not DOM level 3
         }
     }
 
@@ -460,8 +475,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                         String resolvedSchemaLocation = resolveWithCatalogs(catalogs, start, base);
                         if (resolvedSchemaLocation == null) {
                             try {
-                                //check to see if it's already in a URL format.  If so, leave it.
-                                new URL(start);
+                                checkSchemaUrl(doneSchemas, start, decodedStart, imp);
                             } catch (MalformedURLException e) {
                                 if (doneSchemas.put(decodedStart, imp) == null) {
                                     updateSchemaImports(imp.getReferencedSchema(), doneSchemas, base);
@@ -498,8 +512,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                 if (resolvedSchemaLocation == null) {
                     if (!doneSchemas.containsKey(decodedStart)) {
                         try {
-                            //check to see if it's aleady in a URL format.  If so, leave it.
-                            new URL(start);
+                            checkSchemaUrl(doneSchemas, start, decodedStart, included);
                         } catch (MalformedURLException e) {
                             if (doneSchemas.put(decodedStart, included) == null) {
                                 updateSchemaImports(included.getReferencedSchema(), doneSchemas, base);
@@ -534,8 +547,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                 if (resolvedSchemaLocation == null) {
                     if (!doneSchemas.containsKey(decodedStart)) {
                         try {
-                            //check to see if it's aleady in a URL format.  If so, leave it.
-                            new URL(start);
+                            checkSchemaUrl(doneSchemas, start, decodedStart, included);
                         } catch (MalformedURLException e) {
                             if (doneSchemas.put(decodedStart, included) == null) {
                                 updateSchemaImports(included.getReferencedSchema(), doneSchemas, base);
@@ -550,6 +562,12 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                 }
             }
         }
+    }
+
+    protected void checkSchemaUrl(Map<String, SchemaReference> doneSchemas, String start, String decodedStart, SchemaReference imp) throws MalformedURLException
+    {
+        //check to see if it's already in a URL format.  If so, leave it.
+        new URL(start);
     }
 
     @Override

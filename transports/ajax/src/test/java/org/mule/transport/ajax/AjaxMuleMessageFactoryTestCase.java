@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.ajax;
 
 import org.mule.api.MuleMessage;
@@ -41,7 +37,7 @@ public class AjaxMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
     @Override
     protected MuleMessageFactory doCreateMuleMessageFactory()
     {
-        return new AjaxMuleMessageFactory(muleContext);
+        return new AjaxMuleMessageFactory();
     }
 
     @Override
@@ -61,7 +57,7 @@ public class AjaxMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         MuleMessageFactory factory = createMuleMessageFactory();
         
         Object payload = getValidTransportMessage();
-        MuleMessage message = factory.create(payload, encoding);
+        MuleMessage message = factory.create(payload, encoding, muleContext);
         assertNotNull(message);
         assertEquals(JSON_STRING, message.getPayload());
         assertEquals("/reply", message.getReplyTo());
@@ -75,7 +71,7 @@ public class AjaxMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         payload.remove(Bayeux.DATA_FIELD);
         
         MuleMessageFactory factory = createMuleMessageFactory();
-        factory.create(payload, encoding);
+        factory.create(payload, encoding, muleContext);
     }
     
     @Test
@@ -83,7 +79,7 @@ public class AjaxMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
     {
         String payload = "{\"value1\" : \"foo\", \"value2\" : \"bar\"}";
         MuleMessageFactory factory = createMuleMessageFactory();
-        MuleMessage message = factory.create(payload, encoding);
+        MuleMessage message = factory.create(payload, encoding, muleContext);
         assertNotNull(message);
         assertEquals(payload, message.getPayload());
         assertTrue(message.getPayload() instanceof String);
@@ -97,7 +93,7 @@ public class AjaxMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
             data, AjaxConnector.REPLYTO_PARAM);
         
         MuleMessageFactory factory = createMuleMessageFactory();
-        MuleMessage message = factory.create(payload, encoding);
+        MuleMessage message = factory.create(payload, encoding, muleContext);
         assertNotNull(message);
         assertEquals(data, message.getPayload());
         assertEquals("/replyEndpoint", message.getReplyTo());
@@ -108,7 +104,7 @@ public class AjaxMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
     {
         FruitBowl payload = new FruitBowl(new Apple(), new Banana());
         MuleMessageFactory factory = createMuleMessageFactory();
-        MuleMessage message = factory.create(payload, encoding);
+        MuleMessage message = factory.create(payload, encoding, muleContext);
         assertNotNull(message);
         assertEquals(payload, message.getPayload());
     }

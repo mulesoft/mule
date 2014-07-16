@@ -1,14 +1,13 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.registry;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
@@ -24,11 +23,9 @@ import javax.annotation.PreDestroy;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 public class TransientRegistryTestCase extends AbstractMuleContextTestCase
 {
+
     @Test
     public void testObjectLifecycle() throws Exception
     {
@@ -39,6 +36,26 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase
 
         muleContext.dispose();
         assertEquals("[setMuleContext, initialise, start, stop, dispose]", tracker.getTracker().toString());
+    }
+
+    @Test
+    public void testObjectLifecycleDoubleRegistration() throws Exception
+    {
+        muleContext.start();
+
+        InterfaceBasedTracker tracker1 = new InterfaceBasedTracker();
+        muleContext.getRegistry().registerObject("test", tracker1);
+
+        InterfaceBasedTracker tracker2 = new InterfaceBasedTracker();
+        muleContext.getRegistry().registerObject("test", tracker2);
+
+        InterfaceBasedTracker tracker3 = new InterfaceBasedTracker();
+        muleContext.getRegistry().registerObject("test", tracker3);
+
+        muleContext.dispose();
+        assertEquals("[setMuleContext, initialise, start, dispose]", tracker1.getTracker().toString());
+        assertEquals("[setMuleContext, initialise, start, dispose]", tracker2.getTracker().toString());
+        assertEquals("[setMuleContext, initialise, start, stop, dispose]", tracker3.getTracker().toString());
     }
 
     @Test
@@ -167,7 +184,7 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase
         TransientRegistry reg = new TransientRegistry(muleContext);
 
         reg.fireLifecycle(Disposable.PHASE_NAME);
-        
+
         InterfaceBasedTracker tracker = new InterfaceBasedTracker();
         try
         {
@@ -244,9 +261,11 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase
 
     public class JSR250ObjectLifecycleTracker implements MuleContextAware
     {
+
         private final List<String> tracker = new ArrayList<String>();
 
-        public List<String> getTracker() {
+        public List<String> getTracker()
+        {
             return tracker;
         }
 

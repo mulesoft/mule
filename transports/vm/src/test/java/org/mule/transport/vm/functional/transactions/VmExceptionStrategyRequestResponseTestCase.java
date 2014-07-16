@@ -1,28 +1,22 @@
 /*
- * $Id: AbstractMessagingExceptionStrategy.java 21333 2011-02-21 20:54:39Z tcarlson $
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.vm.functional.transactions;
 
-import org.hamcrest.core.Is;
-import org.hamcrest.core.IsInstanceOf;
-import org.hamcrest.core.IsNull;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.message.ExceptionMessage;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transport.NullPayload;
@@ -30,12 +24,14 @@ import org.mule.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import org.hamcrest.core.Is;
+import org.hamcrest.core.IsInstanceOf;
+import org.hamcrest.core.IsNull;
+import org.junit.Before;
+import org.junit.Test;
 
 public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCase
 {
-
     public static final int TIMEOUT = 3000;
     public static final int TINY_TIMEOUT = 300;
     public static final String ORIGINAL_MESSAGE = "some message";
@@ -44,7 +40,7 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
     private static boolean outboundComponentReached;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "vm/vm-exception-strategy-config-request-response.xml";
     }
@@ -60,7 +56,7 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
     @Test
     public void testDeadLetterQueueWithInboundEndpointException() throws Exception
     {
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient muleClient = muleContext.getClient();
         MuleMessage response = muleClient.send("vm://in1", ORIGINAL_MESSAGE, null);
         if (!deadLetterQueueLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
             fail("dead letter queue must be reached");
@@ -76,7 +72,7 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
     @Test
     public void testDeadLetterQueueWithInboundEndpointResponseException() throws Exception
     {
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient muleClient = muleContext.getClient();
         MuleMessage response = muleClient.send("vm://in2", ORIGINAL_MESSAGE, null);
         //TODO PLG - ES - fix this, dlq is failing because transaction was already commited by next flow despite is called using one-way with vm
         /*if (!deadLetterQueueLatch.await(TIMEOUT, MILLISECONDS)) {
@@ -96,7 +92,7 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
     @Test
     public void testDeadLetterQueueWithComponentException() throws Exception
     {
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient muleClient = muleContext.getClient();
         MuleMessage response = muleClient.send("vm://in3", ORIGINAL_MESSAGE, null);
         if (!deadLetterQueueLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
             fail("dead letter queue must be reached");
@@ -112,7 +108,7 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
     @Test
     public void testDeadLetterQueueWithOutboundEndpointException() throws Exception
     {
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient muleClient = muleContext.getClient();
         MuleMessage response = muleClient.send("vm://in4", ORIGINAL_MESSAGE, null);
         if (!deadLetterQueueLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
             fail("dead letter queue must be reached");
@@ -128,7 +124,7 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
     @Test
     public void testDeadLetterQueueWithOutboundEndpointResponseException() throws Exception
     {
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient muleClient = muleContext.getClient();
         MuleMessage response = muleClient.send("vm://in5", ORIGINAL_MESSAGE, null);
         //TODO PLG - ES - fix this issue, the response must have an exception since there was a failire in the flow. It seems that response chain was not executed
         /*assertThat(response, IsNull.<Object>notNullValue());
@@ -148,7 +144,6 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
 
     public static class FailingTransformer extends AbstractTransformer
     {
-
         @Override
         protected Object doTransform(Object src, String enc) throws TransformerException
         {
@@ -158,7 +153,7 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
 
     public static class DeadLetterQueueComponent implements Callable
     {
-
+        @Override
         public Object onCall(MuleEventContext eventContext) throws Exception
         {
             deadLetterQueueLatch.release();
@@ -172,7 +167,7 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
 
     public static class OutboundComponent implements Callable
     {
-
+        @Override
         public Object onCall(MuleEventContext eventContext) throws Exception
         {
             outboundComponentLatch.release();

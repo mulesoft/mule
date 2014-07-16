@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.el.function;
 
 import static org.junit.Assert.assertEquals;
@@ -22,6 +18,8 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.el.context.MessageContext;
 import org.mule.el.mvel.MVELExpressionExecutor;
 import org.mule.el.mvel.MVELExpressionLanguageContext;
+import org.mule.mvel2.CompileException;
+import org.mule.mvel2.ParserConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -31,8 +29,6 @@ import java.util.regex.Pattern;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.mvel2.CompileException;
-import org.mvel2.ParserContext;
 
 @SmallTest
 public class RegexExpressionLanguageFunctionTestCase extends AbstractMuleTestCase
@@ -45,9 +41,9 @@ public class RegexExpressionLanguageFunctionTestCase extends AbstractMuleTestCas
     @Before
     public void setup() throws InitialisationException
     {
-        ParserContext parserContext = new ParserContext();
-        expressionExecutor = new MVELExpressionExecutor(parserContext);
-        context = new MVELExpressionLanguageContext(parserContext, Mockito.mock(MuleContext.class));
+        ParserConfiguration parserConfiguration = new ParserConfiguration();
+        expressionExecutor = new MVELExpressionExecutor(parserConfiguration);
+        context = new MVELExpressionLanguageContext(parserConfiguration, Mockito.mock(MuleContext.class));
         regexFuntion = new RegexExpressionLanguageFuntion();
         context.declareFunction("regex", regexFuntion);
     }

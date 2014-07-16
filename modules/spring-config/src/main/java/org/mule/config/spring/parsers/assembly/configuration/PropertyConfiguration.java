@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.config.spring.parsers.assembly.configuration;
 
 import java.util.Map;
@@ -22,10 +18,9 @@ import java.util.Map;
  */
 public interface PropertyConfiguration
 {
-
     void addReference(String propertyName);
 
-    void addMapping(String propertyName, Map mappings);
+    void addMapping(String propertyName, Map<String, Object> mappings);
 
     void addMapping(String propertyName, String mappings);
 

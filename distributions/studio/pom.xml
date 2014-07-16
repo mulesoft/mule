@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.distributions</groupId>
         <artifactId>mule-distributions</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-studio</artifactId>
     <!-- Packaging 'pom' ensures that maven does not try to bind a plugin to the
@@ -16,6 +16,7 @@
     <properties>
         <communityDistDir>${project.build.directory}/ce-distribution</communityDistDir>
         <communityArtifact>mule-standalone</communityArtifact>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
     </properties>
 
     <build>
@@ -38,6 +39,7 @@
                             <goal>unpack</goal>
                         </goals>
                         <configuration>
+                            <skip>${skipDistributions}</skip>
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>org.mule.distributions</groupId>
@@ -64,6 +66,8 @@
                         <configuration>
                             <source>
                                 import java.util.jar.JarFile
+
+                                if (project.properties.skipDistributions == "true") return
 
                                 log.info '*' * 80
                                 log.info('Removing log4j.properties from jars'.center(80))

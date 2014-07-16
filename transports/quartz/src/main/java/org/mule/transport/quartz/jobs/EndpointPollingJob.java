@@ -1,26 +1,23 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.quartz.jobs;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transport.PropertyScope;
 import org.mule.execution.TransactionalErrorHandlingExecutionTemplate;
-import org.mule.module.client.MuleClient;
-import org.mule.api.execution.ExecutionCallback;
-import org.mule.api.execution.ExecutionTemplate;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractMessageReceiver;
@@ -46,6 +43,7 @@ public class EndpointPollingJob extends AbstractJob
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
+    @Override
     protected void doExecute(JobExecutionContext jobExecutionContext) throws JobExecutionException
     {
         final JobDataMap jobDataMap = jobExecutionContext.getJobDetail().getJobDataMap();
@@ -75,14 +73,12 @@ public class EndpointPollingJob extends AbstractJob
                     QuartzMessages.noReceiverInConnector(receiverKey, connectorName).getMessage());
         }
 
-
         final EndpointPollingJobConfig jobConfig = (EndpointPollingJobConfig) jobDataMap.get(QuartzConnector.PROPERTY_JOB_CONFIG);
         if (jobConfig == null)
         {
             throw new JobExecutionException(
                     QuartzMessages.missingJobDetail(QuartzConnector.PROPERTY_JOB_CONFIG).getMessage());
         }
-
 
         try
         {
@@ -92,7 +88,7 @@ public class EndpointPollingJob extends AbstractJob
 
             //TODO MULE-5050 work around because the builder is no longer idempotent, we now cache the endpoint instance
             InboundEndpoint endpoint = muleContext.getRegistry().lookupObject(jobConfig.getEndpointRef() + ".quartz-job");
-            if(endpoint==null)
+            if (endpoint == null)
             {
                 final EndpointBuilder epBuilder = muleContext.getRegistry().lookupEndpointBuilder(jobConfig.getEndpointRef());
                 pollGlobalEndpoint.set(epBuilder != null);
@@ -117,10 +113,10 @@ public class EndpointPollingJob extends AbstractJob
                 executionTemplate = TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate(muleContext, endpoint.getTransactionConfig(), receiver.getFlowConstruct().getExceptionListener());
             }
 
-
             final InboundEndpoint finalEndpoint = endpoint;
             ExecutionCallback<MuleEvent> cb = new ExecutionCallback<MuleEvent>()
             {
+                @Override
                 public MuleEvent process() throws Exception
                 {
                     Transaction tx = TransactionCoordination.getInstance().getTransaction();
@@ -136,8 +132,7 @@ public class EndpointPollingJob extends AbstractJob
                     }
                     else
                     {
-                        MuleClient client = new MuleClient(connector.getMuleContext());
-                        result = client.request(jobConfig.getEndpointRef(), jobConfig.getTimeout());
+                        result = request();
                     }
 
                     if (result != null)
@@ -161,6 +156,16 @@ public class EndpointPollingJob extends AbstractJob
                     }
                     // nowhere to return
                     return null;
+                }
+
+                private MuleMessage request() throws MuleException, Exception
+                {
+                    String endpointUri = jobConfig.getEndpointRef();
+                    MuleContext context = receiver.getEndpoint().getMuleContext();
+                    InboundEndpoint inboundEndpoint = context.getEndpointFactory().getInboundEndpoint(endpointUri);
+
+                    int timeout = jobConfig.getTimeout();
+                    return inboundEndpoint.request(timeout);
                 }
             };
 

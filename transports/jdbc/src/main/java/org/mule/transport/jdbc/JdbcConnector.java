@@ -1,28 +1,29 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jdbc;
 
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
+import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.common.DefaultTestResult;
 import org.mule.common.FailureType;
@@ -33,9 +34,10 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectException;
+import org.mule.transport.MessageDispatcherUtils;
 import org.mule.transport.jdbc.sqlstrategy.DefaultSqlStatementStrategyFactory;
 import org.mule.transport.jdbc.sqlstrategy.SqlStatementStrategyFactory;
-import org.mule.transport.jdbc.xa.DataSourceWrapper;
+import org.mule.transport.jdbc.xa.CompositeDataSourceDecorator;
 import org.mule.util.StringUtils;
 import org.mule.util.TemplateParser;
 
@@ -44,14 +46,15 @@ import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
-import javax.sql.XADataSource;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
+import org.apache.commons.lang.BooleanUtils;
 
 public class JdbcConnector extends AbstractConnector implements Testable
 {
@@ -64,6 +67,11 @@ public class JdbcConnector extends AbstractConnector implements Testable
 
     private static final Pattern STATEMENT_ARGS = TemplateParser.WIGGLY_MULE_TEMPLATE_PATTERN;
 
+    public static final String USE_DISPATCHER_POOL_SYSTEM_PROPERTY = MuleProperties.SYSTEM_PROPERTY_PREFIX
+                                                                                + "transport."
+                                                                                + JDBC + ".useDispatcherPool";
+
+    private final CompositeDataSourceDecorator databaseDecorator = new CompositeDataSourceDecorator();
     private SqlStatementStrategyFactory sqlStatementStrategyFactory = new DefaultSqlStatementStrategyFactory();
 
     /* Register the SQL Exception reader if this class gets loaded */
@@ -87,13 +95,19 @@ public class JdbcConnector extends AbstractConnector implements Testable
      */
     protected boolean transactionPerMessage = true;
 
+    private boolean useDispatcherPool = false;
+    protected Map<OutboundEndpoint, MessageDispatcher> endpointDispatchers = new ConcurrentHashMap<OutboundEndpoint, MessageDispatcher>();
+
     public JdbcConnector(MuleContext context)
     {
         super(context);
+        useDispatcherPool = BooleanUtils.toBoolean(System.getProperty(USE_DISPATCHER_POOL_SYSTEM_PROPERTY));
     }
 
+    @Override
     protected void doInitialise() throws InitialisationException
     {
+        databaseDecorator.init(muleContext);
         createMultipleTransactedReceivers = false;
 
         if (dataSource == null)
@@ -105,6 +119,7 @@ public class JdbcConnector extends AbstractConnector implements Testable
             resultSetHandler = new org.apache.commons.dbutils.handlers.MapListHandler(
                 new ColumnAliasRowProcessor());
         }
+        decorateDataSourceIfRequired();
         if (queryRunner == null)
         {
             if (this.queryTimeout >= 0)
@@ -119,8 +134,14 @@ public class JdbcConnector extends AbstractConnector implements Testable
         }
     }
 
+    private void decorateDataSourceIfRequired()
+    {
+        dataSource = databaseDecorator.decorate(dataSource, getName(), muleContext);
+    }
+
+    @Override
     public MessageReceiver createReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint)
-        throws Exception
+            throws Exception
     {
         Map props = endpoint.getProperties();
         if (props != null)
@@ -292,11 +313,11 @@ public class JdbcConnector extends AbstractConnector implements Testable
 
     /**
      * Parse the given statement filling the parameter list and return the ready to use statement.
-     * 
+     *
      * @param stmt
      * @param params
      */
-    public String parseStatement(String stmt, List params)
+    public String parseStatement(String stmt, List<String> params)
     {
         if (stmt == null)
         {
@@ -356,11 +377,16 @@ public class JdbcConnector extends AbstractConnector implements Testable
         return param.substring(2, param.length() - 1);
     }
 
+    @Override
     protected void doDispose()
     {
-        // template method
+        if (dataSource instanceof Disposable)
+        {
+            ((Disposable) dataSource).dispose();
+        }
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         Connection connection = null;
@@ -380,9 +406,10 @@ public class JdbcConnector extends AbstractConnector implements Testable
 
     /**
      * Verify that we are able to connect to the DataSource (needed for retry policies)
-     * 
+     *
      * @param retryContext
      */
+    @Override
     public RetryContext validateConnection(RetryContext retryContext)
     {
         Connection con;
@@ -407,16 +434,19 @@ public class JdbcConnector extends AbstractConnector implements Testable
         return retryContext;
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
         // template method
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         // template method
@@ -438,14 +468,7 @@ public class JdbcConnector extends AbstractConnector implements Testable
 
     public void setDataSource(DataSource dataSource)
     {
-        if (dataSource instanceof XADataSource)
-        {
-            this.dataSource = new DataSourceWrapper((XADataSource) dataSource);
-        }
-        else
-        {
-            this.dataSource = dataSource;
-        }
+        this.dataSource = dataSource;
     }
 
     public ResultSetHandler getResultSetHandler()
@@ -475,7 +498,7 @@ public class JdbcConnector extends AbstractConnector implements Testable
         if (queryTimeout >= 0)
         {
             ExtendedQueryRunner extendedQueryRunner = new ExtendedQueryRunner(
-                this.queryRunner.getDataSource(), queryTimeout);
+                    this.queryRunner.getDataSource(), queryTimeout);
             return extendedQueryRunner;
         }
         else
@@ -597,17 +620,17 @@ public class JdbcConnector extends AbstractConnector implements Testable
         }
         catch (Exception e)
         {
-        	// this surely doesn't cover all cases for all kinds of jdbc drivers but it is better than nothing
-        	FailureType failureType = FailureType.UNSPECIFIED;
-        	String msg = e.getMessage();
-        	if (msg != null && msg.contains("Communications link failure"))
-        	{
-        		failureType = FailureType.CONNECTION_FAILURE;
-        	}
-        	else if (msg != null && msg.contains("Access denied for user"))
-        	{
-        		failureType = FailureType.INVALID_CREDENTIALS;
-        	}
+            // this surely doesn't cover all cases for all kinds of jdbc drivers but it is better than nothing
+            FailureType failureType = FailureType.UNSPECIFIED;
+            String msg = e.getMessage();
+            if (msg != null && msg.contains("Communications link failure"))
+            {
+                failureType = FailureType.CONNECTION_FAILURE;
+            }
+            else if (msg != null && msg.contains("Access denied for user"))
+            {
+                failureType = FailureType.INVALID_CREDENTIALS;
+            }
             return new DefaultTestResult(TestResult.Status.FAILURE, e.getMessage(), failureType, e);
         }
         finally
@@ -624,6 +647,51 @@ public class JdbcConnector extends AbstractConnector implements Testable
                 }
             }
         }
+    }
+
+    @Override
+    public MessageProcessor createDispatcherMessageProcessor(OutboundEndpoint endpoint) throws MuleException
+    {
+        if (!useDispatcherPool)
+        {
+            // Avoid lazy initialization of dispatcher in borrow method which would be less performant by
+            // creating the dispatcher instance when DispatcherMessageProcessor is created.
+            MessageDispatcher dispatcher = dispatcherFactory.create(endpoint);
+            applyDispatcherLifecycle(dispatcher);
+            endpointDispatchers.put(endpoint, dispatcher);
+        }
+        return super.createDispatcherMessageProcessor(endpoint);
+    }
+
+    @Override
+    protected MessageDispatcher borrowDispatcher(OutboundEndpoint endpoint) throws MuleException
+    {
+        if (useDispatcherPool)
+        {
+            return super.borrowDispatcher(endpoint);
+        }
+        else
+        {
+            return endpointDispatchers.get(endpoint);
+        }
+    }
+
+    @Override
+    protected void returnDispatcher(OutboundEndpoint endpoint, MessageDispatcher dispatcher)
+    {
+        if (useDispatcherPool)
+        {
+            super.returnDispatcher(endpoint, dispatcher);
+        }
+        else
+        {
+            // Nothing to do because implementation of borrowDispatcher doesn't use dispatcher pool
+        }
+    }
+
+    protected void applyDispatcherLifecycle(MessageDispatcher dispatcher) throws MuleException
+    {
+        MessageDispatcherUtils.applyLifecycle(dispatcher);
     }
 
 }

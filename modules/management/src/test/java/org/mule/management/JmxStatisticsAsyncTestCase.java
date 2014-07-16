@@ -1,35 +1,30 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.management;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.management.stats.ApplicationStatistics;
 import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.management.stats.ServiceStatistics;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Iterator;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
 {
-    
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "jmx-statistics-test.xml";
     }
@@ -38,12 +33,13 @@ public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-                
-        MuleClient muleClient = new MuleClient(muleContext);
+
+        MuleClient muleClient = muleContext.getClient();
         muleClient.dispatch("vm://in", "Hello world", null);
         MuleMessage response = muleClient.request("vm://out", RECEIVE_TIMEOUT * 2);
         assertNotNull(response);
         assertEquals("data", response.getPayloadAsString());
+
         muleClient.dispatch("vm://inflow", "Flow data", null);
         response = muleClient.request("vm://outflow", RECEIVE_TIMEOUT * 2);
         muleClient.dispatch("vm://inflow", "Flow data", null);
@@ -148,5 +144,4 @@ public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
         while (!(stat1 instanceof ApplicationStatistics));
         return (ApplicationStatistics)stat1;
     }
-
 }

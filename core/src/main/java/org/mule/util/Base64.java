@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 /* 
  * Encodes and decodes to and from Base64 notation.
  *
@@ -645,7 +641,7 @@ public final class Base64
             catch (Exception e)
             {
                 // this is not good.
-                StringBuffer msg = new StringBuffer(64);
+                StringBuilder msg = new StringBuilder(64);
                 msg.append(source[srcOffset]).append(": ").append(DECODABET[source[srcOffset]]);
                 msg.append(source[srcOffset + 1]).append(": ").append(DECODABET[source[srcOffset + 1]]);
                 msg.append(source[srcOffset + 2]).append(": ").append(DECODABET[source[srcOffset + 2]]);

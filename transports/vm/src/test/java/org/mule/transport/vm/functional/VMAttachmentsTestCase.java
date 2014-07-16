@@ -1,19 +1,20 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.vm.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.io.File;
 import java.util.Arrays;
@@ -24,19 +25,14 @@ import javax.activation.FileDataSource;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 public class VMAttachmentsTestCase extends AbstractServiceAndFlowTestCase
 {
-
     public VMAttachmentsTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
     }
-   
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -51,10 +47,10 @@ public class VMAttachmentsTestCase extends AbstractServiceAndFlowTestCase
     {
         DefaultMuleMessage msg = new DefaultMuleMessage("Mmm... attachments!", muleContext);
         FileDataSource ds = new FileDataSource(new File("transports/vm/src/test/resources/"
-                                                        + getConfigResources()).getAbsoluteFile());
+                                                        + getConfigFile()).getAbsoluteFile());
         msg.addOutboundAttachment("test-attachment", new DataHandler(ds));
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage reply = client.send("vm-in", msg);
 
         assertNotNull(reply);
@@ -63,7 +59,6 @@ public class VMAttachmentsTestCase extends AbstractServiceAndFlowTestCase
             fail(reply.getExceptionPayload().getException().getCause().toString());
         }
 
-        //TODO MULE-5000 attachments should be on the inbound
         assertEquals(1, reply.getInboundAttachmentNames().size());
         assertNotNull(reply.getInboundAttachment("mule"));
         assertTrue(reply.getInboundAttachment("mule").getContentType().startsWith("image/gif"));

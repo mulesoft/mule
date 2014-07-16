@@ -1,18 +1,13 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.endpoint.outbound;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -79,15 +74,9 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         
         assertMessageSentSame(true);
 
-        // Response message is not the same because we rewrite the response event and
-        // this change the properties
-        // (See: OutboundRewriteResponseEventMessageProcessor)
-        assertNotSame(responseMessage, result.getMessage());
+        assertSame(responseMessage, result.getMessage());
 
-        // Everything else about the message apart from addition of encoding property
-        // is the same though
         assertMessageEqualEncodingPropertyAdded(responseMessage, result.getMessage());
-
     }
 
     @Test
@@ -123,13 +112,8 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
 
         assertMessageSentSame(true);
 
-        // Response message is not the same because we rewrite the response event and
-        // this change the properties
-        // (See: OutboundRewriteResponseEventMessageProcessor)
-        assertNotSame(responseMessage, result.getMessage());
+        assertSame(responseMessage, result.getMessage());
 
-        // Everything else about the message apart from addition of encoding property
-        // is the same though
         assertMessageEqualEncodingPropertyAdded(responseMessage, result.getMessage());
     }
 

@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.email.functional;
 
 import static org.junit.Assert.assertEquals;
@@ -18,8 +14,8 @@ import static org.junit.Assert.fail;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.config.i18n.LocaleMessageHandler;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.email.GreenMailUtilities;
@@ -60,10 +56,10 @@ public abstract class AbstractEmailFunctionalTestCase extends AbstractServiceAnd
     protected static final String DEFAULT_MESSAGE = "Test email message";
     protected static final String DEFAULT_PASSWORD = "password";
     protected static final String DEFAULT_PROCESSED_MAILBOX = "processed";
-    
+
     private String protocol;
     private boolean isMimeMessage;
-    private int port;    
+    private int port;
     protected GreenMail server;
     private String email;
     private String user;
@@ -103,8 +99,8 @@ public abstract class AbstractEmailFunctionalTestCase extends AbstractServiceAnd
     {
         this(variant, isMimeMessage, protocol, configResources, null, null);
         this.addSmtp = addSmtp;
-    }    
-    
+    }
+
     protected AbstractEmailFunctionalTestCase(ConfigVariant variant, boolean isMimeMessage, String protocol, String configResources, Locale locale, String charset)
     {
         this(variant, isMimeMessage, protocol, configResources,
@@ -116,14 +112,14 @@ public abstract class AbstractEmailFunctionalTestCase extends AbstractServiceAnd
     {
         super(variant, configResources);
         this.isMimeMessage = isMimeMessage;
-        this.protocol = protocol;        
+        this.protocol = protocol;
         this.email = email;
         this.user = user;
         this.message = message;
         this.password = password;
         this.charset = charset;
     }
-    
+
     @Override
     protected MuleContext createMuleContext() throws Exception
     {
@@ -167,7 +163,7 @@ public abstract class AbstractEmailFunctionalTestCase extends AbstractServiceAnd
             msg = message;
         }
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Map<String, Object> props = null;
         if (charset != null)
         {
@@ -230,7 +226,7 @@ public abstract class AbstractEmailFunctionalTestCase extends AbstractServiceAnd
     {
         assertEquals(1, server.getReceivedMessages().length);
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage reply = client.request("vm://receive", RECEIVE_TIMEOUT);
 
         assertNotNull(reply);
@@ -250,7 +246,7 @@ public abstract class AbstractEmailFunctionalTestCase extends AbstractServiceAnd
     private void startServer() throws Exception
     {
         logger.debug("starting server on port " + port);
-        
+
         setup = new ServerSetup(port, null, protocol);
         if(addSmtp)
         {
@@ -260,15 +256,15 @@ public abstract class AbstractEmailFunctionalTestCase extends AbstractServiceAnd
         else
         {
             server = new GreenMail(setup);
-        }           
-        
+        }
+
         server.getManagers().getUserManager().createUser(email, user, password);
         GreenMailUser gmUser = server.getManagers().getUserManager().getUser(user);
         assert null != gmUser;
         server.getManagers().getImapHostManager().createMailbox(
-                server.getManagers().getUserManager().getUser(DEFAULT_USER), 
+                server.getManagers().getUserManager().getUser(DEFAULT_USER),
                 DEFAULT_PROCESSED_MAILBOX);
-        
+
         server.start();
         if (protocol.startsWith(Pop3Connector.POP3) || protocol.startsWith(ImapConnector.IMAP))
         {

@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.el.context;
 
 import static org.junit.Assert.assertEquals;
@@ -33,9 +29,9 @@ import org.junit.Test;
 
 public class ServerContextTestCase extends AbstractELTestCase
 {
-    public ServerContextTestCase(Variant variant)
+    public ServerContextTestCase(Variant variant, String mvelOptimizer)
     {
-        super(variant);
+        super(variant, mvelOptimizer);
     }
 
     @Test
@@ -306,21 +302,21 @@ public class ServerContextTestCase extends AbstractELTestCase
     @Test
     public void dateTimeAddDays()
     {
-        Assert.assertEquals((Calendar.getInstance().get(Calendar.DAY_OF_YEAR) + 1) % 365,
+        Assert.assertEquals((Calendar.getInstance().get(Calendar.DAY_OF_YEAR) % 365) + 1,
             evaluate("(int) server.dateTime.plusDays(1).dayOfYear"));
     }
 
     @Test
     public void dateTimeAddWeeks()
     {
-        Assert.assertEquals((Calendar.getInstance().get(Calendar.WEEK_OF_YEAR) + 1) % 52,
+        Assert.assertEquals((Calendar.getInstance().get(Calendar.WEEK_OF_YEAR) % 52) + 1,
             evaluate("(int) server.dateTime.plusWeeks(1).weekOfYear"));
     }
 
     @Test
     public void dateTimeAddMonths()
     {
-        Assert.assertEquals((Calendar.getInstance(Locale.US).get(Calendar.MONTH) + 2) % 12,
+        Assert.assertEquals(((Calendar.getInstance(Locale.US).get(Calendar.MONTH) + 1) % 12) + 1,
             evaluate("(int) server.dateTime.plusMonths(1).month"));
     }
 

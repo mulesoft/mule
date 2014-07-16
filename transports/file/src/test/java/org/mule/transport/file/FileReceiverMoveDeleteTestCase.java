@@ -1,14 +1,15 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.file;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
@@ -30,12 +31,8 @@ import org.mule.util.concurrent.Latch;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Ignore;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCase
 {
@@ -44,16 +41,8 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         super(variant, configResources);
     }
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-
-        // get rid of a warning that complains about two transformers with the same data type
-        muleContext.getRegistry().unregisterTransformer("_ObjectToByteArray");
-    }
-
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testMoveAndDeleteStreaming() throws Exception
     {
         File inFile = initForRequest();
@@ -76,6 +65,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testMoveOnlyStreaming() throws Exception
     {
         File inFile = initForRequest();
@@ -109,6 +99,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testNoMoveNoDeleteStreaming() throws Exception
     {
         File inFile = initForRequest();
@@ -120,6 +111,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testMoveAndDelete() throws Exception
     {
         File inFile = initForRequest();
@@ -142,6 +134,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testDeleteOnly() throws Exception
     {
         File inFile = initForRequest();
@@ -164,6 +157,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testMoveAndDeleteFilePayload() throws Exception
     {
         File inFile = initForRequest();
@@ -198,6 +192,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testNoMoveNoDeleteFilePayload() throws Exception
     {
         File inFile = initForRequest();

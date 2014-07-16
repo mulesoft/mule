@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.registry;
 
 import org.mule.api.MuleContext;
@@ -148,6 +144,17 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
         while (it.hasNext())
         {
             objects.addAll(((Registry) it.next()).lookupObjects(type));
+        }
+        return objects;
+    }
+
+    public <T> Collection<T> lookupLocalObjects(Class<T> type)
+    {
+        Collection<T> objects = new ArrayList<T>();
+        Iterator it = getRegistries().iterator();
+        while (it.hasNext())
+        {
+            objects.addAll(((Registry) it.next()).lookupLocalObjects(type));
         }
         return objects;
     }

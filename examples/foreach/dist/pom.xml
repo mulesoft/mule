@@ -11,7 +11,7 @@
     <description>This example demonstrates how to use Foreach to add information to each message in a collection using some of the new features of Mule 3.3.</description>
 
     <properties>
-        <muleVersion>3.5.0-M1-SNAPSHOT</muleVersion>
+        <muleVersion>3.6.0-M1-SNAPSHOT</muleVersion>
         <activemqVersion>5.5.0</activemqVersion>
         <javaMailVersion>1.4.3</javaMailVersion>
     </properties>
@@ -67,7 +67,7 @@
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
-            <version>10.6.1.0</version>
+            <version>10.9.1.0</version>
         </dependency>
 
         <dependency>
@@ -230,47 +230,11 @@
 
     <repositories>
         <repository>
-            <id>codehaus</id>
-            <name>Codehaus Release Repository</name>
-            <url>http://repository.codehaus.org</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>codehaus-snapshots</id>
-            <name>Codehaus Snapshots Repository</name>
-            <url>http://snapshots.repository.codehaus.org</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-        <repository>
-            <id>mule-deps</id>
-            <name>Mule Dependencies</name>
-            <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+            <id>mule</id>
+            <name>Mule Repository</name>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
         </repository>
     </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>apache-plugin-snapshots</id>
-            <name>Apache Maven Plugins Snapshot Repository</name>
-            <url>http://people.apache.org/maven-snapshot-repository</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </pluginRepository>
-    </pluginRepositories>
 
     <build>
         <defaultGoal>install</defaultGoal>

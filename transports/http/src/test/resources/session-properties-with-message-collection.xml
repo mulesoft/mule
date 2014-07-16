@@ -48,4 +48,12 @@
     	<component class="org.mule.transport.http.functional.SessionPropertiesWithMessageCollectionTestCase$TestSplitterComponent" />
     	<vm:outbound-endpoint path="inVM" exchange-pattern="request-response" />
     </flow>
+
+    <flow name="synchronousCollectionAggregatorFlow">
+        <set-session-variable value="#[new java.util.ArrayList()]" variableName="recordsToUpdate" />
+        <collection-splitter enableCorrelation="ALWAYS"/>
+        <expression-component>#[sessionVars.get('recordsToUpdate').add(payload)]</expression-component>
+        <collection-aggregator failOnTimeout="true" persistentStores="true"/>
+    </flow>
+
 </mule>

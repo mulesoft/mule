@@ -1,20 +1,21 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.management.config;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.mule.agent.EndpointNotificationLoggerAgent;
 import org.mule.agent.Log4jNotificationLoggerAgent;
 import org.mule.api.agent.Agent;
 import org.mule.api.registry.Registry;
-import org.mule.module.management.agent.JmxAgent;
+import org.mule.module.management.agent.JmxApplicationAgent;
 import org.mule.module.management.agent.JmxServerNotificationAgent;
 import org.mule.module.management.agent.Log4jAgent;
 import org.mule.module.management.agent.Mx4jAgent;
@@ -26,14 +27,8 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     private static final int CHAINSAW_PORT = 8080;
     
     public ManagementNamespaceHandlerTestCase()
@@ -44,7 +39,7 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "management-namespace-config.xml";
     }
@@ -52,10 +47,10 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testSimpleJmxAgentConfig() throws Exception
     {
-        Agent agent = muleContext.getRegistry().lookupObject(JmxAgent.class);
+        Agent agent = muleContext.getRegistry().lookupObject(JmxApplicationAgent.class);
         assertNotNull(agent);
-        assertEquals(JmxAgent.class, agent.getClass());
-        JmxAgent jmxAgent = (JmxAgent) agent;
+        assertEquals(JmxApplicationAgent.class, agent.getClass());
+        JmxApplicationAgent jmxAgent = (JmxApplicationAgent) agent;
         assertFalse(jmxAgent.isCreateServer());
         assertTrue(jmxAgent.isLocateServer());
         assertTrue(jmxAgent.isEnableStatistics());
@@ -112,7 +107,7 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(agents.size(), 8);
         
         Iterator<Agent> iter = agents.iterator();
-        assertTrue(iter.next() instanceof JmxAgent);
+        assertTrue(iter.next() instanceof JmxApplicationAgent);
         assertTrue(iter.next() instanceof Log4jAgent);
         assertTrue(iter.next() instanceof Mx4jAgent);
         assertTrue(iter.next() instanceof TestAgent);

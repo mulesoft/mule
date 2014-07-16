@@ -1,17 +1,17 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.multicast;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.HashSet;
@@ -19,17 +19,12 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class MulticastConnectorFunctionalTestCase extends FunctionalTestCase
 {
-
     public static final String MESSAGE = "hello";
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "multicast-functional-test.xml";
     }
@@ -38,7 +33,7 @@ public class MulticastConnectorFunctionalTestCase extends FunctionalTestCase
     public void testSendTestData() throws Exception
     {
         final int numberOfMessages = 2;
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         logger.debug("sending messages");
         for (int sentPackets = 0; sentPackets < numberOfMessages; sentPackets++)
@@ -48,7 +43,7 @@ public class MulticastConnectorFunctionalTestCase extends FunctionalTestCase
         }
 
         int broadcastMessages = numberOfMessages * 3; //3 components
-        Set receivedMessages = new HashSet(broadcastMessages);
+        Set<String> receivedMessages = new HashSet<String>(broadcastMessages);
 
         logger.debug("receiving messages");
         int receivedPackets = 0;
@@ -74,16 +69,16 @@ public class MulticastConnectorFunctionalTestCase extends FunctionalTestCase
     }
 
     protected void checkBroadcastMessagesForComponent(int numberOfMessages,
-                                                      Set receivedMessages, String name)
+                                                      Set<String> receivedMessages, String componentName)
     {
         //Check all broadcasts were received from component <name>
         for (int x = 0; x < numberOfMessages; x++)
         {
-            String expected = MESSAGE + x +  name;
+            String expected = MESSAGE + x +  componentName;
 
             assertTrue(receivedMessages.contains(expected));
             assertTrue(receivedMessages.remove(expected));
         }
     }
-    
+
 }

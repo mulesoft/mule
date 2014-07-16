@@ -64,4 +64,13 @@
         <inbound-endpoint address="test://foo7"/>
         <echo-component/>
     </flow>
+
+    <queued-asynchronous-processing-strategy name="queuedAsyncStrategyPersistentStore">
+        <default-persistent-queue-store />
+    </queued-asynchronous-processing-strategy>
+
+    <flow name="flowQueuedAsyncPersistentStore" processingStrategy="queuedAsyncStrategyPersistentStore">
+        <inbound-endpoint address="test://foo8"/>
+        <echo-component/>
+    </flow>
 </mule>

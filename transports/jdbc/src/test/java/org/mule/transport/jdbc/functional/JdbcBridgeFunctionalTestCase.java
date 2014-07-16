@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jdbc.functional;
 
 import static org.junit.Assert.assertEquals;
@@ -20,6 +16,7 @@ import java.util.List;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
@@ -58,6 +55,7 @@ public class JdbcBridgeFunctionalTestCase extends AbstractJdbcFunctionalTestCase
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testBridgeSuccess() throws Exception
     {
         List<?> results = execSqlQuery("SELECT * FROM TEST");

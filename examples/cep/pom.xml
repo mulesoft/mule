@@ -4,12 +4,16 @@
     <parent>
         <groupId>org.mule.examples</groupId>
         <artifactId>mule-examples</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-example-cep</artifactId>
     <name>CEP Example</name>
     <packaging>mule</packaging>
     <description>This example is an adaptation of the Drools Stock Tick example to run inside Mule.</description>
+
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
 
     <dependencies>
         <dependency>

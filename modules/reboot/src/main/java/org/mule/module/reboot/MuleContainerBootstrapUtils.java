@@ -1,14 +1,12 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.reboot;
+
+import org.mule.MuleServer;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,11 +20,12 @@ import java.security.PrivilegedAction;
 
 public final class MuleContainerBootstrapUtils
 {
+    public static final String MULE_DOMAIN_FOLDER = "domains";
+    public static final String MULE_LOCAL_JAR_FILENAME = "mule-local-install.jar";
     private static final String MULE_APPS_FILENAME = "apps";
     private static final String MULE_LIB_FILENAME = "lib/mule";
     private static final String MULE_TMP_FILENAME = "tmp";
-
-    public static final String MULE_LOCAL_JAR_FILENAME = "mule-local-install.jar";
+    private static final String MULE_CONF_FILENAME = "conf";
 
     private MuleContainerBootstrapUtils()
     {
@@ -61,6 +60,24 @@ public final class MuleContainerBootstrapUtils
     }
 
     /**
+     * @param appName name of the application
+     * @return null if running embedded, otherwise the app dir as a File ref
+     */
+    public static File getMuleAppDir(String appName)
+    {
+        return isStandalone() ? new File(getMuleAppsDir(), appName) : null;
+    }
+
+    /**
+     * @param appName name of the application
+     * @return null if running embedded, otherwise the app default configuration file as a File ref
+     */
+    public static File getMuleAppDefaultConfigFile(String appName)
+    {
+        return isStandalone() ? new File(getMuleAppDir(appName), MuleServer.DEFAULT_CONFIGURATION) : null;
+    }
+
+    /**
      * @return null if running embedded
      */
     public static File getMuleLibDir()
@@ -79,6 +96,19 @@ public final class MuleContainerBootstrapUtils
     public static File getMuleLocalJarFile()
     {
         return isStandalone() ? new File(getMuleLibDir(), MULE_LOCAL_JAR_FILENAME) : null;
+    }
+
+    public static File getMuleDomainsDir()
+    {
+        return isStandalone() ? new File(getMuleHome(), MULE_DOMAIN_FOLDER) : null;
+    }
+
+    /**
+     * @return null if running embedded, otherwise the conf dir as a File ref
+     */
+    public static File getMuleConfDir()
+    {
+        return isStandalone() ? new File(getMuleHome(), MULE_CONF_FILENAME) : null;
     }
 
     public static class ProxyInfo

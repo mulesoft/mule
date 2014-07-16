@@ -1,26 +1,19 @@
 /*
- * $Id: CollectionAggregatorRouterTimeoutTestCase.java 22421 2011-07-15 05:05:06Z dirk.olmes $
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleMessageCollection;
-import org.mule.api.store.ObjectStore;
+import org.mule.api.client.MuleClient;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.store.ObjectStoreException;
-import org.mule.module.client.MuleClient;
 import org.mule.routing.EventGroup;
 import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.util.store.DefaultObjectStoreFactoryBean;
-import org.mule.util.store.MuleDefaultObjectStoreFactory;
 import org.mule.util.store.SimpleMemoryObjectStore;
 
 import java.io.Serializable;
@@ -33,19 +26,9 @@ import org.junit.Test;
 
 public class CollectionAggregatorRouterSerializationTestCase extends FunctionalTestCase
 {
-    static
-    {
-        DefaultObjectStoreFactoryBean.setDelegate(new MuleDefaultObjectStoreFactory(){
-            @Override
-            public ObjectStore<Serializable> createDefaultInMemoryObjectStore()
-            {
-                return new EventGroupSerializerObjectStore();
-            }
-        });
-    }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "collection-aggregator-router-serialization.xml";
     }
@@ -53,7 +36,9 @@ public class CollectionAggregatorRouterSerializationTestCase extends FunctionalT
     @Test
     public void eventGroupDeserialization() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        muleContext.getRegistry().registerObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME,
+                                                 new EventGroupSerializerObjectStore<Serializable>());
+        MuleClient client = muleContext.getClient();
         List<String> list = Arrays.asList("first", "second");
         client.dispatch("vm://splitter", list, null);
         MuleMessageCollection request = (MuleMessageCollection) client.request("vm://out?connector=queue", 10000);
@@ -61,7 +46,7 @@ public class CollectionAggregatorRouterSerializationTestCase extends FunctionalT
         assertEquals(list.size(), request.size());
     }
 
-    private static class EventGroupSerializerObjectStore<T extends Serializable> extends SimpleMemoryObjectStore<Serializable>
+    private class EventGroupSerializerObjectStore<T extends Serializable> extends SimpleMemoryObjectStore<Serializable>
     {
         @Override
         protected void doStore(Serializable key, Serializable value) throws ObjectStoreException

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <!-- Uses an invalid URL to avoid connecting until the URL is fixed using the reconnect notifier-->
+    <db:derby-config name = "badDbConfig" url="jdbc:derby:garbage">
+        <reconnect>
+            <reconnect-custom-notifier class="org.mule.module.db.integration.reconnect.ReconnectStandardTestCase$EnableDatabaseConnection"/>
+        </reconnect>
+    </db:derby-config>
+
+
+    <flow name="testReconnection">
+        <inbound-endpoint address="vm://testReconnection" exchange-pattern="request-response"/>
+
+        <db:select config-ref="badDbConfig">
+            <db:parameterized-query>select * from PLANET order by ID</db:parameterized-query>
+        </db:select>
+    </flow>
+</mule>

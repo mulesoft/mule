@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.quartz;
 
 import org.mule.api.MuleContext;
@@ -18,6 +14,8 @@ import org.mule.api.transport.ConnectorException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractConnector;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.quartz.Scheduler;
@@ -46,6 +44,10 @@ public class QuartzConnector extends AbstractConnector
     public static final String PROPERTY_JOB_DYNAMIC = "jobDynamic";
 
     public static final String DEFAULT_GROUP_NAME = "mule";
+    public static final String QUARTZ_INSTANCE_NAME_PROPERTY = "org.quartz.scheduler.instanceName";
+
+    private static final Object instanceNamesLock = new Object();
+    private static final Map<String, QuartzConnector> instanceNames = new HashMap<String, QuartzConnector>();
 
     /**
      * Properties to be used for creating the scheduler.  If no properties are given, the
@@ -75,11 +77,14 @@ public class QuartzConnector extends AbstractConnector
         //Set the thread count, we can't seem to plug in our work manager unfortunately
         factoryProperties.setProperty("org.quartz.threadPool.class", "org.quartz.simpl.SimpleThreadPool");
         factoryProperties.setProperty("org.quartz.threadPool.threadCount", String.valueOf(getReceiverThreadingProfile().getMaxThreadsActive()));
-        String instanceName = factoryProperties.getProperty("org.quartz.scheduler.instanceName");
+        String instanceName = factoryProperties.getProperty(QUARTZ_INSTANCE_NAME_PROPERTY);
         if (instanceName == null)
         {
-            factoryProperties.setProperty("org.quartz.scheduler.instanceName",
-                "scheduler-" + muleContext.getConfiguration().getId());
+            factoryProperties.setProperty(QUARTZ_INSTANCE_NAME_PROPERTY, "scheduler-" + muleContext.getConfiguration().getId());
+        }
+        else
+        {
+            ensureUniqueInstanceNameBetweenMuleApps(instanceName);
         }
 
         try
@@ -94,7 +99,7 @@ public class QuartzConnector extends AbstractConnector
         }
         catch (Exception e)
         {
-            throw new InitialisationException(CoreMessages.initialisationFailure("Quartz conntector"), e, this);
+            throw new InitialisationException(CoreMessages.initialisationFailure("Quartz connector"), e, this);
         }
     }
 
@@ -111,6 +116,46 @@ public class QuartzConnector extends AbstractConnector
         catch (Exception e)
         {
             logger.warn(CoreMessages.failedToStop("Quartz provider"), e);
+        }
+
+        String instanceName = factoryProperties.getProperty(QUARTZ_INSTANCE_NAME_PROPERTY);
+        if (instanceName != null)
+        {
+            removeUpInstanceName(instanceName);
+        }
+    }
+
+    private void ensureUniqueInstanceNameBetweenMuleApps(String instanceName) throws InitialisationException
+    {
+        synchronized (instanceNamesLock)
+        {
+            if (instanceNames.keySet().contains(instanceName))
+            {
+                throw new InitialisationException(CoreMessages.initialisationFailure(String.format("Value '%s' of quartz connector property '%s' cannot be reused in different applications", instanceName, QUARTZ_INSTANCE_NAME_PROPERTY)), this);
+            }
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Adding quartz instance name: " + instanceName);
+            }
+
+            instanceNames.put(instanceName, this);
+        }
+    }
+
+    private void removeUpInstanceName(String instanceName)
+    {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Removing quartz instance name: " + instanceName);
+        }
+
+        synchronized (instanceNamesLock)
+        {
+            if (instanceNames.get(instanceName) == this)
+            {
+                instanceNames.remove(instanceName);
+            }
         }
     }
 

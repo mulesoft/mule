@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleEvent;
@@ -62,15 +58,12 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwner implements OutboundRouter
 {
-
-
     /**
      * logger used by this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    @SuppressWarnings("unchecked")
-    protected List<MessageProcessor> routes = new CopyOnWriteArrayList();
+    protected List<MessageProcessor> routes = new CopyOnWriteArrayList<MessageProcessor>();
 
     protected String replyTo = null;
 
@@ -90,11 +83,13 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
 
     private MessageProcessorExecutionTemplate notificationTemplate = MessageProcessorExecutionTemplate.createNotificationExecutionTemplate();
 
+    @Override
     public MuleEvent process(final MuleEvent event) throws MuleException
     {
         ExecutionTemplate<MuleEvent> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, getTransactionConfig());
         ExecutionCallback<MuleEvent> processingCallback = new ExecutionCallback<MuleEvent>()
         {
+            @Override
             public MuleEvent process() throws Exception
             {
                 try
@@ -267,7 +262,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
 
             if (logger.isDebugEnabled())
             {
-                StringBuffer buf = new StringBuffer();
+                StringBuilder buf = new StringBuilder();
                 buf.append("Setting Correlation info on Outbound router");
                 if (route instanceof OutboundEndpoint)
                 {
@@ -284,6 +279,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
         }
     }
 
+    @Override
     public List<MessageProcessor> getRoutes()
     {
         return routes;
@@ -308,6 +304,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
         }
     }
 
+    @Override
     public synchronized void addRoute(MessageProcessor route) throws MuleException
     {
         if (initialised.get())
@@ -335,6 +332,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
         routes.add(route);
     }
 
+    @Override
     public synchronized void removeRoute(MessageProcessor route) throws MuleException
     {
         if (started.get())
@@ -359,6 +357,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
         return replyTo;
     }
 
+    @Override
     public void setReplyTo(String replyTo)
     {
         this.replyTo = replyTo;
@@ -403,11 +402,13 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
         return transactionConfig;
     }
 
+    @Override
     public void setTransactionConfig(TransactionConfig transactionConfig)
     {
         this.transactionConfig = transactionConfig;
     }
 
+    @Override
     public boolean isDynamicRoutes()
     {
         return false;
@@ -513,6 +514,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
         AbstractRoutingStrategy.propagateMagicProperties(in, out);
     }
 
+    @Override
     public void initialise() throws InitialisationException
     {
         synchronized (routes)
@@ -522,6 +524,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
         }
     }
 
+    @Override
     public void dispose()
     {
         synchronized (routes)
@@ -532,6 +535,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
         }
     }
 
+    @Override
     public void start() throws MuleException
     {
         synchronized (routes)
@@ -541,6 +545,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
         }
     }
 
+    @Override
     public void stop() throws MuleException
     {
         synchronized (routes)
@@ -550,11 +555,13 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
         }
     }
 
+    @Override
     public MuleContext getMuleContext()
     {
         return muleContext;
     }
 
+    @Override
     public void setRouterStatistics(RouterStatistics stats)
     {
         this.routerStatistics = stats;
@@ -570,5 +577,4 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     {
         return routes;
     }
-
 }

@@ -1,14 +1,14 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 
 package org.mule.module.jersey;
+
+import org.mule.module.jersey.exception.BeanBadRequestException;
+import org.mule.module.jersey.exception.HelloWorldException;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -20,11 +20,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import org.mule.module.jersey.exception.HelloWorldException;
-
 @Path("/helloworld")
 public class HelloWorldResource
 {
+
     @POST
     @Produces("text/plain")
     public String sayHelloWorld()
@@ -72,7 +71,7 @@ public class HelloWorldResource
     {
         return "Hello " + name;
     }
-    
+
     @GET
     @Produces("text/plain")
     @Path("/throwException")
@@ -80,4 +79,13 @@ public class HelloWorldResource
     {
         throw new HelloWorldException("This is an exception");
     }
+
+    @GET
+    @Produces("text/plain")
+    @Path("/throwBadRequestException")
+    public HelloBean throwHelloBeanException() throws BeanBadRequestException
+    {
+        throw new BeanBadRequestException("beans are rotten");
+    }
+
 }

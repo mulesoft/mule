@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport;
 
 import org.mule.api.MessagingException;
@@ -17,6 +13,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.CreateException;
@@ -164,7 +161,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
                         try
                         {
                             this.getWorkManager().scheduleWork(
-                                    new MessageProcessorWorker(pt, countdown, message));
+                                    new MessageProcessorWorker(pt, countdown, endpoint.getMuleContext().getExceptionListener(), message));
                         }
                         catch (Exception e)
                         {
@@ -176,11 +173,14 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
                 }
             }
         }
+        catch (MessagingException e)
+        {
+            //Already handled by exception strategy
+        }
         catch (Exception e)
         {
-            getConnector().getMuleContext().handleException(e);
+            getEndpoint().getMuleContext().handleException(e);
         }
-
     }
 
     /**
@@ -196,12 +196,14 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
         private final ExecutionTemplate<MuleEvent> pt;
         private final Object message;
         private final CountDownLatch latch;
+        private final SystemExceptionHandler exceptionHandler;
 
-        public MessageProcessorWorker(ExecutionTemplate<MuleEvent> pt, CountDownLatch latch, Object message)
+        public MessageProcessorWorker(ExecutionTemplate<MuleEvent> pt, CountDownLatch latch, SystemExceptionHandler exceptionHandler, Object message)
         {
             this.pt = pt;
             this.message = message;
             this.latch = latch;
+            this.exceptionHandler = exceptionHandler;
         }
 
         @Override
@@ -223,7 +225,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
             }
             catch (Exception e)
             {
-                connector.getMuleContext().getExceptionListener().handleException(e);
+                exceptionHandler.handleException(e);
             }
             finally
             {

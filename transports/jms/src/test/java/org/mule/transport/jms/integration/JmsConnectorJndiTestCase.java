@@ -1,23 +1,19 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms.integration;
-
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-
-import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+
+import org.junit.Test;
 
 /**
  * Requires the following connector config: <jms:connector name="jmsConnector1"
@@ -40,7 +36,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
 {
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/jms-jndi-config.xml";
     }
@@ -55,7 +51,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
     @Test
     public void testQueueFromJndi() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         client.dispatch("ep_jndi-queue", DEFAULT_INPUT_MESSAGE, null);
 
@@ -67,7 +63,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
     @Test
     public void testTopicFromJndi() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         client.dispatch("ep_jndi-topic", DEFAULT_INPUT_MESSAGE, null);
 
@@ -82,7 +78,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
     @Test
     public void testNonJndiDestination() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         client.dispatch("ep_non-jndi-queue", DEFAULT_INPUT_MESSAGE, null);
 
@@ -97,7 +93,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
     @Test
     public void testNonJndiDestinationOptional() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         client.dispatch("ep_non-jndi-queue-optional-jndi", DEFAULT_INPUT_MESSAGE, null);
 
@@ -112,7 +108,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
     @Test
     public void testNonJndiDestinationForce() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         client.dispatch("ep_non-jndi-queue-force-jndi", DEFAULT_INPUT_MESSAGE, null);
 
@@ -123,7 +119,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
     @Test
     public void testQueueFromJndiWithJndiNameResolver() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         client.dispatch("ep_jndi-queue-with-jndi-name-resolver", DEFAULT_INPUT_MESSAGE, null);
 
@@ -135,7 +131,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
     @Test
     public void testTopicFromJndiWithJndiNameResolver() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         client.dispatch("ep_jndi-topic-with-jndi-name-resolver", DEFAULT_INPUT_MESSAGE, null);
 
@@ -150,7 +146,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
     @Test
     public void testNonJndiDestinationWithJndiNameResolver() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         client.dispatch("ep_non-jndi-queue-with-jndi-name-resolver", DEFAULT_INPUT_MESSAGE, null);
 
@@ -165,7 +161,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
     @Test
     public void testNonJndiDestinationOptionalWithJndiNameResolver() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         client.dispatch("ep_non-jndi-queue-optional-jndi-with-jndi-name-resolver", DEFAULT_INPUT_MESSAGE, null);
 
@@ -180,7 +176,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
     @Test
     public void testNonJndiDestinationForceWithJndiNameResolver() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         client.dispatch("ep_non-jndi-queue-force-jndi-with-jndi-name-resolver", DEFAULT_INPUT_MESSAGE, null);
 

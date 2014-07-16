@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.sftp;
 
 import static org.junit.Assert.assertEquals;
@@ -19,6 +15,7 @@ import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
+import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -31,7 +28,6 @@ import org.mule.api.model.Model;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.context.notification.EndpointMessageNotification;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -56,7 +52,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.lang.SystemUtils;
 import org.junit.Before;
 import org.junit.Rule;
 
@@ -69,7 +64,7 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
     private static final String USER = "muletest1";
     private static final String PASSWORD = "muletest1";
     private static final String FILENAME_HEADER = "filename";
-    protected static final Map<String, String> MESSAGE_PROPERTIES = new HashMap<String, String>();
+    protected static final Map<String, Object> MESSAGE_PROPERTIES = new HashMap<String, Object>();
     protected static String INBOUND_ENDPOINT_DIR = "inbound";
     protected static String OUTBOUND_ENDPOINT_DIR = "outbound";
     {
@@ -83,22 +78,22 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
 
     protected SftpServer sftpServer;
     protected SftpClient sftpClient;
-    
+
     public AbstractSftpTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
     }
-    
+
     /**
      * Deletes all files in the directory, useful when testing to ensure that no
      * files are in the way...
      */
-    // protected void cleanupRemoteFtpDirectory(MuleClient muleClient, String
+    // protected void cleanupRemoteFtpDirectory(String
     // endpointName) throws IOException
     // {
-    // SftpClient sftpClient = getSftpClient(muleClient, endpointName);
+    // SftpClient sftpClient = getSftpClient(endpointName);
     //
-    // EndpointURI endpointURI = getUriByEndpointName(muleClient, endpointName);
+    // EndpointURI endpointURI = getUriByEndpointName(endpointName);
     // sftpClient.changeWorkingDirectory(sftpClient.getAbsolutePath(endpointURI.getPath()));
     //
     // String[] files = sftpClient.listFiles();
@@ -112,49 +107,47 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
      * Deletes a directory with all its files and sub-directories. The reason it do a
      * "chmod 700" before the delete is that some tests changes the permission, and
      * thus we have to restore the right to delete it...
-     *
-     * @param muleClient
      * @param endpointName
      * @param relativePath
+     *
      * @throws IOException
      */
-    protected void recursiveDelete(MuleClient muleClient,
-                                   SftpClient sftpClient,
+    protected void recursiveDelete(SftpClient client,
                                    String endpointName,
                                    String relativePath) throws IOException
     {
-        EndpointURI endpointURI = getUriByEndpointName(muleClient, endpointName);
+        EndpointURI endpointURI = getUriByEndpointName(endpointName);
         String path = endpointURI.getPath() + relativePath;
 
         try
         {
             // Ensure that we can delete the current directory and the below
             // directories (if write is not permitted then delete is either)
-            sftpClient.chmod(path, 00700);
+            client.chmod(path, 00700);
 
-            sftpClient.changeWorkingDirectory(sftpClient.getAbsolutePath(path));
+            client.changeWorkingDirectory(client.getAbsolutePath(path));
 
             // Delete all sub-directories
-            String[] directories = sftpClient.listDirectories();
+            String[] directories = client.listDirectories();
             for (String directory : directories)
             {
-                recursiveDelete(muleClient, sftpClient, endpointName, relativePath + "/" + directory);
+                recursiveDelete(client, endpointName, relativePath + "/" + directory);
             }
 
             // Needs to change the directory back after the recursiveDelete
-            sftpClient.changeWorkingDirectory(sftpClient.getAbsolutePath(path));
+            client.changeWorkingDirectory(client.getAbsolutePath(path));
 
             // Delete all files
-            String[] files = sftpClient.listFiles();
+            String[] files = client.listFiles();
             for (String file : files)
             {
-                sftpClient.deleteFile(file);
+                client.deleteFile(file);
             }
 
             // Delete the directory
             try
             {
-                sftpClient.deleteDirectory(path);
+                client.deleteDirectory(path);
             }
             catch (Exception e)
             {
@@ -169,19 +162,19 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
     }
 
     /** Creates the <i>directoryName</i> under the endpoint path */
-    protected void createRemoteDirectory(MuleClient muleClient, String endpointName, String directoryName)
+    protected void createRemoteDirectory(String endpointName, String directoryName)
         throws IOException
     {
-        SftpClient sftpClient = getSftpClient(muleClient, endpointName);
+        SftpClient client = getSftpClient(endpointName);
 
         try
         {
-            EndpointURI endpointURI = getUriByEndpointName(muleClient, endpointName);
-            sftpClient.changeWorkingDirectory(sftpClient.getAbsolutePath(endpointURI.getPath()));
+            EndpointURI endpointURI = getUriByEndpointName(endpointName);
+            client.changeWorkingDirectory(client.getAbsolutePath(endpointURI.getPath()));
 
             try
             {
-                sftpClient.mkdir(directoryName);
+                client.mkdir(directoryName);
             }
             catch (IOException e)
             {
@@ -191,7 +184,7 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
 
             try
             {
-                sftpClient.changeWorkingDirectory(endpointURI.getPath() + "/" + directoryName);
+                client.changeWorkingDirectory(endpointURI.getPath() + "/" + directoryName);
             }
             catch (IOException e)
             {
@@ -200,48 +193,46 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
         }
         finally
         {
-            sftpClient.disconnect();
+            client.disconnect();
         }
     }
 
-    protected EndpointURI getUriByEndpointName(MuleClient muleClient, String endpointName) throws IOException
+    protected EndpointURI getUriByEndpointName(String endpointName) throws IOException
     {
-        ImmutableEndpoint endpoint = getImmutableEndpoint(muleClient, endpointName);
+        ImmutableEndpoint endpoint = getImmutableEndpoint(endpointName);
         return endpoint.getEndpointURI();
     }
 
     /**
-     * @param muleClient
-     * @param endpointName
      * @return the endpoint address in the form 'sftp://user:password@host/path'
      */
-    protected String getAddressByEndpoint(MuleClient muleClient, String endpointName)
+    protected String getAddressByEndpoint(String endpointName)
     {
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) muleClient.getProperty(endpointName);
+        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupObject(endpointName);
         EndpointURI endpointURI = endpoint.getEndpointURI();
 
         return "sftp://" + endpointURI.getUser() + ":" + endpointURI.getPassword() + "@"
                + endpointURI.getHost() + endpointURI.getPath();
     }
 
-    protected String getPathByEndpoint(MuleClient muleClient, SftpClient sftpClient, String endpointName)
+    protected String getPathByEndpoint(SftpClient client, String endpointName)
     {
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) muleClient.getProperty(endpointName);
+        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupObject(endpointName);
         EndpointURI endpointURI = endpoint.getEndpointURI();
 
-        return sftpClient.getAbsolutePath(endpointURI.getPath());
+        return client.getAbsolutePath(endpointURI.getPath());
     }
 
     /**
      * Returns a SftpClient that is logged in to the sftp server that the endpoint is
      * configured against.
      */
-    protected SftpClient getSftpClient(MuleClient muleClient, String endpointName) throws IOException
+    protected SftpClient getSftpClient(String endpointName) throws IOException
     {
-        ImmutableEndpoint endpoint = getImmutableEndpoint(muleClient, endpointName);
+        ImmutableEndpoint endpoint = getImmutableEndpoint(endpointName);
         EndpointURI endpointURI = endpoint.getEndpointURI();
-        SftpClient sftpClient = new SftpClient(endpointURI.getHost());
-        sftpClient.setPort(endpointURI.getPort());
+        SftpClient client = new SftpClient(endpointURI.getHost());
+        client.setPort(endpointURI.getPort());
 
         SftpConnector sftpConnector = (SftpConnector) endpoint.getConnector();
 
@@ -249,7 +240,7 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
         {
             try
             {
-                sftpClient.login(endpointURI.getUser(), sftpConnector.getIdentityFile(),
+                client.login(endpointURI.getUser(), sftpConnector.getIdentityFile(),
                     sftpConnector.getPassphrase());
             }
             catch (Exception e)
@@ -261,48 +252,48 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
         {
             try
             {
-                sftpClient.login(endpointURI.getUser(), endpointURI.getPassword());
+                client.login(endpointURI.getUser(), endpointURI.getPassword());
             }
             catch (Exception e)
             {
                 fail("Login failed: " + e);
             }
         }
-        return sftpClient;
+        return client;
     }
 
     /**
      * Returns a SftpClient that is logged in to the sftp server that the endpoint is
      * configured against.
      */
-    protected SftpClient getSftpClient(String host, int port, String user, String password)
+    protected SftpClient getSftpClient(String host, int clientPort, String user, String password)
         throws IOException
     {
-        SftpClient sftpClient = new SftpClient(host);
-        sftpClient.setPort(port);
+        SftpClient client = new SftpClient(host);
+        client.setPort(clientPort);
         try
         {
-            sftpClient.login(user, password);
+            client.login(user, password);
         }
         catch (Exception e)
         {
             fail("Login failed: " + e);
         }
-        return sftpClient;
+        return client;
     }
 
-    
+
     /** Checks if the file exists on the server */
-    protected boolean verifyFileExists(SftpClient sftpClient, EndpointURI endpointURI, String file)
+    protected boolean verifyFileExists(SftpClient client, EndpointURI endpointURI, String file)
         throws IOException
     {
-        return verifyFileExists(sftpClient, endpointURI.getPath(), file);
+        return verifyFileExists(client, endpointURI.getPath(), file);
     }
 
-    protected boolean verifyFileExists(SftpClient sftpClient, String path, String file) throws IOException
+    protected boolean verifyFileExists(SftpClient client, String path, String file) throws IOException
     {
-        sftpClient.changeWorkingDirectory(sftpClient.getAbsolutePath(path));
-        String[] files = sftpClient.listFiles();
+        client.changeWorkingDirectory(client.getAbsolutePath(path));
+        String[] files = client.listFiles();
 
         for (String remoteFile : files)
         {
@@ -347,8 +338,6 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
                                    String expectedFailingConnector,
                                    String serviceName) throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-
         // Do some cleaning so that the endpoint doesn't have any other files
         // We don't need to do this anymore since we are deleting and then creating
         // the directory for each test
@@ -458,16 +447,19 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
             }
         };
 
-        HashMap<String, String> props = new HashMap<String, String>(1);
+        HashMap<String, Object> props = new HashMap<String, Object>();
         props.put(SftpConnector.PROPERTY_FILENAME, filename);
         props.put(SftpConnector.PROPERTY_ORIGINAL_FILENAME, filename);
 
         if (logger.isInfoEnabled())
+        {
             logger.info(StringMessageUtils.getBoilerPlate("Note! If this test fails due to timeout please add '-Dmule.test.timeoutSecs=XX' to the mvn command!"));
+        }
 
         executeBaseAssertionsBeforeCall();
 
         // Send the content using stream
+        MuleClient client = muleContext.getClient();
         client.dispatch(sendUrl, os, props);
 
         boolean workDone = latch.await(timeout, TimeUnit.MILLISECONDS);
@@ -510,12 +502,12 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
         assertEquals("The received file should have the same size as the sent file", sendSize, receivedSize);
     }
 
-    protected ImmutableEndpoint getImmutableEndpoint(MuleClient muleClient, String endpointName)
+    protected ImmutableEndpoint getImmutableEndpoint(String endpointName)
         throws IOException
     {
         ImmutableEndpoint endpoint = null;
 
-        Object o = muleClient.getProperty(endpointName);
+        Object o = muleContext.getRegistry().lookupObject(endpointName);
         if (o instanceof ImmutableEndpoint)
         {
             // For Inbound and Outbound Endpoints
@@ -538,18 +530,17 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
         return endpoint;
     }
 
-    protected void remoteChmod(MuleClient muleClient,
-                               SftpClient sftpClient,
+    protected void remoteChmod(SftpClient client,
                                String endpointName,
                                int permissions) throws SftpException
     {
-        ChannelSftp channelSftp = sftpClient.getChannelSftp();
+        ChannelSftp channelSftp = client.getChannelSftp();
 
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) muleClient.getProperty(endpointName);
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) muleContext.getRegistry().lookupObject(endpointName);
         EndpointURI endpointURI = endpoint.getEndpointURI();
 
         // RW - so that we can do initial cleanup
-        channelSftp.chmod(permissions, sftpClient.getAbsolutePath(endpointURI.getPath()));
+        channelSftp.chmod(permissions, client.getAbsolutePath(endpointURI.getPath()));
     }
 
     /**
@@ -606,14 +597,13 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
     protected void initEndpointDirectory(String endpointName)
         throws MuleException, IOException, SftpException
     {
-        MuleClient muleClient = new MuleClient(muleContext);
-        SftpClient sftpClient = getSftpClient(muleClient, endpointName);
+        SftpClient client = getSftpClient(endpointName);
         try
         {
-            ChannelSftp channelSftp = sftpClient.getChannelSftp();
+            ChannelSftp channelSftp = client.getChannelSftp();
             try
             {
-                recursiveDelete(muleClient, sftpClient, endpointName, "");
+                recursiveDelete(client, endpointName, "");
             }
             catch (IOException e)
             {
@@ -621,12 +611,12 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
                     logger.error("Failed to recursivly delete endpoint " + endpointName, e);
             }
 
-            String path = getPathByEndpoint(muleClient, sftpClient, endpointName);
+            String path = getPathByEndpoint(client, endpointName);
             channelSftp.mkdir(path);
         }
         finally
         {
-            sftpClient.disconnect();
+            client.disconnect();
             if (logger.isDebugEnabled()) logger.debug("Done init endpoint directory: " + endpointName);
         }
     }
@@ -647,14 +637,9 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
         // Declare countdown latch and listener
         final CountDownLatch latch = new CountDownLatch(1);
         EndpointMessageNotificationListener listener = null;
-        MuleClient muleClient = p.getMuleClient();
-        boolean localMuleClient = muleClient == null;
 
         try
         {
-            // First create a local muleClient instance if not supplied
-            if (localMuleClient) muleClient = new MuleClient(muleContext);
-
             // Next create a listener that listens for dispatch events on the
             // outbound endpoint
             listener = new EndpointMessageNotificationListener()
@@ -694,7 +679,7 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
 
             // Prepare message headers, set filename-header and if supplied any
             // headers supplied in the call.
-            Map<String, String> headers = new HashMap<String, String>();
+            Map<String, Object> headers = new HashMap<String, Object>();
             headers.put("filename", p.getFilename());
 
             if (p.getHeaders() != null)
@@ -704,7 +689,8 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
 
             // Setup connect string and perform the actual dispatch
             String connectString = (p.getSftpConnector() == null) ? "" : "?connector=" + p.getSftpConnector();
-            muleClient.dispatch(getAddressByEndpoint(muleClient, p.getInboundEndpoint()) + connectString,
+            org.mule.api.client.MuleClient muleClient = muleContext.getClient();
+            muleClient.dispatch(getAddressByEndpoint(p.getInboundEndpoint()) + connectString,
                 TEST_MESSAGE, headers);
 
             // Wait for the delivery to occur...
@@ -731,11 +717,11 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
         }
         finally
         {
-            // Dispose muleClient if created locally
-            if (localMuleClient) muleClient.dispose();
-
             // Always remove the listener if created
-            if (listener != null) muleContext.getNotificationManager().removeListener(listener);
+            if (listener != null)
+            {
+                muleContext.getNotificationManager().removeListener(listener);
+            }
         }
     }
 
@@ -760,17 +746,12 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
         final CountDownLatch latch = new CountDownLatch(1);
         SystemExceptionHandler listener = null;
         MessagingExceptionHandler messagingListener = null;
-        MuleClient muleClient = p.getMuleClient();
-        boolean localMuleClient = muleClient == null;
         SystemExceptionHandler currentExceptionListener = null;
         MessagingExceptionHandler currentMessagingListener = null;
         final ValueHolder<Exception> exceptionHolder = new ValueHolder<Exception>();
 
         try
         {
-            // First create a local muleClient instance if not supplied
-            if (localMuleClient) muleClient = new MuleClient(muleContext);
-
             // Next create a listener that listens for exception on the
             // sftp-connector
             listener = new SystemExceptionHandler()
@@ -821,7 +802,7 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
 
             // Prepare message headers, set filename-header and if supplied any
             // headers supplied in the call.
-            Map<String, String> headers = new HashMap<String, String>();
+            Map<String, Object> headers = new HashMap<String, Object>();
             headers.put("filename", p.getFilename());
 
             if (p.getHeaders() != null)
@@ -831,7 +812,8 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
 
             // Setup connect string and perform the actual dispatch
             String connectString = (p.getSftpConnector() == null) ? "" : "?connector=" + p.getSftpConnector();
-            muleClient.dispatch(getAddressByEndpoint(muleClient, p.getInboundEndpoint()) + connectString,
+            org.mule.api.client.MuleClient muleClient = muleContext.getClient();
+            muleClient.dispatch(getAddressByEndpoint(p.getInboundEndpoint()) + connectString,
                 TEST_MESSAGE, headers);
 
             // Wait for the exception to occur...
@@ -858,9 +840,6 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
         }
         finally
         {
-            // Dispose muleClient if created locally
-            if (localMuleClient) muleClient.dispose();
-
             // Always reset the current listener
             muleContext.setExceptionListener(currentExceptionListener);
             muleContext.getRegistry().lookupService(serviceName).setExceptionListener(
@@ -886,40 +865,23 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
 
         if (!parentParent.canWrite())
         {
-            // setWritable is only available on JDK6 and beyond
-            //if (!parentParent.setWritable(true))
-                //throw new IOException("Failed to set readonly-folder: " + parentParent + " to writeable");
-            // FIXME DZ: since setWritable doesnt exist on jdk5, need to detect os to make dir writable
-            if(SystemUtils.IS_OS_WINDOWS)
+            if (!parentParent.setWritable(true))
             {
-                Runtime.getRuntime().exec("attrib -r /D" + parentParent.getAbsolutePath());
-            }
-            else if(SystemUtils.IS_OS_UNIX || SystemUtils.IS_OS_LINUX)
-            {
-                Runtime.getRuntime().exec("chmod +w " + parentParent.getAbsolutePath());
-            }
-            else
-            {
-                throw new IOException("This test is not supported on your detected platform : " + SystemUtils.OS_NAME);
+                throw new IOException("Failed to set readonly-folder: " + parentParent + " to writeable");
             }
         }
 
         if (parent.exists())
         {
-            // FIXME DZ: since setWritable doesnt exist on jdk5, need to detect os to make dir writable
-            if (SystemUtils.IS_OS_WINDOWS)
+            if (!parent.setWritable(true))
             {
-                Runtime.getRuntime().exec("attrib -r /D" + parent.getAbsolutePath());
+                throw new IOException("Failed to set readonly-folder: " + parent + " to writeable");
             }
-            else if(SystemUtils.IS_OS_UNIX || SystemUtils.IS_OS_LINUX)
+
+            if (!parent.delete())
             {
-                Runtime.getRuntime().exec("chmod +w " + parent.getAbsolutePath());
+                throw new IOException("Failed to delete folder: " + parent);
             }
-            else
-            {
-                throw new IOException("This test is not supported on your detected platform : " + SystemUtils.OS_NAME);
-            }
-            if (!parent.delete()) throw new IOException("Failed to delete folder: " + parent);
         }
     }
 
@@ -936,29 +898,27 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
 
     /**
      * Asserts that no files are found on the path that the <i>endpointName</i> use.
-     *
-     * @param muleClient MuleClient
      * @param endpointName The endpoint name
+     *
      * @throws IOException Exception
      */
-    protected void assertNoFilesInEndpoint(MuleClient muleClient, String endpointName) throws IOException
+    protected void assertNoFilesInEndpoint(String endpointName) throws IOException
     {
-        assertFilesInEndpoint(muleClient, endpointName, new String[]{});
+        assertFilesInEndpoint(endpointName, new String[]{});
     }
 
     /**
      * Asserts that no files are found on the sub directory <i>subDirectory</i> under
      * the path that <i>endpointName</i> use.
-     *
-     * @param muleClient MuleClient
      * @param endpointName The endpoint name
      * @param subDirectory The sub directory
+     *
      * @throws IOException Exception
      */
-    protected void assertNoFilesInEndpoint(MuleClient muleClient, String endpointName, String subDirectory)
+    protected void assertNoFilesInEndpoint(String endpointName, String subDirectory)
         throws IOException
     {
-        assertFilesInEndpoint(muleClient, endpointName, subDirectory, new String[]{});
+        assertFilesInEndpoint(endpointName, subDirectory, new String[]{});
     }
 
     /**
@@ -995,71 +955,65 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
      * Asserts that only the <i>expectedFile</i> is found on the path that the
      * <i>endpointName</i> use, where filenames can be expressed as a regular
      * expression.
-     *
-     * @param muleClient MuleClient
      * @param endpointName The endpoint name
      * @param expectedFile Expected file
+     *
      * @throws IOException Exception
      */
-    protected void assertFilesInEndpoint(MuleClient muleClient, String endpointName, String expectedFile)
+    protected void assertFilesInEndpoint(String endpointName, String expectedFile)
         throws IOException
     {
-        assertFilesInEndpoint(muleClient, endpointName, null, new String[]{expectedFile});
+        assertFilesInEndpoint(endpointName, null, new String[]{expectedFile});
     }
 
     /**
      * Asserts that only the <i>expectedFiles</i> are found on the path that the
      * <i>endpointName</i> use, where filenames can be expressed as a regular
      * expression.
-     *
-     * @param muleClient MuleClient
      * @param endpointName The endpoint name
      * @param expectedFiles Expected files
+     *
      * @throws IOException Exception
      */
-    protected void assertFilesInEndpoint(MuleClient muleClient, String endpointName, String[] expectedFiles)
+    protected void assertFilesInEndpoint(String endpointName, String[] expectedFiles)
         throws IOException
     {
-        assertFilesInEndpoint(muleClient, endpointName, null, expectedFiles);
+        assertFilesInEndpoint(endpointName, null, expectedFiles);
     }
 
     /**
      * Asserts that only the <i>expectedFile</i> is found on the sub directory
      * <i>subDirectory</i> under the path that <i>endpointName</i> use, where
      * filenames can be expressed as a regular expression.
-     *
-     * @param muleClient MuleClient
      * @param endpointName The endpoint name
      * @param subDirectory The sub directory
      * @param expectedFile Expected files
+     *
      * @throws IOException Exception
      */
-    protected void assertFilesInEndpoint(MuleClient muleClient,
-                                         String endpointName,
+    protected void assertFilesInEndpoint(String endpointName,
                                          String subDirectory,
                                          String expectedFile) throws IOException
     {
-        assertFilesInEndpoint(muleClient, endpointName, subDirectory, new String[]{expectedFile});
+        assertFilesInEndpoint(endpointName, subDirectory, new String[]{expectedFile});
     }
 
     /**
      * Asserts that only the <i>expectedFiles</i> are found on the sub directory
      * <i>subDirectory</i> under the path that <i>endpointName</i> use, where
      * filenames can be expressed as a regular expression.
-     *
-     * @param muleClient MuleClient
      * @param endpointName The endpoint name
      * @param subDirectory The sub directory
      * @param expectedFiles Expected files
+     *
      * @throws IOException Exception
      */
-    protected void assertFilesInEndpoint(MuleClient muleClient,
-                                         String endpointName,
+    protected void assertFilesInEndpoint(String endpointName,
                                          String subDirectory,
                                          String[] expectedFiles) throws IOException
     {
-        SftpClient sftpClient = getSftpClient(muleClient, endpointName);
-        ImmutableEndpoint tEndpoint = (ImmutableEndpoint) muleClient.getProperty(endpointName);
+        SftpClient client = getSftpClient(endpointName);
+        ImmutableEndpoint tEndpoint = muleContext.getRegistry().lookupObject(endpointName);
         try
         {
             String path = tEndpoint.getEndpointURI().getPath();
@@ -1067,11 +1021,11 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
             {
                 path += '/' + subDirectory;
             }
-            assertFilesInPath(sftpClient, path, expectedFiles);
+            assertFilesInPath(client, path, expectedFiles);
         }
         finally
         {
-            sftpClient.disconnect();
+            client.disconnect();
         }
     }
 
@@ -1079,17 +1033,17 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
      * Asserts that only the <i>expectedFiles</i> are found on the path <i>path</i>,
      * where filenames can be expressed as a regular expression.
      *
-     * @param sftpClient SftpClient
+     * @param client SftpClient
      * @param path The path to check
      * @param expectedFiles Expected files
      * @throws IOException Exception
      */
-    private void assertFilesInPath(SftpClient sftpClient, String path, String[] expectedFiles)
+    private void assertFilesInPath(SftpClient client, String path, String[] expectedFiles)
         throws IOException
     {
 
-        sftpClient.changeWorkingDirectory(sftpClient.getAbsolutePath(path));
-        String[] files = sftpClient.listFiles();
+        client.changeWorkingDirectory(client.getAbsolutePath(path));
+        String[] files = client.listFiles();
 
         assertFilesInFileArray(path, expectedFiles, files);
     }
@@ -1166,12 +1120,6 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
      */
     public class DispatchParameters
     {
-
-        /**
-         * Optional MuleClient, the method will create an own if not supplied.
-         */
-        private MuleClient muleClient = null;
-
         /**
          * Optional name of sftp-connector, if not supplied it is assumed that only
          * one sftp-conector is speficied in the mule configuration. If more than one
@@ -1217,16 +1165,6 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
         {
             this.inboundEndpoint = inboundEndpoint;
             this.outboundEndpoint = outboundEndpoint;
-        }
-
-        public MuleClient getMuleClient()
-        {
-            return muleClient;
-        }
-
-        public void setMuleClient(MuleClient muleClient)
-        {
-            this.muleClient = muleClient;
         }
 
         public String getSftpConnector()
@@ -1334,12 +1272,12 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
             assertTrue(pairs.getKey() + " is not started", pairs.getValue().getLifecycleState().isStarted());
         }
     }
-    
+
     @Before
     public void before() throws Exception {
         sftpServer = new SftpServer(this.port.getNumber());
         sftpServer.start();
         sftpClient = getSftpClient(HOST, port.getNumber(), USER, PASSWORD);
     }
-    
+
 }

@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.tests.archetypes</groupId>
         <artifactId>mule-tests-archetypes</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <groupId>org.mule.tests.archetypes</groupId>
     <artifactId>example-archetype</artifactId>
@@ -19,6 +19,7 @@
         <archetype>org.mule.tools:mule-example-archetype</archetype>
         <!-- this string will be appended to the archetype's commandline -->
         <archetypeParams>-DartifactId=foo -DhasCustomSchema=y</archetypeParams>
+        <licensePath>../../../LICENSE_HEADER.txt</licensePath>
     </properties>
 
     <dependencies>
@@ -50,5 +51,59 @@
                 <artifactId>gmaven-plugin</artifactId>
             </plugin>
         </plugins>
+        <pluginManagement>
+        	<plugins>
+        		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+        		<plugin>
+        			<groupId>org.eclipse.m2e</groupId>
+        			<artifactId>lifecycle-mapping</artifactId>
+        			<version>1.0.0</version>
+        			<configuration>
+        				<lifecycleMappingMetadata>
+        					<pluginExecutions>
+        						<pluginExecution>
+        							<pluginExecutionFilter>
+        								<groupId>
+        									org.codehaus.gmaven
+        								</groupId>
+        								<artifactId>
+        									gmaven-plugin
+        								</artifactId>
+        								<versionRange>
+        									[1.4,)
+        								</versionRange>
+        								<goals>
+        									<goal>execute</goal>
+        								</goals>
+        							</pluginExecutionFilter>
+        							<action>
+        								<ignore></ignore>
+        							</action>
+        						</pluginExecution>
+        						<pluginExecution>
+        							<pluginExecutionFilter>
+        								<groupId>
+        									org.apache.maven.plugins
+        								</groupId>
+        								<artifactId>
+        									maven-enforcer-plugin
+        								</artifactId>
+        								<versionRange>
+        									[1.0-alpha-4,)
+        								</versionRange>
+        								<goals>
+        									<goal>enforce</goal>
+        								</goals>
+        							</pluginExecutionFilter>
+        							<action>
+        								<ignore></ignore>
+        							</action>
+        						</pluginExecution>
+        					</pluginExecutions>
+        				</lifecycleMappingMetadata>
+        			</configuration>
+        		</plugin>
+        	</plugins>
+        </pluginManagement>
     </build>
 </project>

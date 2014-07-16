@@ -43,8 +43,8 @@ public class ${ModuleName}MessageReceiver extends #if( $isPollingReceiver == "y"
     public void doConnect() throws ConnectException
     {
         /* IMPLEMENTATION NOTE: This method should make a connection to the underlying
-           transport i.e. connect to a socket or register a soap service. When
-           there is no connection to be made this method should be used to
+           transport i.e. connect to a socket or register a SOAP service. When
+           there is no connection to be made, this method should be used to
            check that resources are available. For example the
            FileMessageReceiver checks that the directories it will be using
            are available and readable. The MessageReceiver should remain in a
@@ -90,10 +90,10 @@ public class ${ModuleName}MessageReceiver extends #if( $isPollingReceiver == "y"
         // Optional; does not need to be implemented. Delete if not required
 
         /* IMPLEMENTATION NOTE: Should perform any actions necessary to enable
-           the reciever to start reciving events. This is different to the
+           the receiver to start receiving events. This is different than the
            doConnect() method which actually makes a connection to the
            transport, but leaves the MessageReceiver in a stopped state. For
-           polling-based MessageReceivers the start() method simply starts the
+           polling-based MessageReceivers, the start() method simply starts the
            polling thread. What action is performed here depends on
            the transport being used. Most of the time a custom provider
            doesn't need to override this method. */

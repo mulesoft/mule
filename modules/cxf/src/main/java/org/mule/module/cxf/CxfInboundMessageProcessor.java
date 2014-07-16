@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.cxf;
 
 import org.mule.VoidMuleEvent;
@@ -39,6 +35,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +48,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
+import org.apache.cxf.binding.soap.jms.interceptor.SoapJMSConstants;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.interceptor.StaxInEndingInterceptor;
 import org.apache.cxf.message.ExchangeImpl;
@@ -62,7 +60,6 @@ import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.local.LocalConduit;
 import org.apache.cxf.transports.http.QueryHandler;
-import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.apache.cxf.wsdl.http.AddressType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -75,6 +72,9 @@ import org.w3c.dom.Node;
  */
 public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProcessor implements Lifecycle
 {
+
+    public static final String JMS_TRANSPORT = "jms";
+
     /**
      * logger used by this class
      */
@@ -88,6 +88,8 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     protected Server server;
 
     private boolean proxy;
+
+    private QueryHandler wsdlQueryHandler;
 
     @Override
     public void initialise() throws InitialisationException
@@ -191,14 +193,11 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         String ct = null;
 
-        for (QueryHandler qh : bus.getExtension(QueryHandlerRegistry.class).getHandlers())
+        if (wsdlQueryHandler.isRecognizedQuery(wsdlUri, ctxUri, ei))
         {
-            if (qh.isRecognizedQuery(wsdlUri, ctxUri, ei))
-            {
-                ct = qh.getResponseContentType(wsdlUri, ctxUri);
-                qh.writeResponse(wsdlUri, ctxUri, ei, out);
-                out.flush();
-            }
+            ct = wsdlQueryHandler.getResponseContentType(wsdlUri, ctxUri);
+            wsdlQueryHandler.writeResponse(wsdlUri, ctxUri, ei, out);
+            out.flush();
         }
 
         String msg;
@@ -281,6 +280,25 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
                     soapActions.add(soapAction);
                     protocolHeaders.put(SoapBindingConstants.SOAP_ACTION, soapActions);
                 }
+
+                String eventRequestUri = event.getMessageSourceURI().toString();
+                if (eventRequestUri.startsWith(JMS_TRANSPORT))
+                {
+                    String contentType = muleReqMsg.getInboundProperty(SoapJMSConstants.CONTENTTYPE_FIELD);
+                    if (contentType == null)
+                    {
+                        contentType = "text/xml";
+                    }
+                    protocolHeaders.put(SoapJMSConstants.CONTENTTYPE_FIELD, Collections.singletonList(contentType));
+
+                    String requestUri = muleReqMsg.getInboundProperty(SoapJMSConstants.REQUESTURI_FIELD);
+                    if (requestUri == null)
+                    {
+                        requestUri = eventRequestUri;
+                    }
+                    protocolHeaders.put(SoapJMSConstants.REQUESTURI_FIELD, Collections.singletonList(requestUri));
+                }
+
                 m.put(Message.PROTOCOL_HEADERS, protocolHeaders);
             }
 
@@ -331,7 +349,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             }
             
             MuleMessage muleResMsg = responseEvent.getMessage();
-            muleResMsg.setPayload(getRessponseOutputHandler(m));
+            muleResMsg.setPayload(getResponseOutputHandler(m));
 
             // Handle a fault if there is one.
             Message faultMsg = m.getExchange().getOutFaultMessage();
@@ -371,7 +389,12 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         return super.processNext(event);
     }
 
+    @Deprecated
     protected OutputHandler getRessponseOutputHandler(final MessageImpl m)
+    {
+        return getResponseOutputHandler(m);
+    }
+    protected OutputHandler getResponseOutputHandler(final MessageImpl m)
     {
         OutputHandler outputHandler = new OutputHandler()
         {
@@ -516,4 +539,10 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     {
         return proxy;
     }
+
+    public void setWSDLQueryHandler(QueryHandler wsdlQueryHandler)
+    {
+        this.wsdlQueryHandler = wsdlQueryHandler;
+    }
+
 }

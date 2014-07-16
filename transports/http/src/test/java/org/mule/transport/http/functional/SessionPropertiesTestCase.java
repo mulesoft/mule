@@ -1,31 +1,27 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
- * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
- *
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.http.functional;
-
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.util.Collections;
-
-import org.junit.Rule;
-import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+
+import java.util.Collections;
+import java.util.Map;
+
+import org.junit.Rule;
+import org.junit.Test;
+
 public class SessionPropertiesTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
@@ -45,23 +41,28 @@ public class SessionPropertiesTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort6 = new DynamicPort("port6");
 
     @Override
-    protected String getConfigResources() {
+    protected String getConfigFile()
+    {
         return "session-properties.xml";
     }
 
     @Test
     public void testHttp1ToHttp2ToHttp3SessionPropertiesTestCase() throws Exception
     {
-        final MuleClient client = new MuleClient(muleContext);
-        MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/Flow1s1", "some message", Collections.emptyMap());
+        MuleClient client = muleContext.getClient();
+
+        Map<String, Object> properties = Collections.emptyMap();
+        MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/Flow1s1", "some message", properties);
         assertNotNullAndNotExceptionResponse(response);
     }
 
     @Test
     public void testHttp1ToHttp2ThenHttp1ToHttp3SessionPropertiesTestCase() throws Exception
     {
-        final MuleClient client = new MuleClient(muleContext);
-        MuleMessage response = client.send("http://localhost:" + dynamicPort4.getNumber() + "/Flow1s2", "some message", Collections.emptyMap());
+        MuleClient client = muleContext.getClient();
+
+        Map<String, Object> properties = Collections.emptyMap();
+        MuleMessage response = client.send("http://localhost:" + dynamicPort4.getNumber() + "/Flow1s2", "some message", properties);
         assertNotNullAndNotExceptionResponse(response);
     }
 
@@ -73,5 +74,4 @@ public class SessionPropertiesTestCase extends FunctionalTestCase
             fail(response.getExceptionPayload().getException().getCause().toString());
         }
     }
-
 }

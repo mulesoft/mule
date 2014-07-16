@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -11,6 +8,7 @@ package org.mule.config.bootstrap;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -29,16 +27,15 @@ import org.mule.registry.MuleRegistryHelper;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
+import org.mule.util.OrderedProperties;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.UUID;
 
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -66,6 +63,13 @@ import org.apache.commons.logging.LogFactory;
  * myFoo=org.foo.MyObject
  * myBar=org.bar.MyObject
  * </pre>
+ * It's also possible to define if the entry must be applied to a domain, an application, or both by using the parameter applyToArtifactType.
+ * <pre>
+ * myFoo=org.foo.MyObject will be applied to any mule application since the parameter applyToArtifactType default value is app
+ * myFoo=org.foo.MyObject;applyToArtifactType=app will be applied to any mule application
+ * myFoo=org.foo.MyObject;applyToArtifactType=domain will be applied to any mule domain
+ * myFoo=org.foo.MyObject;applyToArtifactType=app/domain will be applied to any mule application and any mule domain
+ * </pre>
  * Loading transformers has a slightly different notation since you can define the 'returnClass' with optional mime type, and 'name'of
  * the transformer as parameters i.e.
  * <pre>
@@ -82,19 +86,69 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 {
-    public static final String SERVICE_PATH = "META-INF/services/org/mule/config/";
 
-    public static final String REGISTRY_PROPERTIES = "registry-bootstrap.properties";
+    protected final transient Log logger = LogFactory.getLog(getClass());
 
     public String TRANSFORMER_KEY = ".transformer.";
     public String OBJECT_KEY = ".object.";
     public String SINGLE_TX = ".singletx.";
 
-    protected final transient Log logger = LogFactory.getLog(getClass());
-
+    private ArtifactType supportedArtifactType = ArtifactType.APP;
+    private final RegistryBootstrapDiscoverer discoverer;
     protected MuleContext context;
 
-    /** {@inheritDoc} */
+    public enum ArtifactType
+    {
+        APP("app"), DOMAIN("domain"), ALL("app/domain");
+
+        public static final String APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY = "applyToArtifactType";
+        private final String artifactTypeAsString;
+
+        ArtifactType(String artifactTypeAsString)
+        {
+            this.artifactTypeAsString = artifactTypeAsString;
+        }
+
+        public String getAsString()
+        {
+            return this.artifactTypeAsString;
+        }
+
+        public static ArtifactType createFromString(String artifactTypeAsString)
+        {
+            for (ArtifactType artifactType : values())
+            {
+                if (artifactType.artifactTypeAsString.equals(artifactTypeAsString))
+                {
+                    return artifactType;
+                }
+            }
+            throw new MuleRuntimeException(CoreMessages.createStaticMessage("No artifact type found for value: " + artifactTypeAsString));
+        }
+    }
+
+    /**
+     * Creates a default SimpleRegistryBootstrap using a {@link org.mule.config.bootstrap.ClassPathRegistryBootstrapDiscoverer}
+     * in order to get the Properties resources from the class path.
+     */
+    public SimpleRegistryBootstrap()
+    {
+        this(new ClassPathRegistryBootstrapDiscoverer());
+    }
+
+    /**
+     * Allows to specify a {@link org.mule.config.bootstrap.RegistryBootstrapDiscoverer} to discover the Properties
+     * resources to be used.
+     * @param discoverer
+     */
+    public SimpleRegistryBootstrap(RegistryBootstrapDiscoverer discoverer)
+    {
+        this.discoverer = discoverer;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void setMuleContext(MuleContext context)
     {
         this.context = context;
@@ -103,36 +157,23 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
     /** {@inheritDoc} */
     public void initialise() throws InitialisationException
     {
-        Enumeration<?> e = ClassUtils.getResources(SERVICE_PATH + REGISTRY_PROPERTIES, getClass());
-        List<Properties> bootstraps = new LinkedList<Properties>();
-
-        // load ALL of the bootstrap files first
-        while (e.hasMoreElements())
+        List<Properties> bootstraps;
+        try
         {
-            try
-            {
-                URL url = (URL) e.nextElement();
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Reading bootstrap file: " + url.toString());
-                }
-                Properties p = new Properties();
-                p.load(url.openStream());
-                bootstraps.add(p);
-            }
-            catch (Exception e1)
-            {
-                throw new InitialisationException(e1, this);
-            }
+            bootstraps = discoverer.discover();
+        }
+        catch (BootstrapException e)
+        {
+            throw new InitialisationException(e, this);
         }
 
-        // ... and only then merge and process them
+        // Merge and process properties
         int objectCounter = 1;
         int transformerCounter = 1;
-        Properties transformers = new Properties();
-        Properties namedObjects = new Properties();
-        Properties unnamedObjects = new Properties();
-        Map<String,String> singleTransactionFactories = new HashMap<String,String>();
+        Properties transformers = new OrderedProperties();
+        Properties namedObjects = new OrderedProperties();
+        Properties unnamedObjects = new OrderedProperties();
+        Map<String,String> singleTransactionFactories = new LinkedHashMap<String,String>();
 
         for (Properties bootstrap : bootstraps)
         {
@@ -164,17 +205,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                 }
                 else
                 {
-                    // we allow arbitrary keys in the registry-bootstrap.properties but since we're
-                    // aggregating multiple files here we must make sure that the keys are unique
-//                    if (accumulatedProps.getProperty(key) != null)
-//                    {
-//                        throw new IllegalStateException(
-//                                "more than one registry-bootstrap.properties file contains a key " + key);
-//                    }
-//                    else
-                    {
-                        namedObjects.put(key, entry.getValue());
-                    }
+                    namedObjects.put(key, entry.getValue());
                 }
             }
         }
@@ -195,10 +226,32 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 
     private void registerTransactionFactories(Map<String, String> singleTransactionFactories, MuleContext context) throws Exception
     {
-        for (String transactionFactoryClassName : singleTransactionFactories.keySet())
+        for (Entry<String, String> entry : singleTransactionFactories.entrySet())
         {
-            String transactionResourceClassName = singleTransactionFactories.get(transactionFactoryClassName);
-            context.getTransactionFactoryManager().registerTransactionFactory(Class.forName(transactionResourceClassName), (TransactionFactory) Class.forName(transactionFactoryClassName).newInstance());
+            String transactionResourceClassNameProperties = entry.getValue();
+            String transactionFactoryClassName = entry.getKey();
+            boolean optional = false;
+            // reset
+            int x = transactionResourceClassNameProperties.indexOf(",");
+            if (x > -1)
+            {
+                Properties p = PropertiesUtils.getPropertiesFromString(transactionResourceClassNameProperties.substring(x + 1), ',');
+                optional = p.containsKey("optional");
+            }
+            final String transactionResourceClassName = (x == -1 ? transactionResourceClassNameProperties : transactionResourceClassNameProperties.substring(0, x));
+            try
+            {
+                context.getTransactionFactoryManager().registerTransactionFactory(Class.forName(transactionResourceClassName), (TransactionFactory) Class.forName(transactionFactoryClassName).newInstance());
+
+            }
+            catch (NoClassDefFoundError ncdfe)
+            {
+                throwExceptionIfNotOptional(optional,ncdfe,"Ignoring optional transaction factory: " + transactionResourceClassName);
+            }
+            catch (ClassNotFoundException cnfe)
+            {
+                throwExceptionIfNotOptional(optional,cnfe,"Ignoring optional transaction factory: " + transactionResourceClassName);
+            }
         }
     }
 
@@ -271,45 +324,16 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
             catch (InvocationTargetException itex)
             {
                 Throwable cause = ExceptionUtils.getCause(itex);
-                if (cause instanceof NoClassDefFoundError && optional)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Ignoring optional transformer: " + transClass);
-                    }
-                }
-                else
-                {
-                    throw new Exception(cause);
-                }
+                throwExceptionIfNotOptional(cause instanceof NoClassDefFoundError && optional, cause, "Ignoring optional transformer: " + transClass);
             }
             catch (NoClassDefFoundError ncdfe)
             {
-                if (optional)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Ignoring optional transformer: " + transClass);
-                    }
-                }
-                else
-                {
-                    throw ncdfe;
-                }
+                throwExceptionIfNotOptional( optional, ncdfe, "Ignoring optional transformer: " + transClass);
+
             }
             catch (ClassNotFoundException cnfe)
             {
-                if (optional)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Ignoring optional transformer: " + transClass);
-                    }
-                }
-                else
-                {
-                    throw cnfe;
-                }
+                throwExceptionIfNotOptional( optional, cnfe, "Ignoring optional transformer: " + transClass);
             }
 
             name = null;
@@ -347,6 +371,8 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 
     private void registerObject(String key, String value, Registry registry) throws Exception
     {
+        ArtifactType artifactTypeParameterValue = ArtifactType.APP;
+
         boolean optional = false;
         String className = null;
 
@@ -356,6 +382,10 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
             if (x > -1)
             {
                 Properties p = PropertiesUtils.getPropertiesFromString(value.substring(x + 1), ',');
+                if (p.containsKey(ArtifactType.APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY))
+                {
+                    artifactTypeParameterValue = ArtifactType.createFromString((String) p.get(ArtifactType.APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY));
+                }
                 optional = p.containsKey("optional");
                 className = value.substring(0, x);
             }
@@ -363,6 +393,12 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
             {
                 className = value;
             }
+
+            if (!artifactTypeParameterValue.equals(ArtifactType.ALL) && !artifactTypeParameterValue.equals(supportedArtifactType))
+            {
+                return;
+            }
+
             Object o = ClassUtils.instanciateClass(className);
             Class<?> meta = Object.class;
 
@@ -383,45 +419,45 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         catch (InvocationTargetException itex)
         {
             Throwable cause = ExceptionUtils.getCause(itex);
-            if (cause instanceof NoClassDefFoundError && optional)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Ignoring optional object: " + className);
-                }
-            }
-            else
-            {
-                throw new Exception(cause);
-            }
+            throwExceptionIfNotOptional(cause instanceof NoClassDefFoundError && optional, cause, "Ignoring optional object: " + className);
         }
         catch (NoClassDefFoundError ncdfe)
         {
-            if (optional)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Ignoring optional object: " + className);
-                }
-            }
-            else
-            {
-                throw ncdfe;
-            }
+            throwExceptionIfNotOptional(optional, ncdfe, "Ignoring optional object: " + className);
         }
         catch (ClassNotFoundException cnfe)
         {
-            if (optional)
+            throwExceptionIfNotOptional(optional, cnfe, "Ignoring optional object: " + className);
+        }
+    }
+
+    private void throwExceptionIfNotOptional(boolean optional, Throwable t, String message) throws Exception
+    {
+        if (optional)
+        {
+            if (logger.isDebugEnabled())
             {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Ignoring optional object: " + className);
-                }
-            }
-            else
-            {
-                throw cnfe;
+                logger.debug(message);
             }
         }
+        else if ( t instanceof Exception)
+        {
+            throw (Exception)t;
+        }
+        else
+        {
+            throw new Exception(t);
+        }
+    }
+
+    /**
+     * This attributes define which types or registry bootstrap entries will be
+     * created depending on the entry applyToArtifactType parameter value.
+     *
+     * @param supportedArtifactType type of the artifact to support.
+     */
+    public void setSupportedArtifactType(ArtifactType supportedArtifactType)
+    {
+        this.supportedArtifactType = supportedArtifactType;
     }
 }

@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.email;
 
 import org.mule.DefaultMuleMessage;
@@ -112,7 +108,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         doDispatch(event);
-        return new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
+        return new DefaultMuleMessage(NullPayload.getInstance(), getEndpoint().getMuleContext());
     }
 
     protected void sendMailMessage(Message message) throws MessagingException
@@ -136,7 +132,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
 
         if (logger.isDebugEnabled())
         {
-            StringBuffer msg = new StringBuffer();
+            StringBuilder msg = new StringBuilder();
             msg.append("Email message sent with subject'").append(message.getSubject()).append("' sent- ");
             msg.append(", From: ").append(MailUtils.mailAddressesToString(message.getFrom())).append(" ");
             msg.append(", To: ").append(

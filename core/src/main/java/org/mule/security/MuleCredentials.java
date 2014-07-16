@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.security;
 
 import org.mule.api.EncryptionStrategy;
@@ -85,7 +81,7 @@ public class MuleCredentials implements Credentials, Serializable
 
     public String getToken()
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append(username).append(TOKEN_DELIM);
         buf.append(password).append(TOKEN_DELIM);
 
@@ -114,7 +110,7 @@ public class MuleCredentials implements Credentials, Serializable
 
     public static String createHeader(String username, char[] password)
     {
-        StringBuffer buf = new StringBuffer(32);
+        StringBuilder buf = new StringBuilder(32);
         buf.append("Plain ");
         buf.append(username).append(TOKEN_DELIM);
         buf.append(password).append(TOKEN_DELIM);
@@ -126,7 +122,7 @@ public class MuleCredentials implements Credentials, Serializable
                                       String encryptionName,
                                       EncryptionStrategy es) throws CryptoFailureException
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append(encryptionName).append(" ");
         String creds = username + TOKEN_DELIM + password;
         byte[] encrypted = es.encrypt(creds.getBytes(), null);

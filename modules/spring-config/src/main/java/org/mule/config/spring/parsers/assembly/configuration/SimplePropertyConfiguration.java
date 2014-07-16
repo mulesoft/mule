@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.config.spring.parsers.assembly.configuration;
 
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
@@ -28,69 +24,79 @@ import org.springframework.util.StringUtils;
  */
 public class SimplePropertyConfiguration implements PropertyConfiguration
 {
-
-    private List references = new ArrayList();
+    private List<String> references = new ArrayList<String>();
     private Properties nameMappings = new Properties();
-    private Map valueMappings = new HashMap();
-    private Set collections = new HashSet();
-    private Map ignored = new HashMap();
+    private Map<String, NamedValueMap> valueMappings = new HashMap<String, NamedValueMap>();
+    private Set<String> collections = new HashSet<String>();
+    private Map<String, Boolean> ignored = new HashMap<String, Boolean>();
     private boolean ignoreAll = false;
 
+    @Override
     public void addReference(String propertyName)
     {
         references.add(dropRef(propertyName));
     }
 
-    public void addMapping(String propertyName, Map mappings)
+    @Override
+    public void addMapping(String propertyName, Map<String, Object> mappings)
     {
         valueMappings.put(propertyName, new NamedValueMap(propertyName, mappings));
     }
 
+    @Override
     public void addMapping(String propertyName, String mappings)
     {
         valueMappings.put(propertyName, new NamedValueMap(propertyName, mappings));
     }
 
+    @Override
     public void addMapping(String propertyName, ValueMap mappings)
     {
         valueMappings.put(propertyName, new NamedValueMap(propertyName, mappings));
     }
 
+    @Override
     public void addAlias(String alias, String propertyName)
     {
         nameMappings.put(alias, propertyName);
     }
 
+    @Override
     public void addCollection(String propertyName)
     {
         collections.add(dropRef(propertyName));
     }
 
+    @Override
     public void addIgnored(String propertyName)
     {
         ignored.put(dropRef(propertyName), Boolean.TRUE);
     }
 
+    @Override
     public void removeIgnored(String propertyName)
     {
         ignored.put(dropRef(propertyName), Boolean.FALSE);
     }
 
+    @Override
     public void setIgnoredDefault(boolean ignoreAll)
     {
         this.ignoreAll = ignoreAll;
     }
 
+    @Override
     public String getAttributeMapping(String alias)
     {
         return getAttributeMapping(alias, alias);
     }
 
+    @Override
     public String getAttributeAlias(String name)
     {
-        for (Iterator iterator = nameMappings.entrySet().iterator(); iterator.hasNext();)
+        for (Iterator<?> iterator = nameMappings.entrySet().iterator(); iterator.hasNext();)
         {
-            Map.Entry entry = (Map.Entry)iterator.next();
+            Map.Entry<?, ?> entry = (Map.Entry<?, ?>)iterator.next();
             if(entry.getValue().equals(name))
             {
                 return entry.getKey().toString();
@@ -104,17 +110,19 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
         return nameMappings.getProperty(alias, deflt);
     }
 
+    @Override
     public boolean isCollection(String propertyName)
     {
         return collections.contains(dropRef(propertyName));
     }
 
+    @Override
     public boolean isIgnored(String propertyName)
     {
         String name = dropRef(propertyName);
         if (ignored.containsKey(name))
         {
-            return ((Boolean) ignored.get(name)).booleanValue();
+            return ignored.get(name).booleanValue();
         }
         else
         {
@@ -127,6 +135,7 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
      * or it can simply use the "-ref" suffix.
      * @param attributeName true if the name appears to correspond to a reference
      */
+    @Override
     public boolean isReference(String attributeName)
     {
         return (references.contains(dropRef(attributeName))
@@ -135,6 +144,7 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
                 || attributeName.equals(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF));
     }
 
+    @Override
     public SingleProperty getSingleProperty(String name)
     {
         return new SinglePropertyWrapper(name, this);
@@ -152,6 +162,7 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
      * @param oldName the attribute name taken straight from the XML element being parsed; will never be <code>null</code>
      * @return the extracted JavaBean property name; must never be <code>null</code>
      */
+    @Override
     public String translateName(String oldName)
     {
         // Remove the bean reference suffix if any.
@@ -174,9 +185,10 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
                 AbstractMuleBeanDefinitionParser.ATTRIBUTE_REFS_SUFFIX);
     }
 
+    @Override
     public Object translateValue(String name, String value)
     {
-        NamedValueMap vm = (NamedValueMap) valueMappings.get(name);
+        NamedValueMap vm = valueMappings.get(name);
         if (vm != null)
         {
             return vm.getValue(value);
@@ -199,7 +211,7 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
             valueMap = new MapValueMap(mappingsString);
         }
 
-        public NamedValueMap(String propertyName, Map valueMap)
+        public NamedValueMap(String propertyName, Map<String, Object> valueMap)
         {
             this.propertyName = propertyName;
             this.valueMap = new MapValueMap(valueMap);
@@ -224,17 +236,16 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
 
     public static class MapValueMap implements ValueMap
     {
+        protected Map<String, Object> map;
 
-        protected Map map;
-
-        public MapValueMap(Map map)
+        public MapValueMap(Map<String, Object> map)
         {
             this.map = map;
         }
 
         public MapValueMap(String definition)
         {
-            map = new HashMap();
+            map = new HashMap<String, Object>();
 
             String[] values = StringUtils.tokenizeToStringArray(definition, ",");
             for (int i = 0; i < values.length; i++)
@@ -250,6 +261,7 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
 
         }
 
+        @Override
         public Object rewrite(String value)
         {
             Object result = map.get(value);
@@ -264,11 +276,10 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
         }
 
     }
-    
+
     public static class IndentityMapValueMap extends MapValueMap
     {
-
-        public IndentityMapValueMap(Map map)
+        public IndentityMapValueMap(Map<String, Object> map)
         {
             super(map);
         }

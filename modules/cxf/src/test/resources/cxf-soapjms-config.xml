@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+            http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+            http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+            http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
+
+    <jms:activemq-connector name="jmsConnector" specification="1.1"/>
+
+    <flow name="dispatcher">
+        <vm:inbound-endpoint exchange-pattern="request-response" path="testInput"/>
+
+        <mulexml:object-to-xml-transformer acceptMuleMessage="true"/>
+
+        <jms:outbound-endpoint queue="soapjms" exchange-pattern="request-response"/>
+
+        <mulexml:xml-to-object-transformer/>
+    </flow>
+
+    <flow name="service">
+        <jms:inbound-endpoint queue="soapjms" exchange-pattern="request-response"/>
+
+        <mulexml:xml-to-object-transformer/>
+
+        <response>
+            <mulexml:object-to-xml-transformer acceptMuleMessage="true"/>
+        </response>
+
+        <cxf:jaxws-service serviceClass="org.mule.module.cxf.example.HelloWorldImpl"/>
+    </flow>
+</mule>

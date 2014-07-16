@@ -1,16 +1,15 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.file.reliability;
 
 import static org.junit.Assert.fail;
+import static org.mule.transport.file.FileTestUtils.createDataFile;
+import static org.mule.transport.file.FileTestUtils.createFolder;
+
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.exception.DefaultSystemExceptionStrategy;
@@ -24,6 +23,7 @@ import java.io.File;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -42,11 +42,10 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
     public InboundMessageLossTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
-
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "reliability/inbound-message-loss.xml";
     }
@@ -65,7 +64,7 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
     @Test
     public void testNoException() throws Exception
     {
-        tmpDir = createFolder(".mule/noException");
+        tmpDir = createFolder(getFileInsideWorkingDirectory("noException").getAbsolutePath());
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {
@@ -87,7 +86,7 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
     @Test
     public void testTransformerException() throws Exception
     {
-        tmpDir = createFolder(".mule/transformerException");
+        tmpDir = createFolder(getFileInsideWorkingDirectory("transformerException").getAbsolutePath());
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {
@@ -109,7 +108,7 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
     @Test
     public void testRouterException() throws Exception
     {
-        tmpDir = createFolder(".mule/routerException");
+        tmpDir = createFolder(getFileInsideWorkingDirectory("routerException").getAbsolutePath());
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {
@@ -131,7 +130,7 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
     @Test
     public void testComponentException() throws Exception
     {
-        tmpDir = createFolder(".mule/componentException");
+        tmpDir = createFolder(getFileInsideWorkingDirectory("componentException").getAbsolutePath());
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {
@@ -155,7 +154,7 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
     @Test
     public void testCatchExceptionStrategyConsumesMessage() throws Exception
     {
-        tmpDir = createFolder(".mule/exceptionHandled");
+        tmpDir = createFolder(getFileInsideWorkingDirectory("exceptionHandled").getAbsolutePath());
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {
@@ -179,7 +178,7 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
     @Test
     public void testDefaultExceptionStrategyConsumesMessage() throws Exception
     {
-        tmpDir = createFolder(".mule/commitOnException");
+        tmpDir = createFolder(getFileInsideWorkingDirectory("commitOnException").getAbsolutePath());
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {
@@ -200,12 +199,11 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
         });
     }
 
+    @Ignore("MULE-6926: Flaky Test")
     @Test
     public void testRollbackExceptionStrategyConsumesMessage() throws Exception
     {
         final CountDownLatch exceptionStrategyLatch = new CountDownLatch(4);
-        tmpDir = createFolder(".mule/rollbackOnException");
-        final File file = createDataFile(tmpDir, "test1.txt");
         muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>() {
             @Override
             public void onNotification(ExceptionNotification notification)
@@ -213,6 +211,9 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
                 exceptionStrategyLatch.countDown();
             }
         });
+
+        tmpDir = createFolder(getFileInsideWorkingDirectory("rollbackOnException").getAbsolutePath());
+        final File file = createDataFile(tmpDir, "test1.txt");
         if (!exceptionStrategyLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS))
         {
             fail("message should be redelivered");

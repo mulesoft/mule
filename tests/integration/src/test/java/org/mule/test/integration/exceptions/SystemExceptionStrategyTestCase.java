@@ -1,29 +1,25 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.integration.exceptions;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.tck.testmodels.mule.TestConnector;
 
 import java.util.concurrent.TimeUnit;
-import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import org.junit.Test;
 
 public class SystemExceptionStrategyTestCase extends AbstractExceptionStrategyTestCase
 {
-    
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/exceptions/system-exception-strategy.xml";
     }
@@ -42,7 +38,7 @@ public class SystemExceptionStrategyTestCase extends AbstractExceptionStrategyTe
         {
             // expected
         }
-        latch.await(1000, TimeUnit.MILLISECONDS); 
+        latch.await(1000, TimeUnit.MILLISECONDS);
         assertEquals(0, serviceExceptionCounter.get());
         assertEquals(1, systemExceptionCounter.get());
     }
@@ -52,7 +48,7 @@ public class SystemExceptionStrategyTestCase extends AbstractExceptionStrategyTe
     {
         muleContext.getRegistry().lookupService("Polling").start();
         Thread.sleep(3000);
-        latch.await(1000, TimeUnit.MILLISECONDS); 
+        latch.await(1000, TimeUnit.MILLISECONDS);
         assertEquals(0, serviceExceptionCounter.get());
         assertEquals(1, systemExceptionCounter.get());
     }

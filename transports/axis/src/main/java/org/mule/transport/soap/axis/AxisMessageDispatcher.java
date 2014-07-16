@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.soap.axis;
 
 import org.mule.DefaultMuleMessage;
@@ -132,7 +128,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         // the axis.one.way property is set
         call.setProperty("axis.one.way", Boolean.TRUE);
         call.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
-        call.setProperty(MuleProperties.MULE_CONTEXT_PROPERTY, connector.getMuleContext());
+        call.setProperty(MuleProperties.MULE_CONTEXT_PROPERTY, getEndpoint().getMuleContext());
         call.invoke(args);
     }
 
@@ -146,7 +142,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         result = call.invoke(args);
         if (result == null)
         {
-            return new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
+            return new DefaultMuleMessage(NullPayload.getInstance(), getEndpoint().getMuleContext());
         }
         else
         {
@@ -174,7 +170,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         // set Mule event here so that handlers can extract info
         call.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
         call.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, endpoint);
-        call.setProperty(MuleProperties.MULE_CONTEXT_PROPERTY, connector.getMuleContext());
+        call.setProperty(MuleProperties.MULE_CONTEXT_PROPERTY, getEndpoint().getMuleContext());
 
         setCustomProperties(event, call);
         call.setTimeout(new Integer(event.getTimeout()));
@@ -416,13 +412,12 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         if (event.getMessage().getOutboundAttachmentNames() != null
             && event.getMessage().getOutboundAttachmentNames().size() > 0)
         {
-            ArrayList attachments = new ArrayList();
-            Iterator i = event.getMessage().getOutboundAttachmentNames().iterator();
-            while (i.hasNext())
+            List<DataHandler> attachments = new ArrayList<DataHandler>();
+            for (String name : event.getMessage().getOutboundAttachmentNames())
             {
-                attachments.add(event.getMessage().getOutboundAttachment((String)i.next()));
+                attachments.add(event.getMessage().getOutboundAttachment(name));
             }
-            ArrayList temp = new ArrayList(Arrays.asList(args));
+            ArrayList<Object> temp = new ArrayList<Object>(Arrays.asList(args));
             temp.add(attachments.toArray(new DataHandler[attachments.size()]));
             args = temp.toArray();
         }
@@ -456,7 +451,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     protected void setMessageContextAttachments(MuleMessage message, MessageContext ctx) throws Exception
     {
         int x = 0;
-        for (Iterator iterator = ctx.getMessage().getAttachments(); iterator.hasNext(); x++)
+        for (Iterator<?> iterator = ctx.getMessage().getAttachments(); iterator.hasNext(); x++)
         {
             message.addOutboundAttachment(String.valueOf(x),
                 ((AttachmentPart)iterator.next()).getActivationDataHandler());

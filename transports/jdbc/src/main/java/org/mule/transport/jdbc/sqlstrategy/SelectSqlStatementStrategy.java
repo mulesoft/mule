@@ -1,21 +1,15 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jdbc.sqlstrategy;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.transaction.Transaction;
-import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.jdbc.JdbcConnector;
 import org.mule.transport.jdbc.JdbcUtils;
 import org.mule.util.ArrayUtils;
@@ -28,27 +22,28 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 /**
- * Implements strategy for handling normal select statements + acks.  
+ * Implements strategy for handling normal select statements + acks.
  */
 public  class SelectSqlStatementStrategy implements SqlStatementStrategy
 {
     protected transient Logger logger = Logger.getLogger(getClass());
-    
+
+    @Override
     public MuleMessage executeStatement(JdbcConnector connector, ImmutableEndpoint endpoint,
                                         MuleEvent event, long timeout, Connection connection) throws Exception
     {
         logger.debug("Trying to receive a message with a timeout of " + timeout);
-        
+
         String[] stmts = connector.getReadAndAckStatements(endpoint);
-        
+
         //Unparsed SQL statements (with #[foo] parameters)
         String readStmt = stmts[0];
         String ackStmt = stmts[1];
-        
+
         //Storage for params (format is #[foo])
-        List readParams = new ArrayList();
-        List ackParams = new ArrayList();
-        
+        List<String> readParams = new ArrayList<String>();
+        List<String> ackParams = new ArrayList<String>();
+
         //Prepared statement form (with ? placeholders instead of #[foo] params)
         readStmt = connector.parseStatement(readStmt, readParams);
         ackStmt = connector.parseStatement(ackStmt, ackParams);
@@ -114,7 +109,7 @@ public  class SelectSqlStatementStrategy implements SqlStatementStrategy
         if (ackStmt != null)
         {
             Object[] params = connector.getParams(endpoint, ackParams,
-                    new DefaultMuleMessage(result, (Map)null, connector.getMuleContext()), ackStmt);
+                    new DefaultMuleMessage(result, (Map)null, endpoint.getMuleContext()), ackStmt);
             if (logger.isDebugEnabled())
             {
                 logger.debug("SQL UPDATE: " + ackStmt + ", params = " + ArrayUtils.toString(params));
@@ -130,11 +125,11 @@ public  class SelectSqlStatementStrategy implements SqlStatementStrategy
         MuleMessage message = null;
         if (event != null)
         {
-            message = new DefaultMuleMessage(result, event.getMessage(), connector.getMuleContext());
+            message = new DefaultMuleMessage(result, event.getMessage(), endpoint.getMuleContext());
         }
         else
         {
-            message = new DefaultMuleMessage(result, connector.getMuleContext());
+            message = new DefaultMuleMessage(result, endpoint.getMuleContext());
         }
         return message;
     }

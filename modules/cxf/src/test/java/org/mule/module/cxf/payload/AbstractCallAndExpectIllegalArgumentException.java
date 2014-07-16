@@ -1,24 +1,20 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.cxf.payload;
-
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.transport.DispatchException;
-import org.mule.module.client.MuleClient;
-import org.mule.module.cxf.CxfOutboundMessageProcessor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
+import org.mule.api.client.MuleClient;
+import org.mule.api.transport.DispatchException;
+import org.mule.module.cxf.CxfOutboundMessageProcessor;
 
 /**
  * This is an abstract utility class that helps the testing of
@@ -42,9 +38,10 @@ abstract class AbstractCallAndExpectIllegalArgumentException implements CallAndE
         this.muleContext = muleContext;
     }
 
+    @Override
     public void callEndpointAndExecuteAsserts() throws MuleException
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         try
         {
             client.send(outputEndpointName, payload, null);

@@ -1,90 +1,80 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.sxc;
-
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import org.apache.commons.io.IOUtils;
-import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.apache.commons.io.IOUtils;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 public class SxcFilterTestCase extends FunctionalTestCase
 {
+    private static String TestData;
+
     int finished = 0;
+
+    @BeforeClass
+    public static void loadTestData() throws Exception
+    {
+        TestData = IOUtils.toString(SxcFilterTestCase.class.getResourceAsStream("/purchase-order.xml"));
+    }
 
     @Test
     public void testBasicXPath() throws Exception
     {
-        final MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
-        final String testData = IOUtils.toString(getClass().getResourceAsStream("/purchase-order.xml"));
-
-        MuleMessage res = client.send("vm://in", testData, null);
+        MuleMessage res = client.send("vm://in", TestData, null);
         assertEquals(Boolean.TRUE, res.getPayload());
     }
 
     @Test
     public void testAndFilter() throws Exception
     {
-        final MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
-        final String testData = IOUtils.toString(getClass().getResourceAsStream("/purchase-order.xml"));
-
-        MuleMessage res = client.send("vm://and-filter", testData, null);
-
+        MuleMessage res = client.send("vm://and-filter", TestData, null);
         assertEquals(Boolean.TRUE, res.getPayload());
     }
 
     @Test
     public void testOrFilter() throws Exception
     {
-        final MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
-        final String testData = IOUtils.toString(getClass().getResourceAsStream("/purchase-order.xml"));
-
-        MuleMessage res = client.send("vm://or-filter", testData, null);
-
+        MuleMessage res = client.send("vm://or-filter", TestData, null);
         assertEquals(Boolean.TRUE, res.getPayload());
     }
 
     @Test
     public void testNotFilter() throws Exception
     {
-        final MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
-        final String testData = IOUtils.toString(getClass().getResourceAsStream("/purchase-order.xml"));
-
-        MuleMessage res = client.send("vm://not-filter", testData, null);
-
+        MuleMessage res = client.send("vm://not-filter", TestData, null);
         assertEquals(Boolean.TRUE, res.getPayload());
     }
 
     public void xtestBenchmark() throws Exception
     {
-        final MuleClient client = new MuleClient(muleContext);
-
-        final String testData = IOUtils.toString(getClass().getResourceAsStream("/purchase-order.xml"));
+        MuleClient client = muleContext.getClient();
 
         System.out.println("Warmup");
-        fire(client, testData, 1500);
+        fire(client, TestData, 1500);
 
         System.out.println("Running....");
-
-        fire(client, testData, 1000);
-
+        fire(client, TestData, 1000);
         Thread.sleep(1000);
     }
 
@@ -97,6 +87,7 @@ public class SxcFilterTestCase extends FunctionalTestCase
         {
             new Thread(new Runnable()
             {
+                @Override
                 public void run()
                 {
                     for (int j = 0; j < count; j++)
@@ -124,9 +115,8 @@ public class SxcFilterTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "xpath-filter-conf.xml";
     }
-
 }

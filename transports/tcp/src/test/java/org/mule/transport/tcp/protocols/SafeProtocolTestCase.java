@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.tcp.protocols;
 
 import static org.junit.Assert.assertEquals;
@@ -15,21 +11,21 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
 
 public class SafeProtocolTestCase extends AbstractServiceAndFlowTestCase
 {
-
     protected static String TEST_MESSAGE = "Test TCP Request";
 
     @Rule
@@ -53,7 +49,7 @@ public class SafeProtocolTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testSafeToSafe() throws MuleException
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         assertResponseOk(client.send("tcp://localhost:" + dynamicPort1.getNumber() + "?connector=safe",
             TEST_MESSAGE, null));
     }
@@ -61,7 +57,7 @@ public class SafeProtocolTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testUnsafeToSafe() throws MuleException
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         assertResponseBad(client.send("tcp://localhost:" + dynamicPort1.getNumber() + "?connector=unsafe",
             TEST_MESSAGE, null));
     }
@@ -89,5 +85,4 @@ public class SafeProtocolTestCase extends AbstractServiceAndFlowTestCase
             // expected
         }
     }
-
 }

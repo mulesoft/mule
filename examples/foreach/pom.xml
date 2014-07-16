@@ -4,12 +4,16 @@
     <parent>
         <groupId>org.mule.examples</groupId>
         <artifactId>mule-examples</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-example-foreach</artifactId>
     <name>Foreach Example</name>
     <packaging>mule</packaging>
     <description>This example demonstrates how to use Foreach to add information to each message in a collection using some of the new features of Mule 3.3.</description>
+
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -50,7 +54,6 @@
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
-            <version>10.6.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>

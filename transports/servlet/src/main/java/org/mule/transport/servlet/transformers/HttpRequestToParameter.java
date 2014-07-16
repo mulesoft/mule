@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.servlet.transformers;
 
 import org.mule.api.MuleMessage;
@@ -62,7 +58,7 @@ public class HttpRequestToParameter extends AbstractMessageTransformer
                         reader = new BufferedReader(new InputStreamReader(is));
                     }
                     
-                    StringBuffer buffer = new StringBuffer(8192);
+                    StringBuilder buffer = new StringBuilder(8192);
                     String line = reader.readLine();
                     while (line != null)
                     {

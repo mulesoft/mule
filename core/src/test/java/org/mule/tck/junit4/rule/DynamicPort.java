@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.tck.junit4.rule;
 
 /**
@@ -33,8 +29,8 @@ public class DynamicPort extends SystemProperty
     public static final String MIN_PORT_SYSTEM_PROPERTY = "mule.test.minPort";
     public static final String MAX_PORT_SYSTEM_PROPERTY = "mule.test.maxPort";
 
-    private static final int DEFAULT_MIN_PORT = 5000;
-    private static final int DEFAULT_MAX_PORT = 6000;
+    private static final int DEFAULT_MIN_PORT = 10000;
+    private static final int DEFAULT_MAX_PORT = 40000;
 
     protected static FreePortFinder freePortFinder;
 

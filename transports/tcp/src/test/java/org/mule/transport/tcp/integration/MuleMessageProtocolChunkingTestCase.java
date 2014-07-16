@@ -1,43 +1,38 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.tcp.integration;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 /**
  * This test was set for the new changes due to Mule1199
  */
 public class MuleMessageProtocolChunkingTestCase extends FunctionalTestCase
 {
-
     public static final long WAIT_MS = 3000L;
     private static int messages = 2;
     private static int messagelength = 10;
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
-    
+
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "mule-message-protocol-mule-config.xml";
     }
@@ -57,7 +52,7 @@ public class MuleMessageProtocolChunkingTestCase extends FunctionalTestCase
     @Test
     public void testHugeChunk() throws Exception
     {
-        StringBuffer message = new StringBuffer();
+        StringBuilder message = new StringBuilder();
         // send 50K of stuff;
         for (int i = 1000; i < 2000; i++)
         {
@@ -69,8 +64,8 @@ public class MuleMessageProtocolChunkingTestCase extends FunctionalTestCase
     @Test
     public void testCustomObject() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        StringBuffer sBuffer = new StringBuffer();
+        MuleClient client = muleContext.getClient();
+        StringBuilder sBuffer = new StringBuilder();
         // send 50K of stuff;
         for (int i = 10000; i < 20000; i++)
         {
@@ -97,7 +92,7 @@ public class MuleMessageProtocolChunkingTestCase extends FunctionalTestCase
 
     private void sendString(String message) throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         for (int i = 0; i < messages; i++)
         {
@@ -109,5 +104,4 @@ public class MuleMessageProtocolChunkingTestCase extends FunctionalTestCase
             assertEquals(message, new String((byte[])msg.getPayload()));
         }
     }
-
 }

@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -14,9 +11,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.routing.RoutingException;
 import org.mule.message.ExceptionMessage;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -26,7 +23,7 @@ import org.junit.Test;
 public class MulticastRouterTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/routing/outbound/multicasting-router-config.xml";
     }
@@ -35,7 +32,7 @@ public class MulticastRouterTestCase extends FunctionalTestCase
     public void testAll() throws Exception
     {
         ByteArrayInputStream bis = new ByteArrayInputStream("Hello, world".getBytes("UTF-8"));
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://inbound1", bis, null);
 
         MuleMessage response = client.request("vm://output1", 2000);
@@ -49,7 +46,8 @@ public class MulticastRouterTestCase extends FunctionalTestCase
     public void testFirstSuccessful() throws Exception
     {
         ByteArrayInputStream bis = new ByteArrayInputStream("Hello, world".getBytes("UTF-8"));
-        MuleClient client = new MuleClient(muleContext);
+
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://inbound2", bis, null);
 
         MuleMessage response = client.request("vm://output4", 2000);

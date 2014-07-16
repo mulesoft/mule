@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.file;
 
 import org.mule.api.MuleMessage;
@@ -53,7 +49,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
             tempDir.mkdirs();
         }
 
-        validMessage = File.createTempFile("simple", ".mule", tempDir);
+        validMessage = File.createTempFile("simple", "test", tempDir);
         assertNotNull(validMessage);
         FileUtils.writeStringToFile(validMessage, VALID_MESSAGE);
     }
@@ -172,7 +168,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
         ((FileConnector) connector).setStreaming(false);
 
         Object payload = getValidMessage();
-        MuleMessage message = connector.createMuleMessageFactory().create(payload, encoding);
+        MuleMessage message = connector.createMuleMessageFactory().create(payload, encoding, muleContext);
         assertNotNull(message);
         
         byte[] messagePayload = (byte[]) message.getPayload();

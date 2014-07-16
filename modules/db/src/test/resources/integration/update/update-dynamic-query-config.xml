@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <flow name="updateDynamicQuery">
+        <inbound-endpoint address="vm://updateDynamicQuery" exchange-pattern="request-response"/>
+
+        <set-variable variableName="data" value="Mercury"/>
+        <set-variable variableName="type" value="4"/>
+
+        <db:update config-ref="dbConfig">
+            <db:dynamic-query>update PLANET set NAME='#[data]' where POSITION=#[type]</db:dynamic-query>
+        </db:update>
+    </flow>
+</mule>

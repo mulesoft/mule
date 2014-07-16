@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -13,9 +10,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.text.MessageFormat;
-
-import org.junit.Test;
 import org.mule.api.component.Component;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.construct.Flow;
@@ -23,16 +17,19 @@ import org.mule.routing.filters.WildcardFilter;
 import org.mule.routing.filters.logic.NotFilter;
 import org.mule.tck.junit4.FunctionalTestCase;
 
+import java.text.MessageFormat;
+
+import org.junit.Test;
+
 public class RestServiceComponentFlowTestCase extends FunctionalTestCase
 {
-
     public static final String FLOW_NAME = "WORMS";
     public static final String FLOW_URL = MessageFormat.format("{0}header:serviceUrl{1}",
                                                                   ExpressionManager.DEFAULT_EXPRESSION_PREFIX,
                                                                   ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "rest-service-component-test-flow.xml";
     }

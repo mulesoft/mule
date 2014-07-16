@@ -1,19 +1,14 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
@@ -112,6 +107,17 @@ public class DefaultMessageCollectionTestCase extends AbstractMuleTestCase
         assertSame(banana, ((Fruit[]) ((List) messageCollectionUnderTest.getPayload()).get(0))[1]);
         assertSame(grapeFruit, ((List) messageCollectionUnderTest.getPayload()).get(1));
         assertSame(orange, ((List) messageCollectionUnderTest.getPayload()).get(2));
+    }
+
+    @Test
+    public void ensureOnlyOneArrayConversionOnCopy()
+    {
+        DefaultMessageCollection original = Mockito.mock(DefaultMessageCollection.class);
+        Mockito.when(original.getMessagesAsArray()).thenReturn(new MuleMessage[]{Mockito.mock(MuleMessage.class)});
+
+        new DefaultMessageCollection(original, muleContext, true);
+
+        Mockito.verify(original, Mockito.times(1)).getMessagesAsArray();
     }
 
 }

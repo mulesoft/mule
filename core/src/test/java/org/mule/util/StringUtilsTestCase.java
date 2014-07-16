@@ -1,19 +1,16 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 import org.junit.Test;
 
@@ -46,8 +43,7 @@ public class StringUtilsTestCase extends AbstractMuleTestCase
     public void testSplitAndTrim2()
     {
         String[] inputValues = new String[]{"foo", "bar", "baz", "kaboom"};
-        String inputString = new StringBuffer(40)
-            .append(inputValues[0])
+        String inputString = new StringBuilder(40).append(inputValues[0])
             .append(" ,")
             .append(",  ")
             .append(inputValues[1])
@@ -89,8 +85,8 @@ public class StringUtilsTestCase extends AbstractMuleTestCase
         assertTrue(Arrays.equals(new byte[]{1, 2}, StringUtils.hexStringToByteArray("0102")));
         assertTrue(Arrays.equals(new byte[]{10, 14}, StringUtils.hexStringToByteArray("0A0E")));
         assertTrue(Arrays.equals(new byte[]{10, 14}, StringUtils.hexStringToByteArray("0a0e")));
-        assertTrue(Arrays.equals(new byte[]{10, (byte)0xff}, StringUtils.hexStringToByteArray("0AFF")));
-        assertTrue(Arrays.equals(new byte[]{10, (byte)0xff}, StringUtils.hexStringToByteArray("0aff")));
+        assertTrue(Arrays.equals(new byte[]{10, (byte) 0xff}, StringUtils.hexStringToByteArray("0AFF")));
+        assertTrue(Arrays.equals(new byte[]{10, (byte) 0xff}, StringUtils.hexStringToByteArray("0aff")));
     }
 
     @Test
@@ -102,8 +98,37 @@ public class StringUtilsTestCase extends AbstractMuleTestCase
         assertEquals("0102", StringUtils.toHexString(new byte[]{1, 2}));
         assertEquals("0a0e", StringUtils.toHexString(new byte[]{10, 14}));
         assertEquals("0A0E", StringUtils.toHexString(new byte[]{10, 14}, true));
-        assertEquals("0aff", StringUtils.toHexString(new byte[]{10, (byte)0xff}));
-        assertEquals("0AFF", StringUtils.toHexString(new byte[]{10, (byte)0xff}, true));
+        assertEquals("0aff", StringUtils.toHexString(new byte[]{10, (byte) 0xff}));
+        assertEquals("0AFF", StringUtils.toHexString(new byte[]{10, (byte) 0xff}, true));
+    }
+
+    @Test
+    public void testMatch()
+    {
+        Pattern pattern = Pattern.compile("<<([\\w]*)>>");
+        String value = "<<target>>";
+
+        assertEquals(StringUtils.match(pattern, value, 1), "target");
+
+        try
+        {
+            StringUtils.match(pattern, null, 1);
+            fail("was expecting IllegalArgumentException");
+        }
+        catch (IllegalArgumentException e)
+        {
+        }
+
+        try
+        {
+            StringUtils.match(null, value, 1);
+            fail("was expecting IllegalArgumentException");
+        }
+        catch (IllegalArgumentException e)
+        {
+        }
+
+        assertNull(StringUtils.match(pattern, "hello world!", 1));
     }
 
 }

@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule;
 
 import static junit.framework.Assert.assertNotNull;
@@ -21,10 +17,8 @@ import static org.mockito.Mockito.when;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
-import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextBuilder;
-import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.MuleContextListener;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.Model;
@@ -33,8 +27,6 @@ import org.mule.config.builders.AbstractConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
-import org.mule.context.notification.ServerNotificationManager;
-import org.mule.lifecycle.MuleContextLifecycleManager;
 import org.mule.model.seda.SedaModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -43,13 +35,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import javax.resource.spi.work.WorkListener;
-
+import org.junit.After;
 import org.junit.Test;
 import org.mockito.InOrder;
 
 public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
 {
+
     private DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
     private static String TEST_STRING_KEY = "test";
     private static String TEST_STRING_VALUE = "test_value";
@@ -58,10 +50,21 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
     private static String TEST_OBJECT_NAME = "testObject";
     private static String TEST_MODEL_NAME = "testModel";
 
+    private MuleContext context;
+
+    @After
+    public void disposeContext()
+    {
+        if (context != null && !context.isDisposed())
+        {
+            context.dispose();
+        }
+    }
+
     @Test
     public void testCreateMuleContext() throws InitialisationException, ConfigurationException
     {
-        MuleContext context = muleContextFactory.createMuleContext();
+        context = muleContextFactory.createMuleContext();
 
         assertMuleContextConfiguration(context);
         assertDefaults(context);
@@ -70,7 +73,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
     @Test
     public void testCreateMuleContextConfigurationBuilder() throws InitialisationException, ConfigurationException
     {
-        MuleContext context = muleContextFactory.createMuleContext(new TestConfigurationBuilder());
+        context = muleContextFactory.createMuleContext(new TestConfigurationBuilder());
 
         assertMuleContextConfiguration(context);
         assertConfigurationBuilder1Objects(context);
@@ -85,7 +88,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         configBuilders.add(new TestConfigurationBuilder2());
 
         TestMuleContextBuilder muleContextBuilder = new TestMuleContextBuilder();
-        MuleContext context = muleContextFactory.createMuleContext(configBuilders, muleContextBuilder);
+        context = muleContextFactory.createMuleContext(configBuilders, muleContextBuilder);
 
         assertCustomMuleContext(context);
         assertConfigurationBuilder1Objects(context);
@@ -97,7 +100,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
     public void testCreateMuleContextMuleContextBuilder() throws InitialisationException, ConfigurationException
     {
         TestMuleContextBuilder muleContextBuilder = new TestMuleContextBuilder();
-        MuleContext context = muleContextFactory.createMuleContext(new SimpleConfigurationBuilder(null), muleContextBuilder);
+        context = muleContextFactory.createMuleContext(new SimpleConfigurationBuilder(null), muleContextBuilder);
 
         assertCustomMuleContext(context);
         assertNoDefaults(context);
@@ -107,8 +110,8 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
     public void testCreateMuleContextConfigurationBuilderMuleContextBuilder() throws InitialisationException, ConfigurationException
     {
         TestMuleContextBuilder muleContextBuilder = new TestMuleContextBuilder();
-        MuleContext context = muleContextFactory.createMuleContext(new TestConfigurationBuilder2(),
-            muleContextBuilder);
+        context = muleContextFactory.createMuleContext(new TestConfigurationBuilder2(),
+                                                       muleContextBuilder);
 
         assertCustomMuleContext(context);
         assertConfigurationBuilder2Objects(context);
@@ -118,7 +121,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
     @Test
     public void testCreateMuleContextString() throws InitialisationException, ConfigurationException
     {
-        MuleContext context = null;
+        context = null;
         try
         {
             context = muleContextFactory.createMuleContext("log4j.properties");
@@ -126,9 +129,9 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         catch (ConfigurationException e)
         {
             assertEquals(
-                "No suitable configuration builder for resource \"[ConfigResource{resourceName='log4j.properties'}]\" found.  "
-                                + "Check you have configuration module on your classpath and are using correct file extension. "
-                                + "(org.mule.api.config.ConfigurationException)", e.getMessage());
+                    "No suitable configuration builder for resource \"[ConfigResource{resourceName='log4j.properties'}]\" found.  "
+                    + "Check you have configuration module on your classpath and are using correct file extension. "
+                    + "(org.mule.api.config.ConfigurationException)", e.getMessage());
         }
         assertNull(context);
     }
@@ -140,7 +143,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         properties.put("testKey1", "testValue1");
         properties.put("testKey2", "testValue2");
 
-        MuleContext context = null;
+        context = null;
         try
         {
             context = muleContextFactory.createMuleContext("log4j.properties", properties);
@@ -148,9 +151,9 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         catch (ConfigurationException e)
         {
             assertEquals(
-                "No suitable configuration builder for resource \"[ConfigResource{resourceName='log4j.properties'}]\" found.  "
-                                + "Check you have configuration module on your classpath and are using correct file extension. "
-                                + "(org.mule.api.config.ConfigurationException)", e.getMessage());
+                    "No suitable configuration builder for resource \"[ConfigResource{resourceName='log4j.properties'}]\" found.  "
+                    + "Check you have configuration module on your classpath and are using correct file extension. "
+                    + "(org.mule.api.config.ConfigurationException)", e.getMessage());
         }
 
         assertNull(context);
@@ -163,7 +166,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         properties.put("testKey3", "testValue3");
         properties.put("testKey4", "testValue4");
 
-        MuleContext context = muleContextFactory.createMuleContext(new TestConfigurationBuilder(), properties);
+        context = muleContextFactory.createMuleContext(new TestConfigurationBuilder(), properties);
 
         assertMuleContextConfiguration(context);
         assertConfigurationBuilder1Objects(context);
@@ -179,7 +182,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
     {
         MuleContextListener listener = mock(MuleContextListener.class);
         ConfigurationBuilder configurationBuilder = mock(ConfigurationBuilder.class);
-        MuleContext context = mock(MuleContext.class);
+        context = mock(MuleContext.class);
         MuleContextBuilder contextBuilder = mock(MuleContextBuilder.class);
         when(contextBuilder.buildMuleContext()).thenReturn(context);
 
@@ -262,6 +265,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
 
     static class TestConfigurationBuilder extends AbstractConfigurationBuilder
     {
+
         @Override
         protected void doConfigure(MuleContext context) throws Exception
         {
@@ -272,6 +276,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
 
     static class TestConfigurationBuilder2 extends AbstractConfigurationBuilder
     {
+
         @Override
         protected void doConfigure(MuleContext context) throws Exception
         {
@@ -284,25 +289,20 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
 
     static class TestMuleContextBuilder extends DefaultMuleContextBuilder
     {
-        @Override
-        public MuleContext buildMuleContext()
-        {
-            MuleContextLifecycleManager manager = getLifecycleManager();
 
-            MuleContext context = new TestMuleContext(getMuleConfiguration(), getWorkManager(),
-                getWorkListener(), manager, getNotificationManager());
-            manager.setMuleContext(context);
-            return context;
+        @Override
+        protected DefaultMuleContext createDefaultMuleContext()
+        {
+            return new TestMuleContext();
         }
     }
 
     static class TestMuleContext extends DefaultMuleContext
     {
-        public TestMuleContext(MuleConfiguration config, WorkManager workManager,
-            WorkListener workListener, MuleContextLifecycleManager lifecycleManager,
-            ServerNotificationManager notificationManager)
+
+        public TestMuleContext()
         {
-            super(config, workManager, workListener, lifecycleManager, notificationManager);
+            super();
         }
     }
 

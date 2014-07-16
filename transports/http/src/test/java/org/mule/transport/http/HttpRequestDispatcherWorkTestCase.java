@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -18,6 +15,7 @@ import static org.mockito.Mockito.when;
 
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.execution.MessageProcessContext;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.ByteArrayInputStream;
@@ -37,7 +35,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class HttpRequestDispatcherWorkTestCase
+public class HttpRequestDispatcherWorkTestCase extends AbstractMuleTestCase
 {
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
@@ -95,7 +93,7 @@ public class HttpRequestDispatcherWorkTestCase
         HttpRequestDispatcherWork httpRequestDispatcherWork = new HttpRequestDispatcherWork(mockHttpConnector, mockSocket);
         when(mockHttpConnector.lookupReceiver(isA(Socket.class), isA(RequestLine.class))).thenReturn(mockHttpMessageReceiver);
         setUpSocketMessage();
-        when(mockHttpMessageReceiver.createMessageContext(isA(HttpServerConnection.class))).thenReturn(mockMessageContext);
+        when(mockHttpMessageReceiver.createMessageProcessContext()).thenReturn(mockMessageContext);
         httpRequestDispatcherWork.run();
         verify(mockHttpMessageReceiver, times(1)).processRequest(isA(HttpServerConnection.class));
     }

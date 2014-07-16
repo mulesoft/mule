@@ -1,13 +1,13 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.config.spring.parsers;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestTransactionManagerFactory;
@@ -19,14 +19,10 @@ import javax.transaction.TransactionManager;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 public class CustomTransactionManagerTestCase extends FunctionalTestCase
 {
-
     @Override
-    public String getConfigResources()
+    public String getConfigFile()
     {
         return "test-custom-transaction-manager.xml";
     }
@@ -39,9 +35,8 @@ public class CustomTransactionManagerTestCase extends FunctionalTestCase
         Proxy proxy = (Proxy) transactionManager;
         TestTransactionManagerFactory.InternalInvocationHandler ihandler =
                 (TestTransactionManagerFactory.InternalInvocationHandler) Proxy.getInvocationHandler(proxy);
-        assertTrue(ihandler.getParent() instanceof TestTransactionManagerFactory);
         TestTransactionManagerFactory factory = ihandler.getParent();
-        Map properties = factory.getEnvironment();
+        Map<?, ?> properties = factory.getEnvironment();
         assertEquals(properties.size(), 2);
         assertEquals(properties.get("property1"), "true");
         assertEquals(properties.get("property2"), "Test");

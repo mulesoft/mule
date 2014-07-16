@@ -1,17 +1,14 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.config.spring;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.config.MuleProperties;
 import org.mule.api.processor.ProcessingStrategy;
 import org.mule.api.store.ListableObjectStore;
@@ -30,9 +27,8 @@ import org.junit.Test;
 
 public class QueueStoreConfigurationTestCase extends FunctionalTestCase
 {
-    
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/spring/queue-store-configs.xml";
     }
@@ -99,7 +95,19 @@ public class QueueStoreConfigurationTestCase extends FunctionalTestCase
         QueuedAsynchronousProcessingStrategy queuedPipeline = (QueuedAsynchronousProcessingStrategy)pipeline;
         assertObjectStoreIsDefaultMemoryObjectStore(queuedPipeline.getQueueStore());
     }
-    
+
+    @Test
+    public void testFlowQueuedAsyncWithPersistentObjectStore()
+    {
+        Flow flow = lookupFlow("flowQueuedAsyncPersistentStore");
+
+        ProcessingStrategy pipeline = flow.getProcessingStrategy();
+        assertTrue(pipeline instanceof QueuedAsynchronousProcessingStrategy);
+
+        QueuedAsynchronousProcessingStrategy queuedPipeline = (QueuedAsynchronousProcessingStrategy) pipeline;
+        assertObjectStoreIsDefaultPersistentObjectStore(queuedPipeline.getQueueStore());
+    }
+
     private SedaService lookupService(String name)
     {
         return (SedaService) muleContext.getRegistry().lookupService(name);
@@ -112,14 +120,14 @@ public class QueueStoreConfigurationTestCase extends FunctionalTestCase
 
     private void assertObjectStoreIsDefaultMemoryObjectStore(ListableObjectStore<Serializable> objectStore)
     {
-        Object defaultMemoryObjectStore = 
+        Object defaultMemoryObjectStore =
             muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME);
         assertEquals(defaultMemoryObjectStore, objectStore);
     }
     
     private void assertObjectStoreIsDefaultPersistentObjectStore(ListableObjectStore<Serializable> objectStore)
     {
-        Object defaultPersistentObjectStore = 
+        Object defaultPersistentObjectStore =
             muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME);
         assertEquals(defaultPersistentObjectStore, objectStore);
     }

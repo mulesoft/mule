@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.xml.transformer;
 
 import org.mule.api.MuleMessage;
@@ -17,10 +13,14 @@ import org.mule.module.xml.util.XMLUtils;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 
+import org.dom4j.io.DocumentResult;
+import org.dom4j.io.SAXContentHandler;
 import org.w3c.dom.Document;
+import org.xml.sax.ContentHandler;
 
 /**
  * <code>XmlToDomDocument</code> transforms a XML String to org.w3c.dom.Document.
@@ -56,6 +56,20 @@ public class XmlToDomDocument extends AbstractXmlTransformer implements Discover
             if (holder == null)
             {
                 holder = getResultHolder(Document.class);
+            }
+
+            Result result = holder.getResult();
+
+            if (result instanceof DocumentResult)
+            {
+                DocumentResult dr = (DocumentResult) holder.getResult();
+                ContentHandler contentHandler = dr.getHandler();
+                if (contentHandler instanceof SAXContentHandler)
+                {
+                    //The following code is used to avoid the splitting
+                    //of text inside DOM elements.
+                    ((SAXContentHandler) contentHandler).setMergeAdjacentText(true);
+                }
             }
 
             Transformer idTransformer = XMLUtils.getTransformer();

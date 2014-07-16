@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport;
 
 import org.mule.api.MuleMessage;
@@ -49,7 +45,7 @@ public abstract class AbstractMuleMessageFactoryTestCase extends AbstractMuleCon
     {
         MuleMessageFactory factory = createMuleMessageFactory();
         
-        MuleMessage message = factory.create(null, encoding);
+        MuleMessage message = factory.create(null, encoding, muleContext);
         assertNotNull(message);
         assertEquals(NullPayload.getInstance(), message.getPayload());
     }
@@ -60,7 +56,7 @@ public abstract class AbstractMuleMessageFactoryTestCase extends AbstractMuleCon
         MuleMessageFactory factory = createMuleMessageFactory();
     
         Object payload = getValidTransportMessage();
-        MuleMessage message = factory.create(payload, encoding);
+        MuleMessage message = factory.create(payload, encoding, muleContext);
         assertNotNull(message);
         assertEquals(payload, message.getPayload());
     }
@@ -78,7 +74,7 @@ public abstract class AbstractMuleMessageFactoryTestCase extends AbstractMuleCon
         Object invalidPayload = getUnsupportedTransportMessage();
         try
         {
-            factory.create(invalidPayload, encoding);
+            factory.create(invalidPayload, encoding, muleContext);
             fail("Creating a MuleMessageFactory from an invalid transport message must fail"); 
         }
         catch (MessageTypeNotSupportedException mtnse)

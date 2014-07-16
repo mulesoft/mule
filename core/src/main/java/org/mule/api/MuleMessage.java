@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.api;
 
 import org.mule.api.transformer.DataType;
@@ -749,6 +745,12 @@ public interface MuleMessage extends Serializable
      */
     String getPayloadForLogging(String encoding);
 
+    /**
+     * @deprecated
+     * Avoid getting access to the MuleContext through the message.
+     * You can get access to the MuleContext by making your class implement {@link org.mule.api.context.MuleContextAware}
+     */
+    @Deprecated
     MuleContext getMuleContext();
 
     /**
@@ -779,4 +781,10 @@ public interface MuleMessage extends Serializable
      * @return the inbound message
      */
     MuleMessage createInboundMessage() throws Exception;
+
+    /**
+     * Removes all outbound attachments on this message.  Note: inbound attachments are immutable.
+     * {@link org.mule.api.transport.PropertyScope#OUTBOUND}.
+     */
+    void clearAttachments();
 }

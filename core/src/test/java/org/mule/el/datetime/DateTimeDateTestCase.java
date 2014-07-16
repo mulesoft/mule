@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.el.datetime;
 
 import static org.junit.Assert.assertEquals;
@@ -35,14 +31,16 @@ import org.junit.Test;
 public class DateTimeDateTestCase extends AbstractMuleTestCase
 {
 
-    protected org.mule.api.el.datetime.Date now = new DateTime().withTimeZone("UTC").getDate();
+    private Calendar currentCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+
+    private org.mule.api.el.datetime.Date now = new DateTime(currentCalendar).withTimeZone("UTC").getDate();
 
     @Test
     public void isBefore()
     {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, 1);
-        Assert.assertTrue((Boolean) now.isBefore(new DateTime(cal).withTimeZone("UTC")));
+        Assert.assertTrue(now.isBefore(new DateTime(cal).withTimeZone("UTC")));
     }
 
     @Test
@@ -50,7 +48,7 @@ public class DateTimeDateTestCase extends AbstractMuleTestCase
     {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -1);
-        Assert.assertTrue((Boolean) now.isAfter(new DateTime(cal).withTimeZone("UTC")));
+        Assert.assertTrue(now.isAfter(new DateTime(cal).withTimeZone("UTC")));
     }
 
     @Test
@@ -70,31 +68,25 @@ public class DateTimeDateTestCase extends AbstractMuleTestCase
     @Test
     public void plusDays()
     {
-        Assert.assertEquals(
-            (Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.DAY_OF_YEAR) + 1) % 365,
-            now.plusDays(1).getDayOfYear());
+        Assert.assertEquals((currentCalendar.get(Calendar.DAY_OF_YEAR) % 365) + 1, now.plusDays(1).getDayOfYear());
     }
 
     @Test
     public void plusWeeks()
     {
-        Assert.assertEquals(
-            (Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.WEEK_OF_YEAR) + 1) % 52,
-            now.plusWeeks(1).getWeekOfYear());
+        Assert.assertEquals((currentCalendar.get(Calendar.WEEK_OF_YEAR) % 52) + 1, now.plusWeeks(1).getWeekOfYear());
     }
 
     @Test
     public void plusMonths()
     {
-        Assert.assertEquals((Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.MONTH) + 2) % 12,
-            now.plusMonths(1).getMonth());
+        Assert.assertEquals(((currentCalendar.get(Calendar.MONTH) + 1) % 12) + 1, now.plusMonths(1).getMonth());
     }
 
     @Test
     public void plusYears()
     {
-        Assert.assertEquals(Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.YEAR) + 1,
-            now.plusYears(1).getYear());
+        Assert.assertEquals(currentCalendar.get(Calendar.YEAR) + 1, now.plusYears(1).getYear());
     }
 
     @Test
@@ -108,50 +100,43 @@ public class DateTimeDateTestCase extends AbstractMuleTestCase
     @Test
     public void dayOfWeek()
     {
-        assertEquals(Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.DAY_OF_WEEK),
-            now.getDayOfWeek());
+        assertEquals(currentCalendar.get(Calendar.DAY_OF_WEEK), now.getDayOfWeek());
     }
 
     @Test
     public void dayOfMonth()
     {
-        assertEquals(Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.DAY_OF_MONTH),
-            now.getDayOfMonth());
+        assertEquals(currentCalendar.get(Calendar.DAY_OF_MONTH), now.getDayOfMonth());
     }
 
     @Test
     public void dayOfYear()
     {
-        assertEquals(Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.DAY_OF_YEAR),
-            now.getDayOfYear());
+        assertEquals(currentCalendar.get(Calendar.DAY_OF_YEAR), now.getDayOfYear());
     }
 
     @Test
     public void weekOfMonth()
     {
-        assertEquals(Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.WEEK_OF_MONTH),
-            now.getWeekOfMonth());
+        assertEquals(currentCalendar.get(Calendar.WEEK_OF_MONTH), now.getWeekOfMonth());
     }
 
     @Test
     public void weekOfYear()
     {
-        assertEquals(Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.WEEK_OF_YEAR),
-            now.getWeekOfYear());
+        assertEquals(currentCalendar.get(Calendar.WEEK_OF_YEAR), now.getWeekOfYear());
     }
 
     @Test
     public void monthOfYear()
     {
-        assertEquals(Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.MONTH) + 1,
-            now.getMonth());
+        assertEquals(currentCalendar.get(Calendar.MONTH) + 1, now.getMonth());
     }
 
     @Test
     public void testToString()
     {
-        assertEquals(DatatypeConverter.printDate(Calendar.getInstance(TimeZone.getTimeZone("UTC"))),
-            now.toString());
+        assertEquals(DatatypeConverter.printDate(currentCalendar), now.toString());
     }
 
     @Test

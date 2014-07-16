@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.management.mbean;
 
 import org.mule.MessageExchangePattern;
@@ -67,7 +63,7 @@ public class EndpointService implements EndpointServiceMBean
                 "Recevier is null for Endpoint MBean but the endpoint itself is a receiving endpoint");
         }
 
-        name = new ObjectNameHelper(endpoint.getConnector().getMuleContext()).getEndpointName(endpoint.getEndpointURI());
+        name = new ObjectNameHelper(endpoint.getMuleContext()).getEndpointName(endpoint.getEndpointURI());
     }
 
     public String getAddress()

@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms.transformers;
 
 import org.mule.api.MuleException;
@@ -158,17 +154,18 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
 
             Object value = message.getOutboundProperty(key);
 
-            if (MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(key))
-            {
-                msg.setJMSCorrelationID(message.getCorrelationId());
-            }
-
             // We don't want to set the ReplyTo property again as it will be set
             // using JMSReplyTo
             if (!(MuleProperties.MULE_REPLY_TO_PROPERTY.equals(key) && value instanceof Destination))
             {
                 setJmsPropertySanitizeKeyIfNecessary(msg, key, value);
             }
+        }
+
+        // MULE-6577: Copy Mule message correlation id to JMS message correlation id.
+        if (message.getCorrelationId() != null)
+        {
+            msg.setJMSCorrelationID(message.getCorrelationId());
         }
     }
 

@@ -1,8 +1,5 @@
 /*
- * $Id: MessageProcessorNotificationPathTestCase.java 25187 2013-01-11 16:54:29Z luciano.gandini $
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -28,9 +25,8 @@ import org.junit.Test;
  */
 public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/notifications/message-processor-notification-test-flow.xml";
     }
@@ -85,6 +81,7 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
     {
         testFlowPaths("subflow", "/0", "/1", "/1/subflow-call/subprocessors/0", "/1/subflow-call/subprocessors/1");
         testFlowPaths("subflow2", "/0", "/1", "/1/subflow-call/subprocessors/0", "/1/subflow-call/subprocessors/1","/2");
+        testFlowPaths("subflow\\/With\\/Slash", "/0", "/1", "/1/subflow\\/call/subprocessors/0", "/1/subflow\\/call/subprocessors/1","/2");
     }
 
     @Test
@@ -130,7 +127,7 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
     private void testFlowPaths(String flowName, String... nodes) throws Exception
     {
         String[] expectedPaths = generatePaths(flowName, nodes);
-        FlowConstruct flow = getFlowConstruct(flowName);
+        FlowConstruct flow = getFlowConstruct(unescape(flowName));
         DefaultMessageProcessorPathElement flowElement = new DefaultMessageProcessorPathElement(null, flowName);
         ((Pipeline) flow).addMessageProcessorPathElements(flowElement);
         Map<MessageProcessor, String> messageProcessorPaths = NotificationUtils.buildPaths(flowElement);
@@ -151,5 +148,24 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
             pathSet.add(base + node);
         }
         return pathSet.toArray(new String[0]);
+    }
+
+    private String unescape(String name)
+    {
+        StringBuilder builder = new StringBuilder(name.length());
+        for (int i = 0; i < name.length(); i++)
+        {
+            char c = name.charAt(i);
+            if (i < (name.length() - 1) && name.charAt(i + 1) == '/')
+            {
+                builder.append("/");
+                i++;
+            }
+            else
+            {
+                builder.append(c);
+            }
+        }
+        return builder.toString();
     }
 }

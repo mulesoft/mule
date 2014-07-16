@@ -9,7 +9,7 @@
         <!-- Copy standard CE distro, excluding a few things -->
         <fileSet>
             <directory>target/ce-distribution/${communityArtifact}-${version}/lib</directory>
-            <outputDirectory></outputDirectory>
+            <outputDirectory>lib</outputDirectory>
             <fileMode>0644</fileMode>
             <directoryMode>0755</directoryMode>
             <includes>
@@ -23,12 +23,11 @@
         </fileSet>
         <fileSet>
             <directory>target/ce-distribution/${communityArtifact}-${version}/src</directory>
-            <outputDirectory></outputDirectory>
+            <outputDirectory>src</outputDirectory>
             <includes>
                 <include>mule-sources-*.zip</include>
             </includes>
         </fileSet>
-
     </fileSets>
 
     <!--
@@ -38,10 +37,9 @@
     -->
 
     <dependencySets>
-
         <!-- Scripting pack libraries -->
         <dependencySet>
-            <outputDirectory>user</outputDirectory>
+            <outputDirectory>lib/user</outputDirectory>
             <scope>runtime</scope>
             <fileMode>0644</fileMode>
         </dependencySet>

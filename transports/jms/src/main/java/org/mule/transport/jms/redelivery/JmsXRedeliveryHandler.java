@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms.redelivery;
 
 import org.mule.api.MuleException;
@@ -81,13 +77,13 @@ public class JmsXRedeliveryHandler extends AbstractRedeliveryHandler
 
             if (connectorRedelivery == JmsConnector.REDELIVERY_FAIL_ON_FIRST)
             {
-                MuleMessage msg = createMuleMessage(message);
+                MuleMessage msg = createMuleMessage(message, endpoint.getMuleContext());
                 throw new MessageRedeliveredException(messageId, redeliveryCount, connectorRedelivery, endpoint, flow, msg);
             }
         }
         else if (redeliveryCount > connectorRedelivery)
         {
-            MuleMessage msg = createMuleMessage(message);
+            MuleMessage msg = createMuleMessage(message, endpoint.getMuleContext());
             throw new MessageRedeliveredException(messageId, redeliveryCount, connectorRedelivery, endpoint, flow, msg);
         }
         else

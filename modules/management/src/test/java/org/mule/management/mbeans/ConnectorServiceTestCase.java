@@ -1,18 +1,14 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.management.mbeans;
 
 import org.mule.api.transport.Connector;
 import org.mule.management.AbstractMuleJmxTestCase;
-import org.mule.module.management.agent.JmxAgent;
+import org.mule.module.management.agent.JmxApplicationAgent;
 import org.mule.tck.testmodels.mule.TestConnector;
 
 import java.util.Set;
@@ -28,13 +24,13 @@ public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
 {
 
     protected String domainName;
-    protected JmxAgent jmxAgent;
+    protected JmxApplicationAgent jmxAgent;
 
     @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        jmxAgent = muleContext.getRegistry().lookupObject(JmxAgent.class);
+        jmxAgent = muleContext.getRegistry().lookupObject(JmxApplicationAgent.class);
 
     }
 

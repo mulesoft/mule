@@ -1,17 +1,14 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.sftp;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transport.AbstractMessageRequester;
 import org.mule.transport.sftp.notification.SftpNotifier;
 
@@ -54,7 +51,7 @@ public class SftpMessageRequester extends AbstractMessageRequester
         logger.debug("Routing file: " + path);
 
         MuleMessage message = createMuleMessage(inputStream);
-        message.setOutboundProperty(SftpConnector.PROPERTY_ORIGINAL_FILENAME, path);
+        message.setProperty(SftpConnector.PROPERTY_ORIGINAL_FILENAME, path, PropertyScope.INBOUND);
 
         // Now we can update the notifier with the message
         notifier.setMessage(message);

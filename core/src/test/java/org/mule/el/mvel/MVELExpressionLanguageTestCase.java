@@ -1,17 +1,15 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.el.mvel;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
@@ -23,6 +21,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.el.ExpressionLanguageContext;
 import org.mule.api.el.ExpressionLanguageExtension;
+import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.expression.InvalidExpressionException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
@@ -31,6 +30,11 @@ import org.mule.config.MuleManifest;
 import org.mule.el.context.AppContext;
 import org.mule.el.context.MessageContext;
 import org.mule.el.function.RegexExpressionLanguageFuntion;
+import org.mule.mvel2.CompileException;
+import org.mule.mvel2.ParserContext;
+import org.mule.mvel2.PropertyAccessException;
+import org.mule.mvel2.ast.Function;
+import org.mule.mvel2.optimizers.OptimizerFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 
@@ -51,6 +55,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
@@ -64,8 +69,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.Mockito;
-import org.mvel2.ParserContext;
-import org.mvel2.ast.Function;
 
 @RunWith(Parameterized.class)
 public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
@@ -73,10 +76,20 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
 
     protected Variant variant;
     protected MVELExpressionLanguage mvel;
+    final String largeExpression = "payload = 'Tom,Fennelly,Male,4,Ireland';StringBuilder sb = new StringBuilder(); fields = payload.split(',\');"
+                                   + "if (fields.length > 4) {"
+                                   + "    sb.append('  <Contact>\n');"
+                                   + "    sb.append('    <FirstName>').append(fields[0]).append('</FirstName>\n');"
+                                   + "    sb.append('    <LastName>').append(fields[1]).append('</LastName>\n');"
+                                   + "    sb.append('    <Address>').append(fields[2]).append('</Address>\n');"
+                                   + "    sb.append('    <TelNum>').append(fields[3]).append('</TelNum>\n');"
+                                   + "    sb.append('    <SIN>').append(fields[4]).append('</SIN>\n');"
+                                   + "    sb.append('  </Contact>\n');" + "}" + "sb.toString();";
 
-    public MVELExpressionLanguageTestCase(Variant variant)
+    public MVELExpressionLanguageTestCase(Variant variant, String mvelOptimizer)
     {
         this.variant = variant;
+        OptimizerFactory.setDefaultOptimizer(mvelOptimizer);
     }
 
     @Before
@@ -125,14 +138,14 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     {
         MuleEvent event = createMockEvent();
 
-        // // Literals
-        // assertEquals("hi", evaluate("'hi'", event));
-        // assertEquals(4, evaluate("2*2", event));
-        //
-        // // Static context
-        // assertEquals(Calendar.getInstance().getTimeZone(), evaluate("server.timeZone", event));
-        // assertEquals(MuleManifest.getProductVersion(), evaluate("mule.version", event));
-        // assertEquals(muleContext.getConfiguration().getId(), evaluate("app.name", event));
+        // Literals
+        assertEquals("hi", evaluate("'hi'", event));
+        assertEquals(4, evaluate("2*2", event));
+
+        // Static context
+        assertEquals(Calendar.getInstance().getTimeZone(), evaluate("server.timeZone", event));
+        assertEquals(MuleManifest.getProductVersion(), evaluate("mule.version", event));
+        assertEquals(muleContext.getConfiguration().getId(), evaluate("app.name", event));
 
         // Event context
         assertEquals("myFlow", evaluate("flow.name", event));
@@ -333,7 +346,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     @Test
     public void addGlobalFunction() throws InitialisationException
     {
-        mvel.addGlobalFunction("hello", new HelloWorldFunction(mvel.parserContext));
+        mvel.addGlobalFunction("hello", new HelloWorldFunction(new ParserContext(mvel.parserConfiguration)));
         mvel.initialise();
         assertEquals("Hello World!", evaluate("hello()"));
     }
@@ -369,7 +382,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         @Override
         public void configureContext(ExpressionLanguageContext context)
         {
-            for (int i=0; i<20; i++)
+            for (int i = 0; i < 20; i++)
             {
                 context.declareFunction("dummy-function-" + i, new RegexExpressionLanguageFuntion());
             }
@@ -377,16 +390,55 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void testConcurrentEvaluation() throws Exception
+    public void testConcurrentCompilation() throws Exception
     {
-        muleContext.getRegistry().registerObject("dummy-el-extension", new DummyExpressionLanguageExtension());
         final int N = 100;
         final CountDownLatch start = new CountDownLatch(1);
         final CountDownLatch end = new CountDownLatch(N);
         final AtomicInteger errors = new AtomicInteger(0);
-        for (int i=0; i<N; i++)
+        for (int i = 0; i < N; i++)
         {
-            new Thread(new Runnable(){
+            new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        start.await();
+                        evaluate(largeExpression + new Random().nextInt());
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        errors.incrementAndGet();
+                    }
+                    finally
+                    {
+                        end.countDown();
+                    }
+                }
+            }, "thread-eval-" + i).start();
+        }
+        start.countDown();
+        end.await();
+        if (errors.get() > 0)
+        {
+            fail();
+        }
+    }
+
+    @Test
+    public void testConcurrentEvaluation() throws Exception
+    {
+        final int N = 100;
+        final CountDownLatch start = new CountDownLatch(1);
+        final CountDownLatch end = new CountDownLatch(N);
+        final AtomicInteger errors = new AtomicInteger(0);
+        for (int i = 0; i < N; i++)
+        {
+            new Thread(new Runnable()
+            {
                 @Override
                 public void run()
                 {
@@ -412,6 +464,34 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         if (errors.get() > 0)
         {
             fail();
+        }
+    }
+
+    @Test
+    public void propertyAccessException() throws InitialisationException
+    {
+        try
+        {
+            evaluate("doesntExist");
+        }
+        catch (Exception e)
+        {
+            assertEquals(ExpressionRuntimeException.class, e.getClass());
+            assertThat(e.getCause(), instanceOf(CompileException.class));
+        }
+    }
+
+    @Test
+    public void propertyAccessException2() throws InitialisationException
+    {
+        try
+        {
+            evaluate("app.doesntExist");
+        }
+        catch (Exception e)
+        {
+            assertEquals(ExpressionRuntimeException.class, e.getClass());
+            assertEquals(PropertyAccessException.class, e.getCause().getClass());
         }
     }
 
@@ -501,8 +581,13 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     @Parameters
     public static List<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{Variant.EXPRESSION_WITH_DELIMITER},
-            {Variant.EXPRESSION_STRAIGHT_UP}});
+        return Arrays.asList(new Object[][]
+        {
+            {Variant.EXPRESSION_WITH_DELIMITER, OptimizerFactory.SAFE_REFLECTIVE},
+            {Variant.EXPRESSION_WITH_DELIMITER, OptimizerFactory.DYNAMIC},
+            {Variant.EXPRESSION_STRAIGHT_UP, OptimizerFactory.SAFE_REFLECTIVE},
+            {Variant.EXPRESSION_STRAIGHT_UP, OptimizerFactory.DYNAMIC}
+        });
     }
 
     private static class HelloWorldFunction extends Function
@@ -515,7 +600,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         @Override
         public Object call(Object ctx,
                            Object thisValue,
-                           org.mvel2.integration.VariableResolverFactory factory,
+                           org.mule.mvel2.integration.VariableResolverFactory factory,
                            Object[] parms)
         {
             return "Hello World!";
@@ -525,7 +610,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     /**
      * Scans all classes accessible from the context class loader which belong to the given package and
      * subpackages.
-     *
+     * 
      * @param packageName The base package
      * @return The classes
      * @throws ClassNotFoundException
@@ -553,7 +638,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
 
     /**
      * Recursive method used to find all classes in a given directory and subdirs.
-     *
+     * 
      * @param directory The base directory
      * @param packageName The package name for classes found inside the base directory
      * @return The classes
@@ -576,6 +661,15 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
             }
         }
         return classes;
+    }
+
+    @Test
+    public void collectionAccessPayloadChangedMULE7506() throws Exception
+    {
+        MuleEvent event = getTestEvent(new String[]{"1", "2"});
+        assertEquals("1", mvel.evaluate("payload[0]", event));
+        event.getMessage().setPayload(Collections.singletonList("1"));
+        assertEquals("1", mvel.evaluate("payload[0]", event));
     }
 
 }

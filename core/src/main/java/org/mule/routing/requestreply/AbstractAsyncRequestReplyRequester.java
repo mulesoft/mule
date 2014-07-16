@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.routing.requestreply;
 
 import org.mule.DefaultMuleEvent;
@@ -86,7 +82,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
         }
         else
         {
-            locks.put(getAsyncReplyCorrelationId(event), new Latch());
+            locks.put(getAsyncReplyCorrelationId(event), createEventLock());
 
             sendAsyncRequest(event);
 
@@ -105,6 +101,15 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
             }
             return resultEvent;
         }
+    }
+
+    /**
+     * Creates the lock used to synchronize a given event
+     * @return a new Latch instance
+     */
+    protected Latch createEventLock()
+    {
+        return new Latch();
     }
 
     public void setTimeout(long timeout)
@@ -247,12 +252,8 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
             if (interruptedWhileWaiting)
             {
                 Thread.currentThread().interrupt();
+                return null;
             }
-        }
-
-        if (interruptedWhileWaiting)
-        {
-            Thread.currentThread().interrupt();
         }
 
         if (resultAvailable)

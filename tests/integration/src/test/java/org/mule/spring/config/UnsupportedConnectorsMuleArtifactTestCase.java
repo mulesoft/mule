@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.spring.config;
 
 import org.mule.common.MuleArtifact;
@@ -17,6 +13,7 @@ import org.mule.common.config.XmlConfigurationCallback;
 import org.mule.common.config.XmlConfigurationMuleArtifactFactory;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.ServiceLoader;
 
 import junit.framework.Assert;
@@ -53,9 +50,9 @@ public class UnsupportedConnectorsMuleArtifactTestCase
         //SFTP
         checkUnsupportedConnector("<sftp:connector name=\"sftp-default\" xmlns:sftp=\"http://www.mulesoft.org/schema/mule/sftp\"/>");
         //File Input
-        checkUnsupportedConnector("<file:connector name=\"output\" outputAppend=\"false\" outputPattern=\"#[function:datestamp]-#[header:originalFilename]\" xmlns:file=\"http://www.mulesoft.org/schema/mule/file\"/>\n");
+        checkUnsupportedConnector("<file:connector name=\"output\" outputAppend=\"false\" outputPattern=\"#[function:datestamp]-#[header:inbound:originalFilename]\" xmlns:file=\"http://www.mulesoft.org/schema/mule/file\"/>\n");
         //File Output
-        checkUnsupportedConnector("<file:connector name=\"input\" fileAge=\"500\" autoDelete=\"true\" pollingFrequency=\"100\" moveToDirectory=\"/backup\" moveToPattern=\"#[header:originalFilename].backup\" xmlns:file=\"http://www.mulesoft.org/schema/mule/file\"/>\n");
+        checkUnsupportedConnector("<file:connector name=\"input\" fileAge=\"500\" autoDelete=\"true\" pollingFrequency=\"100\" moveToDirectory=\"/backup\" moveToPattern=\"#[header:inbound:originalFilename].backup\" xmlns:file=\"http://www.mulesoft.org/schema/mule/file\"/>\n");
         //VM
         checkUnsupportedConnector("<vm:connector name=\"memory\" xmlns:vm=\"http://www.mulesoft.org/schema/mule/vm\"/>");
 
@@ -91,6 +88,16 @@ public class UnsupportedConnectorsMuleArtifactTestCase
                     return s;
                 }
                 else return null;
+            }
+
+            public Element[] getPropertyPlaceholders()
+            {
+                return new Element[0];
+            }
+
+            public Map<String, String> getEnvironmentProperties()
+            {
+                return null;
             }
         };
 

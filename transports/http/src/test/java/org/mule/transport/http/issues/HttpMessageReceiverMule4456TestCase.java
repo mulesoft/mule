@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.http.issues;
 
 import static org.junit.Assert.assertEquals;
@@ -15,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -36,7 +32,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class HttpMessageReceiverMule4456TestCase extends AbstractServiceAndFlowTestCase
 {
-    
     private static final String MESSAGE = "test message";
 
     private HttpClient httpClient;
@@ -52,7 +47,7 @@ public class HttpMessageReceiverMule4456TestCase extends AbstractServiceAndFlowT
     {
         super(variant, configResources);
     }
-  
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -60,8 +55,8 @@ public class HttpMessageReceiverMule4456TestCase extends AbstractServiceAndFlowT
             {ConfigVariant.SERVICE, "http-receiver-mule4456-config-service.xml"},
             {ConfigVariant.FLOW, "http-receiver-mule4456-config-flow.xml"}
         });
-    }      
-   
+    }
+
     @Override
     protected boolean isGracefulShutdown()
     {
@@ -75,7 +70,7 @@ public class HttpMessageReceiverMule4456TestCase extends AbstractServiceAndFlowT
         HttpClientParams params = new HttpClientParams();
         params.setVersion(HttpVersion.HTTP_1_1);
         httpClient = new HttpClient(params);
-        muleClient = new MuleClient(muleContext);
+        muleClient = muleContext.getClient();
     }
 
     @Test
@@ -84,6 +79,7 @@ public class HttpMessageReceiverMule4456TestCase extends AbstractServiceAndFlowT
         FunctionalTestComponent component = getFunctionalTestComponent("AsyncService");
         component.setEventCallback(new EventCallback()
         {
+            @Override
             public void eventReceived(MuleEventContext context, Object comp) throws Exception
             {
                 Thread.sleep(200);
@@ -92,11 +88,11 @@ public class HttpMessageReceiverMule4456TestCase extends AbstractServiceAndFlowT
         });
 
         PostMethod request = new PostMethod("http://localhost:" + dynamicPort1.getNumber());
-        RequestEntity entity = new StringRequestEntity(MESSAGE, "text/plain", 
+        RequestEntity entity = new StringRequestEntity(MESSAGE, "text/plain",
             muleContext.getConfiguration().getDefaultEncoding());
         request.setRequestEntity(entity);
         httpClient.executeMethod(request);
-        
+
         MuleMessage message = muleClient.request("vm://out", 1000);
         assertNotNull(message);
         assertEquals(MESSAGE, message.getPayloadAsString());
@@ -108,6 +104,7 @@ public class HttpMessageReceiverMule4456TestCase extends AbstractServiceAndFlowT
         FunctionalTestComponent component = getFunctionalTestComponent("AsyncPersistentQueueService");
         component.setEventCallback(new EventCallback()
         {
+            @Override
             public void eventReceived(MuleEventContext context, Object comp) throws Exception
             {
                 Thread.sleep(200);

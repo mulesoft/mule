@@ -1,16 +1,18 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.tcp.issues;
 
 import static org.junit.Assert.assertEquals;
+
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.tcp.protocols.LengthProtocol;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
@@ -27,11 +29,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.tcp.protocols.LengthProtocol;
 
 public class KeepSendSocketOpenMule1491TestCase extends AbstractServiceAndFlowTestCase
 {
@@ -50,7 +47,7 @@ public class KeepSendSocketOpenMule1491TestCase extends AbstractServiceAndFlowTe
     {
         super(variant, configResources);
     }
-        
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -61,12 +58,12 @@ public class KeepSendSocketOpenMule1491TestCase extends AbstractServiceAndFlowTe
     @Test
     public void testSend() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        
+        MuleClient client = muleContext.getClient();
+
         Map<String, Object> props = new HashMap<String, Object>();
         MuleMessage result = client.send("clientEndpoint", TEST_TCP_MESSAGE, props);
         assertEquals(TEST_TCP_MESSAGE + " Received", result.getPayloadAsString());
-        
+
         // try an extra message in case it's a problem on repeat
         result = client.send("clientEndpoint", TEST_TCP_MESSAGE, props);
         assertEquals(TEST_TCP_MESSAGE + " Received", result.getPayloadAsString());
@@ -78,7 +75,8 @@ public class KeepSendSocketOpenMule1491TestCase extends AbstractServiceAndFlowTe
         try
         {
             new Thread(server).start();
-            MuleClient client = new MuleClient(muleContext);
+
+            MuleClient client = muleContext.getClient();
             client.send(endpoint, "Hello", null);
             client.send(endpoint, "world", null);
             assertEquals(count, server.getCount());
@@ -103,7 +101,7 @@ public class KeepSendSocketOpenMule1491TestCase extends AbstractServiceAndFlowTe
 
     @SuppressWarnings("synthetic-access")
     private class SimpleServerSocket implements Runnable
-    { 
+    {
         private ServerSocket server;
         AtomicBoolean running = new AtomicBoolean(true);
         AtomicInteger count = new AtomicInteger(0);

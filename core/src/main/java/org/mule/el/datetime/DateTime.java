@@ -1,19 +1,17 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.el.datetime;
 
 import org.mule.api.el.datetime.Date;
 import org.mule.api.el.datetime.Time;
-import org.mule.el.context.ServerContext;
 
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -27,8 +25,10 @@ import javax.xml.datatype.XMLGregorianCalendar;
  * Models a DateTime and simplifies the parsing/formatting and very basic manipulation of dates via Mule
  * expression language.
  */
-public class DateTime extends AbstractInstant implements Date, Time
+public class DateTime extends AbstractInstant implements Date, Time, Serializable
 {
+
+    private static final long serialVersionUID = -5006713884149136787L;
 
     public DateTime(Calendar calendar, Locale locale)
     {
@@ -37,24 +37,24 @@ public class DateTime extends AbstractInstant implements Date, Time
 
     public DateTime()
     {
-        this(Calendar.getInstance(ServerContext.getLocale()), (ServerContext.getLocale()));
+        super();
     }
 
     public DateTime(Calendar calendar)
     {
-        this(calendar, ServerContext.getLocale());
+        this(calendar, Locale.getDefault());
     }
 
     public DateTime(java.util.Date date)
     {
-        this(Calendar.getInstance(ServerContext.getTimeZone(), ServerContext.getLocale()),
-            ServerContext.getLocale());
+        this(Calendar.getInstance(Calendar.getInstance().getTimeZone(), Locale.getDefault()),
+            Locale.getDefault());
         this.calendar.setTime(date);
     }
 
     public DateTime(XMLGregorianCalendar xmlCalendar)
     {
-        this(xmlCalendar.toGregorianCalendar(), ServerContext.getLocale());
+        this(xmlCalendar.toGregorianCalendar(), Locale.getDefault());
     }
 
     public DateTime(String iso8601String)
@@ -64,8 +64,7 @@ public class DateTime extends AbstractInstant implements Date, Time
 
     public DateTime(String dateString, String format) throws ParseException
     {
-        this(Calendar.getInstance(TimeZone.getTimeZone("UTC"), ServerContext.getLocale()),
-            ServerContext.getLocale());
+        this(Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.getDefault()), Locale.getDefault());
         SimpleDateFormat dateFormat = new SimpleDateFormat(format);
         dateFormat.setCalendar(this.calendar);
         dateFormat.parse(dateString);
@@ -410,6 +409,20 @@ public class DateTime extends AbstractInstant implements Date, Time
             calendar.set(Calendar.DAY_OF_YEAR, 1);
         }
 
+    }
+
+    private void writeObject(ObjectOutputStream out) throws Exception
+    {
+        out.defaultWriteObject();
+        out.writeObject(this.calendar);
+        out.writeObject(this.locale);
+    }
+
+    private void readObject(ObjectInputStream in) throws Exception
+    {
+        in.defaultReadObject();
+        this.calendar = (Calendar) in.readObject();
+        this.locale = (Locale) in.readObject();
     }
 
 }

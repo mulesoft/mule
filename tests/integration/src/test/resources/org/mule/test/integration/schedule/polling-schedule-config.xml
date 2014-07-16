@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+
+      xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+
+    <vm:endpoint path="foo" exchange-pattern="request-response" name="foo"/>
+
+    <flow name="echo">
+        <inbound-endpoint ref="foo"/>
+        <static-component>
+            <return-data>foo</return-data>
+        </static-component>
+    </flow>
+
+    <flow name="pollfoo">
+        <poll doc:name="watermark">
+            <fixed-frequency-scheduler frequency="${frequency.millis}"/>
+            <outbound-endpoint ref="foo"/>
+        </poll>
+        <component class="org.mule.test.integration.schedule.PollScheduleTestCase$FooComponent"/>
+    </flow>
+
+
+    <flow name="pollbar" processingStrategy="synchronous">
+        <poll frequency="1000" >
+            <static-component>
+                <return-data>bar</return-data>
+            </static-component>
+        </poll>
+        <component class="org.mule.test.integration.schedule.PollScheduleTestCase$BarComponent" />
+    </flow>
+
+    <flow name="pollbarNever">
+        <poll>
+            <!-- Will not run unless my test takes 200 days -->
+            <fixed-frequency-scheduler frequency="${frequency.days}" timeUnit="DAYS" startDelay="200"/>
+            <static-component>
+                <return-data>barNever</return-data>
+            </static-component>
+        </poll>
+        <component class="org.mule.test.integration.schedule.PollScheduleTestCase$BarComponent" />
+    </flow>
+
+</mule>

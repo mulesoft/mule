@@ -12,45 +12,45 @@
     <file:connector name="fileConnector" streaming="false" workDirectory="/tmp" />
     
     <flow name="NoException">
-        <file:inbound-endpoint path=".mule/noException" />
+        <file:inbound-endpoint path="${workingDirectory}/noException" />
         <test:component />
     </flow>
     <flow name="TransformerException">
-        <file:inbound-endpoint path=".mule/transformerException" />
+        <file:inbound-endpoint path="${workingDirectory}/transformerException" />
         <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer" />
         <test:component />
     </flow>
     <flow name="RouterException">
-        <file:inbound-endpoint path=".mule/routerException" />
+        <file:inbound-endpoint path="${workingDirectory}/routerException" />
         <custom-processor class="org.mule.tck.testmodels.mule.FailingRouter" />
         <test:component />
     </flow>
     <flow name="FlowRefException" processingStrategy="synchronous">
-        <file:inbound-endpoint path=".mule/flowRefException" />
+        <file:inbound-endpoint path="${workingDirectory}/flowRefException" />
         <flow-ref name="failingFlow"/>
     </flow>
     <flow name="failingFlow" processingStrategy="synchronous">
         <test:component/>
     </flow>
     <flow name="ComponentException">
-        <file:inbound-endpoint path=".mule/componentException" />
+        <file:inbound-endpoint path="${workingDirectory}/componentException" />
         <test:component throwException="true" />
     </flow>
     <flow name="CatchExceptionStrategy" processingStrategy="synchronous">
-        <file:inbound-endpoint path=".mule/exceptionHandled" />
+        <file:inbound-endpoint path="${workingDirectory}/exceptionHandled" />
         <test:component throwException="true"/>
         <catch-exception-strategy/>
     </flow>
     <flow name="DefaultExceptionStrategyCommit" processingStrategy="synchronous">
-        <file:inbound-endpoint path=".mule/commitOnException" />
+        <file:inbound-endpoint path="${workingDirectory}/commitOnException" />
         <test:component throwException="true"/>
         <default-exception-strategy>
             <commit-transaction exception-pattern="*"/>
         </default-exception-strategy>
     </flow>
     <flow name="RollbackExceptionStrategyCommit" >
-        <file:inbound-endpoint path=".mule/rollbackOnException" >
-            <idempotent-redelivery-policy idExpression="#[header:OUTBOUND:originalFilename]"/>
+        <file:inbound-endpoint path="${workingDirectory}/rollbackOnException" >
+            <idempotent-redelivery-policy idExpression="#[header:inbound:originalFilename]"/>
         </file:inbound-endpoint>
         <test:component throwException="true"/>
         <rollback-exception-strategy maxRedeliveryAttempts="2"/>

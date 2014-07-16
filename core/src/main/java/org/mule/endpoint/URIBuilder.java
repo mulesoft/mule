@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.endpoint;
 
 import org.mule.api.AnnotatedObject;
@@ -52,6 +48,7 @@ public class URIBuilder implements AnnotatedObject
 {
     private static final String DOTS = ":";
     private static final String DOTS_SLASHES = DOTS + "//";
+    private static final String SLASH = "/";
     private static final String QUERY = "?";
     private static final String AND = "&";
     private static final String EQUALS = "=";
@@ -245,15 +242,16 @@ public class URIBuilder implements AnnotatedObject
 
     protected String getEncodedConstructor()
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         appendMeta(buffer);
         OrderedQueryParameters uriQueries = appendAddress(buffer);
         uriQueries.override(queryMap);
         buffer.append(uriQueries.toString());
+        removeRootTrailingSlash(buffer);
         return buffer.toString();
     }
 
-    private void appendMeta(StringBuffer buffer)
+    private void appendMeta(StringBuilder buffer)
     {
         if (null != meta)
         {
@@ -262,7 +260,7 @@ public class URIBuilder implements AnnotatedObject
         }
     }
 
-    private OrderedQueryParameters appendAddress(StringBuffer buffer)
+    private OrderedQueryParameters appendAddress(StringBuilder buffer)
     {
         if (null != address)
         {
@@ -303,7 +301,7 @@ public class URIBuilder implements AnnotatedObject
         return map;
     }
 
-    private void constructAddress(StringBuffer buffer)
+    private void constructAddress(StringBuilder buffer)
     {
         buffer.append(protocol);
         buffer.append(DOTS_SLASHES);
@@ -336,6 +334,27 @@ public class URIBuilder implements AnnotatedObject
                 buffer.append("/");
             }
             buffer.append(path);
+        }
+    }
+
+    private void removeRootTrailingSlash(StringBuilder buffer)
+    {
+        int lastIndex = buffer.length() - 1;
+
+        if (lastIndex >= 0 && buffer.charAt(lastIndex) == SLASH.charAt(0))
+        {
+            int start = 0;
+            int index = buffer.indexOf(DOTS_SLASHES);
+
+            if (index != -1)
+            {
+                start = index + DOTS_SLASHES.length();
+            }
+
+            if (buffer.indexOf(SLASH, start) == lastIndex)
+            {
+                buffer.deleteCharAt(lastIndex);
+            }
         }
     }
 
@@ -471,7 +490,7 @@ public class URIBuilder implements AnnotatedObject
         @Override
         public String toString()
         {
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
 
             boolean first = true;
 
@@ -515,4 +534,50 @@ public class URIBuilder implements AnnotatedObject
         annotations.clear();
         annotations.putAll(newAnnotations);
     }
+
+    public String getProtocol()
+    {
+        return protocol;
+    }
+
+    public String getMeta()
+    {
+        return meta;
+    }
+
+    public String getUser()
+    {
+        return user;
+    }
+
+    public String getPassword()
+    {
+        return password;
+    }
+
+    public String getHost()
+    {
+        return host;
+    }
+
+    public String getPort()
+    {
+        return port;
+    }
+
+    public String getPath()
+    {
+        return path;
+    }
+
+    public String getAddress()
+    {
+        return address;
+    }
+
+    public Map getQueryMap()
+    {
+        return queryMap;
+    }
+
 }

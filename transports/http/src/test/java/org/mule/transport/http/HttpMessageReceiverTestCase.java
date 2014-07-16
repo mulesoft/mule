@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.http;
 
 import static org.hamcrest.core.Is.is;
@@ -23,6 +19,7 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.execution.MessageProcessContext;
 import org.mule.transport.AbstractMessageReceiverTestCase;
+import org.mule.transport.TransportMessageProcessContext;
 import org.mule.transport.http.transformers.MuleMessageToHttpResponse;
 import org.mule.util.CollectionUtils;
 
@@ -83,8 +80,7 @@ public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     @Test
     public void messageSourceIsEndpointNotMessageReceiver()
     {
-        HttpServerConnection mockHttpServerConnection = Mockito.mock(HttpServerConnection.class);
-        MessageProcessContext messageContext = httpMessageReceiver.createMessageContext(mockHttpServerConnection);
+        MessageProcessContext messageContext = httpMessageReceiver.createMessageProcessContext();
         assertThat((InboundEndpoint) messageContext.getMessageSource(), is(httpMessageReceiver.getEndpoint()));
     }
 }

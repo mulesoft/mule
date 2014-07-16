@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -13,6 +10,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
+
 import org.mule.api.MuleContext;
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectStoreException;
@@ -23,6 +21,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
@@ -89,6 +88,20 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
         openPartitions();
         assertAllValuesExistsInPartitionAreUnique(OBJECT_KEY, OBJECT_BASE_VALUE);
     }
+    
+    @Test
+    public void clear() throws ObjectStoreException {
+        this.openPartitions();
+        storeInPartitions(OBJECT_KEY, OBJECT_BASE_VALUE);
+        assertAllValuesExistsInPartitionAreUnique(OBJECT_KEY, OBJECT_BASE_VALUE);
+        
+        this.clearPartitions();
+        this.assertNotPresentInAnyPartition(OBJECT_KEY);
+        
+        // assert is reusable
+        this.storeInPartitions(OBJECT_KEY, OBJECT_BASE_VALUE);
+        this.assertAllValuesExistsInPartitionAreUnique(OBJECT_KEY, OBJECT_BASE_VALUE);
+    }
 
     @Test
     public void allowsAnyPartitionName() throws Exception
@@ -112,6 +125,15 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
             os.close(getPartitionName(i));
         }
         os.close();
+    }
+    
+    private void clearPartitions() throws ObjectStoreException
+    {
+        for (int i = 0; i < numberOfPartitions; i++)
+        {
+            os.clear(getPartitionName(i));
+        }
+        os.clear();
     }
 
     private void assertAllPartitionsAreEmpty() throws ObjectStoreException
@@ -140,6 +162,15 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
         for (int i = 0; i < numberOfPartitions; i++)
         {
             assertThat((String) os.retrieve(key,getPartitionName(i)), is(value + i));
+        }
+    }
+    
+    private void assertNotPresentInAnyPartition(String key) throws ObjectStoreException
+    {
+        Assert.assertFalse(os.contains(key));
+        for (int i = 0; i < numberOfPartitions; i++)
+        {
+            Assert.assertFalse(os.contains(key, getPartitionName(i)));
         }
     }
 

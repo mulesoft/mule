@@ -1,17 +1,18 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.ajax;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.concurrent.Latch;
@@ -26,6 +27,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.cometd.Client;
 import org.cometd.Message;
 import org.cometd.MessageListener;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
@@ -33,14 +35,8 @@ import org.mortbay.cometd.client.BayeuxClient;
 import org.mortbay.jetty.client.Address;
 import org.mortbay.jetty.client.HttpClient;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 public class AjaxFunctionalJsonBindingsTestCase extends AbstractServiceAndFlowTestCase
 {
-
     public AjaxFunctionalJsonBindingsTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -96,6 +92,7 @@ public class AjaxFunctionalJsonBindingsTestCase extends AbstractServiceAndFlowTe
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testClientSubscribeWithJsonObjectResponse() throws Exception
     {
         final Latch latch = new Latch();
@@ -116,7 +113,7 @@ public class AjaxFunctionalJsonBindingsTestCase extends AbstractServiceAndFlowTe
         });
         client.subscribe("/test1");
 
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient muleClient = muleContext.getClient();
         muleClient.dispatch("vm://in1", "Ross", null);
         assertTrue("data did not arrive on time", latch.await(DEFAULT_TEST_TIMEOUT_SECS,
                                                                     TimeUnit.SECONDS));
@@ -132,10 +129,12 @@ public class AjaxFunctionalJsonBindingsTestCase extends AbstractServiceAndFlowTe
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testClientPublishWithJsonObject() throws Exception
     {
         client.publish("/test2", "{\"name\":\"Ross\"}", null);
-        MuleClient muleClient = new MuleClient(muleContext);
+
+        MuleClient muleClient = muleContext.getClient();
         MuleMessage msg = muleClient.request("vm://in2", 5000L);
 
         assertNotNull(msg);

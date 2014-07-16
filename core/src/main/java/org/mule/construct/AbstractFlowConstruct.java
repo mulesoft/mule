@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.construct;
 
 import org.mule.api.AnnotatedObject;
@@ -19,6 +15,7 @@ import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
+import org.mule.api.exception.MessagingExceptionHandlerAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -302,6 +299,14 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
         if (candidate instanceof MuleContextAware)
         {
             ((MuleContextAware) candidate).setMuleContext(muleContext);
+        }
+    }
+
+    protected void injectExceptionHandler(Object candidate)
+    {
+        if (candidate instanceof MessagingExceptionHandlerAware)
+        {
+            ((MessagingExceptionHandlerAware) candidate).setMessagingExceptionHandler(this.getExceptionListener());
         }
     }
 

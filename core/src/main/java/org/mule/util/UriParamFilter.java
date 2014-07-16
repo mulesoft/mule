@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -28,7 +25,7 @@ public class UriParamFilter
         }
         String query = uri.substring(i + 1);
         String base = uri.substring(0, i + 1);
-        StringBuffer newQuery = new StringBuffer();
+        StringBuilder newQuery = new StringBuilder();
 
         TreeMap<String, String> p = getPropertiesFromQueryString(query);
         for (Map.Entry<String, String> entry : p.entrySet())
@@ -55,7 +52,7 @@ public class UriParamFilter
             return props;
         }
 
-        query = new StringBuffer(query.length() + 1).append('&').append(query).toString();
+        query = new StringBuilder(query.length() + 1).append('&').append(query).toString();
 
         int x = 0;
         while ((x = addProperty(query, x, '&', props)) != -1);

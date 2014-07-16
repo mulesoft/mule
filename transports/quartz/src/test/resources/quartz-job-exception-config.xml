@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:quartz="http://www.mulesoft.org/schema/mule/quartz"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+        http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/current/mule-quartz.xsd">
+
+    <quartz:connector name="quartzConnector" validateConnections="true">
+        <receiver-threading-profile maxThreadsActive="1"/>
+        <quartz:factory-property key="org.quartz.scheduler.instanceName" value="PrefSQuartzScheduler"/>
+        <quartz:factory-property key="org.quartz.threadPool.class" value="org.quartz.simpl.SimpleThreadPool"/>
+        <quartz:factory-property key="org.quartz.threadPool.threadCount" value="1"/>
+        <quartz:factory-property key="org.quartz.scheduler.rmi.proxy" value="false"/>
+        <quartz:factory-property key="org.quartz.scheduler.rmi.export" value="false"/>
+        <quartz:factory-property key="org.quartz.jobStore.class" value="org.quartz.simpl.RAMJobStore"/>
+    </quartz:connector>
+
+    <flow name="Retry_Quartz" processingStrategy="synchronous">
+        <quartz:inbound-endpoint jobName="retryJob" repeatInterval="500000" connector-ref="quartzConnector">
+            <quartz:event-generator-job>
+                <quartz:payload>Foo</quartz:payload>
+            </quartz:event-generator-job>
+        </quartz:inbound-endpoint>
+
+        <test:component throwException="true"/>
+
+        <catch-exception-strategy>
+            <vm:outbound-endpoint address="vm://error"/>
+        </catch-exception-strategy>
+    </flow>
+</mule>

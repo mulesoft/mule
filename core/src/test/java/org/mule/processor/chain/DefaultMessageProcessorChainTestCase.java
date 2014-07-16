@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -17,6 +14,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -30,12 +29,14 @@ import org.mule.api.config.MuleConfiguration;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChain;
+import org.mule.api.service.Service;
 import org.mule.construct.Flow;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -51,6 +52,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(value = MockitoJUnitRunner.class)
 @SmallTest
+@SuppressWarnings("deprecation")
 public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
 {
 
@@ -511,8 +513,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
     }
 
     /**
-     * Note: Stopping the flow of a nested chain causes the nested chain to return early, but does not stop
-     * the flow of the parent chain.
+     * Note: Stopping the flow of a nested chain causes the nested chain to return
+     * early, but does not stop the flow of the parent chain.
      */
     @Test
     public void testNestedInterceptingMPChainStopFlow() throws MuleException, Exception
@@ -632,6 +634,38 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         assertEquals(
             "MessageProcessorInterceptingMessageProcessorMessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessor",
             restul.getMessage().getPayload());
+    }
+
+    @Test
+    public void testOneWayOutboundEndpointWithService() throws Exception
+    {
+        MuleEvent event = getTestEventUsingFlow("");
+        when(event.getFlowConstruct()).thenReturn(mock(Service.class));
+
+        MessageProcessor mp = mock(MessageProcessor.class,
+            withSettings().extraInterfaces(OutboundEndpoint.class));
+        OutboundEndpoint outboundEndpoint = (OutboundEndpoint) mp;
+        when(outboundEndpoint.getExchangePattern()).thenReturn(MessageExchangePattern.ONE_WAY);
+
+        MessageProcessorChain chain = new DefaultMessageProcessorChainBuilder().chain(mp).build();
+        MuleEvent response = chain.process(event);
+        assertNull(response);
+    }
+
+    @Test
+    public void testOneWayOutboundEndpointWithFlow() throws Exception
+    {
+        MuleEvent event = getTestEventUsingFlow("");
+
+        MessageProcessor mp = mock(MessageProcessor.class,
+            withSettings().extraInterfaces(OutboundEndpoint.class));
+        OutboundEndpoint outboundEndpoint = (OutboundEndpoint) mp;
+        when(outboundEndpoint.getExchangePattern()).thenReturn(MessageExchangePattern.ONE_WAY);
+        when(mp.process(Mockito.any(MuleEvent.class))).thenReturn(VoidMuleEvent.getInstance());
+
+        MessageProcessorChain chain = new DefaultMessageProcessorChainBuilder().chain(mp).build();
+        MuleEvent response = chain.process(event);
+        assertSame(event, response);
     }
 
     static class TestNonIntercepting implements MessageProcessor

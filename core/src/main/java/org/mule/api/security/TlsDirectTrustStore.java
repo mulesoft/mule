@@ -1,16 +1,11 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.api.security;
 
-import org.mule.api.security.provider.AutoDiscoverySecurityProviderFactory;
 import org.mule.api.security.tls.TlsConfiguration;
 
 import javax.net.ssl.TrustManagerFactory;
@@ -43,14 +38,12 @@ public interface TlsDirectTrustStore extends TlsIndirectTrustStore
     void setTrustStoreType(String trustStoreType);
 
     /**
-     * @return The algorithm used by the trust store.  The default comes from 
-     * {@link AutoDiscoverySecurityProviderFactory}
+     * @return The algorithm used by the trust store.
      */
     String getTrustManagerAlgorithm();
 
     /**
-     * @param trustManagerAlgorithm The algorithm used by the trust store.  The default comes from 
-     * {@link AutoDiscoverySecurityProviderFactory}
+     * @param trustManagerAlgorithm The algorithm used by the trust store.
      */
     void setTrustManagerAlgorithm(String trustManagerAlgorithm);
 

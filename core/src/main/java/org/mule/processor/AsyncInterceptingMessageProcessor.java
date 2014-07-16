@@ -1,24 +1,22 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.processor;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.ThreadingProfile;
-import org.mule.api.construct.Pipeline;
+import org.mule.api.construct.MessageProcessorPathResolver;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.MessagingExceptionHandlerAware;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.Startable;
@@ -40,7 +38,7 @@ import org.mule.work.MuleWorkManager;
  * present then an exception is thrown.
  */
 public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
-    implements Startable, Stoppable
+    implements Startable, Stoppable, MessagingExceptionHandlerAware
 {
 
     public static final String SYNCHRONOUS_EVENT_ERROR_MESSAGE = "Unable to process a synchronous event asynchronously";
@@ -48,6 +46,8 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
     protected WorkManagerSource workManagerSource;
     protected boolean doThreading = true;
     protected WorkManager workManager;
+
+    private MessagingExceptionHandler messagingExceptionHandler;
 
     public AsyncInterceptingMessageProcessor(WorkManagerSource workManagerSource)
     {
@@ -144,7 +144,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
     {
         try
         {
-            workManagerSource.getWorkManager().scheduleWork(new AsyncMessageProcessorWorker(event),
+            workManagerSource.getWorkManager().scheduleWork(new AsyncMessageProcessorWorker(DefaultMuleEvent.copy(event)),
                 WorkManager.INDEFINITE, null, new AsyncWorkListener(next));
             fireAsyncScheduledNotification(event);
         }
@@ -157,11 +157,21 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
 
     protected void fireAsyncScheduledNotification(MuleEvent event)
     {
-        if (event.getFlowConstruct() instanceof Pipeline)
+        if (event.getFlowConstruct() instanceof MessageProcessorPathResolver)
         {
             muleContext.getNotificationManager().fireNotification(
-                new AsyncMessageNotification((Pipeline) event.getFlowConstruct(), event, next,
-                    AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED));
+                    new AsyncMessageNotification(event.getFlowConstruct(), event, next,
+                                                 AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED));
+        }
+
+    }
+
+    @Override
+    public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler)
+    {
+        if (this.messagingExceptionHandler == null)
+        {
+            this.messagingExceptionHandler = messagingExceptionHandler;
         }
     }
 
@@ -175,7 +185,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         @Override
         protected void doRun()
         {
-            MessagingExceptionHandler exceptionHandler = event.getFlowConstruct() != null ? event.getFlowConstruct().getExceptionListener() : null;
+            MessagingExceptionHandler exceptionHandler = messagingExceptionHandler;
             ExecutionTemplate<MuleEvent> executionTemplate = TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate(
                     muleContext, new MuleTransactionConfig(), exceptionHandler);
 
@@ -222,10 +232,10 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
 
     protected void firePipelineNotification(MuleEvent event, MessagingException exception)
     {
-        if (event.getFlowConstruct() instanceof Pipeline)
+        if (event.getFlowConstruct() instanceof MessageProcessorPathResolver)
         {
             muleContext.getNotificationManager().fireNotification(
-                new AsyncMessageNotification((Pipeline) event.getFlowConstruct(), event,
+                new AsyncMessageNotification(event.getFlowConstruct(), event,
                     next, AsyncMessageNotification.PROCESS_ASYNC_COMPLETE, exception));
         }
     }

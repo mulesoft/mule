@@ -1,23 +1,21 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.integration.construct;
+
+import static junit.framework.Assert.assertNull;
+import static org.junit.Assert.assertEquals;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.transport.NullPayload;
 import org.mule.util.concurrent.Latch;
 
 import java.util.Collections;
@@ -28,10 +26,10 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.math.RandomUtils;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class BridgeTestCase extends FunctionalTestCase
 {
+    private static final int TIMEOUT = 5000;
+    
     private MuleClient muleClient;
 
     public BridgeTestCase()
@@ -43,11 +41,11 @@ public class BridgeTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        muleClient = new MuleClient(muleContext);
+        muleClient = muleContext.getClient();
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/construct/bridge-config.xml";
     }
@@ -61,8 +59,12 @@ public class BridgeTestCase extends FunctionalTestCase
     @Test
     public void testAsynchronous() throws Exception
     {
-        final MuleMessage result = muleClient.send("vm://asynchronous-bridge.in", "foobar", null);
-        assertEquals(NullPayload.getInstance(), result.getPayload());
+        final String payload = "foobar";
+        final MuleMessage result = muleClient.send("vm://asynchronous-bridge.in", payload, null);
+        assertNull(result);
+        
+        MuleMessage received = muleClient.request("vm://log-service.in", TIMEOUT);
+        assertEquals(payload, received.getPayload());
     }
 
     @Test
@@ -116,13 +118,15 @@ public class BridgeTestCase extends FunctionalTestCase
     @Test
     public void testDynamicEndpoint() throws Exception
     {
-        doTestMathsService("vm://child-dynamic-endpoint-bridge.in", Collections.singletonMap("bridgeTarget", "maths-service.in"));
+        Map<String, Object> properties = Collections.<String, Object>singletonMap("bridgeTarget", "maths-service.in");
+        doTestMathsService("vm://child-dynamic-endpoint-bridge.in", properties);
     }
 
     @Test
     public void testDynamicAddress() throws Exception
     {
-        doTestMathsService("vm://address-dynamic-endpoint-bridge.in", Collections.singletonMap("bridgeTarget", "maths-service.in"));
+        Map<String, Object> properties = Collections.<String, Object>singletonMap("bridgeTarget", "maths-service.in");
+        doTestMathsService("vm://address-dynamic-endpoint-bridge.in", properties);
     }
 
     private void doJmsBasedTest(final String jmsDestinationUri, final String ftcName) throws Exception, MuleException, InterruptedException
@@ -150,7 +154,7 @@ public class BridgeTestCase extends FunctionalTestCase
         doTestMathsService(url, null);
     }
 
-    private void doTestMathsService(final String url, final Map<?, ?> messageProperties) throws MuleException
+    private void doTestMathsService(String url, Map<String, Object> messageProperties) throws MuleException
     {
         final int a = RandomUtils.nextInt(100);
         final int b = RandomUtils.nextInt(100);

@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.scripting.component;
 
 import org.mule.DefaultMuleEventContext;
@@ -134,45 +130,62 @@ public class Scriptable implements Initialisable, MuleContextAware
             }
         }
 
-        Reader script;
-        // Load script from variable
-        if (StringUtils.isNotBlank(scriptText))
+        Reader script = null;
+        try
         {
-            script = new StringReader(scriptText);
-        }
-        // Load script from file
-        else if (scriptFile != null)
-        {
-            InputStream is;
-            try
+            // Load script from variable
+            if (StringUtils.isNotBlank(scriptText))
             {
-                is = IOUtils.getResourceAsStream(scriptFile, getClass());
+                script = new StringReader(scriptText);
             }
-            catch (IOException e)
+            // Load script from file
+            else if (scriptFile != null)
             {
-                throw new InitialisationException(CoreMessages.cannotLoadFromClasspath(scriptFile), e, this);
+                InputStream is;
+                try
+                {
+                    is = IOUtils.getResourceAsStream(scriptFile, getClass());
+                }
+                catch (IOException e)
+                {
+                    throw new InitialisationException(CoreMessages.cannotLoadFromClasspath(scriptFile), e, this);
+                }
+                if (is == null)
+                {
+                    throw new InitialisationException(CoreMessages.cannotLoadFromClasspath(scriptFile), this);
+                }
+                script = new InputStreamReader(is);
             }
-            if (is == null)
+            else
             {
-                throw new InitialisationException(CoreMessages.cannotLoadFromClasspath(scriptFile), this);
+                throw new InitialisationException(CoreMessages.propertiesNotSet("scriptText, scriptFile"), this);
             }
-            script = new InputStreamReader(is);
-        }
-        else
-        {
-            throw new InitialisationException(CoreMessages.propertiesNotSet("scriptText, scriptFile"), this);
-        }
 
-        // Pre-compile script if scripting engine supports compilation.
-        if (scriptEngine instanceof Compilable)
-        {
-            try
+            // Pre-compile script if scripting engine supports compilation.
+            if (scriptEngine instanceof Compilable)
             {
-                compiledScript = ((Compilable) scriptEngine).compile(script);
+                try
+                {
+                    compiledScript = ((Compilable) scriptEngine).compile(script);
+                }
+                catch (ScriptException e)
+                {
+                    throw new InitialisationException(e, this);
+                }
             }
-            catch (ScriptException e)
+        }
+        finally
+        {
+            if (script != null)
             {
-                throw new InitialisationException(e, this);
+                try
+                {
+                    script.close();
+                }
+                catch (IOException e)
+                {
+                    throw new InitialisationException(e, this);
+                }
             }
         }
     }

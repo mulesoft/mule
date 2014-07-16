@@ -1,18 +1,15 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.OptimizedRequestContext;
 import org.mule.VoidMuleEvent;
-import org.mule.RequestContext;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -24,6 +21,7 @@ import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageDispatcher;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.service.ServiceAsyncReplyCompositeMessageSource;
 
 import java.util.List;
@@ -78,15 +76,25 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
 
             if (hasResponse)
             {
+                if (!event.getMuleContext().waitUntilStarted(event.getTimeout()))
+                {
+                    throw new MessagingException(MessageFactory.createStaticMessage("Timeout waiting for mule context to be completely started"), event);
+                }
+
                 MuleMessage resultMessage = doSend(event);
                 if (resultMessage != null)
                 {
                     resultMessage.setMessageRootId(event.getMessage().getMessageRootId());
+                    
+                    // Ensure ENCODING message property is set to give exactly same behavior as before
+                    // OutboundRewriteResponseEventMessageProcessor was removed (MULE-7535).
+                    resultMessage.setEncoding(resultMessage.getEncoding());
+                    
                     MuleSession storedSession = connector.getSessionHandler().retrieveSessionInfoFromMessage(
                         resultMessage);
                     event.getSession().merge(storedSession);
                     MuleEvent resultEvent = new DefaultMuleEvent(resultMessage, event);
-                    RequestContext.setEvent(resultEvent);
+                    OptimizedRequestContext.unsafeSetEvent(resultEvent);
                     return resultEvent;
                 }
                 else

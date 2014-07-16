@@ -1,16 +1,20 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.cxf;
 
 import static org.junit.Assert.assertTrue;
+
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.http.HttpConnector;
+import org.mule.transport.servlet.MuleReceiverServlet;
+import org.mule.transport.servlet.jetty.util.EmbeddedJettyServer;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,17 +24,9 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.http.HttpConnector;
-import org.mule.transport.servlet.MuleReceiverServlet;
-import org.mule.transport.servlet.jetty.util.EmbeddedJettyServer;
 
 public class ServletTestCase extends AbstractServiceAndFlowTestCase
 {
-
     public int HTTP_PORT = -1;
 
     private EmbeddedJettyServer httpServer;
@@ -87,7 +83,7 @@ public class ServletTestCase extends AbstractServiceAndFlowTestCase
                          + "<ns1:echo xmlns:ns1=\"http://testmodels.cxf.module.mule.org/\">"
                          + "<text>Test String</text>" + "</ns1:echo>" + "</soap:Body>" + "</soap:Envelope>";
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + HTTP_PORT + getContextPath()
                                          + "/services/mycomponent", request, null);
         String res = result.getPayloadAsString();
@@ -98,7 +94,7 @@ public class ServletTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testHttpGet() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
         MuleMessage result = client.send("http://localhost:" + HTTP_PORT + getContextPath()
@@ -106,5 +102,4 @@ public class ServletTestCase extends AbstractServiceAndFlowTestCase
         String res = result.getPayloadAsString();
         assertTrue(res.indexOf("Test String") != -1);
     }
-
 }

@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -27,7 +24,7 @@ public class QNamePropertyEditor extends PropertyEditorSupport
     {
         super();
     }
-    
+
     public QNamePropertyEditor(boolean explicit)
     {
         this();
@@ -55,7 +52,7 @@ public class QNamePropertyEditor extends PropertyEditorSupport
     protected QName parseQName(String val)
     {
         StringTokenizer st = new StringTokenizer(val, ":");
-        List elements = new ArrayList();
+        List<String> elements = new ArrayList<String>();
 
         while (st.hasMoreTokens())
         {
@@ -70,20 +67,20 @@ public class QNamePropertyEditor extends PropertyEditorSupport
             }
             case 1 :
             {
-                return new QName((String) elements.get(0));
+                return new QName(elements.get(0));
             }
             case 2 :
             {
-                return new QName((String) elements.get(0), (String) elements.get(1));
+                return new QName(elements.get(0), elements.get(1));
             }
             case 3 :
             {
-                return new QName((String) elements.get(1) + ":" + (String) elements.get(2), (String) elements.get(0));
+                return new QName(elements.get(1) + ":" + elements.get(2), elements.get(0));
             }
             default :
             {
-                String prefix = (String) elements.get(0);
-                String local = (String) elements.get(1);
+                String prefix = elements.get(0);
+                String local = elements.get(1);
                 // namespace can have multiple colons in it, so just assume the rest
                 // is a namespace
                 String ns = val.substring(prefix.length() + local.length() + 2);

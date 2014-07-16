@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.agent;
 
 import org.mule.DefaultMuleEvent;
@@ -15,13 +11,17 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.exception.MessagingExceptionHandlerAware;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.ModelNotification;
 import org.mule.context.notification.MuleContextNotification;
+import org.mule.exception.MessagingExceptionHandlerToSystemAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +58,18 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
             if (endpoint == null)
             {
                 throw new InitialisationException(CoreMessages.propertiesNotSet("endpoint"), this);
+            }
+            if (endpoint instanceof MuleContextAware)
+            {
+                ((MuleContextAware) endpoint).setMuleContext(muleContext);
+            }
+            if (endpoint instanceof MessagingExceptionHandlerAware)
+            {
+                ((MessagingExceptionHandlerAware) endpoint).setMessagingExceptionHandler(new MessagingExceptionHandlerToSystemAdapter());
+            }
+            if (endpoint instanceof Initialisable)
+            {
+                ((Initialisable) endpoint).initialise();
             }
         }
         catch (Exception e)
@@ -117,7 +129,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
     @Override
     public String getDescription()
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append(getName()).append(": ");
         if (endpoint != null)
         {

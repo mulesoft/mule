@@ -9,7 +9,7 @@
     <version>1.0</version>
 
     <properties>
-        <muleVersion>3.5.0-M1-SNAPSHOT</muleVersion>
+        <muleVersion>3.6.0-M1-SNAPSHOT</muleVersion>
     </properties>
 
     <description>A web based example that plots incoming emails on a world map.  This example demonstrates how to use Ajax events with Mule.</description>
@@ -133,8 +133,9 @@
 
     <repositories>
         <repository>
-            <id>mule-deps</id>
-            <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
+            <id>mule</id>
+            <name>Mule Repository</name>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
         </repository>
     </repositories>
 </project>

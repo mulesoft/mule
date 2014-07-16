@@ -1,13 +1,9 @@
 /*
- * $Id$
- * -------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.session;
 
 import org.mule.api.MuleContext;
@@ -60,8 +56,8 @@ public final class DefaultMuleSession implements MuleSession
      */
     private SecurityContext securityContext;
 
-    private transient Map<String, Object> properties;
-    
+    private Map<String, Object> properties;
+
     @Deprecated
     private FlowConstruct flowConstruct;
 
@@ -83,9 +79,9 @@ public final class DefaultMuleSession implements MuleSession
             this.properties.put(key, session.getProperty(key));
         }
     }
-    
+
     // Deprecated constructor
-    
+
     @Deprecated
     public DefaultMuleSession(MuleContext muleContext)
     {
@@ -111,7 +107,7 @@ public final class DefaultMuleSession implements MuleSession
         this(source);
         this.flowConstruct = flowConstruct;
     }
-    
+
     @Override
     public String getId()
     {
@@ -133,7 +129,7 @@ public final class DefaultMuleSession implements MuleSession
     /**
      * The security context for this session. If not null outbound, inbound and/or method invocations will be
      * authenticated using this context
-     * 
+     *
      * @param context the context for this session or null if the request is not secure.
      */
     @Override
@@ -145,7 +141,7 @@ public final class DefaultMuleSession implements MuleSession
     /**
      * The security context for this session. If not null outbound, inbound and/or method invocations will be
      * authenticated using this context
-     * 
+     *
      * @return the context for this session or null if the request is not secure.
      */
     @Override
@@ -157,7 +153,7 @@ public final class DefaultMuleSession implements MuleSession
     /**
      * Will set a session level property. These will either be stored and retrieved using the underlying
      * transport mechanism of stored using a default mechanism
-     * 
+     *
      * @param key the key for the object data being stored on the session
      * @param value the value of the session data
      */
@@ -173,7 +169,7 @@ public final class DefaultMuleSession implements MuleSession
 
     /**
      * Will retrieve a session level property.
-     * 
+     *
      * @param key the key for the object data being stored on the session
      * @return the value of the session data or null if the property does not exist
      */
@@ -186,7 +182,7 @@ public final class DefaultMuleSession implements MuleSession
 
     /**
      * Will retrieve a session level property and remove it from the session
-     * 
+     *
      * @param key the key for the object data being stored on the session
      * @return the value of the session data or null if the property does not exist
      */
@@ -198,7 +194,7 @@ public final class DefaultMuleSession implements MuleSession
 
     /**
      * Returns an iterater of property keys for the session properties on this session
-     * 
+     *
      * @return an iterater of property keys for the session properties on this session
      * @deprecated Use getPropertyNamesAsSet() instead
      */
@@ -280,17 +276,25 @@ public final class DefaultMuleSession implements MuleSession
 
     private void writeObject(ObjectOutputStream out) throws IOException
     {
+        // Temporally replaces the properties to write only serializable values into the stream
         DefaultMuleSession copy = new DefaultMuleSession(this);
         copy.removeNonSerializableProperties();
-        out.defaultWriteObject();
-        out.writeObject(copy.properties);
+        Map<String, Object> backupProperties = properties;
+        try
+        {
+            properties = copy.properties;
+            out.defaultWriteObject();
+        }
+        finally
+        {
+            properties = backupProperties;
+        }
     }
 
     @SuppressWarnings("unchecked")
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
     {
         in.defaultReadObject();
-        properties = (Map<String, Object>) in.readObject();
     }
 
     @Override

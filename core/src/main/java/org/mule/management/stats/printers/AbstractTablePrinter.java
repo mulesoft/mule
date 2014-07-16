@@ -1,19 +1,15 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.management.stats.printers;
 
 import org.mule.management.stats.FlowConstructStatistics;
-import org.mule.management.stats.ServiceStatistics;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.management.stats.SedaServiceStatistics;
+import org.mule.management.stats.ServiceStatistics;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -182,7 +178,7 @@ public class AbstractTablePrinter extends PrintWriter
         {
             Iterator it = routed.entrySet().iterator();
 
-            StringBuffer buf = new StringBuffer(40);
+            StringBuilder buf = new StringBuilder(40);
             while (it.hasNext())
             {
                 Map.Entry e = (Map.Entry) it.next();
@@ -219,6 +215,7 @@ public class AbstractTablePrinter extends PrintWriter
         return table;
     }
 
+    @Override
     public void print(Object obj)
     {
         if (obj instanceof Collection)
@@ -227,8 +224,8 @@ public class AbstractTablePrinter extends PrintWriter
         }
         else if (obj instanceof ServiceStatistics)
         {
-            List l = new ArrayList();
-            l.add(obj);
+            List<ServiceStatistics> l = new ArrayList<ServiceStatistics>();
+            l.add((ServiceStatistics)obj);
             print(l);
         }
         else
@@ -237,6 +234,7 @@ public class AbstractTablePrinter extends PrintWriter
         }
     }
 
+    @Override
     public void println(Object obj)
     {
         print(obj);
@@ -250,6 +248,7 @@ public class AbstractTablePrinter extends PrintWriter
 
     // help IBM compiler, it complains helplessly about
     // an abmiguously overloaded/overridden method.
+    @Override
     public void println(String string)
     {
         this.println((Object) string);
@@ -257,9 +256,9 @@ public class AbstractTablePrinter extends PrintWriter
 
     // help IBM compiler, it complains helplessly about
     // an abmiguously overloaded/overridden method.
+    @Override
     public void print(String string)
     {
         this.print((Object) string);
     }
-
 }

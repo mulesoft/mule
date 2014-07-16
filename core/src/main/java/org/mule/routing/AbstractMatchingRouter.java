@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.routing;
 
 import org.mule.DefaultMuleMessage;
@@ -17,7 +13,6 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -51,22 +46,21 @@ public class AbstractMatchingRouter implements MatchingRouter, AnnotatedObject
      */
     protected final transient Log logger = LogFactory.getLog(getClass());
 
-    @SuppressWarnings("unchecked")
-    protected List<MatchableMessageProcessor> matchableRoutes = new CopyOnWriteArrayList();
+    protected List<MatchableMessageProcessor> matchableRoutes = new CopyOnWriteArrayList<MatchableMessageProcessor>();
     protected boolean matchAll = false;
     protected MessageProcessor defaultRoute;
     private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
 
+    @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         MuleMessage message = event.getMessage();
-        MuleSession session = event.getSession();
         MuleEvent result;
         boolean matchfound = false;
 
-        for (Iterator iterator = matchableRoutes.iterator(); iterator.hasNext();)
+        for (Iterator<MatchableMessageProcessor> iterator = matchableRoutes.iterator(); iterator.hasNext();)
         {
-            MatchableMessageProcessor outboundRouter = (MatchableMessageProcessor) iterator.next();
+            MatchableMessageProcessor outboundRouter = iterator.next();
 
             final MuleEvent eventToRoute;
 
@@ -128,7 +122,7 @@ public class AbstractMatchingRouter implements MatchingRouter, AnnotatedObject
         }
         return event;
     }
-    
+
     protected MuleEvent processDefaultRoute(MuleEvent event) throws MuleException
     {
         return defaultRoute.process(event);
@@ -144,11 +138,13 @@ public class AbstractMatchingRouter implements MatchingRouter, AnnotatedObject
         this.matchAll = matchAll;
     }
 
+    @Override
     public void addRoute(MatchableMessageProcessor matchable)
     {
         matchableRoutes.add(matchable);
     }
 
+    @Override
     public void removeRoute(MatchableMessageProcessor matchable)
     {
         matchableRoutes.remove(matchable);
@@ -191,16 +187,19 @@ public class AbstractMatchingRouter implements MatchingRouter, AnnotatedObject
         }
     }
 
+    @Override
     public final Object getAnnotation(QName name)
     {
         return annotations.get(name);
     }
 
+    @Override
     public final Map<QName, Object> getAnnotations()
     {
         return Collections.unmodifiableMap(annotations);
     }
 
+    @Override
     public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
     {
         annotations.clear();

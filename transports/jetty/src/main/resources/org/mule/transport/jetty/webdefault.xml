@@ -17,31 +17,43 @@
         This file is applied to a Web application before it's own WEB_INF/web.xml file
     </description>
 
+    <!-- ==================================================================== -->
+    <!-- Removes static references to beans from javax.el.BeanELResolver to   -->
+    <!-- ensure webapp classloader can be released on undeploy                -->
+    <!-- ==================================================================== -->
+    <listener>
+        <listener-class>org.eclipse.jetty.servlet.listener.ELContextCleaner</listener-class>
+    </listener>
+
+    <!-- ==================================================================== -->
+    <!-- Removes static cache of Methods from java.beans.Introspector to      -->
+    <!-- ensure webapp classloader can be released on undeploy                -->
+    <!-- ==================================================================== -->
+    <listener>
+        <listener-class>org.eclipse.jetty.servlet.listener.IntrospectorCleaner</listener-class>
+    </listener>
+
 
     <!-- ==================================================================== -->
     <!-- Context params to control Session Cookies                            -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
     <!-- UNCOMMENT TO ACTIVATE
     <context-param>
-      <param-name>org.mortbay.jetty.servlet.SessionDomain</param-name>
+      <param-name>org.eclipse.jetty.servlet.SessionDomain</param-name>
       <param-value>127.0.0.1</param-value>
     </context-param>
 
     <context-param>
-      <param-name>org.mortbay.jetty.servlet.SessionPath</param-name>
+      <param-name>org.eclipse.jetty.servlet.SessionPath</param-name>
       <param-value>/</param-value>
     </context-param>
 
     <context-param>
-      <param-name>org.mortbay.jetty.servlet.MaxAge</param-name>
+      <param-name>org.eclipse.jetty.servlet.MaxAge</param-name>
       <param-value>-1</param-value>
     </context-param>
     -->
 
-    <context-param>
-        <param-name>org.mortbay.jetty.webapp.NoTLDJarPattern</param-name>
-        <param-value>start.jar|ant-.*\.jar|dojo-.*\.jar|jetty-.*\.jar|jsp-api-.*\.jar|junit-.*\.jar|servlet-api-.*\.jar|dnsns\.jar|rt\.jar|jsse\.jar|tools\.jar|sunpkcs11\.jar|sunjce_provider\.jar|xerces.*\.jar</param-value>
-    </context-param>
 
 
 
@@ -59,7 +71,13 @@
     <!--                                                                      -->
     <!--   welcomeServlets  If true, attempt to dispatch to welcome files     -->
     <!--                    that are servlets, if no matching static          -->
-    <!--                    resources can be found.                           -->
+    <!--                    resources can be found. If false, then a welcome  -->
+    <!--                    file must exist on disk. If "exact", then exact   -->
+    <!--                    servlet matches are supported without an existing -->
+    <!--                    file. Default is true.                            -->
+    <!--                                                                      -->
+    <!--                    This must be false if you want directory listings,-->
+    <!--                    but have index.jsp in your welcome file list.     -->
     <!--                                                                      -->
     <!--   redirectWelcome  If true, redirect welcome file requests           -->
     <!--                    else use request dispatcher forwards              -->
@@ -70,10 +88,18 @@
     <!--                                                                      -->
     <!--   resoureBase      Can be set to replace the context resource base   -->
     <!--                                                                      -->
+    <!--   resourceCache    If set, this is a context attribute name, which   -->
+    <!--                    the servlet will use to look for a shared         -->
+    <!--                    ResourceCache instance.                           -->
+    <!--                                                                      -->
     <!--   relativeResourceBase                                               -->
     <!--                    Set with a pathname relative to the base of the   -->
     <!--                    servlet context root. Useful for only serving     -->
     <!--                    static content from only specific subdirectories. -->
+    <!--                                                                      -->
+    <!--   aliases          If True, aliases of resources are allowed (eg.    -->
+    <!--                    symbolic links and caps variations). May bypass   -->
+    <!--                    security constraints.                             -->
     <!--                                                                      -->
     <!--   useFileMappedBuffer                                                -->
     <!--                    If set to true (the default), a  memory mapped    -->
@@ -92,15 +118,14 @@
     <!--                                                                      -->
     <!--  maxCachedFiles    Maximum number of files in the cache              -->
     <!--                                                                      -->
-    <!--  cacheType         "nio", "bio" or "both" to determine the type(s)   -->
-    <!--                    of resource cache. A bio cached buffer may be used-->
-    <!--                    by nio but is not as efficient as a nio buffer.   -->
-    <!--                    An nio cached buffer may not be used by bio.      -->
-    <!--                                                                      -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
     <servlet>
         <servlet-name>default</servlet-name>
-        <servlet-class>org.mortbay.jetty.servlet.DefaultServlet</servlet-class>
+        <servlet-class>org.eclipse.jetty.servlet.DefaultServlet</servlet-class>
+        <init-param>
+            <param-name>aliases</param-name>
+            <param-value>false</param-value>
+        </init-param>
         <init-param>
             <param-name>acceptRanges</param-name>
             <param-value>true</param-value>
@@ -123,15 +148,11 @@
         </init-param>
         <init-param>
             <param-name>maxCachedFileSize</param-name>
-            <param-value>10000000</param-value>
+            <param-value>200000000</param-value>
         </init-param>
         <init-param>
             <param-name>maxCachedFiles</param-name>
-            <param-value>1000</param-value>
-        </init-param>
-        <init-param>
-            <param-name>cacheType</param-name>
-            <param-value>both</param-value>
+            <param-value>2048</param-value>
         </init-param>
         <init-param>
             <param-name>gzip</param-name>
@@ -140,6 +161,10 @@
         <init-param>
             <param-name>useFileMappedBuffer</param-name>
             <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>resourceCache</param-name>
+            <param-value>resourceCache</param-value>
         </init-param>
         <!--
         <init-param>
@@ -296,7 +321,7 @@
     <!-- Uncomment for dynamic invocation
     <servlet>
       <servlet-name>invoker</servlet-name>
-      <servlet-class>org.mortbay.jetty.servlet.Invoker</servlet-class>
+      <servlet-class>org.eclipse.jetty.servlet.Invoker</servlet-class>
       <init-param>
         <param-name>verbose</param-name>
         <param-value>false</param-value>
@@ -325,7 +350,7 @@
     <!-- ==================================================================== -->
     <!-- Default MIME mappings                                                -->
     <!-- The default MIME mappings are provided by the mime.properties        -->
-    <!-- resource in the org.mortbay.jetty.jar file.  Additional or modified  -->
+    <!-- resource in the org.eclipse.jetty.server.jar file.  Additional or modified  -->
     <!-- mappings may be specified here                                       -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
     <!-- UNCOMMENT TO ACTIVATE

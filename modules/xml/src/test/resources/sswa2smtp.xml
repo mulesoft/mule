@@ -1,0 +1,6 @@
+<sswa2smtp>
+    <operationType>email</operationType>
+    <toAddress>prachurya.barua@bt.com</toAddress>
+    <subject>Voice Circuit Details</subject>
+    <content>hi</content>
+</sswa2smtp>

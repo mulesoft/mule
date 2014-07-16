@@ -1,20 +1,15 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util.counters.impl;
 
 import org.mule.util.counters.CounterFactory.Type;
 
 public class Delta extends AggregateCounter
 {
-
     private double first = 0.0;
     private double second = 0.0;
 
@@ -23,6 +18,7 @@ public class Delta extends AggregateCounter
         super(name, Type.DELTA, base);
     }
 
+    @Override
     public double nextValue()
     {
         if (Double.isNaN(first) || Double.isNaN(second))
@@ -35,10 +31,10 @@ public class Delta extends AggregateCounter
         }
     }
 
+    @Override
     public void doCompute()
     {
         first = second;
         second = this.getBase().nextValue();
     }
-
 }

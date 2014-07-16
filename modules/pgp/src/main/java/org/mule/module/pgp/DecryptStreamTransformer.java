@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
- * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
- *
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.pgp;
 
 import java.io.BufferedInputStream;
@@ -15,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.NoSuchProviderException;
+import java.security.Provider;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -40,6 +37,7 @@ public class DecryptStreamTransformer implements StreamTransformer
     private PGPPublicKey publicKey;
     private PGPSecretKey secretKey;
     private String password;
+    private Provider provider;
 
     private InputStream uncStream;
     private InputStream compressedStream;
@@ -49,18 +47,21 @@ public class DecryptStreamTransformer implements StreamTransformer
     public DecryptStreamTransformer(InputStream toBeDecrypted,
                                      PGPPublicKey publicKey,
                                      PGPSecretKey secretKey,
-                                     String password) throws IOException
+                                     String password,
+                                     Provider provider) throws IOException
     {
         Validate.notNull(toBeDecrypted, "The toBeDecrypted should not be null");
         Validate.notNull(publicKey, "The publicKey should not be null");
         Validate.notNull(secretKey, "The secretKey should not be null");
         Validate.notNull(password, "The password should not be null");
+        Validate.notNull(provider, "The security provider can't be null");
 
         this.toBeDecrypted = toBeDecrypted;
         this.publicKey = publicKey;
         this.secretKey = secretKey;
         this.password = password;
         this.bytesWrote = 0;
+        this.provider = provider;
     }
 
     /**
@@ -105,7 +106,7 @@ public class DecryptStreamTransformer implements StreamTransformer
             }
         }
 
-        clearStream = pbe.getDataStream(privateKey, "BC");
+        clearStream = pbe.getDataStream(privateKey, provider);
         PGPObjectFactory plainFact = new PGPObjectFactory(clearStream);
 
         o = plainFact.nextObject();
@@ -114,7 +115,7 @@ public class DecryptStreamTransformer implements StreamTransformer
         {
             PGPOnePassSignatureList list = (PGPOnePassSignatureList) o;
             signature = list.get(0);
-            signature.initVerify(this.publicKey, "BC");
+            signature.initVerify(this.publicKey, provider);
             // TODO verify signature
             // signature.verify(null);
             o = plainFact.nextObject();
@@ -180,7 +181,7 @@ public class DecryptStreamTransformer implements StreamTransformer
         }
         else
         {
-            return pgpSecKey.extractPrivateKey(pass.toCharArray(), "BC");
+            return pgpSecKey.extractPrivateKey(pass.toCharArray(), provider);
         }
     }
 }

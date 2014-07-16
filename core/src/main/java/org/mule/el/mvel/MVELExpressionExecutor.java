@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -10,18 +7,31 @@
 
 package org.mule.el.mvel;
 
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.el.ExpressionExecutor;
 import org.mule.api.expression.InvalidExpressionException;
+import org.mule.mvel2.MVEL;
+import org.mule.mvel2.ParserConfiguration;
+import org.mule.mvel2.ParserContext;
+import org.mule.mvel2.optimizers.OptimizerFactory;
+import org.mule.mvel2.optimizers.dynamic.DynamicOptimizer;
+import org.mule.mvel2.optimizers.impl.refl.ReflectiveAccessorOptimizer;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 
 import java.io.Serializable;
 
-import org.apache.commons.collections.map.LRUMap;
-import org.mvel2.MVEL;
-import org.mvel2.ParserContext;
-import org.mvel2.optimizers.OptimizerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This MVEL executor uses MVEL {@link ReflectiveAccessorOptimizer} implementation rather than the default
+ * {@link DynamicOptimizer} (which generates byte-code accessors using ASM) because we found that, at least
+ * with JDK7, the {@link ReflectiveAccessorOptimizer} was fastest in typical Mule use cases.
+ */
 public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpressionLanguageContext>
 {
 
@@ -29,20 +39,32 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
 
     protected static final int COMPILED_EXPRESSION_MAX_CACHE_SIZE = 1000;
 
-    protected ParserContext parserContext;
-    protected LRUMap compiledExpressionsCache = new LRUMap(COMPILED_EXPRESSION_MAX_CACHE_SIZE);
+    protected ParserConfiguration parserConfiguration;
 
-    public MVELExpressionExecutor(ParserContext parserContext)
-    {
-        this.parserContext = parserContext;
-    }
+    protected LoadingCache<String, Serializable> compiledExpressionsCache;
 
-    public Object execute(String expression, MVELExpressionLanguageContext context)
+    public MVELExpressionExecutor(final ParserConfiguration parserConfiguration)
     {
-        // Use reflective optimizer rather than default to avoid concurrency issues with JIT complication.
-        // See MULE-6630
+        this.parserConfiguration = parserConfiguration;
+
+        MVEL.COMPILER_OPT_PROPERTY_ACCESS_DOESNT_FAIL = true;
         OptimizerFactory.setDefaultOptimizer(OptimizerFactory.SAFE_REFLECTIVE);
 
+        compiledExpressionsCache = CacheBuilder.newBuilder()
+            .maximumSize(COMPILED_EXPRESSION_MAX_CACHE_SIZE)
+            .build(new CacheLoader<String, Serializable>()
+            {
+                @Override
+                public Serializable load(String key) throws Exception
+                {
+                    return MVEL.compileExpression(key, new ParserContext(parserConfiguration));
+                }
+            });
+    }
+
+    @Override
+    public Object execute(String expression, MVELExpressionLanguageContext context)
+    {
         if (log.isTraceEnabled())
         {
             log.trace("Executing MVEL expression '" + expression + "' with context: \n" + context.toString());
@@ -50,6 +72,7 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
         return MVEL.executeExpression(getCompiledExpression(expression), context);
     }
 
+    @Override
     public void validate(String expression) throws InvalidExpressionException
     {
         getCompiledExpression(expression);
@@ -62,18 +85,24 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
      * @param expression Expression to be compiled
      * @return A {@link Serializable} object representing the compiled expression
      */
-    protected Serializable getCompiledExpression(String expression)
+    protected Serializable getCompiledExpression(final String expression)
     {
-        if (compiledExpressionsCache.containsKey(expression))
+        try
         {
-            return (Serializable) compiledExpressionsCache.get(expression);
+            return compiledExpressionsCache.getUnchecked(expression);
         }
-        else
+        catch (UncheckedExecutionException e)
         {
-            Serializable compiledExpression = MVEL.compileExpression(expression, parserContext);
-            compiledExpressionsCache.put(expression, compiledExpression);
-            return compiledExpression;
+            // While exception is called UncheckedExecutionException and it generally wraps a RuntimeException
+            // only the javadoc states that a non-runtime exception is also possible.
+            if (e.getCause() instanceof RuntimeException)
+            {
+                throw (RuntimeException) e.getCause();
+            }
+            else
+            {
+                throw new MuleRuntimeException(e);
+            }
         }
     }
-
 }

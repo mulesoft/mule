@@ -21,6 +21,7 @@
     </tcp:connector>
 
     <tcp:connector name="separateTimeouts"
+                   connectionTimeout="2000"
                    clientSoTimeout="3000"
                    serverSoTimeout="4000"/>
                    

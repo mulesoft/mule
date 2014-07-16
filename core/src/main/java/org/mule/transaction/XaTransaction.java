@@ -1,19 +1,17 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transaction;
 
 import org.mule.api.MuleContext;
 import org.mule.api.transaction.TransactionException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.util.Preconditions;
+import org.mule.util.xa.XaResourceFactoryHolder;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -40,7 +38,7 @@ public class XaTransaction extends AbstractTransaction
     /**
      * Map of enlisted resources
      */
-    private Map resources = new HashMap();
+    private Map<ResourceKey, Object> resources = new HashMap<ResourceKey, Object>();
 
     protected TransactionManager txManager;
 
@@ -249,29 +247,39 @@ public class XaTransaction extends AbstractTransaction
 
     public synchronized Object getResource(Object key)
     {
-        return resources.get(key);
+        ResourceKey normalizedKey = getResourceEntry(key);
+        return resources.get(normalizedKey);
     }
 
     public synchronized boolean hasResource(Object key)
     {
-        return resources.containsKey(key);
+        ResourceKey normalizedKey = getResourceEntry(key);
+        return resources.containsKey(normalizedKey);
     }
 
+    /**
+     * @param key Must be the provider of the resource object. i.e. for JDBC it's the XADataSource, for JMS is the XAConnectionFactory.
+     *            It can be a wrapper in which case should be a {@link org.mule.util.xa.XaResourceFactoryHolder} to be able to determine
+     *            correctly if there's already a resource for that {@link javax.transaction.xa.XAResource} provider.
+     * @param resource the resource object. It must be an {@link javax.transaction.xa.XAResource} or a {@link org.mule.transaction.XaTransaction.MuleXaObject}
+     * @throws TransactionException
+     */
     public synchronized void bindResource(Object key, Object resource) throws TransactionException
     {
+        ResourceKey normalizedKey = getResourceEntry(key, resource);
         if (resources.containsKey(key))
         {
             throw new IllegalTransactionStateException(
                     CoreMessages.transactionResourceAlreadyListedForKey(key));
         }
 
-        resources.put(key, resource);
-        
+        resources.put(normalizedKey, resource);
+
         if (key == null)
         {
             logger.error("Key for bound resource " + resource + " is null");
         }
-        
+
         if (resource instanceof MuleXaObject)
         {
             MuleXaObject xaObject = (MuleXaObject) resource;
@@ -286,7 +294,6 @@ public class XaTransaction extends AbstractTransaction
             logger.error("Bound resource " + resource + " is neither a MuleXaObject nor XAResource");
         }
     }
-
 
     // moved here from connection wrapper
     public boolean enlistResource(XAResource resource) throws TransactionException
@@ -468,5 +475,65 @@ public class XaTransaction extends AbstractTransaction
     public boolean supports(Object key, Object resource)
     {
         return resource instanceof XAResource || resource instanceof MuleXaObject;
+    }
+
+    private ResourceKey getResourceEntry(Object resourceFactory)
+    {
+        resourceFactory = (resourceFactory instanceof XaResourceFactoryHolder ? ((XaResourceFactoryHolder) resourceFactory).getHoldObject() : resourceFactory);
+        return new ResourceKey(resourceFactory, null);
+    }
+
+    private ResourceKey getResourceEntry(Object resourceFactory, Object resource)
+    {
+        resourceFactory = (resourceFactory instanceof XaResourceFactoryHolder ? ((XaResourceFactoryHolder) resourceFactory).getHoldObject() : resourceFactory);
+        return new ResourceKey(resourceFactory, resource);
+    }
+
+    /**
+     * This class is used as key for the resources map since allows us to
+     * overcome some bad hashcode implementation of resource factories such as
+     * org.enhydra.jdbc.standard.StandardDataSource.
+     */
+    private static class ResourceKey
+    {
+
+        private Object resourceFactory;
+        private Object resource;
+
+        public ResourceKey(Object resourceFactory)
+        {
+            Preconditions.checkArgument(resourceFactory != null, "resourceFactory cannot be null");
+            this.resourceFactory = resourceFactory;
+            this.resource = null;
+        }
+
+        public ResourceKey(Object resourceFactory, Object resource)
+        {
+            this(resourceFactory);
+            this.resource = resource;
+        }
+
+        public Object getResourceFactory()
+        {
+            return resourceFactory;
+        }
+
+        public Object getResource()
+        {
+            return resource;
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return System.identityHashCode(resourceFactory);
+        }
+
+        @Override
+        public boolean equals(Object obj)
+        {
+            //we use this class internally only so are sure obj is always a ResourceEntry
+            return resourceFactory.equals(((ResourceKey) obj).getResourceFactory());
+        }
     }
 }

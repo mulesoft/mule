@@ -40,7 +40,7 @@
                     streaming="true"
                     pollingFrequency="1800000"/>
     <flow name="testFLow">
-        <file:inbound-endpoint name="fileIn" path=".mule/testData"/>
+        <file:inbound-endpoint name="fileIn" path="${workingDirectory}/testData"/>
 
         <transformer ref="encryptTransformer"/>
 

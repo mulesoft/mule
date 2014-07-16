@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util;
 
 import org.mule.routing.filters.WildcardFilter;
@@ -400,7 +396,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
         if (ctor == null)
         {
-            StringBuffer argsString = new StringBuffer(100);
+            StringBuilder argsString = new StringBuilder(100);
             for (Class<?> arg : args)
             {
                 argsString.append(arg.getName()).append(", ");

@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule;
 
 import org.mule.api.DefaultMuleException;
@@ -19,8 +15,8 @@ import org.mule.api.MuleSession;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.Pipeline;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.processor.ProcessingDescriptor;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
@@ -28,13 +24,12 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.management.stats.ProcessingTime;
-import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.security.MuleCredentials;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.DefaultReplyToHandler;
-import org.mule.util.CaseInsensitiveHashMap;
+import org.mule.util.CopyOnWriteCaseInsensitiveMap;
 import org.mule.util.store.DeserializationPostInitialisable;
 
 import java.io.IOException;
@@ -96,7 +91,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
 
     private transient Map<String, Object> serializedData = null;
 
-    private Map<String, Object> flowVariables = new CaseInsensitiveHashMap/* <String, Object> */(6);
+    private CopyOnWriteCaseInsensitiveMap<String, Object> flowVariables = new CopyOnWriteCaseInsensitiveMap<String, Object>();
 
     // Constructors
 
@@ -276,9 +271,20 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
             rewriteEvent.isSynchronous());
     }
 
+    public DefaultMuleEvent(MuleEvent rewriteEvent, FlowConstruct flowConstruct, ReplyToHandler replyToHandler, Object replyToDestination)
+    {
+        this(rewriteEvent.getMessage(), rewriteEvent, flowConstruct, rewriteEvent.getSession(),
+             rewriteEvent.isSynchronous(), replyToHandler, replyToDestination, true);
+    }
+
     public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent, boolean synchronus)
     {
         this(message, rewriteEvent, rewriteEvent.getFlowConstruct(), rewriteEvent.getSession(), synchronus);
+    }
+
+    public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent, boolean synchronus, boolean shareVars)
+    {
+        this(message, rewriteEvent, rewriteEvent.getFlowConstruct(), rewriteEvent.getSession(), synchronus, shareVars);
     }
 
     /**
@@ -298,9 +304,30 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                                MuleSession session,
                                boolean synchronous)
     {
+        this(message, rewriteEvent, flowConstruct, session, synchronous, rewriteEvent.getReplyToHandler(), rewriteEvent.getReplyToDestination(), true);
+    }
+
+    protected DefaultMuleEvent(MuleMessage message,
+                               MuleEvent rewriteEvent,
+                               FlowConstruct flowConstruct,
+                               MuleSession session,
+                               boolean synchronous,
+                               boolean shareVars)
+    {
+        this(message, rewriteEvent, flowConstruct, session, synchronous, rewriteEvent.getReplyToHandler(), rewriteEvent.getReplyToDestination(), shareVars);
+    }
+
+    protected DefaultMuleEvent(MuleMessage message,
+                               MuleEvent rewriteEvent,
+                               FlowConstruct flowConstruct,
+                               MuleSession session,
+                               boolean synchronous,
+                               ReplyToHandler replyToHandler,
+                               Object replyToDestination,
+                               boolean shareVars)
+    {
         this.id = rewriteEvent.getId();
         this.flowConstruct = flowConstruct;
-        this.session = session;
 
         this.credentials = rewriteEvent.getCredentials();
         this.encoding = rewriteEvent.getEncoding();
@@ -311,15 +338,25 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         if (rewriteEvent instanceof DefaultMuleEvent)
         {
             this.processingTime = ((DefaultMuleEvent) rewriteEvent).processingTime;
-            this.flowVariables = ((DefaultMuleEvent) rewriteEvent).flowVariables;
+            if (shareVars)
+            {
+                this.flowVariables = ((DefaultMuleEvent) rewriteEvent).flowVariables;
+                this.session = session;
+            }
+            else
+            {
+                this.flowVariables.putAll(((DefaultMuleEvent) rewriteEvent).flowVariables);
+                this.session = new DefaultMuleSession(session);
+            }
         }
         else
         {
             this.processingTime = ProcessingTime.newInstance(this);
+            this.session = session;
         }
         setMessage(message);
-        this.replyToHandler = rewriteEvent.getReplyToHandler();
-        this.replyToDestination = rewriteEvent.getReplyToDestination();
+        this.replyToHandler = replyToHandler;
+        this.replyToDestination = replyToDestination;
         this.timeout = rewriteEvent.getTimeout();
         this.transacted = rewriteEvent.isTransacted();
         this.notificationsEnabled = rewriteEvent.isNotificationsEnabled();
@@ -365,12 +402,11 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     protected boolean resolveEventSynchronicity()
     {
         boolean syncProcessingStrategy = false;
-        if (flowConstruct != null && flowConstruct instanceof Pipeline)
+        if (flowConstruct != null && flowConstruct instanceof ProcessingDescriptor)
         {
-            syncProcessingStrategy = ((Pipeline) flowConstruct).getProcessingStrategy()
-                .getClass()
-                .equals(SynchronousProcessingStrategy.class);
+            syncProcessingStrategy = ((ProcessingDescriptor) flowConstruct).isSynchronous();
         }
+        
         return transacted
                || exchangePattern.hasResponse()
                || message.getProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY,
@@ -582,7 +618,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     @Override
     public String toString()
     {
-        StringBuffer buf = new StringBuffer(64);
+        StringBuilder buf = new StringBuilder(64);
         buf.append("MuleEvent: ").append(getId());
         buf.append(", stop processing=").append(isStopFurtherProcessing());
         buf.append(", ").append(messageSourceURI);
@@ -743,7 +779,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
             return;
         }
 
-        String serviceName = (String) serializedData.get("serviceName");
+        String serviceName = this.getTransientServiceName();
         // Can be null if service call originates from MuleClient
         if (serviceName != null)
         {
@@ -919,12 +955,33 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         try
         {
             // Optional
-            serializedData.put("serviceName", in.readObject());
+            this.setTransientServiceName(in.readObject());
         }
         catch (OptionalDataException e)
         {
             // ignore
         }
+    }
+    
+    /**
+     * Used to fetch the {@link #flowConstruct} after deserealization since its a
+     * transient value. This is not part of the public API and should only be used
+     * internally for serialization/deserialization
+     * 
+     * @param serviceName the name of the service
+     */
+    public void setTransientServiceName(Object serviceName)
+    {
+        if (serializedData == null)
+        {
+            serializedData = new HashMap<String, Object>();
+        }
+        serializedData.put("serviceName", serviceName);
+    }
+
+    private String getTransientServiceName()
+    {
+        return serializedData != null ? (String) serializedData.get("serviceName") : null;
     }
 
     @Override
@@ -933,10 +990,11 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this.message = message;
         if (message instanceof DefaultMuleMessage)
         {
-            for (String name : message.getInvocationPropertyNames())
-            {
-                setFlowVariable(name, message.getInvocationProperty(name));
-            }
+            // Don't copy properties from message to event every time we copy event as we did before. Rather
+            // only copy invocation properties over if MuleMessage had invocation properties set on it before
+            // MuleEvent was created.
+            flowVariables.putAll(((DefaultMuleMessage) message).getOrphanFlowVariables());
+            
             ((DefaultMuleMessage) message).setInvocationProperties(flowVariables);
             if (session instanceof DefaultMuleSession)
             {
@@ -945,12 +1003,21 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         }
     }
 
+    /**
+     * This method does a complete deep copy of the event.
+     *
+     * This method should be used whenever the event is going to be executed
+     * in a different context and changes to that event must not effect the source event.
+     *
+     * @param event the event that must be copied
+     * @return the copied event
+     */
     public static MuleEvent copy(MuleEvent event)
     {
         MuleMessage messageCopy = (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy();
         DefaultMuleEvent eventCopy = new DefaultMuleEvent(messageCopy, event, new DefaultMuleSession(
             event.getSession()));
-        eventCopy.flowVariables = new CaseInsensitiveHashMap(((DefaultMuleEvent) event).flowVariables);
+        eventCopy.flowVariables = ((DefaultMuleEvent) event).flowVariables.clone();
         ((DefaultMuleMessage) messageCopy).setInvocationProperties(eventCopy.flowVariables);
         ((DefaultMuleMessage) messageCopy).resetAccessControl();
         return eventCopy;

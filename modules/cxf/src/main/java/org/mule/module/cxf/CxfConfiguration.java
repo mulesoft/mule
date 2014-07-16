@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.cxf;
 
 import org.mule.api.MuleContext;
@@ -20,7 +16,6 @@ import org.mule.config.spring.SpringRegistry;
 import org.mule.module.cxf.support.MuleHeadersInInterceptor;
 import org.mule.module.cxf.support.MuleHeadersOutInterceptor;
 import org.mule.module.cxf.support.MuleProtocolHeadersOutInterceptor;
-import org.mule.module.cxf.support.WSDLQueryHandler;
 import org.mule.module.cxf.transport.MuleUniversalTransport;
 
 import java.lang.reflect.Field;
@@ -36,7 +31,6 @@ import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.jaxb.JAXBContextCache;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
-import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -71,8 +65,6 @@ public class CxfConfiguration implements Initialisable, Disposable, MuleContextA
         {
             bus = new SpringBusFactory().createBus((String) null, true);
 
-            // Register query handler to generate WSDL or XSD that was removed in cxf 2.5
-            bus.getExtension(QueryHandlerRegistry.class).registerHandler(new WSDLQueryHandler(bus));
         }
 
         if (!initializeStaticBusInstance)
@@ -191,7 +183,7 @@ public class CxfConfiguration implements Initialisable, Disposable, MuleContextA
     public static CxfConfiguration getConfiguration(MuleContext muleContext) throws MuleException
     {
         CxfConfiguration configuration = muleContext.getRegistry().get(CxfConstants.DEFAULT_CXF_CONFIGURATION);
-        if (configuration == null) 
+        if (configuration == null)
         {
             configuration = new CxfConfiguration();
             configuration.setMuleContext(muleContext);

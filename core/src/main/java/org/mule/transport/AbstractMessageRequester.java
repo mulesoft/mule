@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport;
 
 import org.mule.DefaultMuleMessage;
@@ -89,7 +85,7 @@ public abstract class AbstractMessageRequester extends AbstractTransportMessageH
             EndpointMessageNotification beginNotification = null;
             if (connector.isEnableMessageEvents())
             {
-                MuleMessage dummyMessage = new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
+                MuleMessage dummyMessage = new DefaultMuleMessage(NullPayload.getInstance(), endpoint.getMuleContext());
                 beginNotification = new EndpointMessageNotification(dummyMessage, endpoint, null, EndpointMessageNotification.MESSAGE_REQUEST_BEGIN);
             }
             // Make sure we are connected

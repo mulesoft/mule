@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule;
 
 import org.mule.api.ExceptionPayload;
@@ -28,6 +24,8 @@ import org.mule.api.transport.OutputHandler;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.message.ds.ByteArrayDataSource;
+import org.mule.message.ds.StringDataSource;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.MimeTypes;
@@ -39,6 +37,8 @@ import org.mule.util.StringUtils;
 import org.mule.util.UUID;
 import org.mule.util.store.DeserializationPostInitialisable;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -55,7 +55,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -81,8 +80,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      * The default UUID for the message. If the underlying transport has the notion of a
      * message id, this uuid will be ignored
      */
-    private String id = UUID.getUUID();
-    private String rootId = id;
+    private String id;
+    private String rootId;
 
     private transient Object payload;
     private transient Object originalPayload;
@@ -101,12 +100,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * Collection of attachments that were attached to the incoming message
      */
-    private transient Map<String, DataHandler> inboundAttachments = new ConcurrentHashMap<String, DataHandler>();
+    private transient Map<String, DataHandler> inboundAttachments = new HashMap<String, DataHandler>();
 
     /**
      * Collection of attachments that will be sent out with this message
      */
-    private transient Map<String, DataHandler> outboundAttachments = new ConcurrentHashMap<String, DataHandler>();
+    private transient Map<String, DataHandler> outboundAttachments = new HashMap<String, DataHandler>();
 
     private transient byte[] cache;
     protected transient MuleContext muleContext;
@@ -158,6 +157,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                               Map<String, Object> outboundProperties, Map<String, DataHandler> attachments,
                               MuleContext muleContext)
     {
+        id =  UUID.getUUID();
+        rootId = id;
+        
         setMuleContext(muleContext);
 
         if (message instanceof MuleMessage)
@@ -188,7 +190,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         id = previous.getUniqueId();
         rootId = previous.getMessageRootId();
         setMuleContext(muleContext);
-        setEncoding(previous.getEncoding());
 
         if (message instanceof MuleMessage)
         {
@@ -199,9 +200,11 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         else
         {
             setPayload(message);
-            copyMessageProperties(previous);
+            copyMessagePropertiesContext(previous);
         }
+
         originalPayload = previous.getPayload();
+        setEncoding(previous.getEncoding());
 
         if (previous.getExceptionPayload() != null)
         {
@@ -219,15 +222,22 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         resetAccessControl();
     }
 
+    private void copyMessagePropertiesContext(MuleMessage muleMessage)
+    {
+        if (muleMessage instanceof DefaultMuleMessage)
+        {
+            properties = new MessagePropertiesContext(((DefaultMuleMessage) muleMessage).properties);
+        }
+        else
+        {
+            copyMessageProperties(muleMessage);
+        }        
+    }
+
+    
     protected void copyMessageProperties(MuleMessage muleMessage)
     {
-        // explicitly copy INBOUND message properties over. This cannot be done in the loop below
-        Map<String, Object> inboundProperties =
-                ((DefaultMuleMessage) muleMessage).properties.getScopedProperties(PropertyScope.INBOUND);
-        addInboundProperties(inboundProperties);
-
-        for (PropertyScope scope : new PropertyScope[]{PropertyScope.INBOUND,
-            PropertyScope.OUTBOUND})
+        for (PropertyScope scope : new PropertyScope[]{PropertyScope.INBOUND, PropertyScope.OUTBOUND})
         {
             try
             {
@@ -285,7 +295,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         this(message.getPayload(), message, message.getMuleContext());
     }
 
-    private void setMuleContext(MuleContext context)
+    public void setMuleContext(MuleContext context)
     {
         if (context == null)
         {
@@ -313,6 +323,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         return getPayload(outputType, getEncoding());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MuleContext getMuleContext()
     {
@@ -634,7 +647,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         //TODO logger.warn("MuleMessage.getPropertyNames() method is deprecated, use MuleMessage.getOutboundPropertyNames() instead.  This method will be removed in the next point release");
         //return getOutboundPropertyNames();
         assertAccess(READ);
-        return properties.getPropertyNames();
+        return properties.getPropertyNames(PropertyScope.OUTBOUND);
     }
 
     /**
@@ -991,7 +1004,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public String toString()
     {
         assertAccess(READ);
-        StringBuffer buf = new StringBuffer(120);
+        StringBuilder buf = new StringBuilder(120);
         final String nl = System.getProperty("line.separator");
 
         // format message for multi-line output, single-line is not readable
@@ -1107,6 +1120,21 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             {
                 dh = new DataHandler((URL) object);
             }
+        }
+        else if (object instanceof String)
+        {
+            if (contentType != null)
+            {
+                dh = new DataHandler(new StringDataSource((String) object, name, contentType));
+            }
+            else
+            {
+                dh = new DataHandler(new StringDataSource((String) object, name));
+            }
+        }
+        else if (object instanceof byte[] && contentType != null)
+        {
+            dh = new DataHandler(new ByteArrayDataSource((byte[]) object, contentType, name));
         }
         else
         {
@@ -1277,6 +1305,16 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         assertAccess(WRITE);
         properties.clearProperties(scope);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clearAttachments()
+    {
+        assertAccess(WRITE);
+        outboundAttachments.clear();
     }
 
 
@@ -1701,7 +1739,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             out.writeBoolean(false);
             byte[] serializablePayload = getPayloadAsBytes();
             out.writeInt(serializablePayload.length);
-            out.write(serializablePayload);
+            new DataOutputStream(out).write(serializablePayload);
         }
         out.writeObject(serializeAttachments(inboundAttachments));
         out.writeObject(serializeAttachments(outboundAttachments));
@@ -1761,7 +1799,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         {
             int payloadSize = in.readInt();
             byte[] serializedPayload = new byte[payloadSize];
-            in.read(serializedPayload);
+            new DataInputStream(in).readFully(serializedPayload);
             payload = serializedPayload;
         }
         inboundAttachments = deserializeAttachments((Map<String, SerializedDataHandler>)in.readObject());
@@ -1782,6 +1820,15 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public void initAfterDeserialisation(MuleContext context) throws MuleException
     {
         this.muleContext = context;
+        if (this.inboundAttachments == null)
+        {
+            this.inboundAttachments = new HashMap<String, DataHandler>();
+        }
+
+        if (this.outboundAttachments == null)
+        {
+            this.outboundAttachments = new HashMap<String, DataHandler>();
+        }
     }
 
     @Override
@@ -1990,4 +2037,24 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         properties.invocationMap = invocationProperties;
     }
 
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (!(obj instanceof DefaultMuleMessage))
+        {
+            return false;
+        }
+        return this.id.equals(((DefaultMuleMessage)obj).id);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return id.hashCode();
+    }
+    
+    protected Map<String, Object> getOrphanFlowVariables()
+    {
+        return properties.getOrphanFlowVariables();
+    }
 }

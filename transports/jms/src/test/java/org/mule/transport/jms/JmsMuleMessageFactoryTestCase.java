@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms;
 
 import static org.junit.Assert.assertEquals;
@@ -30,7 +26,7 @@ public class JmsMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTes
     @Override
     protected MuleMessageFactory doCreateMuleMessageFactory()
     {
-        return new JmsMuleMessageFactory(muleContext);
+        return new JmsMuleMessageFactory();
     }
 
     @Override
@@ -66,7 +62,7 @@ public class JmsMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTes
         MuleMessageFactory factory = createMuleMessageFactory();
 
         Object payload = getValidTransportMessage();
-        MuleMessage message = factory.create(payload, encoding);
+        MuleMessage message = factory.create(payload, encoding, muleContext);
         assertNotNull(message);
         assertEquals(payload, message.getPayload());
         // message factory populates the inbound scope

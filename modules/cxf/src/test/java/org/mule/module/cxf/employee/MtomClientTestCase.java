@@ -1,20 +1,17 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.cxf.employee;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -41,19 +38,27 @@ public class MtomClientTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.FLOW, "mtom-client-conf-flow.xml"}
         });
     }      
-    
+
     @Test
     public void testEchoService() throws Exception
     {
-        EmployeeDirectoryImpl svc = (EmployeeDirectoryImpl) getComponent("employeeDirectoryService");
+        final EmployeeDirectoryImpl svc = (EmployeeDirectoryImpl) getComponent("employeeDirectoryService");
 
-        int count = 0;
-        while (svc.getInvocationCount() == 0 && count < 5000) {
-            count += 500;
-            Thread.sleep(500);
-        }
+        Prober prober = new PollingProber(6000, 500);
+        prober.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return (svc.getInvocationCount() == 1);
+            }
 
-        assertEquals(1, svc.getInvocationCount());
+            @Override
+            public String describeFailure()
+            {
+                return "Expected invocation count was 1 but actual one was " + svc.getInvocationCount();
+            }
+        });
 
         // ensure that an attachment was actually sent.
         assertTrue(AttachmentVerifyInterceptor.HasAttachments);

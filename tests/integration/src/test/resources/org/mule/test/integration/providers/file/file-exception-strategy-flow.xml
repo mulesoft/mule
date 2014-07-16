@@ -11,12 +11,12 @@
     <file:connector name="fileConnector" outputAppend="true" outputPattern="test-#[function:count].out"/>
 
     <flow name="FolderToVM">
-        <inbound-endpoint address="file://./.mule/in" exchange-pattern="one-way">
+        <inbound-endpoint address="file://${workingDirectory}/in" exchange-pattern="one-way">
             <custom-transformer name="failPoint" class="org.mule.test.transformers.FailingTransformer"/>
         </inbound-endpoint>
-        <outbound-endpoint address="file://./.mule/out" exchange-pattern="one-way"/>
+        <outbound-endpoint address="file://${workingDirectory}/out" exchange-pattern="one-way"/>
         <default-exception-strategy>
-            <outbound-endpoint address="file://./.mule/errors" exchange-pattern="one-way"/>
+            <outbound-endpoint address="file://${workingDirectory}/errors" exchange-pattern="one-way"/>
         </default-exception-strategy>
     </flow>
 

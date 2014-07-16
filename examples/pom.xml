@@ -4,13 +4,17 @@
     <parent>
         <groupId>org.mule</groupId>
         <artifactId>mule</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <groupId>org.mule.examples</groupId>
     <artifactId>mule-examples</artifactId>
     <packaging>pom</packaging>
     <name>Mule Examples</name>
     <description>Mule Example Applications</description>
+
+    <properties>
+        <licensePath>../LICENSE_HEADER.txt</licensePath>
+    </properties>
 
     <modules>
        <module>all-examples</module>

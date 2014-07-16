@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:ws="http://www.mulesoft.org/schema/mule/ws"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd">
+
+    <flow name="server">
+        <http:inbound-endpoint address="http://localhost:${port}/services/Test" exchange-pattern="request-response"/>
+        <test:component/>
+    </flow>
+
+
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Test" wsdlLocation="TestSoapAction.wsdl"
+                        service="TestService" port="TestPortSoap" name="configSoap11"/>
+
+    <flow name="operationWithSoapActionVersion11" processingStrategy="synchronous">
+        <ws:consumer operation="TestOperationWithSoapAction" config-ref="configSoap11"/>
+    </flow>
+
+    <flow name="operationWithNoSoapActionVersion11" processingStrategy="synchronous">
+        <ws:consumer operation="TestOperationWithNoSoapAction" config-ref="configSoap11"/>
+    </flow>
+
+
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Test" wsdlLocation="TestSoapAction.wsdl"
+                        service="TestService" port="TestPortSoap12" name="configSoap12"/>
+
+    <flow name="operationWithSoapActionVersion12" processingStrategy="synchronous">
+        <ws:consumer operation="TestOperationWithSoapAction" config-ref="configSoap12"/>
+    </flow>
+
+    <flow name="operationWithNoSoapActionVersion12" processingStrategy="synchronous">
+        <ws:consumer operation="TestOperationWithNoSoapAction" config-ref="configSoap12"/>
+    </flow>
+
+
+</mule>

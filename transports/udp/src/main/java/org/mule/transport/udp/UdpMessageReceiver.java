@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.udp;
 
 import org.mule.api.MuleEvent;
@@ -178,7 +174,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
                     if (!connector.isDisposed() && !disposing.get())
                     {
                         logger.debug("Accept failed on socket: " + e, e);
-                        getConnector().getMuleContext().getExceptionListener().handleException(e);
+                        getEndpoint().getMuleContext().getExceptionListener().handleException(e);
                     }
                 }
             }
@@ -265,7 +261,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
             {
                 if (!disposing.get())
                 {
-                    getConnector().getMuleContext().getExceptionListener().handleException(e);
+                    getEndpoint().getMuleContext().getExceptionListener().handleException(e);
                 }
             }
             finally

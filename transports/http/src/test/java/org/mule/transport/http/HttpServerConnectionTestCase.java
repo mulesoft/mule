@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -10,6 +7,7 @@
 package org.mule.transport.http;
 
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
@@ -17,13 +15,17 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.size.SmallTest;
+import org.mule.transport.tcp.TcpConnector;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.cert.Certificate;
 import java.util.HashMap;
@@ -32,6 +34,7 @@ import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;
 import javax.net.ssl.SSLSocket;
 
+import org.hamcrest.core.IsInstanceOf;
 import org.hamcrest.core.IsNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,10 +46,16 @@ import org.mockito.stubbing.Answer;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class HttpServerConnectionTestCase extends AbstractMuleTestCase
+public class HttpServerConnectionTestCase extends AbstractMuleContextTestCase
 {
 
-    public static final String ENCODING = "UTF-8";
+    private final static boolean SEND_TCP_NO_DELAY = false;
+    private final static boolean KEEP_ALIVE = true;
+    private final static int RECEIVE_BUFFER_SIZE = 1024;
+    private final static int SERVER_SO_TIMEOUT = 5000;
+
+    public DynamicPort port1 = new DynamicPort("port1");
+
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Socket mockSocket;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
@@ -55,6 +64,8 @@ public class HttpServerConnectionTestCase extends AbstractMuleTestCase
     private HttpConnector mockHttpConnector;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private HandshakeCompletedEvent mockHandshakeCompleteEvent;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private HttpRequest mockHttpRequest;
     private Certificate[] mockLocalCertificate = new Certificate[2];
     private Certificate[] mockPeerCertificates = new Certificate[2];
 
@@ -72,47 +83,60 @@ public class HttpServerConnectionTestCase extends AbstractMuleTestCase
                 return null;
             }
         }).when(mockSslSocket).addHandshakeCompletedListener(any(HandshakeCompletedListener.class));
-        HttpServerConnection httpServerConnection = new HttpServerConnection(mockSslSocket, ENCODING, mockHttpConnector);
+        HttpServerConnection httpServerConnection = new HttpServerConnection(mockSslSocket, muleContext.getConfiguration().getDefaultEncoding(), mockHttpConnector);
         verify(mockSslSocket, times(1)).addHandshakeCompletedListener(httpServerConnection);
         assertThat(httpServerConnection.getLocalCertificateChain(), is(mockLocalCertificate));
         assertThat(httpServerConnection.getPeerCertificateChain(), is(mockPeerCertificates));
     }
 
+
+    @Test
+    public void inputStreamIsWrappedWithBufferedInputStream() throws Exception
+    {
+        HttpServerConnection httpServerConnection = new HttpServerConnection(mockSocket, muleContext.getConfiguration().getDefaultEncoding(), mockHttpConnector);
+        assertThat(httpServerConnection.getInputStream(), IsInstanceOf.instanceOf(BufferedInputStream.class));
+    }
+
     @Test(expected = IllegalStateException.class)
     public void createHttpServerConnectionWithSocketAndFailForLocalCertificates() throws Exception
     {
-        HttpServerConnection httpServerConnection = new HttpServerConnection(mockSocket, ENCODING, mockHttpConnector);
+        HttpServerConnection httpServerConnection = new HttpServerConnection(mockSocket, muleContext.getConfiguration().getDefaultEncoding(), mockHttpConnector);
         httpServerConnection.getLocalCertificateChain();
     }
 
     @Test(expected = IllegalStateException.class)
     public void createHttpServerConnectionWithSocketAndFailForPeerCertificates() throws Exception
     {
-        HttpServerConnection httpServerConnection = new HttpServerConnection(mockSocket, ENCODING, mockHttpConnector);
+        HttpServerConnection httpServerConnection = new HttpServerConnection(mockSocket, muleContext.getConfiguration().getDefaultEncoding(), mockHttpConnector);
         httpServerConnection.getPeerCertificateChain();
     }
 
     @Test(expected = IllegalStateException.class)
     public void createHttpServerConnectionWithSocketAndFailForHandshakeLatch() throws Exception
     {
-        HttpServerConnection httpServerConnection = new HttpServerConnection(mockSocket, ENCODING, mockHttpConnector);
+        HttpServerConnection httpServerConnection = new HttpServerConnection(mockSocket, muleContext.getConfiguration().getDefaultEncoding(), mockHttpConnector);
         httpServerConnection.getSslSocketHandshakeCompleteLatch();
     }
 
     @Test
     public void resetConnectionReadNextRequest() throws Exception
     {
-        when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream(String.format("GET %s HTTP/1.1\n\nGET %s HTTP/1.1\n", "/service/order?param1=value1&param2=value2", "/?param1=value1&param2=value2").getBytes()));
-        HttpServerConnection httpServerConnection = new HttpServerConnection(mockSocket, ENCODING, mockHttpConnector);
+        configureValidRequestForSocketInputStream();
+        HttpServerConnection httpServerConnection = new HttpServerConnection(mockSocket, muleContext.getConfiguration().getDefaultEncoding(), mockHttpConnector);
         assertThat(httpServerConnection.getUrlWithoutRequestParams(), is("/service/order"));
         httpServerConnection.reset();
         assertThat(httpServerConnection.getUrlWithoutRequestParams(), is("/"));
     }
 
+    private void configureValidRequestForSocketInputStream() throws IOException
+    {
+        when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream(String.format("GET %s HTTP/1.1\n\nGET %s HTTP/1.1\n", "/service/order?param1=value1&param2=value2", "/?param1=value1&param2=value2").getBytes()));
+    }
+
     @Test
     public void getRemoteSocketAddressWithNullSocketAddress() throws Exception
     {
-        HttpServerConnection httpServerConnection = new HttpServerConnection(mockSocket, ENCODING, mockHttpConnector);
+        HttpServerConnection httpServerConnection = new HttpServerConnection(mockSocket, muleContext.getConfiguration().getDefaultEncoding(), mockHttpConnector);
         when(mockSocket.getRemoteSocketAddress()).thenReturn(null);
         assertThat(httpServerConnection.getRemoteClientAddress(), IsNull.nullValue());
     }
@@ -120,7 +144,7 @@ public class HttpServerConnectionTestCase extends AbstractMuleTestCase
     @Test
     public void getRemoteSocketAddress() throws Exception
     {
-        HttpServerConnection httpServerConnection = new HttpServerConnection(mockSocket, ENCODING, mockHttpConnector);
+        HttpServerConnection httpServerConnection = new HttpServerConnection(mockSocket, muleContext.getConfiguration().getDefaultEncoding(), mockHttpConnector);
         when(mockSocket.getRemoteSocketAddress()).thenReturn(new InetSocketAddress("host", 1000));
         assertThat(httpServerConnection.getRemoteClientAddress(), is("host:1000"));
     }
@@ -205,21 +229,89 @@ public class HttpServerConnectionTestCase extends AbstractMuleTestCase
         assertThat(response.endsWith("failureMessage"), is(true));
     }
 
+    /**
+     * Tests the correct propagation of {@link HttpConnector} properties to the {@link HttpServerConnection} (MULE-6884).
+     * Unfortunately we can't use a mocked HTTP connector and a mocked socket for this test, so we need to use real ones.
+     */
+    @Test
+    public void createHttpServerConnectionWithHttpConnectorProperties() throws Exception
+    {
+        // Build http connector and initialise it.
+        HttpConnector httpConnector = new HttpConnector(muleContext);
+        httpConnector.setSendTcpNoDelay(SEND_TCP_NO_DELAY);
+        httpConnector.setKeepAlive(KEEP_ALIVE);
+        httpConnector.setReceiveBufferSize(RECEIVE_BUFFER_SIZE);
+        httpConnector.setServerSoTimeout(SERVER_SO_TIMEOUT);
+        httpConnector.initialise();
+
+        ServerSocket serverSocket = null;
+        Socket clientServerSocket = null;
+        Socket serverClientSocket = null;
+        try
+        {
+            // Establish server and client connections.
+            serverSocket = httpConnector.getServerSocketFactory().createServerSocket(port1.getNumber(), TcpConnector.DEFAULT_BACKLOG, true);
+            clientServerSocket = new Socket("localhost", port1.getNumber());
+            serverClientSocket = serverSocket.accept();
+
+            // Build HTTP server connection.
+            HttpServerConnection conn = new HttpServerConnection(serverClientSocket, muleContext.getConfiguration().getDefaultEncoding(), httpConnector);
+
+            // Assert that properties were propagated correctly from the connector.
+            assertEquals(SEND_TCP_NO_DELAY, conn.isSocketTcpNoDelay());
+            assertEquals(KEEP_ALIVE, conn.isSocketKeepAlive());
+            assertEquals(RECEIVE_BUFFER_SIZE, conn.getSocketReceiveBufferSize());
+            assertEquals(SERVER_SO_TIMEOUT, conn.getSocketTimeout());
+        }
+        finally
+        {
+            // Close connections.
+            if (clientServerSocket != null)
+            {
+                clientServerSocket.close();
+            }
+            if (serverClientSocket != null)
+            {
+                serverClientSocket.close();
+            }
+            if (serverSocket != null)
+            {
+                serverSocket.close();
+            }
+        }
+    }
+
+    @Test
+    public void resetClosesRequestBody() throws Exception
+    {
+        configureValidRequestForSocketInputStream();
+        HttpServerConnection httpServerConnection = new HttpServerConnection(mockSocket, muleContext.getConfiguration().getDefaultEncoding(), mockHttpConnector)
+        {
+            @Override
+            protected HttpRequest createHttpRequest() throws IOException
+            {
+                return mockHttpRequest;
+            }
+        };
+        httpServerConnection.readRequest();
+        httpServerConnection.reset();
+        verify(mockHttpRequest.getBody(), times(1)).close();
+    }
+
     private HttpServerConnection createHttpServerConnectionForResponseTest(ByteArrayOutputStream responseContent) throws IOException
     {
-        when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream(String.format("GET %s HTTP/1.1\n\nGET %s HTTP/1.1\n", "/service/order?param1=value1&param2=value2", "/?param1=value1&param2=value2").getBytes()));
+        configureValidRequestForSocketInputStream();
         when(mockSocket.getOutputStream()).thenReturn(responseContent);
-        return new HttpServerConnection(mockSocket, ENCODING, mockHttpConnector);
+        return new HttpServerConnection(mockSocket, muleContext.getConfiguration().getDefaultEncoding(), mockHttpConnector);
     }
 
     private void testUrlWithoutParams(String requestUrl, String expectedUrlWithoutParams) throws IOException
     {
         when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream(String.format("GET %s HTTP/1.0\n", requestUrl).getBytes()));
-        HttpServerConnection httpServerConnection = new HttpServerConnection(mockSocket, ENCODING, mockHttpConnector);
+        HttpServerConnection httpServerConnection = new HttpServerConnection(mockSocket, muleContext.getConfiguration().getDefaultEncoding(), mockHttpConnector);
         String urlWithoutParams = httpServerConnection.getUrlWithoutRequestParams();
         assertThat(urlWithoutParams, is(expectedUrlWithoutParams));
     }
 
 }
-
 

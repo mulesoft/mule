@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.stdio;
 
 import org.mule.api.MuleMessage;
@@ -122,7 +118,7 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
                     return;
                 }
 
-                StringBuffer fullBuffer = new StringBuffer(bufferSize);
+                StringBuilder fullBuffer = new StringBuilder(bufferSize);
                 while (len > 0)
                 {
                     fullBuffer.append(new String(inputBuffer, 0, len));
@@ -146,7 +142,7 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
         }
         catch (Exception e)
         {
-            getConnector().getMuleContext().getExceptionListener().handleException(e);
+            getEndpoint().getMuleContext().getExceptionListener().handleException(e);
         }
     }
 

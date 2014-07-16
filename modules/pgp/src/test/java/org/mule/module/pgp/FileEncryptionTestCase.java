@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
- * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
- *
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.pgp;
 
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -24,9 +20,7 @@ import org.junit.Test;
 
 public class FileEncryptionTestCase extends FunctionalTestCase
 {
-
-    public static final String TEST_FOLDER = ".mule/testData";
-
+    public String testFolder;
 
     private Prober prober = new PollingProber(30000, 100);
 
@@ -36,9 +30,15 @@ public class FileEncryptionTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "file-encryption-config.xml";
+    }
+
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        testFolder = getFileInsideWorkingDirectory("testData").getAbsolutePath();
     }
 
     private File createTestFile(String folder) throws IOException
@@ -58,7 +58,7 @@ public class FileEncryptionTestCase extends FunctionalTestCase
     @Test
     public void testName() throws Exception
     {
-        final File target = createTestFile(TEST_FOLDER);
+        final File target = createTestFile(testFolder);
 
         // Starts file endpoint polling
         muleContext.start();

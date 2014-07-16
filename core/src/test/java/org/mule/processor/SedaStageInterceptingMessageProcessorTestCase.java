@@ -1,25 +1,26 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.processor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.core.IsNot.not;
+;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -134,14 +135,7 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
             sedaStageInterceptingMessageProcessor.process(event);
         }
 
-        ArgumentMatcher<MuleEvent> notSameEvent = new ArgumentMatcher<MuleEvent>()
-        {
-            @Override
-            public boolean matches(Object argument)
-            {
-                return !argument.equals(event);
-            }
-        };
+        ArgumentMatcher<MuleEvent> notSameEvent = createNotSameEventArgumentMatcher(event);
 
         // Two events are processed
         verify(mockListener, timeout(RECEIVE_TIMEOUT).times(2)).process(argThat(notSameEvent));
@@ -187,14 +181,7 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
 
         assertTrue(latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
 
-        ArgumentMatcher<MuleEvent> notSameEvent = new ArgumentMatcher<MuleEvent>()
-        {
-            @Override
-            public boolean matches(Object argument)
-            {
-                return !argument.equals(event);
-            }
-        };
+        ArgumentMatcher<MuleEvent> notSameEvent = createNotSameEventArgumentMatcher(event);
 
         // One event get processed but then throws an exception
         verify(mockListener, timeout(RECEIVE_TIMEOUT).times(1)).process(argThat(notSameEvent));
@@ -203,6 +190,18 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
         verify(exceptionHandler, timeout(RECEIVE_TIMEOUT).times(1)).handleException((Exception)any(),
             argThat(notSameEvent));
 
+    }
+
+    private ArgumentMatcher<MuleEvent> createNotSameEventArgumentMatcher(final MuleEvent event)
+    {
+        return new ArgumentMatcher<MuleEvent>()
+        {
+            @Override
+            public boolean matches(Object argument)
+            {
+                return argument != event;
+            }
+        };
     }
 
     @Test(expected = MessagingException.class)
@@ -231,6 +230,33 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
 
         sedaStageInterceptingMessageProcessor.process(event);
     }
+
+
+    @Test
+    public void testProcessAsyncDoCopyEvent() throws Exception
+    {
+        SedaStageInterceptingMessageProcessor sedaStageInterceptingMessageProcessor =
+                new SedaStageInterceptingMessageProcessor(
+                  "testProcessAsyncDoCopyEvent", "testProcessAsyncDoCopyEvent", queueProfile,
+                  queueTimeout, mock(ThreadingProfile.class), queueStatistics, muleContext);
+
+        sedaStageInterceptingMessageProcessor.setListener(mock(MessageProcessor.class));
+        sedaStageInterceptingMessageProcessor.initialise();
+
+        MessagingExceptionHandler exceptionHandler = mock(MessagingExceptionHandler.class);
+        Flow flow = mock(Flow.class);
+        when(flow.getExceptionListener()).thenReturn(exceptionHandler);
+        when(flow.getProcessingStrategy()).thenReturn(new AsynchronousProcessingStrategy());
+        final MuleEvent event = getTestEvent(TEST_MESSAGE, flow, MessageExchangePattern.ONE_WAY);
+
+        sedaStageInterceptingMessageProcessor.processNextAsync(event);
+        MuleEvent queuedEvent = sedaStageInterceptingMessageProcessor.dequeue();
+
+        assertThat(queuedEvent, is(not(nullValue())));
+        assertThat(queuedEvent, is(not(same(event))));
+    }
+
+
 
     @Override
     protected AsyncInterceptingMessageProcessor createAsyncInterceptingMessageProcessor(MessageProcessor listener)

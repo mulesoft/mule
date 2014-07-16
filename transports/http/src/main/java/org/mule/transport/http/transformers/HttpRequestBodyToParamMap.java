@@ -1,20 +1,19 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.http.transformers;
+
+import static org.mule.transport.http.HttpConstants.FORM_URLENCODED_CONTENT_TYPE;
+import static org.mule.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
+import static org.mule.transport.http.HttpConstants.METHOD_GET;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transport.http.HttpConstants;
 import org.mule.util.StringUtils;
 
 import java.net.URI;
@@ -41,28 +40,27 @@ public class HttpRequestBodyToParamMap extends AbstractMessageTransformer
         try
         {
             String httpMethod = message.getInboundProperty("http.method");
-            String contentType = message.getInboundProperty("Content-Type");
-            
-            boolean isGet = HttpConstants.METHOD_GET.equalsIgnoreCase(httpMethod);
-            boolean isPost = HttpConstants.METHOD_POST.equalsIgnoreCase(httpMethod);
-            boolean isUrlEncoded = false;
+            String contentType = message.getInboundProperty(HEADER_CONTENT_TYPE);
+
+            boolean isGet = METHOD_GET.equalsIgnoreCase(httpMethod);
+            boolean isFormUrlEncoded = false;
             if (contentType != null)
             {
-                isUrlEncoded = contentType.startsWith("application/x-www-form-urlencoded");
+                isFormUrlEncoded = contentType.startsWith(FORM_URLENCODED_CONTENT_TYPE);
             }
 
-            if (!(isGet || (isPost && isUrlEncoded)))
+            if (!(isGet || isFormUrlEncoded))
             {
                 throw new Exception("The HTTP method or content type is unsupported!");
             }
 
-            String queryString = null;
+            String queryString;
             if (isGet)
             {
                 URI uri = new URI(message.getPayloadAsString(outputEncoding));
                 queryString = uri.getRawQuery();
             }
-            else if (isPost)
+            else
             {
                 queryString = new String(message.getPayloadAsBytes());
             }

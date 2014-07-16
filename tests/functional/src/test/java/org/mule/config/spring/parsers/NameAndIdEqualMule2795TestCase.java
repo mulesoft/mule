@@ -1,27 +1,22 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.config.spring.parsers;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 public class NameAndIdEqualMule2795TestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/config/spring/parsers/name-id-equal-mule-2795-test.xml";
     }
@@ -35,5 +30,4 @@ public class NameAndIdEqualMule2795TestCase extends FunctionalTestCase
         assertNotNull(muleContext.getRegistry().lookupObject("id2"));
         assertNull(muleContext.getRegistry().lookupObject(".:no-name-2"));
     }
-
 }

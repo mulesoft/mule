@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.http.servlet;
 
 import org.mule.api.MuleEvent;
@@ -20,16 +16,25 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.AsyncContext;
+import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
 import org.apache.commons.collections.iterators.IteratorEnumeration;
 
@@ -352,4 +357,73 @@ public class MuleHttpServletRequest implements HttpServletRequest
         return false;
     }
 
+    @Override
+    public boolean authenticate(HttpServletResponse httpServletResponse) throws IOException, ServletException
+    {
+        return false;
+    }
+
+    @Override
+    public ServletContext getServletContext()
+    {
+        return null;
+    }
+
+    @Override
+    public void logout() throws ServletException
+    {
+    }
+
+    @Override
+    public void login(String s, String s2) throws ServletException
+    {
+    }
+
+    @Override
+    public AsyncContext startAsync()
+    {
+        return null;
+    }
+
+    @Override
+    public boolean isAsyncStarted()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isAsyncSupported()
+    {
+        return false;
+    }
+
+    @Override
+    public Part getPart(String s) throws IOException, ServletException
+    {
+        return null;
+    }
+
+    @Override
+    public Collection<Part> getParts() throws IOException, ServletException
+    {
+        return null;
+    }
+
+    @Override
+    public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse)
+    {
+        return null;
+    }
+
+    @Override
+    public AsyncContext getAsyncContext()
+    {
+        return null;
+    }
+
+    @Override
+    public DispatcherType getDispatcherType()
+    {
+        return null;
+    }
 }

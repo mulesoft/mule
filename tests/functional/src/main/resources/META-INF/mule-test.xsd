@@ -8,7 +8,7 @@
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.4/mule.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.5/mule.xsd"/>
 
     <xsd:element name="connector" type="mule:connectorType" substitutionGroup="mule:abstract-connector"/>
 
@@ -104,7 +104,7 @@
                 <xsd:attribute name="enableMessageHistory" type="xsd:boolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Every message that is received by the test component is stored and can be retrieved. If you do not want this information stored, such as if you are running millions of messages through the component, you can disable this feature to avoid a potential out of memory error. 
+                            Every message that is received by the test component is stored and can be retrieved. If you do not want this information stored, such as if you are running millions of messages through the component, you can disable this feature to avoid a potential out of memory error.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -146,6 +146,21 @@
                 A transformer that has no effect.
             </xsd:documentation>
         </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="invocation-counter" substitutionGroup="mule:abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                This component keeps track of the number of times it is executed.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="mule:abstractMessageProcessorType">
+                    <xsd:attribute name="name" use="required" type="xsd:string"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
     </xsd:element>
 
     <xsd:element name="assert" substitutionGroup="mule:abstract-message-processor">

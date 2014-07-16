@@ -1,18 +1,13 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.launcher;
 
 import org.mule.util.ClassUtils;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -30,12 +25,12 @@ import sun.net.www.protocol.jar.Handler;
 /**
  * Fixes major classloader woes by:
  * <ol>
- *  <li>Providing a {@link #close()} method to release any connections to resources.</li>
+ *  <li>Providing a {@link #dispose()} method to release any connections to resources.</li>
  *  <li>Disabling caching of jar resources fix e.g. java.util.ResourceBundle 'tagging' the app
  *      and preventing it from being undeployed correctly (no leaving locked jars behind).</li>
  * </ol>
  */
-public class GoodCitizenClassLoader extends URLClassLoader implements Closeable
+public class GoodCitizenClassLoader extends URLClassLoader implements DisposableClassLoader
 {
 
     public GoodCitizenClassLoader(URL[] urls, ClassLoader parent)
@@ -46,7 +41,8 @@ public class GoodCitizenClassLoader extends URLClassLoader implements Closeable
     /**
      * A workaround for http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5041014
      */
-    public void close()
+    @Override
+    public void dispose()
     {
         // jars
         try

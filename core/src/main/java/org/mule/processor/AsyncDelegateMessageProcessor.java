@@ -1,13 +1,9 @@
 /*
- * $Id: AsyncDelegateMessageProcessor.java 24927 2012-10-03 20:25:08Z svacas $
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
@@ -26,9 +22,9 @@ import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.api.processor.ProcessingStrategy;
-import org.mule.api.processor.ProcessingStrategy.StageNameSource;
+import org.mule.api.processor.StageNameSource;
+import org.mule.api.processor.StageNameSourceProvider;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.construct.Flow;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.util.NotificationUtils;
 import org.mule.work.AbstractMuleEventWork;
@@ -80,14 +76,18 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         {
             throw new InitialisationException(CoreMessages.objectIsNull("processingStrategy"), this);
         }
+
+        validateFlowConstruct();
+
         StageNameSource nameSource = null;
+
         if (name != null)
         {
-            nameSource = ((Flow) flowConstruct).getAsyncStageNameSource(name);
+            nameSource = ((StageNameSourceProvider) flowConstruct).getAsyncStageNameSource(name);
         }
         else
         {
-            nameSource = ((Flow) flowConstruct).getAsyncStageNameSource();
+            nameSource = ((StageNameSourceProvider) flowConstruct).getAsyncStageNameSource();
         }
 
         MessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(flowConstruct);
@@ -104,6 +104,18 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         super.initialise();
     }
 
+    private void validateFlowConstruct()
+    {
+        if (flowConstruct == null) {
+            throw new IllegalArgumentException("FlowConstruct cannot be null");
+        }
+        else if (!(flowConstruct instanceof StageNameSourceProvider))
+        {
+            throw new IllegalArgumentException(String.format("FlowConstuct must implement the %s interface. However, the type %s does not implement it",
+                                                             StageNameSourceProvider.class.getCanonicalName(), flowConstruct.getClass().getCanonicalName()));
+        }
+    }
+
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         if (event.isTransacted())
@@ -115,7 +127,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         {
             // Clone event and make it async
             MuleEvent newEvent = new DefaultMuleEvent(
-                    (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy(), event, false);
+                    (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy(), event, false, false);
             target.process(newEvent);
         }
         if (muleContext.getConfiguration().isFlowEndingWithOneWayEndpointReturnsNull())
@@ -157,6 +169,10 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         }
     }
 
+    /**
+     * Not used anymore, to be removed in future
+     */
+    @Deprecated
     class AsyncMessageProcessorWorker extends AbstractMuleEventWork
     {
 

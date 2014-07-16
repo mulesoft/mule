@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.api.annotations.param;
 
 import static org.junit.Assert.assertEquals;
@@ -15,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.util.ExceptionUtils;
 
@@ -47,7 +43,7 @@ public class OutboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlo
     @Test
     public void testProcessAttachment() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://attachment", null, null);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
@@ -58,7 +54,7 @@ public class OutboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlo
     @Test
     public void testProcessAttachmentWithExistingOutAttachments() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://attachment2", null, null);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
@@ -70,7 +66,8 @@ public class OutboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlo
     @Test
     public void testInvalidParamType() throws Exception
     {
-        MuleMessage message = muleContext.getClient().send("vm://invalid", null, null);
+        MuleClient client = muleContext.getClient();
+        MuleMessage message = client.send("vm://invalid", null, null);
         assertNotNull(message);
         assertNotNull(message.getExceptionPayload());
         assertEquals(IllegalArgumentException.class,

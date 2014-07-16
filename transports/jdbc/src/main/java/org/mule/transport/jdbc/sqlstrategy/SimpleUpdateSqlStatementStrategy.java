@@ -1,23 +1,16 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jdbc.sqlstrategy;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.transaction.Transaction;
-import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.jdbc.JdbcConnector;
-import org.mule.transport.jdbc.JdbcUtils;
 import org.mule.util.ArrayUtils;
 
 import java.sql.Connection;
@@ -41,7 +34,7 @@ public  class SimpleUpdateSqlStatementStrategy implements SqlStatementStrategy
         String statement = connector.getStatement(endpoint);
 
         //Storage for parameters
-        List<?> paramNames = new ArrayList<Object>();
+        List<String> paramNames = new ArrayList<String>();
 
         //Parsed SQL statement (with ? placeholders instead of #[foo] params)
         String sql = connector.parseStatement(statement, paramNames);

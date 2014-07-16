@@ -2,4 +2,5 @@ http\://www.mulesoft.org/schema/mule/servlet/3.1/mule-servlet.xsd=META-INF/mule-
 http\://www.mulesoft.org/schema/mule/servlet/3.2/mule-servlet.xsd=META-INF/mule-servlet.xsd
 http\://www.mulesoft.org/schema/mule/servlet/3.3/mule-servlet.xsd=META-INF/mule-servlet.xsd
 http\://www.mulesoft.org/schema/mule/servlet/3.4/mule-servlet.xsd=META-INF/mule-servlet.xsd
+http\://www.mulesoft.org/schema/mule/servlet/3.5/mule-servlet.xsd=META-INF/mule-servlet.xsd
 http\://www.mulesoft.org/schema/mule/servlet/current/mule-servlet.xsd=META-INF/mule-servlet.xsd

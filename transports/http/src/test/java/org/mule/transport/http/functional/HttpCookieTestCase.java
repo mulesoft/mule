@@ -1,20 +1,21 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.http.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.http.HttpConstants;
+import org.mule.transport.http.HttpRequest;
 
-import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,15 +25,17 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.httpclient.Cookie;
+import org.apache.commons.httpclient.Header;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.rule.DynamicPort;
 
 public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
 {
-    private static final String COOKIE_HEADER = "Cookie:";
+
+    private static final String EXPECTED_CUSTOM_COOKIE = "$Version=0; customCookie=yes";
+    private static final String EXPECTED_EXPRESSION_COOKIE = "$Version=0; expressionCookie=MYCOOKIE";
 
     private CountDownLatch latch = new CountDownLatch(1);
     private boolean cookieFound = false;
@@ -55,28 +58,79 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
     }
 
     @Override
-    protected MockHttpServer getHttpServer(CountDownLatch serverStartLatch)
+    protected MockHttpServer getHttpServer()
     {
-        return new SimpleHttpServer(dynamicPort.getNumber(), serverStartLatch, latch);
+        return new SimpleHttpServer(dynamicPort.getNumber());
     }
 
     @Test
-    public void testCookies() throws Exception
+    public void sendsCookiesFromMapInPathWithoutEncodedCharacters() throws Exception
     {
-        Map<String, String> properties = new HashMap<String, String>();
-        properties.put("COOKIE_HEADER", "MYCOOKIE");
+        doRequest("testPath", getCookieMap());
+        assertCookiesReceived(EXPECTED_CUSTOM_COOKIE, EXPECTED_EXPRESSION_COOKIE);
+    }
 
-        MuleClient client = new MuleClient(muleContext);
-        client.dispatch("vm://vm-in", "foobar", properties);
+    @Test
+    public void sendsCookiesFromMapInPathWithEncodedCharacters() throws Exception
+    {
+        doRequest("testPath%25", getCookieMap());
+        assertCookiesReceived(EXPECTED_CUSTOM_COOKIE, EXPECTED_EXPRESSION_COOKIE);
+    }
+
+    @Test
+    public void sendsCookiesFromArrayInPathWithoutEncodedCharacters() throws Exception
+    {
+        doRequest("testPath", getCookieArray());
+        assertCookiesReceived(EXPECTED_CUSTOM_COOKIE);
+    }
+
+    @Test
+    public void sendsCookiesFromArrayInPathWithEncodedCharacters() throws Exception
+    {
+        doRequest("testPath%25", getCookieArray());
+        assertCookiesReceived(EXPECTED_CUSTOM_COOKIE);
+    }
+
+    private void doRequest(String path, Object cookiesObject) throws Exception
+    {
+        Map<String, Object> outboundProperties = new HashMap<String, Object>();
+
+        outboundProperties.put("COOKIE_HEADER", "MYCOOKIE");
+        outboundProperties.put("PATH", path);
+        outboundProperties.put("cookies", cookiesObject);
+
+        MuleClient client = muleContext.getClient();
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, outboundProperties, muleContext);
+
+        client.dispatch("vm://vm-in", message);
 
         assertTrue(latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
         assertTrue(cookieFound);
-
-        assertEquals(2, cookieHeaders.size());
-        assertThereIsCookieWithThisContent("Cookie: $Version=0; customCookie=yes", cookieHeaders);
-        assertThereIsCookieWithThisContent("Cookie: $Version=0; expressionCookie=MYCOOKIE", cookieHeaders);
     }
 
+    private Map<String, String> getCookieMap()
+    {
+        Map<String, String> cookieMap = new HashMap<String, String>();
+        cookieMap.put("customCookie", "yes");
+        cookieMap.put("expressionCookie", "#[header:INBOUND:COOKIE_HEADER]");
+        return cookieMap;
+    }
+
+    private Cookie[] getCookieArray()
+    {
+        Cookie[] cookieArray = new Cookie[1];
+        cookieArray[0] = new Cookie("localhost", "customCookie", "yes");
+        return cookieArray;
+    }
+
+    private void assertCookiesReceived(String... cookies)
+    {
+        assertEquals(cookies.length, cookieHeaders.size());
+        for (String cookie : cookies)
+        {
+            assertThereIsCookieWithThisContent(cookie, cookieHeaders);
+        }
+    }
     private void assertThereIsCookieWithThisContent(String content, List<String> listOfRawCookies)
     {
         for (String rawCookie : listOfRawCookies)
@@ -90,35 +144,27 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
 
     }
 
-    private class SimpleHttpServer extends MockHttpServer
+    private class SimpleHttpServer extends SingleRequestMockHttpServer
     {
-        public SimpleHttpServer(int listenPort, CountDownLatch startupLatch, CountDownLatch testCompleteLatch)
+
+        public SimpleHttpServer(int listenPort)
         {
-            super(listenPort, startupLatch, testCompleteLatch);
+            super(listenPort, muleContext.getConfiguration().getDefaultEncoding());
         }
 
         @Override
-        protected void readHttpRequest(BufferedReader reader) throws Exception
+        protected void processSingleRequest(HttpRequest httpRequest) throws Exception
         {
-            String line = reader.readLine();
-            while (line != null)
+            for (Header header : httpRequest.getHeaders())
             {
-                // Check that we receive a 'Cookie:' header as it would be
-                // send by a regular http client
-                if (line.indexOf(COOKIE_HEADER) > -1)
+                if (header.getName().equals(HttpConstants.HEADER_COOKIE))
                 {
                     cookieFound = true;
-                    cookieHeaders.add(line);
-                }
-
-                line = reader.readLine();
-                // only read the header, i.e. if we encounter an empty line
-                // stop reading (we're only interested in the headers anyway)
-                if (line.trim().length() == 0)
-                {
-                    line = null;
+                    cookieHeaders.add(header.getValue());
                 }
             }
+
+            latch.countDown();
         }
     }
 }

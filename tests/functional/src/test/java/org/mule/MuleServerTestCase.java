@@ -1,30 +1,34 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule;
 
-import java.security.Permission;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.ClassUtils;
 import org.mule.util.FilenameUtils;
 import org.mule.util.JdkVersionUtils;
 
-import org.junit.Test;
+import java.security.Permission;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.junit.After;
+import org.junit.Test;
 
 public class MuleServerTestCase extends AbstractMuleTestCase
 {
+
+    private static String originalConfigBuilderClassName = MuleServer.getConfigBuilderClassName();
+
+    @After
+    public void restoreOriginalConfigBuilderClassName() throws Exception
+    {
+        MuleServer.setConfigBuilderClassName(originalConfigBuilderClassName);
+    }
 
     @Test
     public void testMuleServer() throws Exception
@@ -86,7 +90,7 @@ public class MuleServerTestCase extends AbstractMuleTestCase
         assertEquals("org.mule.config.spring.SpringXmlConfigurationBuilder", MuleServer.getConfigBuilderClassName());
         muleServer.initialize();
     }
-    
+
     @Test
     public void testMuleServerAppConfig() throws Exception
     {
@@ -99,7 +103,7 @@ public class MuleServerTestCase extends AbstractMuleTestCase
         final String workingDirectory = MuleServer.muleContext.getConfiguration().getWorkingDirectory();
         assertTrue(FilenameUtils.separatorsToUnix(workingDirectory).endsWith("/target/.appT"));
     }
-    
+
     @Test(expected=ExitException.class)
     public void testMuleServerJdkVersion()
     {
@@ -125,7 +129,7 @@ public class MuleServerTestCase extends AbstractMuleTestCase
 	    	finally
 	    	{
 		        System.setSecurityManager(manager);
-	    	}   
+	    	}
     	}
     	finally
     	{

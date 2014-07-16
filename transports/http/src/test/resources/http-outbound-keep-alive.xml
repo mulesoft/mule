@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+          http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+          http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+
+    <flow name="keepAliveOneWay">
+        <vm:inbound-endpoint path="keepAliveOneWay"/>
+        <http:outbound-endpoint address="http://localhost:${httpPort}/" method="GET" keepAlive="true" exchange-pattern="one-way"/>
+        <echo-component/>
+    </flow>
+
+    <flow name="keepAliveRequestResponse">
+        <vm:inbound-endpoint path="keepAliveRequestResponse"/>
+        <http:outbound-endpoint address="http://localhost:${httpPort}/" method="GET" keepAlive="true" exchange-pattern="request-response"/>
+        <echo-component/>
+    </flow>
+
+    <flow name="noKeepAliveOneWay">
+        <vm:inbound-endpoint path="noKeepAliveOneWay"/>
+        <http:outbound-endpoint address="http://localhost:${httpPort}/" method="GET" keepAlive="false" exchange-pattern="one-way"/>
+        <echo-component/>
+    </flow>
+
+    <flow name="noKeepAliveRequestResponse">
+        <vm:inbound-endpoint path="noKeepAliveRequestResponse"/>
+        <http:outbound-endpoint address="http://localhost:${httpPort}/" method="GET" keepAlive="false" exchange-pattern="request-response"/>
+        <echo-component/>
+    </flow>
+
+    <flow name="defaultKeepAliveOneWay">
+        <vm:inbound-endpoint path="defaultKeepAliveOneWay"/>
+        <http:outbound-endpoint address="http://localhost:${httpPort}/" method="GET" exchange-pattern="one-way"/>
+        <echo-component/>
+    </flow>
+
+    <flow name="defaultKeepAliveRequestResponse">
+        <vm:inbound-endpoint path="defaultKeepAliveRequestResponse"/>
+        <http:outbound-endpoint address="http://localhost:${httpPort}/" method="GET" exchange-pattern="request-response"/>
+        <echo-component/>
+    </flow>
+
+</mule>

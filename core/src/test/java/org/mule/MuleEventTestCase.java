@@ -1,22 +1,14 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.api.ThreadSafeAccess;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -32,7 +24,9 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.simple.ByteArrayToObject;
 import org.mule.transformer.simple.SerializableToByteArray;
+import org.mule.util.SerializationUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,136 +34,30 @@ import java.util.List;
 
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.*;
+
 
 public class MuleEventTestCase extends AbstractMuleContextTestCase
 {
+    final String TEST_PAYLOAD = "anyValuePayload";
 
-//    @Test
-//    public void testEventInitialise() throws Exception
-//    {
-//        String data = "Test Data";
-//
-//        DefaultMuleEvent event = (DefaultMuleEvent)getTestEvent(data, getTestService("orange", Orange.class));
-//        RequestContext.setEvent(event);
-//
-//        assertEquals("MuleEvent data should equal " + data, data, event.getMessage().getPayload());
-//        assertEquals("MuleEvent data should equal " + data, data, event.getMessageAsString());
-//        assertEquals("MuleEvent data should equal " + data, data, event.transformMessage());
-//        assertEquals("MuleEvent data should be a byte array 9 bytes in length", 9, event
-//            .transformMessageToBytes().length);
-//
-//        assertEquals("MuleEvent data should be a byte array 9 bytes in length", 9,
-//            event.getMessageAsBytes().length);
-//        assertEquals("MuleEvent data should equal " + data, data, event.getSource());
-//
-//        assertEquals("MuleBeanPropertiesRule", event.getMessage().getProperty("MuleBeanPropertiesRule",
-//            "MuleBeanPropertiesRule"));
-//        event.getMessage().setProperty("Test", "Test1");
-//
-//        assertFalse(event.getMessage().getPropertyNames().isEmpty());
-//        assertEquals("bla2", event.getMessage().getProperty("bla2", "bla2"));
-//        assertEquals("Test1", event.getMessage().getProperty("Test"));
-//        assertEquals("Test1", event.getMessage().getProperty("Test", "bla2"));
-//        assertNotNull(event.getId());
-//    }
-//
-//    @Test
-//    public void testEventTransformer() throws Exception
-//    {
-//        String data = "Test Data";
-//        ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test",CollectionUtils.singletonList(new TestEventTransformer()));
-//        MuleEvent event = getTestEvent(data, endpoint);
-//        RequestContext.setEvent(event);
-//
-//        assertEquals("MuleEvent data should equal " + data, data, event.getMessage().getPayload());
-//        assertEquals("MuleEvent data should equal " + data, data, event.getMessageAsString());
-//        assertEquals("MuleEvent data should equal 'Transformed Test Data'", "Transformed Test Data", event
-//            .transformMessage());
-//        assertEquals("MuleEvent data should be a byte array 28 bytes in length", 21, event
-//            .transformMessageToBytes().length);
-//    }
-//
-//    @Test
-//    public void testEventRewrite() throws Exception
-//    {
-//        String data = "Test Data";
-//        ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test", CollectionUtils.singletonList(new TestEventTransformer()));
-//        DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(data), endpoint,
-//            getTestSession(getTestService("apple", Apple.class), muleContext), true,
-//            new ResponseOutputStream(System.out));
-//
-//        assertNotNull(event.getId());
-//        assertNotNull(event.getSession());
-//        assertNotNull(event.getEndpoint());
-//        assertNotNull(event.getOutputStream());
-//        assertNotNull(event.getMessage());
-//        assertEquals(data, event.getMessageAsString());
-//
-//        MuleEvent event2 = new DefaultMuleEvent(new DefaultMuleMessage("New Data"), event);
-//        assertNotNull(event2.getId());
-//        assertEquals(event.getId(), event2.getId());
-//        assertNotNull(event2.getSession());
-//        assertNotNull(event2.getEndpoint());
-//        assertNotNull(event2.getOutputStream());
-//        assertNotNull(event2.getMessage());
-//        assertEquals("New Data", event2.getMessageAsString());
-//
-//    }
-//
-//    @Test
-//    public void testProperties() throws Exception
-//    {
-//        MuleEvent prevEvent;
-//        Properties props;
-//        MuleMessage msg;
-//        ImmutableEndpoint endpoint;
-//        MuleEvent event;
-//
-//        // nowhere
-//        prevEvent = getTestEvent("payload");
-//        props = new Properties();
-//        msg = new DefaultMuleMessage("payload", props);
-//        props = new Properties();
-//        endpoint = getTestOutboundEndpoint("Test", null, null, null, props);
-//        event = new DefaultMuleEvent(msg, endpoint, prevEvent.getService(), prevEvent);
-//        assertNull(event.getMessage().getProperty("prop"));
-//
-//        // in previous event => previous event
-//        prevEvent.getMessage().setProperty("prop", "value0");
-//        event = new DefaultMuleEvent(msg, endpoint, prevEvent.getService(), prevEvent);
-//        assertEquals("value0", event.getMessage().getProperty("prop"));
-//
-//        // TODO check if this fragment can be removed
-//        // in previous event + endpoint => endpoint
-//        // This doesn't apply now as the previous event properties will be the same
-//        // as the current event props
-//        // props = new Properties();
-//        // props.put("prop", "value2");
-//        // endpoint.setProperties(props);
-//        // event = new DefaultMuleEvent(msg, endpoint, prevEvent.getComponent(), prevEvent);
-//        // assertEquals("value2", event.getProperty("prop"));
-//
-//        // in previous event + message => message
-//        props = new Properties();
-//        props.put("prop", "value1");
-//        msg = new DefaultMuleMessage("payload", props);
-//        endpoint = getTestOutboundEndpoint("Test");
-//        event = new DefaultMuleEvent(msg, endpoint, prevEvent.getService(), prevEvent);
-//        assertEquals("value1", event.getMessage().getProperty("prop"));
-//
-//        // in previous event + endpoint + message => message
-//        props = new Properties();
-//        props.put("prop", "value1");
-//        msg = new DefaultMuleMessage("payload", props);
-//
-//        Properties props2 = new Properties();
-//        props2.put("prop", "value2");
-//        endpoint = getTestOutboundEndpoint("Test", null, null, null, props2);
-//        event = new DefaultMuleEvent(msg, endpoint, prevEvent.getService(), prevEvent);
-//        assertEquals("value1", event.getMessage().getProperty("prop"));
-//
-//    }
-//
+    final String FLOW_KEY = "aFlowVarName";
+
+    final String FLOW_DIFFERENT_KEY = "aFlowVarDifferentName";
+
+    final String FLOW_VALUE = "aFlowVarValue";
+
+    final String FLOW_DIFFERENT_VALUE = "aDifferentFlowVarValue";
+
+    final String SESSION_KEY = "aSessionVarName";
+
+    final String SESSION_VALUE = "aSessionVarValue";
+
+    final String SESSION_DIFFERENT_VALUE = "aDifferentSessionVarValue";
+
+
     /*
      * See http://mule.mulesoft.org/jira/browse/MULE-384 for details.
      */
@@ -191,7 +79,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
         InboundEndpoint endpoint = getTestInboundEndpoint("Test", null, null,
             new PayloadTypeFilter(Object.class), null, null);
 
-        MuleEvent event = RequestContext.setEvent(getTestEvent("payload", endpoint));
+        MuleEvent event = RequestContext.setEvent(getTestEvent(TEST_PAYLOAD, endpoint));
         Serializable serialized = (Serializable) new SerializableToByteArray().transform(event);
         assertNotNull(serialized);
         ByteArrayToObject trans = new ByteArrayToObject();
@@ -271,7 +159,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
         ByteArrayToObject trans = new ByteArrayToObject();
         trans.setMuleContext(muleContext);
 
-        MuleEvent event = RequestContext.setEvent(getTestEvent("payload", endpoint));
+        MuleEvent event = RequestContext.setEvent(getTestEvent(TEST_PAYLOAD, endpoint));
         Serializable serialized = (Serializable) new SerializableToByteArray().transform(event);
         assertNotNull(serialized);
 
@@ -290,7 +178,23 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
         InboundEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
             muleContext.getRegistry().lookupEndpointBuilder("epBuilderTest"));
         Service service = muleContext.getRegistry().lookupService("appleService");
-        return RequestContext.setEvent(getTestEvent("payload", service, endpoint));
+        return RequestContext.setEvent(getTestEvent(TEST_PAYLOAD, service, endpoint));
+    }
+
+
+    @Test
+    public void testMuleEventSerializationWithRawPayload() throws Exception
+    {
+        StringBuilder payload = new StringBuilder();
+        //to reproduce issue we must try to serialize something with a payload bigger than 1020 bytes
+        for (int i = 0; i < 108; i++)
+        {
+            payload.append("1234567890");
+        }
+        MuleEvent testEvent = getTestEvent(new ByteArrayInputStream(payload.toString().getBytes()));
+        byte[] serializedEvent = SerializationUtils.serialize(testEvent);
+        testEvent  = (MuleEvent)SerializationUtils.deserialize(serializedEvent);
+        assertArrayEquals((byte[])testEvent.getMessage().getPayload(), payload.toString().getBytes());
     }
 
     private void createAndRegisterTransformersEndpointBuilderService() throws Exception
@@ -316,6 +220,76 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
         muleContext.getRegistry().registerEndpointBuilder("epBuilderTest", endpointBuilder);
 
         getTestService();
+    }
+
+    
+    @Test(expected=UnsupportedOperationException.class)
+    public void testFlowVarNamesAddImmutable() throws Exception
+    {
+        MuleEvent event = getTestEvent(TEST_PAYLOAD);
+        event.setFlowVariable(FLOW_KEY, FLOW_VALUE);
+        event.getFlowVariableNames().add(FLOW_DIFFERENT_KEY);
+    }
+
+    @Test
+    public void testFlowVarNamesRemoveMutable() throws Exception
+    {
+        MuleEvent event = getTestEvent(TEST_PAYLOAD);
+        event.setFlowVariable(FLOW_KEY, FLOW_VALUE);
+        event.getFlowVariableNames().remove(FLOW_KEY);
+        assertNull(event.getFlowVariable(FLOW_KEY));
+    }
+
+    @Test
+    public void testVarsNotShared() throws Exception
+    {
+        MuleEvent event = getTestEvent(TEST_PAYLOAD);
+        MuleMessage message = event.getMessage();
+        message.setInvocationProperty(FLOW_KEY, FLOW_VALUE);
+        event.setSessionVariable(SESSION_KEY, SESSION_VALUE);
+
+        MuleEvent copy = new DefaultMuleEvent(
+            (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy(), event, false, false);
+
+        MuleMessage messageCopy = copy.getMessage();
+        messageCopy.setInvocationProperty(FLOW_KEY, FLOW_DIFFERENT_VALUE);
+        copy.setSessionVariable(SESSION_KEY, SESSION_DIFFERENT_VALUE);
+
+        assertThat((String) event.getSessionVariable(SESSION_KEY), is(equalTo(SESSION_VALUE)));
+        assertThat((String) message.getSessionProperty(SESSION_KEY), is(equalTo(SESSION_VALUE)));
+        assertThat((String) event.getFlowVariable(FLOW_KEY), is(equalTo(FLOW_VALUE)));
+        assertThat((String) message.getInvocationProperty(FLOW_KEY), is(equalTo(FLOW_VALUE)));
+
+        assertThat((String) copy.getSessionVariable(SESSION_KEY), is(equalTo(SESSION_DIFFERENT_VALUE)));
+        assertThat((String) messageCopy.getSessionProperty(SESSION_KEY), is(equalTo(SESSION_DIFFERENT_VALUE)));
+        assertThat((String) copy.getFlowVariable(FLOW_KEY), is(equalTo(FLOW_DIFFERENT_VALUE)));
+        assertThat((String) messageCopy.getInvocationProperty(FLOW_KEY), is(equalTo(FLOW_DIFFERENT_VALUE)));
+    }
+
+    @Test
+    public void testVarsShared() throws Exception
+    {
+        MuleEvent event = getTestEvent(TEST_PAYLOAD);
+        MuleMessage message = event.getMessage();
+        message.setInvocationProperty(FLOW_KEY, FLOW_VALUE);
+        event.setSessionVariable(SESSION_KEY, SESSION_VALUE);
+
+        MuleEvent copy = new DefaultMuleEvent(
+                (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy(), event, false);
+
+        MuleMessage messageCopy = copy.getMessage();
+        messageCopy.setInvocationProperty(FLOW_KEY, FLOW_DIFFERENT_VALUE);
+        copy.setSessionVariable(SESSION_KEY, SESSION_DIFFERENT_VALUE);
+
+        assertThat((String) event.getSessionVariable(SESSION_KEY), is(equalTo(SESSION_DIFFERENT_VALUE)));
+        assertThat((String) message.getSessionProperty(SESSION_KEY), is(equalTo(SESSION_DIFFERENT_VALUE)));
+        assertThat((String) event.getFlowVariable(FLOW_KEY), is(equalTo(FLOW_DIFFERENT_VALUE)));
+        assertThat((String) message.getInvocationProperty(FLOW_KEY), is(equalTo(FLOW_DIFFERENT_VALUE)));
+
+        assertThat((String) copy.getSessionVariable(SESSION_KEY), is(equalTo(SESSION_DIFFERENT_VALUE)));
+        assertThat((String) messageCopy.getSessionProperty(SESSION_KEY), is(equalTo(SESSION_DIFFERENT_VALUE)));
+        assertThat((String) copy.getFlowVariable(FLOW_KEY), is(equalTo(FLOW_DIFFERENT_VALUE)));
+        assertThat((String) messageCopy.getInvocationProperty(FLOW_KEY), is(equalTo(FLOW_DIFFERENT_VALUE)));
     }
 
     private static class TestEventTransformer extends AbstractTransformer

@@ -1,13 +1,9 @@
 /*
- * $Id: HttpMessageReceiver.java 24837 2012-08-26 04:59:21Z pablo.lagreca $
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.http;
 
 import org.mule.DefaultMuleEvent;
@@ -84,7 +80,7 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
 
     protected boolean shouldConnect()
     {
-        StringBuffer requestUri = new StringBuffer(80);
+        StringBuilder requestUri = new StringBuilder(80);
         requestUri.append(endpoint.getProtocol()).append("://");
         requestUri.append(endpoint.getEndpointURI().getHost());
         requestUri.append(':').append(endpoint.getEndpointURI().getPort());
@@ -113,7 +109,7 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
             String encoding = endpoint.getEncoding();
             if (encoding == null)
             {
-                encoding = connector.getMuleContext().getConfiguration().getDefaultEncoding();
+                encoding = getEndpoint().getMuleContext().getConfiguration().getDefaultEncoding();
             }
 
             conn = new HttpServerConnection(socket, encoding, (HttpConnector) connector);
@@ -172,7 +168,7 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
                         }
                         else
                         {
-                            getConnector().getMuleContext().getExceptionListener().handleException(e);
+                            getEndpoint().getMuleContext().getExceptionListener().handleException(e);
                         }
 
                         if (response != null &&
@@ -217,7 +213,7 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
             }
             catch (Exception e)
             {
-                getConnector().getMuleContext().getExceptionListener().handleException(e);
+                getEndpoint().getMuleContext().getExceptionListener().handleException(e);
             }
             finally
             {
@@ -441,7 +437,7 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
                         HttpResponse expected = new HttpResponse();
                         expected.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_CONTINUE);
                         final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(expected,
-                                                                                                   connector.getMuleContext()), (InboundEndpoint) endpoint, flowConstruct);
+                                                                                                   getEndpoint().getMuleContext()), (InboundEndpoint) endpoint, flowConstruct);
                         RequestContext.setEvent(event);
                         conn.writeResponse(transformResponse(expected, event));
                     }
@@ -462,7 +458,7 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
             response.setStatusLine(version, statusCode);
             response.setBody(description);
             DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(response,
-                                                                                 connector.getMuleContext()), (InboundEndpoint) endpoint, flowConstruct);
+                                                                                 getEndpoint().getMuleContext()), (InboundEndpoint) endpoint, flowConstruct);
             RequestContext.setEvent(event);
             // The DefaultResponseTransformer will set the necessary headers
             return transformResponse(response, event);
@@ -501,7 +497,7 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
             path = path.substring(0, i);
         }
 
-        StringBuffer requestUri = new StringBuffer(80);
+        StringBuilder requestUri = new StringBuilder(80);
         if (path.indexOf("://") == -1)
         {
             requestUri.append(ep.getProtocol()).append("://");
@@ -557,7 +553,7 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
         }
         else
         {
-            message = new DefaultMuleMessage(response, connector.getMuleContext());
+            message = new DefaultMuleMessage(response, getEndpoint().getMuleContext());
         }
         //TODO RM*: Maybe we can have a generic Transformer wrapper rather that using DefaultMuleMessage (or another static utility
         //class

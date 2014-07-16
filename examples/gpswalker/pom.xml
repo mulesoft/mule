@@ -5,13 +5,17 @@
     <parent>
         <groupId>org.mule.examples</groupId>
         <artifactId>mule-examples</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-example-gpswalker</artifactId>
     <packaging>mule</packaging>
     <name>GPS Walker Example</name>
     <description>Simulates plotting GPS coordinates.
         To run directly in Maven use the 'mvn exec:exec' command and go to http://localhost:8081/index.html</description>
+
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
 
     <dependencies>
         <dependency>

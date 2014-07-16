@@ -1,17 +1,16 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.xml.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,14 +18,12 @@ import java.util.Random;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
 
 public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
 {
     public static final int MAX_COUNT = 100;
     public static final String STRING_MESSAGE = "Hello world";
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -44,7 +41,7 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
     public void testNotXml() throws Exception
     {
         logger.debug("not xml");
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("in", STRING_MESSAGE, null);
         MuleMessage response = client.request("notxml", TIMEOUT);
         assertNotNull(response);
@@ -68,7 +65,7 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
 
     public void doTestXml(String endpoint, String xml) throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("in", xml, null);
         MuleMessage response = client.request(endpoint, TIMEOUT * 2);
         assertNotNull(response);

@@ -1,17 +1,17 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.interceptor;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.interceptor.Interceptor;
 import org.mule.api.service.Service;
 import org.mule.component.AbstractComponent;
 import org.mule.management.stats.ProcessingTime;
@@ -23,12 +23,8 @@ import java.util.List;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 public class InterceptorTestCase extends AbstractMuleContextTestCase
 {
-
     private final String BEFORE = "Before";
     private final String AFTER = "After";
     private final String COMPONENT = "component";
@@ -49,7 +45,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
         Service service = createUninitializedService();
         TestComponent component = (TestComponent) service.getComponent();
 
-        List interceptors = new ArrayList();
+        List<Interceptor> interceptors = new ArrayList<Interceptor>();
         interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
         component.setInterceptors(interceptors);
         service.initialise();
@@ -66,7 +62,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
         Service service = createUninitializedService();
         TestComponent component = (TestComponent) service.getComponent();
 
-        List interceptors = new ArrayList();
+        List<Interceptor> interceptors = new ArrayList<Interceptor>();
         interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
         interceptors.add(new TestInterceptor(INTERCEPTOR_TWO));
         interceptors.add(new TestInterceptor(INTERCEPTOR_THREE));
@@ -85,8 +81,8 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
         Service service = createUninitializedService();
         TestComponent component = (TestComponent) service.getComponent();
 
-        List interceptors = new ArrayList();
-        List stackInterceptors = new ArrayList();
+        List<Interceptor> interceptors = new ArrayList<Interceptor>();
+        List<Interceptor> stackInterceptors = new ArrayList<Interceptor>();
         stackInterceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
         interceptors.add(new InterceptorStack(stackInterceptors));
         component.setInterceptors(interceptors);
@@ -104,9 +100,9 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
         Service service = createUninitializedService();
         TestComponent component = (TestComponent) service.getComponent();
 
-        List interceptors = new ArrayList();
+        List<Interceptor> interceptors = new ArrayList<Interceptor>();
         interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
-        List stackInterceptors = new ArrayList();
+        List<Interceptor> stackInterceptors = new ArrayList<Interceptor>();
         stackInterceptors.add(new TestInterceptor(INTERCEPTOR_TWO));
         stackInterceptors.add(new TestInterceptor(INTERCEPTOR_THREE));
         interceptors.add(new InterceptorStack(stackInterceptors));
@@ -125,11 +121,11 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
         Service service = createUninitializedService();
         TestComponent component = (TestComponent) service.getComponent();
 
-        List interceptors = new ArrayList();
+        List<Interceptor> interceptors = new ArrayList<Interceptor>();
         interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
         interceptors.add(new TestInterceptor(INTERCEPTOR_TWO));
         interceptors.add(new TestInterceptor(INTERCEPTOR_THREE));
-        List stackInterceptors = new ArrayList();
+        List<Interceptor> stackInterceptors = new ArrayList<Interceptor>();
         stackInterceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
         stackInterceptors.add(new TestInterceptor(INTERCEPTOR_TWO));
         stackInterceptors.add(new TestInterceptor(INTERCEPTOR_THREE));
@@ -149,7 +145,6 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
 
     class TestInterceptor extends AbstractEnvelopeInterceptor
     {
-
         private String name;
 
         public TestInterceptor(String name)
@@ -212,5 +207,4 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
             return event.getMessageAsString() + COMPONENT;
         }
     }
-
 }

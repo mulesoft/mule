@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util.queue;
 
 import static org.junit.Assert.assertEquals;
@@ -21,16 +17,18 @@ import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.construct.Flow;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.security.MuleSecurityManager;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.util.xa.ResourceManagerSystemException;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.junit.Test;
 
 @SmallTest
-public class QueueManagerLifecycleOrderTestCase
+public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase
 {
     private List<Object> startStopOrder = new ArrayList<Object>();
     private RecordingTQM rtqm = new RecordingTQM();
@@ -50,20 +48,36 @@ public class QueueManagerLifecycleOrderTestCase
         assertSame(rtqm, startStopOrder.get(3));
     }
 
-    private class RecordingTQM extends TransactionalQueueManager
+    private class RecordingTQM implements QueueManager
     {
         @Override
-        public void start() throws ResourceManagerSystemException
+        public void start() throws MuleException
         {
             startStopOrder.add(this);
-            super.start();
         }
 
         @Override
-        public void stop() throws ResourceManagerSystemException
+        public void stop() throws MuleException
         {
             startStopOrder.add(this);
-            super.stop();
+        }
+
+        @Override
+        public QueueSession getQueueSession()
+        {
+            throw new NotImplementedException();
+        }
+
+        @Override
+        public void setDefaultQueueConfiguration(QueueConfiguration config)
+        {
+            throw new NotImplementedException();
+        }
+
+        @Override
+        public void setQueueConfiguration(String queueName, QueueConfiguration config)
+        {
+            throw new NotImplementedException();
         }
     }
 

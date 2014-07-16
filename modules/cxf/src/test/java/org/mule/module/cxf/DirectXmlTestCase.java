@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.cxf;
 
 import static org.junit.Assert.assertNotNull;
@@ -15,7 +11,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.module.xml.stax.StaxSource;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -53,12 +49,12 @@ public class DirectXmlTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "direct/direct-xml-conf-service.xml"},
             {ConfigVariant.FLOW, "direct/direct-xml-conf-flow.xml"}
         });
-    }      
+    }
 
     @Test
     public void testInputStream() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
         assertNotNull(xml);
 
@@ -68,7 +64,7 @@ public class DirectXmlTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testInputStreamWithXslt() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
         assertNotNull(xml);
 
@@ -79,18 +75,14 @@ public class DirectXmlTestCase extends AbstractServiceAndFlowTestCase
 
     private void test(MuleClient client, Object xml) throws MuleException, Exception
     {
-        MuleMessage result = client.send("vm://echo",
-            xml,
-            null);
-
-//        System.out.println(result.getPayloadAsString());
+        MuleMessage result = client.send("vm://echo", xml, null);
         assertTrue(result.getPayloadAsString().indexOf("echoResponse") != -1);
     }
 
     @Test
     public void testDom() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
         Document dom = DOMUtils.readXml(xml);
         test(client, dom);
@@ -99,7 +91,7 @@ public class DirectXmlTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testDomSource() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
         Document dom = DOMUtils.readXml(xml);
         test(client, new DOMSource(dom));
@@ -108,7 +100,7 @@ public class DirectXmlTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testSAXSource() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
         SAXSource source = new SAXSource(new InputSource(xml));
         test(client, source);
@@ -117,7 +109,7 @@ public class DirectXmlTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testStaxSource() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
 
         XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(xml);
@@ -127,11 +119,10 @@ public class DirectXmlTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testXMLStreamReader() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
 
         XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(xml);
         test(client, reader);
     }
-
 }

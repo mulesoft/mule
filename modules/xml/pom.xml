@@ -4,12 +4,16 @@
     <parent>
         <groupId>org.mule.modules</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-xml</artifactId>
     <packaging>jar</packaging>
     <name>XML Extensions</name>
     <description>Functionality for working with XML</description>
+
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -54,7 +58,7 @@
         <dependency>
             <groupId>xpp3</groupId>
             <artifactId>xpp3_min</artifactId>
-            <version>${xmlPullVersion}-osgi</version>
+            <version>${xmlPullVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.woodstox</groupId>
@@ -63,7 +67,7 @@
         <dependency>
             <groupId>jaxen</groupId>
             <artifactId>jaxen</artifactId>
-            <version>${jaxenVersion}-osgi</version>
+            <version>${jaxenVersion}</version>
             <!-- see http://jira.codehaus.org/browse/MNG-3007
                  depending on whether jaxen is resolved via dist.codehaus.org
                  or the central repo we get transitive dependencies that we
@@ -104,21 +108,23 @@
 
         <!-- XSLT Support -->
         <dependency>
-            <groupId>net.sf.saxon</groupId>
+            <groupId>net.sourceforge.saxon</groupId>
             <artifactId>saxon</artifactId>
-            <version>${saxonVersion}-osgi</version>
+            <version>${saxonVersion}</version>
         </dependency>
         <dependency>
-            <groupId>net.sf.saxon</groupId>
-            <artifactId>saxon-dom</artifactId>
-            <version>${saxonVersion}-osgi</version>
+            <groupId>net.sourceforge.saxon</groupId>
+            <artifactId>saxon</artifactId>
+            <version>${saxonVersion}</version>
+            <classifier>dom</classifier>
         </dependency>
 
         <!-- XQuery support -->
         <dependency>
-            <groupId>net.sf.saxon</groupId>
-            <artifactId>saxon-xqj</artifactId>
+            <groupId>net.sourceforge.saxon</groupId>
+            <artifactId>saxon</artifactId>
             <version>${saxonVersion}</version>
+            <classifier>xqj</classifier>
         </dependency>
 
         <!-- JAXB support (JDK 5 only) -->

@@ -43,11 +43,6 @@ root.eachFileRecurse()
         {
             process(file)
         }
-        else if (file.name == 'install.xml')
-        {
-            // MULE-2659: take care of the installer configuration file as well
-            switchInstallerConfigFile(file)
-        }
         else if (file.name == 'setup.xml')
         {
             switchSetupXmlFile(file)
@@ -109,33 +104,6 @@ def process(input)
     }
 
     replaceFile(input, outputFile)
-}
-
-//-----------------------------------------------------------------------------
-def switchInstallerConfigFile(installerConfigFile)
-//-----------------------------------------------------------------------------
-{
-    println("processing " + installerConfigFile)
-
-    def outputFile = new File(installerConfigFile.getParent(), "install.xml.new")
-    outputFile.withWriter
-    { output ->
-
-        installerConfigFile.eachLine
-        { line ->
-
-            if (line.indexOf("<appversion>") > -1)
-            {
-                outputLine(output, switchVersion(line, "appversion", oldVersion, newVersion))
-            }
-            else
-            {
-                outputLine(output, line)
-            }
-        }
-    }
-
-    replaceFile(installerConfigFile, outputFile)
 }
 
 //-----------------------------------------------------------------------------

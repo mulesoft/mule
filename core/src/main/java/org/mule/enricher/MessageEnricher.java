@@ -1,13 +1,9 @@
 /*
- * $Id: MessageEnricher.java 25218 2013-01-17 20:25:10Z svacas $
- * --------------------------------------------------------------------------------------
- * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
- *
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.enricher;
 
 import org.mule.DefaultMuleEvent;
@@ -68,6 +64,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Me
         ExpressionManager expressionManager = event.getMuleContext().getExpressionManager();
 
         MuleEvent enricherEvent;
+        //TODO: change DefaultMuleEvent.copy to DefaultMuleEvent.copyPreservingSession
         enricherEvent = DefaultMuleEvent.copy(event);
 
         OptimizedRequestContext.unsafeSetEvent(enricherEvent);

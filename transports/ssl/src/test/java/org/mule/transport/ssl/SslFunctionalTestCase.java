@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.ssl;
 
 import static org.junit.Assert.assertEquals;
@@ -15,8 +11,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.service.Service;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -29,7 +25,7 @@ import org.mule.util.JdkVersionUtils.JdkVersion;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class SslFunctionalTestCase extends FunctionalTestCase 
+public class SslFunctionalTestCase extends FunctionalTestCase
 {
     private static int NUM_MESSAGES = 100;
 
@@ -43,7 +39,7 @@ public class SslFunctionalTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort3 = new DynamicPort("port3");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "ssl-functional-test.xml";
     }
@@ -60,7 +56,7 @@ public class SslFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testSend() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("sendEndpoint", TEST_MESSAGE, null);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
     }
@@ -68,7 +64,7 @@ public class SslFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testSendMany() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         for (int i = 0; i < NUM_MESSAGES; ++i)
         {
             MuleMessage result = client.send("sendManyEndpoint", TEST_MESSAGE, null);
@@ -90,7 +86,7 @@ public class SslFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testAsynchronous() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("asyncEndpoint", TEST_MESSAGE, null);
         // MULE-2757
         Thread.sleep(100);
@@ -98,5 +94,4 @@ public class SslFunctionalTestCase extends FunctionalTestCase
         assertNotNull("Response is null", response);
         assertEquals(TEST_MESSAGE + " Received Async", response.getPayloadAsString());
     }
-
 }

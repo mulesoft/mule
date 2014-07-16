@@ -1,14 +1,12 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.sftp;
+
+import org.mule.api.endpoint.ImmutableEndpoint;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,12 +17,11 @@ import java.util.Date;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.mule.api.endpoint.ImmutableEndpoint;
 
 /**
  * Contains reusable methods not directly related to usage of the jsch sftp library
  * (they can be found in the class SftpClient).
- * 
+ *
  * @author Magnus Larsson
  */
 public class SftpUtil
@@ -50,19 +47,20 @@ public class SftpUtil
 
     public String createUniqueSuffix(String filename)
     {
-
-        // TODO. Add code for handling no '.'
-        int fileTypeIdx = filename.lastIndexOf('.');
-        String fileType = filename.substring(fileTypeIdx); // Let the fileType
-                                                           // include the leading '.'
-
-        filename = filename.substring(0, fileTypeIdx); // Strip off the leading '/'
-                                                       // from the filename
-
         SimpleDateFormat timestampFormatter = new SimpleDateFormat("yyyyMMddHHmmssSSS");
         String timstampStr = '_' + timestampFormatter.format(new Date());
 
-        return filename + timstampStr + fileType;
+        int fileTypeIdx = filename.lastIndexOf('.');
+        if (fileTypeIdx != -1)
+        {
+            String fileType = filename.substring(fileTypeIdx);
+            filename = filename.substring(0, fileTypeIdx);
+            return filename + timstampStr + fileType;
+        }
+        else
+        {
+            return filename + timstampStr;
+        }
     }
 
     public String getTempDirInbound()

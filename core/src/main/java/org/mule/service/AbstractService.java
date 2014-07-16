@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.service;
 
 import org.mule.DefaultMuleEvent;
@@ -25,6 +21,7 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.MessagingExceptionHandlerAware;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.Disposable;
@@ -172,22 +169,17 @@ public abstract class AbstractService implements Service, MessageProcessor, Anno
             {
                 public void onTransition(String phaseName, FlowConstruct object) throws MuleException
                 {
-                    if (outboundRouter instanceof MuleContextAware)
-                    {
-                        ((MuleContextAware) outboundRouter).setMuleContext(muleContext);
-                    }
-
                     if (exceptionListener == null)
                     {
                         // By default use the model Exception Listener
                         // TODO MULE-2102 This should be configured in the default template.
                         exceptionListener = getModel().getExceptionListener();
                     }
-
-                    injectFlowConstructMuleContext(messageSource);
-                    injectFlowConstructMuleContext(asyncReplyMessageSource);
-                    injectFlowConstructMuleContext(messageProcessorChain);
-                    injectFlowConstructMuleContext(component);
+                    injectFlowConstructMuleContextExceptionHandler(outboundRouter);
+                    injectFlowConstructMuleContextExceptionHandler(messageSource);
+                    injectFlowConstructMuleContextExceptionHandler(asyncReplyMessageSource);
+                    injectFlowConstructMuleContextExceptionHandler(messageProcessorChain);
+                    injectFlowConstructMuleContextExceptionHandler(component);
                     injectFlowConstructMuleContext(exceptionListener);
                     
                     doInitialise();
@@ -428,7 +420,7 @@ public abstract class AbstractService implements Service, MessageProcessor, Anno
         try
         {
             buildServiceMessageProcessorChain();
-            injectFlowConstructMuleContext(messageProcessorChain);
+            injectFlowConstructMuleContextExceptionHandler(messageProcessorChain);
         }
         catch (MuleException e)
         {
@@ -712,6 +704,15 @@ public abstract class AbstractService implements Service, MessageProcessor, Anno
     public MessageProcessorChain getMessageProcessorChain()
     {
         return messageProcessorChain;
+    }
+
+    protected void injectFlowConstructMuleContextExceptionHandler(Object candidate)
+    {
+        injectFlowConstructMuleContext(candidate);
+        if (candidate instanceof MessagingExceptionHandlerAware)
+        {
+            ((MessagingExceptionHandlerAware) candidate).setMessagingExceptionHandler(exceptionListener);
+        }
     }
     
     protected void injectFlowConstructMuleContext(Object candidate)

@@ -1,18 +1,20 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.integration.resolvers;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.Base64;
 
@@ -21,21 +23,14 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 public class DefaultEntryPointResolverSetMultithreadingTestCase extends FunctionalTestCase
 {
-    
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/resolvers/default-entry-point-resolver-multithreading-test-config.xml";
     }
-    
+
     @Override
     public int getTestTimeoutSecs()
     {
@@ -86,7 +81,7 @@ public class DefaultEntryPointResolverSetMultithreadingTestCase extends Function
 
         private ClientRequest(final int requestCount) throws MuleException
         {
-            client = new MuleClient(muleContext);
+            client = muleContext.getClient();
             this.requestCount = requestCount;
         }
 
@@ -136,7 +131,7 @@ public class DefaultEntryPointResolverSetMultithreadingTestCase extends Function
             return payload;
         }
     }
-    
+
     public static class EchoBytes
     {
         public byte[] echo(byte[] input)

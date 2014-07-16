@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.mule.model;
 
 import org.mule.api.model.InvocationResult;
@@ -27,7 +23,7 @@ public class CallableEntryPointDiscoveryTestCase extends AbstractMuleContextTest
     public void testBadMatch() throws Exception
     {
         CallableEntryPointResolver resolver = new CallableEntryPointResolver();
-        InvocationResult result = resolver.invoke(new WaterMelon(), getTestEventContext(new StringBuffer("foo")));
+        InvocationResult result = resolver.invoke(new WaterMelon(), getTestEventContext(new StringBuilder("foo")));
         assertEquals("Service doesn't implement Callable", result.getState(), InvocationResult.State.NOT_SUPPORTED);
     }
 

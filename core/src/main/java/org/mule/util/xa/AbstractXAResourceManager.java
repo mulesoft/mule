@@ -1,39 +1,53 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util.xa;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.transaction.Status;
 import javax.transaction.xa.Xid;
 
-public abstract class AbstractXAResourceManager extends AbstractResourceManager
+public abstract class AbstractXAResourceManager<T extends AbstractXaTransactionContext> extends AbstractResourceManager
 {
 
-    protected Map suspendedContexts = new ConcurrentHashMap();
-    protected Map activeContexts = new ConcurrentHashMap();
+    protected Map<Xid, T> suspendedContexts = new ConcurrentHashMap<Xid, T>();
+    protected Map<Xid, T> activeContexts = new ConcurrentHashMap<Xid, T>();
 
     public AbstractXAResourceManager()
     {
         super();
     }
 
-    protected boolean includeBranchInXid()
+    public int prepareTransaction(T context) throws ResourceManagerException
     {
-        return true;
+        assureReady();
+        synchronized (context)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Preparing transaction " + context);
+            }
+            context.status = Status.STATUS_PREPARING;
+            int status = doPrepare(context);
+            context.status = Status.STATUS_PREPARED;
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Prepared transaction " + context);
+            }
+            return status;
+        }
     }
 
-    AbstractTransactionContext getTransactionalResource(Xid xid)
+    protected abstract int doPrepare(T context) throws ResourceManagerException;
+
+    protected T getTransactionalResource(Xid xid)
     {
-        AbstractTransactionContext context = getActiveTransactionalResource(xid);
+        T context = getActiveTransactionalResource(xid);
         if (context != null)
         {
             return context;
@@ -44,22 +58,22 @@ public abstract class AbstractXAResourceManager extends AbstractResourceManager
         }
     }
 
-    AbstractTransactionContext getActiveTransactionalResource(Xid xid)
+    T getActiveTransactionalResource(Xid xid)
     {
-        return (AbstractTransactionContext) activeContexts.get(xid);
+        return activeContexts.get(xid);
     }
 
-    AbstractTransactionContext getSuspendedTransactionalResource(Xid xid)
+    T getSuspendedTransactionalResource(Xid xid)
     {
-        return (AbstractTransactionContext) suspendedContexts.get(xid);
+        return suspendedContexts.get(xid);
     }
 
-    void addActiveTransactionalResource(Xid xid, AbstractTransactionContext context)
+    void addActiveTransactionalResource(Xid xid, T context)
     {
         activeContexts.put(xid, context);
     }
 
-    void addSuspendedTransactionalResource(Xid xid, AbstractTransactionContext context)
+    void addSuspendedTransactionalResource(Xid xid, T context)
     {
         suspendedContexts.put(xid, context);
     }
@@ -73,5 +87,4 @@ public abstract class AbstractXAResourceManager extends AbstractResourceManager
     {
         suspendedContexts.remove(xid);
     }
-
 }

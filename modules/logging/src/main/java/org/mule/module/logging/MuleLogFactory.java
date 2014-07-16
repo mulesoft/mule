@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.logging;
 
 import java.lang.ref.PhantomReference;
@@ -28,6 +24,9 @@ import org.slf4j.spi.LocationAwareLogger;
 
 public class MuleLogFactory extends SLF4JLogFactory
 {
+
+    public static final String LOG_HANDLER_THREAD_NAME = "Mule.log.clogging.ref.handler";
+
     protected ConcurrentHashMap<Integer, ConcurrentMap<String, Log>> repository = new ConcurrentHashMap<Integer, ConcurrentMap<String, Log>>();
 
     protected static final Integer NO_CCL_CLASSLOADER = 0;
@@ -38,7 +37,15 @@ public class MuleLogFactory extends SLF4JLogFactory
 
     public MuleLogFactory()
     {
-        new LoggerReferenceHandler("Mule.log.clogging.ref.handler", referenceQueue, refs, repository);
+        if (MuleUtils.isStandalone())
+        {
+            createLoggerReferenceHandler();
+        }
+    }
+
+    protected void createLoggerReferenceHandler()
+    {
+        new LoggerReferenceHandler(LOG_HANDLER_THREAD_NAME, referenceQueue, refs, repository);
     }
 
     public Log getInstance(String name) throws LogConfigurationException

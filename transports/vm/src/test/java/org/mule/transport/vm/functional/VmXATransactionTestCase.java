@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -11,6 +8,12 @@ package org.mule.transport.vm.functional;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.transaction.TransactionCoordination;
+import org.mule.transaction.XaTransaction;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -28,15 +31,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.transaction.TransactionCoordination;
-import org.mule.transaction.XaTransaction;
 
 public class VmXATransactionTestCase extends AbstractServiceAndFlowTestCase
 {
-    
     protected static final Log logger = LogFactory.getLog(VmTransactionTestCase.class);
     protected static volatile boolean success = true;
     protected static volatile boolean wouldBeDisabled = false;
@@ -45,7 +42,7 @@ public class VmXATransactionTestCase extends AbstractServiceAndFlowTestCase
     {
         super(variant, configResources);
     }
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -54,12 +51,11 @@ public class VmXATransactionTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.FLOW, "vm-xa-transaction-flow.xml"}
         });
     }
-    
+
     @Test
     public void testTransactionQueueEventsTrue() throws Exception
     {
-
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://in", "TEST", null);
         MuleMessage message = client.request("vm://out", 10000);
         assertNotNull(message);
@@ -72,7 +68,6 @@ public class VmXATransactionTestCase extends AbstractServiceAndFlowTestCase
 
     public static class TestComponent
     {
-
         public Object process(Object a) throws Exception
         {
             success = checkTransaction(TransactionCoordination.getInstance().getTransaction());
@@ -93,18 +88,18 @@ public class VmXATransactionTestCase extends AbstractServiceAndFlowTestCase
 
             Field field = transaction.getClass().getDeclaredField("resources");
             field.setAccessible(true);
-            Map resources = (Map) field.get(transaction);
+            Map<?, ?> resources = (Map<?, ?>) field.get(transaction);
             if (resources == null)
             {
                 return false;
             }
             logger.debug("Mule XATransaction :: registered " + resources.size());
 
-            Iterator i = resources.entrySet().iterator();
+            Iterator<?> i = resources.entrySet().iterator();
             boolean result = true;
             while (i.hasNext())
             {
-                Map.Entry entry = (Map.Entry) i.next();
+                Map.Entry<?, ?> entry = (Map.Entry<?, ?>) i.next();
                 XAResource xaResource = getXAResource(entry.getValue());
                 logger.debug("XAResource " + xaResource);
                 boolean enlisted = isXAResourceEnlisted(tx, xaResource);
@@ -151,32 +146,37 @@ public class VmXATransactionTestCase extends AbstractServiceAndFlowTestCase
 
     public static class TestResource implements XAResource
     {
-
+        @Override
         public void commit(Xid id, boolean onePhase) throws XAException
         {
             logger.debug("XA_COMMIT[" + id + "]");
         }
 
+        @Override
         public void end(Xid xid, int flags) throws XAException
         {
             logger.debug("XA_END[" + xid + "] Flags=" + flags);
         }
 
+        @Override
         public void forget(Xid xid) throws XAException
         {
             logger.debug("XA_FORGET[" + xid + "]");
         }
 
+        @Override
         public int getTransactionTimeout() throws XAException
         {
             return (_timeout);
         }
 
+        @Override
         public boolean isSameRM(XAResource xares) throws XAException
         {
             return (xares.equals(this));
         }
 
+        @Override
         public int prepare(Xid xid) throws XAException
         {
             logger.debug("XA_PREPARE[" + xid + "]");
@@ -184,23 +184,27 @@ public class VmXATransactionTestCase extends AbstractServiceAndFlowTestCase
             return (XA_OK);
         }
 
+        @Override
         public Xid[] recover(int flag) throws XAException
         {
             logger.debug("RECOVER[" + flag + "]");
             return (null);
         }
 
+        @Override
         public void rollback(Xid xid) throws XAException
         {
             logger.debug("XA_ROLLBACK[" + xid + "]");
         }
 
+        @Override
         public boolean setTransactionTimeout(int seconds) throws XAException
         {
             _timeout = seconds;
             return (true);
         }
 
+        @Override
         public void start(Xid xid, int flags) throws XAException
         {
             logger.debug("XA_START[" + xid + "] Flags=" + flags);
@@ -208,6 +212,4 @@ public class VmXATransactionTestCase extends AbstractServiceAndFlowTestCase
 
         protected int _timeout = 0;
     }
-
-
 }

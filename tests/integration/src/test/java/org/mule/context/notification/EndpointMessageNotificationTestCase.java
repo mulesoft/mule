@@ -1,23 +1,19 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.context.notification;
 
-import org.mule.module.client.MuleClient;
+import static org.junit.Assert.assertNotNull;
+
+import org.mule.api.client.MuleClient;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertNotNull;
 
 public class EndpointMessageNotificationTestCase extends AbstractNotificationTestCase
 {
@@ -43,7 +39,7 @@ public class EndpointMessageNotificationTestCase extends AbstractNotificationTes
     @Override
     public void doTest() throws Exception
     {
-        final MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         assertNotNull(client.send("vm://in-1?connector=direct", "hello sweet world", null));
         client.dispatch("vm://in-2?connector=direct", "goodbye cruel world", null);
         assertNotNull(client.request("vm://out-2?connector=queue", 5000));

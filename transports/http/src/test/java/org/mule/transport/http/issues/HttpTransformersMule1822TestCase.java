@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.http.issues;
 
 import static org.junit.Assert.assertEquals;
@@ -15,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.StringAppendTestTransformer;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -52,11 +48,11 @@ public class HttpTransformersMule1822TestCase extends AbstractServiceAndFlowTest
             {ConfigVariant.SERVICE, "http-transformers-mule-1822-test-service.xml"},
             {ConfigVariant.FLOW, "http-transformers-mule-1822-test-flow.xml"}
         });
-    }      
+    }
 
     private MuleMessage sendTo(String uri) throws MuleException
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send(uri, OUTBOUND_MESSAGE, null);
         assertNotNull(message);
         return message;

@@ -1,18 +1,13 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule;
 
-import org.mule.api.MessagingException;
+import static org.mule.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
 import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.SingleResourceTransactionFactoryManager;
@@ -26,6 +21,7 @@ import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.api.el.ExpressionLanguage;
 import org.mule.api.endpoint.EndpointFactory;
+import org.mule.api.endpoint.OutboundEndpointExecutorFactory;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.exception.SystemExceptionHandler;
@@ -41,9 +37,13 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.store.ListableObjectStore;
+import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.transaction.TransactionManagerFactory;
+import org.mule.api.util.StreamCloserService;
 import org.mule.client.DefaultLocalMuleClient;
+import org.mule.config.ClusterConfiguration;
 import org.mule.config.DefaultMuleConfiguration;
+import org.mule.config.NullClusterConfiguration;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
@@ -66,6 +66,7 @@ import org.mule.util.ServerStartupSplashScreen;
 import org.mule.util.SplashScreen;
 import org.mule.util.SystemUtils;
 import org.mule.util.UUID;
+import org.mule.util.concurrent.Latch;
 import org.mule.util.lock.LockFactory;
 import org.mule.util.queue.QueueManager;
 
@@ -74,6 +75,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.resource.spi.work.WorkListener;
 import javax.transaction.TransactionManager;
@@ -84,6 +86,17 @@ import org.apache.commons.logging.LogFactory;
 
 public class DefaultMuleContext implements MuleContext
 {
+
+    /**
+     * TODO: Remove these constants.
+     * These constants only make sense until we have a reliable solution for durable persistence in Clustering.
+     * These are not part of Mule's API and you should not use them in applications or extensions
+     */
+    public static final String LOCAL_TRANSIENT_OBJECT_STORE_KEY = "_localInMemoryObjectStore";
+    public static final String LOCAL_PERSISTENT_OBJECT_STORE_KEY = "_localPersistentObjectStore";
+    public static final String LOCAL_OBJECT_STORE_MANAGER_KEY = "_localObjectStoreManager";
+    public static final String LOCAL_QUEUE_MANAGER_KEY = "_localQueueManager";
+
     /**
      * logger used by this class
      */
@@ -125,20 +138,22 @@ public class DefaultMuleContext implements MuleContext
 
     private ExpressionManager expressionManager;
 
+    private StreamCloserService streamCloserService;
+
     private ClassLoader executionClassLoader;
 
     protected LocalMuleClient localMuleClient;
 
-    /** Global exception handler which handles "system" exceptions (i.e., when no message is involved). */
+    /**
+     * Global exception handler which handles "system" exceptions (i.e., when no message is involved).
+     */
     protected SystemExceptionHandler exceptionListener;
-
-    private String clusterId = "";
-
-    private int clusterNodeId;
 
     private PollingController pollingController = new DefaultPollingController();
 
-    private Map<QName, Set<Object>> configurationAnnotations;
+    private ClusterConfiguration clusterConfiguration = new NullClusterConfiguration();
+
+    private Map<QName, Set<Object>> configurationAnnotations = new HashMap<QName, Set<Object>>();
 
     private SingleResourceTransactionFactoryManager singleResourceTransactionFactoryManager = new SingleResourceTransactionFactoryManager();
 
@@ -146,8 +161,18 @@ public class DefaultMuleContext implements MuleContext
 
     private LockFactory lockFactory;
 
+    private ExpressionLanguage expressionLanguage;
+
     private ProcessingTimeWatcher processingTimeWatcher;
 
+    private final Latch startLatch = new Latch();
+
+    private QueueManager queueManager;
+
+    /**
+     * @deprecated Use empty constructor instead and use setter for dependencies.
+     */
+    @Deprecated
     public DefaultMuleContext(MuleConfiguration config,
                               WorkManager workManager,
                               WorkListener workListener,
@@ -168,7 +193,10 @@ public class DefaultMuleContext implements MuleContext
         muleRegistryHelper = createRegistryHelper(registryBroker);
         localMuleClient = new DefaultLocalMuleClient(this);
         exceptionListener = new DefaultSystemExceptionStrategy(this);
-        configurationAnnotations = new HashMap<QName, Set<Object>>();
+    }
+
+    public DefaultMuleContext()
+    {
     }
 
     protected DefaultRegistryBroker createRegistryBroker()
@@ -194,15 +222,15 @@ public class DefaultMuleContext implements MuleContext
         {
             throw new MuleRuntimeException(CoreMessages.objectIsNull("workManager"));
         }
-        
+
         try
         {
-        	JdkVersionUtils.validateJdk();
+            JdkVersionUtils.validateJdk();
         }
         catch (RuntimeException e)
         {
-        	throw new InitialisationException(CoreMessages.invalidJdk(SystemUtils.JAVA_VERSION, 
-        			JdkVersionUtils.getSupportedJdks()), this);
+            throw new InitialisationException(CoreMessages.invalidJdk(SystemUtils.JAVA_VERSION,
+                                                                      JdkVersionUtils.getSupportedJdks()), this);
         }
 
         try
@@ -240,10 +268,6 @@ public class DefaultMuleContext implements MuleContext
     {
         getLifecycleManager().checkPhase(Startable.PHASE_NAME);
 
-        if (getSecurityManager() == null)
-        {
-            throw new MuleRuntimeException(CoreMessages.objectIsNull("securityManager"));
-        }
         if (getQueueManager() == null)
         {
             throw new MuleRuntimeException(CoreMessages.objectIsNull("queueManager"));
@@ -253,9 +277,12 @@ public class DefaultMuleContext implements MuleContext
 
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTING));
         getLifecycleManager().fireLifecycle(Startable.PHASE_NAME);
-
+        overridePollingController();
+        overrideClusterConfiguration();
 
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTED));
+
+        startLatch.release();
 
         if (logger.isInfoEnabled())
         {
@@ -272,6 +299,8 @@ public class DefaultMuleContext implements MuleContext
      */
     public synchronized void stop() throws MuleException
     {
+        startLatch.release();
+
         getLifecycleManager().checkPhase(Stoppable.PHASE_NAME);
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STOPPING));
         getLifecycleManager().fireLifecycle(Stoppable.PHASE_NAME);
@@ -312,7 +341,7 @@ public class DefaultMuleContext implements MuleContext
 
         notificationManager.dispose();
         workManager.dispose();
-        
+
         if (expressionManager != null && expressionManager instanceof Disposable)
         {
             ((Disposable) expressionManager).dispose();
@@ -470,7 +499,7 @@ public class DefaultMuleContext implements MuleContext
      */
     public SecurityManager getSecurityManager()
     {
-        SecurityManager securityManager = (SecurityManager) registryBroker.lookupObject(MuleProperties.OBJECT_SECURITY_MANAGER);
+        SecurityManager securityManager = registryBroker.lookupObject(MuleProperties.OBJECT_SECURITY_MANAGER);
         if (securityManager == null)
         {
             Collection temp = registryBroker.lookupObjects(SecurityManager.class);
@@ -478,6 +507,10 @@ public class DefaultMuleContext implements MuleContext
             {
                 securityManager = ((SecurityManager) temp.iterator().next());
             }
+        }
+        if (securityManager == null)
+        {
+            throw new MuleRuntimeException(CoreMessages.objectIsNull("securityManager"));
         }
         return securityManager;
     }
@@ -511,22 +544,59 @@ public class DefaultMuleContext implements MuleContext
 
     public QueueManager getQueueManager()
     {
-        QueueManager queueManager = (QueueManager) registryBroker.lookupObject(MuleProperties.OBJECT_QUEUE_MANAGER);
         if (queueManager == null)
         {
-            Collection<QueueManager> temp = registryBroker.lookupObjects(QueueManager.class);
-            if (temp.size() > 0)
+            queueManager = registryBroker.lookupObject(MuleProperties.OBJECT_QUEUE_MANAGER);
+            if (queueManager == null)
             {
-                queueManager = temp.iterator().next();
+                Collection<QueueManager> temp = registryBroker.lookupObjects(QueueManager.class);
+                if (temp.size() > 0)
+                {
+                    queueManager = temp.iterator().next();
+                }
             }
         }
         return queueManager;
     }
 
+    @Override
+    public ObjectStoreManager getObjectStoreManager()
+    {
+        return this.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_MANAGER);
+    }
+
+    /**
+     * When running in clustered mode, it returns a {@link org.mule.api.store.ObjectStoreManager} that
+     * creates {@link org.mule.api.store.ObjectStore} instances which are only local to the current node.
+     * This is just a workaround until we introduce a solution for durable persistent stores in HA. This is not part of
+     * Mule's API and you should not use this in your apps or extensions
+     *
+     * @return a {@link org.mule.api.store.ObjectStoreManager}
+     * @since 3.5.0
+     */
+    public ObjectStoreManager getLocalObjectStoreManager()
+    {
+        return this.getRegistry().lookupObject(LOCAL_OBJECT_STORE_MANAGER_KEY);
+    }
+
+    /**
+     * When running in clustered mode, it returns a {@link org.mule.util.queue.QueueManager} that
+     * creates {@link org.mule.util.queue.Queue} instances which are only local to the current node.
+     * This is just a workaround until we introduce a solution for durable persistent queues in HA. This is not part of
+     * Mule's API and you should not use this in your apps or extensions
+     *
+     * @return a {@link org.mule.util.queue.QueueManager}
+     * @since 3.5.0
+     */
+    public QueueManager getLocalQueueManager()
+    {
+        return this.getRegistry().lookupObject(LOCAL_QUEUE_MANAGER_KEY);
+    }
+
     public void setQueueManager(QueueManager queueManager) throws RegistrationException
     {
-        checkLifecycleForPropertySet(MuleProperties.OBJECT_QUEUE_MANAGER, Initialisable.PHASE_NAME);
         registryBroker.registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager);
+        this.queueManager = queueManager;
     }
 
     /**
@@ -567,10 +637,15 @@ public class DefaultMuleContext implements MuleContext
     {
         if (transactionManager == null)
         {
-            transactionManager = (TransactionManager) registryBroker.lookupObject(MuleProperties.OBJECT_TRANSACTION_MANAGER);
+            transactionManager = registryBroker.lookupObject(MuleProperties.OBJECT_TRANSACTION_MANAGER);
             if (transactionManager == null)
             {
                 Collection temp = registryBroker.lookupObjects(TransactionManagerFactory.class);
+                if (temp.size() > 1)
+                {
+                    throw new MuleRuntimeException(CoreMessages.createStaticMessage("More than one TX manager has been configured - Only one TX manager can be defined per application. " +
+                                                                                    "Validate your app configuration or if your app belongs to a domain and the domains defines a TX manager then you should use that one."));
+                }
                 if (temp.size() > 0)
                 {
                     try
@@ -626,6 +701,21 @@ public class DefaultMuleContext implements MuleContext
     public ThreadingProfile getDefaultServiceThreadingProfile()
     {
         return (ThreadingProfile) getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public StreamCloserService getStreamCloserService()
+    {
+        if (this.streamCloserService == null)
+        {
+            this.streamCloserService = this.getRegistry().lookupObject(
+                    MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE);
+        }
+
+        return this.streamCloserService;
     }
 
     public ThreadingProfile getDefaultThreadingProfile()
@@ -700,15 +790,7 @@ public class DefaultMuleContext implements MuleContext
 
     public void handleException(Exception e, RollbackSourceCallback rollbackMethod)
     {
-        if (e instanceof MessagingException)
-        {
-            MuleEvent event = ((MessagingException) e).getEvent();
-            event.getFlowConstruct().getExceptionListener().handleException(e, event);
-        }
-        else
-        {
-            getExceptionListener().handleException(e, rollbackMethod);
-        }
+        getExceptionListener().handleException(e, rollbackMethod);
     }
 
     public void handleException(Exception e)
@@ -739,22 +821,12 @@ public class DefaultMuleContext implements MuleContext
 
     public String getClusterId()
     {
-        return clusterId;
-    }
-
-    public void setClusterId(String clusterId)
-    {
-        this.clusterId = clusterId;
+        return clusterConfiguration.getClusterId();
     }
 
     public int getClusterNodeId()
     {
-        return clusterNodeId;
-    }
-
-    public void setClusterNodeId(int clusterNodeId)
-    {
-        this.clusterNodeId = clusterNodeId;
+        return clusterConfiguration.getClusterNodeId();
     }
 
     public void setPollingController(PollingController pollingController)
@@ -771,7 +843,7 @@ public class DefaultMuleContext implements MuleContext
     @Override
     public String getUniqueIdString()
     {
-        return clusterNodeId + "-" + UUID.getUUID();
+        return clusterConfiguration.getClusterNodeId() + "-" + UUID.getUUID();
     }
 
     @Override
@@ -830,7 +902,12 @@ public class DefaultMuleContext implements MuleContext
     @Override
     public ExpressionLanguage getExpressionLanguage()
     {
-        return registryBroker.lookupObject(MuleProperties.OBJECT_EXPRESSION_LANGUAGE);
+        if (this.expressionLanguage == null)
+        {
+            this.expressionLanguage = this.registryBroker.lookupObject(MuleProperties.OBJECT_EXPRESSION_LANGUAGE);
+        }
+
+        return this.expressionLanguage;
     }
 
     @Override
@@ -852,5 +929,80 @@ public class DefaultMuleContext implements MuleContext
         }
 
         return this.processingTimeWatcher;
+    }
+
+    @Override
+    public boolean waitUntilStarted(int timeout) throws InterruptedException
+    {
+        return startLatch.await(timeout, TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public OutboundEndpointExecutorFactory getOutboundEndpointExecutorFactory()
+    {
+        return (OutboundEndpointExecutorFactory) registryBroker.lookupObject(MuleProperties.OBJECT_MULE_OUTBOUND_ENDPOINT_EXECUTOR_FACTORY);
+    }
+
+    private void overrideClusterConfiguration()
+    {
+        ClusterConfiguration overriddenClusterConfiguration = getRegistry().get(MuleProperties.OBJECT_CLUSTER_CONFIGURATION);
+        if (overriddenClusterConfiguration != null)
+        {
+            this.clusterConfiguration = overriddenClusterConfiguration;
+        }
+    }
+
+    private void overridePollingController()
+    {
+        PollingController overriddenPollingController = getRegistry().get(OBJECT_POLLING_CONTROLLER);
+        if (overriddenPollingController != null)
+        {
+            this.pollingController = overriddenPollingController;
+        }
+    }
+
+    public void setMuleConfiguration(MuleConfiguration muleConfiguration)
+    {
+        this.config = muleConfiguration;
+    }
+
+    public void setWorkManager(WorkManager workManager)
+    {
+        this.workManager = workManager;
+    }
+
+    public void setworkListener(WorkListener workListener)
+    {
+        this.workListener = workListener;
+    }
+
+    public void setNotificationManager(ServerNotificationManager notificationManager)
+    {
+        this.notificationManager = notificationManager;
+    }
+
+    public void setLifecycleManager(MuleContextLifecycleManager lifecyleManager)
+    {
+        this.lifecycleManager = lifecyleManager;
+    }
+
+    public void setExpressionManager(DefaultExpressionManager expressionManager)
+    {
+        this.expressionManager = expressionManager;
+    }
+
+    public void setRegistryBroker(DefaultRegistryBroker registryBroker)
+    {
+        this.registryBroker = registryBroker;
+    }
+
+    public void setMuleRegistry(MuleRegistryHelper muleRegistry)
+    {
+        this.muleRegistryHelper = muleRegistry;
+    }
+
+    public void setLocalMuleClient(DefaultLocalMuleClient localMuleContext)
+    {
+        this.localMuleClient = localMuleContext;
     }
 }

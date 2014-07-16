@@ -1,13 +1,13 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.api.annotations.transformer;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.mule.api.annotations.ContainsTransformerMethods;
 import org.mule.api.annotations.Transformer;
@@ -24,9 +24,6 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 @ContainsTransformerMethods
 @SmallTest
 public class CollectionTransformerTestCase extends AbstractMuleTestCase
@@ -38,10 +35,11 @@ public class CollectionTransformerTestCase extends AbstractMuleTestCase
         AnnotatedTransformerProxy trans = new AnnotatedTransformerProxy(5, getClass(), m, new Class[]{}, null, null);
 
         DataType dt = DataTypeFactory.create(ArrayList.class, Object.class, null);
-        assertTrue("should be a CollectionDataType", trans.getReturnDataType() instanceof CollectionDataType);
-        assertEquals(Object.class, ((CollectionDataType)trans.getReturnDataType()).getItemType());
+        DataType<?> returnDataType = trans.getReturnDataType();
+        assertTrue("should be a CollectionDataType", returnDataType instanceof CollectionDataType);
+        assertEquals(Object.class, ((CollectionDataType<?>)returnDataType).getItemType());
 
-        assertEquals(dt, trans.getReturnDataType());
+        assertEquals(dt, returnDataType);
     }
 
     @Test
@@ -51,17 +49,16 @@ public class CollectionTransformerTestCase extends AbstractMuleTestCase
         AnnotatedTransformerProxy trans = new AnnotatedTransformerProxy(5, getClass(), m, new Class[]{}, null, null);
 
         DataType dt = DataTypeFactory.create(ArrayList.class, String.class, null);
-        assertTrue("should be a CollectionDataType", trans.getReturnDataType() instanceof CollectionDataType);
-        assertEquals(String.class, ((CollectionDataType)trans.getReturnDataType()).getItemType());
-        assertEquals(dt, trans.getReturnDataType());
-
+        DataType<?> returnDataType = trans.getReturnDataType();
+        assertTrue("should be a CollectionDataType", returnDataType instanceof CollectionDataType);
+        assertEquals(String.class, ((CollectionDataType<?>)returnDataType).getItemType());
+        assertEquals(dt, returnDataType);
     }
 
-
     @Transformer
-    public ArrayList dummy(InputStream in)
+    public ArrayList<Object> dummy(InputStream in)
     {
-        return new ArrayList();
+        return new ArrayList<Object>();
     }
 
     @Transformer

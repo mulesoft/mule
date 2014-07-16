@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.api.endpoint;
 
 import org.mule.api.MuleException;
@@ -43,6 +39,9 @@ public interface EndpointFactory extends MuleContextAware
      * (global) endpoint identifier or name. <br/><br/> The {@link OutboundEndpoint} interface is
      * currently used as the return type but this will be replaces by and more specific interface. SEE
      * MULE-2292
+     *
+     *  To add an outbound endpoint in a pipeline an honor the execution context of an endpoint a {@link org.mule.api.endpoint.OutboundEndpointExecutorFactory} must
+     * be used to wrap the outbound endpoint.
      * 
      * @param uri endpoint identifier or uri
      * @throws MuleException
@@ -59,6 +58,9 @@ public interface EndpointFactory extends MuleContextAware
 
     /**
      * Creates an endpoint with the "OUTBOUND" role using the builder provided.
+     *
+     * To add an outbound endpoint in a pipeline an {@link org.mule.api.endpoint.OutboundEndpointExecutorFactory} must
+     * be used to wrap the outbound endpoint.
      * 
      * @param builder
      * @throws MuleException

@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.servlet.jetty;
 
 import static org.junit.Assert.assertEquals;
@@ -15,8 +11,8 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.transformer.DataType;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -31,7 +27,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class JettyTwoEndpointsSinglePortTestCase extends AbstractServiceAndFlowTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
@@ -47,12 +42,11 @@ public class JettyTwoEndpointsSinglePortTestCase extends AbstractServiceAndFlowT
             {ConfigVariant.SERVICE, "jetty-two-endpoints-single-port-service.xml"},
             {ConfigVariant.FLOW, "jetty-two-endpoints-single-port-flow.xml"}
         });
-    }      
-    
+    }
+
     @Test
     public void testSendToEach() throws Exception
     {
-
         sendWithResponse("http://localhost:" + dynamicPort.getNumber() + "/mycomponent1", "test", "mycomponent1", 10);
         sendWithResponse("http://localhost:" + dynamicPort.getNumber() + "/mycomponent2", "test", "mycomponent2", 10);
     }
@@ -60,8 +54,7 @@ public class JettyTwoEndpointsSinglePortTestCase extends AbstractServiceAndFlowT
     @Test
     public void testSendToEachWithBadEndpoint() throws Exception
     {
-
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         sendWithResponse("http://localhost:" + dynamicPort.getNumber() + "/mycomponent1", "test", "mycomponent1", 5);
         sendWithResponse("http://localhost:" + dynamicPort.getNumber() + "/mycomponent2", "test", "mycomponent2", 5);
@@ -80,9 +73,9 @@ public class JettyTwoEndpointsSinglePortTestCase extends AbstractServiceAndFlowT
     protected void sendWithResponse(String endpoint, String message, String response, int noOfMessages)
         throws MuleException
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
-        List results = new ArrayList();
+        List<Object> results = new ArrayList<Object>();
         for (int i = 0; i < noOfMessages; i++)
         {
             MuleMessage result = client.send(endpoint, message, null);

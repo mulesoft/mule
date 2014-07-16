@@ -1,15 +1,12 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.endpoint;
 
+import static org.junit.Assert.assertEquals;
 import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -19,8 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 @SmallTest
 public class URIBuilderTestCase extends AbstractMuleTestCase
@@ -123,15 +118,62 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void testConstructAddress()
     {
-        URIBuilder uri = new URIBuilder();
-        uri.setHost("localhost");
-        uri.setPort(8080);
-        uri.setProtocol("http");
-        uri.setPath("/test");
-
+        URIBuilder uri = createURIBuilder("localhost", 8080, "http", "/test");
         String result = uri.getEncodedConstructor();
         assertEquals("http://localhost:8080/test", result);
     }
 
+    @Test
+    public void testConstructAddressWithRootTrailingSlashInPath()
+    {
+        URIBuilder uri = createURIBuilder("localhost", 8080, "http", "/");
+        String result = uri.getEncodedConstructor();
+        assertEquals("http://localhost:8080", result);
 
+    }
+
+    @Test
+    public void testConstructAddressWithRootTrailingSlashInAddress()
+    {
+        URIBuilder uri = new URIBuilder();
+        uri.setAddress("http://localhost:8080/");
+        String result = uri.getEncodedConstructor();
+        assertEquals("http://localhost:8080", result);
+    }
+
+    @Test
+    public void testConstructAddressWithTrailingSlashInPath()
+    {
+        URIBuilder uri = createURIBuilder("localhost", 8080, "http", "/test/");
+        String result = uri.getEncodedConstructor();
+        assertEquals("http://localhost:8080/test/", result);
+    }
+
+    @Test
+    public void testConstructAddressWithTrailingSlashInAddress()
+    {
+        URIBuilder uri = new URIBuilder();
+        uri.setAddress("http://localhost:8080/test/");
+        String result = uri.getEncodedConstructor();
+        assertEquals("http://localhost:8080/test/", result);
+    }
+
+    @Test
+    public void testConstructAddressWithParamsInRootPath() {
+        String address = "http://localhost:8080/?key1=value1";
+        URIBuilder uri = new URIBuilder();
+        uri.setAddress(address);
+        String result = uri.getEncodedConstructor();
+        assertEquals(address, result);
+    }
+
+    private URIBuilder createURIBuilder(String host, int port, String protocol, String path)
+    {
+        URIBuilder builder = new URIBuilder();
+        builder.setHost(host);
+        builder.setPort(port);
+        builder.setProtocol(protocol);
+        builder.setPath(path);
+        return builder;
+    }
 }

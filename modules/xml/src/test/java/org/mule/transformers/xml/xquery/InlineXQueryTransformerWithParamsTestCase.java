@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -18,7 +15,6 @@ import org.mule.util.IOUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import org.custommonkey.xmlunit.XMLUnit;
 import org.w3c.dom.Document;
@@ -51,10 +47,12 @@ public class InlineXQueryTransformerWithParamsTestCase extends AbstractTransform
                 "    return <cd-title>{data($cd/title)}</cd-title>\n" +
                 "} \n</cd-listings>");
         transformer.setReturnDataType(DataTypeFactory.STRING);
-        Properties params = new Properties();
-        params.setProperty("title", "#[header:ListTitle]");
-        params.setProperty("rating", "#[header:ListRating]");
+
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("title", "#[header:ListTitle]");
+        params.put("rating", "#[header:ListRating]");
         transformer.setContextProperties(params);
+
         transformer.setMuleContext(muleContext);
         transformer.initialise();
         return transformer;

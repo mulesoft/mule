@@ -1,14 +1,12 @@
 /*
- * $Id: HttpsHandshakeTimingTestCase.java 25119 2012-12-10 21:20:57Z pablo.lagreca $
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.execution;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 
@@ -21,13 +19,18 @@ public interface RequestResponseFlowProcessingPhaseTemplate extends FlowProcessi
 
     /**
      * Template method to send a response after processing the message.
-     *
-     * This method is executed outside the flow. In case of failure the {@link org.mule.api.exception.SystemExceptionHandler}
-     * will be executed.
+     * <p/>
+     * This method is executed within the flow so if it fails it will trigger the exception strategy.
      *
      * @param muleEvent the event with the content of the response to be sent.
-     * @throws MuleException exception thrown during the response is being sent.
+     * @throws MuleException exception thrown when processing the message to send the response. If there's a failure when writing the response
+     *                       using the underlying transport or connector then the exception to throw must be a {@link ResponseDispatchException}.
      */
-    public void sendResponseToClient(MuleEvent muleEvent) throws MuleException;
+    void sendResponseToClient(MuleEvent muleEvent) throws MuleException;
 
+    /**
+     * @param messagingException exception thrown during the flow execution.
+     * @throws MuleException exception thrown when processing the message to send the response.
+     */
+    void sendFailureResponseToClient(MessagingException messagingException) throws MuleException;
 }

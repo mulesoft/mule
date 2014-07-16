@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -10,9 +7,10 @@
 package org.mule.context.notification.processors;
 
 import static org.junit.Assert.assertNotNull;
+
+import org.mule.api.client.MuleClient;
 import org.mule.context.notification.Node;
 import org.mule.context.notification.RestrictedNode;
-import org.mule.module.client.MuleClient;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -22,7 +20,6 @@ import org.junit.runners.Parameterized;
 
 public class MulticastingRouterNotificationTestCase extends AbstractMessageProcessorNotificationTestCase
 {
-
     public MulticastingRouterNotificationTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -38,13 +35,11 @@ public class MulticastingRouterNotificationTestCase extends AbstractMessageProce
     @Override
     public void doTest() throws Exception
     {
-
         List<String> testList = Arrays.asList("test");
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         assertNotNull(client.send("vm://in-all", "test", null));
         assertNotNull(client.send("vm://in-all2", testList, null));
         assertNotNull(client.send("vm://in-all3", "test", null));
-
     }
 
 

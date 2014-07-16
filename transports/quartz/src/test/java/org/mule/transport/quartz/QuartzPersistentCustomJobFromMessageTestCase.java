@@ -1,31 +1,27 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.quartz;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.transport.quartz.jobs.ScheduledDispatchJobConfig;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.transport.quartz.jobs.ScheduledDispatchJobConfig;
 
 public class QuartzPersistentCustomJobFromMessageTestCase extends AbstractServiceAndFlowTestCase
 {
-
     private static final long TIMEOUT = 30000;
 
     public QuartzPersistentCustomJobFromMessageTestCase(ConfigVariant variant, String configResources)
@@ -44,7 +40,7 @@ public class QuartzPersistentCustomJobFromMessageTestCase extends AbstractServic
     @Test
     public void testSendToCustomEventScheduler() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         ScheduledDispatchJobConfig jobConfig = new ScheduledDispatchJobConfig();
         jobConfig.setMuleContext(muleContext);

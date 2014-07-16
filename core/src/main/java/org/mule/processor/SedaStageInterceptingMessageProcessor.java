@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
@@ -89,7 +85,9 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
             {
                 queueStatistics.incQueuedEvent();
             }
-            enqueue(event);
+            // Events to be processed asynchronously should be copied before they are queued, otherwise
+            // concurrent modification of the event could occur.
+            enqueue(DefaultMuleEvent.copy(event));
         }
         catch (Exception e)
         {

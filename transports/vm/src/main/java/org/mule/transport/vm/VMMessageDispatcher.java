@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.vm;
 
 import org.mule.DefaultMuleEvent;
@@ -68,9 +64,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
 
     private QueueSession getQueueSession() throws MuleException
     {
-        QueueSession session = connector.getTransactionalResource(endpoint);
-        connector.bindXaResourceIfRequired();
-        return session;
+        return connector.getTransactionalResource(endpoint);
     }
 
     @Override
@@ -122,7 +116,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         if (!endpoint.getExchangePattern().hasResponse())
         {
             // use the default queue profile to configure this queue.
-            connector.getQueueProfile().configureQueue(connector.getMuleContext(),
+            connector.getQueueProfile().configureQueue(endpoint.getMuleContext(),
                 endpoint.getEndpointURI().getAddress(), connector.getQueueManager());
         }
     }

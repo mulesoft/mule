@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.http.transformers;
 
 import org.mule.api.MuleMessage;
@@ -271,10 +267,10 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
             }
             else
             {
-                Object value = msg.getInvocationProperty(headerName);
+                Object value = msg.getOutboundProperty(headerName);
                 if (value == null)
                 {
-                    value = msg.getOutboundProperty(headerName);
+                    value = msg.getInvocationProperty(headerName);
                 }
                 if (value != null)
                 {

@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util.counters.impl;
 
 import org.mule.util.counters.Counter;
@@ -15,7 +11,6 @@ import org.mule.util.counters.CounterFactory.Type;
 
 public class Operator extends AggregateCounter
 {
-
     private final Counter base2;
     private double val1;
     private double val2;
@@ -27,6 +22,7 @@ public class Operator extends AggregateCounter
         base2.addAggregate(this);
     }
 
+    @Override
     public double nextValue()
     {
         Type type = this.getType();
@@ -55,10 +51,10 @@ public class Operator extends AggregateCounter
         }
     }
 
+    @Override
     public void doCompute()
     {
         this.val1 = this.getBase().nextValue();
         this.val2 = base2.nextValue();
     }
-
 }

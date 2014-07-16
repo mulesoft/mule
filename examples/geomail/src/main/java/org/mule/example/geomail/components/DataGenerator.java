@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -32,7 +29,7 @@ public class DataGenerator implements Callable
         List<String> ipAddresses = new ArrayList<String>(batchSize);
         for (int i = 0; i < batchSize; i++)
         {
-            String address = new StringBuffer().append(generator.nextInt(255)).append(".")
+            String address = new StringBuilder().append(generator.nextInt(255)).append(".")
                 .append(generator.nextInt(255)).append(".").append(generator.nextInt(255)).
                 append(".").append(generator.nextInt(255)).toString();
             ipAddresses.add(address);

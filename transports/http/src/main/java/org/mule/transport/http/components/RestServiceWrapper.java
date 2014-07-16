@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.http.components;
 
 import org.mule.DefaultMuleEventContext;
@@ -179,7 +175,7 @@ public class RestServiceWrapper extends AbstractComponent
             tempUrl = muleContext.getExpressionManager().parse(serviceUrl, event, true);
         }
 
-        StringBuffer urlBuffer = new StringBuffer(tempUrl);
+        StringBuilder urlBuffer = new StringBuilder(tempUrl);
 
         if (GET.equalsIgnoreCase(this.httpMethod) || DELETE.equalsIgnoreCase(this.httpMethod))
         {
@@ -196,7 +192,7 @@ public class RestServiceWrapper extends AbstractComponent
                 event.getMessage().setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, CONTENT_TYPE_VALUE);
             }
 
-            StringBuffer requestBodyBuffer = new StringBuffer();
+            StringBuilder requestBodyBuffer = new StringBuilder();
             setRESTParams(urlBuffer, event.getMessage(), request, requiredParams, false, requestBodyBuffer);
             setRESTParams(urlBuffer, event.getMessage(), request, optionalParams, true, requestBodyBuffer);
             requestBody = requestBodyBuffer.toString();
@@ -253,12 +249,12 @@ public class RestServiceWrapper extends AbstractComponent
     // is a POST and
     // requestBodyBuffer must contain the body of the http method at the end of this
     // function call
-    private void setRESTParams(StringBuffer url,
+    private void setRESTParams(StringBuilder url,
                                MuleMessage msg,
                                Object body,
                                Map args,
                                boolean optional,
-                               StringBuffer requestBodyBuffer)
+                               StringBuilder requestBodyBuffer)
     {
         String sep;
 

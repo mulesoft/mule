@@ -4,12 +4,16 @@
     <parent>
         <groupId>org.mule.distributions</groupId>
         <artifactId>mule-distributions</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-scripting-pack</artifactId>
     <packaging>pom</packaging>
     <name>Mule Scripting Pack</name>
     <description>Support for additional scripting languages in Mule</description>
+
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
 
     <build>
         <plugins>

@@ -30,7 +30,7 @@
 
         <sftp:outbound-endpoint
             address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/outbound"
-            tempDir="uploading" outputPattern="#[header:originalFilename]"
+            tempDir="uploading" outputPattern="#[header:inbound:originalFilename]"
             exchange-pattern="one-way" keepFileOnError="true"
             name="outboundEndpoint" duplicateHandling="addSeqNo" />
 
@@ -42,7 +42,7 @@
             exchange-pattern="one-way" />
         <sftp:outbound-endpoint
             address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/outbound2"
-            tempDir="uploading" outputPattern="#[header:originalFilename]"
+            tempDir="uploading" outputPattern="#[header:inbound:originalFilename]"
             exchange-pattern="one-way" keepFileOnError="false"
             name="outboundEndpoint2" duplicateHandling="throwException" />
     </flow>

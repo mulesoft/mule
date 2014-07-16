@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule-domain xmlns="http://www.mulesoft.org/schema/mule/domain"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:db="http://www.mulesoft.org/schema/mule/db"
+             xmlns:spring="http://www.springframework.org/schema/beans"
+             xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/domain http://www.mulesoft.org/schema/mule/domain/current/mule-domain.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+
+    <spring:bean id="property-placeholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <spring:property name="placeholderPrefix" value="${"/>
+        <spring:property name="placeholderSuffix" value="}"/>
+        <spring:property name="location" value="classpath:derby.properties"/>
+    </spring:bean>
+
+    <db:derby-config name="dbConfig" url="${database.connection}"/>
+
+</mule-domain>
+
+

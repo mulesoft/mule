@@ -1,16 +1,13 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.integration.routing.nested;
 
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
@@ -18,11 +15,10 @@ import org.junit.Test;
 
 public class ComponentBindingReturningNullTestCase extends FunctionalTestCase
 {
-
     private static boolean nullResultAccepted;
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/integration/routing/nested/component-binding-returning-null-config.xml";
     }
@@ -45,7 +41,7 @@ public class ComponentBindingReturningNullTestCase extends FunctionalTestCase
 
     public static class HelloImpl implements HelloInterface
     {
-
+        @Override
         public String sayHello(String s)
         {
             return null;
@@ -54,7 +50,6 @@ public class ComponentBindingReturningNullTestCase extends FunctionalTestCase
 
     public static class Component
     {
-
         private HelloInterface helloInterface;
 
         public String invoke(String s)

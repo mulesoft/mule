@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.soap.axis;
 
 import org.mule.api.MuleMessage;
@@ -60,7 +56,7 @@ public class AxisMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
     @Override
     protected MuleMessageFactory doCreateMuleMessageFactory()
     {
-        return new AxisMuleMessageFactory(muleContext);
+        return new AxisMuleMessageFactory();
     }
 
     @Override
@@ -74,7 +70,7 @@ public class AxisMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
     {
         MuleMessageFactory factory = createMuleMessageFactory();
         Object payload = getValidTransportMessage();
-        MuleMessage message = factory.create(payload, encoding);
+        MuleMessage message = factory.create(payload, encoding, muleContext);
         assertEquals(payload, message.getPayload());
         assertEquals("replyTo", message.getReplyTo());
         assertEquals(42, message.getCorrelationGroupSize());

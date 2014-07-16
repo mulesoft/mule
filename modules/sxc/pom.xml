@@ -4,12 +4,16 @@
     <parent>
         <groupId>org.mule.modules</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-sxc</artifactId>
     <packaging>jar</packaging>
     <name>SXC Module</name>
     <description>Efficiently route messages using streaming XPath.</description>
+
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -43,12 +47,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
             <version>${project.version}</version>
@@ -64,7 +62,7 @@
         <dependency>
             <groupId>com.envoisolutions.sxc</groupId>
             <artifactId>sxc-xpath</artifactId>
-            <version>${sxcVersion}-osgi</version>
+            <version>${sxcVersion}</version>
             <exclusions>
                 <exclusion>
                     <groupId>stax</groupId>
@@ -75,7 +73,7 @@
         <dependency>
             <groupId>com.envoisolutions.sxc</groupId>
             <artifactId>sxc-runtime</artifactId>
-            <version>${sxcVersion}-osgi</version>
+            <version>${sxcVersion}</version>
             <exclusions>
                 <exclusion>
                     <groupId>stax</groupId>
@@ -86,7 +84,7 @@
         <dependency>
             <groupId>com.envoisolutions.sxc</groupId>
             <artifactId>sxc-core</artifactId>
-            <version>${sxcVersion}-osgi</version>
+            <version>${sxcVersion}</version>
             <exclusions>
                 <exclusion>
                     <groupId>stax</groupId>

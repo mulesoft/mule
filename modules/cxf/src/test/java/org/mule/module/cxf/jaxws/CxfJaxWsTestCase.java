@@ -1,17 +1,15 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.cxf.jaxws;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.NullPayload;
@@ -22,16 +20,13 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class CxfJaxWsTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "jaxws-conf.xml";
     }
@@ -41,7 +36,7 @@ public class CxfJaxWsTestCase extends FunctionalTestCase
     {
         String url = "cxf:http://localhost:" + dynamicPort.getNumber() + "/services/Echo?method=echo";
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send(url, "Hello!", null);
         assertEquals("Hello!", result.getPayload());
     }
@@ -51,7 +46,7 @@ public class CxfJaxWsTestCase extends FunctionalTestCase
     {
         String url = "cxf:http://localhost:" + dynamicPort.getNumber() + "/services/async?method=send";
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send(url, "Hello!", null);
         assertEquals(NullPayload.getInstance(), result.getPayload());
     }
@@ -85,7 +80,7 @@ public class CxfJaxWsTestCase extends FunctionalTestCase
     {
         String url = "cxf:http://localhost:" + dynamicPort.getNumber() + "/services/Echo?method=ensureWebSerivceContextIsSet";
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send(url, TEST_MESSAGE, null);
         assertEquals(TEST_MESSAGE, result.getPayload());
     }

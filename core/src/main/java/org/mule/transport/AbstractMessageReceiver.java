@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport;
 
 import org.mule.DefaultMuleEvent;
@@ -37,11 +33,11 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.context.notification.EndpointMessageNotification;
-import org.mule.execution.TransactionalErrorHandlingExecutionTemplate;
-import org.mule.lifecycle.PrimaryNodeLifecycleNotificationListener;
 import org.mule.execution.MessageProcessContext;
 import org.mule.execution.MessageProcessTemplate;
 import org.mule.execution.MessageProcessingManager;
+import org.mule.execution.TransactionalErrorHandlingExecutionTemplate;
+import org.mule.lifecycle.PrimaryNodeLifecycleNotificationListener;
 import org.mule.session.DefaultMuleSession;
 import org.mule.session.LegacySessionHandler;
 import org.mule.transaction.TransactionCoordination;
@@ -174,7 +170,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
             primaryNodeLifecycleNotificationListener.register();
         }
 
-        messageProcessingManager = getConnector().getMuleContext().getRegistry().get(MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER);
+        messageProcessingManager = getEndpoint().getMuleContext().getRegistry().get(MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER);
 
         super.initialise();
     }
@@ -199,7 +195,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
 
     @Override
     public final MuleEvent routeMessage(MuleMessage message, Transaction trans, OutputStream outputStream)
-        throws MuleException
+            throws MuleException
     {
         return routeMessage(message, new DefaultMuleSession(), trans, outputStream);
     }
@@ -392,7 +388,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer(80);
+        final StringBuilder sb = new StringBuilder(80);
         sb.append(ClassUtils.getSimpleName(this.getClass()));
         sb.append("{this=").append(Integer.toHexString(System.identityHashCode(this)));
         sb.append(", receiverKey=").append(receiverKey);
@@ -498,9 +494,16 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
 
     private WorkManager createWorkManager()
     {
-        int shutdownTimeout = connector.getMuleContext().getConfiguration().getShutdownTimeout();
+        int shutdownTimeout = endpoint.getMuleContext().getConfiguration().getShutdownTimeout();
 
-        return new TrackingWorkManager(getConnectorWorkManager(), shutdownTimeout);
+        return new TrackingWorkManager(new WorkManagerHolder()
+        {
+            @Override
+            public WorkManager getWorkManager()
+            {
+                return getConnectorWorkManager();
+            }
+        }, shutdownTimeout);
     }
 
     public MuleEvent routeEvent(MuleEvent muleEvent) throws MuleException

@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.integration.transport.file;
 
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -42,11 +38,11 @@ public class FileRuntimeExceptionStrategyFunctionalTestCase extends AbstractServ
     @Test
     public void testExceptionInTransformer() throws Exception
     {
-        File f = FileUtils.newFile("./.mule/in/test.txt");
+        File f = FileUtils.newFile(getFileInsideWorkingDirectory("in/test.txt").getAbsolutePath());
         f.createNewFile();
 
         // try a couple of times with backoff strategy, then fail
-        File errorFile = FileUtils.newFile("./.mule/errors/test-0.out");
+        File errorFile = FileUtils.newFile(getFileInsideWorkingDirectory("errors/test-0.out").getAbsolutePath());
         boolean testSucceded = false;
         int timesTried = 0;
         while (timesTried <= 3)

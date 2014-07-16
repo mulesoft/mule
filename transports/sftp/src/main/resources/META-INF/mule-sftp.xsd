@@ -10,11 +10,11 @@
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/file"
-                schemaLocation="http://www.mulesoft.org/schema/mule/file/3.4/mule-file.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/file/3.5/mule-file.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.4/mule.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.5/mule.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/schemadoc"
-                schemaLocation="http://www.mulesoft.org/schema/mule/schemadoc/3.4/mule-schemadoc.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/schemadoc/3.5/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>
@@ -52,6 +52,13 @@
                 <xsd:attributeGroup ref="commonKeyAuthenticationAttributes"/>
                 <xsd:attributeGroup ref="connectorAttributes"/>
                 <xsd:attributeGroup ref="commonEndpointAndConnectorAttributes"/>
+                <xsd:attribute name="preferredAuthenticationMethods" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Comma separated list of authentication methods used by the SFTP client. Valid values are: gssapi-with-mic, publickey, keyboard-interactive and password.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -297,6 +304,7 @@
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="throwException"/>
             <xsd:enumeration value="overwrite"/>
+            <xsd:enumeration value="append"/>
             <xsd:enumeration value="addSeqNo"/>
         </xsd:restriction>
     </xsd:simpleType>

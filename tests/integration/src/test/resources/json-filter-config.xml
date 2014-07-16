@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:json="http://www.mulesoft.org/schema/mule/json"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
+
+    <description>
+        This configuration uses an HTTP endpoint to receive requests.
+    </description>
+
+    <flow name="HelloWorld">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="${port}"/>
+        <message-filter>
+            <json:json-schema-validation-filter schemaLocations="match-schema.json"/>
+        </message-filter>
+        <set-payload value="accepted"/>
+    </flow>
+
+</mule>

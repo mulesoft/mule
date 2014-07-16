@@ -1,23 +1,20 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.context.notification;
 
-import org.mule.module.client.MuleClient;
+import static org.junit.Assert.assertNull;
+
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertNotNull;
 
 public class ExceptionNotificationTestCase extends AbstractNotificationTestCase
 {
@@ -38,8 +35,9 @@ public class ExceptionNotificationTestCase extends AbstractNotificationTestCase
     @Override
     public void doTest() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        assertNotNull(client.send("vm://in-1", "hello world", null));
+        MuleClient client = muleContext.getClient();
+        MuleMessage result = client.send("vm://in-1", "hello world", null);
+        assertNull(result);
     }
 
     @Override

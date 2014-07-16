@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.file;
 
 import static org.junit.Assert.assertEquals;
@@ -125,32 +121,4 @@ public abstract class AbstractFileFunctionalTestCase extends AbstractServiceAndF
         FileUtils.deleteTree(tmpDir);
     }
 
-    protected File createDataFile(File folder, final String testMessage) throws Exception
-    {
-        return createDataFile(folder, testMessage, null);
-    }
-    
-    protected File createDataFile(File folder, final String testMessage, String encoding) throws Exception
-    {
-        File temp = File.createTempFile("mule-file-test-", ".txt");
-        FileUtils.writeStringToFile(temp, testMessage, encoding);
-
-        // Copies temp file to target
-        File target = new File(folder, temp.getName());
-        target.deleteOnExit();
-        FileUtils.renameFile(temp, target);
-
-        return target;
-
-    }
-
-    protected File createFolder(String name)
-    {
-        File result = FileUtils.newFile(name);
-        result.delete();
-        result.mkdir();
-        result.deleteOnExit();
-
-        return result;
-    }
 }

@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util;
 
 import org.mule.api.NameableObject;
@@ -37,7 +33,7 @@ public class ObjectUtils extends org.apache.commons.lang.ObjectUtils
         }
         else
         {
-            return new StringBuffer(40).append(
+            return new StringBuilder(40).append(
                     ClassUtils.getSimpleName(obj.getClass()))
                     .append('@')
                     .append(Integer.toHexString(System.identityHashCode(obj))

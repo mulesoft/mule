@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleMessage;
@@ -15,7 +11,8 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
+import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.MessagingExceptionHandlerAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -45,26 +42,25 @@ import org.apache.commons.logging.LogFactory;
  * routers meaning that the message will get sent over all matching routers.
  */
 
-public class DefaultOutboundRouterCollection implements OutboundRouterCollection
+public class DefaultOutboundRouterCollection implements OutboundRouterCollection, MessagingExceptionHandlerAware
 {
-
     /**
      * logger used by this class
      */
     protected final transient Log logger = LogFactory.getLog(getClass());
 
-    @SuppressWarnings("unchecked")
-    protected List<MatchableMessageProcessor> routers = new CopyOnWriteArrayList();
+    protected List<MatchableMessageProcessor> routers = new CopyOnWriteArrayList<MatchableMessageProcessor>();
     protected boolean matchAll = false;
     private OutboundRouterCatchAllStrategy catchAllStrategy;
 
     protected RouterStatistics statistics = new RouterStatistics(RouterStatistics.TYPE_OUTBOUND);
     protected MuleContext muleContext;
+    private MessagingExceptionHandler messagingExceptionHandler;
 
+    @Override
     public MuleEvent process(final MuleEvent event) throws MessagingException
     {
         MuleMessage message = event.getMessage();
-        MuleSession session = event.getSession();
         MuleEvent result;
         boolean matchfound = false;
 
@@ -99,9 +95,9 @@ public class DefaultOutboundRouterCollection implements OutboundRouterCollection
                     matchfound = true;
                     // Manage outbound only transactions here
                     final OutboundRouter router = outboundRouter;
-    
+
                     result = router.process(event);
-    
+
                     if (!isMatchAll())
                     {
                         return result;
@@ -147,10 +143,15 @@ public class DefaultOutboundRouterCollection implements OutboundRouterCollection
         return getCatchAllStrategy().process(event);
     }
 
+    @Override
     public void initialise() throws InitialisationException
     {
         for (MatchableMessageProcessor router : routers)
         {
+            if (router instanceof MessagingExceptionHandlerAware)
+            {
+                ((MessagingExceptionHandlerAware) router).setMessagingExceptionHandler(messagingExceptionHandler);
+            }
             if (router instanceof Initialisable)
             {
                 ((Initialisable) router).initialise();
@@ -158,6 +159,7 @@ public class DefaultOutboundRouterCollection implements OutboundRouterCollection
         }
     }
 
+    @Override
     public void dispose()
     {
         for (MatchableMessageProcessor router : routers)
@@ -168,7 +170,7 @@ public class DefaultOutboundRouterCollection implements OutboundRouterCollection
             }
         }
     }
-    
+
     // TODO Use spring factory bean
     @Deprecated
     public void setMessageProcessors(List<MatchableMessageProcessor> routers)
@@ -178,7 +180,8 @@ public class DefaultOutboundRouterCollection implements OutboundRouterCollection
             addRoute(router);
         }
     }
-    
+
+    @Override
     public void addRoute(MatchableMessageProcessor router)
     {
         if (router instanceof RouterStatisticsRecorder)
@@ -188,21 +191,25 @@ public class DefaultOutboundRouterCollection implements OutboundRouterCollection
         routers.add(router);
     }
 
+    @Override
     public void removeRoute(MatchableMessageProcessor router)
     {
         routers.remove(router);
     }
 
+    @Override
     public List<MatchableMessageProcessor> getRoutes()
     {
         return routers;
     }
 
+    @Override
     public OutboundRouterCatchAllStrategy getCatchAllStrategy()
     {
         return catchAllStrategy;
     }
 
+    @Override
     public void setCatchAllStrategy(OutboundRouterCatchAllStrategy catchAllStrategy)
     {
         this.catchAllStrategy = catchAllStrategy;
@@ -212,34 +219,40 @@ public class DefaultOutboundRouterCollection implements OutboundRouterCollection
         }
     }
 
+    @Override
     public boolean isMatchAll()
     {
         return matchAll;
     }
 
+    @Override
     public void setMatchAll(boolean matchAll)
     {
         this.matchAll = matchAll;
     }
 
+    @Override
     public RouterStatistics getRouterStatistics()
     {
         return statistics;
     }
 
+    @Override
     public void setRouterStatistics(RouterStatistics stat)
     {
         this.statistics = stat;
     }
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
     }
 
+    @Override
     public boolean hasEndpoints()
     {
-        for (Iterator iterator = routers.iterator(); iterator.hasNext();)
+        for (Iterator<?> iterator = routers.iterator(); iterator.hasNext();)
         {
             OutboundRouter router = (OutboundRouter) iterator.next();
             if (router.getRoutes().size() > 0 || router.isDynamicRoutes())
@@ -254,5 +267,11 @@ public class DefaultOutboundRouterCollection implements OutboundRouterCollection
     public String toString()
     {
         return ObjectUtils.toString(this);
+    }
+
+    @Override
+    public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler)
+    {
+        this.messagingExceptionHandler = messagingExceptionHandler;
     }
 }

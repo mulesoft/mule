@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.endpoint;
 
 import org.mule.MessageExchangePattern;
@@ -207,7 +203,18 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
             }
         }
 
-        DefaultInboundEndpoint inboundEndpoint = new DefaultInboundEndpoint(connector, endpointURI,
+        InboundEndpoint inboundEndpoint = createInboundEndpoint(endpointURI, mergedProcessors, mergedResponseProcessors, connector);
+        if (inboundEndpoint instanceof DefaultInboundEndpoint)
+        {
+            ((DefaultInboundEndpoint) inboundEndpoint).setAnnotations(getAnnotations());
+        }
+
+        return inboundEndpoint;
+    }
+
+    protected InboundEndpoint createInboundEndpoint(EndpointURI endpointURI, List<MessageProcessor> mergedProcessors, List<MessageProcessor> mergedResponseProcessors, Connector connector) throws EndpointException
+    {
+        return new DefaultInboundEndpoint(connector, endpointURI,
                 getName(endpointURI), getProperties(), getTransactionConfig(),
                 getDefaultDeleteUnacceptedMessages(connector),
                 messageExchangePattern, getResponseTimeout(connector), getInitialState(connector),
@@ -215,8 +222,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
                 getRedeliveryPolicy(),
                 getMessageProcessorsFactory(), mergedProcessors, mergedResponseProcessors,
                 isDisableTransportTransformer(), mimeType);
-        inboundEndpoint.setAnnotations(getAnnotations());
-        return inboundEndpoint;
     }
 
     protected OutboundEndpoint doBuildOutboundEndpoint() throws InitialisationException, EndpointException
@@ -225,12 +230,13 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
         String uri = uriBuilder.getConstructor();
         if(muleContext.getExpressionManager().isExpression(uri))
         {
-            if(muleContext.getExpressionManager().isValidExpression(uriBuilder.getConstructor()))
+            if (muleContext.getExpressionManager().isValidExpression(uri))
             {
                 String dynamicAddress = getDynamicUriFrom(uri);
+                URIBuilder originalBuilder = uriBuilder;
                 uriBuilder = new URIBuilder(dynamicAddress, muleContext);
 
-                return new DynamicOutboundEndpoint(this, uri);
+                return new DynamicOutboundEndpoint(this, new DynamicURIBuilder(originalBuilder));
             }
             else
             {
@@ -255,16 +261,26 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
 
         checkOutboundExchangePattern();
 
-        DefaultOutboundEndpoint outboundEndpoint = new DefaultOutboundEndpoint(connector, endpointURI,
+        OutboundEndpoint outboundEndpoint = createOutboundEndpoint(endpointURI, mergedProcessors, mergedResponseProcessors, connector);
+        if (outboundEndpoint instanceof DefaultOutboundEndpoint)
+        {
+            ((DefaultOutboundEndpoint) outboundEndpoint).setAnnotations(getAnnotations());
+        }
+
+        return outboundEndpoint;
+    }
+
+    protected OutboundEndpoint createOutboundEndpoint(EndpointURI endpointURI, List<MessageProcessor> messageProcessors, List<MessageProcessor> responseMessageProcessors, Connector connector)
+    {
+
+        return new DefaultOutboundEndpoint(connector, endpointURI,
                 getName(endpointURI), getProperties(), getTransactionConfig(),
-                getDefaultDeleteUnacceptedMessages(connector), 
+                getDefaultDeleteUnacceptedMessages(connector),
                 messageExchangePattern, getResponseTimeout(connector), getInitialState(connector),
                 getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector),
                 getRedeliveryPolicy(),
-                responsePropertiesList,  getMessageProcessorsFactory(), mergedProcessors,
-                mergedResponseProcessors, isDisableTransportTransformer(), mimeType);
-        outboundEndpoint.setAnnotations(getAnnotations());
-        return outboundEndpoint;
+                responsePropertiesList,  getMessageProcessorsFactory(), messageProcessors,
+                responseMessageProcessors, isDisableTransportTransformer(), mimeType);
     }
 
     private String getDynamicUriFrom(String uri)

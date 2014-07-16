@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.sftp;
 
 import static org.junit.Assert.assertEquals;
@@ -17,21 +13,18 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.ResourceBundle;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.module.client.MuleClient;
 
 /**
  * Test the archive features.
  */
 public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
 {
-
     private static final long TIMEOUT = 15000;
 
     private static final String FILE1_TXT = "file1.txt";
@@ -98,7 +91,7 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
         assertFilesInLocalFilesystem(archive, FILE1_TXT);
 
         // And that the file is gone from the inbound endpoint
-        assertNoFilesInEndpoint(new MuleClient(muleContext), INBOUND_ENDPOINT1);
+        assertNoFilesInEndpoint(INBOUND_ENDPOINT1);
     }
 
     /**
@@ -120,10 +113,9 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
         // Assert that the file is gone from the inbound endpoint (including its
         // tmp-folders)
         // Note that directories are not returned in this listing
-        MuleClient mc = new MuleClient(muleContext);
-        assertNoFilesInEndpoint(mc, INBOUND_ENDPOINT2);
-        assertNoFilesInEndpoint(new MuleClient(muleContext), INBOUND_ENDPOINT2, TMP_RECEIVING);
-        assertNoFilesInEndpoint(new MuleClient(muleContext), INBOUND_ENDPOINT2, TMP_SENDING);
+        assertNoFilesInEndpoint(INBOUND_ENDPOINT2);
+        assertNoFilesInEndpoint(INBOUND_ENDPOINT2, TMP_RECEIVING);
+        assertNoFilesInEndpoint(INBOUND_ENDPOINT2, TMP_SENDING);
     }
 
     /**
@@ -142,10 +134,9 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
         // Assert that the file is gone from the inbound endpoint (including its
         // tmp-folders)
         // Note that directories are not returned in this listing
-        MuleClient mc = new MuleClient(muleContext);
-        assertNoFilesInEndpoint(mc, INBOUND_ENDPOINT3);
-        assertNoFilesInEndpoint(new MuleClient(muleContext), INBOUND_ENDPOINT3, TMP_RECEIVING);
-        assertNoFilesInEndpoint(new MuleClient(muleContext), INBOUND_ENDPOINT3, TMP_SENDING);
+        assertNoFilesInEndpoint(INBOUND_ENDPOINT3);
+        assertNoFilesInEndpoint(INBOUND_ENDPOINT3, TMP_RECEIVING);
+        assertNoFilesInEndpoint(INBOUND_ENDPOINT3, TMP_SENDING);
     }
 
     /**
@@ -164,8 +155,7 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
         assertNoFilesInLocalFilesystem(archive + File.separatorChar + TMP_SENDING);
 
         // Assert that the file is gone from the inbound endpoint
-        MuleClient mc = new MuleClient(muleContext);
-        assertNoFilesInEndpoint(mc, INBOUND_ENDPOINT4);
+        assertNoFilesInEndpoint(INBOUND_ENDPOINT4);
     }
 
     /**
@@ -190,7 +180,7 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
         }
 
         // Assert that file still exists in the inbound endpoint after the failure
-        assertFilesInEndpoint(new MuleClient(muleContext), INBOUND_ENDPOINT1, FILE1_TXT);
+        assertFilesInEndpoint(INBOUND_ENDPOINT1, FILE1_TXT);
 
         // Assert that no files exists in the archive after the error
         assertNoFilesInLocalFilesystem(archive);
@@ -224,10 +214,9 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
         // after the failure
         // (with some unknown timestamp in the filename)
         // Note that directories are not returned in this listing
-        MuleClient mc = new MuleClient(muleContext);
-        assertNoFilesInEndpoint(mc, INBOUND_ENDPOINT2);
-        assertNoFilesInEndpoint(mc, INBOUND_ENDPOINT2, TMP_RECEIVING);
-        assertFilesInEndpoint(mc, INBOUND_ENDPOINT2, TMP_SENDING, FILE2_TMP_REGEXP);
+        assertNoFilesInEndpoint(INBOUND_ENDPOINT2);
+        assertNoFilesInEndpoint(INBOUND_ENDPOINT2, TMP_RECEIVING);
+        assertFilesInEndpoint(INBOUND_ENDPOINT2, TMP_SENDING, FILE2_TMP_REGEXP);
 
         // Assert that no files exists in the archive after the error except from the
         // temp-folders
@@ -260,10 +249,9 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
         // after the failure
         // (with some unknown timestamp in the filename)
         // Note that directories are not returned in this listing
-        MuleClient mc = new MuleClient(muleContext);
-        assertNoFilesInEndpoint(mc, INBOUND_ENDPOINT3);
-        assertNoFilesInEndpoint(mc, INBOUND_ENDPOINT3, TMP_RECEIVING);
-        assertFilesInEndpoint(mc, INBOUND_ENDPOINT3, TMP_SENDING, FILE3_TMP_REGEXP);
+        assertNoFilesInEndpoint(INBOUND_ENDPOINT3);
+        assertNoFilesInEndpoint(INBOUND_ENDPOINT3, TMP_RECEIVING);
+        assertFilesInEndpoint(INBOUND_ENDPOINT3, TMP_SENDING, FILE3_TMP_REGEXP);
 
         // Assert that no files exists in the archive after the error
         assertNoFilesInLocalFilesystem(archive);
@@ -293,7 +281,7 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
         }
 
         // Assert that file still exists in the inbound endpoint after the failure
-        assertFilesInEndpoint(new MuleClient(muleContext), INBOUND_ENDPOINT4, FILE4_TXT);
+        assertFilesInEndpoint(INBOUND_ENDPOINT4, FILE4_TXT);
 
         // Assert that no files exists in the archive after the error except from the
         // temp-folders
@@ -326,5 +314,4 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
             throw new IOException("Failed to make folder readonly: " + folderName);
         }
     }
-
 }

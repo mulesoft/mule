@@ -4,12 +4,18 @@
     <parent>
         <groupId>org.mule.modules</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-cxf</artifactId>
     <packaging>jar</packaging>
     <name>CXF Module</name>
     <description>A Mule module for web service connectivity using CXF.</description>
+
+    <properties>
+        <skipExportTests>false</skipExportTests>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
 
     <build>
         <plugins>
@@ -77,17 +83,6 @@
                     <forkMode>always</forkMode>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 
@@ -97,7 +92,7 @@
             <artifactId>cxf-rt-core</artifactId>
             <version>${cxfVersion}</version>
             <exclusions>
-                <!-- We use javax.activation -->
+                <!-- The activation framework is part of JDK6 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -137,7 +132,7 @@
             <artifactId>cxf-rt-frontend-simple</artifactId>
             <version>${cxfVersion}</version>
             <exclusions>
-                <!-- We use javax.activation -->
+                <!-- The activation framework is part of JDK6 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -177,7 +172,7 @@
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
             <version>${cxfVersion}</version>
             <exclusions>
-                <!-- We use javax.activation -->
+                <!-- The activation framework is part of JDK6 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -217,7 +212,7 @@
             <artifactId>cxf-rt-databinding-aegis</artifactId>
             <version>${cxfVersion}</version>
             <exclusions>
-                <!-- We use javax.activation -->
+                <!-- The activation framework is part of JDK6 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -257,7 +252,7 @@
             <artifactId>cxf-rt-databinding-jaxb</artifactId>
             <version>${cxfVersion}</version>
             <exclusions>
-                <!-- We use javax.activation -->
+                <!-- The activation framework is part of JDK6 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -289,7 +284,7 @@
             <artifactId>cxf-rt-databinding-jibx</artifactId>
             <version>${cxfVersion}</version>
             <exclusions>
-                <!-- We use javax.activation -->
+                <!-- The activation framework is part of JDK6 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -333,7 +328,7 @@
             <artifactId>cxf-rt-transports-local</artifactId>
             <version>${cxfVersion}</version>
             <exclusions>
-                <!-- We use javax.activation -->
+                <!-- The activation framework is part of JDK6 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -373,7 +368,7 @@
             <artifactId>cxf-rt-ws-security</artifactId>
             <version>${cxfVersion}</version>
             <exclusions>
-                <!-- We use javax.activation -->
+                <!-- The activation framework is part of JDK6 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -421,7 +416,7 @@
             <artifactId>cxf-rt-ws-rm</artifactId>
             <version>${cxfVersion}</version>
             <exclusions>
-                <!-- We use javax.activation -->
+                <!-- The activation framework is part of JDK6 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -470,7 +465,7 @@
             <artifactId>cxf-rt-ws-addr</artifactId>
             <version>${cxfVersion}</version>
             <exclusions>
-                <!-- We use javax.activation -->
+                <!-- The activation framework is part of JDK6 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -519,7 +514,7 @@
             <artifactId>cxf-rt-transports-http</artifactId>
             <version>${cxfVersion}</version>
             <exclusions>
-                <!-- We use javax.activation -->
+                <!-- The activation framework is part of JDK6 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -560,7 +555,7 @@
             <artifactId>cxf-wstx-msv-validation</artifactId>
             <version>${cxfVersion}</version>
             <exclusions>
-                <!-- We use javax.activation -->
+                <!-- The activation framework is part of JDK6 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -607,6 +602,12 @@
         <dependency>
             <groupId>com.sun.xml.messaging.saaj</groupId>
             <artifactId>saaj-impl</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.activation</groupId>
+                    <artifactId>activation</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -644,13 +645,13 @@
          -->
 
         <dependency>
-            <groupId>net.sf.saxon</groupId>
+            <groupId>net.sourceforge.saxon</groupId>
             <artifactId>saxon</artifactId>
-            <version>${saxonVersion}-osgi</version>
+            <version>${saxonVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-annotation_1.0_spec</artifactId>
+            <artifactId>geronimo-annotation_1.1_spec</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -686,6 +687,22 @@
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
             <version>${cxfVersion}</version>
             <scope>test</scope>
+            <exclusions>
+                <!-- Old Jetty version -->
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-security</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-servlet_2.5_spec</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-security</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>
@@ -706,8 +723,8 @@
         <!-- for integration tests -->
         <!-- Maven classpath gets messed up and WsdlCallTestCase doesn't pass unless this is here -->
         <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty</artifactId>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -748,8 +765,14 @@
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.activation</groupId>
+                    <artifactId>activation</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>javax.xml.ws</groupId>
             <artifactId>jaxws-api</artifactId>
         </dependency>
@@ -777,12 +800,16 @@
             <version>${xalanVersion}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-jms</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-core</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>java.net</id>
-            <url>http://download.java.net/maven/2/</url>
-        </repository>
-    </repositories>
 </project>

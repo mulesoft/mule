@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.sftp.dataintegrity;
 
 import static org.junit.Assert.assertNotNull;
@@ -16,7 +12,6 @@ import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.DispatchException;
-import org.mule.module.client.MuleClient;
 import org.mule.transport.sftp.SftpClient;
 
 import com.jcraft.jsch.SftpException;
@@ -60,14 +55,10 @@ public class SftpWrongPassPhraseOnOutboundDirectoryTestCase extends AbstractSftp
 
     /**
      * The outbound directory doesn't exist. The source file should still exist
-     * 
-     * @throws Exception
      */
     @Test
     public void testWrongPassPhraseOnOutboundDirectory() throws Exception
     {
-        MuleClient muleClient = new MuleClient(muleContext);
-        assertTrue(muleContext.isStarted());
         // Send an file to the SFTP server, which the inbound-outboundEndpoint then
         // can pick up
         final Exception exception = dispatchAndWaitForException(new DispatchParameters(INBOUND_ENDPOINT_NAME,
@@ -81,16 +72,16 @@ public class SftpWrongPassPhraseOnOutboundDirectoryTestCase extends AbstractSftp
             .getMessage()
             .startsWith("Error during login to"));
 
-        SftpClient sftpClient = getSftpClient(muleClient, INBOUND_ENDPOINT_NAME);
+        SftpClient client = getSftpClient(INBOUND_ENDPOINT_NAME);
         try
         {
-            ImmutableEndpoint endpoint = (ImmutableEndpoint) muleClient.getProperty(INBOUND_ENDPOINT_NAME);
+            ImmutableEndpoint endpoint = (ImmutableEndpoint) muleContext.getRegistry().lookupObject(INBOUND_ENDPOINT_NAME);
             assertTrue("The inbound file should still exist",
-                super.verifyFileExists(sftpClient, endpoint.getEndpointURI(), FILENAME));
+                super.verifyFileExists(client, endpoint.getEndpointURI(), FILENAME));
         }
         finally
         {
-            sftpClient.disconnect();
+            client.disconnect();
         }
     }
 
@@ -98,17 +89,17 @@ public class SftpWrongPassPhraseOnOutboundDirectoryTestCase extends AbstractSftp
      * Ensures that the directory exists and is writable by deleting the directory
      * and then recreate it. Overrides inherited behavior to use working credentials.
      */
+    @Override
     protected void initEndpointDirectory(String endpointName)
         throws MuleException, IOException, SftpException
     {
-        // MuleClient muleClient = new MuleClient(muleContext);
         // SftpClient sftpClient = getSftpClient(muleClient, endpointName);
         // try
         // {
         // ChannelSftp channelSftp = sftpClient.getChannelSftp();
         // try
         // {
-        // recursiveDelete(muleClient, sftpClient, endpointName, "");
+        // recursiveDelete(sftpClient, endpointName, "");
         // }
         // catch (IOException e)
         // {
@@ -116,7 +107,7 @@ public class SftpWrongPassPhraseOnOutboundDirectoryTestCase extends AbstractSftp
         // logger.error("Failed to recursivly delete endpoint " + endpointName, e);
         // }
         //
-        // String path = getPathByEndpoint(muleClient, sftpClient, endpointName);
+        // String path = getPathByEndpoint(sftpClient, endpointName);
         // channelSftp.mkdir(path);
         // }
         // finally
@@ -126,5 +117,4 @@ public class SftpWrongPassPhraseOnOutboundDirectoryTestCase extends AbstractSftp
         // + endpointName);
         // }
     }
-
 }

@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util;
 
 import org.mule.api.MuleRuntimeException;
@@ -36,7 +32,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public final class PropertiesUtils
 {
     // @GuardedBy(itself)
-    private static final List maskedProperties = new CopyOnWriteArrayList();
+    private static final List<String> maskedProperties = new CopyOnWriteArrayList<String>();
 
     static
     {
@@ -80,7 +76,7 @@ public final class PropertiesUtils
      *         contents, or <code>null</code> if the property, its key or its value
      *         is <code>null</code>.
      */
-    public static String maskedPropertyValue(Map.Entry property)
+    public static String maskedPropertyValue(Map.Entry<?, ?> property)
     {
         if (property == null)
         {
@@ -114,7 +110,7 @@ public final class PropertiesUtils
      *                     determine the classpath.
      * @return a java.util.Properties object containing the properties.
      */
-    public static synchronized Properties loadProperties(String fileName, final Class callingClass)
+    public static synchronized Properties loadProperties(String fileName, final Class<?> callingClass)
             throws IOException
     {
         InputStream is = IOUtils.getResourceAsStream(fileName, callingClass,
@@ -124,10 +120,10 @@ public final class PropertiesUtils
             Message error = CoreMessages.cannotLoadFromClasspath(fileName);
             throw new IOException(error.toString());
         }
-        
+
         return loadProperties(is);
     }
-    
+
     public static Properties loadProperties(URL url) throws IOException
     {
         if (url == null)
@@ -135,7 +131,7 @@ public final class PropertiesUtils
             Message error = CoreMessages.objectIsNull("url");
             throw new IOException(error.toString());
         }
-        
+
         return loadProperties(url.openStream());
     }
 
@@ -172,14 +168,14 @@ public final class PropertiesUtils
                 p.load(in);
                 in.close();
             }
-        } 
+        }
         catch (IOException e)
         {
             throw new MuleRuntimeException(CoreMessages.createStaticMessage("Failed to load resource: " + fileName), e);
         }
         return p;
     }
-    
+
     public static Properties loadProperties(InputStream is) throws IOException
     {
         if (is == null)
@@ -276,7 +272,7 @@ public final class PropertiesUtils
             return props;
         }
 
-        query = new StringBuffer(query.length() + 1).append('&').append(query).toString();
+        query = new StringBuilder(query.length() + 1).append('&').append(query).toString();
 
         int x = 0;
         while ((x = addProperty(query, x, '&', props)) != -1);
@@ -293,7 +289,7 @@ public final class PropertiesUtils
             return props;
         }
 
-        query = new StringBuffer(query.length() + 1).append(separator).append(query).toString();
+        query = new StringBuilder(query.length() + 1).append(separator).append(query).toString();
 
         int x = 0;
         while ((x = addProperty(query, x, separator, props)) != -1)
@@ -339,6 +335,7 @@ public final class PropertiesUtils
     }
 
     /** @deprecated Use {@link MapUtils#toString(Map, boolean)} instead */
+    @Deprecated
     public static String propertiesToString(Map props, boolean newline)
     {
         return MapUtils.toString(props, newline);

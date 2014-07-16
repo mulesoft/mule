@@ -1,13 +1,9 @@
 /*
- * $Id: AbstractMessageProcessorChain.java 24925 2012-10-03 17:43:02Z svacas $
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.processor.chain;
 
 import org.mule.api.MuleContext;
@@ -17,6 +13,8 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.MessagingExceptionHandlerAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -31,6 +29,7 @@ import org.mule.endpoint.EndpointAware;
 import org.mule.util.NotificationUtils;
 import org.mule.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -43,7 +42,7 @@ import org.apache.commons.logging.LogFactory;
  * the first in the nested chain.
  */
 public abstract class AbstractMessageProcessorChain
-        implements MessageProcessorChain, Lifecycle, FlowConstructAware, MuleContextAware, EndpointAware, MessageProcessorContainer
+        implements MessageProcessorChain, Lifecycle, FlowConstructAware, MuleContextAware, EndpointAware, MessageProcessorContainer, MessagingExceptionHandlerAware
 {
 
     protected final transient Log log = LogFactory.getLog(getClass());
@@ -87,24 +86,39 @@ public abstract class AbstractMessageProcessorChain
 
     public void start() throws MuleException
     {
-        for (MessageProcessor processor : processors)
+        List<MessageProcessor> startedProcessors = new ArrayList<MessageProcessor>();
+        try
         {
-            if (processor instanceof Startable)
+            for (MessageProcessor processor : processors)
             {
-                ((Startable) processor).start();
+                if (processor instanceof Startable)
+                {
+                    ((Startable) processor).start();
+                    startedProcessors.add(processor);
+                }
             }
+        }
+        catch(MuleException e)
+        {
+            stop(startedProcessors);
+            throw e;
         }
     }
 
-    public void stop() throws MuleException
+    private void stop(List<MessageProcessor> processorsToStop) throws MuleException
     {
-        for (MessageProcessor processor : processors)
+        for (MessageProcessor processor : processorsToStop)
         {
             if (processor instanceof Stoppable)
             {
                 ((Stoppable) processor).stop();
             }
         }
+    }
+
+    public void stop() throws MuleException
+    {
+        stop(processors);
     }
 
     public void dispose()
@@ -191,7 +205,19 @@ public abstract class AbstractMessageProcessorChain
         NotificationUtils.addMessageProcessorPathElements(getMessageProcessors(), pathElement);
 
     }
-    
+
+    @Override
+    public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler)
+    {
+        for (MessageProcessor processor : processors)
+        {
+            if (processor instanceof MessagingExceptionHandlerAware)
+            {
+                ((MessagingExceptionHandlerAware) processor).setMessagingExceptionHandler(messagingExceptionHandler);
+            }
+        }
+    }
+
     @Override
     public void setMuleContext(MuleContext context)
     {

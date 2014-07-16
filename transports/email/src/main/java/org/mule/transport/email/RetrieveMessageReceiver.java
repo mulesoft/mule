@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.email;
 
 import org.mule.api.MuleException;
@@ -92,7 +88,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
         // set default value if empty/null
         if (StringUtils.isEmpty(backupFolder))
         {
-            this.backupFolder = connector.getMuleContext().getConfiguration().getWorkingDirectory()
+            this.backupFolder = getEndpoint().getMuleContext().getConfiguration().getWorkingDirectory()
                                 + "/mail/" + folder.getName();
         }
 
@@ -195,7 +191,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                             }
                             catch (Exception e)
                             {
-                                connector.getMuleContext().getExceptionListener().handleException(e);
+                                getEndpoint().getMuleContext().getExceptionListener().handleException(e);
                                 throw e;
                             }
                         }
@@ -372,7 +368,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                 catch (MessagingException e)
                 {
                     done = true;
-                    getConnector().getMuleContext().getExceptionListener().handleException(e);
+                    getEndpoint().getMuleContext().getExceptionListener().handleException(e);
                 }
                 finally
                 {

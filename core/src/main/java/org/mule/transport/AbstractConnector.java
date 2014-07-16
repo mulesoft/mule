@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport;
 
 import org.mule.MessageExchangePattern;
@@ -1020,7 +1016,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         this.dispatchers.setMaxTotal(20 * maxActive);
     }
 
-    private MessageDispatcher getDispatcher(OutboundEndpoint endpoint) throws MuleException
+    protected MessageDispatcher borrowDispatcher(OutboundEndpoint endpoint) throws MuleException
     {
         if (!isStarted())
         {
@@ -1077,7 +1073,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         }
     }
 
-    private void returnDispatcher(OutboundEndpoint endpoint, MessageDispatcher dispatcher)
+    protected void returnDispatcher(OutboundEndpoint endpoint, MessageDispatcher dispatcher)
     {
         if (endpoint != null && dispatcher != null)
         {
@@ -1445,7 +1441,16 @@ public abstract class AbstractConnector implements Connector, WorkListener
      */
     public ReplyToHandler getReplyToHandler(ImmutableEndpoint endpoint)
     {
-        return new DefaultReplyToHandler(muleContext);
+        return new DefaultReplyToHandler(endpoint.getMuleContext());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getCanonicalURI(EndpointURI uri)
+    {
+        return uri.toString();
     }
 
     /**
@@ -1949,9 +1954,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
 
     protected ScheduledExecutorService createScheduler()
     {
-        // Use connector's classloader so that other temporary classloaders
-        // aren't used when things are started lazily or from elsewhere.
-        ThreadFactory threadFactory = new NamedThreadFactory(this.getName() + ".scheduler", muleContext.getExecutionClassLoader());
+        ThreadFactory threadFactory = new NamedThreadFactory(this.getName() + ".scheduler");
         ScheduledThreadPoolExecutor newExecutor = new ScheduledThreadPoolExecutor(4, threadFactory);
         newExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
         newExecutor.setKeepAliveTime(this.getReceiverThreadingProfile().getThreadTTL(), TimeUnit.MILLISECONDS);
@@ -2144,6 +2147,9 @@ public abstract class AbstractConnector implements Connector, WorkListener
         }
     }
 
+    /**
+     * {@inheritDoc}.
+     */
     @Override
     public MuleMessage request(String uri, long timeout) throws Exception
     {
@@ -2392,6 +2398,9 @@ public abstract class AbstractConnector implements Connector, WorkListener
         throw new UnsupportedOperationException(CoreMessages.streamingNotSupported(this.getProtocol()).toString());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MuleContext getMuleContext()
     {
@@ -2401,7 +2410,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer(120);
+        final StringBuilder sb = new StringBuilder(120);
         final String nl = System.getProperty("line.separator");
         sb.append(ClassUtils.getSimpleName(this.getClass()));
         // format message for multi-line output, single-line is not readable
@@ -2535,27 +2544,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
 
     public MessageProcessor createDispatcherMessageProcessor(OutboundEndpoint endpoint) throws MuleException
     {
-        if (endpoint.getExchangePattern().hasResponse() || !getDispatcherThreadingProfile().isDoThreading())
-        {
-            return new DispatcherMessageProcessor(endpoint);
-        }
-        else
-        {
-            SimpleMessageProcessorChainBuilder builder = new SimpleMessageProcessorChainBuilder();
-            builder.setName("dispatcher processor chain for '" + endpoint.getAddress() + "'");
-            LaxAsyncInterceptingMessageProcessor async = new LaxAsyncInterceptingMessageProcessor(
-                new WorkManagerSource()
-            {
-                @Override
-                public WorkManager getWorkManager() throws MuleException
-                {
-                    return getDispatcherWorkManager();
-                }
-            });
-            builder.chain(async);
-            builder.chain(new DispatcherMessageProcessor(endpoint));
-            return builder.build();
-        }
+        return new DispatcherMessageProcessor(endpoint);
     }
 
     @Override
@@ -2613,7 +2602,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
             MessageDispatcher dispatcher = null;
             try
             {
-                dispatcher = getDispatcher(endpoint);
+                dispatcher = borrowDispatcher(endpoint);
                 boolean fireNotification = event.isNotificationsEnabled();
                 EndpointMessageNotification beginNotification = null;
                 if (fireNotification)

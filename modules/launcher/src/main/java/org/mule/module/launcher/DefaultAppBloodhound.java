@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.launcher;
 
 import org.mule.api.MuleRuntimeException;
@@ -108,7 +104,7 @@ public class DefaultAppBloodhound implements AppBloodhound
                                 String.format("Unsupported deployment descriptor format for app '%s': %s", appName, ext)));
             }
 
-            desc = descriptorParser.parse(descriptorFile);
+            desc = descriptorParser.parse(descriptorFile, appName);
             // app name is external to the deployment descriptor
             desc.setAppName(appName);
         }

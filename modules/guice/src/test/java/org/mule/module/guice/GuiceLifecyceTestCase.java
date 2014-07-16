@@ -1,22 +1,20 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.guice;
 
-import org.mule.module.client.MuleClient;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import org.mule.api.client.MuleClient;
 import org.mule.registry.AbstractLifecycleTracker;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.google.inject.AbstractModule;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 public class GuiceLifecyceTestCase extends AbstractMuleContextTestCase
@@ -31,7 +29,7 @@ public class GuiceLifecyceTestCase extends AbstractMuleContextTestCase
     /**
      * ASSERT: - Mule lifecycle methods invoked - Service and muleContext injected
      * (Component implements ServiceAware/MuleContextAware)
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -44,7 +42,7 @@ public class GuiceLifecyceTestCase extends AbstractMuleContextTestCase
     /**
      * ASSERT: - Mule lifecycle methods invoked - Service and muleContext injected
      * (Component implements ServiceAware/MuleContextAware)
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -59,7 +57,7 @@ public class GuiceLifecyceTestCase extends AbstractMuleContextTestCase
      * new object in pool - Service and muleContext injected each time singleton is
      * used to create new object in pool (Component implements
      * ServiceAware/MuleContextAware)
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -80,16 +78,16 @@ public class GuiceLifecyceTestCase extends AbstractMuleContextTestCase
 
         muleContext.dispose();
 
-        Assert.assertEquals(serviceName, expectedLifeCycle, tracker.getTracker().toString());
+        assertEquals(serviceName, expectedLifeCycle, tracker.getTracker().toString());
     }
 
     private AbstractLifecycleTracker exerciseComponent(final String serviceName) throws Exception
     {
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient muleClient = muleContext.getClient();
         final AbstractLifecycleTracker ltc = (AbstractLifecycleTracker)muleClient.send(
             "vm://" + serviceName + ".In", null, null).getPayload();
 
-        Assert.assertNotNull(ltc);
+        assertNotNull(ltc);
 
         return ltc;
     }
@@ -99,7 +97,7 @@ public class GuiceLifecyceTestCase extends AbstractMuleContextTestCase
         @Override
         protected void configure()
         {
-
+            // no custom bindings
         }
 
         // @Provides @AnnotatedService

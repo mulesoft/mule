@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -22,7 +19,7 @@ import java.util.List;
  */
 public class SplitMessage
 {
-    private List parts = new ArrayList();
+    private List<MessagePart> parts = new ArrayList<MessagePart>();
 
     public void addPart(Object part, OutboundEndpoint endpoint)
     {
@@ -31,7 +28,7 @@ public class SplitMessage
 
     public MessagePart getPart(int i)
     {
-        return (MessagePart) parts.get(i);
+        return parts.get(i);
     }
 
     public int size()
@@ -70,9 +67,10 @@ public class SplitMessage
         }
 
 
+        @Override
         public String toString()
         {
-            final StringBuffer sb = new StringBuffer();
+            final StringBuilder sb = new StringBuilder();
             sb.append("MessagePart");
             sb.append("{endpoint=").append(endpoint.getName());
             sb.append(", part=").append(part);

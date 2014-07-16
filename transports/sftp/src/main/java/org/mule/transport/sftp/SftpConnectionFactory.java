@@ -1,27 +1,26 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.sftp;
+
+import org.mule.api.endpoint.EndpointURI;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.util.StringUtils;
+
+import java.io.IOException;
 
 import org.apache.commons.pool.PoolableObjectFactory;
 import org.apache.log4j.Logger;
-import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
-
-import java.io.IOException;
 
 public class SftpConnectionFactory implements PoolableObjectFactory
 {
     private final static Logger logger = Logger.getLogger(SftpConnectionFactory.class);
 
     private final ImmutableEndpoint endpoint;
+    private String preferredAuthenticationMethods;
 
     public SftpConnectionFactory(ImmutableEndpoint endpoint)
     {
@@ -41,10 +40,15 @@ public class SftpConnectionFactory implements PoolableObjectFactory
 
     public Object makeObject() throws Exception
     {
-        return createClient(endpoint);
+        return createClient(endpoint, preferredAuthenticationMethods);
     }
 
     public static SftpClient createClient(ImmutableEndpoint endpoint) throws Exception
+    {
+        return createClient(endpoint, null);
+    }
+
+    public static SftpClient createClient(ImmutableEndpoint endpoint, String preferredAuthenticationMethods) throws IOException
     {
         EndpointURI endpointURI = endpoint.getEndpointURI();
 
@@ -55,6 +59,10 @@ public class SftpConnectionFactory implements PoolableObjectFactory
         }
 
         SftpClient client = new SftpClient(host);
+        if (!StringUtils.isEmpty(preferredAuthenticationMethods))
+        {
+            client.setPreferredAuthenticationMethods(preferredAuthenticationMethods);
+        }
 
         try
         {
@@ -132,5 +140,10 @@ public class SftpConnectionFactory implements PoolableObjectFactory
             logger.debug("Inside validateObject - will return " + client.isConnected());
         }
         return client.isConnected();
+    }
+
+    public void setPreferredAuthenticationMethods(String preferredAuthenticationMethods)
+    {
+        this.preferredAuthenticationMethods = preferredAuthenticationMethods;
     }
 }

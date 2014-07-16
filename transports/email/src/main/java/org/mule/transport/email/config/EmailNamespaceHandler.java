@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -30,7 +27,7 @@ public class EmailNamespaceHandler extends AbstractMuleNamespaceHandler
 
     static
     {
-        Map<String, Flags.Flag> mapping = new HashMap<String, Flags.Flag>();
+        Map<String, Object> mapping = new HashMap<String, Object>();
         mapping.put("ANSWERED", Flags.Flag.ANSWERED);
         mapping.put("DELETED", Flags.Flag.DELETED);
         mapping.put("DRAFT", Flags.Flag.DRAFT);
@@ -42,6 +39,7 @@ public class EmailNamespaceHandler extends AbstractMuleNamespaceHandler
         DEFAULT_PROCESS_MESSAGE_ACTION = new SimplePropertyConfiguration.IndentityMapValueMap(mapping);
     }
 
+    @Override
     public void init()
     {
         registerBeanDefinitionParser("email-to-string-transformer", new MessageProcessorDefinitionParser(EmailMessageToString.class));

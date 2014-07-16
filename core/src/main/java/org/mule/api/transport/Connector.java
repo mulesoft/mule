@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.api.transport;
 
 import org.mule.MessageExchangePattern;
@@ -17,6 +13,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.NameableObject;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
@@ -169,6 +166,14 @@ public interface Connector extends Lifecycle, NameableObject, Connectable, Lifec
      */
     OutputStream getOutputStream(OutboundEndpoint endpoint, MuleEvent event) throws MuleException;
 
+    /**
+     * Only use this method to use the Connector's MuleContext. Otherwise you can be used
+     * the wrong MuleContext because a Connector can be defined at the domain level or de app level.
+     *
+     * @return MuleContext in which this connector has been created.
+     *         If the Connector was defined in a Domain then it will return the MuleContext of the domain.
+     *         If the Connector was defined in a Mule app then it will return the MuleContext of the Mule app.
+     */
     MuleContext getMuleContext();
 
     RetryPolicyTemplate getRetryPolicyTemplate();
@@ -199,4 +204,12 @@ public interface Connector extends Lifecycle, NameableObject, Connectable, Lifec
      * @return AbstractRedeliveryPolicy to use for message redelivery, null if it shouldn't be used
      */
     AbstractRedeliveryPolicy createDefaultRedeliveryPolicy(int maxRedelivery);
+
+    /**
+     * Returns a canonical representation of the given {@link org.mule.api.endpoint.EndpointURI}
+     *
+     * @param uri a not null {@link org.mule.api.endpoint.EndpointURI}
+     * @return the canonical representation of the given uri as a {@link java.lang.String}
+     */
+    public String getCanonicalURI(EndpointURI uri);
 }

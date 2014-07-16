@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.cxf;
 
 
@@ -19,17 +15,16 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.exception.TemplateMessagingExceptionStrategy;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.AbstractTransformer;
-import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpConnector;
+import org.mule.transport.http.HttpConstants;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,7 +38,6 @@ import org.junit.runners.Parameterized;
 
 public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
 {
-
     private static final String requestPayload =
         "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
             "           xmlns:hi=\"http://example.cxf.module.mule.org/\">\n" +
@@ -87,7 +81,7 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
     public void testFaultInCxfServiceWithCatchExceptionStrategy() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String,Object>)null, muleContext);
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchException", request);
         assertNotNull(response);
         assertEquals(String.valueOf(HttpConstants.SC_OK), response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
@@ -98,7 +92,7 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
     public void testFaultInCxfServiceWithCatchExceptionStrategyRethrown() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String,Object>)null, muleContext);
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchExceptionRethrown", request);
         assertNotNull(response);
         assertEquals(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR), response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
@@ -109,7 +103,7 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
     public void testExceptionThrownInTransformerWithCatchExceptionStrategy() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String,Object>)null, muleContext);
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testTransformerExceptionCatchException", request);
         assertNotNull(response);
         assertEquals(String.valueOf(HttpConstants.SC_OK), response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
@@ -120,7 +114,7 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
     public void testClientWithSOAPFaultCatchException() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage("hello", (Map<String,Object>)null, muleContext);
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://testClientSOAPFaultCatchException", request);
         assertNotNull(response);
         assertTrue(response.getExceptionPayload() == null);
@@ -130,7 +124,7 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
     public void testClientWithSOAPFaultCatchExceptionRedirect() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Object>)null, muleContext);
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://testClientSOAPFaultCatchExceptionRedirect", request);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().contains("TEST"));
@@ -141,7 +135,7 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
     public void testClientWithTransformerExceptionCatchException() throws Exception
     {
         MuleMessage request = new DefaultMuleMessage("hello", (Map<String,Object>)null, muleContext);
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://testClientTransformerExceptionCatchException", request);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().contains(" Anonymous"));
@@ -150,7 +144,7 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
     @Test
     public void testServerClientProxyWithTransformerExceptionCatchStrategy() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithTransformerExceptionCatchStrategy", requestPayload, null);
         String resString = result.getPayloadAsString();
         assertEquals(String.valueOf(HttpConstants.SC_OK), result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
@@ -182,6 +176,7 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
         @Override
         protected void nullifyExceptionPayloadIfRequired(MuleEvent event)
         {
+            // does nothing
         }
 
         @Override

@@ -1,19 +1,19 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.tcp.integration;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
+import org.mule.api.client.MuleClient;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalStreamingTestComponent;
@@ -23,10 +23,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * IMPORTANT - DO NOT RUN THIS TEST IN AN IDE WITH LOG LEVEL OF DEBUG. USE INFO TO
@@ -85,10 +81,10 @@ public abstract class AbstractStreamingCapacityTestCase extends AbstractServiceA
         long timeStart = System.currentTimeMillis();
 
         BigInputStream stream = new BigInputStream(size, MESSAGES);
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         // dynamically get the endpoint to send to
         client.dispatch(
-            ((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("testInbound")).getAddress(),
+            ((InboundEndpoint) muleContext.getRegistry().lookupObject("testInbound")).getAddress(),
             new DefaultMuleMessage(stream, muleContext));
 
         // if we assume 1MB/sec then we need at least...

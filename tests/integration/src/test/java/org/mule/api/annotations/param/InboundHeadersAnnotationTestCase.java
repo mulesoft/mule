@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.api.annotations.param;
 
 import static org.junit.Assert.assertEquals;
@@ -17,9 +13,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.expression.RequiredValueException;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -70,7 +66,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     @Test
     public void testSingleHeader() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://header", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertEquals("fooValue", message.getPayload());
@@ -79,7 +75,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     @Test
     public void testSingleHeaderOptional() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://headerOptional", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertEquals("faz not set", message.getPayload());
@@ -91,7 +87,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
         Apple apple = new Apple();
         props.put("apple", apple);
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://headerWithType", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertEquals(apple, message.getPayload());
@@ -103,7 +99,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
         Apple apple = new Apple();
         props.put("apple", apple);
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://headerWithBaseType", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertEquals(apple, message.getPayload());
@@ -112,7 +108,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     @Test
     public void testMapHeaders() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://headers", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
@@ -127,7 +123,9 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     public void testMapHeadersMissing() throws Exception
     {
         props.remove("foo");
-        MuleMessage message = muleContext.getClient().send("vm://headers", null, null);
+
+        MuleClient client = muleContext.getClient();
+        MuleMessage message = client.send("vm://headers", null, null);
         assertNotNull(message);
         assertNotNull(message.getExceptionPayload());
         assertEquals(RequiredValueException.class,
@@ -137,7 +135,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     @Test
     public void testMapSingleHeader() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://singleHeaderMap", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
@@ -153,7 +151,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     {
         props.remove("baz");
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://headersOptional", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
@@ -169,7 +167,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     {
         props.clear();
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://headersAllOptional", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
@@ -181,7 +179,8 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     @Test
     public void testMapHeadersUnmodifiable() throws Exception
     {
-        MuleMessage message = muleContext.getClient().send("vm://headersUnmodifiable", null, props);
+        MuleClient client = muleContext.getClient();
+        MuleMessage message = client.send("vm://headersUnmodifiable", null, props);
         assertNotNull(message);
         assertNotNull(message.getExceptionPayload());
         assertEquals(UnsupportedOperationException.class,
@@ -191,7 +190,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     @Test
     public void testMapHeadersAll() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://headersAll", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
@@ -206,7 +205,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     @Test
     public void testMapHeadersWildcard() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://headersWildcard", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
@@ -221,7 +220,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     @Test
     public void testMapHeadersMultiWildcard() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://headersMultiWildcard", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
@@ -247,7 +246,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
         props.put("banana", new Banana());
         props.put("orange", new Orange());
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://headersWithGenerics", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
@@ -263,7 +262,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     @Test
     public void testListHeaders() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://headersList", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
@@ -278,7 +277,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     public void testListHeadersWithOptional() throws Exception
     {
         props.remove("baz");
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://headersListOptional", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
@@ -292,7 +291,9 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     public void testListHeadersWithMissing() throws Exception
     {
         props.remove("bar");
-        MuleMessage message = muleContext.getClient().send("vm://headersListOptional", null, props);
+
+        MuleClient client = muleContext.getClient();
+        MuleMessage message = client.send("vm://headersListOptional", null, props);
         assertNotNull(message);
         assertNotNull(message.getExceptionPayload());
         assertEquals(RequiredValueException.class,
@@ -303,7 +304,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     @Test
     public void testSingleListHeader() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://singleHeaderList", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
@@ -315,18 +316,18 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     @Test
     public void testListHeadersUnmodifiable() throws Exception
     {
-        MuleMessage message = muleContext.getClient().send("vm://headersListUnmodifiable", null, props);
+        MuleClient client = muleContext.getClient();
+        MuleMessage message = client.send("vm://headersListUnmodifiable", null, props);
         assertNotNull(message);
         assertNotNull(message.getExceptionPayload());
         assertEquals(UnsupportedOperationException.class,
             ExceptionUtils.getRootCause(message.getExceptionPayload().getException()).getClass());
-
     }
 
     @Test
     public void testListHeadersAll() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://headersListAll", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
@@ -343,7 +344,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     {
         props.clear();
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://headersListAllOptional", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
@@ -355,7 +356,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     @Test
     public void testListHeadersWilcard() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://headersListWildcard", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
@@ -372,7 +373,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     @Test
     public void testListHeadersMultiWilcard() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://headersListMultiWildcard", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
@@ -405,7 +406,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
         props.put("banana", banana);
         props.put("orange", orange);
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://headersListWithGenerics", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);

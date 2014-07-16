@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util.store;
 
 import org.mule.api.store.ObjectAlreadyExistsException;
@@ -17,6 +13,8 @@ import org.mule.api.store.ObjectStoreException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.Serializable;
+
+import junit.framework.Assert;
 
 import org.junit.Test;
 
@@ -89,7 +87,8 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleCo
     {
         try
         {
-            // nothing was stored in the OS yet so using any key must trigger the ObjectDoesNotExistException
+            // nothing was stored in the OS yet so using any key must trigger the
+            // ObjectDoesNotExistException
             Serializable key = createKey();
 
             getObjectStore().retrieve(key);
@@ -106,7 +105,8 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleCo
     {
         try
         {
-            // nothing was stored in the OS yet so using any key must trigger the ObjectDoesNotExistException
+            // nothing was stored in the OS yet so using any key must trigger the
+            // ObjectDoesNotExistException
             Serializable key = createKey();
 
             getObjectStore().remove(key);
@@ -116,6 +116,25 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleCo
         {
             // this one was expected
         }
+    }
+
+    @Test
+    public void clear() throws ObjectStoreException
+    {
+        Serializable key = this.createKey();
+        Serializable value = this.getStorableValue();
+        ObjectStore<Serializable> objectStore = this.getObjectStore();
+
+        objectStore.store(key, value);
+        Assert.assertTrue(objectStore.contains(key));
+
+        objectStore.clear();
+
+        Assert.assertFalse(objectStore.contains(key));
+
+        // check it's still usable
+        objectStore.store(key, value);
+        Assert.assertTrue(objectStore.contains(key));
     }
 
     @Test

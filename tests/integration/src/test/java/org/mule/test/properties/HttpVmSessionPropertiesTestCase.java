@@ -1,31 +1,27 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
- * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
- *
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.properties;
 
+import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.Collections;
+import java.util.Map;
 
 import org.hamcrest.core.IsNull;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertThat;
-
 public class HttpVmSessionPropertiesTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
@@ -33,7 +29,7 @@ public class HttpVmSessionPropertiesTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/properties/session-properties-http-vm-config.xml";
     }
@@ -45,8 +41,10 @@ public class HttpVmSessionPropertiesTestCase extends FunctionalTestCase
     @Test
     public void testPropertiesFromHttpToVm() throws Exception
     {
-        final MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("http://localhost:" + dynamicPort1.getNumber() + "/http-inbound-flow", "some message", Collections.emptyMap());
+        MuleClient client = muleContext.getClient();
+
+        Map<String, Object> properties = Collections.emptyMap();
+        MuleMessage message = client.send("http://localhost:" + dynamicPort1.getNumber() + "/http-inbound-flow", "some message", properties);
         assertThat(message, IsNull.<Object>notNullValue());
         assertThat(message.getExceptionPayload(), IsNull.<Object>nullValue());
     }
@@ -57,8 +55,10 @@ public class HttpVmSessionPropertiesTestCase extends FunctionalTestCase
     @Test
     public void testPropertiesFromVmToHttp() throws Exception
     {
-        final MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("vm://vm-inbound-flow", "some message", Collections.emptyMap());
+        MuleClient client = muleContext.getClient();
+
+        Map<String, Object> properties = Collections.emptyMap();
+        MuleMessage message = client.send("vm://vm-inbound-flow", "some message", properties);
         assertThat(message, IsNull.<Object>notNullValue());
         assertThat(message.getExceptionPayload(), IsNull.<Object>nullValue());
     }

@@ -10,11 +10,11 @@
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.4/mule.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.5/mule.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/http"
-                schemaLocation="http://www.mulesoft.org/schema/mule/http/3.4/mule-http.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/http/3.5/mule-http.xsd"/>
     <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
-                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.4/mule-schemadoc.xsd"/>
+                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.5/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>The Jetty transport provides support for exposing services over HTTP by embedding a light-weight Jetty server. You can only define inbound endpoints with this transport.
@@ -53,6 +53,13 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             The location of the Jetty config file to configure this connector with.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="acceptors" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The number of Jetty "acceptor" threads to use. May be increased for improved throughput. Defaults: 1
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -100,7 +107,9 @@
             <xsd:annotation>
                 <xsd:documentation>
                 A comma delimited list of classes which cannot be seen by webapp context classloaders but can be overridden by the webapp.
-                Defaults to: org.mortbay.jetty.plus.jaas., org.mortbay.jetty., org.slf4j.
+                Defaults to all classes in org.eclipse.jetty., except: org.eclipse.jetty.continuation., org.eclipse.jetty.jndi., org.eclipse.jetty.plus.jaas.,
+                org.eclipse.jetty.websocket.WebSocket, org.eclipse.jetty.websocket.WebSocketFactory, org.eclipse.jetty.websocket.WebSocketServlet,
+                org.eclipse.jetty.servlet.DefaultServlet., org.eclipse.jetty.servlet.listener.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -108,7 +117,9 @@
             <xsd:annotation>
                 <xsd:documentation>
                 A comma delimited list of classes which cannot be overridden by webapp classloaders.
-                Defaults to: java., javax.servlet., javax.xml., org.mortbay., org.xml.,org.w3c., org.apache.commons.logging., org.apache.log4j.
+                Defaults to: java., javax., org.xml., org.w3c., org.apache.commons.logging., org.eclipse.jetty.continuation., org.eclipse.jetty.jndi.,
+                org.eclipse.jetty.plus.jaas., org.eclipse.jetty.websocket.WebSocket, org.eclipse.jetty.websocket.WebSocketFactory,
+                org.eclipse.jetty.websocket.WebSocketServlet, org.eclipse.jetty.servlet.DefaultServlet.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>

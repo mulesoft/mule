@@ -1,56 +1,49 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.el.mvel;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.mvel2.ParserConfiguration;
+import org.mule.mvel2.integration.VariableResolver;
 
-import org.mvel2.ParserContext;
-import org.mvel2.UnresolveablePropertyException;
-import org.mvel2.integration.VariableResolver;
-
-public class VariableVariableResolverFactory extends MVELExpressionLanguageContext
+public class VariableVariableResolverFactory extends MuleBaseVariableResolverFactory
 {
 
     private static final long serialVersionUID = -4433478558175131280L;
 
     private MuleMessage message;
 
-    public VariableVariableResolverFactory(ParserContext parserContext,
+    public VariableVariableResolverFactory(ParserConfiguration parserConfiguration,
                                            MuleContext muleContext,
                                            MuleEvent event)
     {
-        super(parserContext, muleContext);
         this.message = event.getMessage();
     }
 
     @Deprecated
-    public VariableVariableResolverFactory(ParserContext parserContext,
+    public VariableVariableResolverFactory(ParserConfiguration parserConfiguration,
                                            MuleContext muleContext,
                                            MuleMessage message)
     {
-        super(parserContext, muleContext);
         this.message = message;
     }
 
     @SuppressWarnings("deprecation")
+    @Override
     public boolean isTarget(String name)
     {
         if (message == null)
         {
-            return isNextResolveable(name);
+            return false;
         }
         return message.getInvocationPropertyNames().contains(name)
-               || message.getSessionPropertyNames().contains(name) || isNextResolveable(name);
+               || message.getSessionPropertyNames().contains(name);
     }
 
     @SuppressWarnings("deprecation")
@@ -66,13 +59,9 @@ public class VariableVariableResolverFactory extends MVELExpressionLanguageConte
         {
             return new SessionVariableVariableResolver(name);
         }
-        else if (nextFactory != null)
-        {
-            return nextFactory.getVariableResolver(name);
-        }
         else
         {
-            throw new UnresolveablePropertyException("unable to resolve variable '" + name + "'");
+            return super.getNextFactoryVariableResolver(name);
         }
     }
 
@@ -213,15 +202,7 @@ public class VariableVariableResolverFactory extends MVELExpressionLanguageConte
         @Override
         public Object getValue()
         {
-            Object value = message.getMuleContext().getRegistry().lookupObject(name);
-            if (value != null)
-            {
-                return value;
-            }
-            else
-            {
-                throw new UnresolveablePropertyException(name);
-            }
+            return message.getMuleContext().getRegistry().lookupObject(name);
         }
 
         @Override

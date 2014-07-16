@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms;
 
 import org.mule.api.MuleContext;
@@ -21,7 +17,6 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.management.stats.ServiceStatistics;
-import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.DefaultReplyToHandler;
 import org.mule.transport.jms.i18n.JmsMessages;
 import org.mule.transport.jms.transformers.ObjectToJMSMessage;
@@ -58,9 +53,9 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
     private transient JmsConnector jmsConnector;
     private transient ObjectToJMSMessage toJmsMessage;
 
-    public JmsReplyToHandler(JmsConnector connector)
+    public JmsReplyToHandler(JmsConnector connector, MuleContext muleContext)
     {
-        super(connector.getMuleContext());
+        super(muleContext);
         this.connector = this.jmsConnector = connector;
         toJmsMessage = new ObjectToJMSMessage();
     }
@@ -110,6 +105,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             //This mimics the OBjectToJmsMessage Transformer behaviour without needing an endpoint
             //TODO clean this up, maybe make the transformer available via a utility class, passing in the Session
             Message replyToMessage = JmsMessageUtils.toMessage(payload, session);
+            connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(), returnMessage);
             toJmsMessage.setJmsProperties(returnMessage, replyToMessage);
 
             processMessage(replyToMessage, event);

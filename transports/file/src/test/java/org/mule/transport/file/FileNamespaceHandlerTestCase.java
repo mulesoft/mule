@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.file;
 
 import static org.junit.Assert.assertEquals;
@@ -48,15 +44,6 @@ public class FileNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.FLOW, "file-namespace-config-flow.xml"}});
     }
 
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        File workDir = new File(".mule");
-        assertTrue(FileUtils.deleteTree(workDir));
-
-        super.doTearDown();
-    }
-
     @Test
     public void testConfig() throws Exception
     {
@@ -68,9 +55,9 @@ public class FileNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
         assertEquals("bcd", c.getMoveToPattern());
         assertEquals("cde", c.getOutputPattern());
         assertEquals(2345, c.getPollingFrequency());
-        assertEquals(".mule/readFromDirectory", c.getReadFromDirectory());
-        assertEquals(".mule/writeToDirectory", c.getWriteToDirectory());
-        assertEquals(".mule/workDirectory", c.getWorkDirectory());
+        assertTrue(getFileInsideWorkingDirectory("readFromDirectory").getAbsolutePath().endsWith(c.getReadFromDirectory()));
+        assertTrue(getFileInsideWorkingDirectory("writeToDirectory").getAbsolutePath().endsWith(c.getWriteToDirectory()));
+        assertTrue(getFileInsideWorkingDirectory("workDirectory").getAbsolutePath().endsWith(c.getWorkDirectory()));
         assertEquals("#[function:uuid]", c.getWorkFileNamePattern());
         assertEquals(false, c.isAutoDelete());
         assertEquals(true, c.isOutputAppend());

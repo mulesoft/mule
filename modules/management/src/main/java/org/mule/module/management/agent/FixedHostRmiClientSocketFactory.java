@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.management.agent;
 
 import java.io.IOException;
@@ -18,7 +14,10 @@ import java.rmi.server.RMIClientSocketFactory;
 /**
  * This implementation will enforce specific overrideHost/ip for RMI calls on multi-NIC servers.
  * TODO MULE-1440 this should probably be moved into the RMI transport.
+ *
+ * @deprecated For multi-homed hosts support set the Java system property java.rmi.server.hostname
  */
+@Deprecated
 public class FixedHostRmiClientSocketFactory implements RMIClientSocketFactory, Serializable
 {
     /**

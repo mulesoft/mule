@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -162,7 +159,7 @@ public class JmxAgentConfigurer implements MuleContextAware
         try
         {
             // by the time mule context is injected, other attributes will have been set already
-            JmxAgent agent = muleContext.getRegistry().lookupObject(JmxAgent.class);
+            AbstractJmxAgent agent = muleContext.getRegistry().lookupObject(AbstractJmxAgent.class);
             // in case it is injected, otherwise will follow the init logic
             if (getMBeanServer() != null)
             {

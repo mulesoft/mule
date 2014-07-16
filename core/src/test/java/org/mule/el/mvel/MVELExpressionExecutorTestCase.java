@@ -1,41 +1,44 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.el.mvel;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.el.context.AbstractELTestCase;
+import org.mule.mvel2.CompileException;
+import org.mule.mvel2.ParserConfiguration;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.mvel2.CompileException;
-import org.mvel2.ParserContext;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 
 @SmallTest
-public class MVELExpressionExecutorTestCase extends AbstractMuleTestCase
+public class MVELExpressionExecutorTestCase extends AbstractELTestCase
 {
+
     protected MVELExpressionExecutor mvel;
     protected MVELExpressionLanguageContext context;
+
+    public MVELExpressionExecutorTestCase(Variant variant, String mvelOptimizer)
+    {
+        super(variant, mvelOptimizer);
+    }
 
     @Before
     public void setupMVEL() throws InitialisationException
     {
-        mvel = new MVELExpressionExecutor(new ParserContext());
+        mvel = new MVELExpressionExecutor(new ParserConfiguration());
         context = Mockito.mock(MVELExpressionLanguageContext.class);
         Mockito.when(context.isResolveable(Mockito.anyString())).thenReturn(false);
     }
@@ -88,6 +91,60 @@ public class MVELExpressionExecutorTestCase extends AbstractMuleTestCase
         {
             Thread.currentThread().setContextClassLoader(originalClassLoader);
         }
+    }
+
+    @Test
+    public void safeMapPropertyAccessIsEnabled()
+    {
+        assertEquals(null, mvel.execute("['test1' : null].doesntExist", context));
+    }
+
+    @Test
+    public void safeMapNestedPropertyAccessIsEnabled()
+    {
+        assertEquals(null, mvel.execute("['test1' : null].test1", context));
+    }
+
+    @Test
+    public void safeBeanPropertyAccessIsEnabled()
+    {
+        assertNull(mvel.execute("new Object().doesntExist", context));
+    }
+
+    @Test
+    public void safeNestedBeanPropertyAccessIsEnabled()
+    {
+        assertNull(mvel.execute("new Object().?doesntExist.other", context));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void nestedMapAccessFailsCorrectly()
+    {
+        assertNull(mvel.execute("['test1' : null]['test2']['test2']", context));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void safeNestedBeanPropertyAccessMaintainsNullSafeBehavior()
+    {
+        assertNull(mvel.execute("new Object().doesntExist.other", context));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void safeNestedMapPropertyAccessMaintainsNullSafeBehavior()
+    {
+        assertNull(mvel.execute("['test1' : null].doesntExist.other", context));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void safePropertyDoesntMessNullSafeMode()
+    {
+        assertNull(mvel.execute("null.doesntExist", context));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void invalidMethodCallFails()
+    {
+        assertNull(mvel.execute("new Object().doesntExist()", context));
     }
 
     static class MyClassClassLoader extends ClassLoader

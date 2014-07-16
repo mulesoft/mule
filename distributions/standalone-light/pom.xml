@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.distributions</groupId>
         <artifactId>mule-distributions</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-standalone-light</artifactId>
     <!-- Packaging 'pom' ensures that maven does not try to bind a plugin to the
@@ -16,6 +16,7 @@
     <properties>
         <communityDistDir>${project.build.directory}/ce-distribution</communityDistDir>
         <communityArtifact>mule-standalone</communityArtifact>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
     </properties>
 
     <build>
@@ -38,6 +39,7 @@
                             <goal>unpack</goal>
                         </goals>
                         <configuration>
+                            <skip>${skipDistributions}</skip>
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>org.mule.distributions</groupId>

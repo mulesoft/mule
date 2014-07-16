@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.cxf.builder;
 
 import org.mule.api.AnnotatedObject;
@@ -21,15 +17,14 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.service.ServiceAware;
 import org.mule.module.cxf.CxfConfiguration;
-import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.CxfInboundMessageProcessor;
 import org.mule.module.cxf.MuleInvoker;
 import org.mule.module.cxf.config.WsSecurity;
 import org.mule.module.cxf.support.CxfUtils;
 import org.mule.module.cxf.support.MuleHeadersInInterceptor;
 import org.mule.module.cxf.support.MuleHeadersOutInterceptor;
-import org.mule.module.cxf.support.MuleSecurityManagerValidator;
 import org.mule.module.cxf.support.MuleServiceConfiguration;
+import org.mule.module.cxf.support.WSDLQueryHandler;
 import org.mule.util.ClassUtils;
 
 import java.util.Collections;
@@ -47,13 +42,13 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
-import org.apache.cxf.interceptor.FaultOutInterceptor;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.OneWayProcessorInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.factory.AbstractServiceConfiguration;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.invoker.Invoker;
+import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 
@@ -163,7 +158,6 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
 
         setSecurityConfig(sfb);
 
-            
         String address = getAddress();
         address = CxfUtils.mapUnsupportedSchemas(address);
         sfb.setAddress(address); // dummy URL for CXF
@@ -215,9 +209,16 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         processor.setBus(sfb.getBus());
         processor.setServer(server);
         processor.setProxy(isProxy());
+        processor.setWSDLQueryHandler(getWSDLQueryHandler());
+
         return processor;
     }
-    
+
+    protected QueryHandler getWSDLQueryHandler()
+    {
+        return new WSDLQueryHandler(configuration.getCxfBus());
+    }
+
     protected Invoker createInvoker(CxfInboundMessageProcessor processor)
     {
         return new MuleInvoker(processor, getServiceClass());

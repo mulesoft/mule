@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.ftp;
 
 import org.mule.api.MuleMessage;
@@ -83,16 +79,24 @@ public class FtpMessageRequester extends AbstractMessageRequester
         try
         {
             client = connector.createFtpClient(endpoint);
-            FTPFile fileToProcess = findFileToProcess(client);
-            if (fileToProcess == null)
+            FTPFile fileToProcess;
+            if(connector.isFile(endpoint,client))
             {
-                return null;
+                fileToProcess = client.listFiles(endpoint.getEndpointURI().getPath())[0];
+            } 
+            else
+            {
+                fileToProcess = findFileToProcess(client);
+                if (fileToProcess == null)
+                {
+                    return null;
+                }
             }
 
             fileToProcess = prepareFile(client, fileToProcess);
 
             FtpMuleMessageFactory messageFactory = createMuleMessageFactory(client);
-            MuleMessage message = messageFactory.create(fileToProcess, endpoint.getEncoding());
+            MuleMessage message = messageFactory.create(fileToProcess, endpoint.getEncoding(), endpoint.getMuleContext());
             postProcess(client, fileToProcess, message);
             return message;
         }
@@ -142,6 +146,8 @@ public class FtpMessageRequester extends AbstractMessageRequester
 
     protected FTPFile findFileToProcess(FTPClient client) throws Exception
     {
+        //Checking if it is a file or a directory
+        boolean isFile = connector.isFile(endpoint, client);
         FTPListParseEngine engine = client.initiateListParsing();
         FTPFile[] files = null;
         while (engine.hasNext())

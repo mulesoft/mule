@@ -1,14 +1,12 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util.store;
+
+import static org.mule.api.store.ObjectStoreManager.UNBOUNDED;
 
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectDoesNotExistException;
@@ -105,6 +103,12 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
     {
         return new ArrayList<Serializable>(getPartition(partitionName).keySet());
     }
+    
+    @Override
+    public void clear(String partitionName) throws ObjectStoreException
+    {
+        this.getPartition(partitionName).clear();
+    }
 
     @Override
     public List<String> allPartitions() throws ObjectStoreException
@@ -172,6 +176,11 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
 
         trimToMaxSize(store, maxEntries, partition);
 
+        if (entryTTL == UNBOUNDED)
+        {
+            return;
+        }
+
         while ((oldestEntry = store.firstEntry()) != null)
         {
             Long oldestKey = oldestEntry.getKey();
@@ -199,10 +208,11 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
                                int maxEntries,
                                ConcurrentMap<Serializable, T> partition)
     {
-        if (maxEntries < 0)
+        if (maxEntries == UNBOUNDED)
         {
             return;
         }
+
         int currentSize = store.size();
         int excess = (currentSize - maxEntries);
         if (excess > 0)
@@ -224,8 +234,17 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
     @Override
     public void disposePartition(String partitionName) throws ObjectStoreException
     {
-        partitions.remove(partitionName);
-        expiryInfoPartition.remove(partitionName);
+        removeAndClear(partitions, partitionName);
+        removeAndClear(expiryInfoPartition, partitionName);
+    }
+
+    private void removeAndClear(Map<String, ? extends Map> map, String key)
+    {
+        Map partition = map.remove(key);
+        if(partition!=null)
+        {
+            partition.clear();
+        }
     }
 
 }

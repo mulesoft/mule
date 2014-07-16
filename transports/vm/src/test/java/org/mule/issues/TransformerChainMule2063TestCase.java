@@ -1,26 +1,23 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.issues;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 public class TransformerChainMule2063TestCase extends AbstractServiceAndFlowTestCase
 {
@@ -45,7 +42,7 @@ public class TransformerChainMule2063TestCase extends AbstractServiceAndFlowTest
 
     protected void doTest(String name, String result) throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.send("vm://" + name + "-in", IN, null);
         MuleMessage message = client.request("vm://" + name + "-out", WAIT_MS);
 
@@ -71,5 +68,4 @@ public class TransformerChainMule2063TestCase extends AbstractServiceAndFlowTest
     {
         doTest("test3", TEST3_OUT);
     }
-
 }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule-domain xmlns="http://www.mulesoft.org/schema/mule/domain"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:http="http://www.mulesoft.org/schema/mule/http"
+             xmlns:context="http://www.springframework.org/schema/context"
+             xmlns:spring="http://www.springframework.org/schema/beans"
+             xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/domain http://www.mulesoft.org/schema/mule/domain/current/mule-domain.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <spring:bean id="property-placeholder"
+                 class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <spring:property name="location" value="classpath:domain/properties/application.properties"/>
+    </spring:bean>
+
+    <spring:bean id="appPropertyObject" class="java.lang.String">
+        <spring:constructor-arg value="${http.port}"/>
+    </spring:bean>
+
+    <spring:bean id="app2PropertyObject" class="java.lang.String">
+        <spring:constructor-arg value="${http.path}"/>
+    </spring:bean>
+
+
+</mule-domain>
+
+

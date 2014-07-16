@@ -4,13 +4,17 @@
     <parent>
         <groupId>org.mule</groupId>
         <artifactId>mule</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <groupId>org.mule.tools</groupId>
     <artifactId>mule-tools</artifactId>
     <packaging>pom</packaging>
     <name>Mule Tools</name>
     <description>Tools for building and working with Mule projects.</description>
+
+    <properties>
+        <licensePath>../LICENSE_HEADER.txt</licensePath>
+    </properties>
 
     <modules>
         <module>bobberplus</module>

@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.launcher.plugin;
 
 import java.io.File;
@@ -56,7 +52,7 @@ public class PluginClasspath
         }
         catch (MalformedURLException e)
         {
-            throw new IllegalArgumentException("Failed to create plugin classpath " + pluginDir);
+            throw new IllegalArgumentException("Failed to getDomainClassLoader plugin classpath " + pluginDir);
         }
         return cp;
     }

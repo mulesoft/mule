@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.ftp;
 
 import org.mule.api.MuleContext;
@@ -639,6 +635,7 @@ public class FtpConnector extends AbstractConnector
     {
         EndpointURI uri = endpoint.getEndpointURI();
         FTPClient client = this.getFtp(uri);
+        client.setDataTimeout(endpoint.getResponseTimeout());
 
         this.enterActiveOrPassiveMode(client, endpoint);
         this.setupFileType(client, endpoint);
@@ -655,10 +652,20 @@ public class FtpConnector extends AbstractConnector
                 path = path.substring(1);
             }
 
-            if (!client.changeWorkingDirectory(path))
+            //Checking if it is a file or a directory
+            boolean isFile = this.isFile(endpoint, client);
+            if (!isFile && !client.changeWorkingDirectory(path))
             {
                 throw new IOException(MessageFormat.format("Failed to change working directory to {0}. Ftp error: {1}",
                                                            path, client.getReplyCode()));
+            }
+            else if (isFile)
+            {
+                // Changing the working directory to the parent folder, it should be better if
+                // the ftpClient API would provide a way to retrieve the parent folder
+                FTPFile[] listFiles = client.listFiles(path);
+                String directory = path.replaceAll(listFiles[0].getName(), "");
+                client.changeWorkingDirectory(directory);
             }
         }
         return client;
@@ -670,6 +677,14 @@ public class FtpConnector extends AbstractConnector
     protected boolean validateFile(FTPFile file)
     {
         return true;
+    }
+
+    protected boolean isFile(ImmutableEndpoint endpoint, FTPClient client) throws IOException 
+    {
+          //Checking if it is a file or a directory
+          String path = endpoint.getEndpointURI().getPath();
+          FTPFile[] listFiles = client.listFiles(path);
+          return listFiles.length == 1 && listFiles[0].isFile();
     }
 
     public boolean isStreaming()

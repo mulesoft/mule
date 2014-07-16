@@ -14,13 +14,13 @@
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
     <file:connector name="fileConnector" fileAge="500" autoDelete="false"  
-        moveToDirectory="./.mule/done" streaming="true" pollingFrequency="100" 
-        workDirectory="./.mule/work" workFileNamePattern="#[function:uuid].#[function:systime].#[header:originalFilename]">
+        moveToDirectory="${workingDirectory}/done" streaming="true" pollingFrequency="100"
+        workDirectory="${workingDirectory}/work" workFileNamePattern="#[function:uuid].#[function:systime].#[header:inbound:originalFilename]">
     </file:connector>
 
-    <file:endpoint path="./.mule/in" name="get" connector-ref="fileConnector"/>
+    <file:endpoint path="${workingDirectory}/in" name="get" connector-ref="fileConnector"/>
 
-    <file:endpoint path="./.mule/out" name="put" connector-ref="fileConnector"/>
+    <file:endpoint path="${workingDirectory}/out" name="put" connector-ref="fileConnector"/>
 
     <model name="receiveModel">
         <service name="relay">

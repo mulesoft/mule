@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.launcher;
 
 import org.mule.config.Preferred;
@@ -101,7 +97,8 @@ public class DescriptorParserTestCase extends AbstractMuleTestCase
     class TestDescriptorParserDefault implements DescriptorParser
     {
 
-        public ApplicationDescriptor parse(File descriptor) throws IOException
+        @Override
+        public ApplicationDescriptor parse(File descriptor, String applicationName) throws IOException
         {
             return null;
         }
@@ -119,7 +116,8 @@ public class DescriptorParserTestCase extends AbstractMuleTestCase
     class TestDescriptorParserPreferred implements DescriptorParser
     {
 
-        public ApplicationDescriptor parse(File descriptor) throws IOException
+        @Override
+        public ApplicationDescriptor parse(File descriptor, String applicationName) throws IOException
         {
             return null;
         }
@@ -135,7 +133,8 @@ public class DescriptorParserTestCase extends AbstractMuleTestCase
     class TestDescriptorParserNoAnnotation implements DescriptorParser
     {
 
-        public ApplicationDescriptor parse(File descriptor) throws IOException
+        @Override
+        public ApplicationDescriptor parse(File descriptor, String applicationName) throws IOException
         {
             return null;
         }

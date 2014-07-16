@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -47,12 +44,13 @@ public class MuleAjaxServlet extends ContinuationCometdServlet
 
     private Set<Class<?>> ignoreClasses = new HashSet<Class<?>>();
     private Set<Class<?>> jsonBindings = new HashSet<Class<?>>();
+    private MuleContext muleContext;
 
     @Override
     public void init() throws ServletException
     {
         super.init();
-        MuleContext muleContext = (MuleContext)getServletContext().getAttribute(MuleProperties.MULE_CONTEXT_PROPERTY);
+        this.muleContext = (MuleContext)getServletContext().getAttribute(MuleProperties.MULE_CONTEXT_PROPERTY);
         if(muleContext==null)
         {
             throw new ServletException("Attribute " + MuleProperties.MULE_CONTEXT_PROPERTY + " not set on ServletContext");
@@ -93,7 +91,7 @@ public class MuleAjaxServlet extends ContinuationCometdServlet
         {
             ((BayeuxAware)connector).setBayeux(getBayeux());
             jsonTransformer = new ObjectToJson();
-            connector.getMuleContext().getRegistry().applyProcessorsAndLifecycle(jsonTransformer);
+            muleContext.getRegistry().applyProcessorsAndLifecycle(jsonTransformer);
         }
         catch (MuleException e)
         {

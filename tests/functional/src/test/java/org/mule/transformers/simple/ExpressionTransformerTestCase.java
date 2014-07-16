@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transformers.simple;
 
 import static org.junit.Assert.assertEquals;
@@ -40,16 +36,15 @@ import org.junit.Test;
 
 public class ExpressionTransformerTestCase extends FunctionalTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/transformers/expression-transformers-test.xml";
     }
 
-    private void testTransformerConfig(String name) throws Exception
+    private void testTransformerConfig(String transformerName) throws Exception
     {
-        ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry().lookupTransformer(name);
+        ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry().lookupTransformer(transformerName);
         assertNotNull(transformer);
         assertNotNull(transformer.getArguments());
         assertEquals(2, transformer.getArguments().size());
@@ -88,9 +83,9 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
         testBeanBuilderTransformerConfig("testTransformer3Inline");
     }
 
-    private void testBeanBuilderTransformerConfig(String name) throws Exception
+    private void testBeanBuilderTransformerConfig(String transformerName) throws Exception
     {
-        BeanBuilderTransformer transformer = (BeanBuilderTransformer) muleContext.getRegistry().lookupTransformer(name);
+        BeanBuilderTransformer transformer = (BeanBuilderTransformer) muleContext.getRegistry().lookupTransformer(transformerName);
         assertNotNull(transformer);
         assertNotNull(transformer.getArguments());
         assertEquals(3, transformer.getArguments().size());
@@ -119,9 +114,9 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
         testExecutionWithCorrectMessage("testTransformerInline");
     }
 
-    private void testExecutionWithCorrectMessage(String name) throws Exception
+    private void testExecutionWithCorrectMessage(String transformerName) throws Exception
     {
-        ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry().lookupTransformer(name);
+        ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry().lookupTransformer(transformerName);
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("foo", "moo");
         props.put("bar", "mar");
@@ -211,9 +206,9 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
         testTransformerConfigWithSingleArgumentShortcutConfig("testTransformer4Inline");
     }
 
-    private void testTransformerConfigWithSingleArgumentShortcutConfig(String name) throws Exception
+    private void testTransformerConfigWithSingleArgumentShortcutConfig(String transformerName) throws Exception
     {
-        ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry().lookupTransformer(name);
+        ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry().lookupTransformer(transformerName);
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("foo", "moo");
         props.put("bar", "mar");

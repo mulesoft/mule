@@ -1,20 +1,16 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.el.datetime;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
+import org.mule.api.store.ObjectStore;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -31,11 +27,12 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-@SmallTest
-public class DateTimeTestCase extends AbstractMuleTestCase
+public class DateTimeTestCase extends AbstractMuleContextTestCase
 {
 
-    protected DateTime now = new DateTime().withTimeZone("UTC");
+    private Calendar currentCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+
+    private DateTime now = new DateTime(currentCalendar).withTimeZone("UTC");
 
     @Test
     public void milliSeconds()
@@ -48,7 +45,7 @@ public class DateTimeTestCase extends AbstractMuleTestCase
     {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, 1);
-        Assert.assertTrue((Boolean) now.isBefore(new DateTime(cal)));
+        Assert.assertTrue(now.isBefore(new DateTime(cal)));
     }
 
     @Test
@@ -56,7 +53,7 @@ public class DateTimeTestCase extends AbstractMuleTestCase
     {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -1);
-        Assert.assertTrue((Boolean) now.isAfter(new DateTime(cal)));
+        Assert.assertTrue(now.isAfter(new DateTime(cal)));
     }
 
     @Test
@@ -76,7 +73,7 @@ public class DateTimeTestCase extends AbstractMuleTestCase
     @Test
     public void plusSeconds()
     {
-        Assert.assertEquals((Calendar.getInstance().get(Calendar.SECOND) + 1) % 60, now.plusSeconds(1)
+        Assert.assertEquals((currentCalendar.get(Calendar.SECOND) + 1) % 60, now.plusSeconds(1)
             .getSeconds());
     }
 
@@ -95,19 +92,19 @@ public class DateTimeTestCase extends AbstractMuleTestCase
     @Test
     public void plusDays()
     {
-        Assert.assertEquals((now.getDayOfYear() + 1) % 365, now.plusDays(1).getDayOfYear());
+        Assert.assertEquals((now.getDayOfYear() % 365) + 1, now.plusDays(1).getDayOfYear());
     }
 
     @Test
     public void plusWeeks()
     {
-        Assert.assertEquals((now.getWeekOfYear() + 1) % 52, now.plusWeeks(1).getWeekOfYear());
+        Assert.assertEquals((now.getWeekOfYear() % 52) + 1, now.plusWeeks(1).getWeekOfYear());
     }
 
     @Test
     public void plusMonths()
     {
-        Assert.assertEquals((now.getMonth() + 1) % 12, now.plusMonths(1).getMonth());
+        Assert.assertEquals((now.getMonth() % 12) + 1, now.plusMonths(1).getMonth());
     }
 
     @Test
@@ -141,69 +138,61 @@ public class DateTimeTestCase extends AbstractMuleTestCase
     @Test
     public void seconds()
     {
-        assertEquals(Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.SECOND), now.getSeconds());
+        assertEquals(currentCalendar.get(Calendar.SECOND), now.getSeconds());
     }
 
     @Test
     public void minutes()
     {
-        assertEquals(Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.MINUTE), now.getMinutes());
+        assertEquals(currentCalendar.get(Calendar.MINUTE), now.getMinutes());
     }
 
     @Test
     public void hourOfDay()
     {
-        assertEquals(Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.HOUR_OF_DAY),
-            now.getHours());
+        assertEquals(currentCalendar.get(Calendar.HOUR_OF_DAY), now.getHours());
     }
 
     @Test
     public void dayOfWeek()
     {
-        assertEquals(Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.DAY_OF_WEEK),
-            now.getDayOfWeek());
+        assertEquals(currentCalendar.get(Calendar.DAY_OF_WEEK), now.getDayOfWeek());
     }
 
     @Test
     public void dayOfMonth()
     {
-        assertEquals(Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.DAY_OF_MONTH),
-            now.getDayOfMonth());
+        assertEquals(currentCalendar.get(Calendar.DAY_OF_MONTH), now.getDayOfMonth());
     }
 
     @Test
     public void dayOfYear()
     {
-        assertEquals(Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.DAY_OF_YEAR),
-            now.getDayOfYear());
+        assertEquals(currentCalendar.get(Calendar.DAY_OF_YEAR), now.getDayOfYear());
     }
 
     @Test
     public void weekOfMonth()
     {
-        assertEquals(Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.WEEK_OF_MONTH),
-            now.getWeekOfMonth());
+        assertEquals(currentCalendar.get(Calendar.WEEK_OF_MONTH), now.getWeekOfMonth());
     }
 
     @Test
     public void weekOfYear()
     {
-        assertEquals(Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.WEEK_OF_YEAR),
-            now.getWeekOfYear());
+        assertEquals(currentCalendar.get(Calendar.WEEK_OF_YEAR), now.getWeekOfYear());
     }
 
     @Test
     public void monthOfYear()
     {
-        assertEquals(Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.MONTH) + 1,
-            now.getMonth());
+        assertEquals(currentCalendar.get(Calendar.MONTH) + 1, now.getMonth());
     }
 
     @Test
     public void testToString()
     {
-        assertEquals(DatatypeConverter.printDateTime(Calendar.getInstance(TimeZone.getTimeZone("UTC")))
-            .substring(0, 18), now.toString().substring(0, 18));
+        assertEquals(DatatypeConverter.printDateTime(currentCalendar).substring(0, 18), now.toString().substring(0, 18));
     }
 
     @Test
@@ -260,5 +249,23 @@ public class DateTimeTestCase extends AbstractMuleTestCase
         assertEquals(1, new DateTime(xmlCal).getMonth());
         assertEquals(1, new DateTime(xmlCal).getDayOfMonth());
     }
+    
+    @Test
+    public void serialization() throws Exception
+    {
+        final String key = "key";
+        ObjectStore<DateTime> os = muleContext.getObjectStoreManager().getObjectStore("DateTimeTestCase",
+            true);
+        try
+        {
+            os.store(key, now);
+            DateTime recovered = os.retrieve(key);
+            assertEquals(now, recovered);
+        }
+        finally
+        {
+            os.clear();
+        }
+    }                    
 
 }

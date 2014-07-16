@@ -1,8 +1,5 @@
 /*
- * $Id: HttpsHandshakeTimingTestCase.java 25119 2012-12-10 21:20:57Z pablo.lagreca $
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -25,14 +22,16 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.config.ExceptionHelper;
 import org.mule.execution.EndPhaseTemplate;
 import org.mule.execution.RequestResponseFlowProcessingPhaseTemplate;
+import org.mule.execution.ResponseDispatchException;
 import org.mule.execution.ThrottlingPhaseTemplate;
 import org.mule.transport.AbstractTransportMessageProcessTemplate;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.i18n.HttpMessages;
+import org.mule.util.ArrayUtils;
+import org.mule.util.StringUtils;
 import org.mule.util.concurrent.Latch;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.httpclient.Header;
@@ -50,68 +49,15 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     private HttpRequest request;
     private boolean badRequest;
     private Latch messageProcessedLatch = new Latch();
-    private boolean failureSendingResponse;
-    private Long remainingRequestInCurrentPeriod;
-    private Long maximumRequestAllowedPerPeriod;
-    private Long timeUntilNextPeriodInMillis;
     private RequestLine requestLine;
+    private boolean failureResponseSentToClient;
+    private HttpThrottlingHeadersMapBuilder httpThrottlingHeadersMapBuilder;
 
-    public HttpMessageProcessTemplate(final HttpMessageReceiver messageReceiver, final HttpServerConnection httpServerConnection, final WorkManager flowExecutionWorkManager)
+    public HttpMessageProcessTemplate(final HttpMessageReceiver messageReceiver, final HttpServerConnection httpServerConnection)
     {
-        super(messageReceiver,flowExecutionWorkManager);
+        super(messageReceiver);
         this.httpServerConnection = httpServerConnection;
-    }
-
-    @Override
-    public void afterFailureProcessingFlow(MessagingException messagingException) throws MuleException
-    {
-        if (!failureSendingResponse)
-        {
-            Exception e = messagingException;
-            MuleEvent response = messagingException.getEvent();
-            if (response != null &&
-                response.getMessage().getExceptionPayload() != null &&
-                response.getMessage().getExceptionPayload().getException() instanceof MessagingException)
-            {
-                e = (Exception) response.getMessage().getExceptionPayload().getException();
-            }
-
-            String temp = ExceptionHelper.getErrorMapping(getInboundEndpoint().getConnector().getProtocol(), messagingException.getClass(), getMuleContext());
-            int httpStatus = Integer.valueOf(temp);
-            try
-            {
-                if (e instanceof  MessagingException)
-                {
-                    sendFailureResponseToClient((MessagingException)e, httpStatus);
-                }
-                else
-                {
-                    sendFailureResponseToClient(httpStatus, e.getMessage());
-                }
-            }
-            catch (IOException ioException)
-            {
-                throw new DefaultMuleException(ioException);
-            }
-        }
-    }
-
-    @Override
-    public void afterFailureProcessingFlow(MuleException exception) throws MuleException
-    {
-        if (!failureSendingResponse)
-        {
-            String temp = ExceptionHelper.getErrorMapping(getConnector().getProtocol(), exception.getClass(),getMuleContext());
-            int httpStatus = Integer.valueOf(temp);
-            try
-            {
-                sendFailureResponseToClient(httpStatus, exception.getMessage());
-            }
-            catch (IOException e)
-            {
-                throw new DefaultMuleException(e);
-            }
-        }
+        this.httpThrottlingHeadersMapBuilder = new HttpThrottlingHeadersMapBuilder();
     }
 
     @Override
@@ -192,7 +138,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
             }
             catch (Exception e)
             {
-                failureSendingResponse = true;
+                throw new ResponseDispatchException(responseMuleEvent, e);
             }
             if (logger.isTraceEnabled())
             {
@@ -207,6 +153,58 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
                 logger.debug(e);
             }
             throw new MessagingException(responseMuleEvent,e);
+        }
+    }
+
+    @Override
+    public void sendFailureResponseToClient(MessagingException messagingException) throws MuleException
+    {
+        MuleEvent response = messagingException.getEvent();
+        MessagingException e = getExceptionForCreatingFailureResponse(messagingException, response);
+        String temp = ExceptionHelper.getErrorMapping(getInboundEndpoint().getConnector().getProtocol(), messagingException.getClass(), getMuleContext());
+        int httpStatus = Integer.valueOf(temp);
+        try
+        {
+            sendFailureResponseToClient(e, httpStatus);
+        }
+        catch (IOException ioException)
+        {
+            throw new DefaultMuleException(ioException);
+        }
+        failureResponseSentToClient = true;
+    }
+
+    private MessagingException getExceptionForCreatingFailureResponse(MessagingException messagingException, MuleEvent response)
+    {
+        MessagingException e = messagingException;
+        if (response != null &&
+            response.getMessage().getExceptionPayload() != null &&
+            response.getMessage().getExceptionPayload().getException() instanceof MessagingException)
+        {
+            e = (MessagingException) response.getMessage().getExceptionPayload().getException();
+        }
+        return e;
+    }
+
+    @Override
+    public void afterFailureProcessingFlow(MuleException exception) throws MuleException
+    {
+        if (!failureResponseSentToClient)
+        {
+            String temp = ExceptionHelper.getErrorMapping(getConnector().getProtocol(), exception.getClass(), getMuleContext());
+            int httpStatus = Integer.valueOf(temp);
+            try
+            {
+                sendFailureResponseToClient(httpStatus, exception.getMessage());
+            }
+            catch (Exception e)
+            {
+                logger.warn("Exception sending http response after error: " + e.getMessage());
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(e);
+                }
+            }
         }
     }
 
@@ -275,7 +273,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
         }
         else
         {
-            message = new DefaultMuleMessage(response, getMessageReceiver().getEndpoint().getConnector().getMuleContext());
+            message = new DefaultMuleMessage(response, getMessageReceiver().getEndpoint().getMuleContext());
         }
         //TODO RM*: Maybe we can have a generic Transformer wrapper rather that using DefaultMuleMessage (or another static utility
         //class
@@ -318,8 +316,47 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
                             processRelativePath(contextPath, path),
                             PropertyScope.INBOUND);
 
-        muleMessage.setProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS, httpServerConnection.getRemoteClientAddress(), PropertyScope.INBOUND);
+        processRemoteAddresses(muleMessage);
         return muleMessage;
+    }
+
+    /**
+     *  For a given MuleMessage will set the <code>MULE_REMOTE_CLIENT_ADDRESS</code> property taking into consideration
+     * if the header <code>X-Forwarded-For</code> is present in the request or not. In case it is, this method will
+     * also set the <code>MULE_PROXY_ADDRESS</code> property. If a proxy address is not passed in
+     * <code>X-Forwarded-For</code>, the connection address will be set as <code>MULE_PROXY_ADDRESS</code>.
+     *
+     * @param muleMessage MuleMessage to be enriched
+     * @see <a href="https://en.wikipedia.org/wiki/X-Forwarded-For">https://en.wikipedia.org/wiki/X-Forwarded-For</a>
+     */
+    protected void processRemoteAddresses(MuleMessage muleMessage)
+    {
+        String xForwardedFor = muleMessage.getInboundProperty(HttpConstants.HEADER_X_FORWARDED_FOR);
+
+        if (StringUtils.isEmpty(xForwardedFor))
+        {
+            muleMessage.setProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS,
+                    httpServerConnection.getRemoteClientAddress(), PropertyScope.INBOUND);
+            return;
+        }
+
+        String[] xForwardedForItems = StringUtils.splitAndTrim(xForwardedFor, ",");
+        if (!ArrayUtils.isEmpty(xForwardedForItems))
+        {
+            muleMessage.setProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS,
+                    xForwardedForItems[0], PropertyScope.INBOUND);
+            if (xForwardedForItems.length > 1)
+            {
+                muleMessage.setProperty(MuleProperties.MULE_PROXY_ADDRESS,
+                        xForwardedForItems[xForwardedForItems.length-1], PropertyScope.INBOUND);
+            }
+            else
+            {
+                // If only one address has been passed, we can assume the connection address is a proxy
+                muleMessage.setProperty(MuleProperties.MULE_PROXY_ADDRESS,
+                        httpServerConnection.getRemoteClientAddress(), PropertyScope.INBOUND);
+            }
+        }
     }
 
     protected String processRelativePath(String contextPath, String path)
@@ -401,13 +438,6 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
         }
     }
 
-
-    @Override
-    public boolean supportsAsynchronousProcessing()
-    {
-        return true;
-    }
-
     protected HttpResponse doBad(RequestLine requestLine) throws MuleException
     {
         MuleMessage message = getMessageReceiver().createMuleMessage(null);
@@ -422,11 +452,6 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     protected HttpServerConnection getHttpServerConnection()
     {
         return httpServerConnection;
-    }
-
-    public Latch getMessageProcessedLatch()
-    {
-        return messageProcessedLatch;
     }
 
     @Override
@@ -445,9 +470,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     @Override
     public void setThrottlingPolicyStatistics(long remainingRequestInCurrentPeriod, long maximumRequestAllowedPerPeriod, long timeUntilNextPeriodInMillis)
     {
-        this.remainingRequestInCurrentPeriod = remainingRequestInCurrentPeriod;
-        this.maximumRequestAllowedPerPeriod  = maximumRequestAllowedPerPeriod;
-        this.timeUntilNextPeriodInMillis = timeUntilNextPeriodInMillis;
+        httpThrottlingHeadersMapBuilder.setThrottlingPolicyStatistics(remainingRequestInCurrentPeriod, maximumRequestAllowedPerPeriod, timeUntilNextPeriodInMillis);
     }
 
     private void sendFailureResponseToClient(int httpStatus, String message) throws IOException
@@ -467,19 +490,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
 
     private Map<String,String> getThrottlingHeaders()
     {
-        Map<String, String> throttlingHeaders = new HashMap<String, String>();
-        addToMapIfNotNull(throttlingHeaders, X_RATE_LIMIT_LIMIT_HEADER,this.remainingRequestInCurrentPeriod);
-        addToMapIfNotNull(throttlingHeaders, X_RATE_LIMIT_REMAINING_HEADER,this.maximumRequestAllowedPerPeriod);
-        addToMapIfNotNull(throttlingHeaders, X_RATE_LIMIT_RESET_HEADER,this.timeUntilNextPeriodInMillis);
-        return throttlingHeaders;
-    }
-
-    private void addToMapIfNotNull(Map<String,String> map, String key, Long value)
-    {
-        if (value != null)
-        {
-            map.put(key, String.valueOf(value));
-        }
+        return httpThrottlingHeadersMapBuilder.build();
     }
 
     @Override

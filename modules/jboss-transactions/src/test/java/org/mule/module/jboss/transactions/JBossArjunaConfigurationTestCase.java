@@ -1,38 +1,59 @@
 /*
- * $Id:JBossArjunaConfigurationTestCase.java 8215 2012-10-25 15:56:51Z chrismordue $
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.jboss.transactions;
 
-import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.transaction.TransactionManagerFactory;
-import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.module.jboss.transaction.JBossArjunaTransactionManagerFactory;
-import org.mule.tck.AbstractTxThreadAssociationTestCase;
-
-import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
 import com.arjuna.ats.arjuna.common.arjPropertyManager;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import java.io.File;
 
-public class JBossArjunaConfigurationTestCase extends AbstractTxThreadAssociationTestCase
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
+public class JBossArjunaConfigurationTestCase extends AbstractJbossArjunaConfigurationTestCase
 {
 
+    private static final String TEMP_OBJECTSTORE_DIR_PROPERTY = "objectstore.dir";
+
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    private File objectStoreFolder;
+    private String previousTempObjectDirProperty;
 
     @Override
-    protected ConfigurationBuilder getBuilder() throws Exception
+    protected void doSetUpBeforeMuleContextCreation() throws Exception
     {
-        return new SpringXmlConfigurationBuilder(getConfigResources());
+        objectStoreFolder = temporaryFolder.newFolder("os_dir");
+        previousTempObjectDirProperty = System.getProperty(TEMP_OBJECTSTORE_DIR_PROPERTY);
+        System.setProperty(TEMP_OBJECTSTORE_DIR_PROPERTY, objectStoreFolder.getAbsolutePath());
+        super.doSetUpBeforeMuleContextCreation();
     }
 
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        super.doTearDown();
+
+        if (previousTempObjectDirProperty != null)
+        {
+            System.setProperty(TEMP_OBJECTSTORE_DIR_PROPERTY, previousTempObjectDirProperty);
+        }
+        else
+        {
+            System.clearProperty(TEMP_OBJECTSTORE_DIR_PROPERTY);
+        }
+
+        previousTempObjectDirProperty = null;
+    }
+
+    @Override
     protected String getConfigResources()
     {
         return "jbossts-configuration.xml";
@@ -41,17 +62,11 @@ public class JBossArjunaConfigurationTestCase extends AbstractTxThreadAssociatio
     @Test
     public void testConfiguration()
     {
-        assertNotNull(muleContext.getTransactionManager());
-        assertTrue(muleContext.getTransactionManager().getClass().getName().compareTo("arjuna") > 0);
-        
+        assertTransactionManagerPresent();
+
         assertTrue(arjPropertyManager.getCoordinatorEnvironmentBean().getTxReaperTimeout() == 108000);
         assertTrue(arjPropertyManager.getCoordinatorEnvironmentBean().getDefaultTimeout() == 47);
+
+        assertObjectStoreDir(objectStoreFolder.getAbsolutePath(), muleContext.getConfiguration().getWorkingDirectory());
     }
-
-	@Override
-	protected TransactionManagerFactory getTransactionManagerFactory()
-	{
-		return new JBossArjunaTransactionManagerFactory();
-	}
-
 }

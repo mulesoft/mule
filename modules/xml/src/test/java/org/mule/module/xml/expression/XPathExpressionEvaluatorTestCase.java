@@ -1,17 +1,21 @@
 /*
- * $Id $
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.xml.expression;
 
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.util.IOUtils;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.dom4j.dom.DOMDocument;
 import org.dom4j.tree.DefaultDocument;
@@ -24,14 +28,8 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import static org.junit.Assert.assertTrue;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 @SmallTest
-public class XPathExpressionEvaluatorTestCase extends AbstractMuleTestCase
+public class XPathExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
 {
     private static final String EXPRESSION = "//isTest[test() = 'true']";
     private static final String OTHER_EXPRESSION = "//isNotTest[test = 'false']";
@@ -62,5 +60,13 @@ public class XPathExpressionEvaluatorTestCase extends AbstractMuleTestCase
         XPathExpressionEvaluator xPathExpressionEvaluator = new XPathExpressionEvaluator();
         Object result = xPathExpressionEvaluator.extractResultFromNode(node);
         Assert.assertEquals("", result);
+    }
+
+    @Test
+    public void textNotSeparated() throws Exception
+    {
+        String payload = IOUtils.getResourceAsString("sswa2smtp.xml", getClass());
+        Object value = muleContext.getExpressionManager().evaluate("#[xpath:/*/toAddress/text()]", getTestEvent(payload));
+        assertEquals("XPath expression extracted the wrong value", "prachurya.barua@bt.com", value);
     }
 }

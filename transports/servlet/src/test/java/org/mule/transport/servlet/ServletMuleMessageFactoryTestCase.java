@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.servlet;
 
 import org.mule.api.MuleMessage;
@@ -54,7 +50,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
     @Override
     protected MuleMessageFactory doCreateMuleMessageFactory()
     {
-        return new ServletMuleMessageFactory(muleContext);
+        return new ServletMuleMessageFactory();
     }
 
     @Override
@@ -76,7 +72,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
     public void testValidPayload() throws Exception
     {
         Object payload = getValidTransportMessage();
-        MuleMessage message = factory.create(payload, encoding);
+        MuleMessage message = factory.create(payload, encoding, muleContext);
         assertNotNull(message);
         assertEquals(REQUEST_URI, message.getPayload());
     }
@@ -88,7 +84,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         builder.queryString = "foo=bar";
         Object payload = builder.buildRequest();
 
-        MuleMessage message = factory.create(payload, encoding);
+        MuleMessage message = factory.create(payload, encoding, muleContext);
         assertNotNull(message);
         String expected = REQUEST_URI + "?" + builder.queryString;
         assertEquals(expected, message.getPayload());
@@ -98,7 +94,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
     public void testPostPayload() throws Exception
     {
         Object payload = buildPostRequest();
-        MuleMessage message = factory.create(payload, encoding);
+        MuleMessage message = factory.create(payload, encoding, muleContext);
         assertNotNull(message);
         assertTrue(message.getPayload() instanceof InputStream);
     }
@@ -107,7 +103,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
     public void testRequestParametersAreConvertedToMessageProperties() throws Exception
     {
         Object payload = buildPostRequest();
-        MuleMessage message = factory.create(payload, encoding);
+        MuleMessage message = factory.create(payload, encoding, muleContext);
         assertRequestParameterProperty("foo-value", message, "foo");
         assertRequestParameterProperty("bar-value", message, "bar");
 
@@ -122,7 +118,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
     {
         String contentType = "text/plain;charset=UTF-21";
         Object payload = buildGetRequestWithContentType(contentType);
-        MuleMessage message = factory.create(payload, encoding);
+        MuleMessage message = factory.create(payload, encoding, muleContext);
         assertEquals("UTF-21", message.getEncoding());
         assertInboundScopedProperty(contentType, message, CONTENT_TYPE_PROPERTY_KEY);
     }
@@ -132,7 +128,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
     {
         String contentType = "charset=UTF-21;text/plain";
         Object payload = buildGetRequestWithContentType(contentType);
-        MuleMessage message = factory.create(payload, encoding);
+        MuleMessage message = factory.create(payload, encoding, muleContext);
         assertEquals("UTF-21", message.getEncoding());
         assertInboundScopedProperty(contentType, message, CONTENT_TYPE_PROPERTY_KEY);
     }
@@ -142,7 +138,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
     {
         String sessionId = UUID.getUUID();
         Object payload = buildGetRequestWithSession(sessionId);
-        MuleMessage message = factory.create(payload, encoding);
+        MuleMessage message = factory.create(payload, encoding, muleContext);
         assertEquals(sessionId, message.<Object>getInboundProperty(ServletConnector.SESSION_ID_PROPERTY_KEY));
     }
 
@@ -155,8 +151,8 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         String sessionId = UUID.getUUID();
         Object payload = buildGetRequestWithSession(sessionId);
         Object payload2 = buildGetRequestWithSession(sessionId);
-        MuleMessage message = factory.create(payload, encoding);
-        MuleMessage message2 = factory.create(payload2, encoding);
+        MuleMessage message = factory.create(payload, encoding, muleContext);
+        MuleMessage message2 = factory.create(payload2, encoding, muleContext);
         assertEquals(sessionId, message.<Object>getInboundProperty(ServletConnector.SESSION_ID_PROPERTY_KEY));
         assertEquals(sessionId, message2.<Object>getInboundProperty(ServletConnector.SESSION_ID_PROPERTY_KEY));
 
@@ -170,7 +166,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         builder.characterEncoding = "UTF-21";
         Object payload = builder.buildRequest();
 
-        MuleMessage message = factory.create(payload, encoding);
+        MuleMessage message = factory.create(payload, encoding, muleContext);
         assertInboundScopedProperty(builder.characterEncoding, message, CHARACTER_ENCODING_PROPERTY_KEY);
     }
 
@@ -178,7 +174,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
     public void testRequestPropertiesAreConvertedToMessageProperties() throws Exception
     {
         Object payload = buildGetRequestWithParameterValue("foo-param", "foo-value");
-        MuleMessage message = factory.create(payload, encoding);
+        MuleMessage message = factory.create(payload, encoding, muleContext);
         assertInboundScopedProperty("foo-value", message, "foo-param");
     }
 
@@ -186,7 +182,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
     public void testRequestAttributesAreConvertedToMessageProperties() throws Exception
     {
         Object payload = buildGetRequestWithAttributeValue("foo-attribute", "foo-value");
-        MuleMessage message = factory.create(payload, encoding);
+        MuleMessage message = factory.create(payload, encoding, muleContext);
         assertInboundScopedProperty("foo-value", message, "foo-attribute");
     }
 
@@ -194,7 +190,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
     public void testRequestHeadersAreConvertedToMessageProperties() throws Exception
     {
         Object payload = buildGetRequestWithHeaders();
-        MuleMessage message = factory.create(payload, encoding);
+        MuleMessage message = factory.create(payload, encoding, muleContext);
         assertInboundScopedProperty("foo-value", message, "foo-header");
         assertInboundScopedProperty("MULE_HEADER_VALUE", message, "MULE_HEADER");
         assertInboundScopedProperty("localhost:8080", message, HttpConstants.HEADER_HOST);

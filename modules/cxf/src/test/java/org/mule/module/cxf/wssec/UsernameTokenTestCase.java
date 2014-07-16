@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.cxf.wssec;
 
 import static org.junit.Assert.assertTrue;
@@ -30,7 +26,7 @@ public class UsernameTokenTestCase extends AbstractServiceAndFlowTestCase
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
-    
+
     public UsernameTokenTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -43,14 +39,14 @@ public class UsernameTokenTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "org/mule/module/cxf/wssec/cxf-secure-service-service.xml, org/mule/module/cxf/wssec/username-token-conf.xml"},
             {ConfigVariant.FLOW, "org/mule/module/cxf/wssec/cxf-secure-service-flow.xml, org/mule/module/cxf/wssec/username-token-conf.xml"}
         });
-    }      
-        
+    }
+
     @Override
     protected void doSetUp() throws Exception
     {
-        ClientPasswordCallback.setPassword("secret");        
+        ClientPasswordCallback.setPassword("secret");
         super.doSetUp();
-        
+
         greetLatch = getGreeter().getLatch();
     }
 
@@ -65,7 +61,6 @@ public class UsernameTokenTestCase extends AbstractServiceAndFlowTestCase
         Object instance = getComponent("greeterService");
         return (GreeterWithLatch) instance;
     }
-
 }
 
 

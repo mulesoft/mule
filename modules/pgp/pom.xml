@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.mule.modules</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-pgp</artifactId>
     <packaging>jar</packaging>
@@ -16,6 +16,7 @@
 
     <properties>
         <bouncycastle.jdk>jdk16</bouncycastle.jdk>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
     </properties>
 
     <dependencies>
@@ -72,12 +73,6 @@
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-file</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

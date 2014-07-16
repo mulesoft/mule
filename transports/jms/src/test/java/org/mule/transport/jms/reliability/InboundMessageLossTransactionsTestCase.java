@@ -1,18 +1,17 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms.reliability;
+
+import static org.junit.Assert.assertTrue;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.Ignore;
+import org.junit.Test;
 
 
 /**
@@ -26,11 +25,18 @@ import static org.junit.Assert.assertTrue;
 public class InboundMessageLossTransactionsTestCase extends InboundMessageLossTestCase
 {
     @Override
-    protected String getConfigResources()
+    protected String[] getConfigFiles()
     {
-        return "reliability/activemq-config.xml, reliability/inbound-message-loss-transactions.xml";
+        return new String[] {
+            "reliability/activemq-config.xml",
+            "reliability/inbound-message-loss-transactions.xml"
+        };
     }
 
+
+    @Test
+    @Ignore("MULE-6926: flaky test")
+    @Override
     public void testComponentException() throws Exception
     {
         putMessageOnQueue("componentException");

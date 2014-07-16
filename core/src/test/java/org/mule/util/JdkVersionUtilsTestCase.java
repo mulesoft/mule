@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util;
 
 import static org.junit.Assert.assertEquals;
@@ -73,14 +69,14 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase
         assertTrue(JdkVersionUtils.isSupportedJdkVersion());
 		setJdkVersion("1.7");
 		assertTrue(JdkVersionUtils.isSupportedJdkVersion());
-		setJdkVersion("1.8");
-		assertTrue(JdkVersionUtils.isSupportedJdkVersion());
 
 		//not supported
 		setJdkVersion("1.4.2");
 		assertFalse(JdkVersionUtils.isSupportedJdkVersion());
 		setJdkVersion("1.4.2_12");
 		assertFalse(JdkVersionUtils.isSupportedJdkVersion());
+        setJdkVersion("1.8");
+        assertFalse(JdkVersionUtils.isSupportedJdkVersion());
 	}
 	
 	@Test
@@ -134,8 +130,6 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase
         assertTrue(JdkVersionUtils.isRecommendedJdkVersion());
 		setJdkVersion("1.7.0_03");
 		assertTrue(JdkVersionUtils.isRecommendedJdkVersion());
-        setJdkVersion("1.8");
-        assertTrue(JdkVersionUtils.isRecommendedJdkVersion());
 
 		//not recommended
 		setJdkVersion("1.4.2");
@@ -145,6 +139,8 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase
 		setJdkVersion("1.6.0_5");
 		assertFalse(JdkVersionUtils.isRecommendedJdkVersion());
         setJdkVersion("1.7.0");
+        assertFalse(JdkVersionUtils.isRecommendedJdkVersion());
+        setJdkVersion("1.8");
         assertFalse(JdkVersionUtils.isRecommendedJdkVersion());
 	}
 	
@@ -216,8 +212,9 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase
         JdkVersionUtils.validateJdk();
         setJdkVersion("1.7.0_03");
         JdkVersionUtils.validateJdk();
-        setJdkVersion("1.8");
+        setJdkVersion("1.7.0_51");
         JdkVersionUtils.validateJdk();
+
 	}
 	
 	@Test(expected=java.lang.RuntimeException.class)
@@ -226,4 +223,11 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase
         setJdkVersion("1.5.1");
         JdkVersionUtils.validateJdk();   
 	}
+
+    @Test
+    public void testValidateJdk8()
+    {
+        setJdkVersion("1.8");
+        JdkVersionUtils.validateJdk();
+    }
 }

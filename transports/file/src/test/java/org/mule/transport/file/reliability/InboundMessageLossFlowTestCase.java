@@ -1,26 +1,24 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.file.reliability;
 
+import static org.mule.transport.file.FileTestUtils.createDataFile;
+import static org.mule.transport.file.FileTestUtils.createFolder;
+
 import org.mule.api.MuleEventContext;
-import org.mule.api.construct.FlowConstruct;
 import org.mule.construct.Flow;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.probe.Probe;
+import org.mule.util.concurrent.Latch;
 
 import java.io.File;
 
 import org.junit.Test;
-import org.mule.util.concurrent.Latch;
 
 
 public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
@@ -31,15 +29,16 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "reliability/inbound-message-loss-flow.xml";
     }
 
+    @Override
     @Test
     public void testTransformerException() throws Exception
     {
-        tmpDir = createFolder(".mule/transformerException");
+        tmpDir = createFolder(getFileInsideWorkingDirectory("transformerException").getAbsolutePath());
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {
@@ -61,10 +60,11 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
         });
     }
 
+    @Override
     @Test
     public void testRouterException() throws Exception
     {
-        tmpDir = createFolder(".mule/routerException");
+        tmpDir = createFolder(getFileInsideWorkingDirectory("routerException").getAbsolutePath());
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {
@@ -94,7 +94,7 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
             return;
         }
         final Latch exceptionThrownLatch = new Latch();
-        tmpDir = createFolder(".mule/flowRefException");
+        tmpDir = createFolder(getFileInsideWorkingDirectory("flowRefException").getAbsolutePath());
         final File file = createDataFile(tmpDir, "test1.txt");
         FunctionalTestComponent ftc = getFunctionalTestComponent("failingFlow");
         ftc.setEventCallback(new EventCallback()

@@ -1,20 +1,22 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms.integration;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.transaction.Transaction;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.util.ClassUtils;
@@ -48,12 +50,6 @@ import javax.transaction.SystemException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * This is the base class for all integration tests that are part of the JMS integration test suite.  This is
@@ -111,7 +107,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     public static final String MIDDLE3_ENDPOINT_KEY = "middle3.destination";
     public static final String BROADCAST_TOPIC_ENDPOINT_KEY = "broadcast.topic.destination";
 
-    protected static final Log logger = LogFactory.getLog("MULE_TESTS");
+    protected static final Log log = LogFactory.getLog("MULE_TESTS");
 
     protected JmsVendorConfiguration jmsConfig = null;
     protected Scenario scenarioNoTx;
@@ -156,9 +152,9 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
             return CollectionUtils.EMPTY_COLLECTION;
         }
 
-        if (logger.isInfoEnabled())
+        if (log.isInfoEnabled())
         {
-            logger.info("Parameterized test using: " + url);
+            log.info("Parameterized test using: " + url);
         }
 
         try
@@ -234,8 +230,8 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     /**
      * This creates a {@link org.mule.config.spring.SpringXmlConfigurationBuilder} as expected but also figures out
-     * which 'connector' configuration file to load with the event flow configuration (obtained from the overriding \
-     * class which implements {@link #getConfigResources()}).
+     * which 'connector' configuration file to load with the event flow configuration (obtained from the overriding
+     * class which implements {@link #getConfigFile()}).
      *
      * @return The config builder used to create the Mule instance for this test
      * @throws Exception
@@ -245,17 +241,20 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     {
         if (multipleProviders)
         {
-            final String configResource = getConfigResources();
+            final String configFile = getConfigFile();
             // multiple configs arent' supported by this mechanism, validate and fail if needed
-            if (StringUtils.splitAndTrim(configResource, ",; ").length > 1)
+            if (StringUtils.splitAndTrim(configFile, ",; ").length > 1)
             {
                 throw new IllegalArgumentException("Parameterized tests don't support multiple " +
-                                                   "config files as input: " + configResource);
+                                                   "config files as input: " + configFile);
             }
-            String resources = configResource.substring(configResource.lastIndexOf("/") + 1);
-            resources = String.format("integration/%s/connector-%s,%s", getJmsConfig().getName(),
-                                      resources, getConfigResources());
-            SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(resources);
+            
+            String resources = configFile.substring(configFile.lastIndexOf("/") + 1);
+            resources = String.format("integration/%s/connector-%s",
+                getJmsConfig().getName(), resources);
+            
+            String[] configFiles = new String[] { resources, configFile };
+            SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(configFiles);
             return builder;
         }
         else
@@ -438,7 +437,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         dispatchMessage(payload, null);
     }
 
-    protected void dispatchMessage(Object payload, Properties props) throws Exception
+    protected void dispatchMessage(Object payload, Map<String, Object> props) throws Exception
     {
         client.dispatch(getInboundEndpoint(), payload, props);
     }
@@ -493,12 +492,12 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
             // TODO DZ: get all of the queue/topic names from the Mule config and just purge those
         }
 
-        client = new MuleClient(muleContext);
+        client = muleContext.getClient();
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
         if (tx != null)
         {
             TransactionCoordination.getInstance().unbindTransaction(tx);
-            logger.warn("Transaction was active when this test began");
+            log.warn("Transaction was active when this test began");
         }
     }
 
@@ -513,15 +512,11 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         }
 
         super.doTearDown();
-        if (client != null)
-        {
-            client.dispose();
-        }
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
         if (tx != null)
         {
             TransactionCoordination.getInstance().unbindTransaction(tx);
-            logger.warn("Transaction was active when this test ended");
+            log.warn("Transaction was active when this test ended");
         }
     }
 
@@ -638,7 +633,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
                 }
                 catch (JMSException e)
                 {
-                    logger.warn("Failed to close jms connection: " + e.getMessage());
+                    log.warn("Failed to close jms connection: " + e.getMessage());
                 }
             }
         }
@@ -657,7 +652,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         Session s = null;
         try
         {
-            logger.debug("purging queue : " + destination);
+            log.debug("purging queue : " + destination);
             c = getConnection(false, false);
             assertNotNull(c);
             c.start();
@@ -668,12 +663,12 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
             while (consumer.receiveNoWait() != null)
             {
-                logger.debug("Destination " + destination + " isn't empty, draining it");
+                log.debug("Destination " + destination + " isn't empty, draining it");
             }
         }
         catch (Exception e)
         {
-            logger.error("unable to purge : " + destination);
+            log.error("unable to purge : " + destination);
         }
         finally
         {
@@ -690,7 +685,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
                 }
                 catch (JMSException e)
                 {
-                    logger.warn("Failed to close jms connection: " + e.getMessage());
+                    log.warn("Failed to close jms connection: " + e.getMessage());
                 }
             }
         }
@@ -720,42 +715,37 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
         try
         {
-            logger.debug("purging topic : " + topic);
+            log.debug("purging topic : " + topic);
             c = getConnection(true, false);
             if (c == null)
             {
-                logger.debug("could not create a connection to topic : " + destination);
+                log.debug("could not create a connection to topic : " + destination);
             }
 
             c.start();
             s = ((TopicConnection) c).createTopicSession(true, Session.SESSION_TRANSACTED);
 
-            logger.debug("created topic session");
+            log.debug("created topic session");
             Topic dest = s.createTopic(destination);
-            logger.debug("created topic destination");
-
-            if (client != null)
-            {
-                client.dispose();
-            }
+            log.debug("created topic destination");
 
             MessageConsumer consumer = null;
 
             try
             {
                 consumer = s.createDurableSubscriber(dest, topic);
-                logger.debug("created consumer");
+                log.debug("created consumer");
                 while (consumer.receiveNoWait() != null)
                 {
-                    logger.debug("Topic " + topic + " isn't empty, draining it");
+                    log.debug("Topic " + topic + " isn't empty, draining it");
                 }
-                logger.debug("topic should be empty");
+                log.debug("topic should be empty");
                 consumer.close();
                 s.unsubscribe(topic);
             }
             catch (JMSException e)
             {
-                logger.debug("could not unsubscribe : " + topic);
+                log.debug("could not unsubscribe : " + topic);
             }
         }
 
@@ -774,11 +764,11 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
                 }
                 catch (JMSException e)
                 {
-                    logger.warn("Failed to close jms connection: " + e.getMessage());
+                    log.warn("Failed to close jms connection: " + e.getMessage());
                 }
             }
         }
-        logger.debug("completed draining topic :" + topic);
+        log.debug("completed draining topic :" + topic);
     }
 
     public boolean isMultipleProviders()

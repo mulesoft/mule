@@ -1,15 +1,15 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextFactory;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -19,18 +19,14 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class EmbeddedMuleTestCase extends AbstractMuleTestCase
 {
+
     @Test
     public void testStartup() throws Exception
     {
         SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(
-            "org/mule/test/spring/mule-root-test.xml");
+                "org/mule/test/spring/mule-root-test.xml");
         MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
         MuleContext context = muleContextFactory.createMuleContext(builder);
         // MuleContext must be started explicitly after MULE-1988
@@ -41,5 +37,7 @@ public class EmbeddedMuleTestCase extends AbstractMuleTestCase
         final EndpointBuilder endpoint = context.getRegistry().lookupEndpointBuilder("endpoint");
         assertNotNull(endpoint);
         assertEquals("test://value", endpoint.buildInboundEndpoint().getEndpointURI().toString());
+
+        context.dispose();
     }
 }

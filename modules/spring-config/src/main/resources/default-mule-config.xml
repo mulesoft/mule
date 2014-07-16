@@ -8,95 +8,33 @@
        default-init-method="initialise">
     <!-- Marker for MULE-4813-->
 
-    <bean name="_muleSimpleRegistryBootstrap" class="org.mule.config.bootstrap.SimpleRegistryBootstrap"/>
-
-    <bean name="_muleNotificationManager" class="org.mule.config.spring.ServerNotificationManagerConfigurator"/>
-
-    <bean name="_muleAnnotationsProcessor" class="org.mule.config.spring.processors.DecoratingFlowAnnotationsBeanProcessor"/>
-
-    <bean name="_muleTransformerAnnotationProcessor" class="org.mule.config.spring.processors.TransformerAnnotatedBeanProcessor"/>
-
-    <bean name="_muleConfiguration" class="org.mule.config.spring.MuleConfigurationConfigurator"/>
-
     <mule:mule>
-
-
-        <!-- Default configuration attributes are configured via default values in mule-core schema mule.xsd.
-             Configuration element is required here so that spring creates a MuleConfiguration instance and
-             populates it with defaults from schema
-        -->
-        <mule:configuration/>
-
-        <mule:notifications>
-            <mule:notification event="CONTEXT"/>
-            <mule:notification event="MODEL"/>
-            <mule:notification event="SERVICE"/>
-            <mule:notification event="SECURITY"/>
-            <mule:notification event="MANAGEMENT"/>
-            <mule:notification event="CONNECTION"/>
-            <mule:notification event="REGISTRY"/>
-            <mule:notification event="CUSTOM"/>
-            <mule:notification event="EXCEPTION"/>
-            <mule:notification event="TRANSACTION"/>
-        </mule:notifications>
 
         <mule:model name="_muleSystemModel"/>
 
     </mule:mule>
 
-    <bean name="_defaultInMemoryQueueStore,_simpleMemoryQueueStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultInMemoryQueueStore"/>
+    <bean name="_muleAnnotationsProcessor" class="org.mule.config.spring.processors.DecoratingFlowAnnotationsBeanProcessor"/>
 
-    <bean name="_defaultPersistentQueueStore,_fileQueueStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultPersistentQueueStore"/>
-
-    <bean name="_defaultInMemoryObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultInMemoryObjectStore"/>
-
-    <bean name="_defaultPersistentObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultPersistentObjectStore"/>
-
-    <bean name="_defaultUserObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserObjectStore"/>
-
-    <bean name="_defaultTransientUserObjectStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserTransientObjectStore"/>
-
-    <bean name="_muleQueueManager" class="org.mule.util.queue.TransactionalQueueManager"/>
-
-    <bean name="_muleObjectStoreManager" class="org.mule.util.store.MuleObjectStoreManager"/>
+    <bean name="_muleTransformerAnnotationProcessor" class="org.mule.config.spring.processors.TransformerAnnotatedBeanProcessor"/>
 
     <bean name="_muleSecurityManager" class="org.mule.security.MuleSecurityManager"/>
 
     <bean name="_muleMessageProcessingManager" class="org.mule.execution.MuleMessageProcessingManager"/>
 
-    <bean name="_muleProperties" class="java.util.HashMap"/>
-
     <bean name="_muleEndpointFactory" class="org.mule.endpoint.DefaultEndpointFactory"/>
 
-    <bean name="_muleStreamCloserService" class="org.mule.util.DefaultStreamCloserService"/>
+    <bean name="_muleOutboundEndpointExecutorFactory" class="org.mule.endpoint.DefaultOutboundEndpointExecutorFactory"/>
 
+    <bean name="_muleStreamCloserService" class="org.mule.util.DefaultStreamCloserService"/>
+    
     <bean name="_defaultThreadingProfile" class="org.mule.config.ChainedThreadingProfile"/>
 
     <bean name="_converterResolver" class="org.mule.DynamicDataTypeConversionResolver">
         <constructor-arg ref="_muleContext"/>
     </bean>
 
-    <bean name="_defaultMessageDispatcherThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
-        <constructor-arg ref="_defaultThreadingProfile"/>
-    </bean>
-
-    <bean name="_defaultMessageRequesterThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
-        <constructor-arg ref="_defaultThreadingProfile"/>
-    </bean>
-
-    <bean name="_defaultMessageReceiverThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
-        <constructor-arg ref="_defaultThreadingProfile"/>
-    </bean>
-
-    <bean name="_defaultServiceThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
-        <constructor-arg ref="_defaultThreadingProfile"/>
-    </bean>
-
     <bean name="_defaultRetryPolicyTemplate" class="org.mule.retry.policies.NoRetryPolicyTemplate"/>
-
-    <bean name="_muleExpressionLanguage" class="org.mule.el.mvel.MVELExpressionLanguage">
-        <constructor-arg ref="_muleContext"/>
-    </bean>
 
     <bean name="_muleLockFactory" class="org.mule.util.lock.MuleLockFactory"/>
 

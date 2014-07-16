@@ -4,21 +4,16 @@
     <parent>
         <groupId>org.mule</groupId>
         <artifactId>mule</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <groupId>org.mule.distributions</groupId>
     <artifactId>mule-distributions</artifactId>
     <packaging>pom</packaging>
     <name>Mule Distributions</name>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>mule-dist-snapshots</id>
-            <name>Mule Distributions Snapshot Repository</name>
-            <url>dav:https://dav.codehaus.org/snapshots.dist/mule/</url>
-            <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
-    </distributionManagement>
+    <properties>
+        <licensePath>../LICENSE_HEADER.txt</licensePath>
+    </properties>
 
     <build>
         <plugins>
@@ -26,45 +21,17 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
                 <configuration>
-                    <repositoryId>mule-dist-releases</repositoryId>
-                    <snapshotRepositoryId>mule-dist-snapshots</snapshotRepositoryId>
+                    <skip>${skipDistributions}</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-install-plugin</artifactId>
+                <configuration>
+                    <skip>${skipDistributions}</skip>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <!-- Mule Assembly Verifier Plugin snapshots hosted here -->
-            <id>codehaus-plugin-snapshots</id>
-            <name>Codehaus Plugin Snapshot Repository</name>
-            <url>http://snapshots.repository.codehaus.org</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </pluginRepository>
-    </pluginRepositories>
-
-    <repositories>
-        <repository>
-            <!--
-                standalone-light needs this repo declared as a regular one now for maven 3,
-                dependency-unpack downloads and repackages full distro
-             -->
-            <id>codehaus-dist-snapshots</id>
-            <name>Codehaus Distribution Snapshots</name>
-            <url>http://snapshots.dist.codehaus.org/mule/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-    </repositories>
 
     <modules>
         <module>embedded</module>

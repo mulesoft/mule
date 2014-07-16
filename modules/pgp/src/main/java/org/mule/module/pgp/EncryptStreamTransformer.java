@@ -1,18 +1,15 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
- * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
- *
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.pgp;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.Provider;
 import java.security.SecureRandom;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicLong;
@@ -33,6 +30,7 @@ public class EncryptStreamTransformer implements StreamTransformer
 
     private InputStream toBeEncrypted;
     private PGPPublicKey publicKey;
+    private Provider provider;
 
     private OutputStream pgpOutputStream;
     private OutputStream compressedEncryptedOutputStream;
@@ -40,7 +38,7 @@ public class EncryptStreamTransformer implements StreamTransformer
     private OutputStream armoredOut;
     private long bytesWrote;
 
-    public EncryptStreamTransformer(InputStream toBeEncrypted, PGPPublicKey publicKey) throws IOException
+    public EncryptStreamTransformer(InputStream toBeEncrypted, PGPPublicKey publicKey, Provider provider) throws IOException
     {
         Validate.notNull(toBeEncrypted, "The toBeEncrypted should not be null");
         Validate.notNull(publicKey, "The publicKey should not be null");
@@ -48,6 +46,7 @@ public class EncryptStreamTransformer implements StreamTransformer
         this.toBeEncrypted = toBeEncrypted;
         this.publicKey = publicKey;
         this.bytesWrote = 0;
+        this.provider = provider;
     }
 
     /**
@@ -58,7 +57,7 @@ public class EncryptStreamTransformer implements StreamTransformer
     {
         armoredOut = new ArmoredOutputStream(out);
         PGPEncryptedDataGenerator encrDataGen = new PGPEncryptedDataGenerator(PGPEncryptedData.CAST5, false,
-            new SecureRandom(), "BC");
+            new SecureRandom(), provider);
         encrDataGen.addMethod(this.publicKey);
         encryptedOutputStream = encrDataGen.open(armoredOut, new byte[1 << 16]);
 

@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.config.builders;
 
 import org.mule.api.MuleContext;
@@ -39,6 +35,7 @@ public abstract class AbstractConfigurationBuilder implements ConfigurationBuild
      * @throws ConfigurationException if the configuration fails i.e. an object cannot be created or
      * initialised properly
      */
+    @Override
     public void configure(MuleContext muleContext) throws ConfigurationException
     {
         try
@@ -91,6 +88,7 @@ public abstract class AbstractConfigurationBuilder implements ConfigurationBuild
      * Has this builder been configured already
      * @return true if the {@link #configure(org.mule.api.MuleContext)} method has been called
      */
+    @Override
     public boolean isConfigured()
     {
         return configured;

@@ -11,14 +11,14 @@
         <spring:import resource="sftp-properties.xml"/>
     </spring:beans>
 
-    <sftp:connector name="sftpCustomConnector" pollingFrequency="500" autoDelete="true" outputPattern="#[header:originalFilename]"
+    <sftp:connector name="sftpCustomConnector" pollingFrequency="500" autoDelete="true" outputPattern="#[header:inbound:originalFilename]"
                     identityFile="${USER1_IDENTITYFILE}" passphrase="${USER1_IDENTITYFILE_PASSPHRASE}"/>
 
-    <sftp:connector name="sftpCustomConnectorTempDirOutbound" outputPattern="#[header:originalFilename]"
+    <sftp:connector name="sftpCustomConnectorTempDirOutbound" outputPattern="#[header:inbound:originalFilename]"
                     identityFile="${USER1_IDENTITYFILE}" passphrase="${USER1_IDENTITYFILE_PASSPHRASE}"
                     tempDirOutbound="uploading"/>
 
-    <sftp:connector name="sftpCustomConnectorTempDirInbound" outputPattern="#[header:originalFilename]"
+    <sftp:connector name="sftpCustomConnectorTempDirInbound" outputPattern="#[header:inbound:originalFilename]"
                     identityFile="${USER1_IDENTITYFILE}" passphrase="${USER1_IDENTITYFILE_PASSPHRASE}"
                     tempDirInbound="uploading"/>
 

@@ -18,7 +18,7 @@
 
     <flow name="TcpReceiver">
 
-        <inbound-endpoint address="tcp://localhost:4444"
+        <inbound-endpoint address="tcp://localhost:${port}"
             exchange-pattern="request-response" />
 
         <component class="org.mule.component.simple.EchoComponent" />

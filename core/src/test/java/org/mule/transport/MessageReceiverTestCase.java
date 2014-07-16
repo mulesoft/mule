@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport;
 
 import static org.junit.Assert.assertEquals;
@@ -95,7 +91,6 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase
     {
         AbstractConnector connector = Mockito.mock(AbstractConnector.class);
         Mockito.when(connector.getSessionHandler()).thenReturn(new NullSessionHandler());
-        Mockito.when(connector.getMuleContext()).thenReturn(muleContext);
 
         FlowConstruct flowConstruct = Mockito.mock(FlowConstruct.class);
 
@@ -105,6 +100,7 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase
         Mockito.when(endpoint.getEndpointURI()).thenReturn(new MuleEndpointURI("test://test", muleContext));
         Mockito.when(endpoint.getTransactionConfig()).thenReturn(new MuleTransactionConfig());
         Mockito.when(endpoint.getExchangePattern()).thenReturn(mep);
+        Mockito.when(endpoint.getMuleContext()).thenReturn(muleContext);
 
         MuleEvent responseEvent = Mockito.mock(MuleEvent.class);
         Mockito.when(responseEvent.getSession()).thenReturn(muleSession);

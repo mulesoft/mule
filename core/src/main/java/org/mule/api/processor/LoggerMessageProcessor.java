@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.api.processor;
 
 import java.util.Collections;
@@ -86,41 +82,21 @@ public class LoggerMessageProcessor implements MessageProcessor, Initialisable, 
             }
             else
             {
-                logWithLevel(expressionManager.parse(message, event));
+                LogLevel logLevel = LogLevel.valueOf(level);
+                if (LogLevel.valueOf(level).isEnabled(logger)) 
+                {
+                    logLevel.log(logger, expressionManager.parse(message, event));
+                }
             }
         }
     }
 
     protected void logWithLevel(Object object)
     {
-        if ("ERROR".equals(level))
+        LogLevel logLevel = LogLevel.valueOf(level);
+        if (logLevel.isEnabled(logger)) 
         {
-            logger.error(object);
-        }
-        else if ("WARN".equals(level))
-        {
-            logger.warn(object);
-        }
-        else if ("INFO".equals(level))
-        {
-            if (logger.isInfoEnabled())
-            {
-                logger.info(object);
-            }
-        }
-        else if ("DEBUG".equals(level))
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug(object);
-            }
-        }
-        else if ("TRACE".equals(level))
-        {
-            if (logger.isTraceEnabled())
-            {
-                logger.trace(object);
-            }
+            logLevel.log(logger, object);
         }
     }
 
@@ -158,5 +134,82 @@ public class LoggerMessageProcessor implements MessageProcessor, Initialisable, 
     {
         annotations.clear();
         annotations.putAll(newAnnotations);
+    }
+    
+    public enum LogLevel
+    {
+        ERROR 
+        {
+            @Override
+            public void log(Log logger, Object object) 
+            {
+                logger.error(object);
+            }
+
+            @Override
+            public boolean isEnabled(Log logger) 
+            {
+                return logger.isErrorEnabled();
+            }
+        },
+        WARN 
+        {
+            @Override
+            public void log(Log logger, Object object) 
+            {
+                logger.warn(object);
+            }
+            
+            @Override
+            public boolean isEnabled(Log logger) 
+            {
+                return logger.isWarnEnabled();
+            }
+        },
+        INFO
+        {
+            @Override
+            public void log(Log logger, Object object) 
+            {
+                logger.info(object);
+            }
+            
+            @Override
+            public boolean isEnabled(Log logger) 
+            {
+                return logger.isInfoEnabled();
+            }
+        },
+        DEBUG
+        {
+            @Override
+            public void log(Log logger, Object object) 
+            {
+                logger.debug(object);
+            }
+            
+            @Override
+            public boolean isEnabled(Log logger) 
+            {
+                return logger.isDebugEnabled();
+            }
+        },
+        TRACE
+        {
+            @Override
+            public void log(Log logger, Object object) 
+            {
+                logger.trace(object);
+            }
+            
+            @Override
+            public boolean isEnabled(Log logger) 
+            {
+                return logger.isTraceEnabled();
+            }
+        };
+        
+        public abstract void log(Log logger, Object object);
+        public abstract boolean isEnabled(Log logger);
     }
 }

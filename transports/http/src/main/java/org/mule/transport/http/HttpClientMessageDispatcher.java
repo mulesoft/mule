@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.http;
 
 import org.mule.VoidMuleEvent;
@@ -71,7 +67,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         else if (ts.size() == 0)
         {
             this.sendTransformer = new ObjectToHttpClientMethodRequest();
-            this.sendTransformer.setMuleContext(httpConnector.getMuleContext());
+            this.sendTransformer.setMuleContext(getEndpoint().getMuleContext());
             this.sendTransformer.setEndpoint(endpoint);
         }
         else
@@ -163,7 +159,12 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
     private void processMuleSession(MuleEvent event, HttpMethod httpMethod)
     {
-        httpMethod.setRequestHeader(new Header(HttpConstants.HEADER_MULE_SESSION, event.getMessage().<String>getOutboundProperty(MuleProperties.MULE_SESSION_PROPERTY)));
+        String muleSession = event.getMessage().getOutboundProperty(MuleProperties.MULE_SESSION_PROPERTY);
+
+        if (muleSession != null)
+        {
+            httpMethod.setRequestHeader(new Header(HttpConstants.HEADER_MULE_SESSION, muleSession));
+        }
     }
 
     protected void processCookies(MuleEvent event)
@@ -195,7 +196,6 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         // precedence and is not available before send/dispatch.
         // Given that dispatchers are borrowed from a thread pool mutating client
         // here is ok even though it is not ideal.
-        client.getHttpConnectionManager().getParams().setConnectionTimeout(endpoint.getResponseTimeout());
         client.getHttpConnectionManager().getParams().setSoTimeout(endpoint.getResponseTimeout());
 
         MuleMessage msg = event.getMessage();
@@ -214,6 +214,13 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         }
 
         httpMethod.setFollowRedirects("true".equalsIgnoreCase((String)endpoint.getProperty("followRedirects")));
+
+        // keepAlive=true is the default behavior of HttpClient
+        if ("false".equalsIgnoreCase((String) endpoint.getProperty("keepAlive")))
+        {
+            httpMethod.setRequestHeader("Connection", "close");
+        }
+
         return httpMethod;
     }
 
@@ -328,7 +335,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             throw new HttpResponseException(method.getStatusText(), method.getStatusCode());
         }
         OutboundEndpoint out = new EndpointURIEndpointBuilder(locationHeader.getValue(),
-            httpConnector.getMuleContext()).buildOutboundEndpoint();
+            getEndpoint().getMuleContext()).buildOutboundEndpoint();
         MuleEvent result = out.process(event);
         if (result != null && !VoidMuleEvent.getInstance().equals(result))
         {
@@ -354,6 +361,16 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         return message;
     }
 
+    /**
+     * An exception is thrown if http.status >= 400 and exceptions are not disabled
+     * through one of the following mechanisms in order of precedence:
+     *
+     *  - setting to true the flow variable "http.disable.status.code.exception.check"
+     *  - setting to true the outbound property "http.disable.status.code.exception.check"
+     *  - setting to false the outbound endpoint attribute "exceptionOnMessageError"
+     *
+     * @return if an exception should be thrown
+     */
     protected boolean returnException(MuleEvent event, HttpMethod httpMethod)
     {
         String disableCheck = event.getMessage().getInvocationProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK);
@@ -361,8 +378,18 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         {
             disableCheck = event.getMessage().getOutboundProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK);
         }
-        return httpMethod.getStatusCode() >= ERROR_STATUS_CODE_RANGE_START
-                && !BooleanUtils.toBoolean(disableCheck);
+
+        boolean throwException;
+        if (disableCheck == null)
+        {
+            throwException = !"false".equals(endpoint.getProperty("exceptionOnMessageError"));
+        }
+        else
+        {
+            throwException = !BooleanUtils.toBoolean(disableCheck);
+        }
+
+        return httpMethod.getStatusCode() >= ERROR_STATUS_CODE_RANGE_START && throwException;
     }
 
     protected HostConfiguration getHostConfig(URI uri) throws Exception

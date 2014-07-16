@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util.store;
 
 import org.mule.api.store.ObjectAlreadyExistsException;
@@ -18,8 +14,8 @@ import org.mule.config.i18n.CoreMessages;
 
 import java.io.Serializable;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is an abstract superclass for {@link ObjectStore} implementations that conforms to the
@@ -28,8 +24,9 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractObjectStore<T extends Serializable> implements ObjectStore<T>
 {
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
+    @Override
     public boolean contains(Serializable key) throws ObjectStoreException
     {
         if (key == null)
@@ -41,6 +38,7 @@ public abstract class AbstractObjectStore<T extends Serializable> implements Obj
 
     protected abstract boolean doContains(Serializable key) throws ObjectStoreException;
 
+    @Override
     public void store(Serializable key, T value) throws ObjectStoreException
     {
         if (key == null)
@@ -58,6 +56,7 @@ public abstract class AbstractObjectStore<T extends Serializable> implements Obj
 
     protected  abstract void doStore(Serializable key, T value) throws ObjectStoreException;
 
+    @Override
     public T retrieve(Serializable key) throws ObjectStoreException
     {
         if (key == null)
@@ -76,6 +75,7 @@ public abstract class AbstractObjectStore<T extends Serializable> implements Obj
 
     protected abstract T doRetrieve(Serializable key) throws ObjectStoreException;
 
+    @Override
     public T remove(Serializable key) throws ObjectStoreException
     {
         if (key == null)

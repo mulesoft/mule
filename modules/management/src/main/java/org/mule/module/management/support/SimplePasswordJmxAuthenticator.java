@@ -1,17 +1,13 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.management.support;
 
 import org.mule.module.management.agent.ConfigurableJMXAuthenticator;
-import org.mule.module.management.agent.JmxAgent;
+import org.mule.module.management.agent.JmxApplicationAgent;
 import org.mule.util.StringUtils;
 
 import java.security.Principal;
@@ -37,7 +33,7 @@ public class SimplePasswordJmxAuthenticator implements JMXAuthenticator, Configu
     /**
      * Logger used by this class.
      */
-    protected static final Log logger = LogFactory.getLog(JmxAgent.class);
+    protected static final Log logger = LogFactory.getLog(JmxApplicationAgent.class);
 
     /**
      * An in-memory credentials storage.

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+      http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <flow name="200Flow">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" path="200" port="${port1}" />
+        <set-payload value="ok" />
+        <http:response-builder status="200"/>
+    </flow>
+
+    <flow name="201Flow">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" path="201" port="${port1}"/>
+        <set-payload value="ok" />
+        <http:response-builder status="201"/>
+    </flow>
+
+    <flow name="202Flow">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" path="202" port="${port1}"/>
+        <set-payload value="ok" />
+        <http:response-builder status="202"/>
+    </flow>
+
+    <flow name="203Flow">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" path="203" port="${port1}"/>
+        <set-payload value="ok" />
+        <http:response-builder status="203"/>
+    </flow>
+
+    <flow name="exceptionFlow">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" path="500" port="${port1}"/>
+        <set-payload value="fail" />
+        <test:component throwException="true"/>
+    </flow>
+
+    <flow name="echoFlow">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" path="echo" port="${port1}" />
+        <set-payload value="#[payload]" />
+        <http:response-builder status="200"/>
+    </flow>
+
+</mule>

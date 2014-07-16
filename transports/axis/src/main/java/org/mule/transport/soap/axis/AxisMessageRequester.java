@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.soap.axis;
 
 import org.mule.api.MuleMessage;
@@ -127,10 +123,10 @@ public class AxisMessageRequester extends AbstractMessageRequester
 
         call.setOperationName(method);
         call.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, endpoint);
-        call.setProperty(MuleProperties.MULE_CONTEXT_PROPERTY, connector.getMuleContext());
+        call.setProperty(MuleProperties.MULE_CONTEXT_PROPERTY, getEndpoint().getMuleContext());
 
         Object result = call.invoke(method, args);
-        return AxisMessageDispatcher.createMessage(result, call, connector.getMuleContext());
+        return AxisMessageDispatcher.createMessage(result, call, getEndpoint().getMuleContext());
     }
 
     public MuleMessage request(String endpoint, Object[] args) throws Exception
@@ -144,13 +140,13 @@ public class AxisMessageRequester extends AbstractMessageRequester
         {
             endpoint = "axis:" + endpoint;
         }
-        EndpointURI ep = new MuleEndpointURI(endpoint, connector.getMuleContext());
+        EndpointURI ep = new MuleEndpointURI(endpoint, getEndpoint().getMuleContext());
         String method = (String)ep.getParams().remove(MuleProperties.MULE_METHOD_PROPERTY);
         call.setOperationName(method);
 
         call.setOperationName(method);
         Object result = call.invoke(method, args);
-        return AxisMessageDispatcher.createMessage(result, call, connector.getMuleContext());
+        return AxisMessageDispatcher.createMessage(result, call, getEndpoint().getMuleContext());
     }
 
     public MuleMessage request(String endpoint, SOAPEnvelope envelope) throws Exception
@@ -160,7 +156,7 @@ public class AxisMessageRequester extends AbstractMessageRequester
         call.setSOAPActionURI(endpoint);
         call.setTargetEndpointAddress(endpoint);
         Object result = call.invoke(new Message(envelope));
-        return AxisMessageDispatcher.createMessage(result, call, connector.getMuleContext());
+        return AxisMessageDispatcher.createMessage(result, call, getEndpoint().getMuleContext());
     }
 
 }

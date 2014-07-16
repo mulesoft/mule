@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.routing.outbound;
 
 import org.mule.api.MuleMessage;
@@ -78,13 +74,13 @@ public class ExpressionMessageSplitter extends AbstractRoundRobinMessageSplitter
     }
 
     @Override
-    protected List splitMessage(MuleMessage message)
+    protected List<Object> splitMessage(MuleMessage message)
     {
-        List results = new ArrayList(4);
+        List<Object> results = new ArrayList<Object>(4);
         Object result = muleContext.getExpressionManager().evaluate(config.getFullExpression(expressionManager), message);
         if (result instanceof List)
         {
-            results.addAll((List)result);
+            results.addAll((List<?>)result);
         }
         else
         {

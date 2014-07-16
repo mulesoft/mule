@@ -1,18 +1,16 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.soap.axis;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -25,16 +23,13 @@ import javax.xml.rpc.ParameterMode;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class AxisNamedParametersTestCase extends FunctionalTestCase
 {
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "axis-named-param-mule-config.xml";
     }
@@ -42,7 +37,7 @@ public class AxisNamedParametersTestCase extends FunctionalTestCase
     @Test
     public void testNamedParameters() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         // The service itself will throw an exception if the parameters in the
         // request SOAP message are not named
         MuleMessage result = client.send("vm://mycomponent1", "Hello Named", null);
@@ -52,8 +47,9 @@ public class AxisNamedParametersTestCase extends FunctionalTestCase
     @Test
     public void testNamedParametersViaClient() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        Map props = new HashMap();
+        MuleClient client = muleContext.getClient();
+
+        Map<String, Object> props = new HashMap<String, Object>();
         // create the soap method passing in the method name and return type
         SoapMethod soapMethod = new SoapMethod(new QName("echo"), NamedParameter.XSD_STRING);
         // add one or more parameters
@@ -66,5 +62,4 @@ public class AxisNamedParametersTestCase extends FunctionalTestCase
             "Hello Named", props);
         assertEquals("Hello Named", result.getPayload());
     }
-
 }

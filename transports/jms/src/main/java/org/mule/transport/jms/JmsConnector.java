@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms;
 
 import org.mule.api.DefaultMuleException;
@@ -19,6 +15,7 @@ import org.mule.api.context.notification.ClusterNodeNotificationListener;
 import org.mule.api.context.notification.ConnectionNotificationListener;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.StartException;
 import org.mule.api.processor.MessageProcessor;
@@ -41,7 +38,6 @@ import org.mule.transport.jms.jndi.JndiNameResolver;
 import org.mule.transport.jms.jndi.SimpleJndiNameResolver;
 import org.mule.transport.jms.redelivery.AutoDiscoveryRedeliveryHandlerFactory;
 import org.mule.transport.jms.redelivery.RedeliveryHandlerFactory;
-import org.mule.transport.jms.xa.ConnectionFactoryWrapper;
 import org.mule.util.BeanUtils;
 
 import java.text.MessageFormat;
@@ -57,7 +53,6 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TemporaryQueue;
 import javax.jms.TemporaryTopic;
-import javax.jms.XAConnectionFactory;
 import javax.naming.CommunicationException;
 import javax.naming.NamingException;
 
@@ -71,6 +66,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 {
 
     public static final String JMS = "jms";
+    public static final String JMS_CONNECTION_FACTORY_DECORATOR = "JMS_CONNECTION_FACTORY_DECORATOR";
 
     /**
      * Indicates that Mule should throw an exception on any redelivery attempt.
@@ -99,6 +95,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
     private int maxRedelivery = REDELIVERY_FAIL_ON_FIRST;
 
+    @Deprecated
     private boolean cacheJmsSessions = false;
 
     /**
@@ -179,6 +176,8 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
      */
     private Boolean sameRMOverrideValue;
 
+    private final CompositeConnectionFactoryDecorator connectionFactoryDecorator = new CompositeConnectionFactoryDecorator();
+
     ////////////////////////////////////////////////////////////////////////
     // Methods
     ////////////////////////////////////////////////////////////////////////
@@ -203,6 +202,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     @Override
     protected void doInitialise() throws InitialisationException
     {
+        connectionFactoryDecorator.init(muleContext);
         if (topicResolver == null)
         {
             topicResolver = new DefaultJmsTopicResolver(this);
@@ -249,8 +249,8 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     /**
      * A factory method to create various JmsSupport class versions.
      *
-     * @return JmsSupport instance
      * @see JmsSupport
+     * @return JmsSupport instance
      */
     protected JmsSupport createJmsSupport()
     {
@@ -362,6 +362,11 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             connection = null;
         }
 
+        if (connectionFactory instanceof Disposable)
+        {
+            ((Disposable) connectionFactory).dispose();
+        }
+
         if (jndiNameResolver != null)
         {
             jndiNameResolver.dispose();
@@ -408,29 +413,23 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
                 throw new DefaultMuleException(JmsMessages.errorCreatingConnectionFactory(), ne);
             }
         }
+        if ((connectionFactoryProperties != null) && !connectionFactoryProperties.isEmpty())
+        {
+            // apply connection factory properties
+            BeanUtils.populateWithoutFail(connectionFactory, connectionFactoryProperties, true);
+        }
 
-        ConnectionFactory cf = this.connectionFactory;
+        connectionFactory = connectionFactoryDecorator.decorate(connectionFactory, this, muleContext);
+
         Connection connection;
-
-        try
-        {
-            if (cf instanceof XAConnectionFactory && muleContext.getTransactionManager() != null)
-            {
-                cf = new ConnectionFactoryWrapper(cf, sameRMOverrideValue);
-            }
-        }
-        catch (Exception e)
-        {
-            throw new InitialisationException(e, this);
-        }
 
         if (username != null)
         {
-            connection = jmsSupport.createConnection(cf, username, password);
+            connection = jmsSupport.createConnection(connectionFactory, username, password);
         }
         else
         {
-            connection = jmsSupport.createConnection(cf);
+            connection = jmsSupport.createConnection(connectionFactory);
         }
 
         if (connection != null)
@@ -445,9 +444,6 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
                 connection.setExceptionListener(this);
             }
         }
-
-
-
         return connection;
     }
 
@@ -518,7 +514,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             // apply connection factory properties
             BeanUtils.populateWithoutFail(connectionFactory, connectionFactoryProperties, true);
         }
-        if (isStarted())
+        if (isStarted() || startOnConnect)
         {
             connection.start();
         }
@@ -702,7 +698,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     @Override
     public ReplyToHandler getReplyToHandler(ImmutableEndpoint endpoint)
     {
-        return new JmsReplyToHandler(this);
+        return new JmsReplyToHandler(this, endpoint.getMuleContext());
     }
 
     /**
@@ -1152,11 +1148,19 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         this.eagerConsumer = eagerConsumer;
     }
 
+    /**
+     * @deprecated configure a {link ConnectionFactory} that supports session caching instead of using this property.
+     */
+    @Deprecated
     public boolean isCacheJmsSessions()
     {
         return cacheJmsSessions;
     }
 
+    /**
+     * @deprecated configure a {link ConnectionFactory} that supports session caching instead of using this property.
+     */
+    @Deprecated
     public void setCacheJmsSessions(boolean cacheJmsSessions)
     {
         this.cacheJmsSessions = cacheJmsSessions;

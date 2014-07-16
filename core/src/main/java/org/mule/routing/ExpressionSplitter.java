@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.routing;
 
 import org.mule.DefaultMuleMessage;
@@ -58,6 +54,7 @@ public class ExpressionSplitter extends AbstractSplitter
         config.validate(expressionManager);
     }
 
+    @Override
     protected List<MuleMessage> splitMessage(MuleEvent event)
     {
         Object result = event.getMuleContext()
@@ -94,7 +91,7 @@ public class ExpressionSplitter extends AbstractSplitter
         }
         else if (result == null)
         {
-            return new ArrayList();
+            return new ArrayList<MuleMessage>();
         }
         else
         {

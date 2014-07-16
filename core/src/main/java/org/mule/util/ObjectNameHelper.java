@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util;
 
 import org.mule.api.MuleContext;
@@ -36,18 +32,23 @@ public final class ObjectNameHelper
 
     public String getEndpointName(final EndpointURI endpointUri)
     {
-            String address = endpointUri.getAddress();
-            if (StringUtils.isBlank(address))
-            {
-                // for some endpoints in TCK like test://xxx
-                address = endpointUri.toString();
-            }
-            // Make sure we include the endpoint scheme in the name
-            address = (address.indexOf(":/") > -1 ? address : endpointUri.getScheme()
-                            + SEPARATOR + address);
-            String name = ENDPOINT_PREFIX + SEPARATOR + replaceObjectNameChars(address);
+        String name = getEndpointNameFor(endpointUri);
 
             return ensureUniqueEndpoint(name);
+    }
+
+    public static String getEndpointNameFor(EndpointURI endpointUri)
+    {
+        String address = endpointUri.getAddress();
+        if (StringUtils.isBlank(address))
+        {
+            // for some endpoints in TCK like test://xxx
+            address = endpointUri.toString();
+        }
+        // Make sure we include the endpoint scheme in the name
+        address = (address.indexOf(":/") > -1 ? address : endpointUri.getScheme()
+                        + SEPARATOR + address);
+        return ENDPOINT_PREFIX + SEPARATOR + replaceObjectNameChars(address);
     }
 
     protected String ensureUniqueEndpoint(String name)
@@ -111,7 +112,7 @@ public final class ObjectNameHelper
             CONNECTOR_PREFIX + SEPARATOR + connector.getProtocol() + SEPARATOR + DEFAULT);
     }
     
-    public String replaceObjectNameChars(String name)
+    public static String replaceObjectNameChars(String name)
     {
         String value = name.replaceAll("//", SEPARATOR);
         value = value.replaceAll("\\p{Punct}", SEPARATOR);

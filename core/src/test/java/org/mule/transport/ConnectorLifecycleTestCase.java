@@ -1,16 +1,18 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport;
 
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -29,19 +31,13 @@ import javax.resource.spi.work.WorkException;
 import junit.framework.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 /**
  * Tests that lifecycle methods on a connector are not processed more than once. (@see MULE-3062)
  * Also test lifecycle of a connector dispatchers, receivers, workManagers and scheduler.
  */
 public class ConnectorLifecycleTestCase extends AbstractMuleContextTestCase
 {
+
     private TestConnector connector;
 
     @Override
@@ -54,7 +50,10 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextTestCase
     @Override
     public void doTearDown() throws Exception
     {
-        if(!connector.isDisposed()) connector.dispose();
+        if (!connector.isDisposed())
+        {
+            connector.dispose();
+        }
         connector = null;
     }
 
@@ -166,7 +165,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextTestCase
         {
             //expected
         }
-        
+
         connector.disconnect();
         assertEquals(1, connector.getInitialiseCount());
         assertEquals(1, connector.getConnectCount());
@@ -295,49 +294,55 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextTestCase
     @Test
     public void testReceiversLifecycle() throws Exception
     {
-        Service service=getTestService();
+        Service service = getTestService();
         service.start();
-        connector.registerListener(getTestInboundEndpoint("in", "test://in"), getSensingNullMessageProcessor(), service);
+        try
+        {
+            connector.registerListener(getTestInboundEndpoint("in", "test://in"), getSensingNullMessageProcessor(), service);
 
-        assertEquals(1, connector.receivers.size());
-        assertFalse(( connector.receivers.get("in")).isConnected());
-        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
+            assertEquals(1, connector.receivers.size());
+            assertFalse((connector.receivers.get("in")).isConnected());
+            assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
 
-        connector.start();
-        assertTrue(( connector.receivers.get("in")).isConnected());
-        assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
+            connector.start();
+            assertTrue((connector.receivers.get("in")).isConnected());
+            assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
 
-        connector.registerListener(getTestInboundEndpoint("in2", "test://in2"), getSensingNullMessageProcessor(), service);
+            connector.registerListener(getTestInboundEndpoint("in2", "test://in2"), getSensingNullMessageProcessor(), service);
 
-        assertEquals(2, connector.receivers.size());
-        assertTrue(( connector.receivers.get("in")).isConnected());
-        assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
+            assertEquals(2, connector.receivers.size());
+            assertTrue((connector.receivers.get("in")).isConnected());
+            assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
 
-        assertTrue((connector.receivers.get("in2")).isConnected());
-        assertTrue(((AbstractMessageReceiver)connector.receivers.get("in2")).isStarted());
+            assertTrue((connector.receivers.get("in2")).isConnected());
+            assertTrue(((AbstractMessageReceiver) connector.receivers.get("in2")).isStarted());
 
-        connector.stop();
-        assertEquals(2, connector.receivers.size());
-        assertTrue(( connector.receivers.get("in")).isConnected());
-        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
-        assertTrue(( connector.receivers.get("in2")).isConnected());
-        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in2")).isStarted());
+            connector.stop();
+            assertEquals(2, connector.receivers.size());
+            assertTrue((connector.receivers.get("in")).isConnected());
+            assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
+            assertTrue((connector.receivers.get("in2")).isConnected());
+            assertFalse(((AbstractMessageReceiver) connector.receivers.get("in2")).isStarted());
 
-        connector.disconnect();
-        assertEquals(2, connector.receivers.size());
-        assertFalse(( connector.receivers.get("in")).isConnected());
-        assertFalse(( connector.receivers.get("in2")).isConnected());
+            connector.disconnect();
+            assertEquals(2, connector.receivers.size());
+            assertFalse((connector.receivers.get("in")).isConnected());
+            assertFalse((connector.receivers.get("in2")).isConnected());
 
-        connector.start();
-        assertEquals(2, connector.receivers.size());
-        assertTrue((connector.receivers.get("in")).isConnected());
-        assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
-        assertTrue((connector.receivers.get("in2")).isConnected());
-        assertTrue(((AbstractMessageReceiver) connector.receivers.get("in2")).isStarted());
+            connector.start();
+            assertEquals(2, connector.receivers.size());
+            assertTrue((connector.receivers.get("in")).isConnected());
+            assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
+            assertTrue((connector.receivers.get("in2")).isConnected());
+            assertTrue(((AbstractMessageReceiver) connector.receivers.get("in2")).isStarted());
 
-        connector.dispose();
-        assertEquals(0, connector.receivers.size());
-
+            connector.dispose();
+            assertEquals(0, connector.receivers.size());
+        }
+        finally
+        {
+            service.dispose();
+        }
     }
 
     @Test
@@ -355,21 +360,21 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextTestCase
 
         service.start();
         assertEquals(1, connector.receivers.size());
-        assertTrue(( connector.receivers.get("in")).isConnected());
+        assertTrue((connector.receivers.get("in")).isConnected());
         assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
 
         connector.stop();
         assertEquals(1, connector.receivers.size());
-        assertTrue(( connector.receivers.get("in")).isConnected());
+        assertTrue((connector.receivers.get("in")).isConnected());
         assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
 
         connector.disconnect();
         assertEquals(1, connector.receivers.size());
-        assertFalse(( connector.receivers.get("in")).isConnected());
+        assertFalse((connector.receivers.get("in")).isConnected());
 
         connector.start();
         assertEquals(1, connector.receivers.size());
-        assertTrue(( connector.receivers.get("in")).isConnected());
+        assertTrue((connector.receivers.get("in")).isConnected());
         assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
 
         service.stop();
@@ -382,9 +387,11 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextTestCase
     @Test
     public void testDispatchersLifecycle() throws Exception
     {
+        muleContext.start();
+
         //using sync endpoint so that any calls to 'process()' will be blocking and avoid timing issues
-        OutboundEndpoint out = getTestOutboundEndpoint("out", 
-            "test://out?exchangePattern=request-response", null, null, null, connector);
+        OutboundEndpoint out = getTestOutboundEndpoint("out",
+                                                       "test://out?exchangePattern=request-response", null, null, null, connector);
 
         // attempts to send/dispatch/request are made on a stopped/stopping connector
         // This should fail because the connector is not started!
@@ -407,8 +414,8 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextTestCase
         //This causes the first instance out dispatcher to be created
         assertDispatcherStartedConnected(out, true, true);
 
-        OutboundEndpoint out2 = getTestOutboundEndpoint("out2", 
-            "test://out2?exchangePattern=request-response", null, null, null, connector);
+        OutboundEndpoint out2 = getTestOutboundEndpoint("out2",
+                                                        "test://out2?exchangePattern=request-response", null, null, null, connector);
         //This causes the first instance out2 dispatcher to be created
         out2.process(getTestEvent("data"));
 
@@ -446,7 +453,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextTestCase
 
         MessageDispatcher dispatcher = connector.getDispatcherFactory().create(out);
         dispatcher.initialise();
-        
+
         assertTrue(dispatcher.getLifecycleState().isInitialised());
         dispatcher.connect();
         assertTrue(dispatcher.isConnected());

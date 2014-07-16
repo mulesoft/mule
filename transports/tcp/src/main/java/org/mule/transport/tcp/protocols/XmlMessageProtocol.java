@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.tcp.protocols;
 
 import java.io.IOException;
@@ -80,7 +76,7 @@ public class XmlMessageProtocol extends AbstractByteProtocol
             // read until xml pattern is seen (and then pushed back) or no more data
             // to read. return all data as message
             byte[] buffer = new byte[READ_BUFFER_SIZE];
-            StringBuffer message = new StringBuffer(READ_BUFFER_SIZE);
+            StringBuilder message = new StringBuilder(READ_BUFFER_SIZE);
             int patternIndex = -1;
             boolean repeat;
             do

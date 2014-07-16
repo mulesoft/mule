@@ -1,17 +1,17 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.integration.message;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Arrays;
@@ -19,10 +19,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 /**
  * Test case for EE-1820
@@ -48,7 +44,7 @@ public class MessageVersionCompatibilityTestCase extends AbstractServiceAndFlowT
     @Test
     public void testOldToOld() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://in1", "test", null);
 
         MuleMessage reply = client.request("vm://out1", TIMEOUT);
@@ -59,7 +55,7 @@ public class MessageVersionCompatibilityTestCase extends AbstractServiceAndFlowT
     @Test
     public void testOldToNew() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://in2", "test", null);
 
         MuleMessage reply = client.request("vm://out2", TIMEOUT);
@@ -70,7 +66,7 @@ public class MessageVersionCompatibilityTestCase extends AbstractServiceAndFlowT
     @Test
     public void testNewToOld() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://in3", "test", null);
 
         MuleMessage reply = client.request("vm://out3", TIMEOUT);
@@ -82,7 +78,7 @@ public class MessageVersionCompatibilityTestCase extends AbstractServiceAndFlowT
     @Test
     public void testNewToNew() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://in4", "test", null);
 
         MuleMessage reply = client.request("vm://out4", TIMEOUT);

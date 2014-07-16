@@ -1,14 +1,13 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.launcher.application;
+
+import org.mule.module.launcher.domain.DefaultDomainFactory;
+import org.mule.module.launcher.domain.MuleDomainClassLoaderRepository;
 
 import java.io.IOException;
 
@@ -24,13 +23,13 @@ public class TestApplicationFactory extends DefaultApplicationFactory
 
     public TestApplicationFactory(ApplicationClassLoaderFactory applicationClassLoaderFactory)
     {
-        super(applicationClassLoaderFactory);
+        super(applicationClassLoaderFactory, new DefaultDomainFactory(new MuleDomainClassLoaderRepository()));
     }
 
     @Override
-    public Application createApp(String appName) throws IOException
+    public Application createArtifact(String appName) throws IOException
     {
-        Application app = super.createApp(appName);
+        Application app = super.createArtifact(appName);
 
         TestApplicationWrapper testApplicationWrapper = new TestApplicationWrapper(app);
         testApplicationWrapper.setFailOnDisposeApplication(failOnDisposeApplication);

@@ -7,7 +7,7 @@
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.4/mule.xsd" />
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.5/mule.xsd" />
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"/>
 
@@ -193,6 +193,8 @@
                 <xsd:attribute name="host" type="xsd:string" >
                     <xsd:annotation>
                         <xsd:documentation>
+                            DEPRECATED: The host attribute for jmx-default-config is deprecated, for multi-homed hosts consider using
+                            instead the Java system property java.rmi.server.hostname.
                             The host to bind to. Normally, override this only for multi-NIC servers (default is localhost).
                         </xsd:documentation>
                     </xsd:annotation>

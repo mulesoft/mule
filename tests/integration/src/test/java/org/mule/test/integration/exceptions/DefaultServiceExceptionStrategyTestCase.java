@@ -1,26 +1,26 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.integration.exceptions;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.message.ExceptionMessage;
-import org.mule.module.client.MuleClient;
 import org.mule.routing.outbound.MulticastingRouter;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
@@ -33,12 +33,6 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class DefaultServiceExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -74,12 +68,12 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractServiceAndF
             ((DefaultMessagingExceptionStrategy) service.getExceptionListener()).getMessageProcessors()
                 .size());
 
-        MuleClient mc = new MuleClient(muleContext);
-        mc.dispatch("vm://in1", "test", null);
-        assertExceptionMessage(mc.request("vm://out1", RECEIVE_TIMEOUT));
+        MuleClient client = muleContext.getClient();
+        client.dispatch("vm://in1", "test", null);
+        assertExceptionMessage(client.request("vm://out1", RECEIVE_TIMEOUT));
         // request one more time to ensure that only one exception message was sent
         // per exception
-        assertNull(mc.request("vm://out1", RECEIVE_TIMEOUT));
+        assertNull(client.request("vm://out1", RECEIVE_TIMEOUT));
     }
 
     @Test
@@ -100,10 +94,10 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractServiceAndF
         assertTrue(mp.getClass().getName(), mp instanceof MulticastingRouter);
         assertEquals(2, ((MulticastingRouter) mp).getRoutes().size());
 
-        MuleClient mc = new MuleClient(muleContext);
-        mc.dispatch("vm://in2", "test", null);
-        MuleMessage out2 = mc.request("vm://out2", FunctionalTestCase.RECEIVE_TIMEOUT);
-        MuleMessage out3 = mc.request("vm://out3", FunctionalTestCase.RECEIVE_TIMEOUT);
+        MuleClient client = muleContext.getClient();
+        client.dispatch("vm://in2", "test", null);
+        MuleMessage out2 = client.request("vm://out2", RECEIVE_TIMEOUT);
+        MuleMessage out3 = client.request("vm://out3", RECEIVE_TIMEOUT);
         assertExceptionMessage(out2);
         assertExceptionMessage(out3);
         assertNotSame(out2, out3);
@@ -113,11 +107,11 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractServiceAndF
     @Test
     public void testDefaultExceptionStrategyNonEndpoint() throws Exception
     {
-        LocalMuleClient mc = muleContext.getClient();
+        MuleClient mc = muleContext.getClient();
 
         mc.dispatch("vm://in3", "test", null);
 
-        MuleMessage out4 = mc.request("vm://out4", FunctionalTestCase.RECEIVE_TIMEOUT);
+        MuleMessage out4 = mc.request("vm://out4", RECEIVE_TIMEOUT);
         assertEquals("ERROR!", out4.getPayloadAsString());
     }
 
@@ -128,9 +122,9 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractServiceAndF
         map.put("key1", "value1");
         map.put("key2", "value2");
 
-        MuleClient mc = new MuleClient(muleContext);
-        mc.dispatch("vm://in1", map, null);
-        MuleMessage message = mc.request("vm://out1", FunctionalTestCase.RECEIVE_TIMEOUT);
+        MuleClient client = muleContext.getClient();
+        client.dispatch("vm://in1", map, null);
+        MuleMessage message = client.request("vm://out1", RECEIVE_TIMEOUT);
 
         assertTrue(message.getPayload() instanceof ExceptionMessage);
         Object payload = ((ExceptionMessage) message.getPayload()).getPayload();
@@ -151,10 +145,10 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractServiceAndF
         else
             service = muleContext.getRegistry().lookupService("testService5");
 
-        MuleClient mc = new MuleClient(muleContext);
-        mc.dispatch("vm://in5", "test", null);
+        MuleClient client = muleContext.getClient();
+        client.dispatch("vm://in5", "test", null);
 
-        assertExceptionMessage(mc.request("vm://out5", FunctionalTestCase.RECEIVE_TIMEOUT));
+        assertExceptionMessage(client.request("vm://out5", RECEIVE_TIMEOUT));
 
         Prober prober = new PollingProber(5000, 100);
         prober.check(new Probe()

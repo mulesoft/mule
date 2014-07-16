@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -16,6 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.endpoint.MuleEndpointURI;
@@ -66,7 +64,7 @@ public class HttpConnectionManagerTestCase extends AbstractMuleTestCase
         new HttpConnectionManager(null, mockWorkManager);
     }
 
-    @Test(expected = ConnectException.class)
+    @Test(expected = MuleRuntimeException.class)
     public void workSchedulingFails() throws Exception
     {
         when(mockHttpConnector.getServerSocket(any(URI.class))).thenThrow(IOException.class);

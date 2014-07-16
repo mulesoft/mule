@@ -4,12 +4,16 @@
     <parent>
         <groupId>org.mule.modules</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-client</artifactId>
     <packaging>jar</packaging>
     <name>Mule Client</name>
-    <description>MuleClient is a simple interface for Mule clients to send and receive events from local or remote Mule Servers.</description>   
+    <description>MuleClient is a simple interface for Mule clients to send and receive events from local or remote Mule Servers.</description>
+
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
 
     <dependencies>
         <dependency>

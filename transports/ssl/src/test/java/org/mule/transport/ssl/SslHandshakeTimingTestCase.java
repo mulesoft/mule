@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.ssl;
 
 import static org.junit.Assert.assertNotNull;
@@ -82,6 +78,7 @@ public class SslHandshakeTimingTestCase extends AbstractMuleContextTestCase
         when(endpoint.getProperties()).thenReturn(properties);
         when(endpoint.getConnector()).thenReturn(connector);
         when(endpoint.getEncoding()).thenReturn(new DefaultMuleConfiguration().getDefaultEncoding());
+        when(endpoint.getMuleContext()).thenReturn(muleContext);
 
         Service service = mock(Service.class);
         return new SslMessageReceiver(connector, service, endpoint);

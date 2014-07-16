@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.api.config;
 
 
@@ -65,6 +61,7 @@ public class MuleProperties
     public static final String MULE_CORRELATION_SEQUENCE_PROPERTY = PROPERTY_PREFIX + "CORRELATION_SEQUENCE";
     public static final String MULE_REMOTE_SYNC_PROPERTY = PROPERTY_PREFIX + "REMOTE_SYNC";
     public static final String MULE_REMOTE_CLIENT_ADDRESS = PROPERTY_PREFIX + "REMOTE_CLIENT_ADDRESS";
+    public static final String MULE_PROXY_ADDRESS = PROPERTY_PREFIX + "PROXY_ADDRESS";
     public static final String MULE_SOAP_METHOD = PROPERTY_PREFIX + "SOAP_METHOD";
     public static final String MULE_JMS_SESSION = PROPERTY_PREFIX + "JMS_SESSION";
     public static final String MULE_MANAGEMENT_CONTEXT_PROPERTY = PROPERTY_PREFIX + "MANAGEMENT_CONTEXT";
@@ -139,6 +136,7 @@ public class MuleProperties
     public static final String OBJECT_STORE_FILE_NAME = "_fileQueueStore";
     public static final String OBJECT_MULE_APPLICATION_PROPERTIES = "_muleProperties";
     public static final String OBJECT_MULE_ENDPOINT_FACTORY = "_muleEndpointFactory";
+    public static final String OBJECT_MULE_OUTBOUND_ENDPOINT_EXECUTOR_FACTORY = "_muleOutboundEndpointExecutorFactory";
     public static final String OBJECT_MULE_STREAM_CLOSER_SERVICE = "_muleStreamCloserService";
     public static final String OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP = "_muleSimpleRegistryBootstrap";
     public static final String OBJECT_DEFAULT_THREADING_PROFILE = "_defaultThreadingProfile";
@@ -156,6 +154,8 @@ public class MuleProperties
     public static final String OBJECT_LOCK_PROVIDER = "_muleLockProvider";
     public static final String OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER = "_muleMessageProcessingManager";
     public static final String OBJECT_PROCESSING_TIME_WATCHER = "_muleProcessingTimeWatcher";
+    public static final String OBJECT_POLLING_CONTROLLER = "_mulePollingController";
+    public static final String OBJECT_CLUSTER_CONFIGURATION = "_muleClusterConfiguration";
 
     // Not currently used as these need to be instance variables of the MuleContext.
     public static final String OBJECT_WORK_MANAGER = "_muleWorkManager";
@@ -177,6 +177,9 @@ public class MuleProperties
     public static final String SYSTEM_PROPERTY_PREFIX = "mule.";
     public static final String MULE_CONTEXT_PROPERTY = SYSTEM_PROPERTY_PREFIX + "context";
     public static final String MULE_ENCODING_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX + "encoding";
+    public static final String MULE_SECURITY_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX + "security.model";
+    public static final String MULE_SECURITY_PROVIDER_PROPERTY = SYSTEM_PROPERTY_PREFIX + "security.provider";
+    public static final String MULE_STREAMING_BUFFER_SIZE = SYSTEM_PROPERTY_PREFIX + "streaming.bufferSize";
 
     public static final String CONTENT_TYPE_PROPERTY = "Content-Type";
 }

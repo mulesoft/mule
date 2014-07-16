@@ -1,19 +1,16 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 // @ThreadSafe
 public class ArrayUtils extends org.apache.commons.lang.ArrayUtils
@@ -71,7 +68,7 @@ public class ArrayUtils extends org.apache.commons.lang.ArrayUtils
 
         if (Array.getLength(array) > maxElements)
         {
-            StringBuffer buf = new StringBuffer(result);
+            StringBuilder buf = new StringBuilder(result);
             buf.insert(buf.length() - 1, " [..]");
             result = buf.toString();
         }
@@ -128,6 +125,18 @@ public class ArrayUtils extends org.apache.commons.lang.ArrayUtils
         String[] copy = new String[ugly.length];
         System.arraycopy(ugly, 0, copy, 0, ugly.length);
         return copy;
+    }
+
+    /**
+     * Calculates the intersection between two arrays, as if they were sets.
+     * @return A new array with the intersection.
+     */
+    public static String[] intersection(String[] a, String[] b)
+    {
+        Set<String> result = new HashSet<String>();
+        result.addAll(Arrays.asList(a));
+        result.retainAll(Arrays.asList(b));
+        return result.toArray(new String[result.size()]);
     }
     
 }

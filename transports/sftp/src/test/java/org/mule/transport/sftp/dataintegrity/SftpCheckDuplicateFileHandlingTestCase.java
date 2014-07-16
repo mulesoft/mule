@@ -1,17 +1,16 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.sftp.dataintegrity;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.api.MuleException;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.PollingProber;
@@ -33,9 +32,6 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Test the three different types of handling when duplicate files (i.e. file names)
@@ -65,14 +61,14 @@ public class SftpCheckDuplicateFileHandlingTestCase extends AbstractServiceAndFl
         super(variant, configResources);
     }
 
-    private static final HashMap<String, String> MESSAGE_PROPERTIES = new HashMap<String, String>();
+    private static final HashMap<String, Object> MESSAGE_PROPERTIES = new HashMap<String, Object>();
     {
         MESSAGE_PROPERTIES.put(FILENAME_MESSAGE_PROPERTY, FILENAME);
     }
 
     private Prober prober = new PollingProber(2000, 100);
 
-    private static MuleClient muleClient;
+    private MuleClient muleClient;
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -116,20 +112,20 @@ public class SftpCheckDuplicateFileHandlingTestCase extends AbstractServiceAndFl
      * Returns a SftpClient that is logged in to the sftp server that the endpoint is
      * configured against.
      */
-    protected SftpClient getSftpClient(String host, int port, String user, String password)
+    protected SftpClient getSftpClient(String host, int clientPort, String user, String password)
         throws IOException
     {
-        SftpClient sftpClient = new SftpClient(host);
-        sftpClient.setPort(port);
+        SftpClient client = new SftpClient(host);
+        client.setPort(clientPort);
         try
         {
-            sftpClient.login(user, password);
+            client.login(user, password);
         }
         catch (Exception e)
         {
             fail("Login failed: " + e);
         }
-        return sftpClient;
+        return client;
     }
 
     @Before
@@ -137,7 +133,7 @@ public class SftpCheckDuplicateFileHandlingTestCase extends AbstractServiceAndFl
     {
         sftpServer = new SftpServer(port.getNumber());
         sftpServer.start();
-        muleClient = new MuleClient(muleContext);
+        muleClient = muleContext.getClient();
         sftpClient = getSftpClient("localhost", port.getNumber(), "muletest1", "muletest1");
         sftpClient.mkdir("inbound");
         sftpClient.mkdir("outbound");
@@ -154,5 +150,4 @@ public class SftpCheckDuplicateFileHandlingTestCase extends AbstractServiceAndFl
         sftpClient.recursivelyDeleteDirectory("inbound2");
         sftpServer.stop();
     }
-
 }

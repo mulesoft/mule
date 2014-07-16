@@ -1,17 +1,14 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.transformers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.transformer.DiscoverableTransformer;
@@ -48,7 +45,6 @@ public class GraphTransformerResolutionTestCase extends FunctionalTestCase
 
     public static class C
     {
-
         private final String value;
 
         public C(String value)
@@ -58,7 +54,7 @@ public class GraphTransformerResolutionTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/test/transformers/graph-transformer-resolution-config.xml";
     }
@@ -74,7 +70,6 @@ public class GraphTransformerResolutionTestCase extends FunctionalTestCase
 
     public static class AtoBConverter extends AbstractTransformer implements DiscoverableTransformer
     {
-
         public AtoBConverter()
         {
             registerSourceType(new SimpleDataType<Object>(A.class));

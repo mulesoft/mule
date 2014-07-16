@@ -1,19 +1,15 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.servlet;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.transport.AbstractMuleMessageFactory;
+import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
 import java.util.Enumeration;
@@ -29,11 +25,6 @@ import org.apache.commons.collections.EnumerationUtils;
 public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
 {
     private static final String REMOTE_ADDRESS_HEADER = "remoteAddress";
-
-    public ServletMuleMessageFactory(MuleContext context)
-    {
-        super(context);
-    }
 
     @Override
     protected Class<?>[] getSupportedTransportMessageTypes()
@@ -139,6 +130,9 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
             // support for the HttpRequestToParameterMap transformer: put the map of request
             // parameters under a well defined key into the message properties as well
             parameterProperties.put(ServletConnector.PARAMETER_MAP_PROPERTY_KEY, parameterMap);
+
+            // make servlet and jetty compatible with http transport
+            parameterProperties.put(HttpConnector.HTTP_QUERY_PARAMS, parameterMap);
 
             message.addInboundProperties(parameterProperties);
         }
@@ -254,10 +248,12 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
 
     protected void copyHeaders(HttpServletRequest request, Map<String, Object> messageProperties)
     {
+        Map<String, Object> headers = new HashMap<String, Object>();
         for (Enumeration<?> e = request.getHeaderNames(); e.hasMoreElements();)
         {
             String key = (String)e.nextElement();
             String realKey = key;
+            Object realValue;
 
             if (key.startsWith(HttpConstants.X_PROPERTY_PREFIX))
             {
@@ -276,7 +272,7 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
                 {
                     value = value + ":" + port;
                 }
-                messageProperties.put(realKey, value);
+                realValue = value;
             }
             else
             {
@@ -284,13 +280,16 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
                 List<?> values = EnumerationUtils.toList(valueEnum);
                 if (values.size() > 1)
                 {
-                    messageProperties.put(realKey, values.toArray());
+                    realValue = values.toArray();
                 }
                 else
                 {
-                    messageProperties.put(realKey, values.get(0));
+                    realValue = values.get(0);
                 }
             }
+            headers.put(realKey, realValue);
         }
+        messageProperties.put(HttpConnector.HTTP_HEADERS, headers);
+        messageProperties.putAll(headers);
     }
 }

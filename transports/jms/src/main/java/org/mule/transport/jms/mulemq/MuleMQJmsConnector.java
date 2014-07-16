@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms.mulemq;
 
 import org.mule.api.MuleContext;
@@ -404,7 +400,7 @@ public class MuleMQJmsConnector extends JmsConnector
             if(logger.isWarnEnabled())
             {
                 // TODO : externalize strings
-                StringBuffer msg = new StringBuffer("MuleMQJmsConnector.onException() received exception: ");
+                StringBuilder msg = new StringBuilder("MuleMQJmsConnector.onException() received exception: ");
                 msg.append(th.getMessage());
                 msg.append("Older Messages will be discarded by MULE MQ.To prevent message loss use transacted outbound-endpoint");
                 msg.append("Refer to 'Queue Capacity' at http://www.mulesoft.org/display/MQ/Configuring+Mule+MQ#ConfiguringMuleMQ-ConfiguringQueues");
@@ -416,7 +412,7 @@ public class MuleMQJmsConnector extends JmsConnector
         else if (this.isInCluster() && errMsg.contains("Disconnected from :"))
         {
             // TODO : externalize strings
-            StringBuffer msg = new StringBuffer("MuleMQJmsConnector.onException() received exception: ");
+            StringBuilder msg = new StringBuilder("MuleMQJmsConnector.onException() received exception: ");
             msg.append(th.getMessage());
             msg.append("If using Mule MQ in a cluster Mule ESB will reconnect automatically in a few seconds");
             // Nothing to do here, log error and return
@@ -425,7 +421,7 @@ public class MuleMQJmsConnector extends JmsConnector
         else if (this.isInCluster() && errMsg.contains("Reconnected to :"))
         {
             // TODO : externalize strings
-            StringBuffer msg = new StringBuffer("MuleMQJmsConnector.onException() received exception: ");
+            StringBuilder msg = new StringBuilder("MuleMQJmsConnector.onException() received exception: ");
             msg.append(th.getMessage());
             msg.append("If using Mule MQ in a cluster Mule ESB will reconnect automatically in a few seconds");
             // Nothing to do here, log message and return

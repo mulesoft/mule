@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:schedulers="http://www.mulesoft.org/schema/mule/schedulers"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+               http://www.mulesoft.org/schema/mule/schedulers http://www.mulesoft.org/schema/mule/schedulers/current/mule-schedulers.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+
+    <vm:endpoint path="foo" exchange-pattern="request-response" name="foo"/>
+
+    <flow name="echo">
+        <inbound-endpoint ref="foo"/>
+        <static-component>
+            <return-data>foo</return-data>
+        </static-component>
+    </flow>
+
+    <flow name="pollfoo">
+        <poll doc:name="watermark">
+            <schedulers:cron-scheduler expression="0/1 * * * * ?"/>
+            <outbound-endpoint ref="foo"/>
+        </poll>
+        <component class="org.mule.modules.schedulers.cron.CronsSchedulerTest$FooComponent"/>
+    </flow>
+
+
+    <flow name="pollbar" processingStrategy="synchronous" >
+        <poll>
+            <schedulers:cron-scheduler expression="${expression.property}"/>
+            <static-component>
+                <return-data>bar</return-data>
+            </static-component>
+        </poll>
+       <component class="org.mule.modules.schedulers.cron.CronsSchedulerTest$BarComponent"/>
+    </flow>
+
+</mule>

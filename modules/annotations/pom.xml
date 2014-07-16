@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.modules</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>3.5.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M1-SNAPSHOT</version>
     </parent>
     <groupId>org.mule.modules</groupId>
     <artifactId>mule-module-annotations</artifactId>
@@ -15,6 +15,11 @@
     <description>Annotations for configuring Mule at various levels such as services, entry points, transformers and
         expressions.
     </description>
+
+    <properties>
+        <skipExportTests>false</skipExportTests>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
 
     <dependencies>
         <!-- Mule Dependencies -->
@@ -29,6 +34,7 @@
             <version>${cglibVersion}</version>
         </dependency>
 
+        <!-- Test Dependencies -->
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>

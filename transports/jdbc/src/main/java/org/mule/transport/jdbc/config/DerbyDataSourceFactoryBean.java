@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jdbc.config;
 
 import java.lang.reflect.Method;
@@ -49,7 +45,6 @@ public class DerbyDataSourceFactoryBean extends AbstractDataSourceFactoryBean
     public void destroy() throws Exception {
     	super.destroy();
     	// call org.apache.derby.iapi.services.monitor.Monitor.getMonitor().shutdown();
-    	logger.warn("destroying derby data source factory bean", new Exception());
     	Class clazz = Class.forName("org.apache.derby.iapi.services.monitor.Monitor");
     	Object monitor = clazz.getMethod("getMonitor", new Class[] {})
     			.invoke(clazz, new Object[] {});

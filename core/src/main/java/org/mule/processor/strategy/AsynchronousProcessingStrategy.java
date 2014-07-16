@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.processor.strategy;
 
 import org.mule.api.MuleContext;
@@ -40,7 +36,7 @@ public class AsynchronousProcessingStrategy implements ProcessingStrategy
 
     @Override
     public void configureProcessors(List<MessageProcessor> processors,
-                                    StageNameSource nameSource,
+                                    org.mule.api.processor.StageNameSource nameSource,
                                     MessageProcessorChainBuilder chainBuilder,
                                     MuleContext muleContext)
     {
@@ -52,7 +48,7 @@ public class AsynchronousProcessingStrategy implements ProcessingStrategy
         }
     }
 
-    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(StageNameSource nameSource,
+    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(org.mule.api.processor.StageNameSource nameSource,
                                                                             MuleContext muleContext)
     {
         return new AsyncInterceptingMessageProcessor(createThreadingProfile(muleContext), getThreadPoolName(

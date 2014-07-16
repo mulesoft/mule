@@ -2,20 +2,10 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
-       xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc"
-       xmlns:jbossts="http://www.mulesoft.org/schema/mule/jbossts"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
-       http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/current/mule-jdbc.xsd
-       http://www.mulesoft.org/schema/mule/jbossts http://www.mulesoft.org/schema/mule/jbossts/current/mule-jbossts.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <!-- Beans for the JBoss transaction manager -->
-    <spring:bean id="muleTM" class="org.mule.config.spring.factories.MuleTransactionManagerFactoryBean"/>
 
     <!-- The database config is stored in derby.properties. Use a placeholder to configure all references -->
     <spring:bean id="property-placeholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
@@ -25,14 +15,8 @@
     </spring:bean>
 
     <!-- Data Source -->
-    <spring:bean id="jdbcDataSource" class="org.enhydra.jdbc.standard.StandardXADataSource" destroy-method="shutdown">
-        <spring:property name="transactionManager" ref="muleTM"/>
-        <spring:property name="driverName" value="org.apache.derby.jdbc.EmbeddedDriver"/>
-        <spring:property name="url" value="${database.connection}"/>
+    <spring:bean id="jdbcDataSource" class="org.apache.derby.jdbc.EmbeddedXADataSource" >
+        <spring:property name="databaseName" value="${database.name}"/>
     </spring:bean>
 
-    <spring:bean id="jdbcDataSourceXA" class="org.enhydra.jdbc.pool.StandardXAPoolDataSource" destroy-method="shutdown">
-       <spring:property name="dataSource" ref="jdbcDataSource"/>
-        <spring:property name="maxSize" value="10"/>
-    </spring:bean>
 </mule>

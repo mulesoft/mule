@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <spring:bean id="beanRouteResolver" class="org.mule.test.routing.CustomRouteResolver"/>
+    <spring:bean id="identifiableRouteResolver" class="org.mule.test.routing.IdentifiableCustomRouteResolver" />
+
+    <flow name="dynamicRoundRobin">
+        <dynamic-round-robin>
+            <custom-route-resolver ref="beanRouteResolver"/>
+        </dynamic-round-robin>
+    </flow>
+
+    <flow name="dynamicRoundRobinWithCustomId">
+        <dynamic-round-robin>
+            <custom-route-resolver ref="identifiableRouteResolver" />
+        </dynamic-round-robin>
+    </flow>
+
+    <flow name="multipleDynamicRoundRobin">
+        <choice>
+            <when expression="#[flowVars['first-router']]">
+                <dynamic-round-robin>
+                    <custom-route-resolver ref="beanRouteResolver" />
+                </dynamic-round-robin>
+            </when>
+            <otherwise>
+                <dynamic-round-robin>
+                    <custom-route-resolver ref="beanRouteResolver" />
+                </dynamic-round-robin>
+            </otherwise>
+        </choice>
+    </flow>
+
+    <flow name="multipleDynamicRoundRobinWithId">
+        <choice>
+            <when expression="#[flowVars['first-router']]">
+                <dynamic-round-robin>
+                    <custom-route-resolver ref="identifiableRouteResolver" />
+                </dynamic-round-robin>
+            </when>
+            <otherwise>
+                <dynamic-round-robin>
+                    <custom-route-resolver ref="identifiableRouteResolver" />
+                </dynamic-round-robin>
+            </otherwise>
+        </choice>
+    </flow>
+
+
+</mule>

@@ -1,22 +1,20 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.issues;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.AbstractMessageTransformer;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -24,7 +22,6 @@ import java.util.Set;
 
 import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
 
 public class MessageRootIdPropagationTestCase extends FunctionalTestCase
 {
@@ -32,7 +29,7 @@ public class MessageRootIdPropagationTestCase extends FunctionalTestCase
     public DynamicPort port1 = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "org/mule/issues/message-root-id.xml";
     }
@@ -41,14 +38,13 @@ public class MessageRootIdPropagationTestCase extends FunctionalTestCase
     public void testRootIDs() throws Exception
     {
         RootIDGatherer.initialize();
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         DefaultMuleMessage msg = new DefaultMuleMessage("Hello", muleContext);
         msg.setOutboundProperty("where", "client");
         RootIDGatherer.process(msg);
-        MuleMessage response = client.send("vm://vmin", msg);
+        client.send("vm://vmin", msg);
         Thread.sleep(1000);
-        System.out.println(RootIDGatherer.getIdMap());
         assertEquals(6, RootIDGatherer.getMessageCount());
         assertEquals(1, RootIDGatherer.getIds().size());
     }
@@ -79,7 +75,7 @@ public class MessageRootIdPropagationTestCase extends FunctionalTestCase
         }
 
         @Override
-        public Object transformMessage(MuleMessage msg, String encoding)
+        public Object transformMessage(MuleMessage msg, String outputEncoding)
         {
             process(msg);
             return msg.getPayload();

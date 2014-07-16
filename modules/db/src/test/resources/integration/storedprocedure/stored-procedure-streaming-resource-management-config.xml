@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+            http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+
+    <flow name="storedProcedureStreaming">
+        <inbound-endpoint address="vm://storedProcedureStreaming" exchange-pattern="request-response"/>
+
+        <db:stored-procedure config-ref="pooledJdbcConfig" streaming="true">
+            <db:parameterized-query>{ call getTestRecords() }</db:parameterized-query>
+        </db:stored-procedure>
+
+        <enricher>
+            <processor-chain>
+                <set-payload value="#[payload.get('resultSet1')]"/>
+                <set-variable variableName="results" value="#[new ArrayList()]"/>
+
+                <foreach>
+                    <expression-component>flowVars['results'].add(payload)</expression-component>
+                </foreach>
+
+                <set-payload value="#[results]"/>
+            </processor-chain>
+            <enrich target="#[variable:results]"/>
+        </enricher>
+
+        <set-property propertyName="processedResults" value="#[results]"/>
+    </flow>
+
+    <flow name="storedProcedureStreamingError">
+        <inbound-endpoint address="vm://storedProcedureStreamingError" exchange-pattern="request-response"/>
+
+        <db:stored-procedure config-ref="pooledJdbcConfig" streaming="true">
+            <db:parameterized-query>{ call getTestRecords() }</db:parameterized-query>
+        </db:stored-procedure>
+
+        <test:component throwException="true" exceptionToThrow="java.lang.RuntimeException" exceptionText="Failing test on purpose"/>
+    </flow>
+</mule>

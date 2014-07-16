@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.http;
 
 import org.mule.RequestContext;
@@ -16,6 +12,7 @@ import org.mule.api.transport.OutputHandler;
 import org.mule.util.SystemUtils;
 import org.mule.util.concurrent.Latch;
 
+import java.io.BufferedInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,7 +76,7 @@ public class HttpServerConnection implements HandshakeCompletedListener
             ((SSLSocket) socket).addHandshakeCompletedListener(this);
         }
 
-        setSocketTcpNoDelay();
+        setSocketTcpNoDelay(connector.isSendTcpNoDelay());
         this.socket.setKeepAlive(connector.isKeepAlive());
 
         if (connector.getReceiveBufferSize() != Connector.INT_VALUE_NOT_SET
@@ -93,16 +90,16 @@ public class HttpServerConnection implements HandshakeCompletedListener
             socket.setSoTimeout(connector.getServerSoTimeout());
         }
 
-        this.in = socket.getInputStream();
+        this.in = new BufferedInputStream(socket.getInputStream());
         this.out = new DataOutputStream(socket.getOutputStream());
         this.encoding = encoding;
     }
 
-    private void setSocketTcpNoDelay() throws IOException
+    private void setSocketTcpNoDelay(boolean tcpNoDelay) throws IOException
     {
         try
         {
-            socket.setTcpNoDelay(true);
+            socket.setTcpNoDelay(tcpNoDelay);
         }
         catch (SocketException se)
         {
@@ -210,7 +207,7 @@ public class HttpServerConnection implements HandshakeCompletedListener
         }
         try
         {
-            cachedRequest = new HttpRequest(getRequestLine(), HttpParser.parseHeaders(this.in, encoding), this.in, encoding);
+            cachedRequest = createHttpRequest();
             return cachedRequest;
         }
         catch (IOException e)
@@ -218,6 +215,11 @@ public class HttpServerConnection implements HandshakeCompletedListener
             close();
             throw e;
         }
+    }
+
+    protected HttpRequest createHttpRequest() throws IOException
+    {
+        return new HttpRequest(getRequestLine(), HttpParser.parseHeaders(this.in, encoding), this.in, encoding);
     }
 
     public HttpResponse readResponse() throws IOException
@@ -433,14 +435,53 @@ public class HttpServerConnection implements HandshakeCompletedListener
         return String.format("%s://%s:%d%s", scheme, localSocketAddress.getHostName(), localSocketAddress.getPort(), readRequest().getUrlWithoutParams());
     }
 
+    /**
+     * Returns the value of the SO_TIMEOUT for the underlying socket.
+     *
+     * @return The value of the SO_TIMEOUT for the underlying socket.
+     * @throws SocketException If there is an error in the underlying protocol.
+     */
     public int getSocketTimeout() throws SocketException
     {
-        return this.socket.getSoTimeout();
+        return socket.getSoTimeout();
     }
 
     public void setSocketTimeout(int timeout) throws SocketException
     {
-        this.socket.setSoTimeout(timeout);
+        socket.setSoTimeout(timeout);
+    }
+
+    /**
+     * Tests if SO_KEEPALIVE is enabled in the underlying socket.
+     *
+     * @return a <code>boolean</code> indicating whether or not SO_KEEPALIVE is enabled.
+     * @throws SocketException If there is an error in the underlying protocol.
+     */
+    public boolean isSocketKeepAlive() throws SocketException
+    {
+        return socket.getKeepAlive();
+    }
+
+    /**
+     * Tests if TCP_NODELAY is enabled in the underlying socket.
+     *
+     * @return a <code>boolean</code> indicating whether or not TCP_NODELAY is enabled.
+     * @throws SocketException If there is an error in the underlying protocol.
+     */
+    public boolean isSocketTcpNoDelay() throws SocketException
+    {
+        return socket.getTcpNoDelay();
+    }
+
+    /**
+     * Gets the value of the SO_RCVBUF for the underlying socket.
+     *
+     * @return The value of the SO_RCVBUF for the underlying socket.
+     * @throws SocketException If there is an error in the underlying protocol.
+     */
+    public int getSocketReceiveBufferSize() throws SocketException
+    {
+        return socket.getReceiveBufferSize();
     }
 
     public Latch getSslSocketHandshakeCompleteLatch()
@@ -457,10 +498,17 @@ public class HttpServerConnection implements HandshakeCompletedListener
      * <p/>
      * Must be called if a new request from the same socket associated with the instance is going to be processed.
      */
-    public void reset()
+    public void reset() throws IOException
     {
         this.requestLine = null;
-        this.cachedRequest = null;
+        if (this.cachedRequest != null)
+        {
+            if (cachedRequest.getBody() != null)
+            {
+                cachedRequest.getBody().close();
+            }
+            this.cachedRequest = null;
+        }
     }
 
     @Override

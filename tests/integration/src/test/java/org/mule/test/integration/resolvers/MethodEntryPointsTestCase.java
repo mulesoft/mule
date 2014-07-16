@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.integration.resolvers;
 
 import static org.junit.Assert.assertEquals;
@@ -16,9 +12,9 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.model.resolvers.EntryPointNotFoundException;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.util.ExceptionUtils;
 
@@ -49,7 +45,8 @@ public class MethodEntryPointsTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testTooManySatisfiableMethods() throws Exception
     {
-        MuleMessage message = muleContext.getClient().send("vm://service", "hello", null);
+        MuleClient client = muleContext.getClient();
+        MuleMessage message = client.send("vm://service", "hello", null);
         assertNotNull(message);
         assertNotNull(message.getExceptionPayload());
         assertEquals(EntryPointNotFoundException.class, message.getExceptionPayload()
@@ -62,7 +59,8 @@ public class MethodEntryPointsTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testBadMethodName() throws Exception
     {
-        MuleMessage message = muleContext.getClient().send("vm://service?method=foo", "hello", null);
+        MuleClient client = muleContext.getClient();
+        MuleMessage message = client.send("vm://service?method=foo", "hello", null);
         assertNotNull(message);
         assertNotNull(message.getExceptionPayload());
         assertEquals(EntryPointNotFoundException.class, message.getExceptionPayload()
@@ -73,7 +71,7 @@ public class MethodEntryPointsTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testValidCallToReverse() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         DefaultMuleMessage msg = new DefaultMuleMessage("hello", muleContext);
         msg.setOutboundProperty("method", "reverseString");
         MuleMessage message = client.send("vm://service", msg);
@@ -84,7 +82,7 @@ public class MethodEntryPointsTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testValidCallToUpperCase() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         DefaultMuleMessage msg = new DefaultMuleMessage("hello", muleContext);
         msg.setOutboundProperty("method", "upperCaseString");
         MuleMessage message = client.send("vm://service", msg);
@@ -95,7 +93,7 @@ public class MethodEntryPointsTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testValidCallToReverseMethodSetOnEndpoint() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://service2-reverseString", "hello", null);
         assertNotNull(message);
         assertEquals("olleh", message.getPayloadAsString());
@@ -104,7 +102,7 @@ public class MethodEntryPointsTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testValidCallToUpperCaseMethodSetOnEndpoint() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://service2-upperCaseString", "hello", null);
         assertNotNull(message);
         assertEquals(message.getPayloadAsString(), "HELLO");
@@ -113,7 +111,7 @@ public class MethodEntryPointsTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testValidCallToReverseMethodSetAsHeader() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(MuleProperties.MULE_METHOD_PROPERTY, "reverseString");
         MuleMessage message = client.send("vm://service", "hello", props);
@@ -124,12 +122,11 @@ public class MethodEntryPointsTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testValidCallToUpperCaseMethodSetAsHeader() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(MuleProperties.MULE_METHOD_PROPERTY, "upperCaseString");
         MuleMessage message = client.send("vm://service", "hello", props);
         assertNotNull(message);
         assertEquals("HELLO", message.getPayloadAsString());
     }
-
 }

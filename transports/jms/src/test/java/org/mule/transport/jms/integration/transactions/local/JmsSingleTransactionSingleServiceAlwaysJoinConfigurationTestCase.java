@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms.integration.transactions.local;
 
 import org.mule.transport.jms.integration.AbstractJmsSingleTransactionSingleServiceTestCase;
@@ -20,13 +16,13 @@ import org.junit.Test;
 public class JmsSingleTransactionSingleServiceAlwaysJoinConfigurationTestCase extends
     AbstractJmsSingleTransactionSingleServiceTestCase
 {
-
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "integration/transactions/local/jms-single-tx-single-service-always-join.xml";
     }
 
+    @Override
     @Test
     public void testNone() throws Exception
     {
@@ -40,6 +36,7 @@ public class JmsSingleTransactionSingleServiceAlwaysJoinConfigurationTestCase ex
         runTransactionFail("testNone");
     }
 
+    @Override
     @Test
     public void testAlwaysBegin() throws Exception
     {
@@ -53,6 +50,7 @@ public class JmsSingleTransactionSingleServiceAlwaysJoinConfigurationTestCase ex
         runTransactionFail("testAlwaysBegin");
     }
 
+    @Override
     @Test
     public void testBeginOrJoin() throws Exception
     {
@@ -66,6 +64,7 @@ public class JmsSingleTransactionSingleServiceAlwaysJoinConfigurationTestCase ex
         runTransactionFail("testBeginOrJoin");
     }
 
+    @Override
     @Test
     public void testAlwaysJoin() throws Exception
     {
@@ -79,6 +78,7 @@ public class JmsSingleTransactionSingleServiceAlwaysJoinConfigurationTestCase ex
         runTransactionFail("testAlwaysJoin");
     }
 
+    @Override
     @Test
     public void testJoinIfPossible() throws Exception
     {

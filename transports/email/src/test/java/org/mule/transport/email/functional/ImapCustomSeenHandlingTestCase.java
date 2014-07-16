@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.email.functional;
 
 import static org.junit.Assert.assertNotNull;
@@ -44,7 +40,7 @@ public class ImapCustomSeenHandlingTestCase extends AbstractEmailFunctionalTestC
     }
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "imap-custom-seen-flag.xml";
     }
@@ -52,11 +48,13 @@ public class ImapCustomSeenHandlingTestCase extends AbstractEmailFunctionalTestC
     @Parameters
     public static Collection<Object[]> parameters()
     {
+        // the (second) config resources parameter must be null - we override
+        // getConfigFile() which provides the actual config that's used
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "imap-functional-test-service.xml"},
-            {ConfigVariant.FLOW, "imap-functional-test-service.xml"}
+            {ConfigVariant.SERVICE, null},
+            {ConfigVariant.FLOW, null}
         });
-    }      
+    }
 
     @Test
     public void testMessagesMatchingFilterGetCustomFlagSet() throws Exception

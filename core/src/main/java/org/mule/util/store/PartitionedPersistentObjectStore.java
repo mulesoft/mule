@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util.store;
 
 import org.mule.api.MuleContext;
@@ -126,11 +122,17 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends
     {
         return getPartitionObjectStore(partitionName).remove(key.toString());
     }
-
+    
     @Override
     public List<Serializable> allKeys(String partitionName) throws ObjectStoreException
     {
         return getPartitionObjectStore(partitionName).allKeys();
+    }
+    
+    @Override
+    public void clear(String partitionName) throws ObjectStoreException
+    {
+        this.getPartitionObjectStore(partitionName).clear();
     }
 
     private PersistentObjectStorePartition<T> getPartitionObjectStore(String partitionName) throws ObjectStoreException
@@ -237,8 +239,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends
     @Override
     public void disposePartition(String partitionName) throws ObjectStoreException
     {
-        File partitionFolder = FileUtils.newFile(storeDirectory, partitionName);
-        FileUtils.deleteQuietly(partitionFolder);
+        clear(partitionName);
     }
 
     @Override

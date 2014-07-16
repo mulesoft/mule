@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.xmpp;
 
 import org.mule.api.MuleMessage;
@@ -26,7 +22,7 @@ public class XmppMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
     @Override
     protected MuleMessageFactory doCreateMuleMessageFactory()
     {
-        return new XmppMuleMessageFactory(muleContext);
+        return new XmppMuleMessageFactory();
     }
 
     @Override
@@ -54,7 +50,7 @@ public class XmppMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         payload.setPacketID(uuid);
      
         MuleMessageFactory factory = createMuleMessageFactory();
-        MuleMessage message = factory.create(payload, encoding);
+        MuleMessage message = factory.create(payload, encoding, muleContext);
         assertNotNull(message);
         assertEquals(Message.class, message.getPayload().getClass());
         assertEquals(TEST_MESSAGE, ((Message) message.getPayload()).getBody());

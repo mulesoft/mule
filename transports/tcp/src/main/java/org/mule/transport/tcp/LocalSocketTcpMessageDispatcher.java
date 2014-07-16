@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.tcp;
 
 import org.mule.DefaultMuleMessage;
@@ -66,7 +62,7 @@ public class LocalSocketTcpMessageDispatcher extends TcpMessageDispatcher
                     Object result = receiveFromSocket(socket, event.getTimeout(), endpoint);
                     if (result == null)
                     {
-                        return new DefaultMuleMessage(NullPayload.getInstance(), this.getConnector().getMuleContext());
+                        return new DefaultMuleMessage(NullPayload.getInstance(), this.getEndpoint().getMuleContext());
                     }
 
                     if (result instanceof MuleMessage)
@@ -74,7 +70,7 @@ public class LocalSocketTcpMessageDispatcher extends TcpMessageDispatcher
                         return (MuleMessage) result;
                     }
 
-                    return new DefaultMuleMessage(result, this.getConnector()
+                    return new DefaultMuleMessage(result, this.getEndpoint()
                             .getMuleContext());
                 }
                 catch (Exception ex)

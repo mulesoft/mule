@@ -1,17 +1,16 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.routing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleEventContext;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -24,12 +23,9 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 public class CorrelationResequencerTestCase extends AbstractServiceAndFlowTestCase
 {
-    CountDownLatch receiveLatch = new CountDownLatch(6);
+    private CountDownLatch receiveLatch = new CountDownLatch(6);
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -63,7 +59,7 @@ public class CorrelationResequencerTestCase extends AbstractServiceAndFlowTestCa
     @Test
     public void testResequencer() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://splitter", Arrays.asList("a", "b", "c", "d", "e", "f"), null);
 
         FunctionalTestComponent resequencer = getFunctionalTestComponent("test validator");

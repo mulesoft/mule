@@ -1,20 +1,19 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.tcp;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -26,9 +25,6 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class TcpRemoteSyncTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -59,12 +55,12 @@ public class TcpRemoteSyncTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testTcpTcpRemoteSync() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Map<String, Object> props = new HashMap<String, Object>();
 
         // must notify the client to wait for a response from the server
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, Boolean.TRUE);
-        MuleMessage reply = client.send(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("echoInTcp")).getAddress(), 
+        MuleMessage reply = client.send(((InboundEndpoint) muleContext.getRegistry().lookupObject("echoInTcp")).getAddress(),
             new DefaultMuleMessage(message, muleContext), props);
 
         assertNotNull(reply);
@@ -75,18 +71,17 @@ public class TcpRemoteSyncTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testTcpVmRemoteSync() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         Map<String, Object> props = new HashMap<String, Object>();
 
         //must notify the client to wait for a response from the server
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, Boolean.TRUE);
 
-        MuleMessage reply = client.send(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("echo2InTcp")).getAddress(),
+        MuleMessage reply = client.send(((InboundEndpoint) muleContext.getRegistry().lookupObject("echo2InTcp")).getAddress(),
             new DefaultMuleMessage(message, muleContext), props);
 
         assertNotNull(reply);
         assertNotNull(reply.getPayload());
         assertEquals("Received: " + message, reply.getPayloadAsString());
     }
-
 }

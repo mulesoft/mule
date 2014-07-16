@@ -1,20 +1,19 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.http.functional;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transformer.DataType;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -26,9 +25,6 @@ import java.util.List;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class TwoEndpointsSinglePortTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -48,7 +44,7 @@ public class TwoEndpointsSinglePortTestCase extends AbstractServiceAndFlowTestCa
     {
         super(variant, configResources);
     }
-    
+
     @Test
     public void testSendToEach() throws Exception
     {
@@ -59,8 +55,7 @@ public class TwoEndpointsSinglePortTestCase extends AbstractServiceAndFlowTestCa
     @Test
     public void testSendToEachWithBadEndpoint() throws Exception
     {
-
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         sendWithResponse("inMyComponent1", "test", "mycomponent1", 5);
         sendWithResponse("inMyComponent2", "test", "mycomponent2", 5);
@@ -80,13 +75,13 @@ public class TwoEndpointsSinglePortTestCase extends AbstractServiceAndFlowTestCa
     protected void sendWithResponse(String endPointName, String message, String response, int noOfMessages)
         throws MuleException
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         List<Object> results = new ArrayList<Object>();
         for (int i = 0; i < noOfMessages; i++)
         {
             results.add(client.send(
-                ((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject(endPointName)).getAddress(),
+                ((InboundEndpoint) muleContext.getRegistry().lookupObject(endPointName)).getAddress(),
                 message, null)
                 .getPayload(DataType.BYTE_ARRAY_DATA_TYPE));
         }

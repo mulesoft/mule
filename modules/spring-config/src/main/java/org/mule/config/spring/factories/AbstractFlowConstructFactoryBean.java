@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.config.spring.factories;
 
 import org.mule.api.MuleContext;
@@ -25,38 +21,19 @@ import org.mule.construct.builder.AbstractFlowConstructWithSingleInboundEndpoint
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-public abstract class AbstractFlowConstructFactoryBean implements FactoryBean<FlowConstruct>, 
+public abstract class AbstractFlowConstructFactoryBean implements FactoryBean<FlowConstruct>,
     InitializingBean, ApplicationContextAware, MuleContextAware, Initialisable
 {
-    private static final NullFlowConstruct NULL_FLOW_CONSTRUCT = new NullFlowConstruct("noop", null);
-
-    /*
-     * Shameful hack, read FIXME below
-     */
-    private static final class NullFlowConstruct extends AbstractFlowConstruct
-    {
-        public NullFlowConstruct(String name, MuleContext muleContext)
-        {
-            super(name, muleContext);
-        }
-
-        @Override
-        public String getConstructType()
-        {
-            return "NULL";
-        }
-    }
 
     protected ApplicationContext applicationContext;
     protected MuleContext muleContext;
 
-    // FIXME terrible hack to get around the first call to getObject that comes too
-    // soon (nothing is injected yet)
-    protected AbstractFlowConstruct flowConstruct = NULL_FLOW_CONSTRUCT;
+    protected AbstractFlowConstruct flowConstruct;
 
     public boolean isSingleton()
     {
@@ -117,6 +94,10 @@ public abstract class AbstractFlowConstructFactoryBean implements FactoryBean<Fl
 
     public FlowConstruct getObject() throws Exception
     {
+        if (flowConstruct == null)
+        {
+            throw new FactoryBeanNotInitializedException();
+        }
         return flowConstruct;
     }
 

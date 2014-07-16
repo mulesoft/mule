@@ -1,8 +1,5 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -47,7 +44,7 @@ public class AtomEntryBuilderTransformer extends AbstractExpressionTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(final MuleMessage message, String outputEncoding) throws TransformerException
     {
         Factory factory = Abdera.getInstance().getFactory();
         Entry entry = factory.newEntry();
@@ -198,7 +195,7 @@ public class AtomEntryBuilderTransformer extends AbstractExpressionTransformer
                 public void write(MuleEvent event, OutputStream out) throws IOException
                 {
                     FOMWriterOptions opts = new FOMWriterOptions();
-                    opts.setCharset(event.getEncoding());
+                    opts.setCharset(message.getEncoding());
                     e.writeTo(out, opts);
                 }
             };

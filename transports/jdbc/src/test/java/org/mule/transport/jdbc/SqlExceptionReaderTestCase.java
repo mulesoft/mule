@@ -1,14 +1,14 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jdbc;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import org.mule.api.DefaultMuleException;
 import org.mule.config.ExceptionHelper;
@@ -21,10 +21,6 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 public class SqlExceptionReaderTestCase extends AbstractMuleTestCase
 {
@@ -52,7 +48,7 @@ public class SqlExceptionReaderTestCase extends AbstractMuleTestCase
         assertEquals("bar", t.getMessage());
         assertNotNull(t.getCause());
 
-        List l = ExceptionHelper.getExceptionsAsList(testException);
+        List<Throwable> l = ExceptionHelper.getExceptionsAsList(testException);
         assertEquals(4, l.size());
 
         Map info = ExceptionHelper.getExceptionInfo(testException);

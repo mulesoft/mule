@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport;
 
 import org.mule.api.MuleException;
@@ -381,7 +377,7 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer(80);
+        final StringBuilder sb = new StringBuilder(80);
         sb.append(ClassUtils.getSimpleName(this.getClass()));
         sb.append("{this=").append(Integer.toHexString(System.identityHashCode(this)));
         sb.append(", endpoint=").append(endpoint.getEndpointURI());
@@ -443,7 +439,7 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
     {
         try
         {
-            return muleMessageFactory.create(transportMessage, previousMessage, encoding);
+            return muleMessageFactory.create(transportMessage, previousMessage, encoding, endpoint.getMuleContext());
         }
         catch (Exception e)
         {
@@ -459,7 +455,7 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
     {
         try
         {
-            return muleMessageFactory.create(transportMessage, encoding);
+            return muleMessageFactory.create(transportMessage, encoding, endpoint.getMuleContext());
         }
         catch (Exception e)
         {

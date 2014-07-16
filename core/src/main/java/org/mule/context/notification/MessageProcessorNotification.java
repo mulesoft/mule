@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.context.notification;
 
 import org.mule.DefaultMuleEvent;
@@ -18,7 +14,7 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.NameableObject;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.Pipeline;
+import org.mule.api.construct.MessageProcessorPathResolver;
 import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.processor.MessageProcessor;
@@ -120,10 +116,10 @@ public class MessageProcessorNotification extends ServerNotification implements 
     public String getProcessorPath()
     {
         FlowConstruct fc = getSource().getFlowConstruct();
-        if (!(fc instanceof Pipeline))
+        if (!(fc instanceof MessageProcessorPathResolver))
         {
             return null;
         }
-        return ((Pipeline) fc).getProcessorPath(processor);
+        return ((MessageProcessorPathResolver) fc).getProcessorPath(processor);
     }
 }

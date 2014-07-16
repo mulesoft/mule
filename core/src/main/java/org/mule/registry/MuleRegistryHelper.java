@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.registry;
 
 import org.mule.api.MuleContext;
@@ -33,6 +29,7 @@ import org.mule.api.registry.ServiceDescriptorFactory;
 import org.mule.api.registry.ServiceException;
 import org.mule.api.registry.ServiceType;
 import org.mule.api.registry.TransformerResolver;
+import org.mule.api.schedule.Scheduler;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Converter;
 import org.mule.api.transformer.DataType;
@@ -41,6 +38,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.types.SimpleDataType;
+import org.mule.util.Predicate;
 import org.mule.util.SpiUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.UUID;
@@ -54,6 +52,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -78,6 +80,20 @@ public class MuleRegistryHelper implements MuleRegistry
     protected ConcurrentHashMap/*Map<String, List<Transformer>>*/ transformerListCache = new ConcurrentHashMap/*<String, List<Transformer>>*/(8);
 
     private MuleContext muleContext;
+
+    private final ReadWriteLock transformerResolversLock = new ReentrantReadWriteLock();
+
+    /**
+     * Transformer transformerResolvers are registered on context start, then they are not unregistered.
+     */
+    private List<TransformerResolver> transformerResolvers = new ArrayList<TransformerResolver>();
+
+    private final ReadWriteLock transformersLock = new ReentrantReadWriteLock();
+
+    /**
+     * Transformers are registered on context start, then they are usually not unregistered
+     */
+    private Collection<Transformer> transformers = new CopyOnWriteArrayList<Transformer>();
 
     public MuleRegistryHelper(DefaultRegistryBroker registry, MuleContext muleContext)
     {
@@ -107,11 +123,11 @@ public class MuleRegistryHelper implements MuleRegistry
 
     public void fireLifecycle(String phase) throws LifecycleException
     {
-        if(Initialisable.PHASE_NAME.equals(phase))
+        if (Initialisable.PHASE_NAME.equals(phase))
         {
             registry.initialise();
         }
-        else if(Disposable.PHASE_NAME.equals(phase))
+        else if (Disposable.PHASE_NAME.equals(phase))
         {
             registry.dispose();
         }
@@ -198,8 +214,8 @@ public class MuleRegistryHelper implements MuleRegistry
      * {@inheritDoc}
      *
      * @deprecated use {@link #lookupTransformer(org.mule.api.transformer.DataType, org.mule.api.transformer.DataType)} instead.  This
-     * method should only be used internally to discover transformers, typically a user does not need ot do this
-     * directly
+     *             method should only be used internally to discover transformers, typically a user does not need ot do this
+     *             directly
      */
     @Deprecated
     public Transformer lookupTransformer(Class inputType, Class outputType) throws TransformerException
@@ -211,8 +227,8 @@ public class MuleRegistryHelper implements MuleRegistry
      * {@inheritDoc}
      *
      * @deprecated use {@link #lookupTransformer(org.mule.api.transformer.DataType, org.mule.api.transformer.DataType)} instead.  This
-     * method should only be used internally to discover transformers, typically a user does not need ot do this
-     * directly
+     *             method should only be used internally to discover transformers, typically a user does not need ot do this
+     *             directly
      */
     @Deprecated
     public List<Transformer> lookupTransformers(Class input, Class output)
@@ -237,7 +253,7 @@ public class MuleRegistryHelper implements MuleRegistry
         if (trans != null)
         {
             Transformer concurrentlyAddedTransformer = (Transformer) exactTransformerCache.putIfAbsent(
-                dataTypePairHash, trans);
+                    dataTypePairHash, trans);
             if (concurrentlyAddedTransformer != null)
             {
                 return concurrentlyAddedTransformer;
@@ -255,24 +271,32 @@ public class MuleRegistryHelper implements MuleRegistry
 
     protected Transformer resolveTransformer(DataType source, DataType result) throws TransformerException
     {
-        List<TransformerResolver> resolvers = (List<TransformerResolver>) lookupObjects(TransformerResolver.class);
-        Collections.sort(resolvers, new TransformerResolverComparator());
+        Lock readLock = transformerResolversLock.readLock();
+        readLock.lock();
 
-        for (TransformerResolver resolver : resolvers)
+        try
         {
-            try
+            for (TransformerResolver resolver : transformerResolvers)
             {
-                Transformer trans = resolver.resolve(source, result);
-                if (trans != null)
+                try
                 {
-                    return trans;
+                    Transformer trans = resolver.resolve(source, result);
+                    if (trans != null)
+                    {
+                        return trans;
+                    }
+                }
+                catch (ResolverException e)
+                {
+                    throw new TransformerException(CoreMessages.noTransformerFoundForMessage(source, result), e);
                 }
             }
-            catch (ResolverException e)
-            {
-                throw new TransformerException(CoreMessages.noTransformerFoundForMessage(source, result), e);
-            }
         }
+        finally
+        {
+            readLock.unlock();
+        }
+
         return null;
     }
 
@@ -290,25 +314,33 @@ public class MuleRegistryHelper implements MuleRegistry
         }
 
         results = new ArrayList<Transformer>(2);
-        Collection<Transformer> transformers = registry.lookupObjects(Transformer.class);
-        for (Transformer t : transformers)
+
+        Lock readLock = transformersLock.readLock();
+        readLock.lock();
+        try
         {
-            // The transformer must have the DiscoveryTransformer interface if we are
-            // going to
-            // find it here
-            if (!(t instanceof Converter))
+            for (Transformer transformer : transformers)
             {
-                continue;
+                // The transformer must have the DiscoveryTransformer interface if we are
+                // going to find it here
+                if (!(transformer instanceof Converter))
+                {
+                    continue;
+                }
+                DataType returnDataType = transformer.getReturnDataType();
+                if (result.isCompatibleWith(returnDataType) && transformer.isSourceDataTypeSupported(source))
+                {
+                    results.add(transformer);
+                }
             }
-            DataType dt = t.getReturnDataType();
-            if (result.isCompatibleWith(dt) && t.isSourceDataTypeSupported(source))
-            {
-                results.add(t);
-            }
+        }
+        finally
+        {
+            readLock.unlock();
         }
 
         List<Transformer> concurrentlyAddedTransformers = (List<Transformer>) transformerListCache.putIfAbsent(
-            dataTypePairHash, results);
+                dataTypePairHash, results);
         if (concurrentlyAddedTransformers != null)
         {
             return concurrentlyAddedTransformers;
@@ -443,21 +475,48 @@ public class MuleRegistryHelper implements MuleRegistry
      */
     public final void registerTransformer(Transformer transformer) throws MuleException
     {
-        registry.registerObject(getName(transformer), transformer, Transformer.class);
-        notifyTransformerResolvers(transformer, TransformerResolver.RegistryAction.ADDED);
+        registerObject(getName(transformer), transformer, Transformer.class);
     }
 
     public void notifyTransformerResolvers(Transformer t, TransformerResolver.RegistryAction action)
     {
         if (t instanceof Converter)
         {
-            Collection<TransformerResolver> resolvers = lookupObjects(TransformerResolver.class);
-            for (TransformerResolver resolver : resolvers)
+            Lock transformerResolversReadLock = transformerResolversLock.readLock();
+            transformerResolversReadLock.lock();
+            try
             {
-                resolver.transformerChange(t, action);
+
+                for (TransformerResolver resolver : transformerResolvers)
+                {
+                    resolver.transformerChange(t, action);
+                }
             }
+            finally
+            {
+                transformerResolversReadLock.unlock();
+            }
+
             transformerListCache.clear();
             exactTransformerCache.clear();
+
+            Lock transformersWriteLock = transformersLock.writeLock();
+            transformersWriteLock.lock();
+            try
+            {
+                if (action == TransformerResolver.RegistryAction.ADDED)
+                {
+                    transformers.add(t);
+                }
+                else
+                {
+                    transformers.remove(t);
+                }
+            }
+            finally
+            {
+                transformersWriteLock.unlock();
+            }
         }
     }
 
@@ -589,6 +648,34 @@ public class MuleRegistryHelper implements MuleRegistry
         registry.unregisterObject(agentName, Agent.class);
     }
 
+    @Override
+    public void registerScheduler(Scheduler scheduler) throws MuleException
+    {
+        registry.registerObject(scheduler.getName(), scheduler);
+    }
+
+    @Override
+    public void unregisterScheduler(Scheduler scheduler) throws MuleException
+    {
+        registry.unregisterObject(scheduler.getName(), scheduler);
+    }
+
+    @Override
+    public Collection<Scheduler> lookupScheduler(Predicate<String> schedulerNamePredicate)
+    {
+        Collection<Scheduler> schedulers = new ArrayList<Scheduler>();
+        Map<String, Scheduler> registeredSchedulers = lookupByType(Scheduler.class);
+        for (Scheduler registeredScheduler : registeredSchedulers.values())
+        {
+            if (schedulerNamePredicate.evaluate(registeredScheduler.getName()))
+            {
+                schedulers.add(registeredScheduler);
+            }
+        }
+
+        return schedulers;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -690,6 +777,12 @@ public class MuleRegistryHelper implements MuleRegistry
         return registry.lookupObjects(type);
     }
 
+    @Override
+    public <T> Collection<T> lookupLocalObjects(Class<T> type)
+    {
+        return registry.lookupLocalObjects(type);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -701,7 +794,7 @@ public class MuleRegistryHelper implements MuleRegistry
     @SuppressWarnings("unchecked")
     public <T> T get(String key)
     {
-        return (T)registry.get(key);
+        return (T) registry.get(key);
     }
 
     public <T> Map<String, T> lookupByType(Class<T> type)
@@ -715,6 +808,21 @@ public class MuleRegistryHelper implements MuleRegistry
     public void registerObject(String key, Object value, Object metadata) throws RegistrationException
     {
         registry.registerObject(key, value, metadata);
+
+        postObjectRegistrationActions(value);
+    }
+
+    private void postObjectRegistrationActions(Object value)
+    {
+        if (value instanceof TransformerResolver)
+        {
+            registerTransformerResolver((TransformerResolver) value);
+        }
+
+        if (value instanceof Converter)
+        {
+            notifyTransformerResolvers((Converter) value,  TransformerResolver.RegistryAction.ADDED);
+        }
     }
 
     /**
@@ -723,6 +831,23 @@ public class MuleRegistryHelper implements MuleRegistry
     public void registerObject(String key, Object value) throws RegistrationException
     {
         registry.registerObject(key, value);
+
+        postObjectRegistrationActions(value);
+    }
+
+    private void registerTransformerResolver(TransformerResolver value)
+    {
+        Lock lock = transformerResolversLock.writeLock();
+        lock.lock();
+        try
+        {
+            transformerResolvers.add(value);
+            Collections.sort(transformerResolvers, new TransformerResolverComparator());
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     /**
@@ -731,6 +856,12 @@ public class MuleRegistryHelper implements MuleRegistry
     public void registerObjects(Map objects) throws RegistrationException
     {
         registry.registerObjects(objects);
+
+        for (Object value : objects.values())
+        {
+            postObjectRegistrationActions(value);
+        }
+
     }
 
     /**
@@ -753,6 +884,7 @@ public class MuleRegistryHelper implements MuleRegistry
      * Returns the name for the object passed in.  If the object implements {@link org.mule.api.NameableObject}, then
      * {@link org.mule.api.NameableObject#getName()} will be returned, otherwise a name is generated using the class name
      * and a generated UUID.
+     *
      * @param obj the object to inspect
      * @return the name for this object
      */
@@ -810,6 +942,7 @@ public class MuleRegistryHelper implements MuleRegistry
 
     private class TransformerResolverComparator implements Comparator<TransformerResolver>
     {
+
         public int compare(TransformerResolver transformerResolver, TransformerResolver transformerResolver1)
         {
             if (transformerResolver.getClass().equals(TypeBasedTransformerResolver.class))

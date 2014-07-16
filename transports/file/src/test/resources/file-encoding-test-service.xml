@@ -14,7 +14,7 @@
     <model name="receiveModel">
         <service name="inputTest">
             <inbound>
-                <file:inbound-endpoint encoding="EUC-JP" path=".mule/mule-file-test-EUC-JP">
+                <file:inbound-endpoint encoding="EUC-JP" path="${workingDirectory}/mule-file-test-EUC-JP">
                     <file:file-to-string-transformer/>
                 </file:inbound-endpoint>
             </inbound>

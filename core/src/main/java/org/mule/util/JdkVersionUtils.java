@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.util;
 
 import org.mule.config.MuleManifest;
@@ -220,6 +216,11 @@ public class JdkVersionUtils
 					&& (upper == null || jdkVersion.compareTo(upper) < 0 
 					|| (jdkVersion.compareTo(upper) == 0 && isUpperBoundInclusive()));
 		}
+
+        public boolean isUnder(JdkVersion jdkVersion)
+        {
+            return (upper != null) && (jdkVersion.compareTo(upper) > 0 || (jdkVersion.compareTo(upper) == 0 && !isUpperBoundInclusive()));
+        }
     }
     
     private static final Log logger = LogFactory.getLog(JdkVersionUtils.class);
@@ -303,6 +304,16 @@ public class JdkVersionUtils
     	}
     	return false;
     }
+
+    private static boolean isJdkAboveRange(JdkVersion version, List<JdkVersionRange> ranges)
+    {
+        boolean isHigher = true;
+        for (JdkVersionRange versionRange : ranges)
+        {
+            isHigher = isHigher && (versionRange.isUnder(version));
+        }
+        return isHigher;
+    }
     
     /**
      * Validates that the jdk version and vendor are acceptable values (either supported or not invalid).
@@ -312,7 +323,12 @@ public class JdkVersionUtils
     {
         if (!isSupportedJdkVersion())
         {
-            throw new RuntimeException("Unsupported Jdk");
+            if (isJdkAboveRange(getJdkVersion(),createJdkVersionRanges(getSupportedJdks())))
+            {
+                logger.warn("We are looking into adding support for this JDK version. Use it at your own risk.");
+            } else {
+                throw new RuntimeException("Unsupported Jdk");
+            }
         }
         if (!isSupportedJdkVendor())
         {

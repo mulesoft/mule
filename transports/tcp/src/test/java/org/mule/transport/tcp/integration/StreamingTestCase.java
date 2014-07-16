@@ -1,18 +1,22 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.tcp.integration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import org.mule.api.MuleEventContext;
+import org.mule.api.client.MuleClient;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.EventCallback;
+import org.mule.tck.functional.FunctionalStreamingTestComponent;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,20 +29,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleEventContext;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.functional.FunctionalStreamingTestComponent;
-import org.mule.tck.junit4.rule.DynamicPort;
 
 /**
  * This test is more about testing the streaming model than the TCP provider, really.
  */
 public class StreamingTestCase extends AbstractServiceAndFlowTestCase
 {
-
     public static final int TIMEOUT = 300000;
     public static final String TEST_MESSAGE = "Test TCP Request";
     public static final String RESULT = "Received stream; length: 16; 'Test...uest'";
@@ -53,7 +49,7 @@ public class StreamingTestCase extends AbstractServiceAndFlowTestCase
     {
         super(variant, configResources);
     }
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -62,7 +58,7 @@ public class StreamingTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.FLOW, "tcp-streaming-test-flow.xml"}
         });
     }
-   
+
     @Test
     public void testSend() throws Exception
     {
@@ -94,7 +90,7 @@ public class StreamingTestCase extends AbstractServiceAndFlowTestCase
             }
         };
 
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         // this works only if singleton set in descriptor
         Object ftc = getComponent("testComponent");
@@ -103,8 +99,8 @@ public class StreamingTestCase extends AbstractServiceAndFlowTestCase
 
         ((FunctionalStreamingTestComponent) ftc).setEventCallback(callback, TEST_MESSAGE.length());
 
-        client.dispatch(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("testInbound")).getAddress(),
-            TEST_MESSAGE, new HashMap<Object, Object>());
+        client.dispatch(((InboundEndpoint) muleContext.getRegistry().lookupObject("testInbound")).getAddress(),
+            TEST_MESSAGE, new HashMap<String, Object>());
 
         latch.await(10, TimeUnit.SECONDS);
         assertEquals(RESULT, message.get());

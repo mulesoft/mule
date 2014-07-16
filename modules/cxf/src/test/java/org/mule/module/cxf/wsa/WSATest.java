@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.module.cxf.wsa;
 
 import org.mule.example.employee.EmployeeDirectory;
@@ -27,7 +23,7 @@ public class WSATest extends FunctionalTestCase
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "wsa-conf.xml";
     }
@@ -42,7 +38,6 @@ public class WSATest extends FunctionalTestCase
         bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
             "http://localhost:" + dynamicPort.getNumber() + "/services/employee");
     }
-
 }
 
 

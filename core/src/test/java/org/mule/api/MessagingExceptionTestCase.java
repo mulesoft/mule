@@ -1,16 +1,23 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.api;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+
+import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
+import org.mule.tck.SerializationTestUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -21,15 +28,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class MessagingExceptionTestCase extends AbstractMuleTestCase
+public class MessagingExceptionTestCase extends AbstractMuleContextTestCase
 {
 
+    private static final String message = "a message";
+    private static final String value = "Hello world!";
+    
     @Mock
     private MuleEvent mockEvent;
 
@@ -158,5 +165,36 @@ public class MessagingExceptionTestCase extends AbstractMuleTestCase
         assertThat(exception.causedExactlyBy(SocketException.class), is(false));
         assertThat(exception.causedExactlyBy(IOException.class), is(true));
         assertThat(exception.causedExactlyBy(MessagingException.class), is(true));
+    }
+    
+    @Test
+    public void testSerializableMessagingException() throws Exception
+    {
+        TestSerializableMessageProcessor processor = new TestSerializableMessageProcessor();
+        processor.setValue(value);
+
+        MessagingException e = new MessagingException(MessageFactory.createStaticMessage(message),
+            getTestEvent(""), processor);
+
+        e = SerializationTestUtils.testException(e, muleContext);
+
+        assertTrue(e.getMessage().contains(message));
+        assertNotNull(e.getFailingMessageProcessor());
+        assertTrue(e.getFailingMessageProcessor() instanceof TestSerializableMessageProcessor);
+        assertEquals(value, ((TestSerializableMessageProcessor) e.getFailingMessageProcessor()).getValue());
+    }
+
+    @Test
+    public void testNonSerializableMessagingException() throws Exception
+    {
+        TestNotSerializableMessageProcessor processor = new TestNotSerializableMessageProcessor();
+
+        MessagingException e = new MessagingException(MessageFactory.createStaticMessage(message),
+            getTestEvent(""), processor);
+
+        e = SerializationTestUtils.testException(e, muleContext);
+
+        assertTrue(e.getMessage().contains(message));
+        assertNull(e.getFailingMessageProcessor());
     }
 }

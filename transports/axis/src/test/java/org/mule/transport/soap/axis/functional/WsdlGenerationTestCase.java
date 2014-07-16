@@ -1,17 +1,17 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.soap.axis.functional;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
@@ -24,10 +24,6 @@ import org.dom4j.DocumentHelper;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class WsdlGenerationTestCase extends FunctionalTestCase
 {
     /**
@@ -39,27 +35,34 @@ public class WsdlGenerationTestCase extends FunctionalTestCase
 
     @Rule
     public DynamicPort dynamicPort1 = new DynamicPort("port1");
-    
+
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
     @Rule
     public DynamicPort dynamicPort3 = new DynamicPort("port3");
 
+    private Map<String, Object> properties;
+
     @Override
-    protected String getConfigResources()
+    protected String getConfigFile()
     {
         return "axis-wsdl-test.xml";
+    }
+
+    public WsdlGenerationTestCase()
+    {
+        super();
+        properties = new HashMap<String, Object>();
+        properties.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
     }
 
     @Test
     public void testWsdl1() throws Exception
     {
-        Map props = new HashMap();
-        props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
-        MuleMessage result = client.send("http://localhost:" + dynamicPort1.getNumber() + "/services/EchoService1?wsdl", null, props);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort1.getNumber() + "/services/EchoService1?wsdl", null, properties);
         assertNotNull(result);
         String wsdl = result.getPayloadAsString();
         Document doc = DocumentHelper.parseText(wsdl);
@@ -85,11 +88,9 @@ public class WsdlGenerationTestCase extends FunctionalTestCase
     @Test
     public void testWsdl2() throws Exception
     {
-        Map props = new HashMap();
-        props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
-        MuleMessage result = client.send("http://localhost:" + dynamicPort2.getNumber() + "/services/EchoService2?wsdl", null, props);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort2.getNumber() + "/services/EchoService2?wsdl", null, properties);
         assertNotNull(result);
         String wsdl = result.getPayloadAsString();
         Document doc = DocumentHelper.parseText(wsdl);
@@ -110,11 +111,9 @@ public class WsdlGenerationTestCase extends FunctionalTestCase
     @Test
     public void testWsdl3() throws Exception
     {
-        Map props = new HashMap();
-        props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
-        MuleMessage result = client.send("http://localhost:" + dynamicPort3.getNumber() + "/services/EchoService3?wsdl", null, props);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort3.getNumber() + "/services/EchoService3?wsdl", null, properties);
         assertNotNull(result);
         String wsdl = result.getPayloadAsString();
         Document doc = DocumentHelper.parseText(wsdl);
@@ -132,5 +131,4 @@ public class WsdlGenerationTestCase extends FunctionalTestCase
         assertEquals("http://localhost:62083/services/EchoService3",
             doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/wsdlsoap:address/@location"));
     }
-
 }

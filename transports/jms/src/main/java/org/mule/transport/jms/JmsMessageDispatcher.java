@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms;
 
 import org.mule.api.MuleEvent;
@@ -53,7 +49,6 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 {
 
     private JmsConnector connector;
-    private Session cachedSession;
     private boolean disableTemporaryDestinations = false;
     private boolean returnOriginalMessageAsReply = false;
 
@@ -118,42 +113,11 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     + ". Outbound transformers are: " + endpoint.getTransformers());
         }
 
-        // assume session is transacted first, and thus, managed
-        boolean sessionManaged = true;
         try
         {
-            if (muleTx != null && muleTx.hasResource(connector.getConnection()))
-            {
-                session = connector.getTransactionalResource(endpoint);
-                transacted = true;
-            }
-            // Should we be caching sessions? Note this is not part of the JMS spec.
-            // and is turned off by default.
-            else if (event.getMessage().getOutboundProperty(JmsConstants.CACHE_JMS_SESSIONS_PROPERTY, connector.isCacheJmsSessions()))
-            {
-                sessionManaged = false;
-                cached = true;
-                if (cachedSession != null)
-                {
-                    session = cachedSession;
-                }
-                else
-                {
-                    session = connector.getTransactionalResource(endpoint);
-                    cachedSession = session;
-                }
-            }
-            else
-            {
-                // by now we're running with a different connector and connection
-                sessionManaged = muleTx != null && muleTx.isXA();
+            session = connector.getTransactionalResource(endpoint);
 
-                session = connector.getTransactionalResource(endpoint);
-                if (endpoint.getTransactionConfig().isTransacted())
-                {
-                    transacted = true;
-                }
-            }
+            transacted = (muleTx != null && muleTx.hasResource(connector.getConnection()) || endpoint.getTransactionConfig().isTransacted());
 
             // If a transaction is running, we can not receive any messages
             // in the same transaction using a replyTo destination
@@ -303,11 +267,6 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 }
             }
 
-            if (!sessionManaged && transacted) { 
-                handleMultiTx(session);
-            }
-
-
             // If the session is from the current transaction, it is up to the
             // transaction to close it.
             if (session != null && !cached && !transacted)
@@ -337,7 +296,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
     {
         // nothing to do
     }
-    
+
+    @Deprecated
     protected void handleMultiTx(Session session) throws Exception
     {
         logger.debug("Multi-transaction support is not available in Mule Community Edition.");

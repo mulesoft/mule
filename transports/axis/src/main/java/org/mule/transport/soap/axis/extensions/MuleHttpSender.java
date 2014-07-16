@@ -1,13 +1,9 @@
 /*
- * $Id$
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.soap.axis.extensions;
 
 import org.mule.module.cxf.SoapConstants;
@@ -283,7 +279,7 @@ public class MuleHttpSender extends BasicHandler
         }
         if (userID != null)
         {
-            StringBuffer tmpBuf = new StringBuffer(64);
+            StringBuilder tmpBuf = new StringBuilder(64);
             tmpBuf.append(userID).append(":").append((passwd == null) ? "" : passwd);
             otherHeaders.append(HTTPConstants.HEADER_AUTHORIZATION).append(": Basic ").append(
                 Base64.encode(tmpBuf.toString().getBytes())).append("\r\n");
@@ -306,7 +302,7 @@ public class MuleHttpSender extends BasicHandler
             }
         }
 
-        StringBuffer header2 = new StringBuffer(64);
+        StringBuilder header2 = new StringBuilder(64);
 
         String webMethod = null;
         boolean posting = true;
@@ -491,7 +487,7 @@ public class MuleHttpSender extends BasicHandler
 
         header2.append("\r\n"); // The empty line to start the BODY.
 
-        StringBuffer header = new StringBuffer(128);
+        StringBuilder header = new StringBuilder(128);
 
         // If we're SOAP 1.2, allow the web method to be set from the
         // MessageContext.
