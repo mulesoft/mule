@@ -119,6 +119,37 @@ public class JdbcDataSourceNamespaceHandlerTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void testNuoDBDefaults()
+    {
+        StandardDataSource source = lookupDataSource("default-nuodb");
+        assertEquals("jdbc:com.nuodb://localhost/mule", source.getUrl());
+        assertEquals("com.nuodb.jdbc.Driver", source.getDriverName());
+        assertEquals("nuodb", source.getUser());
+        assertEquals("secret", source.getPassword());
+    }
+
+    @Test
+    public void testNuoDBCustomUrl()
+    {
+        StandardDataSource source = lookupDataSource("custom-url-nuodb");
+        assertEquals("jdbc:com.nuodb://mule-db-host:48004/mule", source.getUrl());
+    }
+
+    @Test
+    public void testNuoDBCustomHost()
+    {
+        StandardDataSource source = lookupDataSource("custom-host-nuodb");
+        assertEquals("jdbc:com.nuodb://some-other-host/mule", source.getUrl());
+    }
+
+    @Test
+    public void testNuoDBCustomPort()
+    {
+        StandardDataSource source = lookupDataSource("custom-port-nuodb");
+        assertEquals("jdbc:com.nuodb://localhost:4242/mule", source.getUrl());
+    }
+
+    @Test
     public void testPostgresqlDefaults()
     {
         StandardDataSource source = lookupDataSource("default-postgresql");

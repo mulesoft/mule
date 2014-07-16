@@ -452,6 +452,36 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="nuodb-data-source" type="nuodbDataSourceType" substitutionGroup="mule:abstract-extension"/>
+
+    <xsd:complexType name="nuodbDataSourceType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractDataSourceMandatoryUserAndPasswordType">
+                <xsd:attribute name="database" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the database. Must be configured unless a full JDBC URL is configured.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="host" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Allows to configure just the host part of the JDBC URL (and leave the rest of the default JDBC URL untouched).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="port" type="xsd:int" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Allows to configure just the port part of the JDBC URL (and leave the rest of the default JDBC URL untouched).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:element name="postgresql-data-source" type="postgresqlDataSourceType" substitutionGroup="mule:abstract-extension"/>
 
     <xsd:complexType name="postgresqlDataSourceType">

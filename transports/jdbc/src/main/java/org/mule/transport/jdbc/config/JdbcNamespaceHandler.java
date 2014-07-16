@@ -59,6 +59,7 @@ public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
     {
         registerDerbyDataSourceDefinitionParser();
         registerMysqlDataSourceDefinitionParser();
+        registerNuoDBDataSourceDefinitionParser();
         registerInstanceDatasource("oracle-data-source", OracleDataSourceFactoryBean.class);
         registerPostgresqlDataSourceDefinitionParser();
         registerDb2DataSourceDefinitionParser();
@@ -79,6 +80,12 @@ public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
     {
         registerHostAndPortTypeDefinitionParser(MysqlDataSourceFactoryBean.class,
                                                 "mysql-data-source");
+    }
+
+    protected void registerNuoDBDataSourceDefinitionParser()
+    {
+        registerHostAndPortTypeDefinitionParser(NuoDBDataSourceFactoryBean.class,
+                "nuodb-data-source");
     }
 
     protected void registerDb2DataSourceDefinitionParser()
