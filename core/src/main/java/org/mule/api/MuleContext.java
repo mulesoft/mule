@@ -15,7 +15,6 @@ import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.api.el.ExpressionLanguage;
 import org.mule.api.endpoint.EndpointFactory;
-import org.mule.api.endpoint.OutboundEndpointExecutorFactory;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.exception.SystemExceptionHandler;
@@ -335,12 +334,6 @@ public interface MuleContext extends Lifecycle
      * @throws InterruptedException if the current thread is interrupted while waiting
      */
     boolean waitUntilStarted(int timeout) throws InterruptedException;
-
-    /**
-     * @return factory for creating a message processor outbound endpoint
-     * ready to be executed in the context of a pipeline. }
-     */
-    OutboundEndpointExecutorFactory getOutboundEndpointExecutorFactory();
 
 }
 
