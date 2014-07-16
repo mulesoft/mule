@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -38,6 +39,7 @@ public class MuleObjectStoreManager
     ConcurrentMap<String, ObjectStore<?>> stores = new ConcurrentHashMap<String, ObjectStore<?>>();
     protected ScheduledThreadPoolExecutor scheduler;
     private static Log logger = LogFactory.getLog(MuleObjectStoreManager.class);
+    private final ConcurrentMap<String, ScheduledFuture<?>> monitors = new ConcurrentHashMap<String, ScheduledFuture<?>>();
 
     @Override
     public <T extends ObjectStore<? extends Serializable>> T getObjectStore(String name)
@@ -142,9 +144,9 @@ public class MuleObjectStoreManager
             T previous = (T) stores.putIfAbsent(name, store);
             if (previous == null)
             {
-                Monitor m = new Monitor(name, (PartitionableExpirableObjectStore) baseStore, entryTTL,
-                                        maxEntries);
-                scheduler.scheduleWithFixedDelay(m, 0, expirationInterval, TimeUnit.MILLISECONDS);
+                Monitor m = new Monitor(name, (PartitionableExpirableObjectStore) baseStore, entryTTL, maxEntries);
+                ScheduledFuture<?> future = scheduler.scheduleWithFixedDelay(m, 0, expirationInterval, TimeUnit.MILLISECONDS);
+                monitors.put(name, future);
                 return store;
             }
             else
@@ -210,7 +212,63 @@ public class MuleObjectStoreManager
     {
         scheduler = new ScheduledThreadPoolExecutor(1);
         scheduler.setThreadFactory(new DaemonThreadFactory("ObjectStoreManager-Monitor", this.getClass()
-                .getClassLoader()));
+            .getClassLoader()));
+    }
+
+    @Override
+    public void disposeStore(ObjectStore<? extends Serializable> store) throws ObjectStoreException
+    {
+        if (store instanceof ObjectStorePartition)
+        {
+            ObjectStorePartition partition = (ObjectStorePartition) store;
+            String partitionName = partition.getPartitionName();
+            partition.getBaseStore().disposePartition(partitionName);
+
+            ScheduledFuture<?> future = monitors.remove(partitionName);
+            if(future!=null)
+            {
+                future.cancel(false);
+            }
+            stores.remove(partitionName);
+        }
+        else
+        {
+            if(store instanceof ListableObjectStore)
+            {
+                ListableObjectStore listableStore=(ListableObjectStore)store;
+                while(true)
+                {
+                    List<Serializable> keys=listableStore.allKeys();
+                    if(keys.size()==0)
+                    {
+                        break;
+                    }else
+                    {
+                        for(Serializable key:keys)
+                        {
+                            listableStore.remove(key);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                //there is nothing we can do
+            }
+            try
+            {
+                stores.values().remove(store);
+            }
+            catch(Exception e)
+            {
+                logger.warn("Can not remove object store" + store.toString(), e);
+            }
+        }
+
+        if (store instanceof Disposable)
+        {
+            ((Disposable) store).dispose();
+        }
     }
 
     class Monitor implements Runnable
@@ -250,43 +308,8 @@ public class MuleObjectStoreManager
 
     }
 
-    @Override
-    public void disposeStore(ObjectStore<? extends Serializable> store) throws ObjectStoreException
+    int getMonitorsCount()
     {
-        if(store instanceof ObjectStorePartition)
-        {
-            ObjectStorePartition partition=(ObjectStorePartition)store;
-            partition.getBaseStore().disposePartition(partition.getPartitionName());
-        }
-        else
-        {
-            if(store instanceof ListableObjectStore)
-            {
-                ListableObjectStore listableStore=(ListableObjectStore)store;
-                while(true)
-                {
-                    List<Serializable> keys=listableStore.allKeys();
-                    if(keys.size()==0)
-                    {
-                        break;
-                    }else
-                    {
-                        for(Serializable key:keys)
-                        {
-                            listableStore.remove(key);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                //there is nothing we can do
-            }
-        }
-
-        if (store instanceof Disposable)
-        {
-            ((Disposable) store).dispose();
-        }
+        return monitors.size();
     }
 }

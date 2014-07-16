@@ -16,6 +16,7 @@ import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreNotAvaliableException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.util.FileUtils;
 import org.mule.util.SerializationUtils;
 
@@ -382,6 +383,24 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
     public String getPartitionName()
     {
         return partitionName;
+    }
+
+    public void clear() throws ObjectStoreException
+    {
+        try
+        {
+            FileUtils.cleanDirectory(this.partitionDirectory);
+        }
+        catch (IOException e)
+        {
+            throw new ObjectStoreException(MessageFactory.createStaticMessage("Could not clear ObjectStore"),
+                                           e);
+        }
+
+        if (realKeyToUUIDIndex != null)
+        {
+            realKeyToUUIDIndex.clear();
+        }
     }
 
     public static class StoreValue<T> implements Serializable
