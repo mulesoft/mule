@@ -239,8 +239,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends
     @Override
     public void disposePartition(String partitionName) throws ObjectStoreException
     {
-        File partitionFolder = FileUtils.newFile(storeDirectory, partitionName);
-        FileUtils.deleteQuietly(partitionFolder);
+        clear(partitionName);
     }
 
     @Override

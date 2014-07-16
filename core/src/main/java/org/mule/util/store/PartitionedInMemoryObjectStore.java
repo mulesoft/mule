@@ -234,8 +234,17 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
     @Override
     public void disposePartition(String partitionName) throws ObjectStoreException
     {
-        partitions.remove(partitionName);
-        expiryInfoPartition.remove(partitionName);
+        removeAndClear(partitions, partitionName);
+        removeAndClear(expiryInfoPartition, partitionName);
+    }
+
+    private void removeAndClear(Map<String, ? extends Map> map, String key)
+    {
+        Map partition = map.remove(key);
+        if(partition!=null)
+        {
+            partition.clear();
+        }
     }
 
 }
