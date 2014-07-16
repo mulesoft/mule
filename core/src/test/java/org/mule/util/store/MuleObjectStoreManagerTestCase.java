@@ -44,6 +44,11 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase
 {
 
     public static final String TEST_PARTITION_NAME = "partition";
+    public static final int POLLING_TIMEOUT = 1000;
+    public static final int POLLING_DELAY = 60;
+    public static final String TEST_KEY = "Some Key";
+    public static final String TEST_VALUE = "Some Value";
+
     private MuleObjectStoreManager storeManager = new MuleObjectStoreManager();
 
     @Rule
@@ -65,19 +70,17 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase
     @Test
     public void disposePartitionableStore() throws ObjectStoreException
     {
-        String partitionName = "partition";
-
         @SuppressWarnings("unchecked")
         ObjectStorePartition<Serializable> store = mock(ObjectStorePartition.class,
                                                         withSettings()
                                                                 .extraInterfaces(Disposable.class)
                                                                 .defaultAnswer(Mockito.RETURNS_DEEP_STUBS));
 
-        when(store.getPartitionName()).thenReturn(partitionName);
+        when(store.getPartitionName()).thenReturn(TEST_PARTITION_NAME);
 
         storeManager.disposeStore(store);
 
-        verify(store.getBaseStore()).disposePartition(partitionName);
+        verify(store.getBaseStore()).disposePartition(TEST_PARTITION_NAME);
         verify(store, never()).clear();
         verify((Disposable) store).dispose();
     }
@@ -100,7 +103,7 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase
         {
             ObjectStorePartition<Serializable> store = createStorePartition(TEST_PARTITION_NAME, isPersistent);
 
-            store.getBaseStore().store("Some Key", "Some Value", TEST_PARTITION_NAME);
+            store.getBaseStore().store(TEST_KEY, TEST_VALUE, TEST_PARTITION_NAME);
 
             assertThat(store.allKeys().size(), is(1));
 
@@ -148,7 +151,7 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase
 
     private void assertMonitorsCount(final int expectedValue)
     {
-        new PollingProber(1000, 60).check(new Probe()
+        new PollingProber(POLLING_TIMEOUT, POLLING_DELAY).check(new Probe()
         {
             @Override
             public boolean isSatisfied()
@@ -169,7 +172,7 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase
             @Override
             public String describeFailure()
             {
-                return "There are active scheduler tasks.";
+                return "Unexpected count of active monitors.";
             }
         });
     }
