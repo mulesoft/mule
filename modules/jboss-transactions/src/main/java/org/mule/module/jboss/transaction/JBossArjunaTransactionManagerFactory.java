@@ -32,25 +32,12 @@ public class JBossArjunaTransactionManagerFactory implements TransactionManagerF
     public static final String PROPERTY_NODE_IDENTIFIER = "com.arjuna.ats.arjuna.nodeIdentifier";
     public static final String PROPERTY_DEFAULT_TIMEOUT = "com.arjuna.ats.arjuna.coordinator.defaultTimeout";
     public static final String PROPERTY_TX_REAPER_TIMEOUT = "com.arjuna.ats.arjuna.coordinator.txReaperTimeout";
+    public static final String OS_ROOT = "os";
 
     private Map<String, String> properties = new HashMap<String, String>();
 
-    //static
-    //{
-    //arjPropertyManager.propertyManager.setProperty(LogFactory.LOGGER_PROPERTY, "log4j_releveler");
-    //arjPropertyManager.propertyManager.setProperty(LogFactory.LOGGER_PROPERTY, "jakarta");
-    //arjPropertyManager.propertyManager.setProperty(LogFactory.DEBUG_LEVEL, String.valueOf(DebugLevel.FULL_DEBUGGING));
-    //commonPropertyManager.propertyManager.setProperty(LogFactory.LOGGER_PROPERTY, "jakarta");
-    //commonPropertyManager.propertyManager.setProperty(LogFactory.DEBUG_LEVEL, String.valueOf(DebugLevel.FULL_DEBUGGING));
-    //}
 
     private TransactionManager tm;
-
-    public JBossArjunaTransactionManagerFactory()
-    {
-        //arjPropertyManager.propertyManager.setProperty("com.arjuna.ats.arjuna.objectstore.objectStoreType", "ShadowNoFileLockStore");
-        //arjPropertyManager.propertyManager.setProperty(Environment.OBJECTSTORE_TYPE, ArjunaNames.Implementation_ObjectStore_JDBCStore().stringForm());
-    }
 
     public synchronized TransactionManager create(MuleConfiguration config) throws Exception
     {
@@ -65,7 +52,7 @@ public class JBossArjunaTransactionManagerFactory implements TransactionManagerF
             }
 
             arjPropertyManager.getObjectStoreEnvironmentBean().setObjectStoreDir(objectStoreDir);
-            arjPropertyManager.getObjectStoreEnvironmentBean().setLocalOSRoot(muleInternalDir);
+            arjPropertyManager.getObjectStoreEnvironmentBean().setLocalOSRoot(OS_ROOT);
 
             Properties props = PropertiesFactory.getDefaultProperties();
             props.setProperty(PROPERTY_ENVIRONMENT_OBJECTSTORE_DIR, objectStoreDir);
