@@ -7,23 +7,6 @@
 
 package org.mule.module.jersey;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.component.JavaComponent;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transformer.TransformerException;
-import org.mule.component.AbstractComponent;
-import org.mule.transport.http.HttpConnector;
-
-import com.sun.jersey.api.core.DefaultResourceConfig;
-import com.sun.jersey.core.header.InBoundHeaders;
-import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerResponse;
-import com.sun.jersey.spi.container.WebApplication;
-import com.sun.jersey.spi.container.WebApplicationFactory;
-
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -32,8 +15,27 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
+
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.api.component.JavaComponent;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.api.transformer.TransformerException;
+import org.mule.component.AbstractComponent;
+import org.mule.transport.http.HttpConnector;
+import org.mule.transport.http.HttpConstants;
+
+import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.core.header.InBoundHeaders;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
+import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.ContainerResponse;
+import com.sun.jersey.spi.container.WebApplication;
+import com.sun.jersey.spi.container.WebApplicationFactory;
 
 /**
  * Wraps a set of components which can get invoked by Jersey. This component will
@@ -126,10 +128,22 @@ public class JerseyResourcesComponent extends AbstractComponent
         InBoundHeaders headers = new InBoundHeaders();
         for (Object prop : message.getInboundPropertyNames())
         {
-            Object property = message.getInboundProperty(prop.toString());
-            if (property != null)
+            if (prop.equals(HttpConnector.HTTP_COOKIES_PROPERTY))
             {
-                headers.add(prop.toString(), property.toString());
+                org.apache.commons.httpclient.Cookie[] apacheCookies = message
+                        .getInboundProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
+                for (org.apache.commons.httpclient.Cookie apacheCookie : apacheCookies)
+                {
+                    Cookie cookie = new Cookie(apacheCookie.getName(), apacheCookie.getValue());
+                    headers.addObject(HttpConstants.HEADER_COOKIE, cookie);
+                }
+            } else
+            {
+                Object property = message.getInboundProperty(prop.toString());
+                if (property != null)
+                {
+                    headers.add(prop.toString(), property.toString());
+                }
             }
         }
 
@@ -147,6 +161,7 @@ public class JerseyResourcesComponent extends AbstractComponent
         URI completeUri = getCompleteUri(endpointUri, scheme, host, path, query);
         ContainerRequest req = new ContainerRequest(application, method, baseUri, completeUri, headers,
             getInputStream(message));
+
         if (logger.isDebugEnabled())
         {
             logger.debug("Base URI: " + baseUri);

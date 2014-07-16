@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:jersey="http://www.mulesoft.org/schema/mule/jersey"
+	xmlns:inf-mule="http://www.express-scripts.com/schema/inf/mule"
+	xsi:schemaLocation="
+    	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    	http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+    	http://www.mulesoft.org/schema/mule/jersey http://www.mulesoft.org/schema/mule/jersey/current/mule-jersey.xsd
+    	http://jersey.apache.org/core http://jersey.apache.org/schemas/core.xsd
+    	http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+    	http://www.express-scripts.com/schema/inf/mule http://www.express-scripts.com/schema/inf/mule/inf-mule-module.xsd">
+
+	<http:connector name="httpConnector" enableCookies="true" />
+
+	<spring:bean id="jerseyComponent" class="org.mule.module.jersey.HelloWorldCookieResource" />
+
+	<flow name="RequestEchoService">
+		<http:inbound-endpoint connector-ref="httpConnector" address="http://localhost:${httpPort}/" />
+
+		<jersey:resources>
+			<component>
+				<spring-object bean="jerseyComponent" />
+			</component>
+		</jersey:resources>
+	</flow>
+
+</mule>
