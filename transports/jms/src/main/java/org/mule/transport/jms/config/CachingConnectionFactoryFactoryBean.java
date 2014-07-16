@@ -37,7 +37,6 @@ public class CachingConnectionFactoryFactoryBean extends AbstractFactoryBean<Cus
         CustomCachingConnectionFactory cachingConnectionFactory = new CustomCachingConnectionFactory(connectionFactory, username, password);
         cachingConnectionFactory.setCacheProducers(cacheProducers);
         cachingConnectionFactory.setSessionCacheSize(sessionCacheSize);
-        //TODO(pablo.kraan): Add caching of JMS consumers (MULE-7171)
         cachingConnectionFactory.setCacheConsumers(false);
 
         return cachingConnectionFactory;
