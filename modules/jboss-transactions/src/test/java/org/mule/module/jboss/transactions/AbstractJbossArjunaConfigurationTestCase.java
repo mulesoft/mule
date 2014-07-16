@@ -9,6 +9,7 @@ package org.mule.module.jboss.transactions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.module.jboss.transaction.JBossArjunaTransactionManagerFactory.OS_ROOT;
 import static org.mule.module.jboss.transaction.JBossArjunaTransactionManagerFactory.PROPERTY_ENVIRONMENT_OBJECTSTORE_DIR;
 import static org.mule.module.jboss.transaction.JBossArjunaTransactionManagerFactory.PROPERTY_OBJECTSTORE_DIR;
 import static org.mule.module.jboss.transaction.JBossArjunaTransactionManagerFactory.PROPERTY_USER_DIR;
@@ -49,7 +50,7 @@ public abstract class AbstractJbossArjunaConfigurationTestCase extends AbstractT
     protected void assertObjectStoreDir(String objectStoreDir, String workingDirectory)
     {
         assertEquals(arjPropertyManager.getObjectStoreEnvironmentBean().getObjectStoreDir(), objectStoreDir);
-        assertEquals(arjPropertyManager.getObjectStoreEnvironmentBean().getLocalOSRoot(), workingDirectory);
+        assertEquals(arjPropertyManager.getObjectStoreEnvironmentBean().getLocalOSRoot(), OS_ROOT);
 
         Properties props = PropertiesFactory.getDefaultProperties();
         assertEquals(props.getProperty(PROPERTY_ENVIRONMENT_OBJECTSTORE_DIR), objectStoreDir);
