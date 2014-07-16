@@ -132,31 +132,46 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase
         {
             ObjectStorePartition<Serializable> store = createStorePartition(TEST_PARTITION_NAME, isPersistent);
 
-            assertThat(storeManager.scheduler.getActiveCount(), is(1));
+            assertMonitorsCount(1);
 
             storeManager.disposeStore(store);
 
             assertThat(storeManager.stores.keySet(), not(hasItem(TEST_PARTITION_NAME)));
 
-            new PollingProber(1000, 60).check(new Probe()
-            {
-                @Override
-                public boolean isSatisfied()
-                {
-                    return storeManager.scheduler.getActiveCount() == 0;
-                }
-
-                @Override
-                public String describeFailure()
-                {
-                    return "There are active scheduler tasks.";
-                }
-            });
+            assertMonitorsCount(0);
         }
         finally
         {
             storeManager.dispose();
         }
+    }
+
+    private void assertMonitorsCount(final int expectedValue)
+    {
+        new PollingProber(1000, 60).check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return assertMonitors(expectedValue) && assertSchedulers(expectedValue);
+            }
+
+            private boolean assertMonitors(int expectedValue)
+            {
+                return storeManager.getMonitorsCount() == expectedValue;
+            }
+
+            private boolean assertSchedulers(int expectedValue)
+            {
+                return storeManager.scheduler.getQueue().size() + storeManager.scheduler.getActiveCount() == expectedValue;
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "There are active scheduler tasks.";
+            }
+        });
     }
 
     private ObjectStorePartition<Serializable> createStorePartition(String partitionName, boolean isPersistent) throws InitialisationException

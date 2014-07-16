@@ -359,6 +359,11 @@ public class MuleObjectStoreManager
 
     }
 
+    int getMonitorsCount()
+    {
+        return monitors.size();
+    }
+
     public void setBasePersistentStoreKey(String basePersistentStoreKey)
     {
         this.basePersistentStoreKey = basePersistentStoreKey;
