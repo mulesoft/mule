@@ -153,23 +153,9 @@ public abstract class AbstractEmailFunctionalTestCase extends AbstractServiceAnd
 
     protected void doSend() throws Exception
     {
-        Object msg;
-        if (isMimeMessage)
-        {
-            msg = GreenMailUtilities.toMessage(message, email, charset);
-        }
-        else
-        {
-            msg = message;
-        }
-
+        Object msg = message;
         MuleClient client = muleContext.getClient();
         Map<String, Object> props = null;
-        if (charset != null)
-        {
-            props = new HashMap<String, Object>();
-            props.put(MailProperties.CONTENT_TYPE_PROPERTY, "text/plain; charset=" + charset);
-        }
         if (addAttachments)
         {
             MuleMessage muleMessage = new DefaultMuleMessage(msg, props, muleContext);
@@ -188,7 +174,7 @@ public abstract class AbstractEmailFunctionalTestCase extends AbstractServiceAnd
         assertEquals("did not receive 1 mail", 1, messages.length);
         verifyMessage(messages[0]);
     }
-
+    
     protected void verifyMessage(MimeMessage received) throws Exception
     {
         if (addAttachments)

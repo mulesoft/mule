@@ -52,7 +52,7 @@ public class StringToEmailMessage extends AbstractMessageTransformer
     @Override
     public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        String endpointAddress = endpoint.getEndpointURI().getAddress();
+        String endpointAddress = endpoint.getEndpointURI().getHost();
         SmtpConnector connector = (SmtpConnector) endpoint.getConnector();
         String to = lookupProperty(message, MailProperties.TO_ADDRESSES_PROPERTY, endpointAddress);
         String cc = lookupProperty(message, MailProperties.CC_ADDRESSES_PROPERTY, connector.getCcAddresses());
@@ -143,7 +143,7 @@ public class StringToEmailMessage extends AbstractMessageTransformer
                 email.setHeader(entry.getKey().toString(), entry.getValue().toString());
             }
 
-            setContent(message.getPayload(), email, contentType, message);
+            setContent(message.getPayload(), email, contentType + ";charset=" + outputEncoding, message);
 
             return email;
         }
