@@ -1,1 +1,1 @@
-org.apache.cxf.common.logging.Log4jLogger
+org.apache.cxf.common.logging.Slf4jLogger
