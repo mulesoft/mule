@@ -33,7 +33,7 @@
 #
 # /conf
 #
-/mule-standalone-nodocs-${productVersion}/conf/log4j.properties
+/mule-standalone-nodocs-${productVersion}/conf/log4j2.xml
 /mule-standalone-nodocs-${productVersion}/conf/wrapper.conf
 /mule-standalone-nodocs-${productVersion}/conf/tls-default.conf
 /mule-standalone-nodocs-${productVersion}/conf/tls-fips140-2.conf
@@ -58,13 +58,19 @@
 /mule-standalone-nodocs-${productVersion}/lib/boot/libwrapper-solaris-sparc-64.so
 /mule-standalone-nodocs-${productVersion}/lib/boot/libwrapper-solaris-x86-32.so
 /mule-standalone-nodocs-${productVersion}/lib/boot/commons-cli-1.2.jar
-/mule-standalone-nodocs-${productVersion}/lib/boot/log4j-1.2.16.jar
 /mule-standalone-nodocs-${productVersion}/lib/boot/mule-module-boot-${productVersion}.jar
-/mule-standalone-nodocs-${productVersion}/lib/boot/mule-module-logging-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/boot/mule-module-reboot-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/boot/README.txt
 /mule-standalone-nodocs-${productVersion}/lib/boot/wrapper-3.2.3.jar
 /mule-standalone-nodocs-${productVersion}/lib/boot/wrapper-windows-x86-32.dll
+/mule-standalone-nodocs-${productVersion}/lib/boot/disruptor-3.2.1.jar
+/mule-standalone-nodocs-${productVersion}/lib/boot/jcl-over-slf4j-1.7.7.jar
+/mule-standalone-nodocs-${productVersion}/lib/boot/log4j-1.2-api-2.0.jar
+/mule-standalone-nodocs-${productVersion}/lib/boot/log4j-api-2.0.jar
+/mule-standalone-nodocs-${productVersion}/lib/boot/log4j-core-2.0.jar
+/mule-standalone-nodocs-${productVersion}/lib/boot/log4j-jcl-2.0.jar
+/mule-standalone-nodocs-${productVersion}/lib/boot/log4j-slf4j-impl-2.0.jar
+/mule-standalone-nodocs-${productVersion}/lib/boot/slf4j-api-1.7.7.jar
 
 
 #
