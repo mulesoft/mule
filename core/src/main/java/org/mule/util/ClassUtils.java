@@ -13,6 +13,7 @@ import java.io.CharArrayReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -334,6 +335,68 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
             throws ClassNotFoundException
     {
         return classLoader.loadClass(className);
+    }
+
+    public static <T> T getFieldValue(Object target, String fieldName, boolean recursive)
+            throws IllegalAccessException, NoSuchFieldException
+    {
+        Class<?> clazz = target.getClass();
+        Field field;
+        while (!Object.class.equals(clazz))
+        {
+            try
+            {
+                field = clazz.getDeclaredField(fieldName);
+                field.setAccessible(true);
+                return (T) field.get(target);
+            }
+            catch (NoSuchFieldException e)
+            {
+                // ignore and look in superclass
+                if (recursive)
+                {
+                    clazz = clazz.getSuperclass();
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+
+        throw new NoSuchFieldException(String.format("Could not find field '%s' in class %s", fieldName, target.getClass().getName()));
+    }
+
+    public static void setFieldValue(Object target, String fieldName, Object value, boolean recursive)
+            throws IllegalAccessException, NoSuchFieldException
+    {
+        Class<?> clazz = target.getClass();
+        Field field;
+        while (!Object.class.equals(clazz))
+        {
+            try
+            {
+                field = clazz.getDeclaredField(fieldName);
+                field.setAccessible(true);
+                field.set(target, value);
+
+                return;
+            }
+            catch (NoSuchFieldException e)
+            {
+                // ignore and look in superclass
+                if (recursive)
+                {
+                    clazz = clazz.getSuperclass();
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+
+        throw new NoSuchFieldException(String.format("Could not find field '%s' in class %s", fieldName, target.getClass().getName()));
     }
 
 

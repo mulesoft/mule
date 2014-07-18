@@ -34,7 +34,7 @@ public class IOUtilsTestCase extends AbstractMuleTestCase
     @Test
     public void testLoadingResourcesAsStream() throws Exception
     {
-        InputStream is = IOUtils.getResourceAsStream("log4j.properties", getClass(), false, false);
+        InputStream is = IOUtils.getResourceAsStream("log4j2-test.xml", getClass(), false, false);
         assertNotNull(is);
 
         is = IOUtils.getResourceAsStream("does-not-exist.properties", getClass(), false, false);
