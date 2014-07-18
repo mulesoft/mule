@@ -19,25 +19,26 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.management.remote.rmi.RMIConnectorServer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.management.remote.rmi.RMIConnectorServer;
-
 public class DefaultJmxSupportAgent extends AbstractAgent
 {
+
     private static final Logger logger = LoggerFactory.getLogger(DefaultJmxSupportAgent.class);
 
     public static final String DEFAULT_HOST = "localhost";
     public static final String DEFAULT_PORT = "1099";
 
-    private boolean loadLog4jAgent = true;
+    private final boolean loadLog4jAgent = false;
     private boolean loadJdmkAgent = false;
     private boolean loadMx4jAgent = false;
     private boolean loadProfilerAgent = false;
     private String port;
     private String host;
-    
+
     private ConfigurableJMXAuthenticator jmxAuthenticator;
 
     public DefaultJmxSupportAgent()
@@ -62,13 +63,17 @@ public class DefaultJmxSupportAgent extends AbstractAgent
         return "Default Jmx Support Agent";
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void start() throws MuleException
     {
         // nothing to do
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void stop() throws MuleException
     {
         // nothing to do
@@ -92,9 +97,8 @@ public class DefaultJmxSupportAgent extends AbstractAgent
      * There is no guarantee that by throwing a Recoverable exception that the Mule
      * instance will not shut down.
      *
-     * @throws org.mule.api.lifecycle.InitialisationException
-     *          if a fatal error occurs
-     *          causing the Mule instance to shutdown
+     * @throws org.mule.api.lifecycle.InitialisationException if a fatal error occurs
+     *                                                        causing the Mule instance to shutdown
      */
     public void initialise() throws InitialisationException
     {
@@ -114,22 +118,13 @@ public class DefaultJmxSupportAgent extends AbstractAgent
             {
                 registry.registerAgent(agent);
             }
-            
-            if (loadLog4jAgent)
-            {
-                agent = createLog4jAgent();
-                if (!isAgentRegistered(agent))
-                {
-                    registry.registerAgent(agent);
-                }
-            }
-            
+
             agent = createJmxNotificationAgent();
             if (!isAgentRegistered(agent))
             {
                 registry.registerAgent(agent);
             }
-            
+
             if (loadJdmkAgent)
             {
                 agent = createJdmkAgent();
@@ -193,7 +188,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
             Map<String, Object> props = agent.getConnectorServerProperties();
             Map<String, Object> mergedProps = new HashMap<String, Object>(props.size() + 1);
             mergedProps.putAll(props);
-            
+
             RMIClientSocketFactory factory = new FixedHostRmiClientSocketFactory(host);
             mergedProps.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE,
                             factory);
@@ -204,8 +199,8 @@ public class DefaultJmxSupportAgent extends AbstractAgent
         if (StringUtils.isBlank(remotingUri))
         {
             remotingUri = MessageFormat.format("service:jmx:rmi:///jndi/rmi://{0}:{1}/server",
-                StringUtils.defaultString(host, DEFAULT_HOST),
-                StringUtils.defaultString(port, DEFAULT_PORT));
+                                               StringUtils.defaultString(host, DEFAULT_HOST),
+                                               StringUtils.defaultString(port, DEFAULT_PORT));
         }
 
         if (credentials != null && !credentials.isEmpty())
@@ -262,7 +257,11 @@ public class DefaultJmxSupportAgent extends AbstractAgent
 
     public void setLoadLog4jAgent(boolean loadLog4jAgent)
     {
-        this.loadLog4jAgent = loadLog4jAgent;
+        if (loadLog4jAgent)
+        {
+            logger.warn("Log4jAgent is deprecated since Mule 3.6.0 because log4j2 already supports JMX OOTB. " +
+                        "Thus, enabling it here will have no effect. Check migration guide for more information");
+        }
     }
 
     public boolean isLoadJdmkAgent()
@@ -315,7 +314,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
     public void setHost(final String host)
     {
         logger.warn("The host attribute for jmx-default-config is deprecated, for multi-homed hosts consider using " +
-                "instead the Java system property java.rmi.server.hostname");
+                    "instead the Java system property java.rmi.server.hostname");
         this.host = host;
     }
 
