@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+    xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+	">
+
+    <flow name="ApplicationFlow">
+        <vm:inbound-endpoint path="in" exchange-pattern="request-response" />
+        <flow-ref name="SubprocessCreateLicense" />
+        <logger level="INFO"  />
+    </flow>
+
+    <sub-flow name="SubprocessCreateLicense">
+        <set-variable variableName="_enricher.name" value="EnrichCreateLicense" />
+        <enricher target="#[header:OUTBOUND:_enricher.status]">
+            <flow-ref name="#[flowVars['_enricher.name']]" />
+        </enricher>
+    </sub-flow>
+
+    <sub-flow name="EnrichCreateLicense">
+        <component>
+            <spring-object bean="idTraceLogger" />
+        </component>
+        <set-payload value="SUCCESS" />
+    </sub-flow>
+    <spring:beans>
+        <spring:bean id="idTraceLogger" class="org.mule.test.construct.BasicLogger">
+            <spring:property name="type" value="trace" />
+        </spring:bean>
+    </spring:beans>
+
+</mule>

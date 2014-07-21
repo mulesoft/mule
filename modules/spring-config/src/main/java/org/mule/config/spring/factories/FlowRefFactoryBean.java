@@ -11,11 +11,14 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Startable;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.config.i18n.CoreMessages;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -82,7 +85,7 @@ public class FlowRefFactoryBean
     }
 
     protected MessageProcessor createDynamicReferenceMessageProcessor(String name)
-        throws InitialisationException
+            throws MuleException
     {
         if (name == null)
         {
@@ -97,7 +100,7 @@ public class FlowRefFactoryBean
                 {
                     // Need to initialize because message processor won't be managed by parent
                     MessageProcessor dynamicMessageProcessor = getReferencedFlow(muleContext.getExpressionManager()
-                        .parse(refName, event));
+                        .parse(refName, event), event.getFlowConstruct());
                     return dynamicMessageProcessor.process(event);
                 }
             };
@@ -110,22 +113,37 @@ public class FlowRefFactoryBean
         return referenceCache.get(name);
     }
 
-    protected MessageProcessor getReferencedFlow(String name) throws InitialisationException
+    protected MessageProcessor getReferencedFlow(String name, FlowConstruct flowConstruct) throws MuleException
     {
         if (name == null)
         {
             throw new MuleRuntimeException(CoreMessages.objectIsNull(name));
         }
-        else if (!referenceCache.containsKey(name))
+        String categorizedName = name + "-" + flowConstruct.getName();
+        if (!referenceCache.containsKey(categorizedName))
         {
-            MessageProcessor processor = lookupReferencedFlowInApplicationContext(name);
-            if (processor instanceof Initialisable)
+            MessageProcessor referencedFlow = lookupReferencedFlowInApplicationContext(name);
+            if (referencedFlow instanceof Initialisable)
             {
-                ((Initialisable) processor).initialise();
+                if(referencedFlow instanceof MessageProcessorChain)
+                {
+                    for(MessageProcessor processor : ((MessageProcessorChain) referencedFlow).getMessageProcessors())
+                    {
+                        if(processor instanceof FlowConstructAware)
+                        {
+                            ((FlowConstructAware) processor).setFlowConstruct(flowConstruct);
+                        }
+                    }
+                }
+                ((Initialisable) referencedFlow).initialise();
             }
-            referenceCache.putIfAbsent(name, processor);
+            if(referencedFlow instanceof Startable)
+            {
+                ((Startable) referencedFlow).start();
+            }
+            referenceCache.putIfAbsent(categorizedName, referencedFlow);
         }
-        return referenceCache.get(name);
+        return referenceCache.get(categorizedName);
     }
 
     protected MessageProcessor lookupReferencedFlowInApplicationContext(String name)
