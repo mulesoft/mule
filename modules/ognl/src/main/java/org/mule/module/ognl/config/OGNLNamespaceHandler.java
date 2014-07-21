@@ -11,6 +11,8 @@ import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.module.ognl.filters.OGNLFilter;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
@@ -21,10 +23,18 @@ import org.w3c.dom.Element;
 public class OGNLNamespaceHandler extends NamespaceHandlerSupport
 {
 
+    private transient final Log logger = LogFactory.getLog(getClass());
+
     public void init()
     {
+        logger.warn(getDeprecationWarning());
         registerBeanDefinitionParser("filter", new FilterDefinitionParser(OGNLFilter.class));
         registerBeanDefinitionParser("expression", new CDATABeanDefinitionParser("expression", String.class));
+    }
+
+    protected String getDeprecationWarning()
+    {
+        return "OGNL module is deprecated and will be removed in Mule 4.0. Use MEL expressions instead.";
     }
 
     private static class CDATABeanDefinitionParser extends
