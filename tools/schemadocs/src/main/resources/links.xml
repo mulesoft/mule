@@ -360,9 +360,6 @@
     <link><item>management:yourkit-profiler</item><page>Management+Module</page></link>
     <link><item>management:custom-agent</item><page>Management+Module</page></link>
 
-    <link><item>ognl:filter</item><page>OGNL+Module</page></link>
-    <link><item>ognl:expression</item><page>OGNL+Module</page></link>
-
     <link><item>pgp:security-manager</item><page>PGP+Module</page></link>
     <link><item>pgp:security-provider</item><page>PGP+Module</page></link>
     <link><item>pgp:keybased-encryption-strategy</item><page>PGP+Module</page></link>
