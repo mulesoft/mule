@@ -56,7 +56,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     public void initialise() throws InitialisationException
     {
         super.initialise();
-        dateFormatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US);
+        dateFormatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);
         dateFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
@@ -74,12 +74,17 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
         setHeaders(httpResponse, msg);
         setCookies(httpResponse, msg);
         setCacheControl(httpResponse, msg);
-        String date = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US).format(new Date());
-        httpResponse.setHeader(new Header(HttpConstants.HEADER_DATE, date));
+        setDateHeader(httpResponse, new Date());
         setBody(httpResponse, msg, event);
 
         msg.setPayload(httpResponse);
         return event;
+    }
+
+    protected void setDateHeader(HttpResponse httpResponse, Date date)
+    {
+        String formattedDate = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US).format(date);
+        httpResponse.setHeader(new Header(HttpConstants.HEADER_DATE, formattedDate));
     }
 
     @Override
