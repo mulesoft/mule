@@ -117,7 +117,6 @@
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-json-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-launcher-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-management-${productVersion}.jar
-/mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-ognl-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-pgp-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-rss-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-scripting-${productVersion}.jar
@@ -304,7 +303,6 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/mx4j-remote-2.1.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/mx4j-tools-2.1.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/neethi-3.0.2.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/ognl-2.7.3.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/oro-2.0.8.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/quartz-1.8.5.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/relaxngDatatype-20020414.jar
