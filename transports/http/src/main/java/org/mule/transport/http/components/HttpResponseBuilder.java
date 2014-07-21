@@ -48,6 +48,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     private CacheControlHeader cacheControl;
     private boolean propagateMuleProperties = false;
     private AbstractTransformer bodyTransformer;
+    private SimpleDateFormat expiresHeaderFormatter;
     private SimpleDateFormat dateFormatter;
 
     private List<MessageProcessor> ownedMessageProcessor = new ArrayList<MessageProcessor>();
@@ -56,8 +57,9 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     public void initialise() throws InitialisationException
     {
         super.initialise();
+        expiresHeaderFormatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);
+        expiresHeaderFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
         dateFormatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);
-        dateFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
     @Override
@@ -83,8 +85,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
 
     protected void setDateHeader(HttpResponse httpResponse, Date date)
     {
-        String formattedDate = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US).format(date);
-        httpResponse.setHeader(new Header(HttpConstants.HEADER_DATE, formattedDate));
+        httpResponse.setHeader(new Header(HttpConstants.HEADER_DATE, dateFormatter.format(date)));
     }
 
     @Override
@@ -332,7 +333,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
 
         if(realValue instanceof Date)
         {
-            return dateFormatter.format(realValue);
+            return expiresHeaderFormatter.format(realValue);
         }
 
         return String.valueOf(realValue);
