@@ -38,7 +38,6 @@
         <module>json</module>
         <module>logging</module>
         <module>management</module>
-        <module>ognl</module>
         <module>pgp</module>
         <module>reboot</module>
         <module>rss</module>

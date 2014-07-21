@@ -4897,7 +4897,6 @@
             <xsd:enumeration value="map-payload"/>
             <xsd:enumeration value="message"/>
             <xsd:enumeration value="mule"/>
-            <xsd:enumeration value="ognl"/>
             <xsd:enumeration value="payload"/>
             <xsd:enumeration value="process"/>
             <xsd:enumeration value="regex"/>
@@ -4917,7 +4916,6 @@
             <xsd:enumeration value="exception-type"/>
             <xsd:enumeration value="wildcard"/>
             <xsd:enumeration value="regex"/>
-            <xsd:enumeration value="ognl"/>
             <xsd:enumeration value="xpath"/>
             <xsd:enumeration value="jxpath"/>
             <xsd:enumeration value="groovy"/>

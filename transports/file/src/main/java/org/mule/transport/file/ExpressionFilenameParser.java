@@ -16,7 +16,7 @@ import java.text.MessageFormat;
 
 /**
  * <code>ExpressionFilenameParser</code> can use any expression language supported by Mule
- * to construct a file name for the current message.  Expressions can be xpath, xquery, ognl, mvel,
+ * to construct a file name for the current message.  Expressions can be xpath, xquery, mvel,
  * header, function and more. For more information see http://www.mulesoft.org/documentation/display/MULE3USER/Using+Expressions.
  * <p/>
  * For example an xpath expression can be defined to pull a message id out of an xml message and 

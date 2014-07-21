@@ -213,7 +213,6 @@
         <mqSeriesVersion>6.0</mqSeriesVersion>
         <muleMvelVersion>2.1.9-MULE-004</muleMvelVersion>
         <mx4jVersion>2.1.1</mx4jVersion>
-        <ognlVersion>2.7.3</ognlVersion>
         <oroVersion>2.0.8</oroVersion>
         <quartzVersion>1.8.5</quartzVersion>
         <saajVersion>1.3</saajVersion>
