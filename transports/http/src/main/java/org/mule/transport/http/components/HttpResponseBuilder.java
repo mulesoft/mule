@@ -48,6 +48,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     private CacheControlHeader cacheControl;
     private boolean propagateMuleProperties = false;
     private AbstractTransformer bodyTransformer;
+    private SimpleDateFormat expiresHeaderFormatter;
     private SimpleDateFormat dateFormatter;
 
     private List<MessageProcessor> ownedMessageProcessor = new ArrayList<MessageProcessor>();
@@ -56,8 +57,9 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     public void initialise() throws InitialisationException
     {
         super.initialise();
-        dateFormatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US);
-        dateFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
+        expiresHeaderFormatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);
+        expiresHeaderFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
+        dateFormatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);
     }
 
     @Override
@@ -74,12 +76,16 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
         setHeaders(httpResponse, msg);
         setCookies(httpResponse, msg);
         setCacheControl(httpResponse, msg);
-        String date = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US).format(new Date());
-        httpResponse.setHeader(new Header(HttpConstants.HEADER_DATE, date));
+        setDateHeader(httpResponse, new Date());
         setBody(httpResponse, msg, event);
 
         msg.setPayload(httpResponse);
         return event;
+    }
+
+    protected void setDateHeader(HttpResponse httpResponse, Date date)
+    {
+        httpResponse.setHeader(new Header(HttpConstants.HEADER_DATE, dateFormatter.format(date)));
     }
 
     @Override
@@ -327,7 +333,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
 
         if(realValue instanceof Date)
         {
-            return dateFormatter.format(realValue);
+            return expiresHeaderFormatter.format(realValue);
         }
 
         return String.valueOf(realValue);
