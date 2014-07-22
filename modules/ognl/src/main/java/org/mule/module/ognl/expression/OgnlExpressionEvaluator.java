@@ -11,6 +11,7 @@ import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.module.ognl.config.OGNLNamespaceHandler;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,6 +26,13 @@ import org.apache.commons.logging.LogFactory;
  */
 public class OgnlExpressionEvaluator implements ExpressionEvaluator, Disposable
 {
+
+    static
+    {
+        Log deprecationLogger = LogFactory.getLog(OgnlExpressionEvaluator.class);
+        deprecationLogger.warn(OGNLNamespaceHandler.getDeprecationWarning());
+    }
+
     Map<String, Object> expressions = new ConcurrentHashMap<String, Object>(4);
 
     public static final String NAME = "ognl";
