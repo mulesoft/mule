@@ -1,6 +1,6 @@
 # Mule Java Coding Conventions
 
-As best practice for team development, Mule uses coding conventions to ensure that code is clean and consistent, and that developers are able to maintain efficient productivity.  
+As a best practice for team development, Mule uses coding conventions to ensure that code is clean and consistent, and that developers are able to maintain efficient productivity.  
 
 ## Coding Conventions
 
