@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+	">
+
+    <flow name="ApplicationFlow">
+        <vm:inbound-endpoint path="in" exchange-pattern="request-response" />
+        <flow-ref name="SubprocessCreateLicense" />
+        <logger level="INFO"  />
+    </flow>
+
+    <sub-flow name="SubprocessCreateLicense">
+        <set-variable variableName="_enricher.name" value="EnrichCreateLicense" />
+        <enricher target="#[header:OUTBOUND:_enricher.status]">
+            <flow-ref name="#[flowVars['_enricher.name']]" />
+        </enricher>
+    </sub-flow>
+
+    <sub-flow name="EnrichCreateLicense">
+        <test:component />
+        <set-payload value="SUCCESS" />
+    </sub-flow>
+
+</mule>
