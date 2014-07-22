@@ -32,7 +32,7 @@ public class OGNLNamespaceHandler extends NamespaceHandlerSupport
         registerBeanDefinitionParser("expression", new CDATABeanDefinitionParser("expression", String.class));
     }
 
-    protected String getDeprecationWarning()
+    public static String getDeprecationWarning()
     {
         return "OGNL module is deprecated and will be removed in Mule 4.0. Use MEL expressions instead.";
     }
