@@ -11,8 +11,8 @@ import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.module.ognl.filters.OGNLFilter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
@@ -23,7 +23,7 @@ import org.w3c.dom.Element;
 public class OGNLNamespaceHandler extends NamespaceHandlerSupport
 {
 
-    private transient final Log logger = LogFactory.getLog(getClass());
+    private transient final Logger logger = LoggerFactory.getLogger(getClass());
 
     public void init()
     {
