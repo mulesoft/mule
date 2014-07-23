@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.examples</groupId>
         <artifactId>mule-examples</artifactId>
-        <version>3.6.0-M1-SNAPSHOT</version>
+        <version>3.6.0-M2-SNAPSHOT</version>
     </parent>
     <artifactId>mule-example-cep</artifactId>
     <name>CEP Example</name>
