@@ -26,6 +26,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import junit.framework.Assert;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 @SmallTest
@@ -149,6 +150,7 @@ public class DateTimeTimeTestCase extends AbstractMuleTestCase
     }
 
     @Test
+    @Ignore("MULE-7771/MULE-6926: flaky test")
     public void seconds()
     {
         assertEquals(Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.SECOND), now.getSeconds());

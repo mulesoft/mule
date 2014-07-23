@@ -106,12 +106,11 @@ public class SynchronizedMuleContextStartTestCase extends FunctionalTestCase
             if (endpoint.getName().equals("endpoint.vm.flow2"))
             {
                 InboundEndpointWrapper wrappedEndpoint = new DelayedStartInboundEndpointWrapper(endpoint);
-
-                return (InboundEndpoint) registerEndpoint(wrappedEndpoint);
+                return wrappedEndpoint;
             }
             else
             {
-                return (InboundEndpoint) registerEndpoint(endpoint);
+                return endpoint;
             }
         }
     }

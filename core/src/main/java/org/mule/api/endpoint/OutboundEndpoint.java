@@ -6,11 +6,12 @@
  */
 package org.mule.api.endpoint;
 
+import org.mule.api.exception.MessagingExceptionHandlerAware;
 import org.mule.api.processor.MessageProcessor;
 
 import java.util.List;
 
-public interface OutboundEndpoint extends ImmutableEndpoint, MessageProcessor
+public interface OutboundEndpoint extends ImmutableEndpoint, MessageProcessor, MessagingExceptionHandlerAware
 {    
     /**
      * @return a list of properties which should be carried over from the request message to the response message
