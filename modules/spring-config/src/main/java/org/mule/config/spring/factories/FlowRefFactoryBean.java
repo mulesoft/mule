@@ -36,6 +36,9 @@ public class FlowRefFactoryBean
     implements FactoryBean<MessageProcessor>, ApplicationContextAware, MuleContextAware, Initialisable,
     Disposable
 {
+
+    private static final String NULL_FLOW_CONTRUCT_NAME = "null";
+    private static final String MULE_PREFIX = "_mule-";
     private String refName;
     private ApplicationContext applicationContext;
     private MuleContext muleContext;
@@ -87,8 +90,7 @@ public class FlowRefFactoryBean
         }
     }
 
-    protected MessageProcessor createDynamicReferenceMessageProcessor(String name)
-            throws MuleException
+    protected MessageProcessor createDynamicReferenceMessageProcessor(String name) throws MuleException
     {
         if (name == null)
         {
@@ -151,7 +153,8 @@ public class FlowRefFactoryBean
 
     private String getReferencedFlowCategorizedName(String referencedFlowName, FlowConstruct flowConstruct)
     {
-        return String.format("_mule-%s-%s", flowConstruct.getName(), referencedFlowName);
+        String flowConstructName = flowConstruct != null ? flowConstruct.getName() : NULL_FLOW_CONTRUCT_NAME;
+        return MULE_PREFIX + flowConstructName + "-" + referencedFlowName;
     }
 
     protected MessageProcessor lookupReferencedFlowInApplicationContext(String name)
