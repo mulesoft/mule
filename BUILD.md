@@ -2,9 +2,9 @@
 
 [Maven](http://maven.apache.org/) is the build automation tool used in Mule ESB. To modify or add to Mule source code, it's specially relevant to understand the hierarchy of maven projects that represent the Mule source code.  
 
-To be able to build Mule you will need Maven among others. Refer to the [CONTRIBUTE.md](CONTRIBUTE.md) file to find the installation instructions prerequisites necessary to build Mule.
+To be able to build Mule you will need Maven among other things. Refer to the [CONTRIBUTE.md](CONTRIBUTE.md) file to find the installation instructions and prerequisites necessary to build Mule.
 
-In the following sections we will learn how Mule is organized, how to build Mule and how to troubleshoot problems we might find.
+In the following sections you will learn how Mule is organized, how to build Mule and how to troubleshoot problems we might find.
 
 ### Mule Source Code Sub-projects
 
@@ -61,7 +61,7 @@ The following list shows the Mule's build profiles:
 | Property                  | Description                                                       |
 |:--------------------------|:------------------------------------------------------------------|
 | `unit`                	   | Only tests annotated with `org.mule.tck.size.SmallTest` will run.|
-| `functional     `         | Will just run functional tests, located in [/tests/functional](mule/tree/3.x/tests/functional). |
+| `functional`              | Will just run functional tests, located in [/tests/functional](mule/tree/3.x/tests/functional). |
 | `integration`             | Will just run integration tests, located in [/tests/integration](mule/tree/3.x/tests/integration). |
 | `system`                  | Will just run system tests. |
 | `release`                 | Won't execute any tests and will create the distributable files.|
