@@ -6,6 +6,13 @@
  */
 package org.mule.transport.http.components;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -34,19 +41,13 @@ import java.util.TimeZone;
 
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @SmallTest
 public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
@@ -441,7 +442,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
         HttpResponse httpResponse = new HttpResponse();
         httpResponseBuilder.setHeaders(httpResponse, mockMuleMessage);
 
-        SimpleDateFormat httpDateFormatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US);
+        SimpleDateFormat httpDateFormatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);
         httpDateFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         validateHeader(httpResponse.getHeaders(), HttpConstants.HEADER_EXPIRES, httpDateFormatter.format(now));
@@ -495,6 +496,29 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
 
         httpResponseBuilder.setBody(response, mockMuleMessage, mockEvent);
         assertEquals(HTTP_BODY, response.getBodyAsString());
+    }
+
+    @Test
+    public void testDateHeaderFormat() throws Exception
+    {
+        TimeZone savedTimeZone = TimeZone.getDefault();
+        try {
+            HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
+            HttpResponse response = new HttpResponse();
+
+            TimeZone.setDefault(TimeZone.getTimeZone("EST"));
+
+            DateTime dateTime = new DateTime(2005, 9, 5, 16, 30, 0, 0, DateTimeZone.forID("EST"));
+
+            Date date = new Date(dateTime.getMillis());
+
+            httpResponseBuilder.setDateHeader(response, date);
+            validateHeader(response.getHeaders(), HttpConstants.HEADER_DATE, "Mon, 05 Sep 2005 16:30:00 -0500");
+        }
+        finally
+        {
+            TimeZone.setDefault(savedTimeZone);
+        }
     }
 
     private CookieWrapper createCookie(String name, String value, String domain, String path, String expiryDate, String secure, String version)
