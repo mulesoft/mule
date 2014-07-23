@@ -12,6 +12,8 @@ import org.mule.util.SerializationUtils;
 
 import java.io.File;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -35,8 +37,10 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
 {
 
     private static final String QUEUE_STORE_DIRECTORY = "queuestore";
-    public static final int ONE_MEGABYTE = 1024 * 1024;
+    private static final int ONE_MEGABYTE = 1024 * 1024;
     private static final Integer MAXIMUM_QUEUE_FILE_SIZE_IN_BYTES = Integer.valueOf(System.getProperty("mule.queue.maxlength", Integer.valueOf(ONE_MEGABYTE).toString()));
+    private static final String FIRST_QUEUE_SUFFIX = "-1";
+    private static final String SECOND_QUEUE_SUFFIX = "-2";
 
     protected final Log logger = LogFactory.getLog(this.getClass());
     private final MuleContext muleContext;
@@ -55,10 +59,8 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
         {
             Preconditions.checkState(queuesDirectory.mkdirs(), "Could not create queue store directory " + queuesDirectory.getAbsolutePath());
         }
-        File queueStoreFile1 = getFirstQueueFile(queueName, workingDirectory);
-        File queueStoreFile2 = getSecondQueueFile(queueName, workingDirectory);
-        randomAccessFileQueueStore1 = new RandomAccessFileQueueStore(queueStoreFile1);
-        randomAccessFileQueueStore2 = new RandomAccessFileQueueStore(queueStoreFile2);
+        randomAccessFileQueueStore1 = createRandomAccessFileQueueStore(queueName, workingDirectory, FIRST_QUEUE_SUFFIX);
+        randomAccessFileQueueStore2 = createRandomAccessFileQueueStore(queueName, workingDirectory, SECOND_QUEUE_SUFFIX);
         writeFile = randomAccessFileQueueStore1;
         readFile = randomAccessFileQueueStore1;
         if (logger.isDebugEnabled())
@@ -68,15 +70,39 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
         filesLock = new ReentrantReadWriteLock();
     }
 
+    private RandomAccessFileQueueStore createRandomAccessFileQueueStore(String queueName, String workingDirectory, String suffix)
+    {
+        try
+        {
+            return tryToCreateRandomAccessFileQueueStore(queueName, workingDirectory, suffix);
+        }
+        catch (Exception e)
+        {
+            return tryToCreateRandomAccessFileQueueStore(toHex(queueName), workingDirectory, suffix);
+        }
+    }
+
+    private RandomAccessFileQueueStore tryToCreateRandomAccessFileQueueStore(String queueName, String workingDirectory, String suffix)
+    {
+        return new RandomAccessFileQueueStore(getQueueFile(queueName, workingDirectory, suffix));
+    }
+
+    private static String toHex(String filename)
+    {
+        try
+        {
+            return new BigInteger(filename.getBytes("UTF-8")).toString(16);
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            // This should never happen
+            return filename;
+        }
+    }
 
     public static File getFirstQueueFile(String queueName, String workingDirectory)
     {
-        return getQueueFile(queueName, workingDirectory, "-1");
-    }
-
-    public static File getSecondQueueFile(String queueName, String workingDirectory)
-    {
-        return getQueueFile(queueName, workingDirectory, "-2");
+        return getQueueFile(queueName, workingDirectory, FIRST_QUEUE_SUFFIX);
     }
 
     private static File getQueueFile(String queueName, String workingDirectory, String suffix)
