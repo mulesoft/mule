@@ -10,7 +10,7 @@
     <description>This example is an adaptation of the Drools Stock Tick example to run inside Mule.</description>
 
     <properties>
-        <muleVersion>3.6.0-M1-SNAPSHOT</muleVersion>
+        <muleVersion>3.6.0-M1</muleVersion>
     </properties>
 
     <dependencies>

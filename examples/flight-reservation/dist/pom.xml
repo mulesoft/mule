@@ -10,7 +10,7 @@
     <description>This example simulates a flight reservation system using some of the new features added in Mule 3.3.</description>
 
     <properties>
-        <muleVersion>3.6.0-M1-SNAPSHOT</muleVersion>
+        <muleVersion>3.6.0-M1</muleVersion>
     </properties>
 
     <dependencies>

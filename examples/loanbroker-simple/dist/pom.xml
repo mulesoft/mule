@@ -9,7 +9,7 @@
     <description>A simple implementation of the loanbroker example from the Enterprise Integration Patterns book using the new constructs in Mule 3</description>
 
     <properties>
-        <muleVersion>3.6.0-M1-SNAPSHOT</muleVersion>
+        <muleVersion>3.6.0-M1</muleVersion>
     </properties>
 
     <build>
