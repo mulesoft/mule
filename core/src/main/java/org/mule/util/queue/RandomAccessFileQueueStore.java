@@ -11,7 +11,6 @@ import org.mule.util.FileUtils;
 
 import java.io.EOFException;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
@@ -43,15 +42,21 @@ class RandomAccessFileQueueStore
     public RandomAccessFileQueueStore(File directory, String filename)
     {
         this.file = new File(directory, filename);
-        createQueueFile();
         try
         {
             createQueueFile();
         }
-        catch(Exception e)
+        catch(IOException e)
         {
             this.file = new File(directory, toHex(filename));
-            createQueueFile();
+            try
+            {
+                createQueueFile();
+            }
+            catch (IOException e2)
+            {
+                throw new MuleRuntimeException(e2);
+            }
         }
         initialise();
     }
@@ -144,15 +149,15 @@ class RandomAccessFileQueueStore
         try
         {
             queueFile.close();
+            orderedKeys.clear();
+            fileTotalSpace = 0;
+            FileUtils.deleteQuietly(file);
+            createQueueFile();
         }
         catch (IOException e)
         {
-            throw new RuntimeException(e);
+            throw new MuleRuntimeException(e);
         }
-        orderedKeys.clear();
-        fileTotalSpace = 0;
-        FileUtils.deleteQuietly(file);
-        createQueueFile();
     }
 
     /**
@@ -283,27 +288,13 @@ class RandomAccessFileQueueStore
         return data;
     }
 
-    private void createQueueFile()
+    private void createQueueFile() throws IOException
     {
-        try
+        if (!file.exists())
         {
-            if (!file.exists())
-            {
-                try
-                {
-                    file.createNewFile();
-                }
-                catch (IOException e)
-                {
-                    throw new MuleRuntimeException(e);
-                }
-            }
-            queueFile = new RandomAccessFile(file, "rw");
+            file.createNewFile();
         }
-        catch (FileNotFoundException e)
-        {
-            throw new MuleRuntimeException(e);
-        }
+        queueFile = new RandomAccessFile(file, "rw");
     }
 
     private long writeData(byte[] data)
