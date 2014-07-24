@@ -6,6 +6,8 @@
  */
 package org.mule.module.pgp;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -23,9 +25,6 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class PGPSecurityFilterTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -78,7 +77,7 @@ public class PGPSecurityFilterTestCase extends AbstractServiceAndFlowTestCase
 
     private byte[] loadEncryptedMessage() throws IOException
     {
-        URL url = Thread.currentThread().getContextClassLoader().getResource("./encrypted-signed.asc");
+        URL url = Thread.currentThread().getContextClassLoader().getResource("./encrypted-compressed-signed.asc");
 
         FileInputStream in = new FileInputStream(url.getFile());
         byte[] msg = IOUtils.toByteArray(in);
