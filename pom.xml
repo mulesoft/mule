@@ -135,7 +135,7 @@
         <coberturaVersion>2.5</coberturaVersion>
         <eclipsePluginVersion>2.5.1</eclipsePluginVersion>
         <gmavenPluginVersion>1.4</gmavenPluginVersion>
-        <javadocPluginVersion>2.8</javadocPluginVersion>
+        <javadocPluginVersion>2.9.1</javadocPluginVersion>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
 
         <!--
@@ -1374,7 +1374,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.9.1</version>
+                    <version>${javadocPluginVersion}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -2136,17 +2136,9 @@
                 <defaultGoal>deploy</defaultGoal>
                 <plugins>
                     <plugin>
-                        <inherited>false</inherited>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <executions>
-                            <execution>
-                                <id>aggregated-javadocs</id>
-                                <phase>install</phase>
-                                <goals>
-                                    <goal>javadoc</goal>
-                                </goals>
-                            </execution>
                             <execution>
                                 <id>attach-javadocs</id>
                                 <goals>
