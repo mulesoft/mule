@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -33,16 +35,38 @@ class RandomAccessFileQueueStore
     private static final byte NOT_REMOVED = 0;
     private static final byte REMOVED = 1;
 
-    private final File file;
+    private File file;
     private RandomAccessFile queueFile;
     private LinkedList<Long> orderedKeys = new LinkedList<Long>();
     private long fileTotalSpace = 0;
 
-    public RandomAccessFileQueueStore(File file)
+    public RandomAccessFileQueueStore(File directory, String filename)
     {
-        this.file = file;
+        this.file = new File(directory, filename);
         createQueueFile();
+        try
+        {
+            createQueueFile();
+        }
+        catch(Exception e)
+        {
+            this.file = new File(directory, toHex(filename));
+            createQueueFile();
+        }
         initialise();
+    }
+
+    private static String toHex(String filename)
+    {
+        try
+        {
+            return new BigInteger(filename.getBytes("UTF-8")).toString(16);
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            // This should never happen
+            return filename;
+        }
     }
 
     /**
