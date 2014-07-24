@@ -72,18 +72,18 @@ public class DecryptStreamTransformer implements StreamTransformer
     {
         InputStream decodedInputStream = PGPUtil.getDecoderStream(this.toBeDecrypted);
         PGPObjectFactory pgpF = new PGPObjectFactory(decodedInputStream);
-        Object o = pgpF.nextObject();
+        Object pgpObject = pgpF.nextObject();
 
-        if (o == null)
+        if (pgpObject == null)
         {
             throw new IllegalArgumentException("Invalid PGP message");
         }
 
         // the first object might be a PGP marker packet.
         PGPEncryptedDataList enc;
-        if (o instanceof PGPEncryptedDataList)
+        if (pgpObject instanceof PGPEncryptedDataList)
         {
-            enc = (PGPEncryptedDataList) o;
+            enc = (PGPEncryptedDataList) pgpObject;
 
         }
         else
@@ -107,39 +107,38 @@ public class DecryptStreamTransformer implements StreamTransformer
         }
 
         clearStream = pbe.getDataStream(privateKey, provider);
-        PGPObjectFactory plainFact = new PGPObjectFactory(clearStream);
+        PGPObjectFactory pgpObjectFactory = new PGPObjectFactory(clearStream);
 
-        o = plainFact.nextObject();
-        PGPOnePassSignature signature = null;
-        if (o instanceof PGPOnePassSignatureList)
+        pgpObject = pgpObjectFactory.nextObject();
+
+        while (!(pgpObject instanceof PGPLiteralData))
         {
-            PGPOnePassSignatureList list = (PGPOnePassSignatureList) o;
-            signature = list.get(0);
-            signature.initVerify(this.publicKey, provider);
-            // TODO verify signature
-            // signature.verify(null);
-            o = plainFact.nextObject();
+            if (pgpObject instanceof PGPOnePassSignatureList)
+            {
+                PGPOnePassSignature signature = null;
+                PGPOnePassSignatureList list = (PGPOnePassSignatureList) pgpObject;
+                signature = list.get(0);
+                signature.initVerify(this.publicKey, provider);
+                // TODO verify signature
+                // signature.verify(null);
+                pgpObject = pgpObjectFactory.nextObject();
+            }
+            else if (pgpObject instanceof PGPCompressedData)
+            {
+                PGPCompressedData cData = (PGPCompressedData) pgpObject;
+                compressedStream = new BufferedInputStream(cData.getDataStream());
+                pgpObjectFactory = new PGPObjectFactory(compressedStream);
+                pgpObject = pgpObjectFactory.nextObject();
+            }
+            else
+            {
+                throw new PGPException("input is not PGPLiteralData - type unknown.");
+            }
         }
 
-        compressedStream = null;
-        if (o instanceof PGPCompressedData)
-        {
-            PGPCompressedData cData = (PGPCompressedData) o;
-            compressedStream = new BufferedInputStream(cData.getDataStream());
-            PGPObjectFactory pgpFact = new PGPObjectFactory(compressedStream);
-            Object streamData = pgpFact.nextObject();
-            o = streamData;
-        }
+        PGPLiteralData pgpLiteralData = (PGPLiteralData) pgpObject;
+        uncStream = pgpLiteralData.getInputStream();
 
-        if (o instanceof PGPLiteralData)
-        {
-            PGPLiteralData ld = (PGPLiteralData) o;
-            uncStream = ld.getInputStream();
-        }
-        else
-        {
-            throw new PGPException("input is not PGPLiteralData - type unknown.");
-        }
     }
 
     /**
