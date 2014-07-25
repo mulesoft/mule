@@ -38,7 +38,7 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
     @Test
     public void testSetCookieOnOutbound() throws Exception
     {
-        MuleMessageToHttpResponse transformer = new MuleMessageToHttpResponse();
+        MuleMessageToHttpResponse transformer = getMuleMessageToHttpResponse();
         MuleMessage msg = mock(MuleMessage.class);
 
         Cookie[] cookiesOutbound = new Cookie[2];
@@ -62,12 +62,11 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
         }
         Assert.assertEquals(cookiesOutbound.length, cookiesSet);
     }
-    
 
     @Test
     public void testSetDateOnOutbound() throws Exception
     {
-        MuleMessageToHttpResponse transformer = new MuleMessageToHttpResponse();
+        MuleMessageToHttpResponse transformer = getMuleMessageToHttpResponse();
         MuleMessage msg = mock(MuleMessage.class);
 
         HttpResponse response = transformer.createResponse(null, "UTF-8", msg);
@@ -103,7 +102,7 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
     @Test
     public void testContentTypeOnOutbound() throws Exception
     {
-        MuleMessageToHttpResponse transformer = new MuleMessageToHttpResponse();
+        MuleMessageToHttpResponse transformer = getMuleMessageToHttpResponse();
         final String contentType = "text/xml";
         final String wrongContentType = "text/json";
         Map<String, Object> outboundProperties =  new HashMap<String, Object>();
@@ -129,5 +128,12 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
             }
         }
         Assert.assertTrue("Missing "+HttpConstants.HEADER_CONTENT_TYPE+" header", hasContentTypeHeader);
+    }
+
+    private MuleMessageToHttpResponse getMuleMessageToHttpResponse() throws Exception
+    {
+        MuleMessageToHttpResponse transformer = new MuleMessageToHttpResponse();
+        transformer.initialise();
+        return transformer;
     }
 }

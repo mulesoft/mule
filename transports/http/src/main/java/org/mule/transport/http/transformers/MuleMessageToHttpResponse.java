@@ -26,10 +26,12 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -39,7 +41,7 @@ import org.joda.time.format.DateTimeFormatter;
 public class MuleMessageToHttpResponse extends AbstractMessageTransformer
 {
     
-    private static final DateTimeFormatter dateFormatter = DateTimeFormat.forPattern(HttpConstants.DATE_FORMAT_RFC822).withLocale(Locale.US);
+    private static DateTimeFormatter dateFormatter = DateTimeFormat.forPattern(HttpConstants.DATE_FORMAT_RFC822).withLocale(Locale.US);
     
     public static String formatDate(long time)
     {
@@ -66,6 +68,16 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
         else
         {
             server = MuleManifest.getProductName() + "/" + MuleManifest.getProductVersion();
+        }
+
+        if(HttpConstants.SERVER_TIME_ZONE_PROPERTY.isEnabled())
+        {
+            logger.warn(HttpMessages.dateInServerTimeZone());
+            dateFormatter = dateFormatter.withZone(DateTimeZone.forID(TimeZone.getDefault().getID()));
+        }
+        else
+        {
+            dateFormatter = dateFormatter.withZone(DateTimeZone.forID("GMT"));
         }
     }
 
@@ -216,8 +228,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
         {
             response.setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, contentType));
         }
-        String date = formatDate(System.currentTimeMillis());
-        response.setHeader(new Header(HttpConstants.HEADER_DATE, date));
+        setDateHeader(response, System.currentTimeMillis());
         response.setHeader(new Header(HttpConstants.HEADER_SERVER, server));
 
         String etag = msg.getOutboundProperty(HttpConstants.HEADER_ETAG);
@@ -331,6 +342,11 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
         }
 
         return response;
+    }
+
+    protected void setDateHeader(HttpResponse response, long millis)
+    {
+        response.setHeader(new Header(HttpConstants.HEADER_DATE, formatDate(millis)));
     }
 
     @Override
