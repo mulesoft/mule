@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.slf4j.LoggerFactory;
+
 /**
  * <code>FilteringRouter</code> is a router that accepts events based on a filter
  * set.
@@ -48,6 +50,11 @@ public class SxcFilteringOutboundRouter extends FilteringOutboundRouter
     private XPathBuilder builder;
 
     private NamespaceManager namespaceManager;
+
+    static
+    {
+        LoggerFactory.getLogger(SxcFilter.class).warn("SXC module is deprecated and will be removed in Mule 4.0.");
+    }
 
     @Override
     public void setMuleContext(MuleContext context)
