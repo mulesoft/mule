@@ -8,10 +8,7 @@ package org.mule.util.queue;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import java.io.File;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -55,6 +52,6 @@ public class RandomAccessFileQueueStoreTestCase extends AbstractMuleTestCase
 
     private RandomAccessFileQueueStore createRandomAccessFileQueueStore()
     {
-        return new RandomAccessFileQueueStore(new File(temporaryFolder.getRoot(), "datafile"));
+        return new RandomAccessFileQueueStore(temporaryFolder.getRoot(), "datafile");
     }
 }
