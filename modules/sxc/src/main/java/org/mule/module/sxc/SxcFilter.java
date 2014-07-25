@@ -6,20 +6,20 @@
  */
 package org.mule.module.sxc;
 
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 
 import com.envoisolutions.sxc.xpath.XPathBuilder;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SxcFilter implements Filter
 {
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     private String pattern;
     
@@ -31,6 +31,11 @@ public class SxcFilter implements Filter
     public SxcFilter(String pattern)
     {
         this.pattern = pattern;
+    }
+
+    static
+    {
+        LoggerFactory.getLogger(SxcFilter.class).warn("SXC module is deprecated and will be removed in Mule 4.0.");
     }
 
     public boolean accept(MuleMessage msg)
