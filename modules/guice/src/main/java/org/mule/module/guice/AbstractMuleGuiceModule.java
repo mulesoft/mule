@@ -22,7 +22,10 @@ import com.google.inject.AbstractModule;
  * on a module and mark with the {@link com.google.inject.Provides} annotation.
  * <p/>
  * Its recommended that you put all your Mule configuration objects in a separate Guice module.
+ *
+ * @deprecated Guice module is deprecated and will be removed in Mule 4.
  */
+@Deprecated
 public abstract class AbstractMuleGuiceModule extends AbstractModule
 {
     protected MuleContext muleContext;
