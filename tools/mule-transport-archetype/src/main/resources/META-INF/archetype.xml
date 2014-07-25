@@ -114,7 +114,7 @@ for testing:
 
 (options: annotations, atom, boot, builders, client, cxf,
           jaas, jbossts, jersey, json, management, pgp, rss, scripting,
-          spring-extras, spring-security, sxc, xml):
+          spring-extras, spring-security, xml):
 
                     </description>
                     <defvalue>client</defvalue>

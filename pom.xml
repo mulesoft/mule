@@ -227,7 +227,6 @@
         <staxUtilsVersion>20080702</staxUtilsVersion>
         <staxApiVersion>3.1.1</staxApiVersion>
         <staxonVersion>1.2</staxonVersion>
-        <sxcVersion>0.7.3</sxcVersion>
         <tomcatVersion>6.0.29</tomcatVersion>
         <woodstoxVersion>4.1.4</woodstoxVersion>
         <wrapperVersion>3.2.3</wrapperVersion>
