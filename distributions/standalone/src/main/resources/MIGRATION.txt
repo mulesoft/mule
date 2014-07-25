@@ -6,6 +6,7 @@ Please check http://www.mulesoft.org/documentation/display/current/Mule+Release+
 
 Migration changes from 3.5.x to 3.6.x
 
+MULE-7774: All date related headers for the HTTP transport are now in GMT following RFC2616. To maintain the previous behaviour where the Date header was in the server's time zone, you can set system property mule.http.dateheaderservertimezone to true.
 MULE-7755: Patterns module is deprecated and will be removed in Mule 4.0.
 
 Migration changes from 3.4.x to 3.5.x
