@@ -470,7 +470,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-spring-config-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-spring-extras-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-spring-security-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-module-sxc-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-tomcat-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-ws-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-xml-${productVersion}.jar
@@ -683,9 +682,6 @@
 /mule-standalone-${productVersion}/lib/opt/stax2-api-3.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/staxon-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/stringtemplate-3.2.1.jar
-/mule-standalone-${productVersion}/lib/opt/sxc-core-0.7.3.jar
-/mule-standalone-${productVersion}/lib/opt/sxc-runtime-0.7.3.jar
-/mule-standalone-${productVersion}/lib/opt/sxc-xpath-0.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/tomcat-apr-5.5.23.jar
 /mule-standalone-${productVersion}/lib/opt/tomcat-util-5.5.23.jar
 /mule-standalone-${productVersion}/lib/opt/uuid-3.4.0.jar

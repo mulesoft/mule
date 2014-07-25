@@ -39,7 +39,7 @@
                     <description>Which Mule modules do you want to include in this module?
 
 (options: builders, client, doc, jaas, jbossts, management, pgp, scripting,
-spring-extras, sxc, xml):
+spring-extras, xml):
 
                     </description>
                     <defvalue>client</defvalue>
