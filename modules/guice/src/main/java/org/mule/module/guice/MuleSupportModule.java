@@ -26,8 +26,9 @@ import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 
 /**
- * TODO
+ * @deprecated Guice module is deprecated and will be removed in Mule 4.
  */
+@Deprecated
 public class MuleSupportModule extends AbstractModule
 {
     protected MuleContext muleContext;

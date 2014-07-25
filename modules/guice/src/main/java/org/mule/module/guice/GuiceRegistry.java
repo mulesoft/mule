@@ -40,7 +40,9 @@ import org.guiceyfruit.support.CloseFailedException;
  *
  * @see org.mule.module.guice.AbstractMuleGuiceModule
  * @see org.mule.module.guice.GuiceModuleFactory
+ * @deprecated Guice module is deprecated and will be removed in Mule 4.
  */
+@Deprecated
 public class GuiceRegistry extends AbstractRegistry
 {
     private Injector injector = null;
