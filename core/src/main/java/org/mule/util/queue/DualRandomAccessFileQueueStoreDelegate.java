@@ -35,8 +35,10 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
 {
 
     private static final String QUEUE_STORE_DIRECTORY = "queuestore";
-    public static final int ONE_MEGABYTE = 1024 * 1024;
+    private static final int ONE_MEGABYTE = 1024 * 1024;
     private static final Integer MAXIMUM_QUEUE_FILE_SIZE_IN_BYTES = Integer.valueOf(System.getProperty("mule.queue.maxlength", Integer.valueOf(ONE_MEGABYTE).toString()));
+    private static final String QUEUE_STORE_1_SUFFIX = "-1";
+    private static final String QUEUE_STORE_2_SUFFIX = "-2";
 
     protected final Log logger = LogFactory.getLog(this.getClass());
     private final MuleContext muleContext;
@@ -50,15 +52,13 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
     {
         super(capacity);
         this.muleContext = muleContext;
-        File queuesDirectory = new File(workingDirectory + File.separator + QUEUE_STORE_DIRECTORY);
+        File queuesDirectory = getQueuesDirectory(workingDirectory);
         if (!queuesDirectory.exists())
         {
             Preconditions.checkState(queuesDirectory.mkdirs(), "Could not create queue store directory " + queuesDirectory.getAbsolutePath());
         }
-        File queueStoreFile1 = getFirstQueueFile(queueName, workingDirectory);
-        File queueStoreFile2 = getSecondQueueFile(queueName, workingDirectory);
-        randomAccessFileQueueStore1 = new RandomAccessFileQueueStore(queueStoreFile1);
-        randomAccessFileQueueStore2 = new RandomAccessFileQueueStore(queueStoreFile2);
+        randomAccessFileQueueStore1 = new RandomAccessFileQueueStore(queuesDirectory, queueName + QUEUE_STORE_1_SUFFIX);
+        randomAccessFileQueueStore2 = new RandomAccessFileQueueStore(queuesDirectory, queueName + QUEUE_STORE_2_SUFFIX);
         writeFile = randomAccessFileQueueStore1;
         readFile = randomAccessFileQueueStore1;
         if (logger.isDebugEnabled())
@@ -68,20 +68,15 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
         filesLock = new ReentrantReadWriteLock();
     }
 
-
-    public static File getFirstQueueFile(String queueName, String workingDirectory)
+    private static File getQueuesDirectory(String workingDirectory)
     {
-        return getQueueFile(queueName, workingDirectory, "-1");
+        return new File(workingDirectory + File.separator + QUEUE_STORE_DIRECTORY);
     }
 
-    public static File getSecondQueueFile(String queueName, String workingDirectory)
-    {
-        return getQueueFile(queueName, workingDirectory, "-2");
-    }
 
-    private static File getQueueFile(String queueName, String workingDirectory, String suffix)
+    public static File getFirstQueueFileForTesting(String queueName, String workingDirectory)
     {
-        return new File(new File(workingDirectory + File.separator + QUEUE_STORE_DIRECTORY), queueName + suffix);
+        return new File(getQueuesDirectory(workingDirectory), queueName + QUEUE_STORE_1_SUFFIX);
     }
 
     @Override
