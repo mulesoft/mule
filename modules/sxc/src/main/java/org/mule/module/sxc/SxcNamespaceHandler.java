@@ -12,10 +12,16 @@ import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class SxcNamespaceHandler extends AbstractMuleNamespaceHandler
 {
+    private transient final Log logger = LogFactory.getLog(getClass());
+
     public void init()
-    {        
+    {
+        logger.warn("SXC module is deprecated and will be removed in Mule 4.0.");
         registerBeanDefinitionParser("filtering-router",
                 new RouterDefinitionParser(SxcFilteringOutboundRouter.class)    );
          registerBeanDefinitionParser("namespace",

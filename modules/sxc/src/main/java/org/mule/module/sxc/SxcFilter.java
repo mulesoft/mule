@@ -33,6 +33,11 @@ public class SxcFilter implements Filter
         this.pattern = pattern;
     }
 
+    static
+    {
+        LogFactory.getLog(SxcFilter.class).warn("SXC module is deprecated and will be removed in Mule 4.0.");
+    }
+
     public boolean accept(MuleMessage msg)
     {
         Object accept = msg.getInvocationProperty(toString());
