@@ -6,6 +6,8 @@ Please check http://www.mulesoft.org/documentation/display/current/Mule+Release+
 
 Migration changes from 3.5.x to 3.6.x
 
+MULE-7774: All date related headers for the HTTP transport are now in GMT following RFC2616. To maintain the previous behaviour where the Date header was in the server's time zone, you can set system property mule.http.dateheaderservertimezone to true.
+
 Migration changes from 3.4.x to 3.5.x
 
 MULE-6968: In the previous version, requests to "/" were only received by an HTTP endpoint when no path was defined, and rejected if path was set to "" or "/". Now requests are received by the endpoint in any of the three cases.

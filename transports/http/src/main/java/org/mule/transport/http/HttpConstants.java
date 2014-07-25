@@ -43,6 +43,8 @@ public class HttpConstants
     // Date header format
     public static final String DATE_FORMAT = "EEE, dd MMM yyyy hh:mm:ss zzz";
     public static final String DATE_FORMAT_RFC822 = "EEE, dd MMM yyyy HH:mm:ss Z";
+    //Date header backwards compatibility property
+    public static final String MULE_HTTP_DATE_HEADER_SERVER_TIME_ZONE = "mule.http.dateheaderservertimezone";
 
     // Newline
     public static final String CRLF = "\r\n";

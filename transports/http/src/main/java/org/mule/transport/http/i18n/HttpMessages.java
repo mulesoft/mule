@@ -8,6 +8,7 @@ package org.mule.transport.http.i18n;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.transport.http.HttpConstants;
 
 import java.net.URI;
 
@@ -115,5 +116,10 @@ public class HttpMessages extends MessageFactory
     public static Message noReceiverFoundForUrl(String url)
     {
         return factory.createMessage(BUNDLE_PATH, 26, url);
+    }
+
+    public static Message dateInServerTimeZone()
+    {
+        return factory.createMessage(BUNDLE_PATH, 27, HttpConstants.MULE_HTTP_DATE_HEADER_SERVER_TIME_ZONE);
     }
 }
