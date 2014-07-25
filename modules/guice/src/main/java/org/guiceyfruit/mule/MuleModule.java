@@ -27,8 +27,9 @@
  import org.guiceyfruit.mule.support.DisposableCloser;
  
  /**
-  * TODO
+  * @deprecated Guice module is deprecated and will be removed in Mule 4.
   */
+ @Deprecated
  public class MuleModule extends Jsr250Module
  {
      /**

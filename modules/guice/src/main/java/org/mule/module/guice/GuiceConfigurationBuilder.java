@@ -33,7 +33,10 @@ import org.guiceyfruit.mule.MuleModule;
  * Note for better performance, any basepath set should be qualified to your application. For example, if your application
  * has a package com.mycompany.app, its better to set the base path to 'com/mycompany/app' over 'com/' or '/' since they will
  * search everything on the classpath that matches the specified package.
+ *
+ * @deprecated Guice module is deprecated and will be removed in Mule 4.
  */
+@Deprecated
 public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
 {
     public static final String DEFAULT_PACKAGE = "";

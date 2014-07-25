@@ -10,7 +10,10 @@ import com.google.inject.Module;
 
 /**
  * A factory class that allows non-discoverable modules to be discovered and created via a factory
+ *
+ * @deprecated Guice module is deprecated and will be removed in Mule 4.
  */
+@Deprecated
 public interface GuiceModuleFactory
 {
     Module createModule();
