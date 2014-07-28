@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:pattern="http://www.mulesoft.org/schema/mule/pattern"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/pattern http://www.mulesoft.org/schema/mule/pattern/current/mule-pattern.xsd
+               ">
+
+    <pattern:web-service-proxy name="weather-forecast-ws-proxy"
+                               inboundAddress="http://localhost:8081/weather-forecast/0"
+                               outboundAddress="http://localhost:8082/weather-forecast" />
+
+</mule>
