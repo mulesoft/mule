@@ -33,7 +33,6 @@ import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.construct.SimpleService;
 import org.mule.context.notification.ComponentMessageNotification;
 import org.mule.context.notification.OptimisedNotificationHandler;
 import org.mule.management.stats.ComponentStatistics;
@@ -347,7 +346,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
             sb.append(".");
         }
         sb.append("component");
-        if (!(flowConstruct instanceof Service || flowConstruct instanceof SimpleService))
+        if (!(flowConstruct instanceof Service))
         {
             sb.append(".");
             sb.append(System.identityHashCode(this));

@@ -25,7 +25,6 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.construct.AbstractPipeline;
 import org.mule.construct.Flow;
-import org.mule.construct.SimpleService;
 import org.mule.processor.chain.SubflowInterceptingChainLifecycleWrapper;
 import org.mule.tck.functional.FlowAssert;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -136,10 +135,6 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
         if (flowConstruct instanceof Service)
         {
             return getComponentObject(((Service) flowConstruct).getComponent());
-        }
-        else if (flowConstruct instanceof SimpleService)
-        {
-            return getComponentObject(((SimpleService) flowConstruct).getComponent());
         }
         else if (flowConstruct instanceof AbstractPipeline)
         {

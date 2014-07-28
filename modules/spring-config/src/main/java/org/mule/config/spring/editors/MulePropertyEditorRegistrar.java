@@ -10,7 +10,6 @@ import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.transport.Connector;
-import org.mule.construct.SimpleService.Type;
 import org.mule.endpoint.URIBuilder;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
@@ -49,7 +48,6 @@ public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, Mul
         registry.registerCustomEditor(URIBuilder.class, new URIBuilderPropertyEditor(muleContext));
         registry.registerCustomEditor(MessageExchangePattern.class,
             new MessageExchangePatternPropertyEditor());
-        registry.registerCustomEditor(Type.class, new SimpleServiceTypePropertyEditor());
         registry.registerCustomEditor(Date.class, new DatePropertyEditor(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"), new SimpleDateFormat("yyyy-MM-dd"), true));
 
         if (customPropertyEditorsCache == null)
