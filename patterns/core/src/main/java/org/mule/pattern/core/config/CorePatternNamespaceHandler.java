@@ -7,6 +7,7 @@
 package org.mule.pattern.core.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.config.spring.handlers.MuleNamespaceHandler;
 import org.mule.config.spring.parsers.specific.BridgeDefinitionParser;
 import org.mule.config.spring.parsers.specific.SimpleServiceDefinitionParser;
 import org.mule.config.spring.parsers.specific.ValidatorDefinitionParser;
@@ -20,6 +21,8 @@ public class CorePatternNamespaceHandler extends AbstractMuleNamespaceHandler
 {
     public void init()
     {
+        logger.warn(MuleNamespaceHandler.PATTERNS_DEPRECATION_MESSAGE);
+
         // Flow Constructs
         registerBeanDefinitionParser("web-service-proxy", new WSProxyDefinitionParser());
         registerBeanDefinitionParser("simple-service", new SimpleServiceDefinitionParser());
