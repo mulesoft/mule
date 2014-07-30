@@ -103,9 +103,4 @@ public abstract class AbstractPluggableDelegate implements MuleDefinitionParser
         delegate.setIgnoredDefault(ignoreAll);
         return this;
     }
-
-    public void setDeprecationWarning(String deprecationWarning)
-    {
-        delegate.setDeprecationWarning(deprecationWarning);
-    }
 }

@@ -171,9 +171,4 @@ public class AllAttributeChildDefinitionParser
         delegate.addBeanFlag(flag);
         return this;
     }
-
-    public void setDeprecationWarning(String deprecationWarning)
-    {
-        delegate.setDeprecationWarning(deprecationWarning);
-    }
 }

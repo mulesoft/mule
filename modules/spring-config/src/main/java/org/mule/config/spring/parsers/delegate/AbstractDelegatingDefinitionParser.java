@@ -185,12 +185,4 @@ public abstract class AbstractDelegatingDefinitionParser extends AbstractBeanDef
         }
         return this;
     }
-
-    public void setDeprecationWarning(String deprecationWarning)
-    {
-        for (int i = 0; i < delegates.length; ++i)
-        {
-            delegates[i].setDeprecationWarning(deprecationWarning);
-        }
-    }
 }
