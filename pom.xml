@@ -121,6 +121,7 @@
         <skipExportTests>true</skipExportTests>
 
         <!-- Properties that can be used to enable/disable parts of the build via cmd line or profiles -->
+        <skipFunctionalTests>true</skipFunctionalTests>
         <skipIntegrationTests>false</skipIntegrationTests>
         <skipPerformanceTests>true</skipPerformanceTests>
         <skipArchetypeTests>true</skipArchetypeTests>
@@ -1470,6 +1471,9 @@
                             <!-- exclude inner classes -->
                             <exclude>**/*$*</exclude>
                         </excludes>
+                        <excludedAnnotations>
+                            <excludedAnnotation>org.mule.tck.size.LargeTest</excludedAnnotation>
+                        </excludedAnnotations>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -2032,6 +2036,7 @@
                 </plugins>
              </build>
             <properties>
+                <skipFunctionalTests>false</skipFunctionalTests>
                 <skipIntegrationTests>true</skipIntegrationTests>
                 <skipDistributions>true</skipDistributions>
                 <skipVerifications>true</skipVerifications>
