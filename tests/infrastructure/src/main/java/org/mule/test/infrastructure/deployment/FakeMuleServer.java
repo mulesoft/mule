@@ -12,7 +12,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
 import org.mule.MuleCoreExtension;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
@@ -26,7 +25,6 @@ import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.coreextension.DefaultMuleCoreExtensionManager;
 import org.mule.module.launcher.coreextension.MuleCoreExtensionDiscoverer;
 import org.mule.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
-import org.mule.module.launcher.log4j.ArtifactAwareRepositorySelector;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
@@ -41,8 +39,6 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
-
-import org.apache.log4j.LogManager;
 
 public class FakeMuleServer
 {
@@ -67,7 +63,7 @@ public class FakeMuleServer
         // NOTE: this causes mule.simpleLog to no work on these tests
         if (!Boolean.getBoolean(FAKE_SERVER_DISABLE_LOG_REPOSITORY_SELECTOR))
         {
-            LogManager.setRepositorySelector(new ArtifactAwareRepositorySelector(), new Object());
+            System.setProperty(MuleProperties.MULE_SIMPLE_LOG, "true");
         }
     }
 

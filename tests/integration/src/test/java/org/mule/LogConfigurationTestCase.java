@@ -6,23 +6,26 @@
  */
 package org.mule;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleException;
+import org.mule.api.config.MuleProperties;
 import org.mule.module.launcher.application.Application;
-import org.mule.module.launcher.log4j.ArtifactAwareRepositorySelector;
+import org.mule.module.launcher.log4j2.MuleLog4jContextFactory;
 import org.mule.test.infrastructure.deployment.AbstractFakeMuleServerTestCase;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.ConsoleAppender;
+import org.apache.logging.log4j.core.appender.RollingFileAppender;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -33,6 +36,22 @@ public class LogConfigurationTestCase extends AbstractFakeMuleServerTestCase
 
     public static final String APP_NAME = "app1";
     public static final String DOMAIN_NAME = "domain";
+
+    @BeforeClass
+    public static void setupClass()
+    {
+        LogManager.setFactory(new MuleLog4jContextFactory());
+    }
+
+    @Override
+    public void setUp() throws Exception
+    {
+        super.setUp();
+        // here we're trying to test log separation so we need to
+        // disable this default property of the fake mule server
+        // in order to test that
+        System.clearProperty(MuleProperties.MULE_SIMPLE_LOG);
+    }
 
     @Test
     public void defaultAppLoggingConfigurationOnlyLogsOnApplicationLogFile() throws IOException, MuleException
@@ -70,59 +89,62 @@ public class LogConfigurationTestCase extends AbstractFakeMuleServerTestCase
 
     private void ensureOnlyDefaultAppender()
     {
-        Logger logger = getRootLoggerForApp(APP_NAME);
+        assertEquals(1, appendersCount(APP_NAME));
+        assertEquals(1, selectByClass(APP_NAME, RollingFileAppender.class).size());
 
-        assertEquals(1, appendersCount(logger));
-        assertEquals(1, selectByClass(logger, FileAppender.class).size());
-
-        FileAppender fileAppender = (FileAppender) selectByClass(logger, FileAppender.class).get(0);
+        RollingFileAppender fileAppender = (RollingFileAppender) selectByClass(APP_NAME, RollingFileAppender.class).get(0);
         assertEquals("defaultFileAppender", fileAppender.getName());
-        assertTrue(fileAppender.getFile().contains(String.format(ArtifactAwareRepositorySelector.MULE_APP_LOG_FILE_TEMPLATE, APP_NAME)));
+        assertTrue(fileAppender.getFileName().contains(String.format("mule-app-%s.log", APP_NAME)));
     }
 
     private void ensureArtifactAppender(String appenderName)
     {
         Logger logger = getRootLoggerForApp(APP_NAME);
-        assertEquals(Level.DEBUG, logger.getEffectiveLevel());
+        assertEquals(Level.DEBUG, logger.getLevel());
 
-        assertEquals(1, appendersCount(logger));
-        assertEquals(1, selectByClass(logger, ConsoleAppender.class).size());
-        assertEquals(appenderName, selectByClass(logger, ConsoleAppender.class).get(0).getName());
+        assertEquals(1, appendersCount(APP_NAME));
+        assertEquals(1, selectByClass(APP_NAME, ConsoleAppender.class).size());
+        assertEquals(appenderName, selectByClass(APP_NAME, ConsoleAppender.class).get(0).getName());
     }
 
     private Logger getRootLoggerForApp(String appName)
     {
+        return getContext(appName).getLogger("");
+    }
+
+    private LoggerContext getContext(String appName)
+    {
         Application app = muleServer.findApplication(appName);
-        ClassLoader ccl = Thread.currentThread().getContextClassLoader();
+        ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
-            Thread.currentThread().setContextClassLoader(app.getMuleContext().getExecutionClassLoader());
-            return Logger.getLogger(app.getClass()).getLoggerRepository().getRootLogger();
+            ClassLoader classLoader = app.getMuleContext().getExecutionClassLoader();
+            Thread.currentThread().setContextClassLoader(classLoader);
+            return (LoggerContext) LogManager.getContext(classLoader, false);
         }
         finally
         {
-            Thread.currentThread().setContextClassLoader(ccl);
+            Thread.currentThread().setContextClassLoader(currentClassLoader);
         }
     }
 
-    private List<Appender> selectByClass(Logger root, Class<?> appenderClass)
+    private List<Appender> selectByClass(String appName, Class<?> appenderClass)
     {
-        List<Appender> filteredAppenders = new ArrayList<Appender>();
-        Enumeration appenders = root.getAllAppenders();
-        while (appenders.hasMoreElements())
+        LoggerContext context = getContext(appName);
+        List<Appender> filteredAppenders = new LinkedList<>();
+        for (Appender appender : context.getConfiguration().getAppenders().values())
         {
-            Appender appender = (Appender) appenders.nextElement();
             if (appenderClass.isAssignableFrom(appender.getClass()))
             {
                 filteredAppenders.add(appender);
             }
         }
+
         return filteredAppenders;
     }
 
-    private int appendersCount(Logger root)
+    private int appendersCount(String appName)
     {
-        return selectByClass(root, Appender.class).size();
+        return selectByClass(appName, Appender.class).size();
     }
-
 }
