@@ -17,7 +17,7 @@ import org.junit.Rule;
 public class HttpMuleMessageToHttpResponseLegacyDateHeaderTestCase extends HttpMuleMessageToHttpResponseDateHeaderTestCase
 {
     @Rule
-    public SystemProperty systemProperty = new SystemProperty(HttpConstants.MULE_HTTP_DATE_HEADER_SERVER_TIME_ZONE, "true");
+    public SystemProperty systemProperty = new SystemProperty(HttpConstants.SERVER_TIME_ZONE_PROPERTY.getPropertyName(), "true");
 
     @Override
     protected String getExpectedHeaderValue()

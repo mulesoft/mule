@@ -8,17 +8,16 @@ package org.mule.transport.http.transformers;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.CustomTimeZone;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
-
-import java.util.TimeZone;
 
 import org.apache.commons.httpclient.Header;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -26,20 +25,8 @@ import org.junit.Test;
  */
 public class HttpMuleMessageToHttpResponseDateHeaderTestCase extends AbstractMuleTestCase
 {
-    private TimeZone savedTimeZone;
-
-    @Before
-    public void setUp()
-    {
-        savedTimeZone = TimeZone.getDefault();
-        TimeZone.setDefault(TimeZone.getTimeZone("EST"));
-    }
-
-    @After
-    public void tearDown()
-    {
-        TimeZone.setDefault(savedTimeZone);
-    }
+    @Rule
+    public final CustomTimeZone timeZone = new CustomTimeZone("EST");
 
     @Test
     public void testDateHeaderFormat() throws Exception
@@ -52,13 +39,16 @@ public class HttpMuleMessageToHttpResponseDateHeaderTestCase extends AbstractMul
 
         transformer.setDateHeader(response, dateTime.getMillis());
 
+        boolean headerFound = false;
         for (Header header : response.getHeaders())
         {
             if (HttpConstants.HEADER_DATE.equals(header.getName()))
             {
+                headerFound = true;
                 assertThat(header.getValue(), equalTo(getExpectedHeaderValue()));
             }
         }
+        assertTrue("Date header missing.", headerFound);
     }
 
     protected String getExpectedHeaderValue()

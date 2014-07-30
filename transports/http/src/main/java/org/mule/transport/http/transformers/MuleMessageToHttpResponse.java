@@ -19,7 +19,6 @@ import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
 import org.mule.transport.http.i18n.HttpMessages;
-import org.mule.util.BackwardsCompatibilityPropertyChecker;
 import org.mule.util.StringUtils;
 
 import java.io.IOException;
@@ -71,8 +70,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
             server = MuleManifest.getProductName() + "/" + MuleManifest.getProductVersion();
         }
 
-        BackwardsCompatibilityPropertyChecker dateTimeZonePropertyChecker = new BackwardsCompatibilityPropertyChecker(HttpConstants.MULE_HTTP_DATE_HEADER_SERVER_TIME_ZONE);
-        if(dateTimeZonePropertyChecker.isPropertySet())
+        if(HttpConstants.SERVER_TIME_ZONE_PROPERTY.isEnabled())
         {
             logger.warn(HttpMessages.dateInServerTimeZone());
             dateFormatter = dateFormatter.withZone(DateTimeZone.forID(TimeZone.getDefault().getID()));

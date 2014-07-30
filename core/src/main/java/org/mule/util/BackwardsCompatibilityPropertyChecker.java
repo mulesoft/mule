@@ -8,19 +8,24 @@ package org.mule.util;
 
 /**
  *  Class to check that system properties introduced to maintain backwards compatibility
- *  are set or not, the latter being the default. It can be used to track said properties.
+ *  are enabled or not, the latter being the default. It can be used to track said properties.
  */
 public class BackwardsCompatibilityPropertyChecker
 {
-    private final String property;
+    private final String propertyName;
 
-    public BackwardsCompatibilityPropertyChecker(String property)
+    public BackwardsCompatibilityPropertyChecker(String propertyName)
     {
-        this.property = property;
+        this.propertyName = propertyName;
     }
 
-    public boolean isPropertySet()
+    public boolean isEnabled()
     {
-        return Boolean.getBoolean(property);
+        return Boolean.getBoolean(propertyName);
+    }
+
+    public String getPropertyName()
+    {
+        return propertyName;
     }
 }

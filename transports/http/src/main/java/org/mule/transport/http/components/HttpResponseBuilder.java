@@ -23,7 +23,6 @@ import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
 import org.mule.transport.http.i18n.HttpMessages;
-import org.mule.util.BackwardsCompatibilityPropertyChecker;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -65,8 +64,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
         super.initialise();
         expiresHeaderFormatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);
         expiresHeaderFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
-        BackwardsCompatibilityPropertyChecker dateTimeZonePropertyChecker = new BackwardsCompatibilityPropertyChecker(HttpConstants.MULE_HTTP_DATE_HEADER_SERVER_TIME_ZONE);
-        if (dateTimeZonePropertyChecker.isPropertySet())
+        if (HttpConstants.SERVER_TIME_ZONE_PROPERTY.isEnabled())
         {
             logger.warn(HttpMessages.dateInServerTimeZone().getMessage());
             dateFormatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);

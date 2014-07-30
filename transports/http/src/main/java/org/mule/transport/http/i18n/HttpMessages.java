@@ -120,6 +120,6 @@ public class HttpMessages extends MessageFactory
 
     public static Message dateInServerTimeZone()
     {
-        return factory.createMessage(BUNDLE_PATH, 27, HttpConstants.MULE_HTTP_DATE_HEADER_SERVER_TIME_ZONE);
+        return factory.createMessage(BUNDLE_PATH, 27, HttpConstants.SERVER_TIME_ZONE_PROPERTY.getPropertyName());
     }
 }
