@@ -268,20 +268,6 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
         }
     }
 
-    /**
-     * Subclasses can call this to register the supplied {@link BeanDefinitionParser} to
-     * handle the specified element. The element name is the local (non-namespace qualified)
-     * name.
-     */
-    protected void registerDeprecatedBeanDefinitionParser(String elementName, BeanDefinitionParser parser, String deprecationWarning)
-    {
-        if (parser instanceof MuleDefinitionParserConfiguration)
-        {
-            ((MuleDefinitionParser) parser).setDeprecationWarning(deprecationWarning);
-        }
-        registerBeanDefinitionParser(elementName, parser);
-    }
-
     static class AnnotationsBeanDefintionParser extends AbstractChildDefinitionParser
     {
         AnnotationsBeanDefintionParser()

@@ -19,7 +19,7 @@ import org.w3c.dom.Element;
 public class DeprecatedBeanDefinitionParser implements BeanDefinitionParser
 {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger;
 
     private final BeanDefinitionParser delegate;
     private final String deprecationMessage;
@@ -28,6 +28,7 @@ public class DeprecatedBeanDefinitionParser implements BeanDefinitionParser
     {
         this.delegate = delegate;
         this.deprecationMessage = deprecationMessage;
+        this.logger = LoggerFactory.getLogger(delegate.getClass());
     }
 
     @Override

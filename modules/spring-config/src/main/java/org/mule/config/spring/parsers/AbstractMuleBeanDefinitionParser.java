@@ -123,8 +123,6 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     private boolean allowClassAttribute = true;
     private Class<?> classConstraint = null;
 
-    private String deprecationWarning;
-
     public AbstractMuleBeanDefinitionParser()
     {
         addIgnored(ATTRIBUTE_ID);
@@ -411,11 +409,6 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      */
     protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder)
     {
-        if (deprecationWarning != null && logger.isWarnEnabled())
-        {
-            logger.warn("Schema warning: Use of element <" + element.getLocalName() + "> is deprecated.  " + deprecationWarning);
-        }
-
         BeanAssembler assembler = getBeanAssembler(element, builder);
         NamedNodeMap attributes = element.getAttributes();
         for (int x = 0; x < attributes.getLength(); x++)
@@ -526,10 +519,5 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     {
         beanAttributes.add(flag);
         return this;
-    }
-
-    public void setDeprecationWarning(String deprecationWarning)
-    {
-        this.deprecationWarning = deprecationWarning;
     }
 }
