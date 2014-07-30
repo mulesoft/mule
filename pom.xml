@@ -110,7 +110,6 @@
         <module>distributions</module>
         <module>examples</module>
         <module>modules</module>
-        <module>patterns</module>
         <module>tools</module>
         <module>transports</module>
         <module>tests</module>
