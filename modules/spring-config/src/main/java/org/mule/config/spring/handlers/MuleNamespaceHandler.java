@@ -227,7 +227,9 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("on-redelivery-attempts-exceeded", new ChildDefinitionParser("redeliveryExceeded", RedeliveryExceeded.class));
         registerBeanDefinitionParser("choice-exception-strategy", new ExceptionStrategyDefinitionParser(ChoiceMessagingExceptionStrategy.class));
         registerMuleBeanDefinitionParser("exception-strategy", new ReferenceExceptionStrategyDefinitionParser());
-        registerBeanDefinitionParser("default-service-exception-strategy", new DeprecatedBeanDefinitionParser(new ChildDefinitionParser("exceptionListener", DefaultMessagingExceptionStrategy.class), "Schema warning: Use of element <default-service-exception-strategy> is deprecated.  Use default-exception-strategy instead."));
+        registerBeanDefinitionParser("default-service-exception-strategy", new DeprecatedBeanDefinitionParser(
+                new ChildDefinitionParser("exceptionListener", DefaultMessagingExceptionStrategy.class),
+                "Schema warning: Use of element <default-service-exception-strategy> is deprecated.  Use default-exception-strategy instead."));
         registerBeanDefinitionParser("custom-exception-strategy", new ExceptionStrategyDefinitionParser(null));
         registerBeanDefinitionParser("commit-transaction", new ExceptionTXFilterDefinitionParser("commitTxFilter"));
         registerBeanDefinitionParser("rollback-transaction", new ExceptionTXFilterDefinitionParser("rollbackTxFilter"));

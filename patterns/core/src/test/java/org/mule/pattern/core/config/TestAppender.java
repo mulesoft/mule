@@ -39,7 +39,7 @@ public class TestAppender extends NullAppender
         expectationsInstance().clear();
     }
 
-    public static void ensure(Expectation ... expectationsToCheck)
+    public static void ensure(Expectation... expectationsToCheck)
     {
         Set s = new HashSet();
         s.addAll(Arrays.asList(expectationsToCheck));
@@ -64,10 +64,10 @@ public class TestAppender extends NullAppender
 
     private static void addCollection(StringBuilder builder, Collection items, String description)
     {
-        if(items!=null && !items.isEmpty())
+        if (items != null && !items.isEmpty())
         {
             builder.append('\n').append(description);
-            for(Object item: items)
+            for (Object item : items)
             {
                 builder.append('\n').append(item);
             }
@@ -112,6 +112,5 @@ public class TestAppender extends NullAppender
             return HashCodeBuilder.reflectionHashCode(this);
         }
     }
-
 }
 
