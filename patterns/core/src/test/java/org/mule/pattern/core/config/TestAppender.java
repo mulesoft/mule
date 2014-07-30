@@ -12,6 +12,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.varia.NullAppender;
 
@@ -95,50 +97,19 @@ public class TestAppender extends NullAppender
         @Override
         public String toString()
         {
-            return "Expectation{" +
-                   "level='" + level + '\'' +
-                   ", category='" + category + '\'' +
-                   ", message='" + message + '\'' +
-                   '}';
+            return String.format("Expectation {level='%s', category='%s', message='%s'}", level, category, message);
         }
 
         @Override
-        public boolean equals(Object o)
+        public boolean equals(Object other)
         {
-            if (this == o)
-            {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass())
-            {
-                return false;
-            }
-
-            Expectation that = (Expectation) o;
-
-            if (category != null ? !category.equals(that.category) : that.category != null)
-            {
-                return false;
-            }
-            if (level != null ? !level.equals(that.level) : that.level != null)
-            {
-                return false;
-            }
-            if (message != null ? !message.equals(that.message) : that.message != null)
-            {
-                return false;
-            }
-
-            return true;
+            return EqualsBuilder.reflectionEquals(this, other);
         }
 
         @Override
         public int hashCode()
         {
-            int result = level != null ? level.hashCode() : 0;
-            result = 31 * result + (category != null ? category.hashCode() : 0);
-            result = 31 * result + (message != null ? message.hashCode() : 0);
-            return result;
+            return HashCodeBuilder.reflectionHashCode(this);
         }
     }
 

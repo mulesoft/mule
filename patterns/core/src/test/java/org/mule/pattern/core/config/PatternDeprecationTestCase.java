@@ -24,6 +24,6 @@ public class PatternDeprecationTestCase extends FunctionalTestCase
     @Test
     public void ensurePatternsDeprecation()
     {
-        TestAppender.ensure(new TestAppender.Expectation(Level.WARN.toString(), CorePatternNamespaceHandler.class.getName(), MuleNamespaceHandler.PATTERNS_DEPRECATION_MESSAGE));
+        TestAppender.ensure(new TestAppender.Expectation(Level.WARN.toString(), CorePatternNamespaceHandler.class.getName()+1, MuleNamespaceHandler.PATTERNS_DEPRECATION_MESSAGE));
     }
 }
