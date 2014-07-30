@@ -6,4 +6,4 @@ Please check http://www.mulesoft.org/documentation/display/current/Mule+Release+
 
 MULE-7757: The OGNL module has been removed. You can obtain the same functionality by using MEL expressions.
 MULE-7756: The Guice module has been removed.
-MULE-7756: The Patterns project has been removed.
+MULE-7755: The Patterns project has been removed.
