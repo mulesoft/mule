@@ -46,11 +46,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-core</artifactId>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
-            <type>test-jar</type>
         </dependency>
         <dependency>
             <groupId>dom4j</groupId>
