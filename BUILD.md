@@ -29,7 +29,7 @@ The following table lists common goals to execute for building Mule. These goals
 |Command | Description |
 |:----------|:-------------|
 | `mvn clean`	 | purges any built artifacts or intermediate files (such as .class) from the target directory |
-| `mvn install` | installs the artifact to your local repository.|
+| `mvn install` | installs the artifact to your local repository, will run all tests but the ones that have external dependencies. |
 | `mvn test`    | runs any unit tests for this sub-project |
 | `mvn -DskipTests install` |	By default, Maven runs all unit tests for each project for each build which, depending on the project, can take a long time to complete. If you wish, you can skip the tests using this command.|
  
@@ -40,6 +40,7 @@ In addition to the standard properties, the following ones can change the behavi
 | Property                  | Default      | Description  |
 |:--------------------------|:-------------|:-------------|
 | `skipIntegrationTests`	   | `false`      | Skip flag for integration tests |
+| `skipFunctionalTests`	   | `true`      | Skip flag for functional tests |
 | `skipSystemTests`         | `true`       | Skip flag for container level tests |
 | `skipPerformanceTests`    | `true`       | Skip flag for performance tests |
 | `skipArchetypeTests`      | `true`       | Skip flag for the archetype tests|
