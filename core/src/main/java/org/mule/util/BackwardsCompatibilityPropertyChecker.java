@@ -13,6 +13,7 @@ package org.mule.util;
 public class BackwardsCompatibilityPropertyChecker
 {
     private final String propertyName;
+    private Boolean override;
 
     public BackwardsCompatibilityPropertyChecker(String propertyName)
     {
@@ -21,9 +22,26 @@ public class BackwardsCompatibilityPropertyChecker
 
     public boolean isEnabled()
     {
-        return Boolean.getBoolean(propertyName);
+        if (override == null)
+        {
+            return Boolean.getBoolean(propertyName);
+        }
+        else
+        {
+            return override;
+        }
     }
 
+
+    public void override(boolean override)
+    {
+        this.override = override;
+    }
+
+    public void removeOverride()
+    {
+        this.override = null;
+    }
     public String getPropertyName()
     {
         return propertyName;

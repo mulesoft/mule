@@ -6,9 +6,10 @@
  */
 package org.mule.transport.http.components;
 
-import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.tck.junit4.rule.BackwardsCompatibilityProperty;
 import org.mule.transport.http.HttpConstants;
 
+import org.junit.Before;
 import org.junit.Rule;
 
 /**
@@ -17,7 +18,13 @@ import org.junit.Rule;
 public class HttpResponseBuilderLegacyDateHeaderTestCase extends HttpResponseBuilderDateHeaderTestCase
 {
     @Rule
-    public SystemProperty systemProperty = new SystemProperty(HttpConstants.SERVER_TIME_ZONE_PROPERTY.getPropertyName(), "true");
+    public BackwardsCompatibilityProperty property = new BackwardsCompatibilityProperty(HttpConstants.SERVER_TIME_ZONE_PROPERTY);
+
+    @Before
+    public void setUp()
+    {
+        property.switchOn();
+    }
 
     @Override
     protected String getExpectedHeaderValue()
