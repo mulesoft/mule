@@ -8,12 +8,11 @@ package org.mule.pattern.core.config;
 
 import org.mule.config.spring.handlers.MuleNamespaceHandler;
 import org.mule.config.spring.parsers.specific.BridgeDefinitionParser;
-import org.mule.tck.junit4.FunctionalTestCase;
 
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.Level;
 import org.junit.Test;
 
-public class CoreDeprecationTestCase extends FunctionalTestCase
+public class CoreDeprecationTestCase extends AbstractDeprecationTestCase
 {
 
     @Override

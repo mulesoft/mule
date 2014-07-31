@@ -7,12 +7,11 @@
 package org.mule.pattern.core.config;
 
 import org.mule.config.spring.handlers.MuleNamespaceHandler;
-import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.apache.log4j.Level;
 import org.junit.Test;
 
-public class PatternDeprecationTestCase extends FunctionalTestCase
+public class PatternDeprecationTestCase extends AbstractDeprecationTestCase
 {
 
     @Override
