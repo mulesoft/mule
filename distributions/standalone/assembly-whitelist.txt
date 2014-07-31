@@ -36,7 +36,7 @@
 #
 # /conf
 #
-/mule-standalone-${productVersion}/conf/log4j.properties
+/mule-standalone-${productVersion}/conf/log4j2.xml
 /mule-standalone-${productVersion}/conf/wrapper.conf
 /mule-standalone-${productVersion}/conf/tls-default.conf
 /mule-standalone-${productVersion}/conf/tls-fips140-2.conf
@@ -104,7 +104,7 @@
 /mule-standalone-${productVersion}/examples/bookstore/src/main/resources
 /mule-standalone-${productVersion}/examples/bookstore/src/main/resources/bookstore-config.xml
 /mule-standalone-${productVersion}/examples/bookstore/src/main/resources/email.properties
-/mule-standalone-${productVersion}/examples/bookstore/src/main/resources/log4j.properties
+/mule-standalone-${productVersion}/examples/bookstore/src/main/resources/log4j2.xml
 /mule-standalone-${productVersion}/examples/bookstore/src/main/resources/messages
 /mule-standalone-${productVersion}/examples/bookstore/src/main/resources/messages/bookstore-admin-messages.properties
 /mule-standalone-${productVersion}/examples/bookstore/src/test
@@ -115,7 +115,7 @@
 /mule-standalone-${productVersion}/examples/bookstore/src/test/java/org/mule/example/bookstore
 /mule-standalone-${productVersion}/examples/bookstore/src/test/java/org/mule/example/bookstore/BookstoreTestCase.java
 /mule-standalone-${productVersion}/examples/bookstore/src/test/resources
-/mule-standalone-${productVersion}/examples/bookstore/src/test/resources/log4j.properties
+/mule-standalone-${productVersion}/examples/bookstore/src/test/resources/log4j2-test.xml
 
 
 
@@ -144,7 +144,7 @@
 /mule-standalone-${productVersion}/examples/echo/src/test/java/org/mule/example/echo
 /mule-standalone-${productVersion}/examples/echo/src/test/java/org/mule/example/echo/EchoTestCase.java
 /mule-standalone-${productVersion}/examples/echo/src/test/resources
-/mule-standalone-${productVersion}/examples/echo/src/test/resources/log4j.properties
+/mule-standalone-${productVersion}/examples/echo/src/test/resources/log4j2-test.xml
 /mule-standalone-${productVersion}/examples/echo/src/test/resources/mule-test-exclusions.txt
 
 
@@ -169,7 +169,7 @@
 /mule-standalone-${productVersion}/examples/gpswalker/src/main/java/org/mule/example/gpswalker/CityStroller.java
 /mule-standalone-${productVersion}/examples/gpswalker/src/main/java/org/mule/example/gpswalker/GpsCoord.java
 /mule-standalone-${productVersion}/examples/gpswalker/src/main/resources
-/mule-standalone-${productVersion}/examples/gpswalker/src/main/resources/log4j.properties
+/mule-standalone-${productVersion}/examples/gpswalker/src/main/resources/log4j2.xml
 
 
 
@@ -219,7 +219,7 @@
 /mule-standalone-${productVersion}/examples/hello/src/test/java/org/mule/example/hello/HelloSampleTestCase.java
 /mule-standalone-${productVersion}/examples/hello/src/test/java/org/mule/example/hello/HelloTestCase.java
 /mule-standalone-${productVersion}/examples/hello/src/test/resources
-/mule-standalone-${productVersion}/examples/hello/src/test/resources/log4j.properties
+/mule-standalone-${productVersion}/examples/hello/src/test/resources/log4j2-test.xml
 
 #
 # /examples/flight-reservation
@@ -292,7 +292,7 @@
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/main/java/org/mule/example/loanbroker/model/Customer.java
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/main/java/org/mule/example/loanbroker/model/LoanQuote.java
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/main/resources
-/mule-standalone-${productVersion}/examples/loanbroker-simple/src/main/resources/log4j.properties
+/mule-standalone-${productVersion}/examples/loanbroker-simple/src/main/resources/log4j2.xml
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/main/resources/loanbroker-simple.properties
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/test
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/test/java
@@ -302,7 +302,7 @@
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/test/java/org/mule/example/loanbroker
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/test/java/org/mule/example/loanbroker/LoanBrokerSyncTestCase.java
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src/test/resources
-/mule-standalone-${productVersion}/examples/loanbroker-simple/src/test/resources/log4j.properties
+/mule-standalone-${productVersion}/examples/loanbroker-simple/src/test/resources/log4j2-test.xml
 
 #
 # /examples/scripting
@@ -385,7 +385,7 @@
 /mule-standalone-${productVersion}/examples/stockquote/src/test/java/org/mule/example/stockquote
 /mule-standalone-${productVersion}/examples/stockquote/src/test/java/org/mule/example/stockquote/StockQuoteFunctionalTestCase.java
 /mule-standalone-${productVersion}/examples/stockquote/src/test/resources
-/mule-standalone-${productVersion}/examples/stockquote/src/test/resources/log4j.properties
+/mule-standalone-${productVersion}/examples/stockquote/src/test/resources/log4j2-test.xml
 /mule-standalone-${productVersion}/examples/stockquote/src/test/resources/mule-test-exclusions.txt
 
 
@@ -404,14 +404,19 @@
 /mule-standalone-${productVersion}/lib/boot/libwrapper-solaris-sparc-64.so
 /mule-standalone-${productVersion}/lib/boot/libwrapper-solaris-x86-32.so
 /mule-standalone-${productVersion}/lib/boot/commons-cli-1.2.jar
-/mule-standalone-${productVersion}/lib/boot/log4j-1.2.16.jar
 /mule-standalone-${productVersion}/lib/boot/mule-module-boot-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/boot/mule-module-logging-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/boot/mule-module-reboot-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/boot/README.txt
 /mule-standalone-${productVersion}/lib/boot/wrapper-3.2.3.jar
 /mule-standalone-${productVersion}/lib/boot/wrapper-windows-x86-32.dll
-
+/mule-standalone-${productVersion}/lib/boot/disruptor-3.2.1.jar
+/mule-standalone-${productVersion}/lib/boot/jcl-over-slf4j-1.7.7.jar
+/mule-standalone-${productVersion}/lib/boot/log4j-1.2-api-2.0.jar
+/mule-standalone-${productVersion}/lib/boot/log4j-api-2.0.jar
+/mule-standalone-${productVersion}/lib/boot/log4j-core-2.0.jar
+/mule-standalone-${productVersion}/lib/boot/log4j-jcl-2.0.jar
+/mule-standalone-${productVersion}/lib/boot/log4j-slf4j-impl-2.0.jar
+/mule-standalone-${productVersion}/lib/boot/slf4j-api-1.7.7.jar
 
 #
 # /lib/boot/exec

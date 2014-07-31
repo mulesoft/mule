@@ -9,34 +9,22 @@ package org.mule.module.management.agent;
 import org.mule.AbstractAgent;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.module.management.support.AutoDiscoveryJmxSupportFactory;
-import org.mule.module.management.support.JmxSupport;
-import org.mule.module.management.support.JmxSupportFactory;
 
-import java.util.Set;
-
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanRegistrationException;
-import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectInstance;
-import javax.management.ObjectName;
-
-import org.apache.log4j.jmx.HierarchyDynamicMBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>Log4jAgent</code> exposes the configuration of the Log4J instance running
  * in Mule for Jmx management
+ *
+ * @deprecated deprecated since Mule 3.6.0. This will no longer function since log4j2 supports JMX out of the box.
+ * Check migration guide for more information
  */
+@Deprecated
 public class Log4jAgent extends AbstractAgent
 {
-    private MBeanServer mBeanServer;
-    public static final String JMX_OBJECT_NAME = "log4j:type=Hierarchy";
 
-    private JmxSupportFactory jmxSupportFactory = AutoDiscoveryJmxSupportFactory.getInstance();
-    private JmxSupport jmxSupport = jmxSupportFactory.getJmxSupport();
+    private static final Logger logger = LoggerFactory.getLogger(Log4jAgent.class);
 
     public Log4jAgent()
     {
@@ -44,46 +32,16 @@ public class Log4jAgent extends AbstractAgent
     }
 
     @Override
-    public String getDescription() {
+    public String getDescription()
+    {
         return "JMX Log4J Agent";
     }
 
     @Override
     public void initialise() throws InitialisationException
     {
-        try
-        {
-            mBeanServer = MBeanServerFactory.findMBeanServer(null).get(0);
-            final ObjectName objectName = jmxSupport.getObjectName(JMX_OBJECT_NAME);
-            // unregister existing Log4j MBean first if required
-            unregisterMBeansIfNecessary();
-            mBeanServer.registerMBean(new HierarchyDynamicMBean(), objectName);
-        }
-        catch (Exception e)
-        {
-            throw new InitialisationException(CoreMessages.failedToStart("Log4j Agent"), e, this);
-        }
-    }
-
-    /**
-     * Unregister log4j MBeans if there are any left over the old deployment
-     */
-    protected void unregisterMBeansIfNecessary()
-        throws MalformedObjectNameException, InstanceNotFoundException, MBeanRegistrationException
-    {
-        if (mBeanServer.isRegistered(jmxSupport.getObjectName(JMX_OBJECT_NAME)))
-        {
-            // unregister all log4jMBeans and loggers
-            Set<ObjectInstance> log4jMBeans = mBeanServer.queryMBeans(jmxSupport.getObjectName("log4j*:*"), null);
-            for (ObjectInstance objectInstance : log4jMBeans)
-            {
-                ObjectName theName = objectInstance.getObjectName();
-                if (mBeanServer.isRegistered(theName))
-                {
-                    mBeanServer.unregisterMBean(theName);
-                }
-            }
-        }
+        logger.warn("Log4jAgent is deprecated since Mule 3.6.0. This will no longer function since log4j2 supports JMX out of the box. +" +
+                    "Check migration guide for more information");
     }
 
     @Override
@@ -101,13 +59,6 @@ public class Log4jAgent extends AbstractAgent
     @Override
     public void dispose()
     {
-        try
-        {
-            unregisterMBeansIfNecessary();
-        }
-        catch (Exception ex)
-        {
-            // ignore
-        }
+        // nothing to do
     }
 }
