@@ -37,7 +37,7 @@
                 java.naming.provider.url=rmi://localhost:1099
                 openejb.base=${mule.base}
                 openejb.configuration=apps/loanbroker-esb/openejb.conf
-                logging.conf=conf/log4j.properties
+                logging.conf=conf/log4j2.xml
                 openejb.nobanner=true
             </jee:environment>
         </jee:remote-slsb>
