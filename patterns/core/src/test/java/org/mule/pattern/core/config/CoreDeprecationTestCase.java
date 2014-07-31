@@ -7,7 +7,7 @@
 package org.mule.pattern.core.config;
 
 import org.mule.config.spring.handlers.MuleNamespaceHandler;
-import org.mule.config.spring.parsers.DeprecatedBeanDefinitionParser;
+import org.mule.config.spring.parsers.specific.BridgeDefinitionParser;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.apache.log4j.Level;
@@ -25,6 +25,6 @@ public class CoreDeprecationTestCase extends FunctionalTestCase
     @Test
     public void ensureCoreDeprecation()
     {
-        TestAppender.ensure(new TestAppender.Expectation(Level.WARN.toString(), DeprecatedBeanDefinitionParser.class.getName(), MuleNamespaceHandler.PATTERNS_DEPRECATION_MESSAGE));
+        TestAppender.ensure(new TestAppender.Expectation(Level.WARN.toString(), BridgeDefinitionParser.class.getName(), MuleNamespaceHandler.PATTERNS_DEPRECATION_MESSAGE));
     }
 }
