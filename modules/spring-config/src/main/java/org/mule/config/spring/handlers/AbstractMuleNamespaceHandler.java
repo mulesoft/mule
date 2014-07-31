@@ -10,6 +10,7 @@ import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
+import org.mule.config.spring.parsers.DeprecatedBeanDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
 import org.mule.config.spring.parsers.PostProcessor;
@@ -359,5 +360,12 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
             }
         }
         return basicConnector;
+    }
+
+    protected void registerDeprecatedBeanDefinitionParser(String elementName, BeanDefinitionParser parser, String message)
+    {
+        registerBeanDefinitionParser(elementName, new DeprecatedBeanDefinitionParser(
+                parser,
+                String.format("Schema warning: Use of element <%s> is deprecated.  %s.", elementName, message)));
     }
 }
