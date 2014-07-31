@@ -6,6 +6,7 @@
  */
 package org.mule.pattern.core.config;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -14,13 +15,15 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.log4j.spi.LoggingEvent;
-import org.apache.log4j.varia.NullAppender;
+import org.apache.logging.log4j.core.Filter;
+import org.apache.logging.log4j.core.Layout;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.appender.AbstractAppender;
 
 /**
  * Allows to check log events occurrences in a test case.
  */
-public class TestAppender extends NullAppender
+public class TestAppender extends AbstractAppender
 {
 
     private static ThreadLocal<Set<Expectation>> expectations = new ThreadLocal<>();
@@ -74,10 +77,20 @@ public class TestAppender extends NullAppender
         }
     }
 
-    @Override
-    public void doAppend(LoggingEvent event)
+    public TestAppender(String name, Filter filter, Layout<? extends Serializable> layout)
     {
-        expectationsInstance().add(new Expectation(event.getLevel().toString(), event.getLoggerName(), event.getRenderedMessage()));
+        super(name, filter, layout);
+    }
+
+    public TestAppender(String name, Filter filter, Layout<? extends Serializable> layout, boolean ignoreExceptions)
+    {
+        super(name, filter, layout, ignoreExceptions);
+    }
+
+    @Override
+    public void append(LogEvent event)
+    {
+        expectationsInstance().add(new Expectation(event.getLevel().toString(), event.getLoggerName(), event.getMessage().getFormattedMessage()));
     }
 
     public static class Expectation
