@@ -117,7 +117,7 @@ public class QueryTemplateBeanDefinitionParser extends AbstractMuleBeanDefinitio
     {
         String sqlText;
         boolean hasFileAttribute = sqlElem.hasAttribute(FILE_ATTRIBUTE);
-        boolean hasTextContent = !element.getTextContent().isEmpty();
+        boolean hasTextContent = !element.getTextContent().trim().isEmpty();
 
         if (hasFileAttribute && hasTextContent)
         {
