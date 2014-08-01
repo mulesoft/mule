@@ -60,16 +60,13 @@ public class TemplateQueryConfigTestCase extends FunctionalTestCase
     @Test
     public void readQueryFromFile() throws Exception
     {
-        Object queryTemplateBean = muleContext.getRegistry().get("testFileQuery");
-        assertTrue(queryTemplateBean instanceof QueryTemplate);
-        QueryTemplate queryTemplate = (QueryTemplate) queryTemplateBean;
-        assertEquals(QueryType.SELECT, queryTemplate.getType());
-        assertEquals("SELECT * FROM PLANET WHERE POSITION = ?", queryTemplate.getSqlText());
-        assertEquals(1, queryTemplate.getInputParams().size());
-        InputQueryParam param1 = queryTemplate.getInputParams().get(0);
-        assertEquals(UnknownDbType.getInstance(), param1.getType());
-        assertEquals("position", param1.getName());
-        assertEquals("1", param1.getValue());
+        doQueryFromFileTest(muleContext.getRegistry().get("testFileQuery"));
+    }
+
+    @Test
+    public void readQueryFromFileAndEmptyContent() throws Exception
+    {
+        doQueryFromFileTest(muleContext.getRegistry().get("testFileQueryAndEmptyContent"));
     }
 
     @Test
@@ -97,5 +94,18 @@ public class TemplateQueryConfigTestCase extends FunctionalTestCase
         assertEquals(UnknownDbType.getInstance(), param1.getType());
         assertEquals("position", param1.getName());
         assertEquals(null, param1.getValue());
+    }
+
+    private void doQueryFromFileTest(Object queryTemplateBean)
+    {
+        assertTrue(queryTemplateBean instanceof QueryTemplate);
+        QueryTemplate queryTemplate = (QueryTemplate) queryTemplateBean;
+        assertEquals(QueryType.SELECT, queryTemplate.getType());
+        assertEquals("SELECT * FROM PLANET WHERE POSITION = ?", queryTemplate.getSqlText());
+        assertEquals(1, queryTemplate.getInputParams().size());
+        InputQueryParam param1 = queryTemplate.getInputParams().get(0);
+        assertEquals(UnknownDbType.getInstance(), param1.getType());
+        assertEquals("position", param1.getName());
+        assertEquals("1", param1.getValue());
     }
 }
