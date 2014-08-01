@@ -8,11 +8,9 @@ package org.mule.management.config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.agent.Agent;
 import org.mule.module.management.agent.JmxApplicationAgent;
 import org.mule.module.management.agent.JmxServerNotificationAgent;
-import org.mule.module.management.agent.Log4jAgent;
 import org.mule.module.management.agent.Mx4jAgent;
 import org.mule.module.management.support.SimplePasswordJmxAuthenticator;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -39,10 +37,6 @@ public class ManagementDefaultNamespaceHandlerTestCase extends FunctionalTestCas
         assertEquals(true, jmxAgent.isLocateServer());
         assertEquals(true, jmxAgent.isEnableStatistics());
         assertEquals(SimplePasswordJmxAuthenticator.class, jmxAgent.getJmxAuthenticator().getClass());
-
-        agent = muleContext.getRegistry().lookupAgent("jmx-log4j");
-        assertNotNull(agent);
-        assertEquals(Log4jAgent.class, agent.getClass());
 
         agent = muleContext.getRegistry().lookupAgent(JmxServerNotificationAgent.DEFAULT_AGENT_NAME);
         assertNotNull(agent);
