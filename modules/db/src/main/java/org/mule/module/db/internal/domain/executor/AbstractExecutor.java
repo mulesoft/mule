@@ -43,21 +43,24 @@ public abstract class AbstractExecutor
 
     protected void doProcessParameters(PreparedStatement statement, QueryTemplate queryTemplate, List<QueryParamValue> paramValues, SingleQueryLogger queryLogger) throws SQLException
     {
-        for (int index = 1, inputParamsSize = queryTemplate.getParams().size(); index <= inputParamsSize; index++)
+        int valueIndex = 0;
+
+        for (int paramIndex = 1, inputParamsSize = queryTemplate.getParams().size(); paramIndex <= inputParamsSize; paramIndex++)
         {
-            QueryParam queryParam = queryTemplate.getParams().get(index - 1);
+            QueryParam queryParam = queryTemplate.getParams().get(paramIndex - 1);
             if (queryParam instanceof InputQueryParam)
             {
-                QueryParamValue param = paramValues.get(index - 1);
+                QueryParamValue param = paramValues.get(valueIndex);
 
-                queryLogger.addParameter(queryTemplate.getInputParams().get(index - 1), param.getValue());
+                queryLogger.addParameter(queryTemplate.getInputParams().get(valueIndex), param.getValue());
 
-                processInputParam(statement, index, param.getValue(), queryParam.getType());
+                processInputParam(statement, paramIndex, param.getValue(), queryParam.getType());
+                valueIndex++;
             }
 
             if (queryParam instanceof OutputQueryParam)
             {
-                processOutputParam((CallableStatement) statement, index, queryParam.getType());
+                processOutputParam((CallableStatement) statement, paramIndex, queryParam.getType());
             }
         }
     }
