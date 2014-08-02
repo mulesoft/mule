@@ -9,10 +9,12 @@
         <inbound-endpoint address="vm://multiplyInts" exchange-pattern="request-response"/>
 
         <db:stored-procedure config-ref="dbConfig">
-            <db:parameterized-query>{ call multiplyInts(:int1, :int2, :result) }</db:parameterized-query>
+            <db:parameterized-query>{ call multiplyInts(:int1, :int2, :result1, :int3, :result2) }</db:parameterized-query>
             <db:in-param name="int1" value="3"/>
             <db:in-param name="int2" value="4"/>
-            <db:out-param name="result"/>
+            <db:out-param name="result1"/>
+            <db:in-param name="int3" value="5"/>
+            <db:out-param name="result2"/>
         </db:stored-procedure>
     </flow>
 

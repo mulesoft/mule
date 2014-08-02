@@ -65,7 +65,7 @@ public class DerbyTestDatabase extends AbstractTestDatabase
             "EXTERNAL NAME 'org.mule.module.db.integration.model.derbyutil.DerbyTestStoredProcedure.doubleMyInt'";
 
     public static String SQL_CREATE_SP_MULTIPLY_INTS =
-            "CREATE PROCEDURE multiplyInts(IN INT1 INTEGER, IN INT2 INTEGER, OUT RESULT INTEGER)\n" +
+            "CREATE PROCEDURE multiplyInts(IN INT1 INTEGER, IN INT2 INTEGER, OUT RESULT1 INTEGER, IN INT3 INTEGER, OUT RESULT2 INTEGER)\n" +
             "PARAMETER STYLE JAVA\n" +
             "LANGUAGE JAVA\n" +
             "DYNAMIC RESULT SETS 0\n" +

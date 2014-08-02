@@ -119,9 +119,10 @@ public class MySqlTestDatabase extends AbstractTestDatabase
         executeDdl(dataSource, "DROP PROCEDURE IF EXISTS multiplyInts;\n");
 
         final String sql =
-                "CREATE DEFINER=CURRENT_USER PROCEDURE multiplyInts(IN pInt1 INT, IN iInt2 INT, OUT pResult INT)\n" +
+                "CREATE DEFINER=CURRENT_USER PROCEDURE multiplyInts(IN pInt1 INT, IN pInt2 INT, OUT pResult1 INT, IN pInt3 INT, OUT pResult2 INT)\n" +
                 "BEGIN\n" +
-                "SET pResult := pInt1 * iInt2;\n" +
+                "SET pResult1 := pInt1 * pInt2;\n" +
+                "SET pResult2 := pInt1 * pInt2 * pInt3;\n" +
                 "END";
         createStoredProcedure(dataSource, sql);
     }

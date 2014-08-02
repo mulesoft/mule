@@ -121,9 +121,10 @@ public class DerbyTestStoredProcedure
         i[0] *= 2;
     }
 
-    public static void multiplyInts(int int1, int int2, int[] result)
+    public static void multiplyInts(int int1, int int2, int[] result1, int int3, int[] result2)
     {
-        result[0] = int1 * int2;
+        result1[0] = int1 * int2;
+        result2[0] = int1 * int2 * int3;
     }
 
     public static void concatenateStrings(String string1, String string2, String[] result)
