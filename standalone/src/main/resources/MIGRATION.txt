@@ -74,6 +74,48 @@ MULE-8469: applying a message transformer does not changes message's data type i
 MULE-8498: applying a message transformer that changes message's payload will update the message data type, but instead of using transformer's output data type it will use a merge between payload's and transformer data types.
            If transformer's output data type does not provides mime type and/or encoding, then the original payload data type mime type and/or encoding will be used.
            This can cause that different transformers are applied on an application after the upgrade. In case there is a failure use <set-payload> to set encoding and mime type while maintaining the same payload.
+MULE-7990: A new API for object serialization has been added through the ObjectSerializer interface. Please have the following considerations:
+    * If you were manually using the org.mule.util.SerializationUtils class in custom components, scripts or flows, you should
+      use this API instead.
+    * In the same way, where you were before catching a org.apache.commons.lang.SerializationException you should now expect
+      a org.mule.api.serialization.SerializationException
+    * You can now specify which is the default implementation of ObjectSerializer that you want your application to use. Such instance
+      will be the one used by Mule (although you're free to use others in your custom code). By default, the ObjectSerializer implementation
+      uses default Java serialization an behaves exactly the same as in prior versions
+    * To configure your custom serializer as the default you can use the <configuration> tag:
+
+        <configuration defaultObjectSerializer-ref="myCustomSerializer" />
+
+    * There're many ways to obtain an ObjectSerializer. Recommended approach
+      is through dependency injection. The following shows how to get the ObjectSerializer that has been
+      configured as the default:
+
+      public class MyClass {
+
+        @Inject
+        @DefaultObjectSerializer
+        private ObjectSerializer objectSerializer;
+
+      }
+
+     * Instead, if you want a specific named serializer (whether it's the default or not) you can also
+       do it like this:
+
+       public clss MyClass {
+
+        @Inject
+        @Named("mySerializer")
+        private ObjectSerializer objectSerializer;
+
+       }
+
+     * Finally, you can always pull it from the muleContext but depedency injection is preferred:
+
+        // returns the default object serializer
+        muleContext.getObjectSerializer();
+
+        // returns a named object serializer
+        muleContext.getRegistry().get("mySerializer")
 
 Migration changes from 3.5.x to 3.6.x
 
