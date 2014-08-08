@@ -7,8 +7,8 @@
 package org.mule.util.queue;
 
 import org.mule.api.MuleContext;
+import org.mule.api.serialization.ObjectSerializer;
 import org.mule.util.Preconditions;
-import org.mule.util.SerializationUtils;
 
 import java.io.File;
 import java.io.Serializable;
@@ -44,6 +44,7 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
 
     protected final Log logger = LogFactory.getLog(this.getClass());
     private final MuleContext muleContext;
+    private final ObjectSerializer serializer;
     private final ReadWriteLock filesLock;
     private final QueueControlDataFile queueControlDataFile;
     private RandomAccessFileQueueStore writeFile;
@@ -55,6 +56,7 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
     {
         super(capacity);
         this.muleContext = muleContext;
+        serializer = muleContext.getObjectSerializer();
         File queuesDirectory = getQueuesDirectory(workingDirectory);
         if (!queuesDirectory.exists())
         {
@@ -94,7 +96,7 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
     protected void addFirst(Serializable item) throws InterruptedException
     {
         switchWriteFileIfFull();
-        byte[] serialiazedObject = SerializationUtils.serialize(item);
+        byte[] serialiazedObject = serializer.serialize(item);
         readFile.addFirst(serialiazedObject);
     }
 
@@ -102,7 +104,7 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
     protected void add(Serializable item)
     {
         switchWriteFileIfFull();
-        byte[] serialiazedObject = SerializationUtils.serialize(item);
+        byte[] serialiazedObject = serializer.serialize(item);
         writeFile.addLast(serialiazedObject);
     }
 
@@ -239,7 +241,7 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
 
     private Serializable deserialize(byte[] valuesAsBytes)
     {
-        return (Serializable) SerializationUtils.deserialize(valuesAsBytes, muleContext);
+        return serializer.deserialize(valuesAsBytes);
     }
 
     public void remove(Serializable value)

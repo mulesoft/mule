@@ -16,22 +16,36 @@ import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleSession;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.security.Authentication;
 import org.mule.api.security.SecurityContext;
+import org.mule.api.serialization.ObjectSerializer;
 import org.mule.construct.Flow;
 import org.mule.security.DefaultMuleAuthentication;
 import org.mule.security.DefaultSecurityContextFactory;
 import org.mule.security.MuleCredentials;
-import org.mule.util.SerializationUtils;
+import org.mule.serialization.internal.JavaObjectSerializer;
 
 import java.util.Collections;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 public class DefaultMuleSessionTestCase
 {
+
+    private static final int LATCH_TIMEOUT = 1000;
+
+    private ObjectSerializer serializer;
+
+    @Before
+    public void before()
+    {
+        serializer = new JavaObjectSerializer();
+    }
+
     @Test
     public void create()
     {
@@ -165,9 +179,9 @@ public class DefaultMuleSessionTestCase
         Mockito.when(muleContext.getExecutionClassLoader()).thenReturn(getClass().getClassLoader());
         Mockito.when(registry.lookupFlowConstruct("flow")).thenReturn(flow);
 
+        ((MuleContextAware) serializer).setMuleContext(muleContext);
         // Serialize and then deserialize
-        DefaultMuleSession after = (DefaultMuleSession) SerializationUtils.deserialize(
-            SerializationUtils.serialize(before), muleContext);
+        DefaultMuleSession after = serializer.deserialize(serializer.serialize(before));
 
         // assertions
         assertEquals(before.getId(), after.getId());
@@ -196,8 +210,7 @@ public class DefaultMuleSessionTestCase
         before.setProperty("foo", nonSerializable);
         before.setProperty("foo2", "bar2");
 
-        MuleSession after = (DefaultMuleSession) SerializationUtils.deserialize(
-            SerializationUtils.serialize(before), getClass().getClassLoader());
+        MuleSession after = serializer.deserialize(serializer.serialize(before), getClass().getClassLoader());
 
         assertNotNull(after);
         assertNotSame(after, before);

@@ -154,6 +154,18 @@ public class TcpConnector extends AbstractConnector
     @Override
     protected void doInitialise() throws InitialisationException
     {
+        if (tcpProtocol != null)
+        {
+            try
+            {
+                muleContext.getInjector().inject(getTcpProtocol());
+            }
+            catch (MuleException e)
+            {
+                throw new InitialisationException(e, this);
+            }
+        }
+
         socketFactory.setConnectionTimeout(getConnectionTimeout());
 
         socketsPool.setFactory(getSocketFactory());

@@ -35,7 +35,7 @@ public class XaTxQueueTransactionJournal extends AbstractQueueTransactionJournal
             @Override
             public void serialize(XaQueueTxJournalEntry journalEntry, DataOutputStream dataOutputStream)
             {
-                journalEntry.write(dataOutputStream);
+                journalEntry.write(dataOutputStream, muleContext);
             }
         });
     }

@@ -37,6 +37,7 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
+import org.mule.api.serialization.ObjectSerializer;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.transaction.TransactionManagerFactory;
@@ -179,6 +180,8 @@ public class DefaultMuleContext implements MuleContext
     private QueueManager queueManager;
 
     private ExtensionManager extensionManager;
+
+    private ObjectSerializer objectSerializer;
 
     /**
      * @deprecated Use empty constructor instead and use setter for dependencies.
@@ -580,6 +583,15 @@ public class DefaultMuleContext implements MuleContext
     public ObjectStoreManager getObjectStoreManager()
     {
         return this.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_MANAGER);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ObjectSerializer getObjectSerializer()
+    {
+        return objectSerializer;
     }
 
     /**
@@ -1046,5 +1058,10 @@ public class DefaultMuleContext implements MuleContext
     public void setExtensionManager(ExtensionManager extensionManager)
     {
         this.extensionManager = extensionManager;
+    }
+
+    public void setObjectSerializer(ObjectSerializer objectSerializer)
+    {
+        this.objectSerializer = objectSerializer;
     }
 }

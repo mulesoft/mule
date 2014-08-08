@@ -8,24 +8,13 @@ package org.mule.transport.vm.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.util.FileUtils;
-import org.mule.util.SerializationUtils;
 import org.mule.util.queue.DefaultQueueConfiguration;
-import org.mule.util.queue.DelegateQueueManager;
 import org.mule.util.queue.TransactionalQueueManager;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-
-import org.junit.Rule;
 import org.junit.Test;
 
 public class PersistentRecoverMessageTestCase extends FunctionalTestCase

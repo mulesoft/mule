@@ -6,6 +6,9 @@
  */
 package org.mule.api.config;
 
+import org.mule.api.MuleContext;
+import org.mule.api.serialization.ObjectSerializer;
+
 /**
  * Configuration info. which can be set when creating the MuleContext but becomes
  * immutable after startup.
@@ -92,5 +95,16 @@ public interface MuleConfiguration
      * @return extension configured of type extensionType, if there's no such extension then null.
      */
     <T> T getExtension(final Class<T> extensionType);
+
+    /**
+     * Returns the default instance of {@link ObjectSerializer} to be
+     * used. This instance will be accessible through {@link MuleContext#getObjectSerializer()}.
+     * <p/>
+     * If not provided, if defaults to an instance of {@link ObjectSerializer}
+     *
+     * @return a {@link ObjectSerializer}
+     * @since 3.7.0
+     */
+    ObjectSerializer getDefaultObjectSerializer();
 
 }
