@@ -13,6 +13,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.FatalException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Startable;
+import org.mule.api.serialization.ObjectSerializer;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.FileUtils;
 import org.mule.util.NetworkUtils;
@@ -177,6 +178,13 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
      * List of extensions defined in the configuration element at the application.
      */
     private List<Object> extensions;
+
+    /**
+     * The instance of {@link ObjectSerializer} to use by default
+     *
+     * @since 3.7.0
+     */
+    private ObjectSerializer defaultObjectSerializer;
 
     public DefaultMuleConfiguration()
     {
@@ -721,6 +729,20 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     public boolean isDisableTimeouts()
     {
         return disableTimeouts;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ObjectSerializer getDefaultObjectSerializer()
+    {
+        return defaultObjectSerializer;
+    }
+
+    public void setDefaultObjectSerializer(ObjectSerializer defaultObjectSerializer)
+    {
+        this.defaultObjectSerializer = defaultObjectSerializer;
     }
 
     public void setExtensions(List<Object> extensions)

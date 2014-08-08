@@ -13,7 +13,6 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.model.SessionException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.Base64;
-import org.mule.util.SerializationUtils;
 
 import java.io.IOException;
 
@@ -37,7 +36,7 @@ public class SerializeAndEncodeSessionHandler extends SerializeOnlySessionHandle
             byte[] serializedSession = Base64.decode(serializedEncodedSession);            
             if (serializedSession != null)
             {
-                session = (MuleSession) SerializationUtils.deserialize(serializedSession, message.getMuleContext());
+                session = message.getMuleContext().getObjectSerializer().deserialize(serializedSession, message.getMuleContext().getExecutionClassLoader());
             }
         }
         return session;
@@ -46,7 +45,9 @@ public class SerializeAndEncodeSessionHandler extends SerializeOnlySessionHandle
     @Override
     public void storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException
     {        
-        byte[] serializedSession = SerializationUtils.serialize(removeNonSerializableProperties(session,message.getMuleContext()));
+        session = removeNonSerializableProperties(session, message.getMuleContext());
+        byte[] serializedSession = message.getMuleContext().getObjectSerializer().serialize(session);
+
         String serializedEncodedSession;
         try
         {

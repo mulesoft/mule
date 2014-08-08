@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.ThreadSafeAccess;
@@ -31,7 +30,6 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.simple.ByteArrayToObject;
 import org.mule.transformer.simple.SerializableToByteArray;
-import org.mule.util.SerializationUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.Serializable;
@@ -190,10 +188,13 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
     public void testEventSerialization() throws Exception
     {
         InboundEndpoint endpoint = getTestInboundEndpoint("Test", null, null,
-            new PayloadTypeFilter(Object.class), null, null);
+                                                          new PayloadTypeFilter(Object.class), null, null);
 
         MuleEvent event = RequestContext.setEvent(getTestEvent("payload", endpoint));
-        Serializable serialized = (Serializable) new SerializableToByteArray().transform(event);
+
+        Transformer transformer = createSerializableToByteArrayTransformer();
+        transformer.setMuleContext(muleContext);
+        Serializable serialized = (Serializable) createSerializableToByteArrayTransformer().transform(event);
         assertNotNull(serialized);
         ByteArrayToObject trans = new ByteArrayToObject();
         trans.setMuleContext(muleContext);
@@ -214,6 +215,14 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
 
     }
 
+    private Transformer createSerializableToByteArrayTransformer()
+    {
+        Transformer transformer = new SerializableToByteArray();
+        transformer.setMuleContext(muleContext);
+
+        return transformer;
+    }
+
     @Test
     public void testEventSerializationRestart() throws Exception
     {
@@ -222,7 +231,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
         muleContext.start();
 
         //Serialize
-        Serializable serialized = (Serializable) new SerializableToByteArray().transform(event);
+        Serializable serialized = (Serializable) createSerializableToByteArrayTransformer().transform(event);
         assertNotNull(serialized);
 
         // Simulate mule cold restart
@@ -273,7 +282,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
         trans.setMuleContext(muleContext);
 
         MuleEvent event = RequestContext.setEvent(getTestEvent("payload", endpoint));
-        Serializable serialized = (Serializable) new SerializableToByteArray().transform(event);
+        Serializable serialized = (Serializable) createSerializableToByteArrayTransformer().transform(event);
         assertNotNull(serialized);
 
         MuleEvent deserialized = (MuleEvent) trans.transform(serialized);
@@ -305,8 +314,9 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
             payload.append("1234567890");
         }
         MuleEvent testEvent = getTestEvent(new ByteArrayInputStream(payload.toString().getBytes()));
-        byte[] serializedEvent = SerializationUtils.serialize(testEvent);
-        testEvent  = (MuleEvent)SerializationUtils.deserialize(serializedEvent);
+        byte[] serializedEvent = muleContext.getObjectSerializer().serialize(testEvent);
+        testEvent = muleContext.getObjectSerializer().deserialize(serializedEvent);
+
         assertArrayEquals((byte[])testEvent.getMessage().getPayload(), payload.toString().getBytes());
     }
 

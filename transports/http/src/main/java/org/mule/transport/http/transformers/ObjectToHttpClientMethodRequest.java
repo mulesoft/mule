@@ -28,11 +28,9 @@ import org.mule.transport.http.multipart.MultiPartInputStream;
 import org.mule.transport.http.multipart.PartDataSource;
 import org.mule.util.IOUtils;
 import org.mule.util.ObjectUtils;
-import org.mule.util.SerializationUtils;
 import org.mule.util.StringUtils;
 
 import java.io.InputStream;
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -409,7 +407,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             }
             else
             {
-                final byte[] buffer = SerializationUtils.serialize((Serializable) src);
+                final byte[] buffer = muleContext.getObjectSerializer().serialize(src);
                 postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, outboundMimeType));
             }
         }

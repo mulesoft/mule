@@ -6,6 +6,7 @@
  */
 package org.mule.config.spring;
 
+import org.mule.DefaultMuleContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationException;
@@ -13,9 +14,11 @@ import org.mule.api.config.MuleConfiguration;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
+import org.mule.api.serialization.ObjectSerializer;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.serialization.internal.JavaObjectSerializer;
 
 import java.util.List;
 
@@ -69,7 +72,10 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
             defaultConfig.setDefaultExceptionStrategyName(config.getDefaultExceptionStrategyName());
             defaultConfig.setEnricherPropagatesSessionVariableChanges(config.isEnricherPropagatesSessionVariableChanges());
             defaultConfig.setExtensions(config.getExtensions());
+
             validateDefaultExceptionStrategy();
+            applyDefaultIfNoObjectSerializerSet(defaultConfig);
+
             return configuration;
         }
         else
@@ -99,6 +105,23 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
                         CoreMessages.createStaticMessage("Default exception strategy must not have expression attribute. It must accept any message."));
                 }
             }
+        }
+    }
+
+    private void applyDefaultIfNoObjectSerializerSet(DefaultMuleConfiguration configuration)
+    {
+        ObjectSerializer configuredSerializer = config.getDefaultObjectSerializer();
+        if (configuredSerializer == null)
+        {
+            configuredSerializer = new JavaObjectSerializer();
+            ((MuleContextAware) configuredSerializer).setMuleContext(muleContext);
+            config.setDefaultObjectSerializer(configuredSerializer);
+        }
+
+        configuration.setDefaultObjectSerializer(configuredSerializer);
+        if (muleContext instanceof DefaultMuleContext)
+        {
+            ((DefaultMuleContext) muleContext).setObjectSerializer(configuredSerializer);
         }
     }
 
@@ -150,6 +173,11 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
     public void setEnricherPropagatesSessionVariableChanges(boolean enricherPropagatesSessionVariableChanges)
     {
         config.setEnricherPropagatesSessionVariableChanges(enricherPropagatesSessionVariableChanges);
+    }
+
+    public void setDefaultObjectSerializer(ObjectSerializer objectSerializer)
+    {
+        config.setDefaultObjectSerializer(objectSerializer);
     }
 
     public void setExtensions(List<Object> extensions)

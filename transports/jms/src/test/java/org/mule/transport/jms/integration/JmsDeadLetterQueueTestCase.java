@@ -11,10 +11,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.api.config.MuleProperties;
 import org.mule.message.ExceptionMessage;
-import org.mule.util.SerializationUtils;
 
 import javax.jms.BytesMessage;
 import javax.jms.JMSException;
@@ -86,7 +84,7 @@ public class JmsDeadLetterQueueTestCase extends AbstractJmsFunctionalTestCase
             {
                 byte[] messageBytes = new byte[(int) ((BytesMessage) message).getBodyLength()];
                 ((BytesMessage) message).readBytes(messageBytes);
-                obj = SerializationUtils.deserialize(messageBytes, muleContext);
+                obj = muleContext.getObjectSerializer().deserialize(messageBytes);
             }
             // ExceptionMessage did not get serialized by JMS provider
             else if (message instanceof ObjectMessage)

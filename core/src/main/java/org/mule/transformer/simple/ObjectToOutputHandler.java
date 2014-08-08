@@ -14,7 +14,6 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
-import org.mule.util.SerializationUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -84,7 +83,7 @@ public class ObjectToOutputHandler extends AbstractTransformer implements Discov
             {
                 public void write(MuleEvent event, OutputStream out) throws IOException
                 {
-                    SerializationUtils.serialize((Serializable) src, out);
+                    muleContext.getObjectSerializer().serialize(src, out);
                 }
             };
         }

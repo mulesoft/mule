@@ -6,6 +6,8 @@
  */
 package org.mule.transformer.simple;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -16,16 +18,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
-import org.apache.commons.lang.SerializationUtils;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class ObjectToInputStreamTestCase extends AbstractMuleContextTestCase
 {
 
-    private ObjectToInputStream transformer = new ObjectToInputStream();
+    private ObjectToInputStream transformer;
+
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        transformer = new ObjectToInputStream();
+        transformer.setMuleContext(muleContext);
+    }
 
     @Test
     public void testTransformString() throws TransformerException, IOException
@@ -63,7 +68,7 @@ public class ObjectToInputStreamTestCase extends AbstractMuleContextTestCase
     public void testTransformSerializable()
     {
         Apple apple = new Apple();
-        InputStream serializedApple = new ByteArrayInputStream(SerializationUtils.serialize(apple));
+        InputStream serializedApple = new ByteArrayInputStream(muleContext.getObjectSerializer().serialize(apple));
         try
         {
             assertTrue(compare(serializedApple, (InputStream) transformer.transform(apple)));

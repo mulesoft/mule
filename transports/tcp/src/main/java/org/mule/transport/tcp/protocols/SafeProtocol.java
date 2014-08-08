@@ -7,12 +7,17 @@
 package org.mule.transport.tcp.protocols;
 
 import org.mule.ResponseOutputStream;
+import org.mule.api.serialization.DefaultObjectSerializer;
+import org.mule.api.serialization.ObjectSerializer;
+import org.mule.api.serialization.ObjectSerializerAware;
 import org.mule.transport.tcp.TcpProtocol;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+
+import javax.inject.Inject;
 
 /**
  * This precedes every message with a cookie.
@@ -21,7 +26,7 @@ import java.net.Socket;
  * You should probably change to LengthProtocol.
  * Remember - both sender and receiver must use the same protocol.
  */
-public class SafeProtocol implements TcpProtocol
+public class SafeProtocol implements TcpProtocol, ObjectSerializerAware
 {
 
     public static final String COOKIE = "You are using SafeProtocol";
@@ -81,8 +86,8 @@ public class SafeProtocol implements TcpProtocol
         if (null != cookie)
         {
             if (!(cookie instanceof byte[]
-                    && ((byte[]) cookie).length == COOKIE.length()
-                    && COOKIE.equals(new String((byte[]) cookie))))
+                  && ((byte[]) cookie).length == COOKIE.length()
+                  && COOKIE.equals(new String((byte[]) cookie))))
             {
                 helpUser();
             }
@@ -97,16 +102,16 @@ public class SafeProtocol implements TcpProtocol
     private void helpUser() throws IOException
     {
         throw new IOException("You are not using a consistent protocol on your TCP transport. "
-                + "Please read the documentation for the TCP transport, "
-                + "paying particular attention to the protocol parameter.");
+                              + "Please read the documentation for the TCP transport, "
+                              + "paying particular attention to the protocol parameter.");
     }
 
     private void helpUser(Exception e) throws IOException
     {
         throw (IOException) new IOException("An error occurred while verifying your connection.  "
-                + "You may not be using a consistent protocol on your TCP transport. "
-                + "Please read the documentation for the TCP transport, "
-                + "paying particular attention to the protocol parameter.").initCause(e);
+                                            + "You may not be using a consistent protocol on your TCP transport. "
+                                            + "Please read the documentation for the TCP transport, "
+                                            + "paying particular attention to the protocol parameter.").initCause(e);
     }
 
     public void setMaxMessageLength(int maxMessageLength)
@@ -114,4 +119,20 @@ public class SafeProtocol implements TcpProtocol
         delegate = new LengthProtocol(maxMessageLength);
     }
 
+    @Override
+    @Inject
+    @DefaultObjectSerializer
+    public void setObjectSerializer(ObjectSerializer objectSerializer)
+    {
+        propagateObjectSerializerIfNecessary(delegate, objectSerializer);
+        propagateObjectSerializerIfNecessary(cookieProtocol, objectSerializer);
+    }
+
+    private void propagateObjectSerializerIfNecessary(TcpProtocol protocol, ObjectSerializer objectSerializer)
+    {
+        if (protocol instanceof ObjectSerializerAware)
+        {
+            ((ObjectSerializerAware) protocol).setObjectSerializer(objectSerializer);
+        }
+    }
 }

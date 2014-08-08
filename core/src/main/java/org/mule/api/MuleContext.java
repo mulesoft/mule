@@ -26,6 +26,7 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
+import org.mule.api.serialization.ObjectSerializer;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.util.StreamCloserService;
@@ -190,6 +191,15 @@ public interface MuleContext extends Lifecycle
     ObjectStoreManager getObjectStoreManager();
 
     ExtensionManager getExtensionManager();
+
+    /**
+     * The instance of {@link org.mule.api.serialization.ObjectSerializer}
+     * to be used to serialize/deserealize objects
+     *
+     * @return a {@link org.mule.api.serialization.ObjectSerializer}
+     * @since 3.7.0
+     */
+    ObjectSerializer getObjectSerializer();
 
     AllStatistics getStatistics();
 

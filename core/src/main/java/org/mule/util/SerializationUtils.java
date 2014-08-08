@@ -54,7 +54,7 @@ public class SerializationUtils extends org.apache.commons.lang.SerializationUti
      * @throws org.apache.commons.lang.SerializationException
      *                                  (runtime) if the serialization fails
      */
-    private static Object deserialize(InputStream inputStream, ClassLoader cl, MuleContext muleContext)
+    public static Object deserialize(InputStream inputStream, ClassLoader cl, MuleContext muleContext)
     {
         if (inputStream == null)
         {
