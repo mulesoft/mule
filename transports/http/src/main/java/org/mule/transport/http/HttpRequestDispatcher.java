@@ -154,6 +154,11 @@ class HttpRequestDispatcher implements Work
         {
             logger.warn("Failed to close server socket: " + e.getMessage(), e);
         }
+        finally
+        {
+            requestHandOffExecutor.shutdown();
+        }
+
     }
 
 }
