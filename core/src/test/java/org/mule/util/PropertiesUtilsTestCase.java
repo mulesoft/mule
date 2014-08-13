@@ -128,4 +128,11 @@ public class PropertiesUtilsTestCase extends AbstractMuleTestCase
         assertThat(properties.isEmpty(), is(true));
     }
 
+    @Test
+    public void noPropertiesAreFoundOnEmptyQueryString()
+    {
+        Properties properties = PropertiesUtils.getPropertiesFromQueryString("");
+        assertThat(properties.size(), is(0));
+    }
+
 }

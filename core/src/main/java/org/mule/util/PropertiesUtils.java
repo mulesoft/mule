@@ -267,7 +267,7 @@ public final class PropertiesUtils
     {
         Properties props = new Properties();
 
-        if (query == null)
+        if (StringUtils.isEmpty(query))
         {
             return props;
         }
