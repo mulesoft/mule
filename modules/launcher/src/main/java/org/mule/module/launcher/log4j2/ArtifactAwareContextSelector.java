@@ -14,6 +14,10 @@ import org.mule.module.launcher.artifact.ArtifactClassLoader;
 import org.mule.module.launcher.artifact.ShutdownListener;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.ImmutableList;
 
 import java.net.URI;
@@ -21,8 +25,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.selector.ContextSelector;
@@ -59,6 +63,7 @@ import org.apache.logging.log4j.status.StatusLogger;
 final class ArtifactAwareContextSelector implements ContextSelector
 {
 
+    private static final int NO_CCL_CLASSLOADER = 0;
     private static final StatusLogger logger = StatusLogger.getLogger();
 
     private LoggerContextCache cache = new LoggerContextCache();
@@ -67,7 +72,6 @@ final class ArtifactAwareContextSelector implements ContextSelector
     ArtifactAwareContextSelector()
     {
     }
-
 
     @Override
     public LoggerContext getContext(String fqcn, ClassLoader loader, boolean currentContext)
@@ -78,20 +82,7 @@ final class ArtifactAwareContextSelector implements ContextSelector
     @Override
     public LoggerContext getContext(String fqcn, ClassLoader classLoader, boolean currentContext, URI configLocation)
     {
-        classLoader = resolveClassLoader(classLoader);
-
-        LoggerContext context = cache.getLoggerContext(classLoader);
-        if (context == null)
-        {
-            context = buildContext(classLoader);
-            cache.storeLoggerContext(classLoader, context);
-            LoggerContext previous = cache.storeLoggerContext(classLoader, context);
-
-            // Checks if repository was already initialized in a different thread
-            return previous != null ? previous : context;
-        }
-
-        return context;
+        return cache.getLoggerContext(resolveClassLoader(classLoader));
     }
 
     @Override
@@ -145,7 +136,11 @@ final class ArtifactAwareContextSelector implements ContextSelector
             return getDefaultContext();
         }
 
-        MuleLoggerContext loggerContext = new MuleLoggerContext(parameters.contextName, parameters.loggerConfigFile, classLoader, isStandalone());
+        MuleLoggerContext loggerContext = new MuleLoggerContext(parameters.contextName,
+                                                                parameters.loggerConfigFile,
+                                                                classLoader,
+                                                                this,
+                                                                isStandalone());
 
         if (classLoader instanceof ArtifactClassLoader)
         {
@@ -205,58 +200,80 @@ final class ArtifactAwareContextSelector implements ContextSelector
         }
     }
 
-    private static class LoggerContextCache
+    private class LoggerContextCache
     {
 
-        private static final Integer NO_CCL_CLASSLOADER = 0;
+        private Cache<Integer, LoggerContext> contexts;
 
-        private ConcurrentMap<Integer, LoggerContext> contexts = new ConcurrentHashMap<>();
-
-        private LoggerContext getLoggerContext(ClassLoader classLoader)
+        private LoggerContextCache()
         {
-            return contexts.get(computeKey(classLoader));
+            contexts = CacheBuilder.newBuilder()
+                    .removalListener(new RemovalListener<Integer, LoggerContext>()
+                    {
+                        @Override
+                        public void onRemoval(RemovalNotification<Integer, LoggerContext> notification)
+                        {
+                            LoggerContext context = notification.getValue();
+                            if (context != null && !context.isStopping() && !context.isStopped())
+                            {
+                                context.stop();
+                            }
+                        }
+                    })
+                    .build();
         }
 
-        private LoggerContext storeLoggerContext(ClassLoader classLoader, LoggerContext context)
+        private LoggerContext getLoggerContext(final ClassLoader classLoader)
         {
-            return contexts.putIfAbsent(computeKey(classLoader), context);
+            try
+            {
+                return contexts.get(computeKey(classLoader), new Callable<LoggerContext>()
+                {
+                    @Override
+                    public LoggerContext call() throws Exception
+                    {
+                        return buildContext(classLoader);
+                    }
+                });
+            }
+            catch (ExecutionException e)
+            {
+                throw new MuleRuntimeException(
+                        MessageFactory.createStaticMessage("Could not init logger context "), e);
+            }
         }
 
         private void remove(ClassLoader classLoader)
         {
-            LoggerContext context = contexts.remove(computeKey(classLoader));
-            if (context != null && !context.isStopping() && !context.isStopped())
-            {
-                context.stop();
-            }
+            contexts.invalidate(computeKey(classLoader));
         }
 
         private void remove(LoggerContext context)
         {
-            for (Map.Entry<Integer, LoggerContext> entry : contexts.entrySet())
+            for (Map.Entry<Integer, LoggerContext> entry : contexts.asMap().entrySet())
             {
                 if (entry.getValue() == context)
                 {
-                    contexts.remove(entry.getKey());
+                    contexts.invalidate(entry.getKey());
                     return;
                 }
             }
         }
 
-        private Integer computeKey(ClassLoader classLoader)
+        private int computeKey(ClassLoader classLoader)
         {
             return classLoader == null ? NO_CCL_CLASSLOADER : classLoader.hashCode();
         }
 
         private List<LoggerContext> getAllLoggerContexts()
         {
-            return ImmutableList.copyOf(contexts.values());
+            return ImmutableList.copyOf(contexts.asMap().values());
         }
     }
 
     private LoggerContext getDefaultContext()
     {
-        return new MuleLoggerContext("Default", isStandalone());
+        return new MuleLoggerContext("Default", this, isStandalone());
     }
 
     private boolean isStandalone()
