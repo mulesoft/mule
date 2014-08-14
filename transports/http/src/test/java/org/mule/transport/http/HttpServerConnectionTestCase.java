@@ -28,7 +28,6 @@ public class HttpServerConnectionTestCase extends AbstractMuleContextTestCase
 
     private final static boolean SEND_TCP_NO_DELAY = false;
     private final static boolean KEEP_ALIVE = true;
-    private final static int RECEIVE_BUFFER_SIZE = 1024;
     private final static int SERVER_SO_TIMEOUT = 5000;
 
     @Test
@@ -38,7 +37,6 @@ public class HttpServerConnectionTestCase extends AbstractMuleContextTestCase
         HttpConnector httpConnector = new HttpConnector(muleContext);
         httpConnector.setSendTcpNoDelay(SEND_TCP_NO_DELAY);
         httpConnector.setKeepAlive(KEEP_ALIVE);
-        httpConnector.setReceiveBufferSize(RECEIVE_BUFFER_SIZE);
         httpConnector.setServerSoTimeout(SERVER_SO_TIMEOUT);
         httpConnector.initialise();
 
@@ -58,7 +56,6 @@ public class HttpServerConnectionTestCase extends AbstractMuleContextTestCase
             // Assert that properties were propagated correctly from the connector.
             assertEquals(SEND_TCP_NO_DELAY, conn.isSocketTcpNoDelay());
             assertEquals(KEEP_ALIVE, conn.isSocketKeepAlive());
-            assertEquals(RECEIVE_BUFFER_SIZE, conn.getSocketReceiveBufferSize());
             assertEquals(SERVER_SO_TIMEOUT, conn.getSocketTimeout());
         }
         finally
