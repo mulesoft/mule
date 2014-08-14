@@ -213,6 +213,16 @@ public class HttpRequestDispatcherTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
+    public void shutsDownRequestHandOffExecutorWhenDisconnected()
+    {
+        HttpRequestDispatcher httpRequestDispatcher = new HttpRequestDispatcher(mockHttpConnector, mockRetryTemplate, mockServerSocket, mockWorkManager);
+        httpRequestDispatcher.requestHandOffExecutor = mockExecutor;
+
+        httpRequestDispatcher.disconnect();
+        verify(mockExecutor).shutdown();
+    }
+
     private void sustituteLifecycleManager() throws NoSuchFieldException, IllegalAccessException
     {
         Field filed = AbstractConnector.class.getDeclaredField("lifecycleManager");
