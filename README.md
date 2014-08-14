@@ -15,19 +15,19 @@ Mule transformers are the key to exchanging data between nodes, as they allow Mu
 
 Process
 =======
-Mule uses components to conduct backend processes for specific business logic (like checking the customer and inventory databases). Then, the components route messages to the correct application (such as an order fulfillment system). Mule uses is called Staged Event-Driven Architecture (SEDA) for core asynchronous message processing in flows. Importantly, components don't have to have any Mule-specific code; they can simply be POJOs, Spring beans, Java beans, Groovy scripts, or web services containing the business logic for processing data. Components can even be developed in other languages such as Python, JavaScript, Ruby, and PHP. Mule’s catalog of building blocks includes the most commonly used Enterprise Integration Patterns.
+Mule uses components to conduct backend processes for specific business logic (like checking the customer and inventory databases). Then, the components route messages to the correct application (such as an order fulfillment system). This use is called a Staged Event-Driven Architecture (SEDA) for core asynchronous message processing in flows. Importantly, components don't have to have any Mule-specific code; they can simply be POJOs, Spring beans, Java beans, Groovy scripts, or web services containing the business logic for processing data. Components can even be developed in other languages such as Python, JavaScript, Ruby, and PHP. Mule’s catalog of building blocks includes the most commonly used Enterprise Integration Patterns.
 
-A flow, therefore, is the construct within which you link together several individual components (i.e. building blocks) to handle the receipt, processing and eventual routing of a message. You can connect many flows together to build a complete application which you can then deploy on premise, on Mule or another application server, or in the cloud. Practically speaking, you could build, deploy and run a Mule application in a matter of hours, rather than spending weeks or months building point-to-point connections between systems. Studio, Mule’s Eclipse-based graphical IDE, makes it even easier to model, then configure, test and deploy your applications. Mule is so named because it “carries the heavy development load” of connecting systems.
+A flow, therefore, is the construct within which you link together several individual components (i.e. building blocks) to handle the receipt, processing, and eventual routing of a message. You can connect many flows together to build a complete application which you can then deploy on premise, on Mule, on another application server, or in the cloud. Practically speaking, you could build, deploy, and run a Mule application in a matter of hours, rather than spending weeks or months building point-to-point connections between systems. Studio, Mule’s Eclipse-based graphical IDE, makes it even easier to model, then configure, test, and deploy your applications. Mule is so named because it “carries the heavy development load” of connecting systems.
 
 Get Started
 ===========
 
 1. Download, then unzip Mule – either the Standalone version (just the ESB) or Mule Studio (the ESB + the Eclipse-based graphical IDE) – from [mulesoft.org](http://www.mulesoft.org).
 
-1. Confirm that you have a [JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html) on your local drive, Java SE 6 Update 26 or later.
+1. Confirm that you have a [JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html) on your local drive, Java SE 6 Update 26 or SE 7 (SE 8 is not currently supported).
 
 1. Launch Mule Studio by double-clicking MuleStudio.app (Mac) or MuleStudio.exe (Windows).  
-     Launch Mule Standalone via the command line by executing ./bin/mule (Mac) or mule.bat (Windows). 
+     Launch Mule as a standalone from the command line by executing ./bin/mule (Mac) or mule.bat (Windows). 
      Refer to the [Mule Installation Guide](http://www.mulesoft.org/documentation/display/current/Downloading+and+Launching+Mule+ESB) for more details. 
 
 Mule is up and kicking! Check out some [example applications](http://www.mulesoft.org/documentation/display/current/Mule+Examples) to explore the potential of Mule.
@@ -37,7 +37,7 @@ Contribute
 ==========
 Mule is open source and we love contributions! If you have an idea for a great improvement or spy an issue you’re keen to fix, you can fork us on [github](https://github.com/mulesoft/mule).
 
-No contribution is too small– providing feedback, [reporting issues](http://www.mulesoft.org/jira/browse/MULE) and participating in the [community forums](http://forum.mulesoft.org/mulesoft) is invaluable and extremely helpful for all our users. Please refer to our [contribution guidelines](CONTRIBUTE.md) for details.
+No contribution is too small – providing feedback, [reporting issues](http://www.mulesoft.org/jira/browse/MULE) and participating in the [community forums](http://forum.mulesoft.org/mulesoft) is invaluable and extremely helpful for all our users. Please refer to our [contribution guidelines](CONTRIBUTE.md) for details.
 
 
 
