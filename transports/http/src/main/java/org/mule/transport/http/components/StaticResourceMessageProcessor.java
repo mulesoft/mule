@@ -27,6 +27,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.lang.RuntimeException;
 import javax.activation.MimetypesFileTypeMap;
 
 /**
@@ -112,7 +113,10 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
         {
             throw new ResourceNotFoundException(HttpMessages.fileNotFound(resourceBase + path),event);
         }
-
+        finally
+        {
+            IOUtils.closeQuietly(in);
+        }
         return resultEvent;
     }
 
