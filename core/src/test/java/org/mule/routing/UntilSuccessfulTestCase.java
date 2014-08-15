@@ -21,6 +21,9 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.probe.JUnitProbe;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Prober;
 import org.mule.util.store.SimpleMemoryObjectStore;
 
 import java.io.ByteArrayInputStream;
@@ -68,6 +71,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
 
     private ListableObjectStore<MuleEvent> objectStore;
     private ConfigurableMessageProcessor targetMessageProcessor;
+    private Prober pollingProber = new PollingProber(10000, 500l);
 
     @Override
     protected void doSetUp() throws Exception
@@ -180,7 +184,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
     {
         targetMessageProcessor.setNumberOfFailuresToSimulate(Integer.MAX_VALUE);
         EndpointBuilder dlqEndpointBuilder = mock(EndpointBuilder.class);
-        OutboundEndpoint dlqEndpoint = mock(OutboundEndpoint.class);
+        final OutboundEndpoint dlqEndpoint = mock(OutboundEndpoint.class);
         when(dlqEndpointBuilder.buildOutboundEndpoint()).thenReturn(dlqEndpoint);
         untilSuccessful.setDeadLetterQueue(dlqEndpointBuilder);
         untilSuccessful.initialise();
@@ -188,9 +192,22 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
 
         final MuleEvent testEvent = getTestEvent("ERROR");
         assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(testEvent));
-        ponderUntilEventAborted(testEvent);
 
-        verify(dlqEndpoint).process(any(MuleEvent.class));
+        pollingProber.check(new JUnitProbe()
+        {
+            @Override
+            protected boolean test() throws Exception
+            {
+                verify(dlqEndpoint).process(any(MuleEvent.class));
+                return true;
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "Dead letter queue was not called";
+            }
+        });
     }
 
     @Test
