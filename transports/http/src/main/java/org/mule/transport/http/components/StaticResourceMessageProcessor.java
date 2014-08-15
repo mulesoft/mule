@@ -115,17 +115,7 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
         }
         finally
         {
-            if (in != null)
-            {
-                try
-                {
-                    in.close();
-                }
-                catch (IOException e)
-                {
-                    throw new RuntimeException(e);
-                }
-            }
+            IOUtils.closeQuietly(in);
         }
         return resultEvent;
     }
