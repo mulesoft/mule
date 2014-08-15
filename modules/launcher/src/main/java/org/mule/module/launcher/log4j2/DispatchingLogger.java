@@ -68,7 +68,7 @@ abstract class DispatchingLogger extends Logger
 
     private boolean isRootLogger(ClassLoader currentClassLoader)
     {
-        return currentClassLoader == null || ownerClassLoaderHash == NO_CCL_CLASSLOADER || currentClassLoader.hashCode() == ownerClassLoaderHash
+        return currentClassLoader == null || ownerClassLoaderHash == NO_CCL_CLASSLOADER || currentClassLoader.hashCode() == ownerClassLoaderHash;
     }
 
     @Override
