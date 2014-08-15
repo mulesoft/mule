@@ -7,7 +7,27 @@
 
 package org.mule.module.jersey;
 
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.api.component.JavaComponent;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.OutputHandler;
+import org.mule.component.AbstractComponent;
+import org.mule.transport.http.HttpConnector;
+import org.mule.transport.http.HttpConstants;
+
+import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.core.header.InBoundHeaders;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
+import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.WebApplication;
+import com.sun.jersey.spi.container.WebApplicationFactory;
+
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -18,24 +38,6 @@ import java.util.Set;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
-
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.component.JavaComponent;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transformer.TransformerException;
-import org.mule.component.AbstractComponent;
-import org.mule.transport.http.HttpConnector;
-import org.mule.transport.http.HttpConstants;
-
-import com.sun.jersey.api.core.DefaultResourceConfig;
-import com.sun.jersey.core.header.InBoundHeaders;
-import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerResponse;
-import com.sun.jersey.spi.container.WebApplication;
-import com.sun.jersey.spi.container.WebApplicationFactory;
 
 /**
  * Wraps a set of components which can get invoked by Jersey. This component will
@@ -169,11 +171,20 @@ public class JerseyResourcesComponent extends AbstractComponent
         }
 
         MuleResponseWriter writer = new MuleResponseWriter(message);
-        ContainerResponse res = new ContainerResponse(application, req, writer);
+        final MuleContainerResponse res = new MuleContainerResponse(application, req, writer);
 
+        /* This will process the request in the Jersey application, but only the headers will be written
+         * to the response, as we are providing a custom implementation of ContainerResponse. Streaming of the
+         * payload will be executed inside the output handler that is returned. */
         application.handleRequest(req, res);
 
-        return writer.getResponse();
+        return new OutputHandler()
+        {
+            public void write(MuleEvent event, OutputStream out) throws IOException
+            {
+                res.writeToStream(out);
+            }
+        };
     }
 
     protected static InputStream getInputStream(MuleMessage message) throws TransformerException
