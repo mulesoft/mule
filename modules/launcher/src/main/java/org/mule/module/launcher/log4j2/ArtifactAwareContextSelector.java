@@ -68,7 +68,6 @@ final class ArtifactAwareContextSelector implements ContextSelector
     {
     }
 
-
     @Override
     public LoggerContext getContext(String fqcn, ClassLoader loader, boolean currentContext)
     {
@@ -145,7 +144,11 @@ final class ArtifactAwareContextSelector implements ContextSelector
             return getDefaultContext();
         }
 
-        MuleLoggerContext loggerContext = new MuleLoggerContext(parameters.contextName, parameters.loggerConfigFile, classLoader, isStandalone());
+        MuleLoggerContext loggerContext = new MuleLoggerContext(parameters.contextName,
+                                                                parameters.loggerConfigFile,
+                                                                classLoader,
+                                                                this,
+                                                                isStandalone());
 
         if (classLoader instanceof ArtifactClassLoader)
         {
@@ -256,7 +259,7 @@ final class ArtifactAwareContextSelector implements ContextSelector
 
     private LoggerContext getDefaultContext()
     {
-        return new MuleLoggerContext("Default", isStandalone());
+        return new MuleLoggerContext("Default", this, isStandalone());
     }
 
     private boolean isStandalone()
