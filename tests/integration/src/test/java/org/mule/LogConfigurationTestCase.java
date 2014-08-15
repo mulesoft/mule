@@ -10,15 +10,14 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.StringContains.containsString;
-import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.log4j2.MuleLog4jContextFactory;
 import org.mule.test.infrastructure.deployment.AbstractFakeMuleServerTestCase;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -56,7 +55,7 @@ public class LogConfigurationTestCase extends AbstractFakeMuleServerTestCase
     }
 
     @Test
-    public void defaultAppLoggingConfigurationOnlyLogsOnApplicationLogFile() throws IOException, MuleException
+    public void defaultAppLoggingConfigurationOnlyLogsOnApplicationLogFile() throws Exception
     {
         muleServer.start();
         muleServer.deploy("/log/emptyApp.zip", APP_NAME);
@@ -64,7 +63,7 @@ public class LogConfigurationTestCase extends AbstractFakeMuleServerTestCase
     }
 
     @Test
-    public void defaultAppInDomainLoggingConfigurationOnlyLogsOnApplicationLogFile() throws IOException, MuleException
+    public void defaultAppInDomainLoggingConfigurationOnlyLogsOnApplicationLogFile() throws Exception
     {
         muleServer.start();
         muleServer.deployDomainFromClasspathFolder("log/empty-domain", DOMAIN_NAME);
@@ -73,7 +72,7 @@ public class LogConfigurationTestCase extends AbstractFakeMuleServerTestCase
     }
 
     @Test
-    public void honorLog4jConfigFileForApp() throws IOException, MuleException
+    public void honorLog4jConfigFileForApp() throws Exception
     {
         muleServer.start();
         muleServer.deploy("/log/appWithLog4j.zip", APP_NAME);
@@ -81,7 +80,7 @@ public class LogConfigurationTestCase extends AbstractFakeMuleServerTestCase
     }
 
     @Test
-    public void honorLog4jConfigFileForAppInDomain() throws IOException, MuleException
+    public void honorLog4jConfigFileForAppInDomain() throws Exception
     {
         muleServer.start();
         muleServer.deployDomainFromClasspathFolder("log/empty-domain-with-log4j", DOMAIN_NAME);
@@ -89,7 +88,7 @@ public class LogConfigurationTestCase extends AbstractFakeMuleServerTestCase
         ensureArtifactAppender("Console", ConsoleAppender.class);
     }
 
-    private void ensureOnlyDefaultAppender()
+    private void ensureOnlyDefaultAppender() throws Exception
     {
         assertThat(1, equalTo(appendersCount(APP_NAME)));
         assertThat(1, equalTo(selectByClass(APP_NAME, RollingFileAppender.class).size()));
@@ -99,30 +98,53 @@ public class LogConfigurationTestCase extends AbstractFakeMuleServerTestCase
         assertThat(fileAppender.getFileName(), containsString(String.format("mule-app-%s.log", APP_NAME)));
     }
 
-    private void ensureArtifactAppender(String appenderName, Class<? extends Appender> appenderClass)
+    private void ensureArtifactAppender(final String appenderName, final Class<? extends Appender> appenderClass) throws Exception
     {
-        Logger logger = getRootLoggerForApp(APP_NAME);
-        assertEquals(Level.DEBUG, logger.getLevel());
+        withAppClassLoader(APP_NAME, new Callable<Void>()
+        {
+            @Override
+            public Void call() throws Exception
+            {
+                Logger logger = getRootLoggerForApp(APP_NAME);
+                assertEquals(Level.DEBUG, logger.getLevel());
 
-        assertThat(1, equalTo(appendersCount(APP_NAME)));
-        assertThat(1, equalTo(selectByClass(APP_NAME, appenderClass).size()));
-        assertThat(appenderName, equalTo(selectByClass(APP_NAME, appenderClass).get(0).getName()));
+                assertThat(1, equalTo(appendersCount(APP_NAME)));
+                assertThat(1, equalTo(selectByClass(APP_NAME, appenderClass).size()));
+                assertThat(appenderName, equalTo(selectByClass(APP_NAME, appenderClass).get(0).getName()));
+
+                return null;
+            }
+        });
     }
 
-    private Logger getRootLoggerForApp(String appName)
+    private Logger getRootLoggerForApp(String appName) throws Exception
     {
         return getContext(appName).getLogger("");
     }
 
-    private LoggerContext getContext(String appName)
+    private LoggerContext getContext(final String appName) throws Exception
+    {
+        return withAppClassLoader(appName, new Callable<LoggerContext>()
+        {
+            @Override
+            public LoggerContext call() throws Exception
+            {
+                Application app = muleServer.findApplication(appName);
+                ClassLoader classLoader = app.getMuleContext().getExecutionClassLoader();
+                return (LoggerContext) LogManager.getContext(classLoader, false);
+            }
+        });
+    }
+
+    private <T> T withAppClassLoader(String appName, Callable<T> closure) throws Exception
     {
         Application app = muleServer.findApplication(appName);
         ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoader classLoader = app.getMuleContext().getExecutionClassLoader();
+        Thread.currentThread().setContextClassLoader(classLoader);
         try
         {
-            ClassLoader classLoader = app.getMuleContext().getExecutionClassLoader();
-            Thread.currentThread().setContextClassLoader(classLoader);
-            return (LoggerContext) LogManager.getContext(classLoader, false);
+            return closure.call();
         }
         finally
         {
@@ -130,7 +152,7 @@ public class LogConfigurationTestCase extends AbstractFakeMuleServerTestCase
         }
     }
 
-    private List<Appender> selectByClass(String appName, Class<?> appenderClass)
+    private List<Appender> selectByClass(String appName, Class<?> appenderClass) throws Exception
     {
         LoggerContext context = getContext(appName);
         List<Appender> filteredAppenders = new LinkedList<>();
@@ -145,7 +167,7 @@ public class LogConfigurationTestCase extends AbstractFakeMuleServerTestCase
         return filteredAppenders;
     }
 
-    private int appendersCount(String appName)
+    private int appendersCount(String appName) throws Exception
     {
         return selectByClass(appName, Appender.class).size();
     }
