@@ -37,7 +37,7 @@ public abstract class JUnitProbe implements Probe
         }
         catch (Throwable e)
         {
-            logger.error("Probing failed with exception", e);
+            logger.debug("Probing failed with exception", e);
             return false;
         }
     }
