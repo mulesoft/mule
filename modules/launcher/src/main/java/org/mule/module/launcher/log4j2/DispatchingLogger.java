@@ -36,6 +36,7 @@ import org.apache.logging.log4j.spi.ExtendedLogger;
  */
 abstract class DispatchingLogger extends Logger
 {
+    private static final int NO_CCL_CLASSLOADER = 0;
 
     private final Logger originalLogger;
     private final ContextSelector contextSelector;
@@ -46,14 +47,15 @@ abstract class DispatchingLogger extends Logger
         super(loggerContext, originalLogger.getName(), messageFactory);
         this.originalLogger = originalLogger;
         this.contextSelector = contextSelector;
-        ownerClassLoaderHash = ownerClassLoader.hashCode();
+        ownerClassLoaderHash = ownerClassLoader != null ? ownerClassLoader.hashCode() : NO_CCL_CLASSLOADER;
+        //ownerClassLoaderHash = ownerClassLoader.hashCode();
     }
 
 
     private Logger getLogger()
     {
         final ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
-        if (currentClassLoader == null || currentClassLoader.hashCode() == ownerClassLoaderHash)
+        if (currentClassLoader == null || ownerClassLoaderHash == NO_CCL_CLASSLOADER || currentClassLoader.hashCode() == ownerClassLoaderHash)
         {
             return originalLogger;
         }
