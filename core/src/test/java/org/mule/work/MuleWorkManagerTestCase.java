@@ -4,20 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule;
+package org.mule.work;
 
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.work.MuleWorkManager;
 
 import javax.resource.spi.work.Work;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 
 /**
  * Tests the following behavior:
@@ -159,4 +160,10 @@ public class MuleWorkManagerTestCase extends AbstractMuleContextTestCase
 
     }
 
+    @Test
+    public void testThreadingProfileIsNotShared()
+    {
+        MuleWorkManager wm = new MuleWorkManager(ThreadingProfile.DEFAULT_THREADING_PROFILE, null, 5000);
+        assertThat(wm.getThreadingProfile(), not(sameInstance(ThreadingProfile.DEFAULT_THREADING_PROFILE)));
+    }
 }
