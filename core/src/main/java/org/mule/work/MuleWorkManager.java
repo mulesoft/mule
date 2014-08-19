@@ -13,6 +13,7 @@ import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.WorkManager;
 import org.mule.api.work.WorkExecutor;
+import org.mule.config.ImmutableThreadingProfile;
 
 import java.text.MessageFormat;
 import java.util.List;
@@ -80,7 +81,7 @@ public class MuleWorkManager implements WorkManager, MuleContextAware
             name = "WorkManager#" + hashCode();
         }
 
-        this.threadingProfile = profile;
+        this.threadingProfile = new ImmutableThreadingProfile(profile);
         this.name = name;
         gracefulShutdownTimeout = shutdownTimeout;
     }
@@ -258,5 +259,10 @@ public class MuleWorkManager implements WorkManager, MuleContextAware
         {
             threadingProfile.setMuleContext(muleContext);
         }
+    }
+
+    protected ThreadingProfile getThreadingProfile()
+    {
+        return threadingProfile;
     }
 }
