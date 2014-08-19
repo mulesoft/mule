@@ -6,6 +6,8 @@
  */
 package org.mule.module.launcher.log4j2;
 
+import static org.mule.module.launcher.log4j2.MuleLoggerContext.NO_CCL_CLASSLOADER;
+
 import java.util.Iterator;
 import java.util.Map;
 
@@ -32,23 +34,26 @@ import org.apache.logging.log4j.spi.ExtendedLogger;
  * which {@link org.apache.logging.log4j.core.LoggerContext} is different than L's, and thus
  * forward the event to the correct context.
  *
+ * Because this class is a fix for issues in static loggers,
+ * it must not hold any reference to any {@link java.lang.ClassLoader} since otherwise
+ * that class loader would be GC unreachable. For that reason, it uses {@link #ownerClassLoaderHash}
+ * instead of the real reference
+ *
  * @since 3.6.0
  */
 abstract class DispatchingLogger extends Logger
 {
 
-    private static final int NO_CCL_CLASSLOADER = 0;
-
     private final Logger originalLogger;
     private final ContextSelector contextSelector;
     private final int ownerClassLoaderHash;
 
-    DispatchingLogger(Logger originalLogger, ClassLoader ownerClassLoader, LoggerContext loggerContext, ContextSelector contextSelector, MessageFactory messageFactory)
+    DispatchingLogger(Logger originalLogger, int ownerClassLoaderHash, LoggerContext loggerContext, ContextSelector contextSelector, MessageFactory messageFactory)
     {
         super(loggerContext, originalLogger.getName(), messageFactory);
         this.originalLogger = originalLogger;
         this.contextSelector = contextSelector;
-        ownerClassLoaderHash = ownerClassLoader != null ? ownerClassLoader.hashCode() : NO_CCL_CLASSLOADER;
+        this.ownerClassLoaderHash = ownerClassLoaderHash;
     }
 
 

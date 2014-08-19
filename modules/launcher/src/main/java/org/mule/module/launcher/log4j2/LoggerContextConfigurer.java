@@ -8,8 +8,6 @@ package org.mule.module.launcher.log4j2;
 
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.module.launcher.application.ApplicationClassLoader;
-import org.mule.module.launcher.artifact.ArtifactClassLoader;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
@@ -78,14 +76,12 @@ final class LoggerContextConfigurer
         configureMonitor(context);
 
 
-        ClassLoader classLoader = context.getOwnerClassLoader();
-
         if (context.getConfigFile() == null)
         {
             removeConsoleAppender(context);
         }
 
-        if (classLoader instanceof ArtifactClassLoader)
+        if (context.isArtifactClassloader())
         {
             addDefaultArtifactContext(context);
         }
@@ -176,8 +172,8 @@ final class LoggerContextConfigurer
 
     private void addDefaultArtifactContext(MuleLoggerContext context)
     {
-        String artifactName = ((ArtifactClassLoader) context.getOwnerClassLoader()).getArtifactName();
-        String logFileNameTemplate = getFilenamePattern(context.getOwnerClassLoader());
+        String artifactName = context.getArtifactName();
+        String logFileNameTemplate = getFilenamePattern(context);
 
         String logName = String.format(logFileNameTemplate, (artifactName != null ? artifactName : ""));
         File logDir = new File(MuleContainerBootstrapUtils.getMuleHome(), "logs");
@@ -257,11 +253,11 @@ final class LoggerContextConfigurer
         return false;
     }
 
-    private String getFilenamePattern(ClassLoader classLoader)
+    private String getFilenamePattern(MuleLoggerContext context)
     {
-        if (classLoader instanceof ArtifactClassLoader)
+        if (context.isArtifactClassloader())
         {
-            return classLoader instanceof ApplicationClassLoader ? MULE_APP_LOG_FILE_TEMPLATE : MULE_DOMAIN_LOG_FILE_TEMPLATE;
+            return context.isApplicationClassloader() ? MULE_APP_LOG_FILE_TEMPLATE : MULE_DOMAIN_LOG_FILE_TEMPLATE;
         }
 
         return null;
