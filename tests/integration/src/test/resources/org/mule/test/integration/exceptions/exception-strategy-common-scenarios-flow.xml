@@ -110,7 +110,7 @@
 
     <flow name="StopFlowBasedOnExceptionType">
         <vm:inbound-endpoint path="in5" exchange-pattern="request-response"/>
-        <http:outbound-endpoint host="localhost" port="808" responseTimeout="5"/>
+        <http:outbound-endpoint host="localhost" port="${port7}" responseTimeout="5"/>
         <default-exception-strategy>
             <choice>
                 <when evaluator="groovy" expression="payload.getException().getCause() instanceof java.net.ConnectException">

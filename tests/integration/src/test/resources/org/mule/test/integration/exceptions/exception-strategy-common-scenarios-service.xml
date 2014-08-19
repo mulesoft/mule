@@ -135,7 +135,7 @@
             <test:component/>
             <outbound>
                 <pass-through-router>
-                    <http:outbound-endpoint host="localhost" port="808" responseTimeout="5"/>
+                    <http:outbound-endpoint host="localhost" port="${port7}" responseTimeout="5"/>
                 </pass-through-router>
             </outbound>
             <default-exception-strategy>
