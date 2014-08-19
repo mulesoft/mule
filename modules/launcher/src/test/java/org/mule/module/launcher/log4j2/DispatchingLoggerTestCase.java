@@ -57,7 +57,7 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase
         currentClassLoader = Thread.currentThread().getContextClassLoader();
         when(loggerContext.getConfiguration().getLoggerConfig(anyString()).getLevel()).thenReturn(Level.INFO);
 
-        logger = new DispatchingLogger(originalLogger, currentClassLoader, loggerContext, contextSelector, messageFactory)
+        logger = new DispatchingLogger(originalLogger, currentClassLoader.hashCode(), loggerContext, contextSelector, messageFactory)
         {
             @Override
             public String getName()
