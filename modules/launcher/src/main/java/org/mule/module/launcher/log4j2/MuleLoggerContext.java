@@ -6,6 +6,9 @@
  */
 package org.mule.module.launcher.log4j2;
 
+import org.mule.module.launcher.application.ApplicationClassLoader;
+import org.mule.module.launcher.artifact.ArtifactClassLoader;
+
 import java.net.URI;
 
 import org.apache.logging.log4j.core.Logger;
@@ -23,17 +26,25 @@ import org.apache.logging.log4j.message.MessageFactory;
  * <p/>
  * The {@link org.mule.module.launcher.log4j2.LoggerContextConfigurer} needs to be invoked here so
  * that it's invoked each time the configuration is reloaded.
+ * <p/>
+ * This class must not hold any reference to a {@link java.lang.ClassLoader} since otherwise
+ * {@link org.apache.logging.log4j.core.Logger} instances held on static fields will make
+ * that class loader GC unreachable
  *
  * @since 3.6.0
  */
 class MuleLoggerContext extends LoggerContext
 {
 
-    private final ClassLoader ownerClassLoader;
+    protected static final int NO_CCL_CLASSLOADER = 0;
+
     private final URI configFile;
     private final boolean standlone;
     private final ContextSelector contextSelector;
-
+    private final boolean artifactClassloader;
+    private final boolean applicationClassloader;
+    private final String artifactName;
+    private final int ownerClassLoaderHash;
 
     MuleLoggerContext(String name, ContextSelector contextSelector, boolean standalone)
     {
@@ -43,10 +54,23 @@ class MuleLoggerContext extends LoggerContext
     MuleLoggerContext(String name, URI configLocn, ClassLoader ownerClassLoader, ContextSelector contextSelector, boolean standalone)
     {
         super(name, null, configLocn);
-        this.ownerClassLoader = ownerClassLoader;
         configFile = configLocn;
         this.contextSelector = contextSelector;
         this.standlone = standalone;
+        ownerClassLoaderHash = ownerClassLoader != null ? ownerClassLoader.hashCode() : NO_CCL_CLASSLOADER;
+
+        if (ownerClassLoader instanceof ArtifactClassLoader)
+        {
+            artifactClassloader = true;
+            artifactName = ((ArtifactClassLoader) ownerClassLoader).getArtifactName();
+            applicationClassloader = ownerClassLoader instanceof ApplicationClassLoader;
+        }
+        else
+        {
+            artifactClassloader = false;
+            applicationClassloader = false;
+            artifactName = null;
+        }
     }
 
     @Override
@@ -60,13 +84,14 @@ class MuleLoggerContext extends LoggerContext
      * Override to return a {@link DispatchingLogger}
      * instead of a simple logger
      * {@inheritDoc}
+     *
      * @return a {@link DispatchingLogger}
      */
     @Override
     protected Logger newInstance(LoggerContext ctx, final String name, final MessageFactory messageFactory)
     {
 
-        return new DispatchingLogger(super.newInstance(ctx, name, messageFactory), ownerClassLoader, this, contextSelector, messageFactory)
+        return new DispatchingLogger(super.newInstance(ctx, name, messageFactory), ownerClassLoaderHash, this, contextSelector, messageFactory)
         {
             // force the name due to log4j2's cyclic constructor dependencies
             // aren't a friend of the wrapper pattern
@@ -78,11 +103,6 @@ class MuleLoggerContext extends LoggerContext
         };
     }
 
-    protected ClassLoader getOwnerClassLoader()
-    {
-        return ownerClassLoader;
-    }
-
     protected URI getConfigFile()
     {
         return configFile;
@@ -91,5 +111,20 @@ class MuleLoggerContext extends LoggerContext
     protected boolean isStandlone()
     {
         return standlone;
+    }
+
+    protected boolean isArtifactClassloader()
+    {
+        return artifactClassloader;
+    }
+
+    protected boolean isApplicationClassloader()
+    {
+        return applicationClassloader;
+    }
+
+    protected String getArtifactName()
+    {
+        return artifactName;
     }
 }
