@@ -8,6 +8,7 @@ package org.mule.module.launcher.application;
 
 import org.mule.api.config.ThreadingProfile;
 import org.mule.config.DefaultMuleConfiguration;
+import org.mule.config.ImmutableThreadingProfile;
 import org.mule.config.PropertiesMuleConfigurationFactory;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
@@ -45,7 +46,7 @@ public class ApplicationMuleContextBuilder extends DefaultMuleContextBuilder
     {
         // use app name in the core Mule thread
         final String threadName = String.format("[%s].Mule", desc.getAppName());
-        return new MuleWorkManager(ThreadingProfile.DEFAULT_THREADING_PROFILE, threadName, getMuleConfiguration().getShutdownTimeout());
+        return new MuleWorkManager(new ImmutableThreadingProfile(ThreadingProfile.DEFAULT_THREADING_PROFILE), threadName, getMuleConfiguration().getShutdownTimeout());
 
     }
 }

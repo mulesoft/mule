@@ -259,4 +259,9 @@ public class MuleWorkManager implements WorkManager, MuleContextAware
             threadingProfile.setMuleContext(muleContext);
         }
     }
+
+    public ThreadingProfile getThreadingProfile()
+    {
+        return threadingProfile;
+    }
 }
