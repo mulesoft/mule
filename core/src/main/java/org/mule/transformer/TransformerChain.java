@@ -13,6 +13,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.StringUtils;
 
 import java.util.Arrays;
@@ -73,7 +74,7 @@ public class TransformerChain extends AbstractMessageTransformer
                 result.setPayload(temp);
             }
         }
-        if (lastTransformer != null && lastTransformer.getReturnClass().equals(MuleMessage.class))
+        if (lastTransformer != null && DataTypeFactory.MULE_MESSAGE.equals(lastTransformer.getReturnDataType()) )
         {
             return result;
         }
