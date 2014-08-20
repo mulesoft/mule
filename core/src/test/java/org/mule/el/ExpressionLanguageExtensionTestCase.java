@@ -6,6 +6,10 @@
  */
 package org.mule.el;
 
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationBuilder;
@@ -30,6 +34,7 @@ import java.util.Collections;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.mule.mvel2.compiler.AbstractParser;
 
 public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
 {
@@ -171,6 +176,18 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase
         MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
         mvel.initialise();
         mvel.evaluate("f('one')");
+    }
+
+    @Test
+    public void testParserContextThreadLocalCleared() throws RegistrationException, InitialisationException
+    {
+        MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
+        mvel.initialise();
+        // Ensure ParserContext ThreadLocal is cleared after initialization (occurs in deployment thread)
+        assertThat(AbstractParser.contextControl(2, null, null), is(nullValue()));
+        mvel.evaluate("f('one','two')");
+        // Ensure ParserContext ThreadLocal is cleared after evaluation (occurs in receiver/flow/dispatcher thread)
+        assertThat(AbstractParser.contextControl(2, null, null), is(nullValue()));
     }
 
     class TestExtension implements ExpressionLanguageExtension
