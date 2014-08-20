@@ -49,7 +49,7 @@ public class SftpClient
 
     private Log logger = LogFactory.getLog(getClass());
 
-    private ChannelSftp channelSftp;
+    protected ChannelSftp channelSftp;
 
     private JSch jsch;
     private SftpNotifier notifier;
@@ -106,7 +106,7 @@ public class SftpClient
     /**
      * Converts a relative path to an absolute path according to
      * http://tools.ietf.org/html/draft-ietf-secsh-scp-sftp-ssh-uri-04.
-     * 
+     *
      * @param path relative path
      * @return Absolute path
      */
@@ -305,27 +305,21 @@ public class SftpClient
     {
         try
         {
-            @SuppressWarnings("unchecked")
-            Vector<String> vv = channelSftp.ls(path);
-            if (vv != null)
+            Vector<LsEntry> entries = channelSftp.ls(path);
+            if (entries != null)
             {
                 List<String> ret = new ArrayList<String>();
-                for (int i = 0; i < vv.size(); i++)
+                for (LsEntry entry : entries)
                 {
-                    Object obj = vv.elementAt(i);
-                    if (obj instanceof com.jcraft.jsch.ChannelSftp.LsEntry)
+                    if (includeFiles && !entry.getAttrs().isDir())
                     {
-                        LsEntry entry = (LsEntry) obj;
-                        if (includeFiles && !entry.getAttrs().isDir())
+                        ret.add(entry.getFilename());
+                    }
+                    if (includeDirectories && entry.getAttrs().isDir())
+                    {
+                        if (!entry.getFilename().equals(".") && !entry.getFilename().equals(".."))
                         {
                             ret.add(entry.getFilename());
-                        }
-                        if (includeDirectories && entry.getAttrs().isDir())
-                        {
-                            if (!entry.getFilename().equals(".") && !entry.getFilename().equals(".."))
-                            {
-                                ret.add(entry.getFilename());
-                            }
                         }
                     }
                 }
@@ -334,7 +328,7 @@ public class SftpClient
         }
         catch (SftpException e)
         {
-            throw new IOException(e.getMessage());
+            throw new IOException(e.getMessage(), e);
         }
         return null;
     }
@@ -453,7 +447,7 @@ public class SftpClient
 
     /**
      * Creates a directory
-     * 
+     *
      * @param directoryName The directory name
      * @throws IOException If an error occurs
      */
@@ -497,7 +491,7 @@ public class SftpClient
 
     /**
      * Setter for 'home'
-     * 
+     *
      * @param home The path to home
      */
     void setHome(String home)
@@ -518,7 +512,7 @@ public class SftpClient
      * SftpClient methods can be merged Note, this method is synchronized because it
      * in rare cases can be called from two threads at the same time and thus cause
      * an error.
-     * 
+     *
      * @param endpoint
      * @param newDir
      * @throws IOException
@@ -709,7 +703,7 @@ public class SftpClient
         APPEND
         {
             @Override
-            public int intValue() 
+            public int intValue()
             {
                 return ChannelSftp.APPEND;
             }
@@ -717,7 +711,7 @@ public class SftpClient
         OVERWRITE
         {
             @Override
-            public int intValue() 
+            public int intValue()
             {
                 return ChannelSftp.OVERWRITE;
             }

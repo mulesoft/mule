@@ -8,19 +8,27 @@ package org.mule.transport.sftp;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.transport.sftp.notification.SftpNotifier;
 
 import java.io.IOException;
 
 import org.junit.Test;
 
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.SftpException;
+
 /**
  * JUnit test for SftpClient
- * 
+ *
  * @author Lennart Häggkvist
  */
 @SmallTest
@@ -75,11 +83,54 @@ public class SftpClientTestCase extends AbstractMuleTestCase
         assertEquals(fileName, newName);
     }
 
+    @Test
+    public void causedByShouldBeAnSftpException() throws Exception
+    {
+        ChannelSftp mockChannel = mock(ChannelSftp.class);
+        when(mockChannel.ls(anyString())).thenThrow(new SftpException(1, destDir));
+        try
+        {
+            SftpClientMock mockClient = new SftpClientMock("local");
+            mockClient.setChannel(mockChannel);
+            mockClient.listFiles(destDir);
+        } catch (IOException e)
+        {
+            if (e.getCause() == null)
+            {
+                fail("no cause provided, should have been SftpException");
+            }
+            final Class actualClass = e.getCause().getClass();
+            assertEquals(actualClass, SftpException.class);
+        } catch (Exception e)
+        {
+            fail("cause should have been SftpException");
+        }
+    }
+
     private SftpClient getSftpClientSpy() throws IOException
     {
         SftpClient sftp = new SftpClient("local");
         SftpClient spy = spy(sftp);
         doReturn(new String[]{fileName}).when(spy).listFiles(destDir);
         return spy;
+    }
+
+    class SftpClientMock extends SftpClient
+    {
+
+        public SftpClientMock(String host)
+        {
+            super(host);
+        }
+
+        public SftpClientMock(String host, SftpNotifier notifier)
+        {
+            super(host, notifier);
+        }
+
+        public void setChannel(ChannelSftp channel)
+        {
+            channelSftp = channel;
+        }
     }
 }
