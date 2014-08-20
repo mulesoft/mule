@@ -18,7 +18,7 @@ import org.mule.util.ClassUtils;
 import java.util.Map;
 
 /**
- * Creates and object of type {@link #getReturnClass()} and populates values of a
+ * Creates and object of type {@link #getReturnDataType()} and populates values of a
  * {@link java.util.Map} as bean properties on the object.
  * The bean class name can also be passed in as a property on the Map (which gets removed once read).
  * The {@link MapToBean#CLASS_PROPERTY} should be set as a fully qualified class name string.
@@ -42,7 +42,7 @@ public class MapToBean extends AbstractTransformer implements DiscoverableTransf
     public void initialise() throws InitialisationException
     {
         super.initialise();
-        if(getReturnClass().equals(Object.class))
+        if(getReturnDataType().equals(DataTypeFactory.OBJECT))
         {
             throw new InitialisationException(CoreMessages.propertiesNotSet("returnClass"), this);
         }
@@ -55,7 +55,7 @@ public class MapToBean extends AbstractTransformer implements DiscoverableTransf
         {
             Map props = (Map)src;
             String c = (String)props.remove(CLASS_PROPERTY);
-            Class clazz = getReturnClass();
+            Class clazz = getReturnDataType().getType();
             if(c==null && clazz.equals(Object.class))
             {
                 throw new TransformerException(CoreMessages.transforemrMapBeanClassNotSet());

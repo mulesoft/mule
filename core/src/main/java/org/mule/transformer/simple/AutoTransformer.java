@@ -32,7 +32,7 @@ public class AutoTransformer extends AbstractMessageTransformer
     public void initialise() throws InitialisationException
     {
         super.initialise();
-        if(getReturnClass().equals(Object.class))
+        if(getReturnDataType().equals(DataTypeFactory.OBJECT))
         {
             throw new InitialisationException(CoreMessages.transformerInvalidReturnType(Object.class, getName()), this);
         }
@@ -41,6 +41,6 @@ public class AutoTransformer extends AbstractMessageTransformer
     @Override
     public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        return message.getPayload(DataTypeFactory.create(getReturnClass()));
+        return message.getPayload(getReturnDataType());
     }
 }

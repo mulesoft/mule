@@ -30,6 +30,6 @@ public class TransformerArraysTestCase extends FunctionalTestCase
         Transformer trans = muleContext.getRegistry().lookupTransformer("testTrans");
 
         assertNotNull(trans);
-        assertEquals(Orange[].class, trans.getReturnClass());
+        assertEquals(Orange[].class, trans.getReturnDataType().getType());
     }
 }
