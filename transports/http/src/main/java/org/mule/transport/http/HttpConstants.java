@@ -42,7 +42,6 @@ public class HttpConstants
     public static final String METHOD_CONNECT = "CONNECT";
 
     // Date header format
-    public static final String DATE_FORMAT = "EEE, dd MMM yyyy hh:mm:ss zzz";
     public static final String DATE_FORMAT_RFC822 = "EEE, dd MMM yyyy HH:mm:ss Z";
     //Date header backwards compatibility property checker
     public static final BackwardsCompatibilityPropertyChecker SERVER_TIME_ZONE_PROPERTY = new BackwardsCompatibilityPropertyChecker("mule.http.dateheaderservertimezone");

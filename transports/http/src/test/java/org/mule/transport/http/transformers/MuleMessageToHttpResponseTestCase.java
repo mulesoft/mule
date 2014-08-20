@@ -6,9 +6,11 @@
  */
 package org.mule.transport.http.transformers;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
@@ -28,7 +30,6 @@ import java.util.Set;
 
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
-import org.junit.Assert;
 import org.junit.Test;
 
 @SmallTest
@@ -60,7 +61,7 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
                 cookiesSet++;
             }
         }
-        Assert.assertEquals(cookiesOutbound.length, cookiesSet);
+        assertThat(cookiesSet, equalTo(cookiesOutbound.length));
     }
 
     @Test
@@ -79,7 +80,7 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
             {
                 hasDateHeader = true;
                 // validate that the header is in the appropriate format (rfc-1123)
-                SimpleDateFormat formatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US);
+                SimpleDateFormat formatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);
                 formatter.setLenient(false);
                 try
                 {
@@ -87,16 +88,12 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
                 }
                 catch (ParseException e)
                 {
-                    // will to accept 24 hour style (which is really what it's supposed to be).
                     formatter.setLenient(true);
-                    formatter.parse(header.getValue());
-                    formatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT.replaceFirst("hh", "HH"), Locale.US);
-                    formatter.setLenient(false);
                     formatter.parse(header.getValue());
                 }
             }
         }
-        Assert.assertTrue("Missing 'Date' header", hasDateHeader);
+        assertThat("Missing 'Date' header", hasDateHeader, is(true));
     }
     
     @Test
@@ -124,10 +121,10 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
             if (HttpConstants.HEADER_CONTENT_TYPE.equals(header.getName()))
             {
                 hasContentTypeHeader = true;
-                Assert.assertEquals(contentType, header.getValue());
+                assertThat(header.getValue(), is(equalTo(contentType)));
             }
         }
-        Assert.assertTrue("Missing "+HttpConstants.HEADER_CONTENT_TYPE+" header", hasContentTypeHeader);
+        assertThat("Missing"+HttpConstants.HEADER_CONTENT_TYPE+" header", hasContentTypeHeader, is(true));
     }
 
     private MuleMessageToHttpResponse getMuleMessageToHttpResponse() throws Exception

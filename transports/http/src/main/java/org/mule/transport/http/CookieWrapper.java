@@ -96,7 +96,7 @@ public class CookieWrapper extends NameValuePair
     {
         if(expiryDate instanceof String)
         {
-            SimpleDateFormat format = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US);
+            SimpleDateFormat format = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);
             format.setTimeZone(TimeZone.getTimeZone("GMT"));
             return format.parse((String) expiryDate);
         }
