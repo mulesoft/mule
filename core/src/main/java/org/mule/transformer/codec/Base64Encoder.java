@@ -60,7 +60,7 @@ public class Base64Encoder extends AbstractTransformer
 
             String result = Base64.encodeBytes(buf, Base64.DONT_BREAK_LINES);
 
-            if (getReturnClass().equals(byte[].class))
+            if (DataTypeFactory.BYTE_ARRAY.equals(getReturnDataType()))
             {
                 return result.getBytes(encoding);
             }

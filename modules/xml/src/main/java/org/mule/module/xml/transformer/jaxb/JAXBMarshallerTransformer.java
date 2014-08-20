@@ -70,32 +70,32 @@ public class JAXBMarshallerTransformer extends AbstractTransformer
         try
         {
             final Marshaller m = jaxbContext.createMarshaller();
-            if (getReturnClass().equals(String.class))
+            if (getReturnDataType().equals(DataTypeFactory.STRING))
             {
                 Writer w = new StringWriter();
                 m.marshal(src, w);
                 return w.toString();
             }
-            else if (getReturnClass().isAssignableFrom(Writer.class))
+            else if (getReturnDataType().getType().isAssignableFrom(Writer.class))
             {
                 Writer w = new StringWriter();
                 m.marshal(src, w);
                 return w;
             }
-            else if (Document.class.isAssignableFrom(getReturnClass()))
+            else if (Document.class.isAssignableFrom(getReturnDataType().getType()))
             {
                 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
                 Document doc = factory.newDocumentBuilder().newDocument();
                 m.marshal(src, doc);
                 return doc;
             }
-            else if (OutputStream.class.isAssignableFrom(getReturnClass()))
+            else if (OutputStream.class.isAssignableFrom(getReturnDataType().getType()))
             {
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 m.marshal(src, out);
                 return out;
             }
-            else if (OutputHandler.class.equals(getReturnClass()))
+            else if (OutputHandler.class.equals(getReturnDataType().getType()))
             {
                 return new OutputHandler()
                 {
@@ -116,7 +116,7 @@ public class JAXBMarshallerTransformer extends AbstractTransformer
             }
             else
             {
-                throw new TransformerException(CoreMessages.transformerInvalidReturnType(getReturnClass(), getName()));
+                throw new TransformerException(CoreMessages.transformerInvalidReturnType(getReturnDataType().getType(), getName()));
             }
 
         }
