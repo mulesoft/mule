@@ -6,10 +6,11 @@
  */
 package org.mule.test.integration.transformer.response;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
@@ -77,8 +78,8 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://sync", "request", null);
-        assertNotNull(message);
-        assertEquals("request" + VM_OUT_IN_RESP, message.getPayloadAsString());
+        assertThat(message, notNullValue());
+        assertThat(message.getPayloadAsString(), is(equalTo("request" + VM_OUT_IN_RESP)));
     }
 
     @Test
@@ -91,8 +92,8 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
         props.put(MuleProperties.MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY, "true");
 
         MuleMessage message = client.send("vm://syncResponseTransformer", "request", props);
-        assertNotNull(message);
-        assertEquals("request" + CUSTOM_RESPONSE, message.getPayloadAsString());
+        assertThat(message, notNullValue());
+        assertThat(message.getPayloadAsString(), is(equalTo("request" + CUSTOM_RESPONSE)));
     }
 
     @Test
@@ -100,18 +101,18 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("http://localhost:" + httpPort2.getNumber(), "request", null);
-        assertNotNull(message);
+        assertThat(message, notNullValue());
         // Ensure MuleMessageToHttpResponse was used before sending response
 
         String server = message.getInboundProperty(HttpConstants.HEADER_SERVER);
         assertTrue(server.startsWith("Mule"));
 
         String dateStr = message.getInboundProperty(HttpConstants.HEADER_DATE);
-        SimpleDateFormat format = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US);
+        SimpleDateFormat format = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);
         Date msgDate = format.parse(dateStr);
-        assertTrue(new Date().after(msgDate));
+        assertThat(new Date().after(msgDate), is(true));
 
-        assertEquals("request", message.getPayloadAsString());
+        assertThat(message.getPayloadAsString(), is(equalTo("request")));
     }
 
     @Test
@@ -119,17 +120,17 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("http://localhost:" + httpPort3.getNumber(), "request", null);
-        assertNotNull(message);
+        assertThat(message, notNullValue());
 
         String server = message.getInboundProperty(HttpConstants.HEADER_SERVER);
         assertTrue(server.startsWith("Mule"));
 
         String dateStr = message.getInboundProperty(HttpConstants.HEADER_DATE);
-        SimpleDateFormat format = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US);
+        SimpleDateFormat format = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);
         Date msgDate = format.parse(dateStr);
-        assertTrue(new Date().after(msgDate));
+        assertThat(new Date().after(msgDate), is(true));
 
-        assertEquals("request" + CUSTOM_RESPONSE, message.getPayloadAsString());
+        assertThat(message.getPayloadAsString(), is(equalTo("request" + CUSTOM_RESPONSE)));
     }
 
     // ***** RESPONSE ENDPONTS ON INBOUND ENDPOINTS USED FOR REMOTE-SYNC RESPONSE AFTER ROUTRING *****
@@ -155,9 +156,8 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://syncOutboundEndpointResponseTransformer", "request", null);
-        assertNotNull(message);
-        assertEquals("request" + VM_OUTBOUND + VM_INBOUND + VM_OUT_IN_RESP + CUSTOM_RESPONSE + VM_RESPONSE,
-            message.getPayloadAsString());
+        assertThat(message, notNullValue());
+        assertThat(message.getPayloadAsString(), is(equalTo("request" + VM_OUTBOUND + VM_INBOUND + VM_OUT_IN_RESP + CUSTOM_RESPONSE + VM_RESPONSE)));
     }
 
     @Test
@@ -165,9 +165,9 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://jmsSync", "request", null);
-        assertNotNull(message);
+        assertThat(message, notNullValue());
 
-        assertEquals("request" + VM_OUT_IN_RESP, message.getPayloadAsString());
+        assertThat(message.getPayloadAsString(), is(equalTo("request" + VM_OUT_IN_RESP)));
     }
 
     @Test
@@ -175,8 +175,8 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://jmsSyncOutboundEndpointResponseTransformer", "request", null);
-        assertNotNull(message);
-        assertEquals("request" + VM_OUTBOUND + VM_INBOUND + CUSTOM_RESPONSE + VM_RESPONSE, message.getPayloadAsString());
+        assertThat(message, notNullValue());
+        assertThat(message.getPayloadAsString(), is(equalTo("request" + VM_OUTBOUND + VM_INBOUND + CUSTOM_RESPONSE + VM_RESPONSE)));
     }
 
     @Test
@@ -184,9 +184,9 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://chainedRouterOutboundEndpointResponseTransformer", "request", null);
-        assertNotNull(message);
-        assertEquals("request" + VM_OUTBOUND + VM_INBOUND + VM_OUT_IN_RESP + VM_OUT_IN_RESP + CUSTOM_RESPONSE
-            + CUSTOM_RESPONSE + VM_RESPONSE, message.getPayloadAsString());
+        assertThat(message, notNullValue());
+        assertThat(message.getPayloadAsString(), is(equalTo("request" + VM_OUTBOUND + VM_INBOUND
+                                                            + VM_OUT_IN_RESP + VM_OUT_IN_RESP + CUSTOM_RESPONSE + CUSTOM_RESPONSE + VM_RESPONSE)));
     }
 
     @Test
@@ -194,8 +194,8 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://nestedRouterOutboundEndpointResponseTransformer", "request", null);
-        assertNotNull(message);
-        assertEquals("request" + VM_OUTBOUND + VM_INBOUND + VM_OUT_IN_RESP + CUSTOM_RESPONSE + CUSTOM_RESPONSE
-            + VM_RESPONSE, message.getPayloadAsString());
+        assertThat(message, notNullValue());
+        assertThat(message.getPayloadAsString(), is(equalTo("request" + VM_OUTBOUND + VM_INBOUND
+                                                            + VM_OUT_IN_RESP + CUSTOM_RESPONSE + CUSTOM_RESPONSE + VM_RESPONSE)));
     }
 }
