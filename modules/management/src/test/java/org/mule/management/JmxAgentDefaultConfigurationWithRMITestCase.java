@@ -6,17 +6,14 @@
  */
 package org.mule.management;
 
-import static org.junit.Assert.fail;
-
-import org.junit.Rule;
 import org.mule.module.management.agent.FixedHostRmiClientSocketFactory;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.net.ConnectException;
 import java.net.Socket;
 
+import org.junit.Rule;
 import org.junit.Test;
-import org.mule.tck.junit4.rule.DynamicPort;
 
 public class JmxAgentDefaultConfigurationWithRMITestCase extends FunctionalTestCase
 {
@@ -33,27 +30,8 @@ public class JmxAgentDefaultConfigurationWithRMITestCase extends FunctionalTestC
     public void testDefaultJmxAgent() throws Exception
     {
         FixedHostRmiClientSocketFactory rmiSocketFactory = new FixedHostRmiClientSocketFactory();
-        try
-        {
-            Socket socket = rmiSocketFactory.createSocket("localhost", port.getNumber()+1);
-            socket.close();
-            fail("Should not connect");
-        }
-        catch (ConnectException e)
-        {
-            // expected behavior
-        }
-
-        try
-        {
-            Socket socket = rmiSocketFactory.createSocket("localhost", port.getNumber());
-            socket.close();
-            // expected behavior
-        }
-        catch (ConnectException e)
-        {
-            fail("Should connect");
-        }
+        Socket socket = rmiSocketFactory.createSocket("localhost", port.getNumber());
+        socket.close();
     }
 
 }
