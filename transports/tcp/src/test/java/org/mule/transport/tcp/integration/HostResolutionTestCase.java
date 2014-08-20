@@ -6,25 +6,28 @@
  */
 package org.mule.transport.tcp.integration;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.junit.Assert.assertThat;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.NullPayload;
 
+import java.net.SocketTimeoutException;
+
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HostResolutionTestCase extends FunctionalTestCase 
+public class HostResolutionTestCase extends FunctionalTestCase
 {
 
     @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");    
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
     protected String getConfigResources()
@@ -32,31 +35,30 @@ public class HostResolutionTestCase extends FunctionalTestCase
         return "host-resolution-config.xml";
     }
 
+    private void assertTimeoutException(String endpoint) throws MuleException
+    {
+        final MuleMessage message = muleContext.getClient().send(endpoint, "something", null);
+        assertThat(message.getExceptionPayload(), is(not(nullValue())));
+        assertThat(message.getExceptionPayload().getRootException(), is(instanceOf(SocketTimeoutException.class)));
+        assertThat((NullPayload) message.getPayload(), is(sameInstance(NullPayload.getInstance())));
+    }
+
     @Test
     public void testDefaultConfiguration() throws MuleException
     {
-        final MuleClient client = new MuleClient(muleContext);
-        final MuleMessage message = client.send("vm://defaultConfiguration", "something", null);
-        assertNotNull(message.getExceptionPayload());
-        assertEquals(NullPayload.getInstance(), message.getPayload());
+        assertTimeoutException("vm://defaultConfiguration");
     }
 
     @Test
     public void testFailOnUnresolvedHost_false() throws MuleException
     {
-        final MuleClient client = new MuleClient(muleContext);
-        final MuleMessage message = client.send("vm://failOnUnresolvedHostFalse", "something", null);
-        assertTrue(message.getExceptionPayload() == null);
-        assertArrayEquals("something else".getBytes(), (byte[])message.getPayload());
+        assertTimeoutException("vm://failOnUnresolvedHostFalse");
     }
 
     @Test
     public void testFailOnUnresolvedHost_true() throws MuleException
     {
-        final MuleClient client = new MuleClient(muleContext);
-        final MuleMessage message = client.send("vm://failOnUnresolvedHostTrue", "something", null);
-        assertNotNull(message.getExceptionPayload());
-        assertEquals(NullPayload.getInstance(), message.getPayload());
+        assertTimeoutException("vm://failOnUnresolvedHostTrue");
     }
 
 }
