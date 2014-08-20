@@ -15,6 +15,7 @@ import org.mule.mvel2.ImmutableElementException;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.ast.FunctionInstance;
+import org.mule.mvel2.compiler.AbstractParser;
 import org.mule.mvel2.integration.VariableResolver;
 
 import java.lang.reflect.Method;
@@ -156,8 +157,16 @@ public class MVELExpressionLanguageContext extends MuleBaseVariableResolverFacto
     @Override
     public void declareFunction(String name, ExpressionLanguageFunction function)
     {
-        addFinalVariable(name, new FunctionInstance(new MVELFunctionAdaptor(name, function,
-            new ParserContext(parserConfiguration))));
+        try
+        {
+            addFinalVariable(name, new FunctionInstance(new MVELFunctionAdaptor(name, function,
+                    new ParserContext(parserConfiguration))));
+        }
+        finally
+        {
+            // Clear AbstractParser.parserContext ThreadLocal once Function has been created.
+            AbstractParser.resetParserContext();
+        }
     }
 
     @Override
