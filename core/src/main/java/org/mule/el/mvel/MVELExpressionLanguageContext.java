@@ -19,6 +19,7 @@ import java.util.Map;
 import org.mvel2.ImmutableElementException;
 import org.mvel2.ParserContext;
 import org.mvel2.UnresolveablePropertyException;
+import org.mvel2.compiler.AbstractParser;
 import org.mvel2.integration.VariableResolver;
 import org.mvel2.integration.VariableResolverFactory;
 import org.mvel2.integration.impl.BaseVariableResolverFactory;
@@ -222,7 +223,16 @@ public class MVELExpressionLanguageContext extends BaseVariableResolverFactory
     @Override
     public void declareFunction(String name, ExpressionLanguageFunction function)
     {
-        addFinalVariable(name, new MVELFunctionAdaptor(name, function, parserContext));
+        try
+        {
+            addFinalVariable(name, new MVELFunctionAdaptor(name, function,
+                                                           parserContext));
+        }
+        finally
+        {
+            // Clear AbstractParser.parserContext ThreadLocal once Function has been created.
+            AbstractParser.resetParserContext();
+        }
     }
 
 
