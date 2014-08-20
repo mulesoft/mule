@@ -6,16 +6,12 @@
  */
 package org.mule.module.jersey;
 
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.OutputHandler;
-import org.mule.module.jersey.JerseyResourcesComponent;
 import org.mule.transport.http.HttpConnector;
 
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseWriter;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
@@ -25,40 +21,36 @@ import java.util.Map;
 public class MuleResponseWriter implements ContainerResponseWriter
 {
 
-    private ByteArrayOutputStream out;
-    private OutputHandler output;
     private final MuleMessage message;
+
+    private OutputStream outputStream;
+    private boolean headersWritten = false;
 
     public MuleResponseWriter(MuleMessage request)
     {
         super();
         this.message = request;
-        this.out = new ByteArrayOutputStream();
-        this.output = new OutputHandler()
-        {
-
-            public void write(MuleEvent arg0, OutputStream realOut) throws IOException
-            {
-                realOut.write(out.toByteArray());
-                realOut.flush();
-            }
-
-        };
     }
 
+    @Override
     public OutputStream writeStatusAndHeaders(long x, ContainerResponse response) throws IOException
     {
-        Map<String, String> customHeaders = new HashMap<String, String>();
-        for (Map.Entry<String, List<Object>> e : response.getHttpHeaders().entrySet())
+        if (!headersWritten)
         {
-              // TODO: is this correct?
-              message.setOutboundProperty(e.getKey(), getHeaderValue(e.getValue()));
+            Map<String, String> customHeaders = new HashMap<String, String>();
+            for (Map.Entry<String, List<Object>> e : response.getHttpHeaders().entrySet())
+            {
+                // TODO: is this correct?
+                message.setOutboundProperty(e.getKey(), getHeaderValue(e.getValue()));
+            }
+
+            message.setInvocationProperty(JerseyResourcesComponent.JERSEY_RESPONSE, response);
+            message.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, response.getStatus());
+
+            headersWritten = true;
         }
 
-        message.setInvocationProperty(JerseyResourcesComponent.JERSEY_RESPONSE, response);
-        message.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, response.getStatus());
-
-        return out;
+        return outputStream;
     }
 
     private String getHeaderValue(List<Object> values)
@@ -81,12 +73,13 @@ public class MuleResponseWriter implements ContainerResponseWriter
         return sb.toString();
     }
 
+    @Override
     public void finish() throws IOException
     {
     }
 
-    public OutputHandler getResponse()
+    public void setOutputStream(OutputStream outputStream)
     {
-        return output;
+        this.outputStream = outputStream;
     }
 }
