@@ -488,7 +488,35 @@ public class XsltTransformer extends AbstractXmlTransformer
     {
         if (value instanceof String)
         {
-            return muleContext.getExpressionManager().parse(value.toString(), message);
+            String stringValue = (String) value;
+            if (muleContext.getExpressionManager().isExpression(stringValue))
+            {
+                Object expressionResult = muleContext.getExpressionManager().evaluate(stringValue, message);
+                if (expressionResult == null)
+                {
+                    logger.debug(String.format("expression %s resolved to null. Parameter will have a null value", stringValue));
+                }
+                else if (expressionResult instanceof String)
+                {
+                    try
+                    {
+                        XMLUtils.toDocument(expressionResult, muleContext);
+                        return XMLUtils.toXmlSource(getXMLInputFactory(), isUseStaxSource(), expressionResult);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.debug(String.format(
+                                "expression parameter %s does not resolve to a XML structure. Using value as is", stringValue));
+                    }
+                }
+                else
+                {
+                    logger.debug(String.format(
+                            "expression %s resolved to an object of type %s. Using value as is", value, expressionResult.getClass().getName()));
+                }
+
+                return expressionResult;
+            }
         }
 
         return value;
