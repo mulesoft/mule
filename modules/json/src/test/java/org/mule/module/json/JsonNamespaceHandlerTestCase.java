@@ -36,17 +36,17 @@ public class JsonNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testJsonConfig() throws Exception
     {
-        JsonToXml jToX = muleContext.getRegistry().lookupObject("jToX");
+        JsonToXml jToX = (JsonToXml)muleContext.getRegistry().lookupObject("jToX");
         assertNotNull(jToX);
 
-        XmlToJson xToJ = muleContext.getRegistry().lookupObject("xToJ");
+        XmlToJson xToJ = (XmlToJson)muleContext.getRegistry().lookupObject("xToJ");
         assertNotNull(xToJ);
 
-        JsonXsltTransformer jToJ = muleContext.getRegistry().lookupObject("jToJ");
+        JsonXsltTransformer jToJ = (JsonXsltTransformer)muleContext.getRegistry().lookupObject("jToJ");
         assertNotNull(jToJ);
         assertNotNull(jToJ.getXslt());
 
-        JsonSchemaValidationFilter jvf = muleContext.getRegistry().lookupObject("jvf");
+        JsonSchemaValidationFilter jvf = (JsonSchemaValidationFilter)muleContext.getRegistry().lookupObject("jvf");
         assertNotNull(jvf);
         assertNotNull(jvf.getSchemaLocations());
 
@@ -58,20 +58,20 @@ public class JsonNamespaceHandlerTestCase extends FunctionalTestCase
             return;
         }
           
-        IsJsonFilter filter = muleContext.getRegistry().lookupObject("jsonFilter");
+        IsJsonFilter filter = (IsJsonFilter) muleContext.getRegistry().lookupObject("jsonFilter");
         assertNotNull(filter);
         assertTrue(filter.isValidateParsing());
 
-        ObjectToJson serializer = muleContext.getRegistry().lookupObject("fruitCollectionToJson");
+        ObjectToJson serializer = (ObjectToJson) muleContext.getRegistry().lookupObject("fruitCollectionToJson");
         serializer.initialise();
         assertNotNull(serializer);
-        assertEquals(String.class, serializer.getReturnDataType().getType());
+        assertEquals(String.class, serializer.getReturnClass());
         assertEquals(FruitCollection.class, serializer.getSourceClass());
         assertEquals(3, serializer.getSerializationMixins().size());
 
-        JsonToObject deserializer = muleContext.getRegistry().lookupObject("jsonToFruitCollection");
+        JsonToObject deserializer = (JsonToObject) muleContext.getRegistry().lookupObject("jsonToFruitCollection");
         assertNotNull(deserializer);
-        assertEquals(FruitCollection.class, deserializer.getReturnDataType().getType());
+        assertEquals(FruitCollection.class, deserializer.getReturnClass());
         assertEquals(1, deserializer.getDeserializationMixins().size());
 
        //Test roundTrip

@@ -131,10 +131,10 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
             ((TestCompressionTransformer)t).getBeanProperty1());
         assertEquals(12, ((TestCompressionTransformer)t).getBeanProperty2());
 
-        assertEquals(t.getReturnDataType().getType(), java.lang.String.class);
+        assertEquals(t.getReturnClass(), java.lang.String.class);
 
         t = muleContext.getRegistry().lookupTransformer("TestTransformer");
         assertNotNull(t);
-        assertEquals(t.getReturnDataType().getType(), byte[].class);
+        assertEquals(t.getReturnClass(), byte[].class);
     }
 }

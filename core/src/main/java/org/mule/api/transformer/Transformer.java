@@ -26,12 +26,32 @@ public interface Transformer extends MessageProcessor, Initialisable, Disposable
     /**
      * Determines if a particular source class can be handled by this transformer
      *
+     * @param aClass The class to check for compatibility
+     * @return true if the transformer supports this type of class or false
+     *         otherwise
+     * @deprecated use {@link #isSourceDataTypeSupported(org.mule.api.transformer.DataType)} instead
+     */
+    @Deprecated
+    boolean isSourceTypeSupported(Class<?> aClass);
+
+    /**
+     * Determines if a particular source class can be handled by this transformer
+     *
      * @param dataType The DataType to check for compatibility
      * @return true if the transformer supports this type of class or false
      *         otherwise
      * @since 3.0.0
      */
     boolean isSourceDataTypeSupported(DataType<?> dataType);
+
+    /**
+     * Returns an unmodifiable list of Source types registered on this transformer
+     *
+     * @return an unmodifiable list of Source types registered on this transformer
+     * @deprecated use {@link #getSourceDataTypes()} instead
+     */
+    @Deprecated
+    List<Class<?>> getSourceTypes();
 
     /**
      * Returns an unmodifiable list of Source types registered on this transformer
@@ -81,9 +101,34 @@ public interface Transformer extends MessageProcessor, Initialisable, Disposable
     Object transform(Object src, String encoding) throws TransformerException;
 
     /**
-     * Sets the expected return type for the transformed data.
+     * Sets the expected return type for the transformed data. If the transformed
+     * data is not of this class type a <code>TransformerException</code> will be
+     * thrown.
+     *
+     * @param theClass the expected return type class
+     * @deprecated use {@link #setReturnDataType(DataType)} instead
+     */
+    @Deprecated
+    void setReturnClass(Class<?> theClass);
+
+    /**
+     * Specifies the Java type of the result after this transformer has been executed. Mule will use this to validate
+     * the return type but also allow users to perform automatic transformations based on the source type of the object
+     * to transform and this return type.
+     *
+     * @return the excepted return type from this transformer
+     * @deprecated use {@link #getReturnDataType()} instead.
+     */
+    @Deprecated
+    Class<?> getReturnClass();
+
+    /**
+     * Sets the expected return type for the transformed data. If the transformed
+     * data is not of this class type a <code>TransformerException</code> will be
+     * thrown.
      * <p/>
-     * This method allows Generics information to be associated with the return type of the transformer
+     * This method supersedes {@link #getReturnClass()} because it allows Generics information to be associated with the
+     * return type of the transformer
      *
      * @param type the expected return type for this transformer
      * @since 3.0.0
@@ -95,7 +140,8 @@ public interface Transformer extends MessageProcessor, Initialisable, Disposable
      * the return type but also allow users to perform automatic transformations based on the source type of the object
      * to transform and this return type.
      * <p/>
-     * This method allows Generics information to be associated with the return type of the transformer
+     * This method supersedes {@link #getReturnClass()} because it allows Generics information to be associated with the
+     * return type of the transformer
      *
      * @return the excepted return type for this transformer
      * @since 3.0.0

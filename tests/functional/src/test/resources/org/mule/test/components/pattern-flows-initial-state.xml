@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+	<simple-service name="defaultSimpleService" address="test://in.simple.default"
+		component-class="org.mule.component.simple.EchoComponent" />
+	<simple-service name="startedSimpleService" address="test://in.simple.started"
+		initialState="started" component-class="org.mule.component.simple.EchoComponent" />
+	<simple-service name="stoppedSimpleService" address="test://in.simple.stopped"
+		initialState="stopped" component-class="org.mule.component.simple.EchoComponent" />
+
+	<bridge name="defaultBridge" inboundAddress="test://in.bridge.default"
+		outboundAddress="test://out.bridge.default" />
+	<bridge name="startedBridge" inboundAddress="test://in.bridge.started"
+		outboundAddress="test://out.bridge.started" initialState="started" />
+	<bridge name="stoppedBridge" inboundAddress="test://in.bridge.stopped"
+		outboundAddress="test://out.bridge.stopped" initialState="stopped" />
+
+	<validator name="defaultValidator" inboundAddress="test://in.validator.default"
+		outboundAddress="test://out.validator.default" validationFilter-ref="someFilter"
+		ackExpression="#[string:ACK]" nackExpression="#[string:NACK]" />
+	<validator name="startedValidator" initialState="started"
+		inboundAddress="test://in.validator.started" outboundAddress="test://out.validator.started"
+		validationFilter-ref="someFilter" ackExpression="#[string:ACK]"
+		nackExpression="#[string:NACK]" />
+	<validator name="stoppedValidator" initialState="stopped"
+		inboundAddress="test://in.validator.stopped" outboundAddress="test://out.validator.stopped"
+		validationFilter-ref="someFilter" ackExpression="#[string:ACK]"
+		nackExpression="#[string:NACK]" />
+
+	<wildcard-filter name="someFilter" pattern="*" />
+</mule>

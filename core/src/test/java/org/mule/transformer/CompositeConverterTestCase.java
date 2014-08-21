@@ -43,6 +43,16 @@ public class CompositeConverterTestCase
     }
 
     @Test
+    public void isSourceTypeSupported()
+    {
+        Converter converter = mock(Converter.class);
+        when(converter.isSourceTypeSupported(String.class)).thenReturn(true);
+        CompositeConverter chain = new CompositeConverter(converter);
+
+        assertTrue(chain.isSourceTypeSupported(String.class));
+    }
+
+    @Test
     public void isSourceDataTypeSupported()
     {
         Converter converter = mock(Converter.class);
@@ -50,6 +60,17 @@ public class CompositeConverterTestCase
         CompositeConverter chain = new CompositeConverter(converter);
 
         assertTrue(chain.isSourceDataTypeSupported(DataType.STRING_DATA_TYPE));
+    }
+
+    @Test
+    public void getSourceTypes()
+    {
+        Class<?>[] dataTypes = new Class<?>[] {String.class};
+        Converter converter = mock(Converter.class);
+        when(converter.getSourceTypes()).thenReturn(Arrays.asList(dataTypes));
+        CompositeConverter chain = new CompositeConverter(converter);
+
+        assertEquals(String.class, chain.getSourceTypes().get(0));
     }
 
     @Test
@@ -84,6 +105,16 @@ public class CompositeConverterTestCase
     }
 
     @Test
+    public void setReturnClass()
+    {
+        Converter converter = mock(Converter.class);
+        CompositeConverter chain = new CompositeConverter(converter);
+        chain.setReturnClass(String.class);
+
+        verify(converter, atLeastOnce()).setReturnClass(String.class);
+    }
+
+    @Test
     public void setReturnDataType()
     {
         Converter converter = mock(Converter.class);
@@ -91,6 +122,15 @@ public class CompositeConverterTestCase
         chain.setReturnDataType(DataType.STRING_DATA_TYPE);
 
         verify(converter, atLeastOnce()).setReturnDataType(DataType.STRING_DATA_TYPE);
+    }
+
+    @Test
+    public void getReturnClass()
+    {
+        doReturn(String.class).when(mockConverterB).getReturnClass();
+        CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
+
+        assertEquals(String.class, compositeConverter.getReturnClass());
     }
 
     @Test

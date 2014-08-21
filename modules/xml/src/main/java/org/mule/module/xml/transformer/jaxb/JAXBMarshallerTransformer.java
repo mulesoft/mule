@@ -70,32 +70,32 @@ public class JAXBMarshallerTransformer extends AbstractTransformer
         try
         {
             final Marshaller m = jaxbContext.createMarshaller();
-            if (getReturnDataType().equals(DataTypeFactory.STRING))
+            if (getReturnClass().equals(String.class))
             {
                 Writer w = new StringWriter();
                 m.marshal(src, w);
                 return w.toString();
             }
-            else if (getReturnDataType().getType().isAssignableFrom(Writer.class))
+            else if (getReturnClass().isAssignableFrom(Writer.class))
             {
                 Writer w = new StringWriter();
                 m.marshal(src, w);
                 return w;
             }
-            else if (Document.class.isAssignableFrom(getReturnDataType().getType()))
+            else if (Document.class.isAssignableFrom(getReturnClass()))
             {
                 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
                 Document doc = factory.newDocumentBuilder().newDocument();
                 m.marshal(src, doc);
                 return doc;
             }
-            else if (OutputStream.class.isAssignableFrom(getReturnDataType().getType()))
+            else if (OutputStream.class.isAssignableFrom(getReturnClass()))
             {
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 m.marshal(src, out);
                 return out;
             }
-            else if (OutputHandler.class.equals(getReturnDataType().getType()))
+            else if (OutputHandler.class.equals(getReturnClass()))
             {
                 return new OutputHandler()
                 {
@@ -116,7 +116,7 @@ public class JAXBMarshallerTransformer extends AbstractTransformer
             }
             else
             {
-                throw new TransformerException(CoreMessages.transformerInvalidReturnType(getReturnDataType().getType(), getName()));
+                throw new TransformerException(CoreMessages.transformerInvalidReturnType(getReturnClass(), getName()));
             }
 
         }
