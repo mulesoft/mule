@@ -1,11 +1,11 @@
 package org.mule.config.builders
+
 import org.mule.api.config.MuleProperties
 import org.mule.api.config.ThreadingProfile
 import org.mule.api.endpoint.InboundEndpoint
 import org.mule.api.endpoint.OutboundEndpoint
 import org.mule.api.model.Model
 import org.mule.api.service.Service
-import org.mule.api.transformer.DataType
 import org.mule.component.DefaultInterfaceBinding
 import org.mule.component.DefaultJavaComponent
 import org.mule.config.ChainedThreadingProfile
@@ -32,9 +32,11 @@ import org.mule.tck.testmodels.mule.TestEntryPointResolverSet
 import org.mule.tck.testmodels.mule.TestExceptionStrategy
 import org.mule.tck.testmodels.mule.TestResponseAggregator
 import org.mule.tck.testmodels.mule.TestTransactionManagerFactory
+import org.mule.util.store.SimpleMemoryObjectStore
 import org.mule.util.queue.QueueManager
 import org.mule.util.queue.TransactionalQueueManager
 import org.mule.util.store.MuleObjectStoreManager
+
 // Set up defaults / system objects
 QueueManager queueManager = new TransactionalQueueManager();
 muleContext.registry.registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager);
@@ -94,7 +96,7 @@ muleContext.registry.registerConnector(c);
 //Register transformers
 TestCompressionTransformer testCompressionTransformer = new TestCompressionTransformer();
 testCompressionTransformer.name = "TestCompressionTransformer"
-testCompressionTransformer.returnDataType = DataType.STRING_DATA_TYPE
+testCompressionTransformer.returnClass = String.class
 testCompressionTransformer.beanProperty2 = 12
 testCompressionTransformer.containerProperty = "myString"
 muleContext.registry.registerTransformer(testCompressionTransformer);

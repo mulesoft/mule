@@ -80,7 +80,7 @@ public class TransformerPairWireFormat implements WireFormat
         }
         try
         {
-            Class returnClass = outboundTransformer.getReturnDataType().getType();
+            Class returnClass = outboundTransformer.getReturnClass();
             if (returnClass == null)
             {
                 logger.warn("No return class was set on transformer: " + outboundTransformer
