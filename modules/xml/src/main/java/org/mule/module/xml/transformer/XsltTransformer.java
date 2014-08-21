@@ -488,7 +488,28 @@ public class XsltTransformer extends AbstractXmlTransformer
     {
         if (value instanceof String)
         {
-            return muleContext.getExpressionManager().parse(value.toString(), message);
+        	String stringVal = (String)value;
+        	if(stringVal.startsWith("#[") && stringVal.endsWith("]")) {
+        		Object expressionResult = muleContext.getExpressionManager().evaluate(stringVal, message);
+        		// MULE-6501 handle XLST parameters that are XML documents / nodes
+        		Object xmlParameter = null;
+        		// only try and convert if a string looks like XML
+        		if(XMLUtils.mightBeXml(expressionResult))
+        		{
+        			try
+        			{
+        				xmlParameter = XMLUtils.toXmlSource(getXMLInputFactory(), isUseStaxSource(), expressionResult);
+					} catch (Exception e)
+					{
+						logger.debug("Unable to convert to an XML structure", e);
+					}
+        		}
+        		return (xmlParameter != null) ? xmlParameter : expressionResult;
+        	}
+        	else // 
+        	{
+        		return muleContext.getExpressionManager().parse(value.toString(), message);
+        	}
         }
 
         return value;

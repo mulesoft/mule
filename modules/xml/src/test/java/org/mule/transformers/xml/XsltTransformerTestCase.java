@@ -10,6 +10,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.Source;
+import javax.xml.transform.URIResolver;
+
+import org.junit.Test;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
@@ -21,17 +33,6 @@ import org.mule.module.xml.util.XMLTestUtils;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
-
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.URIResolver;
-
-import org.junit.Test;
 
 public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
 {
@@ -251,6 +252,35 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         transformerResult = transformerResult.substring(transformerResult.indexOf("?>") + 2);
 
         assertTrue(transformerResult.indexOf(expectedTransformedxml) > -1);
+    }
+    
+    @Test
+    public void testTransformWithXmlDocParam() throws Exception
+    {
+    	XsltTransformer transformer = new XsltTransformer();
+
+        transformer.setMuleContext(muleContext);
+        transformer.setReturnDataType(DataTypeFactory.STRING);
+        transformer.setMuleContext(muleContext);
+        
+        transformer.setXslFile("with-xml-node-param.xsl");
+        Source body = XMLTestUtils.toSource("simple.xml");
+        Source param = XMLTestUtils.toSource("test.xml");
+        
+        // set parameters
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("SomeXml", "#[header:myparam]");
+        transformer.setContextProperties(params);
+        
+        // init transformer
+        transformer.initialise();
+        
+        MuleMessage message = new DefaultMuleMessage(body, muleContext);
+        message.setOutboundProperty("myparam", param);
+        // do transformation
+        String transformerResult = (String) transformer.transform(message);
+        System.out.println(transformerResult);
+        compareResults("<?xml version=\"1.0\" encoding=\"UTF-8\"?><result><body><just>testing</just></body><fromParam>value element</fromParam></result>", transformerResult);
     }
 
     @Test

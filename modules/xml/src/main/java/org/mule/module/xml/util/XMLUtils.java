@@ -51,6 +51,8 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.DocumentException;
+import org.dom4j.DocumentFactory;
+import org.dom4j.Element;
 import org.dom4j.io.DOMReader;
 import org.dom4j.io.DOMWriter;
 import org.dom4j.io.DocumentSource;
@@ -381,6 +383,11 @@ public class XMLUtils extends org.mule.util.XMLUtils
         {
             return new DocumentSource((org.dom4j.Document) src);
         }
+        else if (src instanceof org.dom4j.Element)
+        {
+        	Element element = (org.dom4j.Element)src;
+        	return new DocumentSource(DocumentFactory.getInstance().createDocument(element.createCopy()));
+        }
         else if (src instanceof org.xml.sax.InputSource)
         {
             return new SAXSource((InputSource) src);
@@ -654,4 +661,49 @@ public class XMLUtils extends org.mule.util.XMLUtils
             return list.iterator();
         }
     }
+
+    /**
+     * Check if an object could be considered XML, either through casting or conversion.
+     * @param src The object to check.
+     * @return Whether the argument cold be converted to XML;
+     */
+	public static boolean mightBeXml(Object src)
+	{
+		if(src instanceof org.w3c.dom.Node)
+		{
+			return true;
+		} else if (src instanceof org.dom4j.Node)
+		{
+			return true;
+		} else if (src instanceof javax.xml.transform.Source)
+		{
+			return true;
+		} else if (src instanceof org.xml.sax.InputSource)
+		{
+			return true;
+		} else if (src instanceof javax.xml.stream.XMLStreamReader)
+		{
+			return true;
+		} else if (src instanceof String)
+		{
+			return ((String)src).contains("</");
+		} else if (src instanceof byte[])
+		{
+			return mightBeXml(new String((byte[])src));
+		}
+		else if (src instanceof InputStream)
+        {
+            return true; // can't tell for sure without reading the input stream
+        }
+        else if (src instanceof DelayedResult) 
+        {
+            return true;
+        }
+        else if (src instanceof OutputHandler) 
+        {
+        	 return true; // can't tell for sure without reading the input stream
+        }
+		
+		return false;
+	}
 }

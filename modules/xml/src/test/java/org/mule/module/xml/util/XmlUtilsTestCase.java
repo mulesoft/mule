@@ -98,4 +98,13 @@ public class XmlUtilsTestCase extends AbstractMuleTestCase
         String actualXml = XMLUtils.toXml(document);
         assertEquals(SIMPLE_XML_CONTENT, actualXml);
     }
+    
+    @Test
+    public void testConvertsToSourceFromDom4jElement() throws Exception
+    {
+    	org.dom4j.Element element = XMLTestUtils.toDom4jDocument(SIMPLE_XML_RESOURCE).getRootElement();
+    	javax.xml.transform.Source source = XMLUtils.toXmlSource(null, false, element);
+    	String actualXml = XMLUtils.toXml(XMLUtils.toW3cDocument(source));
+    	assertEquals(SIMPLE_XML_CONTENT, actualXml);
+    }
 }
