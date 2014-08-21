@@ -70,9 +70,7 @@ public class StringToNumber extends AbstractTransformer implements DiscoverableT
         }
     }
 
-    @SuppressWarnings({"unchecked"})
-    @Override
-    public Class<? extends Number> getReturnClass()
+    private Class<? extends Number> getReturnClass()
     {
         return (Class<Number>) super.getReturnDataType().getType();
     }

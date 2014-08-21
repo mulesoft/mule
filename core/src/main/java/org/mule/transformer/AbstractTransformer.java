@@ -31,7 +31,6 @@ import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -220,13 +219,6 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
         name = string;
     }
 
-    @Deprecated
-    @Override
-    public Class<?> getReturnClass()
-    {
-        return returnType.getType();
-    }
-
     @Override
     public void setReturnDataType(DataType<?> type)
     {
@@ -241,8 +233,6 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
         return returnType;
     }
 
-    @Override
-    @Deprecated
     public void setReturnClass(Class<?> newClass)
     {
         DataType<?> tempReturnType = new SimpleDataType<Object>(newClass);
@@ -297,13 +287,6 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
     public void setAllowNullReturn(boolean allowNullReturn)
     {
         this.allowNullReturn = allowNullReturn;
-    }
-
-    @Deprecated
-    @Override
-    public boolean isSourceTypeSupported(Class<?> aClass)
-    {
-        return isSourceDataTypeSupported(DataTypeFactory.create(aClass), false);
     }
 
     @Override
@@ -519,19 +502,6 @@ public abstract class AbstractTransformer implements Transformer, AnnotatedObjec
             transformerName = transformerName.substring(0, i + 2) + StringUtils.capitalize(target);
         }
         return transformerName;
-    }
-
-    @Deprecated
-    @Override
-    public List<Class<?>> getSourceTypes()
-    {
-        //A work around to support the legacy API
-        List<Class<?>> sourceClasses = new ArrayList<Class<?>>();
-        for (DataType<?> sourceType : sourceTypes)
-        {
-            sourceClasses.add(sourceType.getType());
-        }
-        return Collections.unmodifiableList(sourceClasses);
     }
 
     @Override
