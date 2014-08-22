@@ -6,6 +6,7 @@
  */
 package org.mule.module.xml.util;
 
+import static org.junit.Assert.assertEquals;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.IOUtils;
 
@@ -18,8 +19,6 @@ import javax.xml.transform.Source;
 
 import org.junit.Test;
 import org.xml.sax.InputSource;
-
-import static org.junit.Assert.assertEquals;
 
 public class XmlUtilsTestCase extends AbstractMuleTestCase
 {
