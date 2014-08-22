@@ -22,7 +22,7 @@ public class XsltWithXmlParamsTestCase extends FunctionalTestCase
     private static final String EXPECTED = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><result><body><just>testing</just></body><fromParam>value element</fromParam></result>";
 
     @Override
-    protected String getConfigFile()
+    protected String getConfigResources()
     {
         return "xslt-with-xml-param-config.xml";
     }
