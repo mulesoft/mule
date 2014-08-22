@@ -6,51 +6,103 @@
  */
 package org.mule.module.jersey;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.transport.http.HttpConnector;
 
-import com.sun.jersey.spi.container.ContainerResponse;
-import com.sun.jersey.spi.container.ContainerResponseWriter;
-
-import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-public class MuleResponseWriter implements ContainerResponseWriter
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.HttpHeaders;
+
+import org.glassfish.jersey.server.ContainerResponse;
+import org.glassfish.jersey.server.internal.JerseyRequestTimeoutHandler;
+import org.glassfish.jersey.server.spi.ContainerResponseWriter;
+
+class MuleResponseWriter implements ContainerResponseWriter
 {
 
-    private final MuleMessage message;
+    private ContainerResponse response = null;
 
-    private OutputStream outputStream;
-    private boolean headersWritten = false;
+    private final String requestMethodName;
+    private final MuleEvent muleEvent;
+    private final JerseyRequestTimeoutHandler requestTimeoutHandler;
+    private final DeferredForwardOutputStream outputStream = new DeferredForwardOutputStream();
 
-    public MuleResponseWriter(MuleMessage request)
+    MuleResponseWriter(MuleEvent muleEvent,
+                       String requestMethodName,
+                       ScheduledExecutorService backgroundScheduler)
     {
-        super();
-        this.message = request;
+        this.muleEvent = muleEvent;
+        this.requestMethodName = requestMethodName;
+        this.requestTimeoutHandler = new JerseyRequestTimeoutHandler(this, backgroundScheduler);
     }
 
     @Override
-    public OutputStream writeStatusAndHeaders(long x, ContainerResponse response) throws IOException
+    public OutputStream writeResponseStatusAndHeaders(final long contentLength, final ContainerResponse response)
     {
-        if (!headersWritten)
+        this.response = response;
+
+        if (contentLength >= 0)
         {
-            Map<String, String> customHeaders = new HashMap<String, String>();
-            for (Map.Entry<String, List<Object>> e : response.getHttpHeaders().entrySet())
-            {
-                // TODO: is this correct?
-                message.setOutboundProperty(e.getKey(), getHeaderValue(e.getValue()));
-            }
-
-            message.setInvocationProperty(JerseyResourcesComponent.JERSEY_RESPONSE, response);
-            message.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, response.getStatus());
-
-            headersWritten = true;
+            response.getHeaders().putSingle(HttpHeaders.CONTENT_LENGTH, Long.toString(contentLength));
         }
 
-        return outputStream;
+        MuleMessage muleMessage = muleEvent.getMessage();
+
+        for (Map.Entry<String, List<Object>> e : response.getHeaders().entrySet())
+        {
+            muleMessage.setOutboundProperty(e.getKey(), getHeaderValue(e.getValue()));
+        }
+
+        muleMessage.setInvocationProperty(JerseyResourcesComponent.JERSEY_RESPONSE, response);
+        muleMessage.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, response.getStatus());
+
+        return getOutputStream();
+    }
+
+    @Override
+    public boolean suspend(final long time, final TimeUnit unit, final TimeoutHandler handler)
+    {
+        return requestTimeoutHandler.suspend(time, unit, handler);
+    }
+
+    @Override
+    public void setSuspendTimeout(final long time, final TimeUnit unit)
+    {
+        requestTimeoutHandler.setSuspendTimeout(time, unit);
+    }
+
+    @Override
+    public void commit()
+    {
+        final ContainerResponse current = response;
+        if (current != null)
+        {
+            if (HttpMethod.HEAD.equals(requestMethodName) && current.hasEntity())
+            {
+                // for testing purposes:
+                // need to also strip the object entity as it was stripped when writing to output
+                current.setEntity(null);
+            }
+            requestTimeoutHandler.close();
+        }
+    }
+
+    @Override
+    public void failure(final Throwable error)
+    {
+        requestTimeoutHandler.close();
+    }
+
+    @Override
+    public boolean enableResponseBuffering()
+    {
+        return true;
     }
 
     private String getHeaderValue(List<Object> values)
@@ -68,18 +120,14 @@ public class MuleResponseWriter implements ContainerResponseWriter
                 first = false;
             }
 
-            sb.append(ContainerResponse.getHeaderValue(o));
+            sb.append(o);
         }
+
         return sb.toString();
     }
 
-    @Override
-    public void finish() throws IOException
+    DeferredForwardOutputStream getOutputStream()
     {
-    }
-
-    public void setOutputStream(OutputStream outputStream)
-    {
-        this.outputStream = outputStream;
+        return outputStream;
     }
 }

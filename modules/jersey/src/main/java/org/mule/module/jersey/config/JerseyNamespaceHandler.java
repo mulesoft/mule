@@ -7,6 +7,8 @@
 package org.mule.module.jersey.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
+import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.module.jersey.JerseyResourcesComponent;
@@ -23,6 +25,9 @@ public class JerseyNamespaceHandler extends AbstractMuleNamespaceHandler
         ChildDefinitionParser contextResolverParser = new ChildDefinitionParser("contextResolver",
             null, null, true);
         registerBeanDefinitionParser("context-resolver", contextResolverParser);
+
+        registerBeanDefinitionParser("property", new ChildMapEntryDefinitionParser("properties"));
+        registerBeanDefinitionParser("package", new ChildListEntryDefinitionParser("packages", "packageName"));
 
         ComponentDefinitionParser parser = new ComponentDefinitionParser(JerseyResourcesComponent.class);
         registerBeanDefinitionParser("resources", parser);

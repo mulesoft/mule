@@ -15,29 +15,39 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.component.AbstractComponent;
+import org.mule.module.jersey.exception.FallbackErrorMapper;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
-
-import com.sun.jersey.api.core.DefaultResourceConfig;
-import com.sun.jersey.core.header.InBoundHeaders;
-import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.WebApplication;
-import com.sun.jersey.spi.container.WebApplicationFactory;
+import org.mule.util.ClassUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.Principal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
 
 import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
+
+import org.glassfish.hk2.utilities.Binder;
+import org.glassfish.jersey.internal.MapPropertiesDelegate;
+import org.glassfish.jersey.jackson1.Jackson1Feature;
+import org.glassfish.jersey.server.ApplicationHandler;
+import org.glassfish.jersey.server.ContainerRequest;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.ServerProperties;
+import org.glassfish.jersey.server.ServerRuntime;
+import org.glassfish.jersey.server.spi.ResponseErrorMapper;
 
 /**
  * Wraps a set of components which can get invoked by Jersey. This component will
@@ -46,22 +56,56 @@ import javax.ws.rs.ext.ExceptionMapper;
  */
 public class JerseyResourcesComponent extends AbstractComponent
 {
-    public static String JERSEY_RESPONSE = "jersey_response";
+
+    protected static final String JERSEY_RESPONSE = "jersey_response";
+
+    /**
+     * Default dummy security context.
+     */
+    private static final SecurityContext DEFAULT_SECURITY_CONTEXT = new SecurityContext()
+    {
+
+        @Override
+        public boolean isUserInRole(final String role)
+        {
+            return false;
+        }
+
+        @Override
+        public boolean isSecure()
+        {
+            return false;
+        }
+
+        @Override
+        public Principal getUserPrincipal()
+        {
+            return null;
+        }
+
+        @Override
+        public String getAuthenticationScheme()
+        {
+            return null;
+        }
+    };
 
     private List<JavaComponent> components;
+    private ScheduledExecutorService backgroundScheduler;
+    private List<ExceptionMapper<?>> exceptionMappers = new ArrayList<>();
+    private List<ContextResolver<?>> contextResolvers = new ArrayList<>();
+    private Set<String> packages = new HashSet<>();
+    private Map<String, Object> properties = new HashMap<>();
 
-    private WebApplication application;
-
-    private List<ExceptionMapper<?>> exceptionMappers = new ArrayList<ExceptionMapper<?>>();
-
-    private List<ContextResolver<?>> contextResolvers = new ArrayList<ContextResolver<?>>();
+    private ApplicationHandler application;
+    private ResourceConfig resourceConfig;
 
     @Override
     protected void doInitialise() throws InitialisationException
     {
         super.doInitialise();
 
-        final Set<Class<?>> resources = new HashSet<Class<?>>();
+        final Set<Class<?>> resources = new HashSet<>();
 
         if (components == null)
         {
@@ -72,10 +116,16 @@ public class JerseyResourcesComponent extends AbstractComponent
         initializeOtherResources(exceptionMappers, resources);
         initializeOtherResources(contextResolvers, resources);
 
-        DefaultResourceConfig resourceConfig = createConfiguration(resources);
-
-        application = WebApplicationFactory.createWebApplication();
-        application.initiate(resourceConfig, getComponentProvider());
+        application = createApplication(resources);
+        try
+        {
+            ServerRuntime serverRuntime = ClassUtils.getFieldValue(application, "runtime", false);
+            backgroundScheduler = ClassUtils.getFieldValue(serverRuntime, "backgroundScheduler", false);
+        }
+        catch (Exception e)
+        {
+            throw new InitialisationException(e, this);
+        }
     }
 
     protected void initializeResources(Set<Class<?>> resources) throws InitialisationException
@@ -104,16 +154,99 @@ public class JerseyResourcesComponent extends AbstractComponent
         }
     }
 
-    protected DefaultResourceConfig createConfiguration(final Set<Class<?>> resources)
+    protected ApplicationHandler createApplication(final Set<Class<?>> resources)
     {
-        return new DefaultResourceConfig(resources);
+        if (!properties.containsKey(ServerProperties.PROCESSING_RESPONSE_ERRORS_ENABLED))
+        {
+            properties.put(ServerProperties.PROCESSING_RESPONSE_ERRORS_ENABLED, true);
+        }
+
+        resourceConfig = new ResourceConfig();
+
+        for (String pkg : packages)
+        {
+            resourceConfig.packages(pkg);
+        }
+
+        resourceConfig.addProperties(properties)
+                .registerClasses(resources)
+                .register(Jackson1Feature.class);
+
+        if (!resourceConfig.isRegistered(ResponseErrorMapper.class))
+        {
+            resourceConfig.register(new FallbackErrorMapper());
+        }
+
+        return new ApplicationHandler(resourceConfig, getComponentProvider());
     }
 
     @Override
     protected Object doInvoke(MuleEvent event) throws Exception
     {
-        MuleMessage message = event.getMessage();
+        ContainerRequest req = buildRequest(event);
+        req.setSecurityContext(DEFAULT_SECURITY_CONTEXT);
 
+        MuleMessage message = event.getMessage();
+        req.setEntityStream(getInputStream(message));
+        copyProperties(message, req);
+
+        return execute(req, event);
+    }
+
+    private Object execute(final ContainerRequest request, MuleEvent event)
+    {
+        final MuleResponseWriter writer = new MuleResponseWriter(event, request.getMethod(), backgroundScheduler);
+
+        request.setWriter(writer);
+        application.handle(request);
+
+        return new OutputHandler()
+        {
+            @Override
+            public void write(MuleEvent event, OutputStream out) throws IOException
+            {
+                writer.getOutputStream().setDelegate(out);
+            }
+        };
+    }
+
+    protected void copyProperties(MuleMessage message, ContainerRequest request)
+    {
+        for (Object prop : message.getInboundPropertyNames())
+        {
+            if (prop.equals(HttpConnector.HTTP_COOKIES_PROPERTY))
+            {
+                org.apache.commons.httpclient.Cookie[] apacheCookies = message.getInboundProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
+                for (org.apache.commons.httpclient.Cookie apacheCookie : apacheCookies)
+                {
+                    Cookie cookie = new Cookie(apacheCookie.getName(), apacheCookie.getValue());
+                    request.header(HttpConstants.HEADER_COOKIE, cookie);
+                }
+            }
+            else
+            {
+                Object property = message.getInboundProperty(prop.toString());
+                if (property != null)
+                {
+                    request.header(prop.toString(), property.toString());
+                }
+            }
+        }
+    }
+
+    private InputStream getInputStream(MuleMessage message) throws TransformerException
+    {
+        return message.getPayload(InputStream.class);
+    }
+
+    protected Binder getComponentProvider()
+    {
+        return new MuleComponentBinder(muleContext, components);
+    }
+
+    private ContainerRequest buildRequest(MuleEvent event) throws URISyntaxException
+    {
+        MuleMessage message = event.getMessage();
         String path = message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
         String contextPath = message.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
         String query = null;
@@ -127,27 +260,6 @@ public class JerseyResourcesComponent extends AbstractComponent
         URI endpointUri = event.getMessageSourceURI();
         String host = message.getInboundProperty("Host", endpointUri.getHost());
         String method = message.getInboundProperty(HttpConnector.HTTP_METHOD_PROPERTY);
-        InBoundHeaders headers = new InBoundHeaders();
-        for (Object prop : message.getInboundPropertyNames())
-        {
-            if (prop.equals(HttpConnector.HTTP_COOKIES_PROPERTY))
-            {
-                org.apache.commons.httpclient.Cookie[] apacheCookies = message
-                        .getInboundProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
-                for (org.apache.commons.httpclient.Cookie apacheCookie : apacheCookies)
-                {
-                    Cookie cookie = new Cookie(apacheCookie.getName(), apacheCookie.getValue());
-                    headers.addObject(HttpConstants.HEADER_COOKIE, cookie);
-                }
-            } else
-            {
-                Object property = message.getInboundProperty(prop.toString());
-                if (property != null)
-                {
-                    headers.add(prop.toString(), property.toString());
-                }
-            }
-        }
 
         String scheme;
         if ("servlet".equals(endpointUri.getScheme()))
@@ -159,10 +271,8 @@ public class JerseyResourcesComponent extends AbstractComponent
             scheme = endpointUri.getScheme();
         }
 
-        URI baseUri = getBaseUri(endpointUri, scheme, host, contextPath);
+        URI baseUri = getBaseUri(scheme, host, contextPath);
         URI completeUri = getCompleteUri(endpointUri, scheme, host, path, query);
-        ContainerRequest req = new ContainerRequest(application, method, baseUri, completeUri, headers,
-            getInputStream(message));
 
         if (logger.isDebugEnabled())
         {
@@ -170,39 +280,14 @@ public class JerseyResourcesComponent extends AbstractComponent
             logger.debug("Complete URI: " + completeUri);
         }
 
-        MuleResponseWriter writer = new MuleResponseWriter(message);
-        final MuleContainerResponse res = new MuleContainerResponse(application, req, writer);
-
-        /* This will process the request in the Jersey application, but only the headers will be written
-         * to the response, as we are providing a custom implementation of ContainerResponse. Streaming of the
-         * payload will be executed inside the output handler that is returned. */
-        application.handleRequest(req, res);
-
-        return new OutputHandler()
-        {
-            @Override
-            public void write(MuleEvent event, OutputStream out) throws IOException
-            {
-                res.writeToStream(out);
-            }
-        };
+        return new ContainerRequest(baseUri, completeUri, method, null, new MapPropertiesDelegate());
     }
 
-    protected static InputStream getInputStream(MuleMessage message) throws TransformerException
-    {
-        return message.getPayload(InputStream.class);
-    }
-
-    protected IoCComponentProviderFactory getComponentProvider()
-    {
-        return new MuleComponentProviderFactory(muleContext, components);
-    }
-
-    protected static URI getCompleteUri(URI endpointUri,
-                                        String scheme,
-                                        String host,
-                                        String path,
-                                        String query) throws URISyntaxException
+    private URI getCompleteUri(URI endpointUri,
+                               String scheme,
+                               String host,
+                               String path,
+                               String query) throws URISyntaxException
     {
         String uri = scheme + "://" + host + path;
         if (query != null)
@@ -213,8 +298,7 @@ public class JerseyResourcesComponent extends AbstractComponent
         return new URI(uri);
     }
 
-    protected static URI getBaseUri(URI endpointUri, String scheme, String host, String contextPath)
-        throws URISyntaxException
+    private URI getBaseUri(String scheme, String host, String contextPath) throws URISyntaxException
     {
         if (!contextPath.endsWith("/"))
         {
@@ -236,7 +320,7 @@ public class JerseyResourcesComponent extends AbstractComponent
 
     public void setMessageProcessors(List<MessageProcessor> messageProcessors)
     {
-        List<JavaComponent> javaComponents = new ArrayList<JavaComponent>();
+        List<JavaComponent> javaComponents = new ArrayList<>();
         for (MessageProcessor mp : messageProcessors)
         {
             if (mp instanceof JavaComponent)
@@ -252,6 +336,11 @@ public class JerseyResourcesComponent extends AbstractComponent
         setComponents(javaComponents);
     }
 
+    protected ResourceConfig getResourceConfig()
+    {
+        return resourceConfig;
+    }
+
     public void setExceptionMappers(List<ExceptionMapper<?>> exceptionMappers)
     {
         this.exceptionMappers.addAll(exceptionMappers);
@@ -262,4 +351,13 @@ public class JerseyResourcesComponent extends AbstractComponent
         this.contextResolvers.addAll(contextResolvers);
     }
 
+    public void setPackages(Set<String> packages)
+    {
+        this.packages = packages;
+    }
+
+    public void setProperties(Map<String, Object> properties)
+    {
+        this.properties = properties;
+    }
 }
