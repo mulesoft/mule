@@ -293,6 +293,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/joda-time-1.6.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jsch-0.1.50.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/json-schema-validator-1.2.2.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/json-20140107.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jsp-api-6.0.29.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jsr181-api-1.0-MR1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jsr250-api-1.0.jar
