@@ -52,27 +52,20 @@
             Jersey versions and exclusions are managed via a top-level depencencyManagement.
         -->
         <dependency>
-            <groupId>com.sun.jersey</groupId>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-server</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-json</artifactId>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson1</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-client</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-core-asl</artifactId>
-            <version>${jacksonVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-jaxrs</artifactId>
-            <version>${jacksonVersion}</version>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jettison</artifactId>
         </dependency>
 
         <!-- test dependencies -->
@@ -86,17 +79,6 @@
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!--
-            for using json with natural configuration, we need at least jaxb 2.1.12
-            this is used in the context resolver test case
-        -->
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <version>2.1.12</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

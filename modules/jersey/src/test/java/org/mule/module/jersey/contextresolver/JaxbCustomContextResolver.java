@@ -8,17 +8,18 @@ package org.mule.module.jersey.contextresolver;
 
 import org.mule.module.jersey.HelloBean;
 
-import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.api.json.JSONJAXBContext;
-
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
+import org.glassfish.jersey.jettison.JettisonConfig;
+import org.glassfish.jersey.jettison.JettisonJaxbContext;
+
 @Provider
 public class JaxbCustomContextResolver implements ContextResolver<JAXBContext>
 {
+
     protected JAXBContext context;
 
     @Override
@@ -30,7 +31,7 @@ public class JaxbCustomContextResolver implements ContextResolver<JAXBContext>
             {
                 try
                 {
-                    context = new JSONJAXBContext(JSONConfiguration.natural().build(), type);
+                    context = new JettisonJaxbContext(JettisonConfig.DEFAULT, type);
                 }
                 catch (JAXBException e)
                 {
