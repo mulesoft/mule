@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-       xmlns:multicast="http://www.mulesoft.org/schema/mule/multicast"
-       xmlns:test="http://www.mulesoft.org/schema/mule/test"
-       xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:multicast="http://www.mulesoft.org/schema/mule/multicast"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
@@ -15,41 +15,22 @@
     <!-- 224.0.0.1 is all systems on this subnet -->
     <multicast:endpoint host="224.0.0.1" port="60131" name="serverEndpoint" exchange-pattern="one-way"/>
 
-    <model name="main">
-        <service name="Component1">
-            <inbound>
-                <inbound-endpoint ref="serverEndpoint"/>
-            </inbound>
-            <test:component appendString="#[context:serviceName]"/>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint address="vm://foo" exchange-pattern="one-way"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="Component1">
+        <inbound-endpoint ref="serverEndpoint"/>
+        <test:component appendString="#[context:serviceName]"/>
+        <outbound-endpoint address="vm://foo" exchange-pattern="one-way"/>
+    </flow>
 
-        <service name="Component2">
-            <inbound>
-                <inbound-endpoint ref="serverEndpoint"/>
-            </inbound>
-            <test:component appendString="#[context:serviceName]"/>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint address="vm://foo" exchange-pattern="one-way"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="Component2">
+        <inbound-endpoint ref="serverEndpoint"/>
+        <test:component appendString="#[context:serviceName]"/>
+        <outbound-endpoint address="vm://foo" exchange-pattern="one-way"/>
+    </flow>
 
-        <service name="Component3">
-            <inbound>
-                <inbound-endpoint ref="serverEndpoint"/>
-            </inbound>
-            <test:component appendString="#[context:serviceName]"/>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint address="vm://foo" exchange-pattern="one-way"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
+    <flow name="Component3">
+        <inbound-endpoint ref="serverEndpoint"/>
+        <test:component appendString="#[context:serviceName]"/>
+        <outbound-endpoint address="vm://foo" exchange-pattern="one-way"/>
+    </flow>
+
 </mule>
