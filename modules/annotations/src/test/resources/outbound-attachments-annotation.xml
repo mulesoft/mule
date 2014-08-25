@@ -10,32 +10,26 @@
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <model name="main">
-        <service name="attachments1">
-            <inbound>
-                <inbound-endpoint address="vm://attachment?method=processAttachments" exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.OutboundAttachmentsAnnotationComponent"/>
-        </service>
+    <flow name="attachments1">
+        <inbound-endpoint address="vm://attachment?method=processAttachments" exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.OutboundAttachmentsAnnotationComponent"/>
+    </flow>
 
-        <service name="attachments2">
-            <inbound>
-                <inbound-endpoint address="vm://attachment2?method=processAttachments" exchange-pattern="request-response">
-                    <scripting:transformer>
-                        <scripting:script engine="groovy">
-                            message.addAttachment("foo", new javax.activation.DataHandler(new org.mule.util.StringDataSource("changeme")));
-                        </scripting:script>
-                    </scripting:transformer>
-                </inbound-endpoint>
-            </inbound>
-            <component class="org.mule.api.annotations.param.OutboundAttachmentsAnnotationComponent"/>
-        </service>
+    <flow name="attachments2">
+        <inbound-endpoint address="vm://attachment2?method=processAttachments" exchange-pattern="request-response">
+            <scripting:transformer>
+                <scripting:script engine="groovy">
+                    message.addAttachment("foo", new javax.activation.DataHandler(new
+                    org.mule.util.StringDataSource("changeme")));
+                </scripting:script>
+            </scripting:transformer>
+        </inbound-endpoint>
+        <component class="org.mule.api.annotations.param.OutboundAttachmentsAnnotationComponent"/>
+    </flow>
 
-        <service name="attachments3">
-            <inbound>
-                <inbound-endpoint address="vm://invalid?method=invalidParamType" exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.OutboundAttachmentsAnnotationComponent"/>
-        </service>
-    </model>
+    <flow name="attachments3">
+        <inbound-endpoint address="vm://invalid?method=invalidParamType" exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.OutboundAttachmentsAnnotationComponent"/>
+    </flow>
+
 </mule>
