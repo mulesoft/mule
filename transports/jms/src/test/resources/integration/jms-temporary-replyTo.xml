@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans"
-    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-    xmlns:test="http://www.mulesoft.org/schema/mule/test"
-    xsi:schemaLocation="
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
@@ -13,74 +13,45 @@
     <vm:connector name="vmConnector"/>
 
     <endpoint name="replyTo" address="${inbound.destination}" connector-ref="jmsConnector2"
-        exchange-pattern="one-way"/>
-    
-    <model name="Model">
+              exchange-pattern="one-way"/>
 
-        <service name="JMSService1Sync">
-            <inbound>
-                <vm:inbound-endpoint path="in1Sync" exchange-pattern="request-response"/>
-            </inbound>
-            <echo-component/>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint address="${outbound.destination}" exchange-pattern="request-response" 
-                        connector-ref="jmsConnector1" />
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="JMSService1Sync">
+        <vm:inbound-endpoint path="in1Sync" exchange-pattern="request-response"/>
+        <echo-component/>
+        <outbound-endpoint address="${outbound.destination}" exchange-pattern="request-response"
+                           connector-ref="jmsConnector1"/>
+    </flow>
 
-        <service name="JMSService2Sync">
-            <inbound>
-                <vm:inbound-endpoint path="in2Sync" exchange-pattern="request-response"/>
-            </inbound>
-            <echo-component/>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector1" 
-                        exchange-pattern="request-response">
-                        <property key="disableTemporaryReplyToDestinations" value="true"/>
-                    </outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="JMSService2Sync">
+        <vm:inbound-endpoint path="in2Sync" exchange-pattern="request-response"/>
+        <echo-component/>
+        <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector1"
+                           exchange-pattern="request-response">
+            <property key="disableTemporaryReplyToDestinations" value="true"/>
+        </outbound-endpoint>
+    </flow>
 
-        <service name="JMSService3">
-            <inbound>
-                <vm:inbound-endpoint path="in3" exchange-pattern="request-response"/>
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector2"
-                        exchange-pattern="one-way"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="JMSService3">
+        <vm:inbound-endpoint path="in3" exchange-pattern="request-response"/>
+        <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector2"
+                           exchange-pattern="one-way"/>
+    </flow>
 
+    <flow name="JMSService4">
+        <vm:inbound-endpoint path="in4" exchange-pattern="request-response"/>
+        <test:component logMessageDetails="true"/>
+        <request-reply timeout="5001">
+            <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector2"
+                               exchange-pattern="one-way"/>
+            <inbound-endpoint address="${inbound.destination}" connector-ref="jmsConnector2"
+                              exchange-pattern="one-way"/>
+        </request-reply>
+    </flow>
 
-        <service name="JMSService4">
-            <inbound>
-                <vm:inbound-endpoint path="in4" exchange-pattern="request-response"/>
-            </inbound>
-            <test:component logMessageDetails="true"/>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector2"
-                        exchange-pattern="one-way"/>
-                    <reply-to ref="replyTo"/>
-                </pass-through-router>
-            </outbound>
-            <async-reply timeout="5001">
-                <inbound-endpoint address="${inbound.destination}" connector-ref="jmsConnector2"
-                    exchange-pattern="one-way"/>
-            </async-reply>
-        </service>
+    <flow name="TestService1">
+        <inbound-endpoint address="${outbound.destination}" exchange-pattern="request-response"
+                          connector-ref="jmsConnector1"/>
+        <test:component appendString=" #[context:serviceName]" logMessageDetails="true"/>
+    </flow>
 
-        <service name="TestService1">
-            <inbound>
-                <inbound-endpoint address="${outbound.destination}" exchange-pattern="request-response" connector-ref="jmsConnector1"/>
-            </inbound>
-            <test:component appendString=" #[context:serviceName]" logMessageDetails="true"/>
-        </service>
-    </model>
 </mule>

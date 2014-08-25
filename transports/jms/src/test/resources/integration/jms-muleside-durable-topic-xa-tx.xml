@@ -20,69 +20,50 @@
     <vm:endpoint name="in" path="in" connector-ref="vm" exchange-pattern="one-way"/>
     <vm:endpoint name="out" path="out" connector-ref="vm" exchange-pattern="one-way"/>
 
-    <endpoint name="broadcast" address="${broadcast.topic.destination}" 
-        connector-ref="jmsConnectorTestDriver" exchange-pattern="one-way"/>
-    <endpoint name="broadcast1" address="${broadcast.topic.destination}" 
-        connector-ref="jmsConnectorC1" exchange-pattern="one-way"/>
-    <endpoint name="broadcast2" address="${broadcast.topic.destination}" 
-        connector-ref="jmsConnectorC2" exchange-pattern="one-way"/>
+    <endpoint name="broadcast" address="${broadcast.topic.destination}"
+              connector-ref="jmsConnectorTestDriver" exchange-pattern="one-way"/>
+    <endpoint name="broadcast1" address="${broadcast.topic.destination}"
+              connector-ref="jmsConnectorC1" exchange-pattern="one-way"/>
+    <endpoint name="broadcast2" address="${broadcast.topic.destination}"
+              connector-ref="jmsConnectorC2" exchange-pattern="one-way"/>
 
     <model name="TEST">
-        <service name="InputPart">
-            <inbound>
-                <inbound-endpoint ref="in"/>
-            </inbound>
-            <test:component>
-                <test:return-data>OUTPUT MESSAGE</test:return-data>
-            </test:component>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="broadcast">
-                        <xa-transaction action="BEGIN_OR_JOIN"/> 
-                    </outbound-endpoint>
-                    <!--
-                        There's no inbound TX, so make sure XA is happy by starting it via router
-                        on the outbound. Such problems are now nicely detected and reported via an error.
-                    -->
-                    <xa-transaction action="BEGIN_OR_JOIN"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+        <inbound-endpoint ref="in"/>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <outbound-endpoint ref="broadcast">
+            <xa-transaction action="BEGIN_OR_JOIN"/>
+        </outbound-endpoint>
+        <!--
+            There's no inbound TX, so make sure XA is happy by starting it via router
+            on the outbound. Such problems are now nicely detected and reported via an error.
+        -->
+        <!--<xa-transaction action="BEGIN_OR_JOIN"/>-->
+    </flow>
 
-        <service name="Part1">
-            <inbound>
-                <inbound-endpoint ref="broadcast1">
-                    <xa-transaction action="BEGIN_OR_JOIN"/>
-                </inbound-endpoint>
-            </inbound>
-            <test:component>
-                <test:return-data>OUTPUT MESSAGE</test:return-data>
-            </test:component>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="out">
-                        <xa-transaction action="NONE"/>
-                    </outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="Part1">
+        <inbound-endpoint ref="broadcast1">
+            <xa-transaction action="BEGIN_OR_JOIN"/>
+        </inbound-endpoint>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <outbound-endpoint ref="out">
+            <xa-transaction action="NONE"/>
+        </outbound-endpoint>
+    </flow>
 
-        <service name="Part3">
-            <inbound>
-                <inbound-endpoint ref="broadcast2">
-                    <xa-transaction action="BEGIN_OR_JOIN"/>
-                </inbound-endpoint>
-            </inbound>
-            <test:component>
-                <test:return-data>OUTPUT MESSAGE</test:return-data>
-            </test:component>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="out">
-                        <xa-transaction action="NONE"/>
-                    </outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
+    <flow name="Part3">
+        <inbound-endpoint ref="broadcast2">
+            <xa-transaction action="BEGIN_OR_JOIN"/>
+        </inbound-endpoint>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <outbound-endpoint ref="out">
+            <xa-transaction action="NONE"/>
+        </outbound-endpoint>
+    </flow>
+
 </mule>
