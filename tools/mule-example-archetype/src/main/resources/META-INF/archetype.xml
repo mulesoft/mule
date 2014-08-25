@@ -96,9 +96,9 @@
             </output>
         </template>
         <template>
-            <file>src/test/resources/log4j.properties</file>
+            <file>src/test/resources/log4j2-test.xml</file>
             <output>
-                src/test/resources/log4j.properties
+                src/test/resources/log4j2-test.xml
             </output>
         </template>
     </templates>

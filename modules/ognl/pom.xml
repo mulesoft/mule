@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.modules</groupId>
+        <artifactId>mule-modules</artifactId>
+        <version>3.6.0-M2-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-module-ognl</artifactId>
+    <packaging>jar</packaging>
+    <name>OGNL Filter</name>
+    <description>Support for filtering events using OGNL notation.</description>
+
+    <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-spring-config</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ognl</groupId>
+            <artifactId>ognl</artifactId>
+            <version>${ognlVersion}</version>
+        </dependency>
+         <dependency>
+            <groupId>jboss</groupId>
+            <artifactId>javassist</artifactId>
+            <version>${javassistVersion}</version>
+        </dependency>
+
+        <!-- Unit tests -->
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

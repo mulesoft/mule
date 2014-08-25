@@ -20,6 +20,13 @@
         <db:in-param name="position" defaultValue="1"/>
     </db:template-query>
 
+    <db:template-query name="testFileQueryAndEmptyContent">
+        <db:parameterized-query file="integration/template/template-query.sql">
+
+        </db:parameterized-query>
+        <db:in-param name="position" defaultValue="1"/>
+    </db:template-query>
+
     <db:template-query name="testDynamicQuery">
         <db:dynamic-query>SELECT * FROM PLANET WHERE POSITION = #[position]</db:dynamic-query>
     </db:template-query>

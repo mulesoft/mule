@@ -8,6 +8,7 @@ package org.mule.module.launcher;
 
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import org.mule.api.config.MuleProperties;
 import org.mule.module.launcher.coreextension.MuleCoreExtensionManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -24,9 +25,9 @@ public class MuleContainerTestCase extends AbstractMuleTestCase
 {
 
     // Required to run the test, otherwise we need to configure a fake mule
-    // folder with a conf/log4j.properties
+    // folder with a conf/log4j2.xml
     @Rule
-    public SystemProperty simpleLog = new SystemProperty("mule.simpleLog", "true");
+    public SystemProperty simpleLog = new SystemProperty(MuleProperties.MULE_SIMPLE_LOG, "true");
 
     private MuleContainer container;
 

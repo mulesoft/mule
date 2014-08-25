@@ -66,6 +66,10 @@ public class ExceptionStrategyCommonScenariosTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort6 = new DynamicPort("port6");
 
+
+    @Rule
+    public DynamicPort dynamicPort7 = new DynamicPort("port7");
+
     @Override
     protected String getConfigFile()
     {

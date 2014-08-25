@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.examples</groupId>
         <artifactId>mule-example-loanbroker-parent</artifactId>
- <version>4.0-SNAPSHOT</version>
+        <version>4.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-example-loanbroker-credit-agency</artifactId>
     <packaging>ejb</packaging>

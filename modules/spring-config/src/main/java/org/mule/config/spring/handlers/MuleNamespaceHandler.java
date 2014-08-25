@@ -35,6 +35,7 @@ import org.mule.config.spring.factories.SubflowMessageProcessorChainFactoryBean;
 import org.mule.config.spring.factories.TransactionalMessageProcessorsFactoryBean;
 import org.mule.config.spring.factories.WatermarkFactoryBean;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.config.spring.parsers.DeprecatedBeanDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
@@ -196,6 +197,9 @@ import org.springframework.beans.factory.xml.BeanDefinitionParser;
  */
 public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 {
+
+    public static final String PATTERNS_DEPRECATION_MESSAGE = "Patterns module is deprecated and will be removed in Mule 4.0.";
+
     @Override
     public void init()
     {
@@ -223,7 +227,9 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("on-redelivery-attempts-exceeded", new ChildDefinitionParser("redeliveryExceeded", RedeliveryExceeded.class));
         registerBeanDefinitionParser("choice-exception-strategy", new ExceptionStrategyDefinitionParser(ChoiceMessagingExceptionStrategy.class));
         registerMuleBeanDefinitionParser("exception-strategy", new ReferenceExceptionStrategyDefinitionParser());
-        registerDeprecatedBeanDefinitionParser("default-service-exception-strategy", new ChildDefinitionParser("exceptionListener", DefaultMessagingExceptionStrategy.class), "Use default-exception-strategy instead.");
+        registerDeprecatedBeanDefinitionParser("default-service-exception-strategy",
+                                               new ChildDefinitionParser("exceptionListener", DefaultMessagingExceptionStrategy.class),
+                                               "Use default-exception-strategy instead");
         registerBeanDefinitionParser("custom-exception-strategy", new ExceptionStrategyDefinitionParser(null));
         registerBeanDefinitionParser("commit-transaction", new ExceptionTXFilterDefinitionParser("commitTxFilter"));
         registerBeanDefinitionParser("rollback-transaction", new ExceptionTXFilterDefinitionParser("rollbackTxFilter"));
@@ -402,7 +408,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 
         // Flow Constructs
         registerBeanDefinitionParser("flow", new FlowDefinitionParser());
-
         registerBeanDefinitionParser("flow-ref", new FlowRefDefinitionParser());
         
         // Processing Strategies

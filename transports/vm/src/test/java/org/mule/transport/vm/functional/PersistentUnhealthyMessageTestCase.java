@@ -17,7 +17,6 @@ import org.mule.util.queue.DualRandomAccessFileQueueStoreDelegate;
 
 import java.io.File;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class PersistentUnhealthyMessageTestCase extends FunctionalTestCase
@@ -35,7 +34,7 @@ public class PersistentUnhealthyMessageTestCase extends FunctionalTestCase
     @Test
     public void testUnhealthyMessageIgnored() throws Exception
     {
-        File firstQueueFile = DualRandomAccessFileQueueStoreDelegate.getFirstQueueFile(OUTPUT_QUEUE_NAME, getWorkingDirectory().getAbsolutePath());
+        File firstQueueFile = DualRandomAccessFileQueueStoreDelegate.getFirstQueueFileForTesting(OUTPUT_QUEUE_NAME, getWorkingDirectory().getAbsolutePath());
         FileUtils.createFile(firstQueueFile.getAbsolutePath());
 
         muleContext.start();

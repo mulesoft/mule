@@ -120,6 +120,7 @@
         <skipExportTests>true</skipExportTests>
 
         <!-- Properties that can be used to enable/disable parts of the build via cmd line or profiles -->
+        <skipFunctionalTests>true</skipFunctionalTests>
         <skipIntegrationTests>false</skipIntegrationTests>
         <skipSystemTests>true</skipSystemTests>
         <skipPerformanceTests>true</skipPerformanceTests>
@@ -135,7 +136,7 @@
         <coberturaVersion>2.5</coberturaVersion>
         <eclipsePluginVersion>2.5.1</eclipsePluginVersion>
         <gmavenPluginVersion>1.4</gmavenPluginVersion>
-        <javadocPluginVersion>2.8</javadocPluginVersion>
+        <javadocPluginVersion>2.9.1</javadocPluginVersion>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
 
         <!--
@@ -206,21 +207,22 @@
         <jschVersion>0.1.50</jschVersion>
         <jsr181Version>1.0-MR1</jsr181Version>
         <jsr250AnnotationVerson>1.0</jsr250AnnotationVerson>
-        <log4jVersion>1.2.16</log4jVersion>
+        <log4jVersion>2.0</log4jVersion>
+        <disruptorVersion>3.2.1</disruptorVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <!-- TODO EE-1395 -->
         <mqSeriesVersion>6.0</mqSeriesVersion>
-        <muleMvelVersion>2.1.9-MULE-004</muleMvelVersion>
+        <muleMvelVersion>2.1.9-MULE-005</muleMvelVersion>
         <mx4jVersion>2.1.1</mx4jVersion>
         <oroVersion>2.0.8</oroVersion>
         <quartzVersion>1.8.5</quartzVersion>
         <saajVersion>1.3</saajVersion>
         <saxonVersion>9.1.0.8</saxonVersion>
-        <slf4jVersion>1.6.1</slf4jVersion>
+        <slf4jVersion>1.7.7</slf4jVersion>
         <smackVersion>3.1.0</smackVersion>
         <springOsgiVersion>1.0.2</springOsgiVersion>
         <!-- see http://www.springsource.com/security/cve-2010-1622 -->
-        <springVersion>3.2.1.RELEASE</springVersion>
+        <springVersion>3.2.10.RELEASE</springVersion>
         <springSecurityVersion>3.1.0.RELEASE</springSecurityVersion>
         <sshCoreVersion>0.6.0</sshCoreVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
@@ -229,7 +231,7 @@
         <tomcatVersion>6.0.29</tomcatVersion>
         <woodstoxVersion>4.1.4</woodstoxVersion>
         <wrapperVersion>3.2.3</wrapperVersion>
-        <xalanVersion>2.7.1</xalanVersion>
+        <xalanVersion>2.7.2</xalanVersion>
         <xmlPullVersion>1.1.3.4.O</xmlPullVersion>
         <xmlSecurityVersion>1.5.3</xmlSecurityVersion>
         <xstreamVersion>1.4.2</xstreamVersion>
@@ -628,26 +630,44 @@
                 <artifactId>jython</artifactId>
                 <version>2.2.1</version>
             </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>jcl-over-slf4j</artifactId>
-                <version>${slf4jVersion}</version>
-            </dependency>
+
+            <!--Logging-->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4jVersion}</version>
             </dependency>
             <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4jVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
                 <version>${log4jVersion}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4jVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j-impl</artifactId>
+                <version>${log4jVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-1.2-api</artifactId>
+                <version>${log4jVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-jcl</artifactId>
+                <version>${log4jVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+                <version>${slf4jVersion}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-all</artifactId>
@@ -1345,6 +1365,12 @@
                 <version>${commonsDbcpVersion}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.lmax</groupId>
+                <artifactId>disruptor</artifactId>
+                <version>${disruptorVersion}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -1413,7 +1439,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.9.1</version>
+                    <version>${javadocPluginVersion}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1504,6 +1530,9 @@
                             <!-- exclude inner classes -->
                             <exclude>**/*$*</exclude>
                         </excludes>
+                        <excludedAnnotations>
+                            <excludedAnnotation>org.mule.tck.size.LargeTest</excludedAnnotation>
+                        </excludedAnnotations>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -1799,7 +1828,7 @@
                                     <link>http://jakarta.apache.org/commons/io/api-1.2/</link>
                                     <link>http://jakarta.apache.org/commons/lang/api-2.1/</link>
                                     <link>http://jakarta.apache.org/commons/pool/apidocs/</link>
-                                    <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
+                                    <link>http://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
                                     <link>http://www.slf4j.org/api/</link>
                                     <link>http://junit.sourceforge.net/javadoc/</link>
                                 </links>
@@ -1931,6 +1960,7 @@
                 </plugins>
              </build>
             <properties>
+                <skipFunctionalTests>false</skipFunctionalTests>
                 <skipIntegrationTests>true</skipIntegrationTests>
                 <skipDistributions>true</skipDistributions>
                 <skipVerifications>true</skipVerifications>
@@ -1980,17 +2010,9 @@
                 <defaultGoal>deploy</defaultGoal>
                 <plugins>
                     <plugin>
-                        <inherited>false</inherited>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <executions>
-                            <execution>
-                                <id>aggregated-javadocs</id>
-                                <phase>install</phase>
-                                <goals>
-                                    <goal>javadoc</goal>
-                                </goals>
-                            </execution>
                             <execution>
                                 <id>attach-javadocs</id>
                                 <goals>

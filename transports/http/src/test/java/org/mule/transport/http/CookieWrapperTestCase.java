@@ -6,6 +6,12 @@
  */
 package org.mule.transport.http;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -23,13 +29,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @SmallTest
 public class CookieWrapperTestCase extends AbstractMuleTestCase
@@ -126,7 +125,7 @@ public class CookieWrapperTestCase extends AbstractMuleTestCase
         Cookie cookie = cookieWrapper.createCookie();
         Date expiryDate = cookie.getExpiryDate();
 
-        SimpleDateFormat formatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US);
+        SimpleDateFormat formatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);
         formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         assertNotNull("Sun, 15 Dec 2013 16:00:00 GMT", formatter.format(expiryDate));
