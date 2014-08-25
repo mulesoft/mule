@@ -13,13 +13,12 @@ import static org.junit.Assert.assertThat;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
+import org.mule.module.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
 import java.util.Map;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
@@ -57,8 +56,8 @@ public class StoredProcedureMultipleParamsTestCase extends AbstractDbIntegration
         // there is a fake updateCount=0 that is returned. Check how this works in other DB vendors.
         //assertThat(payload.size(), equalTo(2));
         // Compares string in to avoid problems when different DB return different integer classes (BigDecimal, integer, etc)
-        assertThat("12", CoreMatchers.equalTo(payload.get("result").toString()));
-        //assertThat((Integer) payload.get("updateCount1"), equalTo(0));
+        assertThat(payload.get("result1").toString(), equalTo("12"));
+        assertThat(payload.get("result2").toString(), equalTo("60"));
     }
 
     @Test

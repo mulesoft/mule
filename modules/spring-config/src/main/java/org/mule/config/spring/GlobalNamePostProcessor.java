@@ -17,7 +17,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 public class GlobalNamePostProcessor implements BeanPostProcessor
 {
 
-    private static final String INNER_BEAN_PLACEHOLDER = "(inner bean)";
+    private static final String INNER_BEAN_PLACEHOLDER_PREFIX = "(inner bean)";
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException
@@ -28,7 +28,7 @@ public class GlobalNamePostProcessor implements BeanPostProcessor
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException
     {
-        if (bean instanceof GlobalNameableObject && !INNER_BEAN_PLACEHOLDER.equals(beanName))
+        if (bean instanceof GlobalNameableObject && beanName!=null && !beanName.startsWith(INNER_BEAN_PLACEHOLDER_PREFIX))
         {
             ((GlobalNameableObject) bean).setGlobalName(beanName);
         }

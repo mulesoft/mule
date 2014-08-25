@@ -199,11 +199,6 @@
             <artifactId>mule-module-launcher</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-logging</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <!-- Include all Mule Patterns -->
         <dependency>
@@ -242,7 +237,7 @@
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
-            <version>2.7.1</version>
+            <version>${xalanVersion}</version>
             <exclusions>
                 <exclusion>
                     <groupId>xalan</groupId>

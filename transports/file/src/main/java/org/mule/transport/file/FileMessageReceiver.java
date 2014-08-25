@@ -700,7 +700,10 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         {
             if (file.isDirectory())
             {
-                basicListFiles(file, discoveredFiles);
+                if (fileConnector.isRecursive())
+                {
+                    basicListFiles(file, discoveredFiles);
+                }
             }
             else
             {

@@ -112,9 +112,9 @@ extending a transport you should add it here:
 Which Mule modules do you want to include in this project? The client is added
 for testing:
 
-(options: annotations, atom, boot, builders, client, cxf, guice,
-          jaas, jbossts, jersey, json, management, ognl, pgp, rss, scripting,
-          spring-extras, spring-security, sxc, xml):
+(options: annotations, atom, boot, builders, client, cxf,
+          jaas, jbossts, jersey, json, management, pgp, rss, scripting,
+          spring-extras, spring-security, xml):
 
                     </description>
                     <defvalue>client</defvalue>

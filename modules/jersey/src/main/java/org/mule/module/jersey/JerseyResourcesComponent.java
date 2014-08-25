@@ -13,18 +13,21 @@ import org.mule.api.component.JavaComponent;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.OutputHandler;
 import org.mule.component.AbstractComponent;
 import org.mule.transport.http.HttpConnector;
+import org.mule.transport.http.HttpConstants;
 
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.WebApplicationFactory;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -32,6 +35,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
 
@@ -126,10 +130,22 @@ public class JerseyResourcesComponent extends AbstractComponent
         InBoundHeaders headers = new InBoundHeaders();
         for (Object prop : message.getInboundPropertyNames())
         {
-            Object property = message.getInboundProperty(prop.toString());
-            if (property != null)
+            if (prop.equals(HttpConnector.HTTP_COOKIES_PROPERTY))
             {
-                headers.add(prop.toString(), property.toString());
+                org.apache.commons.httpclient.Cookie[] apacheCookies = message
+                        .getInboundProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
+                for (org.apache.commons.httpclient.Cookie apacheCookie : apacheCookies)
+                {
+                    Cookie cookie = new Cookie(apacheCookie.getName(), apacheCookie.getValue());
+                    headers.addObject(HttpConstants.HEADER_COOKIE, cookie);
+                }
+            } else
+            {
+                Object property = message.getInboundProperty(prop.toString());
+                if (property != null)
+                {
+                    headers.add(prop.toString(), property.toString());
+                }
             }
         }
 
@@ -147,6 +163,7 @@ public class JerseyResourcesComponent extends AbstractComponent
         URI completeUri = getCompleteUri(endpointUri, scheme, host, path, query);
         ContainerRequest req = new ContainerRequest(application, method, baseUri, completeUri, headers,
             getInputStream(message));
+
         if (logger.isDebugEnabled())
         {
             logger.debug("Base URI: " + baseUri);
@@ -154,11 +171,21 @@ public class JerseyResourcesComponent extends AbstractComponent
         }
 
         MuleResponseWriter writer = new MuleResponseWriter(message);
-        ContainerResponse res = new ContainerResponse(application, req, writer);
+        final MuleContainerResponse res = new MuleContainerResponse(application, req, writer);
 
+        /* This will process the request in the Jersey application, but only the headers will be written
+         * to the response, as we are providing a custom implementation of ContainerResponse. Streaming of the
+         * payload will be executed inside the output handler that is returned. */
         application.handleRequest(req, res);
 
-        return writer.getResponse();
+        return new OutputHandler()
+        {
+            @Override
+            public void write(MuleEvent event, OutputStream out) throws IOException
+            {
+                res.writeToStream(out);
+            }
+        };
     }
 
     protected static InputStream getInputStream(MuleMessage message) throws TransformerException

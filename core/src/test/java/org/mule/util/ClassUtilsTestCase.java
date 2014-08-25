@@ -6,6 +6,15 @@
  */
 package org.mule.util;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.AbstractFruit;
@@ -25,14 +34,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 @SmallTest
 public class ClassUtilsTestCase extends AbstractMuleTestCase
@@ -161,7 +162,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
     @Test
     public void testLoadingResources() throws Exception
     {
-        URL resource = ClassUtils.getResource("log4j.properties", getClass());
+        URL resource = ClassUtils.getResource("log4j2-test.xml", getClass());
         assertNotNull(resource);
 
         resource = ClassUtils.getResource("does-not-exist.properties", getClass());
@@ -171,7 +172,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
     @Test
     public void testLoadingResourceEnumeration() throws Exception
     {
-        Enumeration enumeration = ClassUtils.getResources("log4j.properties", getClass());
+        Enumeration enumeration = ClassUtils.getResources("log4j2-test.xml", getClass());
         assertNotNull(enumeration);
         assertTrue(enumeration.hasMoreElements());
 
@@ -277,6 +278,80 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         assertFalse(ClassUtils.compare(c2, c1, true));
     }
 
+    @Test
+    public void getFieldValue() throws Exception
+    {
+        final int hash = hashCode();
+        HashBlob blob = new HashBlob(hash);
+        assertThat(hash, equalTo(ClassUtils.getFieldValue(blob, "hash", false)));
+    }
+
+    @Test(expected = NoSuchFieldException.class)
+    public void getUnexistentFieldValue() throws Exception
+    {
+        ClassUtils.getFieldValue(new HashBlob(0), "fake", false);
+    }
+
+    @Test
+    public void getFieldValueRecursive() throws Exception
+    {
+        final int hash = hashCode();
+        HashBlob blob = new ExtendedHashBlob(hash);
+
+        assertThat(hash, equalTo(ClassUtils.getFieldValue(blob, "hash", true)));
+    }
+
+    @Test(expected = NoSuchFieldException.class)
+    public void getUnexistentFieldValueRecursive() throws Exception
+    {
+        ClassUtils.getFieldValue(new ExtendedHashBlob(1), "fake", true);
+    }
+
+    @Test(expected = NoSuchFieldException.class)
+    public void getInheritedFieldValueWithoutRecurse() throws Exception
+    {
+        ClassUtils.getFieldValue(new ExtendedHashBlob(1), "hash", false);
+    }
+
+    @Test
+    public void setFieldValue() throws Exception
+    {
+        HashBlob blob = new HashBlob(0);
+        final int hash = hashCode();
+
+        ClassUtils.setFieldValue(blob, "hash", hash, false);
+
+        assertThat(hash, equalTo(blob.getHash()));
+    }
+
+    @Test(expected = NoSuchFieldException.class)
+    public void setUnexistentFieldValue() throws Exception
+    {
+        ClassUtils.setFieldValue(new HashBlob(0), "fake", 0, false);
+    }
+
+    @Test
+    public void setFieldValueRecursive() throws Exception
+    {
+        HashBlob blob = new ExtendedHashBlob(0);
+        final int hash = hashCode();
+
+        ClassUtils.setFieldValue(blob, "hash", hash, true);
+        assertThat(hash, equalTo(blob.getHash()));
+    }
+
+    @Test(expected = NoSuchFieldException.class)
+    public void setUnexistentFieldValueRecursive() throws Exception
+    {
+        ClassUtils.setFieldValue(new ExtendedHashBlob(1), "fake", 0, true);
+    }
+
+    @Test(expected = NoSuchFieldException.class)
+    public void setInheritedFieldValueWithoutRecurse() throws Exception
+    {
+        ClassUtils.setFieldValue(new ExtendedHashBlob(1), "hash", 0, false);
+    }
+
     private void simpleNameHelper(String target, Class clazz)
     {
         assertEquals(target, ClassUtils.getSimpleName(clazz));
@@ -305,6 +380,11 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
             this.hash = hash;
         }
 
+        private int getHash()
+        {
+            return hash;
+        }
+
         public int hashCode()
         {
             return hash;
@@ -318,7 +398,15 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
             }
             return hash == ((HashBlob) other).hash;
         }
+    }
 
+    private static class ExtendedHashBlob extends HashBlob
+    {
+
+        public ExtendedHashBlob(int hash)
+        {
+            super(hash);
+        }
     }
 
 }

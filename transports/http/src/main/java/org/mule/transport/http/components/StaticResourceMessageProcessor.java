@@ -112,6 +112,10 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
         {
             throw new ResourceNotFoundException(HttpMessages.fileNotFound(resourceBase + path),event);
         }
+        finally
+        {
+            IOUtils.closeQuietly(in);
+        }
 
         return resultEvent;
     }

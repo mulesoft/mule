@@ -6,12 +6,6 @@
  */
 package org.mule.transport.servlet.jetty;
 
-import org.mule.module.logging.MuleLoggerFactory;
-import org.mule.util.StringMessageUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jetty.util.log.Logger;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.impl.StaticLoggerBinder;
@@ -29,20 +23,7 @@ public class JettyLogger implements Logger
     protected void initLogger()
     {
         ILoggerFactory loggerFactory = StaticLoggerBinder.getSingleton().getLoggerFactory();
-        String message = null;
-        if ((loggerFactory instanceof MuleLoggerFactory) == false)
-        {
-            List<String> messages = new ArrayList<String>();
-            messages.add("Mule's StaticLoggerBinder should be installed but isn't.");
-            messages.add("Logger factory in place is: " + loggerFactory.getClass().getName());
-            message = StringMessageUtils.getBoilerPlate(messages, '!', 70);
-        }
-
         logger = loggerFactory.getLogger("org.eclipse.jetty");
-        if (message != null)
-        {
-            logger.warn(message);
-        }
     }
 
     @Override

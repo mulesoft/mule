@@ -28,6 +28,4 @@ public interface MuleDefinitionParser extends BeanDefinitionParser, MuleDefiniti
     AbstractBeanDefinition muleParse(Element element, ParserContext parserContext);
 
     String getBeanName(Element element);
-
-    void setDeprecationWarning(String deprecationWarning);
 }

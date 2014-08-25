@@ -11,9 +11,10 @@ import org.mule.util.FileUtils;
 
 import java.io.EOFException;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -33,16 +34,44 @@ class RandomAccessFileQueueStore
     private static final byte NOT_REMOVED = 0;
     private static final byte REMOVED = 1;
 
-    private final File file;
+    private File file;
     private RandomAccessFile queueFile;
     private LinkedList<Long> orderedKeys = new LinkedList<Long>();
     private long fileTotalSpace = 0;
 
-    public RandomAccessFileQueueStore(File file)
+    public RandomAccessFileQueueStore(File directory, String filename)
     {
-        this.file = file;
-        createQueueFile();
+        this.file = new File(directory, filename);
+        try
+        {
+            createQueueFile();
+        }
+        catch(IOException e)
+        {
+            this.file = new File(directory, toHex(filename));
+            try
+            {
+                createQueueFile();
+            }
+            catch (IOException e2)
+            {
+                throw new MuleRuntimeException(e2);
+            }
+        }
         initialise();
+    }
+
+    private static String toHex(String filename)
+    {
+        try
+        {
+            return new BigInteger(filename.getBytes("UTF-8")).toString(16);
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            // This should never happen
+            return filename;
+        }
     }
 
     /**
@@ -120,15 +149,15 @@ class RandomAccessFileQueueStore
         try
         {
             queueFile.close();
+            orderedKeys.clear();
+            fileTotalSpace = 0;
+            FileUtils.deleteQuietly(file);
+            createQueueFile();
         }
         catch (IOException e)
         {
-            throw new RuntimeException(e);
+            throw new MuleRuntimeException(e);
         }
-        orderedKeys.clear();
-        fileTotalSpace = 0;
-        FileUtils.deleteQuietly(file);
-        createQueueFile();
     }
 
     /**
@@ -259,27 +288,13 @@ class RandomAccessFileQueueStore
         return data;
     }
 
-    private void createQueueFile()
+    private void createQueueFile() throws IOException
     {
-        try
+        if (!file.exists())
         {
-            if (!file.exists())
-            {
-                try
-                {
-                    file.createNewFile();
-                }
-                catch (IOException e)
-                {
-                    throw new MuleRuntimeException(e);
-                }
-            }
-            queueFile = new RandomAccessFile(file, "rw");
+            file.createNewFile();
         }
-        catch (FileNotFoundException e)
-        {
-            throw new MuleRuntimeException(e);
-        }
+        queueFile = new RandomAccessFile(file, "rw");
     }
 
     private long writeData(byte[] data)

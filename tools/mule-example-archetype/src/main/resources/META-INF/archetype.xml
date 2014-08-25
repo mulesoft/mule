@@ -32,12 +32,12 @@
             <name>modules</name>
             <description>Which Mule modules do you want to include in this project?
 
-(options: annotations, atom, boot, builders, client, cxf, doc, guice,
-          jaas, jbossts, jersey, json, management, ognl, pgp, rss, scripting,
-          spring-extras, spring-security, sxc, xml):
+(options: annotations, atom, boot, builders, client, cxf, doc,
+          jaas, jbossts, jersey, json, management, pgp, rss, scripting,
+          spring-extras, spring-security, xml):
 
             </description>
-            <defvalue>client,cxf,management,scripting,sxc,xml</defvalue>
+            <defvalue>client,cxf,management,scripting,xml</defvalue>
         </variable>
     </variables>
 
@@ -96,9 +96,9 @@
             </output>
         </template>
         <template>
-            <file>src/test/resources/log4j.properties</file>
+            <file>src/test/resources/log4j2-test.xml</file>
             <output>
-                src/test/resources/log4j.properties
+                src/test/resources/log4j2-test.xml
             </output>
         </template>
     </templates>

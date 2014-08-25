@@ -67,7 +67,7 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
 
     private byte[] loadEncryptedMessage() throws IOException
     {
-        URL url = Thread.currentThread().getContextClassLoader().getResource("./encrypted-signed.asc");
+        URL url = Thread.currentThread().getContextClassLoader().getResource("./encrypted-compressed-signed.asc");
 
         FileInputStream in = new FileInputStream(url.getFile());
         byte[] msg = IOUtils.toByteArray(in);

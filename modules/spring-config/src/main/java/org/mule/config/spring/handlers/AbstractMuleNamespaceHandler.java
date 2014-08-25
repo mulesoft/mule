@@ -10,6 +10,7 @@ import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
+import org.mule.config.spring.parsers.DeprecatedBeanDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
 import org.mule.config.spring.parsers.PostProcessor;
@@ -268,20 +269,6 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
         }
     }
 
-    /**
-     * Subclasses can call this to register the supplied {@link BeanDefinitionParser} to
-     * handle the specified element. The element name is the local (non-namespace qualified)
-     * name.
-     */
-    protected void registerDeprecatedBeanDefinitionParser(String elementName, BeanDefinitionParser parser, String deprecationWarning)
-    {
-        if (parser instanceof MuleDefinitionParserConfiguration)
-        {
-            ((MuleDefinitionParser) parser).setDeprecationWarning(deprecationWarning);
-        }
-        registerBeanDefinitionParser(elementName, parser);
-    }
-
     static class AnnotationsBeanDefintionParser extends AbstractChildDefinitionParser
     {
         AnnotationsBeanDefintionParser()
@@ -373,5 +360,12 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
             }
         }
         return basicConnector;
+    }
+
+    protected void registerDeprecatedBeanDefinitionParser(String elementName, BeanDefinitionParser parser, String message)
+    {
+        registerBeanDefinitionParser(elementName, new DeprecatedBeanDefinitionParser(
+                parser,
+                String.format("Schema warning: Use of element <%s> is deprecated.  %s.", elementName, message)));
     }
 }

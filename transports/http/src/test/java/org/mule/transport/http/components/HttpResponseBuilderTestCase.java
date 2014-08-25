@@ -6,6 +6,13 @@
  */
 package org.mule.transport.http.components;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -39,14 +46,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @SmallTest
 public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
@@ -85,7 +84,6 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
         mockExpressionManager = mock(ExpressionManager.class);
         when(muleContext.getExpressionManager()).thenReturn(mockExpressionManager);
     }
-
 
     @Test
     public void testEmptyHttpResponseBuilder() throws Exception
@@ -441,7 +439,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
         HttpResponse httpResponse = new HttpResponse();
         httpResponseBuilder.setHeaders(httpResponse, mockMuleMessage);
 
-        SimpleDateFormat httpDateFormatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US);
+        SimpleDateFormat httpDateFormatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);
         httpDateFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         validateHeader(httpResponse.getHeaders(), HttpConstants.HEADER_EXPIRES, httpDateFormatter.format(now));

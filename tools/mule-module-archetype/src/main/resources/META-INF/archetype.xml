@@ -38,8 +38,8 @@
                     <name>modules</name>
                     <description>Which Mule modules do you want to include in this module?
 
-(options: builders, client, doc, jaas, jbossts, management, ognl, pgp, scripting,
-spring-extras, sxc, xml):
+(options: builders, client, doc, jaas, jbossts, management, pgp, scripting,
+spring-extras, xml):
 
                     </description>
                     <defvalue>client</defvalue>
