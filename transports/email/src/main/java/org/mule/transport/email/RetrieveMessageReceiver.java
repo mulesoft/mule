@@ -324,6 +324,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
     public void poll()
     {
         boolean done = false;
+        int offset = 1;
         while (!done)
         {
             synchronized (folderLock)
@@ -353,17 +354,22 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                     int batchSize = getBatchSize(count);
                     if (count > 0)
                     {
-                        Message[] messages = folder.getMessages(1, batchSize);
+                        int limit = Math.min(count, offset + batchSize - 1);
+                        Message[] messages = folder.getMessages(offset, limit);
                         MessageCountEvent event = new MessageCountEvent(folder, MessageCountEvent.ADDED, true,
                             messages);
                         messagesAdded(event);
+                        if (!castConnector().isDeleteReadMessages())
+                        {
+                            offset += batchSize;
+                        }
                     }
                     else if (count == -1)
                     {
                         throw new MessagingException("Cannot monitor folder: " + folder.getFullName()
                             + " as folder is closed");
                     }
-                    done = batchSize >= count;
+                    done = (offset >= count) || (batchSize >= count);
                 }
                 catch (MessagingException e)
                 {
