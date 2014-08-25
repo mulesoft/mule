@@ -8,28 +8,18 @@ package org.mule.config.spring.factories;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
-import org.mule.ResponseOutputStream;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.ThreadSafeAccess;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transport.PropertyScope;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -37,7 +27,6 @@ import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Answers;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationContext;
 
@@ -45,9 +34,7 @@ import org.springframework.context.ApplicationContext;
 public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase
 {
 
-    private DefaultMuleEvent result = mock(DefaultMuleEvent.class, RETURNS_DEEP_STUBS.get());
-    private DefaultMuleEvent resultCopy = mock(DefaultMuleEvent.class, RETURNS_DEEP_STUBS.get());
-    private DefaultMuleEvent event = createMuleEvent();
+    private MuleEvent result = mock(MuleEvent.class);
     private ProcessableFlowConstruct targetFlow = mock(ProcessableFlowConstruct.class);
     private InitializableMessageProcessor targetSubFlow = mock(InitializableMessageProcessor.class);
     private ApplicationContext applicationContext = mock(ApplicationContext.class);
@@ -61,9 +48,6 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase
         when(expressionManager.isExpression(Mockito.anyString())).thenReturn(true);
         when(targetFlow.process(Mockito.any(MuleEvent.class))).thenReturn(result);
         when(targetSubFlow.process(Mockito.any(MuleEvent.class))).thenReturn(result);
-        when(result.getOutputStream()).thenReturn(Mockito.mock(ResponseOutputStream.class));
-        when(result.getMessage()).thenReturn(mock(DefaultMuleMessage.class, withSettings().extraInterfaces(ThreadSafeAccess.class).defaultAnswer(Answers.RETURNS_DEEP_STUBS.get())));
-        when(result.newThreadCopy()).thenReturn(resultCopy);
     }
 
     @Test
@@ -82,7 +66,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase
         assertNotSame(targetFlow, flowRefFactoryBean.getObject());
         assertNotSame(targetFlow, flowRefFactoryBean.getObject());
 
-        flowRefFactoryBean.getObject().process(event);
+        Assert.assertSame(result, flowRefFactoryBean.getObject().process(mock(MuleEvent.class)));
 
         Mockito.verify(applicationContext, Mockito.times(1)).getBean(Mockito.anyString());
 
@@ -113,8 +97,8 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase
         Assert.assertNotSame(targetFlow, flowRefFactoryBean.getObject());
         Assert.assertNotSame(targetFlow, flowRefFactoryBean.getObject());
 
-        flowRefFactoryBean.getObject().process(event);
-        flowRefFactoryBean.getObject().process(event);
+        Assert.assertSame(result, flowRefFactoryBean.getObject().process(mock(MuleEvent.class)));
+        Assert.assertSame(result, flowRefFactoryBean.getObject().process(mock(MuleEvent.class)));
 
         Mockito.verify(applicationContext, Mockito.times(1)).getBean(Mockito.anyString());
 
@@ -210,15 +194,6 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase
         flowRefFactoryBean.setMuleContext(muleContext);
         flowRefFactoryBean.initialise();
         flowRefFactoryBean.getObject().process(mock(MuleEvent.class));
-    }
-
-    private DefaultMuleEvent createMuleEvent()
-    {
-        MuleMessage mockMessage = mock(DefaultMuleMessage.class, withSettings().extraInterfaces(ThreadSafeAccess.class).defaultAnswer(Answers.RETURNS_DEEP_STUBS.get()));
-        when(((ThreadSafeAccess) mockMessage).newThreadCopy()).thenReturn(mock(DefaultMuleMessage.class));
-        when(mockMessage.getProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY, PropertyScope.INBOUND, false)).thenReturn(false);
-        when(mockMessage.getOutboundProperty(MuleProperties.MULE_CREDENTIALS_PROPERTY)).thenReturn(null);
-        return new DefaultMuleEvent(mockMessage, mock(MessageExchangePattern.class, Answers.RETURNS_DEEP_STUBS.get()), mock(FlowConstruct.class, Answers.RETURNS_DEEP_STUBS.get()));
     }
 
     interface InitializableMessageProcessor extends MessageProcessor, Initialisable, Disposable
