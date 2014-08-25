@@ -7,7 +7,6 @@
 package org.mule.transport.http.reliability;
 
 import static org.junit.Assert.assertEquals;
-
 import org.mule.transport.http.HttpConstants;
 
 import org.apache.commons.httpclient.HttpMethodBase;
@@ -18,12 +17,13 @@ import org.junit.Test;
  * Verify that no inbound messages are lost when exceptions occur.
  * The message must either make it all the way to the SEDA queue (in the case of
  * an asynchronous inbound endpoint), or be restored/rolled back at the source.
- * 
+ * <p/>
  * In the case of the HTTP transport, there is no way to restore the source message
  * so an exception is simply returned to the client.
  */
 public class InboundMessageLossAsynchTestCase extends InboundMessageLossTestCase
 {
+
     @Override
     protected String getConfigFile()
     {
@@ -45,7 +45,8 @@ public class InboundMessageLossAsynchTestCase extends InboundMessageLossTestCase
     {
         HttpMethodBase request = createRequest(getBaseUri() + "/handledTransformerException");
         int status = httpClient.executeMethod(request);
-        assertEquals(HttpConstants.SC_OK, status);    }
+        assertEquals(HttpConstants.SC_OK, status);
+    }
 
     @Test
     @Override
@@ -57,6 +58,25 @@ public class InboundMessageLossAsynchTestCase extends InboundMessageLossTestCase
         // perspective, the message has been delivered successfully.
         assertEquals(HttpConstants.SC_OK, status);
     }
+
+    @Test
+    @Override
+    public void testTransformerException() throws Exception
+    {
+        HttpMethodBase request = createRequest(getBaseUri() + "/transformerException");
+        int status = httpClient.executeMethod(request);
+        assertEquals(HttpConstants.SC_OK, status);
+    }
+
+    @Test
+    @Override
+    public void testRouterException() throws Exception
+    {
+        HttpMethodBase request = createRequest(getBaseUri() + "/routerException");
+        int status = httpClient.executeMethod(request);
+        assertEquals(HttpConstants.SC_OK, status);
+    }
+
 
     @Override
     protected HttpMethodBase createRequest(String uri)

@@ -16,20 +16,12 @@
 
     <http:connector name="httpConnector" enableCookies="true"/>
 
-    <http:endpoint name="clientEndpoint" address="http://localhost:${port1}" exchange-pattern="request-response" />
+    <http:endpoint name="clientEndpoint" address="http://localhost:${port1}" exchange-pattern="request-response"/>
     <http:endpoint name="serverEndpoint" address="http://localhost:${port2}" exchange-pattern="request-response"/>
 
-    <model name="main">
-        <service name="HttpProxyService">
-            <inbound>
-                <inbound-endpoint ref="clientEndpoint"/>
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="serverEndpoint">
-                    </outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
+    <flow name="HttpProxyService">
+        <inbound-endpoint ref="clientEndpoint"/>
+        <outbound-endpoint ref="serverEndpoint"/>
+    </flow>
+
 </mule>

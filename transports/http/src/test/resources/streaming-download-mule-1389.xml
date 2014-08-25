@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <model name="main">
-        <service name="testComponent">
-            <inbound>
-                <inbound-endpoint address="http://localhost:${port1}" exchange-pattern="one-way" name="inTestComponent"/>
-            </inbound>
-            <component class="org.mule.transport.tcp.issues.InputStreamSource"/>
-        </service>
-    </model>
+    <flow name="testComponent">
+        <inbound-endpoint address="http://localhost:${port1}" exchange-pattern="one-way" name="inTestComponent"/>
+        <component class="org.mule.transport.tcp.issues.InputStreamSource"/>
+    </flow>
+
 </mule>
