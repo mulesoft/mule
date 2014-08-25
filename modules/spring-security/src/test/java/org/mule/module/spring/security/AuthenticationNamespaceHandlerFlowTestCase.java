@@ -15,7 +15,7 @@ import org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilte
 
 import org.junit.Test;
 
-public class AuthenticationNamespaceHandlerFlowTestCase extends AuthenticationNamespaceHandlerServiceTestCase
+public class AuthenticationNamespaceHandlerFlowTestCase extends AuthenticationNamespaceHandlerTestCase
 {
     @Override
     protected String getConfigFile()
@@ -23,7 +23,6 @@ public class AuthenticationNamespaceHandlerFlowTestCase extends AuthenticationNa
         return "authentication-config-flow.xml";
     }
  
-    @Override
     @Test
     public void testEndpointConfiguration()
     {
