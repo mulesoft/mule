@@ -8,12 +8,10 @@ package org.mule.config.spring;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.config.MuleProperties;
 import org.mule.api.processor.ProcessingStrategy;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.QueueStore;
-import org.mule.config.QueueProfile;
 import org.mule.construct.Flow;
 import org.mule.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.model.seda.SedaService;
@@ -36,43 +34,43 @@ public class QueueStoreConfigurationTestCase extends FunctionalTestCase
     @Test
     public void testServiceDefaults()
     {
-        SedaService service = lookupService("serviceDefault");
-        QueueProfile queueProfile = service.getQueueProfile();
-        assertEquals(0, queueProfile.getMaxOutstandingMessages());
-        assertObjectStoreIsDefaultMemoryObjectStore(queueProfile.getObjectStore());
+        Flow service = lookupFlow("serviceDefault");
+        QueuedAsynchronousProcessingStrategy ps = (QueuedAsynchronousProcessingStrategy) service.getProcessingStrategy();
+        assertEquals(0, ps.getMaxQueueSize().intValue());
+        assertObjectStoreIsDefaultMemoryObjectStore(ps.getQueueStore());
     }
     
     @Test
     public void testServiceOnlyNumberOfOutstandingMessagesConfigured()
     {
-        SedaService service = lookupService("serviceNoObjectStore");
-        QueueProfile queueProfile = service.getQueueProfile();
-        assertEquals(42, queueProfile.getMaxOutstandingMessages());
-        assertObjectStoreIsDefaultMemoryObjectStore(queueProfile.getObjectStore());
+        Flow service = lookupFlow("serviceNoObjectStore");
+        QueuedAsynchronousProcessingStrategy ps = (QueuedAsynchronousProcessingStrategy) service.getProcessingStrategy();
+        assertEquals(42, ps.getMaxQueueSize().intValue());
+        assertObjectStoreIsDefaultMemoryObjectStore(ps.getQueueStore());
     }
     
     @Test
     public void testServiceExplicitDefaultMemoryObjectStoreConfigured()
     {
-        SedaService service = lookupService("serviceExplicitDefaultMemoryObjectStore");
-        QueueProfile queueProfile = service.getQueueProfile();
-        assertObjectStoreIsDefaultMemoryObjectStore(queueProfile.getObjectStore());
+        Flow service = lookupFlow("serviceExplicitDefaultMemoryObjectStore");
+        QueuedAsynchronousProcessingStrategy ps = (QueuedAsynchronousProcessingStrategy) service.getProcessingStrategy();
+        assertObjectStoreIsDefaultMemoryObjectStore(ps.getQueueStore());
     }
     
     @Test
     public void testServiceExplicitDefaultPersistentObjectStoreConfigured()
     {
-        SedaService service = lookupService("serviceExplicitDefaultPersistentObjectStore");
-        QueueProfile queueProfile = service.getQueueProfile();
-        assertObjectStoreIsDefaultPersistentObjectStore(queueProfile.getObjectStore());
+        Flow service = lookupFlow("serviceExplicitDefaultPersistentObjectStore");
+        QueuedAsynchronousProcessingStrategy ps = (QueuedAsynchronousProcessingStrategy) service.getProcessingStrategy();
+        assertObjectStoreIsDefaultPersistentObjectStore(ps.getQueueStore());
     }
 
     @Test
     public void testServiceExplicitObjectStoreConfigured()
     {
-        SedaService service = lookupService("serviceExplicitObjectStore");
-        QueueProfile queueProfile = service.getQueueProfile();
-        assertTrue(queueProfile.getObjectStore() instanceof TestQueueStore);
+        Flow service = lookupFlow("serviceExplicitObjectStore");
+        QueuedAsynchronousProcessingStrategy ps = (QueuedAsynchronousProcessingStrategy) service.getProcessingStrategy();
+        assertTrue(ps.getQueueStore() instanceof TestQueueStore);
     }
 
     @Test
