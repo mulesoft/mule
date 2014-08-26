@@ -20,9 +20,4 @@ public class SingleServerLockProvider implements LockProvider
         return new ReentrantLock(true);
     }
 
-    @Override
-    public void destroyLock(Lock lock)
-    {
-        //Nothing to do.
-    }
 }
