@@ -324,6 +324,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
     public void poll()
     {
         boolean done = false;
+        int offset = 1;
         while (!done)
         {
             synchronized (folderLock)
@@ -349,21 +350,31 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                         }
                     }
 
+                    //total messages in folder
                     int count = folder.getMessageCount();
+                    //amount that can be processed
                     int batchSize = getBatchSize(count);
                     if (count > 0)
                     {
-                        Message[] messages = folder.getMessages(1, batchSize);
+                        //retrieve batchSize messages at most, considering the offset that might be present
+                        int limit = Math.min(count, offset + batchSize - 1);
+                        Message[] messages = folder.getMessages(offset, limit);
                         MessageCountEvent event = new MessageCountEvent(folder, MessageCountEvent.ADDED, true,
                             messages);
                         messagesAdded(event);
+                        if (!castConnector().isDeleteReadMessages())
+                        {
+                            //if the processed messages are not deleted, move the offset forward to not consider them next
+                            offset += batchSize;
+                        }
                     }
                     else if (count == -1)
                     {
                         throw new MessagingException("Cannot monitor folder: " + folder.getFullName()
                             + " as folder is closed");
                     }
-                    done = batchSize >= count;
+                    //stop if the total or current processed messages exceed the total amount
+                    done = (offset >= count) || (batchSize >= count);
                 }
                 catch (MessagingException e)
                 {
