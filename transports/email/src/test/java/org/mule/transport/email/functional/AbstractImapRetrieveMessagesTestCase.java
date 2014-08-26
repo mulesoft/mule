@@ -32,6 +32,8 @@ public class AbstractImapRetrieveMessagesTestCase extends AbstractEmailFunctiona
 {
 
     private static final int NUMBER_OF_MESSAGES = 10;
+    public static final int POLL_DELAY_MILLIS = 1000;
+    public static final int TIMEOUT_MILLIS = 10000;
     private FlowExecutionListener flowExecutionListener;
     protected static Set<Object> retrievedMessages;
 
@@ -54,7 +56,7 @@ public class AbstractImapRetrieveMessagesTestCase extends AbstractEmailFunctiona
 
         flowExecutionListener.waitUntilFlowIsComplete();
 
-        Prober prober = new PollingProber(10000, 1000);
+        Prober prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
         prober.check(new Probe()
         {
             @Override
