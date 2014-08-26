@@ -9,12 +9,10 @@ package org.mule.management;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.management.stats.ApplicationStatistics;
 import org.mule.management.stats.FlowConstructStatistics;
-import org.mule.management.stats.ServiceStatistics;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Iterator;
@@ -35,15 +33,13 @@ public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
         super.doSetUp();
 
         MuleClient muleClient = muleContext.getClient();
-        muleClient.dispatch("vm://in", "Hello world", null);
+
+        muleClient.dispatch("vm://in", "Flow data", null);
         MuleMessage response = muleClient.request("vm://out", RECEIVE_TIMEOUT * 2);
         assertNotNull(response);
-        assertEquals("data", response.getPayloadAsString());
-
-        muleClient.dispatch("vm://inflow", "Flow data", null);
-        response = muleClient.request("vm://outflow", RECEIVE_TIMEOUT * 2);
-        muleClient.dispatch("vm://inflow", "Flow data", null);
-        response = muleClient.request("vm://outflow", RECEIVE_TIMEOUT * 2);
+        assertEquals("Flow data", response.getPayloadAsString());
+        muleClient.dispatch("vm://in", "Flow data", null);
+        response = muleClient.request("vm://out", RECEIVE_TIMEOUT * 2);
         assertNotNull(response);
         assertEquals("Flow data", response.getPayloadAsString());
     }
@@ -51,72 +47,54 @@ public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
     @Override
     protected void doTearDown() throws Exception
     {
-        getServiceStatistics().clear();
+        getFlowConstructStatistics().clear();
         super.doTearDown();
     }
 
     @Test
     public void testCorrectAverageQueueSize() throws Exception
     {
-        ServiceStatistics stats = getServiceStatistics();
+        FlowConstructStatistics stats = getFlowConstructStatistics();
         assertEquals(1, stats.getAverageQueueSize());
     }
 
     @Test
     public void testCorrectAsynchEventsReceived() throws Exception
     {
-        ServiceStatistics stats = getServiceStatistics();
-        assertEquals(1, stats.getAsyncEventsReceived());
         FlowConstructStatistics fstats = getFlowConstructStatistics();
         assertEquals(2, fstats.getAsyncEventsReceived());
         ApplicationStatistics astats = getApplicationStatistics();
-        assertEquals(3, astats.getAsyncEventsReceived());
+        assertEquals(2, astats.getAsyncEventsReceived());
     }
 
-    @Test
-    public void testCorrectMaxQueueSize() throws Exception
-    {
-        ServiceStatistics stats = getServiceStatistics();
-        assertEquals(1, stats.getMaxQueueSize());
-    }
-
-    @Test
-    public void testCorrectAsynchEventsSent() throws Exception
-    {
-        ServiceStatistics stats = getServiceStatistics();
-        assertEquals(1, stats.getAsyncEventsSent());
-    }
-
-    @Test
-    public void testCorrectTotalEventsSent() throws Exception
-    {
-        ServiceStatistics stats = getServiceStatistics();
-        assertEquals(1, stats.getTotalEventsSent());
-    }
+    //@Test
+    //public void testCorrectMaxQueueSize() throws Exception
+    //{
+    //    FlowConstructStatistics stats = getFlowConstructStatistics();
+    //    assertEquals(1, stats.getMaxQueueSize());
+    //}
+    //
+    //@Test
+    //public void testCorrectAsynchEventsSent() throws Exception
+    //{
+    //    FlowConstructStatistics stats = getFlowConstructStatistics();
+    //    assertEquals(1, stats.getAsyncEventsSent());
+    //}
+    //
+    //@Test
+    //public void testCorrectTotalEventsSent() throws Exception
+    //{
+    //    FlowConstructStatistics stats = getFlowConstructStatistics();
+    //    assertEquals(1, stats.getTotalEventsSent());
+    //}
 
     @Test
     public void testCorrectTotalEventsReceived() throws Exception
     {
-        ServiceStatistics stats = getServiceStatistics();
-        assertEquals(1, stats.getTotalEventsReceived());
-        FlowConstructStatistics fstats = getFlowConstructStatistics();
-        assertEquals(2, fstats.getTotalEventsReceived());
+        FlowConstructStatistics stats = getFlowConstructStatistics();
+        assertEquals(2, stats.getTotalEventsReceived());
         ApplicationStatistics astats = getApplicationStatistics();
-        assertEquals(3, astats.getTotalEventsReceived());
-    }
-
-    private ServiceStatistics getServiceStatistics()
-    {
-        Iterator<FlowConstructStatistics> iterator = muleContext.getStatistics().getServiceStatistics().iterator();
-        FlowConstructStatistics stat1;
-        do
-        {
-            assertTrue(iterator.hasNext());
-            stat1 = iterator.next();
-        }
-        while (!(stat1 instanceof ServiceStatistics));
-        return (ServiceStatistics)stat1;
-
+        assertEquals(2, astats.getTotalEventsReceived());
     }
 
     private FlowConstructStatistics getFlowConstructStatistics()

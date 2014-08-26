@@ -37,6 +37,7 @@ import org.mule.processor.AbstractFilteringMessageProcessor;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
+import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.source.ClusterizableMessageSourceWrapper;
 import org.mule.util.NotificationUtils;
@@ -187,6 +188,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     public void setProcessingStrategy(ProcessingStrategy processingStrategy)
     {
         this.processingStrategy = processingStrategy;
+        if (processingStrategy instanceof QueuedAsynchronousProcessingStrategy)
+        {
+            ((QueuedAsynchronousProcessingStrategy) processingStrategy).setQueueStatistics(statistics);
+        }
     }
 
     @Override
