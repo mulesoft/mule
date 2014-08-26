@@ -350,10 +350,13 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                         }
                     }
 
+                    //total messages in folder
                     int count = folder.getMessageCount();
+                    //amount that can be processed
                     int batchSize = getBatchSize(count);
                     if (count > 0)
                     {
+                        //retrieve batchSize messages at most, considering the offset that might be present
                         int limit = Math.min(count, offset + batchSize - 1);
                         Message[] messages = folder.getMessages(offset, limit);
                         MessageCountEvent event = new MessageCountEvent(folder, MessageCountEvent.ADDED, true,
@@ -361,6 +364,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                         messagesAdded(event);
                         if (!castConnector().isDeleteReadMessages())
                         {
+                            //if the processed messages are not deleted, move the offset forward to not consider them next
                             offset += batchSize;
                         }
                     }
@@ -369,6 +373,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                         throw new MessagingException("Cannot monitor folder: " + folder.getFullName()
                             + " as folder is closed");
                     }
+                    //stop if the total or current processed messages exceed the total amount
                     done = (offset >= count) || (batchSize >= count);
                 }
                 catch (MessagingException e)
