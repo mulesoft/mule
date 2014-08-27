@@ -36,10 +36,37 @@ import java.util.Map;
 
 public class DefaultOutboundEndpoint extends AbstractEndpoint implements OutboundEndpoint
 {
+
     private static final long serialVersionUID = 8860985949279708638L;
-    private final MessagingExceptionHandler exceptionHandler;
+    private MessagingExceptionHandler exceptionHandler;
 
     private List<String> responseProperties;
+
+
+    public DefaultOutboundEndpoint(Connector connector,
+                                   EndpointURI endpointUri,
+                                   String name,
+                                   Map properties,
+                                   TransactionConfig transactionConfig,
+                                   boolean deleteUnacceptedMessage,
+                                   MessageExchangePattern messageExchangePattern,
+                                   int responseTimeout,
+                                   String initialState,
+                                   String endpointEncoding,
+                                   String endpointBuilderName,
+                                   MuleContext muleContext,
+                                   RetryPolicyTemplate retryPolicyTemplate,
+                                   AbstractRedeliveryPolicy redeliveryPolicy,
+                                   String responsePropertiesList,
+                                   EndpointMessageProcessorChainFactory messageProcessorsFactory,
+                                   List<MessageProcessor> messageProcessors,
+                                   List<MessageProcessor> responseMessageProcessors,
+                                   boolean disableTransportTransformer,
+                                   String endpointMimeType)
+    {
+        this(connector, endpointUri, name, properties, transactionConfig, deleteUnacceptedMessage, messageExchangePattern, responseTimeout, initialState, endpointEncoding,endpointBuilderName, muleContext,
+             retryPolicyTemplate, redeliveryPolicy, responsePropertiesList, messageProcessorsFactory, messageProcessors, responseMessageProcessors, disableTransportTransformer, endpointMimeType, null);
+    }
 
     public DefaultOutboundEndpoint(Connector connector,
                                    EndpointURI endpointUri,
@@ -63,10 +90,10 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
                                    String endpointMimeType,
                                    MessagingExceptionHandler exceptionHandler)
     {
-        super(connector, endpointUri, name, properties, transactionConfig, 
-                deleteUnacceptedMessage, messageExchangePattern, responseTimeout, initialState,
-                endpointEncoding, endpointBuilderName, muleContext, retryPolicyTemplate, null,
-                messageProcessorsFactory, messageProcessors, responseMessageProcessors, disableTransportTransformer, endpointMimeType);
+        super(connector, endpointUri, name, properties, transactionConfig,
+              deleteUnacceptedMessage, messageExchangePattern, responseTimeout, initialState,
+              endpointEncoding, endpointBuilderName, muleContext, retryPolicyTemplate, null,
+              messageProcessorsFactory, messageProcessors, responseMessageProcessors, disableTransportTransformer, endpointMimeType);
 
 
         this.exceptionHandler = exceptionHandler;
@@ -112,7 +139,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
     {
         EndpointMessageProcessorChainFactory factory = getMessageProcessorsFactory();
         MessageProcessor chain = factory.createOutboundMessageProcessorChain(this, flowContruct,
-            ((AbstractConnector) getConnector()).createDispatcherMessageProcessor(this, exceptionHandler));
+                                                                             ((AbstractConnector) getConnector()).createDispatcherMessageProcessor(this, exceptionHandler == null ? flowContruct.getExceptionListener() : exceptionHandler));
 
         if (chain instanceof MuleContextAware)
         {
@@ -126,13 +153,20 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         {
             ((Initialisable) chain).initialise();
         }
-        
+
         return chain;
     }
 
     @Override
     public int hashCode()
     {
-        return  super.hashCode() + ClassUtils.hash(new Object[] {exceptionHandler});
+        if (exceptionHandler == null)
+        {
+            return super.hashCode();
+        }
+        else
+        {
+            return super.hashCode() + ClassUtils.hash(new Object[] {exceptionHandler});
+        }
     }
 }
