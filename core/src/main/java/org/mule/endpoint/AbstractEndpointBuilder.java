@@ -266,7 +266,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
 
         checkOutboundExchangePattern();
 
-        OutboundEndpoint outboundEndpoint = createOutboundEndpoint(endpointURI, mergedProcessors, mergedResponseProcessors, connector, messagingExceptionHandler);
+
+        OutboundEndpoint outboundEndpoint = createOutboundEndpoint(endpointURI, mergedProcessors, mergedResponseProcessors, connector);
         if (outboundEndpoint instanceof DefaultOutboundEndpoint)
         {
             ((DefaultOutboundEndpoint) outboundEndpoint).setAnnotations(getAnnotations());
@@ -275,9 +276,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
         return outboundEndpoint;
     }
 
-    protected OutboundEndpoint createOutboundEndpoint(EndpointURI endpointURI, List<MessageProcessor> messageProcessors, List<MessageProcessor> responseMessageProcessors, Connector connector, MessagingExceptionHandler exceptionHandler)
+    protected OutboundEndpoint createOutboundEndpoint(EndpointURI endpointURI, List<MessageProcessor> messageProcessors, List<MessageProcessor> responseMessageProcessors, Connector connector)
     {
-
         return new DefaultOutboundEndpoint(connector, endpointURI,
                 getName(endpointURI), getProperties(), getTransactionConfig(),
                 getDefaultDeleteUnacceptedMessages(connector),
@@ -285,7 +285,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder, Annota
                 getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector),
                 getRedeliveryPolicy(),
                 responsePropertiesList,  getMessageProcessorsFactory(), messageProcessors,
-                responseMessageProcessors, isDisableTransportTransformer(), mimeType, exceptionHandler);
+                responseMessageProcessors, isDisableTransportTransformer(), mimeType, this.messagingExceptionHandler);
     }
 
     private String getDynamicUriFrom(String uri)
