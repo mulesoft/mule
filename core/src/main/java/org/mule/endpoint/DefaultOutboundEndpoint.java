@@ -135,11 +135,13 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
     }
 
     @Override
-    protected MessageProcessor createMessageProcessorChain(FlowConstruct flowContruct) throws MuleException
+    protected MessageProcessor createMessageProcessorChain(FlowConstruct flowConstruct) throws MuleException
     {
         EndpointMessageProcessorChainFactory factory = getMessageProcessorsFactory();
-        MessageProcessor chain = factory.createOutboundMessageProcessorChain(this, flowContruct,
-                                                                             ((AbstractConnector) getConnector()).createDispatcherMessageProcessor(this, exceptionHandler == null ? flowContruct.getExceptionListener() : exceptionHandler));
+        final MessagingExceptionHandler flowConstructExceptionListener = flowConstruct != null ? flowConstruct.getExceptionListener() : null;
+        final MessagingExceptionHandler exceptionHandler = this.exceptionHandler != null ? this.exceptionHandler : flowConstructExceptionListener;
+        MessageProcessor chain = factory.createOutboundMessageProcessorChain(this, flowConstruct,
+                                                                             ((AbstractConnector) getConnector()).createDispatcherMessageProcessor(this, exceptionHandler));
 
         if (chain instanceof MuleContextAware)
         {
@@ -147,7 +149,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         }
         if (chain instanceof FlowConstructAware)
         {
-            ((FlowConstructAware) chain).setFlowConstruct(flowContruct);
+            ((FlowConstructAware) chain).setFlowConstruct(flowConstruct);
         }
         if (chain instanceof Initialisable)
         {
