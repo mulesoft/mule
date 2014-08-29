@@ -6,10 +6,9 @@
  */
 package org.mule.module.jersey;
 
+import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import org.junit.Rule;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -22,6 +21,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
@@ -74,7 +74,7 @@ public class BasicJerseyTestCase extends AbstractServiceAndFlowTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
         MuleMessage result = client.send(String.format(URL, "/helloworld/sayHelloWithUri/Dan"), "", props);
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
@@ -99,14 +99,14 @@ public class BasicJerseyTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testThrowException() throws Exception
     {
-        callThrowException(500, "Failed to invoke JerseyResourcesComponent{helloWorldResource.component}. Component that caused exception is: JerseyResourcesComponent{helloWorldResource.component}. Message payload is of type: String");
+        callThrowException(INTERNAL_SERVER_ERROR.getStatusCode(), "This is an exception");
     }
 
     protected void callThrowException(Integer expectedErrorCode, String expectedData) throws Exception
     {
         MuleClient client = muleContext.getClient();
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
         MuleMessage result = client.send(String.format(URL, "/helloworld/throwException"), "", props);
         assertEquals(expectedErrorCode, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
@@ -115,6 +115,6 @@ public class BasicJerseyTestCase extends AbstractServiceAndFlowTestCase
 
     protected String getJsonHelloBean()
     {
-        return "{\"message\":\"Hello Dan\",\"number\":\"0\"}";
+        return "{\"message\":\"Hello Dan\",\"number\":0}";
     }
 }
