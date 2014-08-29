@@ -111,10 +111,10 @@
 		</dependency>
 
 		<!-- Needed for CXF -->
-		<dependency>
-			<groupId>org.apache.geronimo.specs</groupId>
-			<artifactId>geronimo-annotation_1.1_spec</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+        </dependency>
 
 		<!-- Needed for JAX-RS -->
 		<dependency>
