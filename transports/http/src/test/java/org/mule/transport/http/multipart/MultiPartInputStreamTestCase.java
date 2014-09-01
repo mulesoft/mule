@@ -21,7 +21,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -34,12 +36,12 @@ public class MultiPartInputStreamTestCase extends AbstractMuleTestCase
     private static final int NUMBER_OF_PARTS = 3;
     private static final String TMP_DIR = "./multipartTmpDir";
 
-    private static File tmpDir;
-    private static Set<String> partContents;
-    private static String multipartMessage;
+    private File tmpDir;
+    private Set<String> partContents;
+    private String multipartMessage;
 
-    @BeforeClass
-    public static void setUp() throws IOException
+    @Before
+    public void setUp() throws IOException
     {
         // Create temp. dir. for the MultiPartInputStream to store intermediate part files.
         tmpDir = createTempDirectory(TMP_DIR);
@@ -61,8 +63,8 @@ public class MultiPartInputStreamTestCase extends AbstractMuleTestCase
         multipartMessage = multipartMessageBuilder.toString();
     }
 
-    @AfterClass
-    public static void tearDown() throws IOException
+    @After
+    public void tearDown() throws IOException
     {
         FileUtils.deleteDirectory(tmpDir);
     }
@@ -70,7 +72,18 @@ public class MultiPartInputStreamTestCase extends AbstractMuleTestCase
     @Test
     public void buildMultiPartInputStream() throws Exception
     {
-        ByteArrayInputStream bis = new ByteArrayInputStream(multipartMessage.getBytes("UTF-8"));
+        buildMultiPartInputStream(multipartMessage);
+    }
+
+    @Test
+    public void multiPartWithContentBeforeFirstBoundary() throws Exception
+    {
+        buildMultiPartInputStream("\nprologue\n" + multipartMessage);
+    }
+
+    private void buildMultiPartInputStream(String body) throws Exception
+    {
+        ByteArrayInputStream bis = new ByteArrayInputStream(body.getBytes("UTF-8"));
         MultiPartInputStream mpis = new MultiPartInputStream(bis, "multipart/form-data; boundary=" + MULTIPART_BOUNDARY,
                                                              new MultipartConfiguration(TMP_DIR));
 

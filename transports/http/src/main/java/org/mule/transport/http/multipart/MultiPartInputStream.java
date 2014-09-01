@@ -350,9 +350,16 @@ public class MultiPartInputStream
         byte[] byteBoundary=(boundary+"--").getBytes("ISO-8859-1");
 
         // Get first boundary
-        byte[] bytes=readLine(_in);
-        String line=bytes==null?null:new String(bytes,"UTF-8");
-        if(line==null || !line.equals(boundary))
+        byte[] bytes;
+        String line;
+        do
+        {
+            bytes = readLine(_in);
+            line = bytes == null ? null : new String(bytes, "UTF-8");
+        }
+        while (line != null && !line.equals(boundary));
+
+        if (line == null)
         {
             throw new IOException("Missing initial multi part boundary");
         }

@@ -6,19 +6,9 @@
  */
 package org.mule.module.launcher.log4j2;
 
-import java.net.URI;
-
 import org.apache.commons.lang.StringUtils;
-import org.apache.logging.log4j.core.LifeCycle;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.config.Configuration;
-import org.apache.logging.log4j.core.config.ConfigurationFactory;
-import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.xml.XmlConfigurationFactory;
-import org.apache.logging.log4j.core.impl.ContextAnchor;
-import org.apache.logging.log4j.core.selector.ContextSelector;
-import org.apache.logging.log4j.spi.LoggerContextFactory;
-import org.apache.logging.log4j.status.StatusLogger;
+import org.apache.logging.log4j.core.impl.Log4jContextFactory;
 
 /**
  * Implementation of {@link org.apache.logging.log4j.spi.LoggerContextFactory} which
@@ -41,26 +31,27 @@ import org.apache.logging.log4j.status.StatusLogger;
  *
  * @since 3.6.0
  */
-public final class MuleLog4jContextFactory implements LoggerContextFactory
+public final class MuleLog4jContextFactory extends Log4jContextFactory
 {
-
-    private static final StatusLogger LOGGER = StatusLogger.getLogger();
 
     private static final String LOG_CONFIGURATION_FACTORY_PROPERTY = "log4j.configurationFactory";
     private static final String DEFAULT_LOG_CONFIGURATION_FACTORY = XmlConfigurationFactory.class.getName();
     private static final String ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY = "AsyncLoggerConfig.ExceptionHandler";
     private static final String DEFAULT_ASYNC_LOGGER_EXCEPTION_HANLDER = AsyncLoggerExceptionHandler.class.getName();
 
-    private final ContextSelector selector;
-
     /**
      * Initializes the ContextSelector.
      */
     public MuleLog4jContextFactory()
     {
+        super(new ArtifactAwareContextSelector());
+
+    }
+
+    protected void initialise()
+    {
         setupConfigurationFactory();
         setupAsyncLoggerExceptionHandler();
-        selector = new ArtifactAwareContextSelector();
     }
 
     private void setupConfigurationFactory()
@@ -77,115 +68,4 @@ public final class MuleLog4jContextFactory implements LoggerContextFactory
         }
     }
 
-    /**
-     * Loads the LoggerContext using the ContextSelector.
-     *
-     * @param fqcn            The fully qualified class name of the caller.
-     * @param loader          The ClassLoader to use or null.
-     * @param currentContext  If true returns the current Context, if false returns the Context appropriate
-     *                        for the caller if a more appropriate Context can be determined.
-     * @param externalContext An external context (such as a ServletContext) to be associated with the LoggerContext.
-     * @return The LoggerContext.
-     */
-    @Override
-    public LoggerContext getContext(final String fqcn, final ClassLoader loader, final Object externalContext,
-                                    final boolean currentContext)
-    {
-        final LoggerContext ctx = selector.getContext(fqcn, loader, currentContext);
-        ctx.setExternalContext(externalContext);
-        if (ctx.getState() == LifeCycle.State.INITIALIZED)
-        {
-            ctx.start();
-        }
-        return ctx;
-    }
-
-    /**
-     * Loads the LoggerContext using the ContextSelector.
-     *
-     * @param fqcn            The fully qualified class name of the caller.
-     * @param loader          The ClassLoader to use or null.
-     * @param externalContext An external context (such as a ServletContext) to be associated with the LoggerContext.
-     * @param currentContext  If true returns the current Context, if false returns the Context appropriate
-     *                        for the caller if a more appropriate Context can be determined.
-     * @param source          The configuration source.
-     * @return The LoggerContext.
-     */
-    public LoggerContext getContext(final String fqcn, final ClassLoader loader, final Object externalContext,
-                                    final boolean currentContext, final ConfigurationSource source)
-    {
-        final LoggerContext ctx = selector.getContext(fqcn, loader, currentContext, null);
-        if (externalContext != null && ctx.getExternalContext() == null)
-        {
-            ctx.setExternalContext(externalContext);
-        }
-        if (ctx.getState() == LifeCycle.State.INITIALIZED)
-        {
-            if (source != null)
-            {
-                ContextAnchor.THREAD_CONTEXT.set(ctx);
-                final Configuration config = ConfigurationFactory.getInstance().getConfiguration(source);
-                LOGGER.debug("Starting LoggerContext[name={}] from configuration {}", ctx.getName(), source);
-                ctx.start(config);
-                ContextAnchor.THREAD_CONTEXT.remove();
-            }
-            else
-            {
-                ctx.start();
-            }
-        }
-        return ctx;
-    }
-
-    /**
-     * Loads the LoggerContext using the ContextSelector.
-     *
-     * @param fqcn            The fully qualified class name of the caller.
-     * @param loader          The ClassLoader to use or null.
-     * @param externalContext An external context (such as a ServletContext) to be associated with the LoggerContext.
-     * @param currentContext  If true returns the current Context, if false returns the Context appropriate
-     *                        for the caller if a more appropriate Context can be determined.
-     * @param configLocation  The location of the configuration for the LoggerContext.
-     * @return The LoggerContext.
-     */
-    @Override
-    public LoggerContext getContext(final String fqcn, final ClassLoader loader, final Object externalContext,
-                                    final boolean currentContext, final URI configLocation, final String name)
-    {
-        final LoggerContext ctx = selector.getContext(fqcn, loader, currentContext, configLocation);
-        if (externalContext != null && ctx.getExternalContext() == null)
-        {
-            ctx.setExternalContext(externalContext);
-        }
-        if (ctx.getState() == LifeCycle.State.INITIALIZED)
-        {
-            if (configLocation != null || name != null)
-            {
-                ContextAnchor.THREAD_CONTEXT.set(ctx);
-                final Configuration config = ConfigurationFactory.getInstance().getConfiguration(name, configLocation);
-                LOGGER.debug("Starting LoggerContext[name={}] from configuration at {}", ctx.getName(), configLocation);
-                ctx.start(config);
-                ContextAnchor.THREAD_CONTEXT.remove();
-            }
-            else
-            {
-                ctx.start();
-            }
-        }
-        return ctx;
-    }
-
-    /**
-     * Removes knowledge of a LoggerContext.
-     *
-     * @param context The context to remove.
-     */
-    @Override
-    public void removeContext(final org.apache.logging.log4j.spi.LoggerContext context)
-    {
-        if (context instanceof LoggerContext)
-        {
-            selector.removeContext((LoggerContext) context);
-        }
-    }
 }

@@ -6,6 +6,13 @@
  */
 package org.mule.module.jersey;
 
+import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.runners.Parameterized.Parameters;
+
 public class BasicJerseyWithContextResolverTestCase extends BasicJerseyTestCase
 {
 
@@ -18,7 +25,7 @@ public class BasicJerseyWithContextResolverTestCase extends BasicJerseyTestCase
     @Override
     public void testThrowException() throws Exception
     {
-        callThrowException(500, "Failed to invoke JerseyResourcesComponent");
+        callThrowException(INTERNAL_SERVER_ERROR.getStatusCode(), "This is an exception");
     }
 
     @Override

@@ -35,7 +35,7 @@ public class InterfaceBindingTestCase extends FunctionalTestCase
     public void bindsComponentInterface() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        Map<String, Object> headers = new HashMap<String, Object>();
+        Map<String, Object> headers = new HashMap<>();
         headers.put("http.method", "GET");
         MuleMessage result = client.send("http://localhost:" + port.getNumber() + "/sayHello", "", headers);
 
