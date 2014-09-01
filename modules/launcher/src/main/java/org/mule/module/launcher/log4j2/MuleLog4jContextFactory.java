@@ -45,6 +45,7 @@ public final class MuleLog4jContextFactory extends Log4jContextFactory
     public MuleLog4jContextFactory()
     {
         super(new ArtifactAwareContextSelector());
+        initialise();
 
     }
 
