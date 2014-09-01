@@ -105,9 +105,6 @@ public class MuleEndpointConfigurationFlowTestCase extends FunctionalTestCase
         ImmutableEndpoint endpoint = (ImmutableEndpoint) messageProcessors.get(1);
         assertEquals("udp", endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("udp://localhost:56731", endpoint.getEndpointURI().getAddress());
-        // cannot get this to work and get axis tests to work
-        // (axis seems to use undefined transformers in some strange way)
-        // assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
         assertTrue(endpoint instanceof OutboundEndpoint);
     }
 
@@ -123,9 +120,6 @@ public class MuleEndpointConfigurationFlowTestCase extends FunctionalTestCase
         ImmutableEndpoint endpoint = (ImmutableEndpoint) messageProcessors.get(1);
         assertEquals(TcpConnector.TCP, endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("tcp://localhost:45431", endpoint.getEndpointURI().getAddress());
-        // cannot get this to work and get axis tests to work
-        // (axis seems to use undefined transformers in some strange way)
-        // assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
         assertTrue(endpoint instanceof OutboundEndpoint);
     }
 

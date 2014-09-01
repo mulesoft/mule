@@ -17,7 +17,6 @@
 
     <modules>
         <module>all-transports</module>
-        <module>axis</module>
         <module>ajax</module>
         <module>ejb</module>
         <module>email</module>
