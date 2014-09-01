@@ -208,7 +208,7 @@
         <jschVersion>0.1.51</jschVersion>
         <jsr181Version>1.0-MR1</jsr181Version>
         <jsr250AnnotationVerson>1.0</jsr250AnnotationVerson>
-        <log4jVersion>2.0</log4jVersion>
+        <log4jVersion>2.0.2</log4jVersion>
         <disruptorVersion>3.2.1</disruptorVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <!-- TODO EE-1395 -->
