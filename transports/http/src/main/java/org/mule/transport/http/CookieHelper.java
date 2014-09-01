@@ -317,7 +317,7 @@ public class CookieHelper
     {
         StringBuffer sb = new StringBuffer();
         ServerCookie.appendCookieValue(sb, cookie.getVersion(), cookie.getName(), cookie.getValue(),
-            cookie.getPath(), cookie.getDomain(), cookie.getComment(), -1, cookie.getSecure(), false);
+            cookie.getPath(), cookie.getDomain(), cookie.getComment(), -1, cookie.getSecure());
 
         Date expiryDate = cookie.getExpiryDate();
         if (expiryDate != null)
