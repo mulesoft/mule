@@ -113,19 +113,6 @@
     <link><item>mule:dispatcher-threading-profile</item><page>General+Transport+Configuration</page></link>
     <link><item>mule:service-overrides</item><page>General+Transport+Configuration</page></link>
 
-    <link><item>axis:connector</item><page>Axis+Transport</page></link>
-    <link><item>axis:inbound-endpoint</item><page>Axis+Transport</page></link>
-    <link><item>axis:outbound-endpoint</item><page>Axis+Transport</page></link>
-    <link><item>axis:endpoint</item><page>Axis+Transport</page></link>
-    <link><item>axis:options</item><page>Axis+Transport</page></link>
-    <link><item>axis:option</item><page>Axis+Transport</page></link>
-    <link><item>axis:bean-type</item><page>Axis+Transport</page></link>
-    <link><item>axis:soap-service</item><page>Axis+Transport</page></link>
-    <link><item>axis:soap-method</item><page>Axis+Transport</page></link>
-    <link><item>axis:soap-parameter</item><page>Axis+Transport</page></link>
-    <link><item>axis:soap-return</item><page>Axis+Transport</page></link>
-    <link><item>axis:supported-scheme</item><page>Axis+Transport</page></link>
-
     <link><item>bpm:connector</item><page>BPM+Transport</page></link>
     <link><item>bpm:inbound-endpoint</item><page>BPM+Transport</page></link>
     <link><item>bpm:outbound-endpoint</item><page>BPM+Transport</page></link>

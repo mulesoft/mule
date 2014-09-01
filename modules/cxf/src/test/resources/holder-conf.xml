@@ -7,7 +7,6 @@
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:https="http://www.mulesoft.org/schema/mule/https"
       xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
-      xmlns:axis="http://www.mulesoft.org/schema/mule/axis"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
       xsi:schemaLocation="
            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
