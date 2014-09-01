@@ -78,12 +78,6 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-
-    //protected AbstractEmailFunctionalTestCase(ConfigVariant variant, boolean isMimeMessage, String protocol, Locale locale, String charset)
-    //{
-    //    this(isMimeMessage, protocol, locale, charset);
-    //}
-
     protected AbstractEmailFunctionalTestCase(boolean isMimeMessage, String protocol)
     {
         this(isMimeMessage, protocol, null, null);

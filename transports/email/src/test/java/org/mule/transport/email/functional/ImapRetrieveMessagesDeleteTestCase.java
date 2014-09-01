@@ -6,23 +6,13 @@
  */
 package org.mule.transport.email.functional;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.runners.Parameterized;
-
 public class ImapRetrieveMessagesDeleteTestCase extends AbstractImapRetrieveMessagesTestCase
 {
-    public ImapRetrieveMessagesDeleteTestCase(ConfigVariant variant, String configResources)
+
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "imap-delete-messages-test.xml";
     }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.SERVICE, "imap-delete-messages-test.xml"}
-        });
-    }
 }

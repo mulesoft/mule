@@ -37,9 +37,9 @@ public class AbstractImapRetrieveMessagesTestCase extends AbstractEmailFunctiona
     private FlowExecutionListener flowExecutionListener;
     protected static Set<Object> retrievedMessages;
 
-    public AbstractImapRetrieveMessagesTestCase(ConfigVariant variant, String configResources)
+    public AbstractImapRetrieveMessagesTestCase()
     {
-        super(variant, STRING_MESSAGE, "imap", configResources);
+        super(STRING_MESSAGE, "imap");
     }
 
     @Before
