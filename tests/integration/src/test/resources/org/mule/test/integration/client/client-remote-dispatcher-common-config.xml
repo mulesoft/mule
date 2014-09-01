@@ -23,25 +23,20 @@
     <vm:connector name="vmRemoteConnector"/>
 
     <endpoint address="vm://remote.queue" name="remoteVmQueue" exchange-pattern="one-way"/>
-    <endpoint address="vm://remote.endpoint" name="testVmEndpoint" connector-ref="vmRemoteConnector" 
-        exchange-pattern="request-response"/>
+    <endpoint address="vm://remote.endpoint" name="testVmEndpoint" connector-ref="vmRemoteConnector"
+              exchange-pattern="request-response"/>
 
-    <model name="model">
-        <service name="TestReceiverUMO">
-            <inbound>
-                <inbound-endpoint address="vm://test.queue" connector-ref="vmRemoteQueueConnector"
-                    exchange-pattern="one-way"/>
-            </inbound>
-            <test:component appendString=" Received"/>
-        </service>
+    <flow name="TestReceiverUMO">
+        <inbound-endpoint address="vm://test.queue" connector-ref="vmRemoteQueueConnector"
+                          exchange-pattern="one-way"/>
+        <test:component appendString=" Received"/>
+    </flow>
 
-        <service name="remoteUMO">
-            <inbound>
-                <inbound-endpoint ref="testVmEndpoint"/>
-            </inbound>
-            <test:component>
-                <test:return-data>received from remote component</test:return-data>
-            </test:component>
-        </service>
-    </model>
+    <flow name="remoteUMO">
+        <inbound-endpoint ref="testVmEndpoint"/>
+        <test:component>
+            <test:return-data>received from remote component</test:return-data>
+        </test:component>
+    </flow>
+
 </mule>

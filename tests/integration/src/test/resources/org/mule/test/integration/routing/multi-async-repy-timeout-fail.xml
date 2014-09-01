@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-       xmlns:test="http://www.mulesoft.org/schema/mule/test"
-       xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
@@ -12,50 +12,34 @@
 
     <vm:connector name="vm"/>
 
-    <model name="CollationError">
-        <service name="Distributor">
-            <inbound>
-                <inbound-endpoint address="vm://distributor.queue" exchange-pattern="request-response"/>
-            </inbound>
-            <echo-component/>
-            <outbound>
-                <static-recipient-list-router synchronous="false">
-                    <reply-to address="vm://Aggregator.queue"/>
-                    <recipients>
-                        <spring:value>vm://quoteprovider1.queue</spring:value>
-                        <spring:value>vm://quoteprovider2.queue</spring:value>
-                        <spring:value>vm://quoteprovider3.queue</spring:value>
-                    </recipients>
-                </static-recipient-list-router>
-            </outbound>
-            <async-reply timeout="3000" failOnTimeout="true">
-                <inbound-endpoint address="vm://Aggregator.queue" exchange-pattern="one-way"/>
-                <collection-async-reply-router/>
-            </async-reply>
-        </service>
+    <flow name="Distributor">
+        <inbound-endpoint address="vm://distributor.queue" exchange-pattern="request-response"/>
+        <echo-component/>
+        <request-reply timeout="3000">
+            <recipient-list
+                    expression="#[['vm://quoteprovider1.queue','vm://quoteprovider2.queue','vm://quoteprovider3.queue']]"/>
+            <inbound-endpoint address="vm://Aggregator.queue" exchange-pattern="one-way">
+                <collection-aggregator timeout="3000" failOnTimeout="false"/>
+            </inbound-endpoint>
+        </request-reply>
+    </flow>
 
-        <service name="QuoteProviderOne">
-            <inbound>
-                <inbound-endpoint address="vm://quoteprovider1.queue" exchange-pattern="one-way"/>
-            </inbound>
-            <test:component appendString=" Received"/>
-        </service>
+    <flow name="QuoteProviderOne">
+        <inbound-endpoint address="vm://quoteprovider1.queue" exchange-pattern="one-way"/>
+        <test:component appendString=" Received"/>
+    </flow>
 
-        <!-- This is a quotation system -->
-        <service name="QuoteProviderTwo">
-            <inbound>
-                <inbound-endpoint address="vm://quoteprovider2.queue" exchange-pattern="one-way"/>
-            </inbound>
-            <test:component appendString=" Received"/>
+    <!-- This is a quotation system -->
+    <flow name="QuoteProviderTwo">
+        <inbound-endpoint address="vm://quoteprovider2.queue" exchange-pattern="one-way"/>
+        <test:component appendString=" Received"/>
 
-        </service>
+    </flow>
 
-        <!-- this will cause a response timeout -->
-        <service name="QuoteProviderThree">
-            <inbound>
-                <inbound-endpoint address="vm://quoteprovider3.queue" exchange-pattern="one-way"/>
-            </inbound>
-            <test:component waitTime="4000" appendString=" Received Late!"/>
-        </service>
-    </model>
+    <!-- this will cause a response timeout -->
+    <flow name="QuoteProviderThree">
+        <inbound-endpoint address="vm://quoteprovider3.queue" exchange-pattern="one-way"/>
+        <test:component waitTime="4000" appendString=" Received Late!"/>
+    </flow>
+
 </mule>

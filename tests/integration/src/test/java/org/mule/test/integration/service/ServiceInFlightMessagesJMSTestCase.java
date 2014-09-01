@@ -8,7 +8,7 @@ package org.mule.test.integration.service;
 
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.service.Service;
+import org.mule.construct.Flow;
 import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.JmsSupport;
 
@@ -37,17 +37,17 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
     }
 
     @Override
-    protected void stopService(Service service) throws Exception
+    protected void stopService(Flow flow) throws Exception
     {
-        service.stop();
+        flow.stop();
         // Give connector and jms broker some time to process all pending messages
         Thread.sleep(WAIT_TIME_MILLIS);
     }
 
     @Override
-    protected void startService(Service service) throws Exception
+    protected void startService(Flow flow) throws Exception
     {
-        service.start();
+        flow.start();
     }
 
     private TestJMSMessageListener createTestJMSConsumer() throws MuleException, JMSException

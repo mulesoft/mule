@@ -12,13 +12,10 @@
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
-    <model name="Asynchronous_Message_Pattern">
-        <service name="AsynchronousService">
-            <inbound>
-                <jms:inbound-endpoint queue="test.in" exchange-pattern="one-way"/>
-            </inbound>
-            <test:component/>
-        </service>
-    </model>
+    <flow name="AsynchronousService">
+        <jms:inbound-endpoint queue="test.in" exchange-pattern="one-way"/>
+        <test:component/>
+    </flow>
+
 </mule>
 <!--// END SNIPPET: full-config -->

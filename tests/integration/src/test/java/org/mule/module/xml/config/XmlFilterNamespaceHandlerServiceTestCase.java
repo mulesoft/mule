@@ -9,14 +9,12 @@ package org.mule.module.xml.config;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.api.routing.MatchableMessageProcessor;
-import org.mule.api.routing.OutboundRouterCollection;
-import org.mule.api.service.Service;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.construct.Flow;
 import org.mule.module.xml.filters.IsXmlFilter;
 import org.mule.module.xml.filters.JXPathFilter;
+import org.mule.routing.MessageFilter;
 import org.mule.routing.filters.logic.NotFilter;
-import org.mule.routing.outbound.FilteringOutboundRouter;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.List;
@@ -26,6 +24,7 @@ import org.junit.Test;
 
 public class XmlFilterNamespaceHandlerServiceTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigFile()
     {
@@ -35,30 +34,27 @@ public class XmlFilterNamespaceHandlerServiceTestCase extends FunctionalTestCase
     @Test
     public void testIsXmlFilter() throws Exception
     {
-        Service service = muleContext.getRegistry().lookupService("test for xml");
+        Flow service = (Flow) muleContext.getRegistry().lookupFlowConstruct("test for xml");
 
-        List<MatchableMessageProcessor> routers = ((OutboundRouterCollection) (service).getOutboundMessageProcessor()).getRoutes();
+        List<MessageProcessor> processors = service.getMessageProcessors();
 
-        assertEquals(2, routers.size());
-        assertTrue(routers.get(0).getClass().getName(), routers.get(0) instanceof FilteringOutboundRouter);
-        assertTrue(((FilteringOutboundRouter) routers.get(0)).getFilter() instanceof IsXmlFilter);
-        assertTrue(routers.get(1).getClass().getName(), routers.get(1) instanceof FilteringOutboundRouter);
-        assertTrue(((FilteringOutboundRouter) routers.get(1)).getFilter() instanceof NotFilter);
-        assertTrue(((NotFilter) ((FilteringOutboundRouter) routers.get(1)).getFilter()).getFilter() instanceof IsXmlFilter);
+        assertEquals(2, processors.size());
+        assertEquals(IsXmlFilter.class, ((MessageFilter) processors.get(0)).getFilter().getClass());
+        assertEquals(NotFilter.class, ((MessageFilter) processors.get(1)).getFilter().getClass());
+        assertEquals(IsXmlFilter.class, ((MessageFilter) processors.get(0)).getFilter().getClass());
 
     }
 
     @Test
     public void testJXPathFilter()
     {
-        Service service = muleContext.getRegistry().lookupService("filter xml for content");
+        Flow service = (Flow) muleContext.getRegistry().lookupFlowConstruct("filter xml for content");
 
-        List<MatchableMessageProcessor> routers = ((OutboundRouterCollection) (service).getOutboundMessageProcessor()).getRoutes();
+        List<MessageProcessor> processors = service.getMessageProcessors();
 
-        assertEquals(1, routers.size());
-        assertTrue(routers.get(0).getClass().getName(), routers.get(0) instanceof FilteringOutboundRouter);
-        assertTrue(((FilteringOutboundRouter) routers.get(0)).getFilter() instanceof JXPathFilter);
-        JXPathFilter filter = (JXPathFilter) ((FilteringOutboundRouter) routers.get(0)).getFilter();
+        assertEquals(1, processors.size());
+        assertEquals(JXPathFilter.class, ((MessageFilter) processors.get(0)).getFilter().getClass());
+        JXPathFilter filter = (JXPathFilter) ((MessageFilter) processors.get(0)).getFilter();
         assertEquals("filter xml for content", filter.getExpectedValue());
         assertEquals("/mule:mule/mule:model/mule:service[2]/@name", filter.getPattern());
         assertNotNull(filter.getNamespaces());

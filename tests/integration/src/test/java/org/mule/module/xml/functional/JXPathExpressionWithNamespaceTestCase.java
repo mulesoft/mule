@@ -23,9 +23,7 @@ public class JXPathExpressionWithNamespaceTestCase extends AbstractXmlPropertyEx
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
-        p.setProperty("selector.expression", "/foo:endpoint");
-        p.setProperty("selector.evaluator", "jxpath");
-
+        p.setProperty("selector.expression", "jxpath:/foo:endpoint");
         return p;
     }
 

@@ -24,9 +24,7 @@ public class W3CDomPropertyExtractorMultipleEndpointsTestCase extends AbstractXm
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
-        p.setProperty("selector.expression", "/endpoints/endpoint");
-        p.setProperty("selector.evaluator", "xpath");
-
+        p.setProperty("selector.expression", "xpath:/endpoints/endpoint");
         return p;
     }
 

@@ -1,38 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans" 
-    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-    xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
     <vm:connector name="vmConnector"/>
 
-    <model>
-        <service name="HelloComponent">
-            <inbound>
-                <inbound-endpoint address="vm://hello.in" exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.test.integration.routing.nested.HelloService" />
-        </service>
+    <flow name="HelloComponent">
+        <inbound-endpoint address="vm://hello.in" exchange-pattern="request-response"/>
+        <component class="org.mule.test.integration.routing.nested.HelloService"/>
+    </flow>
 
-        <service name="InvokerComponent">
-            <inbound>
-                <vm:inbound-endpoint path="invoker.in" exchange-pattern="request-response"/>
-            </inbound>
-            <component>
-                <singleton-object class="org.mule.test.integration.routing.nested.BindingReturnTypeTestCase$Component" />
-                <binding interface="org.mule.test.integration.routing.nested.BindingReturnTypeTestCase$BindingInterface">
-                    <outbound-endpoint address="vm://hello.in" exchange-pattern="request-response" />
-                </binding>
-            </component>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="invoker.out" exchange-pattern="one-way"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
+    <flow name="InvokerComponent">
+        <vm:inbound-endpoint path="invoker.in" exchange-pattern="request-response"/>
+        <component>
+            <singleton-object class="org.mule.test.integration.routing.nested.BindingReturnTypeTestCase$Component"/>
+            <binding interface="org.mule.test.integration.routing.nested.BindingReturnTypeTestCase$BindingInterface">
+                <outbound-endpoint address="vm://hello.in" exchange-pattern="request-response"/>
+            </binding>
+        </component>
+        <vm:outbound-endpoint path="invoker.out" exchange-pattern="one-way"/>
+    </flow>
+
 </mule>

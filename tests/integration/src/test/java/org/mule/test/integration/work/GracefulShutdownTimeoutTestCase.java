@@ -6,24 +6,18 @@
  */
 package org.mule.test.integration.work;
 
+import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleEventContext;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.service.Service;
 import org.mule.construct.Flow;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertTrue;
 
 public class GracefulShutdownTimeoutTestCase extends FunctionalTestCase
 {

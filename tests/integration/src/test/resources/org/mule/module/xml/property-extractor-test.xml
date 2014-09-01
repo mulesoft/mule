@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:mxml="http://www.mulesoft.org/schema/mule/xml"
-       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-    xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:mxml="http://www.mulesoft.org/schema/mule/xml"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
@@ -14,32 +14,23 @@
         <mxml:namespace prefix="foo" uri="http://foo.com"/>
     </mxml:namespace-manager>
 
-    <model name="property extractor test">
-        <service name="test">
-            <inbound>
-                <vm:inbound-endpoint path="in" exchange-pattern="one-way"/>
-            </inbound>
-            <outbound>
-                <exception-based-router>
-                    <vm:outbound-endpoint path="unreliable" exchange-pattern="request-response"/>
-                    <vm:outbound-endpoint path="error" exchange-pattern="one-way"/>
-                </exception-based-router>
-            </outbound>
-        </service>
+    <vm:endpoint name="matchingEndpoint1" path="match1"/>
+    <vm:endpoint name="matchingEndpoint2" path="match2"/>
 
-        <service name="unreliable">
-            <inbound>
-                <vm:inbound-endpoint path="unreliable" exchange-pattern="request-response"/>
-            </inbound>
-            <outbound>
-                <!-- this property is set from the test case as something like "#[bean:childBean.value]"
-                 or #[xpath:/endpoints/endpoint]
-                 -->
-                <endpoint-selector-router evaluator="custom" custom-evaluator="${selector.evaluator}" expression="${selector.expression}">
-                    <vm:outbound-endpoint name="matchingEndpoint1" path="match1"/>
-                    <vm:outbound-endpoint name="matchingEndpoint2" path="match2"/>
-                </endpoint-selector-router>
-            </outbound>
-        </service>
-    </model>
+    <flow name="test">
+        <vm:inbound-endpoint path="in" exchange-pattern="one-way"/>
+        <first-successful>
+            <vm:outbound-endpoint path="unreliable" exchange-pattern="request-response"/>
+            <vm:outbound-endpoint path="error" exchange-pattern="one-way"/>
+        </first-successful>
+    </flow>
+
+    <flow name="unreliable">
+        <vm:inbound-endpoint path="unreliable" exchange-pattern="request-response"/>
+        <!-- this property is set from the test case as something like "#[bean:childBean.value]"
+         or #[xpath:/endpoints/endpoint]
+         -->
+        <recipient-list expression="${selector.expression}"/>
+    </flow>
+
 </mule>

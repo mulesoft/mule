@@ -22,55 +22,42 @@
               exchange-pattern="request-response"
               address="http://localhost:63081/services/greeter">
         <cxf:jaxws-client
-            clientClass="org.apache.hello_world_soap_http.SOAPService"
-            port="SoapPort"
-            wsdlLocation="classpath:/wsdl/hello_world.wsdl"/>
+                clientClass="org.apache.hello_world_soap_http.SOAPService"
+                port="SoapPort"
+                wsdlLocation="classpath:/wsdl/hello_world.wsdl"/>
     </endpoint>
 
-    <model>
-        <service name="greeterService">
-            <inbound>
-                <inbound-endpoint address="http://localhost:63081/services/greeter"
-                    exchange-pattern="request-response">
-                     <cxf:jaxws-service />
-                 </inbound-endpoint>
-            </inbound>
-            <component>
-                <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl"/>
-            </component>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="out" exchange-pattern="one-way"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="greeterService">
+        <inbound-endpoint address="http://localhost:63081/services/greeter"
+                          exchange-pattern="request-response">
+            <cxf:jaxws-service/>
+        </inbound-endpoint>
+        <component>
+            <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl"/>
+        </component>
+        <vm:outbound-endpoint path="out" exchange-pattern="one-way"/>
+    </flow>
 
-        <service name="PopulateBatchData">
-            <inbound>
-                <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
-            </inbound>
-            <scripting:component>
-                <scripting:script engine="groovy">
-                    <![CDATA[
+    <flow name="PopulateBatchData">
+        <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
+        <scripting:component>
+            <scripting:script engine="groovy">
+                <![CDATA[
                     import org.mule.DefaultMuleMessage;
 
                     return "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:sim=\"http://www.example.org/simplewithheader/\"><soapenv:Header><sim:header><headerparam>?</headerparam></sim:header></soapenv:Header><soapenv:Body><sim:NewOperationRequest><in>Garbage</in></sim:NewOperationRequest></soapenv:Body></soapenv:Envelope>";
                     ]]>
-                </scripting:script>
-            </scripting:component>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint
-                            address="http://localhost:63081/services/greeter"
-                            exchange-pattern="request-response">
-                        <cxf:jaxws-client
-                            clientClass="org.apache.hello_world_soap_http.SOAPService"
-                            port="SoapPort"
-                            wsdlLocation="classpath:/wsdl/hello_world.wsdl"
-                            operation="greetMe"/>
-                    </outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
+            </scripting:script>
+        </scripting:component>
+        <outbound-endpoint
+                address="http://localhost:63081/services/greeter"
+                exchange-pattern="request-response">
+            <cxf:jaxws-client
+                    clientClass="org.apache.hello_world_soap_http.SOAPService"
+                    port="SoapPort"
+                    wsdlLocation="classpath:/wsdl/hello_world.wsdl"
+                    operation="greetMe"/>
+        </outbound-endpoint>
+    </flow>
+
 </mule>

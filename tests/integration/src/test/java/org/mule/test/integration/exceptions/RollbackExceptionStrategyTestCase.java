@@ -9,6 +9,22 @@ package org.mule.test.integration.exceptions;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.LocalMuleClient;
+import org.mule.api.context.notification.ExceptionNotificationListener;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.context.notification.ExceptionNotification;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.http.HttpConnector;
+import org.mule.util.CharSetUtils;
+import org.mule.util.concurrent.Latch;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -18,25 +34,6 @@ import org.hamcrest.core.IsNull;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.api.context.notification.ExceptionNotificationListener;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.context.notification.ExceptionNotification;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.http.HttpConnector;
-import org.mule.util.CharSetUtils;
-import org.mule.util.concurrent.Latch;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 public class RollbackExceptionStrategyTestCase extends FunctionalTestCase
 {

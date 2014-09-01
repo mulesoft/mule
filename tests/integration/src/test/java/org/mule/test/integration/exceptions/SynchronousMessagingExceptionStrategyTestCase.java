@@ -73,16 +73,7 @@ public class SynchronousMessagingExceptionStrategyTestCase extends AbstractExcep
     }
 
     @Test
-    public void testInboundRouter() throws Exception
-    {
-        client.send("vm://in6", TEST_MESSAGE, null);
-        latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
-        assertEquals(1, serviceExceptionCounter.get());
-        assertEquals(0, systemExceptionCounter.get());
-    }
-
-    @Test
-    public void testOutboundRouter() throws Exception
+    public void testRouter() throws Exception
     {
         client.send("vm://in7", TEST_MESSAGE, null);
         latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);

@@ -7,20 +7,15 @@
 package org.mule.test.integration.routing;
 
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class WireTapTestCase extends FunctionalTestCase
 {

@@ -7,20 +7,15 @@
 package org.mule.test.integration.routing;
 
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.RoutingNotificationListener;
 import org.mule.context.notification.RoutingNotification;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.FunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class InboundAggregationWithTimeoutTestCase extends FunctionalTestCase
 {

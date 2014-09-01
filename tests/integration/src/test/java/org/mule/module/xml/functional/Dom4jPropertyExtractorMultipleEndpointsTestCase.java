@@ -24,9 +24,7 @@ public class Dom4jPropertyExtractorMultipleEndpointsTestCase extends AbstractXml
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
-        p.setProperty("selector.expression", "/endpoints/endpoint");
-        p.setProperty("selector.evaluator", "xpath");
-
+        p.setProperty("selector.expression", "xpath:/endpoints/endpoint");
         return p;
     }
 

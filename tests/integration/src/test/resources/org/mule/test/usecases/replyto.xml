@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-       xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xsi:schemaLocation="
             http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
@@ -14,25 +14,25 @@
     <vm:connector name="asyncVm"/>
 
     <vm:endpoint name="ReplyTo" path="reply.to" exchange-pattern="one-way"
-        connector-ref="asyncVm"/>
+                 connector-ref="asyncVm"/>
 
     <vm:endpoint name="EchoVm" path="echo.service" exchange-pattern="one-way"/>
-    
+
     <endpoint name="EchoCxfSend" address="http://localhost:10081/mule/EchoService" exchange-pattern="request-response">
         <cxf:simple-client serviceClass="org.mule.api.component.simple.EchoService" operation="echo"/>
     </endpoint>
-    
-    <endpoint name="EchoCxfReceive" address="http://localhost:10081/mule/EchoService" exchange-pattern="request-response">
+
+    <endpoint name="EchoCxfReceive" address="http://localhost:10081/mule/EchoService"
+              exchange-pattern="request-response">
         <cxf:simple-service serviceClass="org.mule.api.component.simple.EchoService"/>
     </endpoint>
-    
-    <model name="ReplyToTestCase">
-        <service name="EchoService">
-            <inbound>
-                <inbound-endpoint ref="EchoVm"/>
-                <inbound-endpoint ref="EchoCxfReceive"/>
-            </inbound>
-            <echo-component/>
-        </service>
-    </model>
+
+    <flow name="EchoService">
+        <composite-source>
+            <inbound-endpoint ref="EchoVm"/>
+            <inbound-endpoint ref="EchoCxfReceive"/>
+        </composite-source>
+        <echo-component/>
+    </flow>
+
 </mule>
