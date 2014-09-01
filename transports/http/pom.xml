@@ -49,9 +49,16 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>coyote</artifactId>
-            <version>${tomcatVersion}</version>
+            <groupId>tomcat</groupId>
+            <artifactId>tomcat-util</artifactId>
+            <version>5.5.23</version>
+            <exclusions>
+                <!-- we use slf4j -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.samba.jcifs</groupId>
