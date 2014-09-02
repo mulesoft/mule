@@ -14,7 +14,6 @@ import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.QueueStore;
 import org.mule.construct.Flow;
 import org.mule.construct.flow.DefaultFlowProcessingStrategy;
-import org.mule.model.seda.SedaService;
 import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.store.SimpleMemoryObjectStore;
@@ -106,11 +105,6 @@ public class QueueStoreConfigurationTestCase extends FunctionalTestCase
         assertObjectStoreIsDefaultPersistentObjectStore(queuedPipeline.getQueueStore());
     }
 
-    private SedaService lookupService(String name)
-    {
-        return (SedaService) muleContext.getRegistry().lookupService(name);
-    }
-    
     private Flow lookupFlow(String name)
     {
         return (Flow) muleContext.getRegistry().lookupFlowConstruct(name);

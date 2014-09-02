@@ -12,18 +12,17 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
-
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.NoReceiverForEndpointException;
+import org.mule.construct.Flow;
 import org.mule.tck.MuleTestUtils.TestCallback;
-import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transport.AbstractConnectorTestCase;
 import org.mule.transport.tcp.TcpConnector;
 
@@ -85,11 +84,10 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
     @Test
     public void testValidListener() throws Exception
     {
-        Service service = getTestService("orange", Orange.class);
         InboundEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
                 getTestEndpointURI());
 
-        getConnector().registerListener(endpoint, getSensingNullMessageProcessor(), service);
+        getConnector().registerListener(endpoint, getSensingNullMessageProcessor(), mock(Flow.class));
     }
 
     @Test

@@ -10,22 +10,19 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.construct.Flow;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.execution.MessageProcessContext;
 import org.mule.transport.AbstractMessageReceiverTestCase;
-import org.mule.transport.TransportMessageProcessContext;
 import org.mule.transport.http.transformers.MuleMessageToHttpResponse;
 import org.mule.util.CollectionUtils;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
@@ -38,9 +35,8 @@ public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     @Override
     public MessageReceiver getMessageReceiver() throws Exception
     {
-        Service mockService = mock(Service.class);
         Connector connector = endpoint.getConnector();
-        return new HttpMessageReceiver(connector, mockService, endpoint);
+        return new HttpMessageReceiver(connector, mock(Flow.class), endpoint);
     }
 
     @Override

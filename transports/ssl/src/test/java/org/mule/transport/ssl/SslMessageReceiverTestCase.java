@@ -9,9 +9,9 @@ package org.mule.transport.ssl;
 import static org.mockito.Mockito.mock;
 
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.construct.Flow;
 import org.mule.transport.AbstractMessageReceiverTestCase;
 
 public class SslMessageReceiverTestCase extends AbstractMessageReceiverTestCase
@@ -19,9 +19,8 @@ public class SslMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     @Override
     public MessageReceiver getMessageReceiver() throws Exception
     {
-        Service mockService = mock(Service.class);
         Connector connector = endpoint.getConnector();
-        return new SslMessageReceiver(connector, mockService, endpoint);
+        return new SslMessageReceiver(connector, mock(Flow.class), endpoint);
     }
 
     @Override

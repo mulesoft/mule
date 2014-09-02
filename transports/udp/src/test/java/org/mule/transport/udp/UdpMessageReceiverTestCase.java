@@ -10,8 +10,8 @@ import static org.mockito.Mockito.mock;
 
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.construct.Flow;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.transport.AbstractMessageReceiverTestCase;
 
@@ -21,8 +21,7 @@ public class UdpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     public MessageReceiver getMessageReceiver() throws Exception
     {
         endpoint = muleContext.getEndpointFactory().getInboundEndpoint("udp://localhost:10100");
-        Service mockService = mock(Service.class);
-        return new UdpMessageReceiver(endpoint.getConnector(), mockService, endpoint);
+        return new UdpMessageReceiver(endpoint.getConnector(), mock(Flow.class), endpoint);
     }
 
     @Override

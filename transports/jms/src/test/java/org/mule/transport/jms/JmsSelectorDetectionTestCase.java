@@ -8,7 +8,6 @@ package org.mule.transport.jms;
 
 import static org.junit.Assert.assertNotNull;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.service.Service;
 import org.mule.api.source.MessageSource;
 import org.mule.construct.Flow;
 import org.mule.service.ServiceCompositeMessageSource;
@@ -59,21 +58,10 @@ public class JmsSelectorDetectionTestCase extends FunctionalTestCase
 
     private MessageSource getSource()
     {
-        MessageSource source;
         Object flowOrService = muleContext.getRegistry().lookupObject("TestSelector");
         assertNotNull(flowOrService);
-        if (flowOrService instanceof Service)
-        {
-            Service svc = (Service) flowOrService;
-            source = svc.getMessageSource();
-        }
-        else
-        {
-            Flow flow = (Flow) flowOrService;
-            source = flow.getMessageSource();
-        }
-
-        return source;
+        Flow flow = (Flow) flowOrService;
+        return flow.getMessageSource();
     }
 
 }

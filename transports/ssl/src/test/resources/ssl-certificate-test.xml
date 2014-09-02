@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:ssl="http://www.mulesoft.org/schema/mule/ssl"
-       xmlns:test="http://www.mulesoft.org/schema/mule/test"
-    xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:ssl="http://www.mulesoft.org/schema/mule/ssl"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/ssl http://www.mulesoft.org/schema/mule/ssl/current/mule-ssl.xsd">
@@ -16,15 +16,11 @@
 
     <ssl:endpoint name="in" host="localhost" port="${port1}" exchange-pattern="request-response"/>
 
-    <model name="main">
-        <custom-service name="service" class="org.mule.tck.testmodels.mule.TestSedaService">
-            <inbound>
-                <ssl:inbound-endpoint ref="in"/>
-            </inbound>
+    <flow name="service">
+        <ssl:inbound-endpoint ref="in"/>
+        <test:component appendString=" Received">
+            <test:callback class="org.mule.transport.ssl.SaveCertificateCallback"/>
+        </test:component>
+    </flow>
 
-            <test:component appendString=" Received">
-                <test:callback class="org.mule.transport.ssl.SaveCertificateCallback"/>
-            </test:component>
-        </custom-service>
-    </model>
 </mule>

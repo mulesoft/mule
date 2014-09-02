@@ -23,9 +23,8 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.exception.SystemExceptionHandler;
-import org.mule.api.model.Model;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
+import org.mule.construct.Flow;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -549,12 +548,12 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
     {
 
         // Stop all named services
-        List<Service> services = new ArrayList<Service>();
+        List<Flow> services = new ArrayList<Flow>();
         for (String serviceName : serviceNames)
         {
             try
             {
-                Service service = muleContext.getRegistry().lookupService(serviceName);
+                Flow service = (Flow) muleContext.getRegistry().lookupFlowConstruct(serviceName);
                 service.stop();
                 services.add(service);
             }
@@ -573,9 +572,9 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
         }
 
         // We are done, startup the services again so that the test can begin...
-        for (Service service : services)
+        for (Flow flow : services)
         {
-            service.start();
+            flow.start();
         }
     }
 
@@ -1241,8 +1240,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
     {
         assertTrue("context is not started", muleContext.getLifecycleManager().getState().isStarted());
         Map<String, Connector> connectorMap = muleContext.getRegistry().lookupByType(Connector.class);
-        Map<String, Service> serviceMap = muleContext.getRegistry().lookupByType(Service.class);
-        Map<String, Model> modelMap = muleContext.getRegistry().lookupByType(Model.class);
+        Map<String, Flow> flowConstructMap = muleContext.getRegistry().lookupByType(Flow.class);
 
         Iterator<Map.Entry<String, Connector>> connectorItr = connectorMap.entrySet().iterator();
         while (connectorItr.hasNext())
@@ -1252,18 +1250,11 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
             assertTrue(pairs.getKey() + " is not started", pairs.getValue().isStarted());
         }
 
-        Iterator<Map.Entry<String, Service>> serviceItr = serviceMap.entrySet().iterator();
+        Iterator<Map.Entry<String, Flow>> serviceItr = flowConstructMap.entrySet().iterator();
         while (serviceItr.hasNext())
         {
-            Map.Entry<String, Service> pairs = serviceItr.next();
+            Map.Entry<String, Flow> pairs = serviceItr.next();
             assertTrue(pairs.getKey() + " is not started", pairs.getValue().isStarted());
-        }
-
-        Iterator<Map.Entry<String, Model>> modelItr = modelMap.entrySet().iterator();
-        while (modelItr.hasNext())
-        {
-            Map.Entry<String, Model> pairs = modelItr.next();
-            assertTrue(pairs.getKey() + " is not started", pairs.getValue().getLifecycleState().isStarted());
         }
     }
 

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:ssl="http://www.mulesoft.org/schema/mule/ssl"
-       xmlns:test="http://www.mulesoft.org/schema/mule/test"
-    xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:ssl="http://www.mulesoft.org/schema/mule/ssl"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/ssl http://www.mulesoft.org/schema/mule/ssl/current/mule-ssl.xsd">
@@ -21,32 +21,25 @@
 
     <ssl:endpoint name="asyncEndpoint" host="localhost" port="${port1}" exchange-pattern="one-way"/>
 
-    <model name="main">
-        <custom-service name="testComponent1" class="org.mule.tck.testmodels.mule.TestSedaService">
-            <inbound>
-                <ssl:inbound-endpoint ref="sendEndpoint"/>
-            </inbound>
-            <test:component appendString=" Received">
-                <test:callback class="org.mule.tck.functional.CounterCallback"/>
-            </test:component>
-        </custom-service>
+    <flow name="testComponent1">
+        <ssl:inbound-endpoint ref="sendEndpoint"/>
+        <test:component appendString=" Received">
+            <test:callback class="org.mule.tck.functional.CounterCallback"/>
+        </test:component>
+    </flow>
 
-        <custom-service name="testComponent2" class="org.mule.tck.testmodels.mule.TestSedaService">
-            <inbound>
-                <ssl:inbound-endpoint ref="sendManyEndpoint"/>
-            </inbound>
-            <test:component appendString=" Received">
-                <test:callback class="org.mule.tck.functional.CounterCallback"/>
-            </test:component>
-        </custom-service>
+    <flow name="testComponent2">
+        <ssl:inbound-endpoint ref="sendManyEndpoint"/>
+        <test:component appendString=" Received">
+            <test:callback class="org.mule.tck.functional.CounterCallback"/>
+        </test:component>
+    </flow>
 
-        <custom-service name="testComponent3" class="org.mule.tck.testmodels.mule.TestSedaService">
-            <inbound>
-                <inbound-endpoint ref="asyncEndpoint"/>
-            </inbound>
-            <test:component appendString=" Received">
-                <test:callback class="org.mule.tck.functional.ResponseWriterCallback"/>
-            </test:component>
-        </custom-service>
-    </model>
+    <flow name="testComponent3">
+        <inbound-endpoint ref="asyncEndpoint"/>
+        <test:component appendString=" Received">
+            <test:callback class="org.mule.tck.functional.ResponseWriterCallback"/>
+        </test:component>
+    </flow>
+
 </mule>

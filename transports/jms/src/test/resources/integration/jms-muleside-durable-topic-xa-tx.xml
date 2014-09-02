@@ -27,7 +27,7 @@
     <endpoint name="broadcast2" address="${broadcast.topic.destination}"
               connector-ref="jmsConnectorC2" exchange-pattern="one-way"/>
 
-    <model name="TEST">
+    <flow name="TEST">
         <inbound-endpoint ref="in"/>
         <test:component>
             <test:return-data>OUTPUT MESSAGE</test:return-data>
