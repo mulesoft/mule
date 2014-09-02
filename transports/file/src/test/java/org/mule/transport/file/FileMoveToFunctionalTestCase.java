@@ -84,7 +84,7 @@ public class FileMoveToFunctionalTestCase extends FunctionalTestCase {
     }
 
     private void copyFiles() throws InterruptedException, IOException {
-        for (int i=0; i < ITERATIONS; i++)
+        for (int i=1; i <= ITERATIONS; i++)
         {
             List<File> files = createFiles(inputTemporaryFolder, NUMBER_OF_FILES, FILE_SIZE);
             waitForFiles(moveToTemporaryFolder.getRoot(), i * NUMBER_OF_FILES);
