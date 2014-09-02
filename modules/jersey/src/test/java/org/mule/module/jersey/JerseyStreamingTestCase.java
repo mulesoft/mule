@@ -30,7 +30,7 @@ public class JerseyStreamingTestCase extends FunctionalTestCase
 {
 
     @Override
-    protected String getConfigFile()
+    protected String getConfigResources()
     {
         return "jersey-streaming-config.xml";
     }
