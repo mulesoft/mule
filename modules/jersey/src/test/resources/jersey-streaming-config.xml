@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:jersey="http://www.mulesoft.org/schema/mule/jersey"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+    	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    	http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+    	http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd
+    	http://www.mulesoft.org/schema/mule/jersey http://www.mulesoft.org/schema/mule/jersey/3.1/mule-jersey.xsd">
+
+    <flow name="testFlow">
+        <vm:inbound-endpoint path="in" exchange-pattern="one-way"/>
+        <jersey:resources>
+            <component>
+                <spring-object bean="testResourceBean"/>
+            </component>
+        </jersey:resources>
+        <vm:outbound-endpoint path="out"  exchange-pattern="one-way" />
+    </flow>
+
+    <spring:beans>
+        <spring:bean name="testResourceBean" class="org.mule.module.jersey.JerseyStreamingTestCase.TestResource" />
+    </spring:beans>
+
+</mule>
