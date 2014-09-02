@@ -69,6 +69,12 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
 
     void redeploy(String artifactName);
 
+    void undeployDomain(String domainName);
+
+    void deployDomain(URL domainArchiveUrl) throws IOException;
+
+    void redeployDomain(String domainName);
+
     void start();
 
     void stop();
