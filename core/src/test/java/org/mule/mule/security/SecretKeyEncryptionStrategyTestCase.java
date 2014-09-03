@@ -6,19 +6,18 @@
  */
 package org.mule.mule.security;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
 import org.mule.security.SecretKeyEncryptionStrategy;
 import org.mule.security.SecretKeyFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 
 public class SecretKeyEncryptionStrategyTestCase extends AbstractMuleTestCase
 {
 
-    private static final String TRIPLE_DES_KEY = RandomStringUtils.randomAlphabetic(24);
     @Test
     public void testRoundTripEncryptionBlowfish() throws Exception
     {
@@ -60,7 +59,7 @@ public class SecretKeyEncryptionStrategyTestCase extends AbstractMuleTestCase
     {
         SecretKeyEncryptionStrategy ske = new SecretKeyEncryptionStrategy();
         ske.setAlgorithm("TripleDES");
-        ske.setKey(TRIPLE_DES_KEY);
+        ske.setKey("shhhhh");
 
         ske.initialise();
 
