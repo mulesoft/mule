@@ -8,14 +8,14 @@
 package org.mule.test.infrastructure.process;
 
 import java.io.File;
+
 import org.apache.commons.lang.SystemUtils;
 
 public class MuleProcessController
 {
 
-    private Controller controller;
-
     private static final int DEFAULT_TIMEOUT = 60000;
+    private Controller controller;
 
     public MuleProcessController(String muleHome)
     {
@@ -24,79 +24,85 @@ public class MuleProcessController
 
     public MuleProcessController(String muleHome, int timeout)
     {
-        this.controller = SystemUtils.IS_OS_WINDOWS ? new WindowsController(muleHome, timeout) : new UnixController(muleHome, timeout);
+        controller = SystemUtils.IS_OS_WINDOWS ? new WindowsController(muleHome, timeout) : new UnixController(muleHome, timeout);
     }
 
     public boolean isRunning()
     {
-        return this.controller.isRunning();
+        return controller.isRunning();
     }
 
     public void start(String... args)
     {
-        this.controller.start(args);
+        controller.start(args);
     }
 
     public void stop(String... args)
     {
-        this.controller.stop(args);
+        controller.stop(args);
     }
 
     public int status(String... args)
     {
-        return this.controller.status(args);
+        return controller.status(args);
     }
 
     public int getProcessId()
     {
-        return this.controller.getProcessId();
+        return controller.getProcessId();
     }
 
     public void restart(String... args)
     {
-        this.controller.restart(args);
+        controller.restart(args);
     }
 
 
 
     public void deploy(String path)
     {
-        this.controller.deploy(path);
+        controller.deploy(path);
     }
 
     public boolean isDeployed(String appName)
     {
-        return this.controller.isDeployed(appName);
+        return controller.isDeployed(appName);
     }
-
 
 
     public void undeployAll()
     {
-        this.controller.undeployAll();
+        controller.undeployAll();
     }
 
     public void installLicense(String path)
     {
-        this.controller.installLicense(path);
+        controller.installLicense(path);
     }
 
     public void uninstallLicense()
     {
-        this.controller.uninstallLicense();
+        controller.uninstallLicense();
     }
 
     public void addLibrary(File jar)
     {
-        this.controller.addLibrary(jar);
+        controller.addLibrary(jar);
     }
 
     public void deployDomain(String domain)
     {
-        this.controller.deployDomain(domain);
+        controller.deployDomain(domain);
     }
 
+    public File getLog()
+    {
+        return controller.getLog();
+    }
 
-
+    public File getLog(String appName)
+    {
+        return controller.getLog(appName);
+    }
 
 }
