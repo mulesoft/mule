@@ -63,16 +63,48 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
      */
     ReentrantLock getLock();
 
+    /**
+     * Undeploys an application from the mule container
+     *
+     * @param appName name of the application to undeploy
+     */
     void undeploy(String appName);
 
+    /**
+     * Deploys and application bundled as a zip from the given URL to the mule container
+     *
+     * @param appArchiveUrl location of the zip application file
+     * @throws IOException
+     */
     void deploy(URL appArchiveUrl) throws IOException;
 
+    /**
+     * Undeploys and redeploys an application
+     *
+     * @param artifactName then name of the application to redeploy
+     */
     void redeploy(String artifactName);
 
+    /**
+     * Undeploys a domain from the mule container
+     *
+     * @param domainName name of the domain to undeploy
+     */
     void undeployDomain(String domainName);
 
+    /**
+     * Deploys a domain bundled as a zip from the given URL to the mule container
+     *
+     * @param domainArchiveUrl location of the zip domain file
+     * @throws IOException
+     */
     void deployDomain(URL domainArchiveUrl) throws IOException;
 
+    /**
+     * Undeploys and redeploys a domain
+     *
+     * @param domainName then name of the domain to redeploy
+     */
     void redeployDomain(String domainName);
 
     void start();
