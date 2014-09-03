@@ -208,6 +208,24 @@ public class MuleDeploymentService implements DeploymentService
     }
 
     @Override
+    public void undeployDomain(String domainName)
+    {
+        domainDeployer.undeployArtifact(domainName);
+    }
+
+    @Override
+    public void deployDomain(URL domainArchiveUrl) throws IOException
+    {
+        domainDeployer.deployPackagedArtifact(domainArchiveUrl);
+    }
+
+    @Override
+    public void redeployDomain(String domainName)
+    {
+        domainDeployer.redeploy(findDomain(domainName));
+    }
+
+    @Override
     public void addStartupListener(StartupListener listener)
     {
         this.startupListeners.add(listener);
