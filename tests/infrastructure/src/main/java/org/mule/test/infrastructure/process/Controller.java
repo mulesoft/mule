@@ -27,15 +27,15 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 public abstract class Controller
 {
 
-    private static final int DEFAULT_TIMEOUT = 30000;
-    private static final String MULE_HOME_VARIABLE = "MULE_HOME";
     protected static final String ANCHOR_SUFFIX = "-anchor.txt";
-    private static final String DOMAIN_DEPLOY_ERROR = "Error deploying domain %s.";
-    private static final String ANCHOR_DELETE_ERROR = "Could not delete anchor file [%s] when stopping Mule ESB.";
-    private static final String ADD_LIBRARY_ERROR = "Error copying jar file [%s] to lib directory [%s].";
     private static final IOFileFilter ANCHOR_FILTER = FileFilterUtils.suffixFileFilter(ANCHOR_SUFFIX);
     protected static final String STATUS = "Mule Enterprise Edition is running \\(([0-9]+)\\)\\.";
     protected static final Pattern STATUS_PATTERN = Pattern.compile(STATUS);
+    private static final int DEFAULT_TIMEOUT = 30000;
+    private static final String MULE_HOME_VARIABLE = "MULE_HOME";
+    private static final String DOMAIN_DEPLOY_ERROR = "Error deploying domain %s.";
+    private static final String ANCHOR_DELETE_ERROR = "Could not delete anchor file [%s] when stopping Mule ESB.";
+    private static final String ADD_LIBRARY_ERROR = "Error copying jar file [%s] to lib directory [%s].";
     private static final int IS_RUNNING_STATUS_CODE = 0;
     protected String muleHome;
     protected String muleBin;
@@ -254,5 +254,28 @@ public abstract class Controller
     protected boolean isDeployed(String appName)
     {
         return new File(appsDir, appName + ANCHOR_SUFFIX).exists();
+    }
+
+    public File getLog()
+    {
+        File log_ee = org.mule.util.FileUtils.newFile(muleHome + "/logs/mule_ee.log");
+        File log_ce = org.mule.util.FileUtils.newFile(muleHome + "/logs/mule.log");
+
+        if (log_ce.isFile())
+        {
+            return log_ce;
+        }
+        if (log_ee.isFile())
+        {
+            return log_ee;
+        }
+
+        throw new MuleControllerException("There is no mule log available at " + muleHome + "/logs/");
+    }
+
+    public File getLog(String appName)
+    {
+        File log = org.mule.util.FileUtils.newFile(String.format("%d/logs/mule-app-%d.log", muleHome, appName));
+        return log;
     }
 }

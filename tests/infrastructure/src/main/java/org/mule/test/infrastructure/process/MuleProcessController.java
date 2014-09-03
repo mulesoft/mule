@@ -8,14 +8,14 @@
 package org.mule.test.infrastructure.process;
 
 import java.io.File;
+
 import org.apache.commons.lang.SystemUtils;
 
 public class MuleProcessController
 {
 
-    private Controller controller;
-
     private static final int DEFAULT_TIMEOUT = 60000;
+    private Controller controller;
 
     public MuleProcessController(String muleHome)
     {
@@ -96,7 +96,14 @@ public class MuleProcessController
         this.controller.deployDomain(domain);
     }
 
+    public File getLog()
+    {
+        return this.controller.getLog();
+    }
 
-
+    public File getLog(String appName)
+    {
+        return this.controller.getLog(appName);
+    }
 
 }
