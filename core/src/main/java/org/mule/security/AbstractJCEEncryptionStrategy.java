@@ -61,30 +61,27 @@ public abstract class AbstractJCEEncryptionStrategy extends AbstractNamedEncrypt
         try
         {
             secretKey = getSecretKey();
-            createAndInitCiphers();
+            // Create Ciphers
+            encryptCipher = Cipher.getInstance(getAlgorithm());
+            decryptCipher = Cipher.getInstance(getAlgorithm());
+
+            AlgorithmParameterSpec paramSpec = createAlgorithmParameterSpec();
+            if (paramSpec != null)
+            {
+                encryptCipher.init(Cipher.ENCRYPT_MODE, secretKey, paramSpec);
+                decryptCipher.init(Cipher.DECRYPT_MODE, secretKey, paramSpec);
+            }
+            else
+            {
+                encryptCipher.init(Cipher.ENCRYPT_MODE, secretKey);
+                decryptCipher.init(Cipher.DECRYPT_MODE, secretKey);
+            }
+
         }
         catch (Exception e)
         {
             throw new InitialisationException(CoreMessages.failedToCreate("encryption ciphers"),
                 e, this);
-        }
-    }
-
-    protected void createAndInitCiphers() throws GeneralSecurityException
-    {
-        encryptCipher = Cipher.getInstance(getAlgorithm());
-        decryptCipher = Cipher.getInstance(getAlgorithm());
-
-        AlgorithmParameterSpec paramSpec = createAlgorithmParameterSpec();
-        if (paramSpec != null)
-        {
-            encryptCipher.init(Cipher.ENCRYPT_MODE, secretKey, paramSpec);
-            decryptCipher.init(Cipher.DECRYPT_MODE, secretKey, paramSpec);
-        }
-        else
-        {
-            encryptCipher.init(Cipher.ENCRYPT_MODE, secretKey);
-            decryptCipher.init(Cipher.DECRYPT_MODE, secretKey);
         }
     }
 
