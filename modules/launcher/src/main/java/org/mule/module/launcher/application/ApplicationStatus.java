@@ -21,5 +21,7 @@ public enum ApplicationStatus
 
     STOPPED,
 
+    DEPLOYMENT_FAILED,
+
     DESTROYED
 }
