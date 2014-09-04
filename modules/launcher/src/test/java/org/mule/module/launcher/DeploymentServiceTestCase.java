@@ -31,6 +31,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.config.StartupContext;
 import org.mule.module.launcher.application.Application;
+import org.mule.module.launcher.application.ApplicationStatus;
 import org.mule.module.launcher.application.MuleApplicationClassLoaderFactory;
 import org.mule.module.launcher.application.TestApplicationFactory;
 import org.mule.module.launcher.domain.Domain;
@@ -158,13 +159,12 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
         assertAppsDir(NONE, new String[] {dummyAppDescriptor.id}, true);
         assertApplicationAnchorFileExists(dummyAppDescriptor.id);
 
         // just assert no privileged entries were put in the registry
         final Application app = findApp(dummyAppDescriptor.id, 1);
-
         final MuleRegistry registry = getMuleRegistry(app);
 
         // mule-app.properties from the zip archive must have loaded properly
@@ -206,7 +206,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         addPackedAppFromResource(dummyAppDescriptor.zipPath);
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
         assertAppsDir(NONE, new String[] {dummyAppDescriptor.id}, true);
         assertApplicationAnchorFileExists(dummyAppDescriptor.id);
 
@@ -230,6 +230,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertAppsDir(new String[] {"brokenApp.zip"}, NONE, true);
 
         assertApplicationAnchorFileDoesNotExists(brokenAppDescriptor.id);
+
+        deploymentService.getApplications();
 
         final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
         assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
@@ -267,11 +269,11 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         addPackedAppFromResource(dummyAppDescriptor.zipPath);
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
         assertDeploymentFailure(applicationDeploymentListener, "brokenApp+", never());
 
         addPackedAppFromResource(emptyAppDescriptor.zipPath);
-        assertDeploymentSuccess(applicationDeploymentListener, emptyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppDescriptor.id);
         assertDeploymentFailure(applicationDeploymentListener, "brokenApp+", never());
     }
 
@@ -302,7 +304,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         addPackedAppFromResource(dummyAppDescriptor.zipPath);
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
 
         assertAppsDir(NONE, new String[] {dummyAppDescriptor.id}, true);
         assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
@@ -312,7 +314,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         addPackedAppFromResource(dummyAppDescriptor.zipPath);
 
         assertUndeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+
         assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
         assertAppsDir(NONE, new String[] {dummyAppDescriptor.id}, true);
     }
@@ -324,7 +327,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
 
         assertAppsDir(NONE, new String[] {dummyAppDescriptor.id}, true);
         assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
@@ -334,7 +337,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         addPackedAppFromResource(dummyAppDescriptor.zipPath);
 
         assertUndeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
         assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
         assertAppsDir(NONE, new String[] {dummyAppDescriptor.id}, true);
     }
@@ -346,7 +349,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
         assertAppsDir(NONE, new String[] {dummyAppDescriptor.id}, true);
         assertApplicationAnchorFileExists(dummyAppDescriptor.id);
     }
@@ -359,14 +362,13 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
-
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
         addPackedAppFromResource(emptyAppDescriptor.zipPath);
 
-        assertDeploymentSuccess(applicationDeploymentListener, emptyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppDescriptor.id);
 
         // Checks that dummy app was deployed just once
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
     }
 
     @Test
@@ -376,7 +378,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         addExplodedAppFromResource(dummyAppDescriptor.zipPath);
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
         assertAppsDir(NONE, new String[] {dummyAppDescriptor.id}, true);
         assertApplicationAnchorFileExists(dummyAppDescriptor.id);
     }
@@ -430,10 +432,10 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertDeploymentFailure(applicationDeploymentListener, "app with spaces", atLeast(1));
 
         addExplodedAppFromResource(dummyAppDescriptor.zipPath);
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
 
         addExplodedAppFromResource(emptyAppDescriptor.zipPath);
-        assertDeploymentSuccess(applicationDeploymentListener, emptyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppDescriptor.id);
 
         // After three update cycles should have only one deployment failure notification for the broken app
         assertDeploymentFailure(applicationDeploymentListener, "app with spaces");
@@ -489,7 +491,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
         assertAppsDir(NONE, new String[] {dummyAppDescriptor.id}, true);
 
         reset(applicationDeploymentListener);
@@ -497,7 +499,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         File configFile = new File(appsDir + dummyAppDescriptor.path, MULE_CONFIG_XML_FILE);
         configFile.setLastModified(configFile.lastModified() + 1000);
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
     }
 
     @Test
@@ -507,7 +509,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         addExplodedAppFromResource(dummyAppDescriptor.zipPath);
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
         assertAppsDir(NONE, new String[] {dummyAppDescriptor.id}, true);
 
         reset(applicationDeploymentListener);
@@ -515,7 +517,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         File configFile = new File(appsDir + dummyAppDescriptor.path, MULE_CONFIG_XML_FILE);
         configFile.setLastModified(configFile.lastModified() + 1000);
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
     }
 
     @Test
@@ -575,7 +577,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+
         assertAppsDir(NONE, new String[] {dummyAppDescriptor.id}, true);
 
         reset(applicationDeploymentListener);
@@ -586,6 +589,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         FileUtils.copyFile(newConfigFile, originalConfigFile);
 
         assertDeploymentFailure(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertStatus(dummyAppDescriptor.id, ApplicationStatus.DEPLOYMENT_FAILED);
     }
 
     @Test
@@ -595,7 +599,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         addExplodedAppFromResource(dummyAppDescriptor.zipPath, dummyAppDescriptor.id);
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
         assertAppsDir(NONE, new String[] {dummyAppDescriptor.id}, true);
 
         reset(applicationDeploymentListener);
@@ -606,6 +610,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         FileUtils.copyFile(newConfigFile, originalConfigFile);
 
         assertDeploymentFailure(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertStatus(dummyAppDescriptor.id, ApplicationStatus.DEPLOYMENT_FAILED);
     }
 
     @Test
@@ -623,10 +628,10 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         URL url = getClass().getResource(emptyDomainDescriptor.configFilePath);
         File newConfigFile = new File(url.toURI());
         FileUtils.copyFile(newConfigFile, originalConfigFile);
-        assertDeploymentSuccess(applicationDeploymentListener, incompleteAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, incompleteAppDescriptor.id);
 
         addPackedAppFromResource(dummyAppDescriptor.zipPath);
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
 
         // Check that the failed application folder is still there
         assertAppFolderIsMaintained(incompleteAppDescriptor.id);
@@ -649,10 +654,10 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         File newConfigFile = new File(url.toURI());
         FileUtils.copyFile(newConfigFile, originalConfigFile);
 
-        assertDeploymentSuccess(applicationDeploymentListener, incompleteAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, incompleteAppDescriptor.id);
 
         addPackedAppFromResource(dummyAppDescriptor.zipPath);
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
 
         // Check that the failed application folder is still there
         assertAppFolderIsMaintained(incompleteAppDescriptor.id);
@@ -665,7 +670,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
 
         assertAppsDir(NONE, new String[] {dummyAppDescriptor.id}, true);
         assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
@@ -676,7 +681,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         configFile.setLastModified(configFile.lastModified() + 1000);
 
         assertUndeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
         assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
         assertAppsDir(NONE, new String[] {dummyAppDescriptor.id}, true);
     }
@@ -743,7 +748,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(applicationDeploymentListener, emptyAppDescriptor.targetPath);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppDescriptor.targetPath);
         reset(applicationDeploymentListener);
 
         assertAppsDir(NONE, new String[] {emptyAppDescriptor.targetPath}, true);
@@ -766,9 +771,9 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(applicationDeploymentListener, "1");
-        assertDeploymentSuccess(applicationDeploymentListener, "2");
-        assertDeploymentSuccess(applicationDeploymentListener, "3");
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, "1");
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, "2");
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, "3");
         assertAppsDir(NONE, new String[] {"1", "2", "3"}, true);
 
         // When apps are passed as -app app1:app2:app3 the startup order matters
@@ -793,9 +798,9 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(applicationDeploymentListener, "1");
-        assertDeploymentSuccess(applicationDeploymentListener, "2");
-        assertDeploymentSuccess(applicationDeploymentListener, "3");
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, "1");
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, "2");
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, "3");
 
         assertAppsDir(NONE, new String[] {"1", "2", "3"}, true);
 
@@ -819,7 +824,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
         assertAppsDir(NONE, new String[] {dummyAppDescriptor.id}, true);
 
         List<Application> applications = deploymentService.getApplications();
@@ -837,7 +842,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         configFile.setLastModified(System.currentTimeMillis() + ONE_HOUR_IN_MILLISECONDS);
 
         deploymentService.start();
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
         reset(applicationDeploymentListener);
 
         assertNoDeploymentInvoked(applicationDeploymentListener);
@@ -860,7 +865,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         URL url = getClass().getResource(emptyDomainDescriptor.configFilePath);
         FileUtils.copyFile(new File(url.toURI()), configFile);
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
     }
 
     @Test
@@ -872,7 +877,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
         assertMuleContextCreated(applicationDeploymentListener, dummyAppDescriptor.id);
         assertMuleContextInitialized(applicationDeploymentListener, dummyAppDescriptor.id);
         assertMuleContextConfigured(applicationDeploymentListener, dummyAppDescriptor.id);
@@ -885,9 +890,10 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
         final Application app = findApp(dummyAppDescriptor.id, 1);
         app.stop();
+        assertStatus(app, ApplicationStatus.STOPPED);
 
         deploymentService.undeploy(app);
     }
@@ -899,11 +905,13 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        Application app = findApp(dummyAppDescriptor.id, 1);
 
         assertTrue("Unable to remove anchor file", removeAppAnchorFile(dummyAppDescriptor.id));
 
         assertUndeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertStatus(app, ApplicationStatus.DESTROYED);
     }
 
     @Test
@@ -917,13 +925,15 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.setAppFactory(appFactory);
         deploymentService.start();
 
-        assertDeploymentSuccess(applicationDeploymentListener, emptyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppDescriptor.id);
+        Application app = findApp(emptyAppDescriptor.id, 1);
 
         assertTrue("Unable to remove anchor file", removeAppAnchorFile(emptyAppDescriptor.id));
 
         assertUndeploymentSuccess(applicationDeploymentListener, emptyAppDescriptor.id);
 
         assertAppFolderIsDeleted(emptyAppDescriptor.id);
+        assertStatus(app, ApplicationStatus.DESTROYED);
     }
 
     @Test
@@ -936,12 +946,13 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.setAppFactory(appFactory);
         deploymentService.start();
 
-        assertDeploymentSuccess(applicationDeploymentListener, emptyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppDescriptor.id);
+        Application app = findApp(emptyAppDescriptor.id, 1);
 
         assertTrue("Unable to remove anchor file", removeAppAnchorFile(emptyAppDescriptor.id));
 
         assertUndeploymentSuccess(applicationDeploymentListener, emptyAppDescriptor.id);
-
+        assertStatus(app, ApplicationStatus.STOPPED);
         assertAppFolderIsDeleted(emptyAppDescriptor.id);
     }
 
@@ -957,7 +968,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         // Deploys another app to confirm that DeploymentService has execute the updater thread
         addPackedAppFromResource(dummyAppDescriptor.zipPath);
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
 
         // Check that the failed application folder is still there
         assertAppFolderIsMaintained(incompleteAppDescriptor.id);
@@ -977,7 +988,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         // Deploys another app to confirm that DeploymentService has execute the updater thread
         addPackedAppFromResource(dummyAppDescriptor.zipPath);
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
 
         // Check that the failed application folder is still there
         assertAppFolderIsMaintained(incompleteAppDescriptor.id);
@@ -997,7 +1008,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         // Deploys another app to confirm that DeploymentService has execute the updater thread
         addPackedAppFromResource(dummyAppDescriptor.zipPath);
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
 
         // Check that the failed application folder is still there
         assertAppFolderIsMaintained(incompleteAppDescriptor.id);
@@ -1017,11 +1028,11 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         // Deploys another app to confirm that DeploymentService has execute the updater thread
         addPackedAppFromResource(dummyAppDescriptor.zipPath);
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
 
         // Deploys another app to confirm that DeploymentService has execute the updater thread
         addPackedAppFromResource(emptyAppDescriptor.zipPath, incompleteAppDescriptor.targetPath);
-        assertDeploymentSuccess(applicationDeploymentListener, incompleteAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, incompleteAppDescriptor.id);
 
         assertEquals("Failed app still appears as zombie after a successful redeploy", 0, deploymentService.getZombieApplications().size());
     }
@@ -1038,11 +1049,11 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         // Deploys another app to confirm that DeploymentService has execute the updater thread
         addPackedAppFromResource(dummyAppDescriptor.zipPath);
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
 
         // Deploys another app to confirm that DeploymentService has execute the updater thread
         addPackedAppFromResource(emptyAppDescriptor.zipPath, incompleteAppDescriptor.targetPath);
-        assertDeploymentSuccess(applicationDeploymentListener, incompleteAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, incompleteAppDescriptor.id);
 
         assertEquals("Failed app still appears as zombie after a successful redeploy", 0, deploymentService.getZombieApplications().size());
     }
@@ -1054,7 +1065,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentService.start();
 
-        assertDeploymentSuccess(applicationDeploymentListener, emptyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppDescriptor.id);
 
         addPackedAppFromResource(incompleteAppDescriptor.zipPath, emptyAppDescriptor.targetPath);
 
@@ -1070,7 +1081,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.start();
 
         addPackedAppFromResource(emptyAppDescriptor.zipPath);
-        assertDeploymentSuccess(applicationDeploymentListener, emptyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppDescriptor.id);
 
         addPackedAppFromResource(incompleteAppDescriptor.zipPath, emptyAppDescriptor.targetPath);
         assertDeploymentFailure(applicationDeploymentListener, emptyAppDescriptor.id);
@@ -1127,12 +1138,12 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         // Deploys another app to confirm that DeploymentService has execute the updater thread
         addPackedAppFromResource(dummyAppDescriptor.zipPath);
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
 
         // Redeploys a fixed version for incompleteApp
         addExplodedAppFromResource(emptyAppDescriptor.zipPath, incompleteAppDescriptor.id);
 
-        assertDeploymentSuccess(applicationDeploymentListener, incompleteAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, incompleteAppDescriptor.id);
         assertEquals("Failed app still appears as zombie after a successful redeploy", 0, deploymentService.getZombieApplications().size());
     }
 
@@ -1192,7 +1203,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         deploymentServiceThread.start();
 
-        assertDeploymentSuccess(applicationDeploymentListener, emptyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppDescriptor.id);
 
         assertFalse("Able to lock deployment service during start", lockedFromClient[0]);
     }
@@ -1292,7 +1303,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertNotNull(domain);
         assertNull(domain.getMuleContext());
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
         assertAppsDir(NONE, new String[] {dummyAppDescriptor.id}, true);
 
         final Application app = findApp(dummyAppDescriptor.id, 1);
@@ -1926,10 +1937,10 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
 
         addPackedAppFromResource(dummyDomainApp1Descriptor.zipPath);
-        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
 
         addPackedAppFromResource(dummyDomainApp2Descriptor.zipPath);
-        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp2Descriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp2Descriptor.id);
 
         undeployAction.perform();
 
@@ -1971,8 +1982,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
-        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp2Descriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp2Descriptor.id);
 
         reset(domainDeploymentListener);
         reset(applicationDeploymentListener);
@@ -1981,8 +1992,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
-        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp2Descriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp2Descriptor.id);
     }
 
     @Test
@@ -1997,8 +2008,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
-        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp2Descriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp2Descriptor.id);
 
         reset(domainDeploymentListener);
         reset(applicationDeploymentListener);
@@ -2023,8 +2034,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
-        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp2Descriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp2Descriptor.id);
         assertDeploymentFailure(applicationDeploymentListener, dummyDomainApp3Descriptor.id);
 
         reset(domainDeploymentListener);
@@ -2043,8 +2054,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
-        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp2Descriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp2Descriptor.id);
         assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp3Descriptor.id);
     }
 
@@ -2060,8 +2071,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
-        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp2Descriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp2Descriptor.id);
 
         reset(domainDeploymentListener);
         reset(applicationDeploymentListener);
@@ -2079,7 +2090,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertDeploymentSuccess(domainDeploymentListener, dummyDomainDescriptor.id);
 
-        assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
         assertDeploymentFailure(applicationDeploymentListener, dummyDomainApp2Descriptor.id);
     }
 
@@ -2221,7 +2232,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
             @Override
             public void perform() throws Exception
             {
-                assertDeploymentSuccess(applicationDeploymentListener, waitAppDescriptor.id);
+                assertApplicationDeploymentSuccess(applicationDeploymentListener, waitAppDescriptor.id);
             }
         };
         Action verifyAnchorFileExistsAction = new Action()
@@ -2289,6 +2300,11 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         verifyAnchorFileExistsAction.perform();
     }
 
+    private void assertApplicationDeploymentSuccess(DeploymentListener listener, String artifactName)
+    {
+        assertDeploymentSuccess(listener, artifactName);
+        assertStatus(artifactName, ApplicationStatus.STARTED);
+    }
 
     private void assertDeploymentSuccess(final DeploymentListener listener, final String artifactName)
     {
@@ -2434,6 +2450,23 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertDeploymentFailure(listener, artifactName, times(1));
     }
 
+    private void assertStatus(String appName, ApplicationStatus status)
+    {
+        assertStatus(appName, status, -1);
+    }
+
+    private void assertStatus(String appName, ApplicationStatus status, int expectedApps)
+    {
+        Application app = findApp(appName, expectedApps);
+        assertThat(app, notNullValue());
+        assertStatus(app, status);
+    }
+
+    private void assertStatus(Application application, ApplicationStatus status)
+    {
+        assertThat(application.getStatus(), is(status));
+    }
+
     private void assertDeploymentFailure(final DeploymentListener listener, final String artifactName, final VerificationMode mode)
     {
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
@@ -2505,7 +2538,12 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         // list all apps to validate total count
         final List<Application> apps = deploymentService.getApplications();
         assertNotNull(apps);
-        assertEquals(totalAppsExpected, apps.size());
+
+        if (totalAppsExpected >= 0)
+        {
+            assertEquals(totalAppsExpected, apps.size());
+        }
+
         final Application app = deploymentService.findApplication(appName);
         assertNotNull(app);
         return app;

@@ -12,11 +12,14 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.config.builders.SimpleConfigurationBuilder;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.context.DefaultMuleContextFactory;
+import org.mule.context.notification.MuleContextNotification;
+import org.mule.context.notification.NotificationException;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.module.launcher.DeploymentInitException;
 import org.mule.module.launcher.DeploymentListener;
@@ -49,6 +52,7 @@ public class DefaultMuleApplication implements Application
 
     protected final ApplicationDescriptor descriptor;
     protected final ApplicationClassLoaderFactory applicationClassLoaderFactory;
+    private ApplicationStatus status;
 
     protected MuleContext muleContext;
     protected ArtifactClassLoader deploymentClassLoader;
@@ -61,6 +65,7 @@ public class DefaultMuleApplication implements Application
         this.applicationClassLoaderFactory = applicationClassLoaderFactory;
         this.deploymentListener = new NullDeploymentListener();
         this.domain = domain;
+        updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
     }
 
     public void setDeploymentListener(DeploymentListener deploymentListener)
@@ -80,6 +85,9 @@ public class DefaultMuleApplication implements Application
         {
             logger.info(miniSplash(String.format("New app '%s'", descriptor.getAppName())));
         }
+
+        // set even though it might be redundant, just in case the app is been redeployed
+        updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
 
         for (String configResourceAbsolutePatch : this.descriptor.getAbsoluteResourcePaths())
         {
@@ -135,8 +143,10 @@ public class DefaultMuleApplication implements Application
                 Thread.currentThread().setContextClassLoader(oldCl);
             }
         }
-        catch (MuleException e)
+        catch (Exception e)
         {
+            status = ApplicationStatus.DEPLOYMENT_FAILED;
+
             // log it here so it ends up in app log, sys log will only log a message without stacktrace
             logger.error(null, ExceptionUtils.getRootCause(e));
             // TODO add app name to the exception field
@@ -170,16 +180,44 @@ public class DefaultMuleApplication implements Application
                 {
                     muleContextFactory.addListener(new MuleContextDeploymentListener(getArtifactName(), deploymentListener));
                 }
+
                 ApplicationMuleContextBuilder applicationContextBuilder = new ApplicationMuleContextBuilder(descriptor);
-                this.muleContext = muleContextFactory.createMuleContext(builders, applicationContextBuilder);
+                setMuleContext(muleContextFactory.createMuleContext(builders, applicationContextBuilder));
             }
         }
         catch (Exception e)
         {
+            status = ApplicationStatus.DEPLOYMENT_FAILED;
+
             // log it here so it ends up in app log, sys log will only log a message without stacktrace
             logger.error(null, ExceptionUtils.getRootCause(e));
             throw new DeploymentInitException(CoreMessages.createStaticMessage(ExceptionUtils.getRootCauseMessage(e)), e);
         }
+    }
+
+    protected void setMuleContext(final MuleContext muleContext) throws NotificationException
+    {
+        this.muleContext = muleContext;
+        this.muleContext.registerListener(new MuleContextNotificationListener<MuleContextNotification>()
+        {
+            @Override
+            public void onNotification(MuleContextNotification notification)
+            {
+                int action = notification.getAction();
+                if (action == MuleContextNotification.CONTEXT_INITIALISED ||
+                    action == MuleContextNotification.CONTEXT_STARTED ||
+                    action == MuleContextNotification.CONTEXT_STOPPED ||
+                    action == MuleContextNotification.CONTEXT_DISPOSED)
+                {
+                    updateStatusFor(muleContext.getLifecycleManager().getCurrentPhase());
+                }
+            }
+        });
+    }
+
+    private void updateStatusFor(String phase)
+    {
+        status = ApplicationStatusMapper.getApplicationStatus(phase);
     }
 
     protected ConfigurationBuilder createConfigurationBuilderFromApplicationProperties()
@@ -283,6 +321,8 @@ public class DefaultMuleApplication implements Application
             {
                 logger.info(String.format("Stopping app '%s' with no mule context", descriptor.getAppName()));
             }
+
+            status = ApplicationStatus.STOPPED;
             return;
         }
 
@@ -307,14 +347,7 @@ public class DefaultMuleApplication implements Application
     @Override
     public ApplicationStatus getStatus()
     {
-        if (muleContext != null)
-        {
-            return ApplicationStatusMapper.getApplicationStatus(muleContext.getLifecycleManager().getCurrentPhase());
-        }
-        else
-        {
-            return ApplicationStatusMapper.getApplicationStatus(NotInLifecyclePhase.PHASE_NAME);
-        }
+        return status;
     }
 
     @Override
