@@ -19,7 +19,7 @@ import groovy.transform.AutoClone
 @Field String version
 @Field String m2repo
 @Field packagingExceptions = ['geomail': 'war']
-@Field deployExceptions = ['archetypes', 'integration-axis', 'loanbroker-legacy']
+@Field deployExceptions = ['archetypes', 'loanbroker-legacy']
 @Field artifactIdExceptions = ['jboss-transactions'      : 'mule-module-jbossts',
                                'bobberplus'              : 'bobberplus',
                                'mule-transport-archetype': 'mule-transport-archetype',

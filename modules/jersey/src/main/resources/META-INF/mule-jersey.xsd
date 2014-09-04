@@ -49,12 +49,35 @@
             <xsd:extension base="mule:abstractComponentType">
                 <xsd:sequence>
                     <xsd:element ref="mule:abstract-component" minOccurs="1" maxOccurs="unbounded"/>
+                    <xsd:element name="package" type="packageType" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                These are the packages that Jersey should scan for annotated resources
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="property" type="mule:keyValueType" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                These are the ResourceConfig properties
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                     <xsd:element ref="exception-mapper" minOccurs="0" maxOccurs="unbounded" />
                     <xsd:element ref="context-resolver" minOccurs="0" maxOccurs="unbounded" />
                 </xsd:sequence>
                 <xsd:attributeGroup ref="componentAttributes" />
             </xsd:extension>
         </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="packageType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Represents the name of a Java package
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:attribute name="packageName" type="xsd:string" use="required"/>
     </xsd:complexType>
 
     <xsd:attributeGroup name="componentAttributes">

@@ -65,11 +65,11 @@
 /mule-standalone-nodocs-${productVersion}/lib/boot/wrapper-windows-x86-32.dll
 /mule-standalone-nodocs-${productVersion}/lib/boot/disruptor-3.2.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/boot/jcl-over-slf4j-1.7.7.jar
-/mule-standalone-nodocs-${productVersion}/lib/boot/log4j-1.2-api-2.0.jar
-/mule-standalone-nodocs-${productVersion}/lib/boot/log4j-api-2.0.jar
-/mule-standalone-nodocs-${productVersion}/lib/boot/log4j-core-2.0.jar
-/mule-standalone-nodocs-${productVersion}/lib/boot/log4j-jcl-2.0.jar
-/mule-standalone-nodocs-${productVersion}/lib/boot/log4j-slf4j-impl-2.0.jar
+/mule-standalone-nodocs-${productVersion}/lib/boot/log4j-1.2-api-2.0.2.jar
+/mule-standalone-nodocs-${productVersion}/lib/boot/log4j-api-2.0.2.jar
+/mule-standalone-nodocs-${productVersion}/lib/boot/log4j-core-2.0.2.jar
+/mule-standalone-nodocs-${productVersion}/lib/boot/log4j-jcl-2.0.2.jar
+/mule-standalone-nodocs-${productVersion}/lib/boot/log4j-slf4j-impl-2.0.2.jar
 /mule-standalone-nodocs-${productVersion}/lib/boot/slf4j-api-1.7.7.jar
 
 
@@ -228,7 +228,6 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/drools-compiler-5.0.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/drools-core-5.0.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/el-api-6.0.29.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/geronimo-annotation_1.1_spec-1.0.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/geronimo-ejb_2.1_spec-1.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/geronimo-j2ee-connector_1.5_spec-1.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/geronimo-j2ee-management_1.0_spec-1.1.jar
@@ -243,6 +242,9 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/hibernate-commons-annotations-3.2.0.Final.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/hibernate-core-3.6.0.Final.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/hibernate-jpa-2.0-api-1.0.0.Final.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/hk2-api-2.3.0-b05.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/hk2-locator-2.3.0-b05.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/hk2-utils-2.3.0-b05.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/isorelax-20030108.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jackson-annotations-2.1.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jackson-core-2.1.1.jar
@@ -255,6 +257,9 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/jasper-el-6.0.29.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jasper-jdt-6.0.29.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/javassist-3.7.ga.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/javax.annotation-api-1.2.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/javax.inject-2.3.0-b05.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/javax.ws.rs-api-2.0.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jaxb-api-2.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jaxb-impl-2.1.9.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jaxb-xjc-2.1.9.jar
@@ -268,10 +273,13 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/jbpm-pvm-4.4.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jcifs-1.3.3.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jdom-1.1.3.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/jersey-client-1.6.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/jersey-core-1.6.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/jersey-json-1.6.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/jersey-server-1.6.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/jersey-client-2.11.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/jersey-common-2.11.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/jersey-guava-2.11.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/jersey-media-json-jackson1-2.11.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/jersey-media-json-jettison-2.11.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/jersey-server-2.11.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/jettison-1.3.3.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jetty-annotations-9.0.7.v20131107.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jetty-continuation-9.0.7.v20131107.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jetty-deploy-9.0.7.v20131107.jar
@@ -289,7 +297,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/jetty-util5-6.1.26.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jgrapht-jdk1.5-0.7.3.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/joda-time-1.6.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/jsch-0.1.50.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/jsch-0.1.51.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/json-schema-validator-1.2.2.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jsp-api-6.0.29.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jsr181-api-1.0-MR1.jar
@@ -309,6 +317,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/mx4j-tools-2.1.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/neethi-3.0.2.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/oro-2.0.8.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/osgi-resource-locator-1.0.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/quartz-1.8.5.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/relaxngDatatype-20020414.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/rhino-1.7R4.jar
@@ -342,9 +351,8 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/stax2-api-3.1.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/staxon-1.2.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/stringtemplate-3.2.1.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/catalina-6.0.29.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/coyote-6.0.29.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/servlet-api-6.0.29.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/tomcat-apr-5.5.23.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/tomcat-util-5.5.23.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/uuid-3.4.0.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/woodstox-core-asl-4.1.4.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/wsdl4j-1.6.2.jar
@@ -361,6 +369,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/openws-1.4.2-1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/xmlbeans-2.3.0.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/xmltooling-1.3.2-1.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/validation-api-1.1.0.Final.jar
 /mule-standalone-nodocs-${productVersion}/lib/shared
 /mule-standalone-nodocs-${productVersion}/lib/shared/README.txt
 /mule-standalone-nodocs-${productVersion}/lib/user
