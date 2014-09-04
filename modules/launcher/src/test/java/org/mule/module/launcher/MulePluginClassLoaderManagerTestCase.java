@@ -7,8 +7,8 @@
 package org.mule.module.launcher;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
-import static org.junit.internal.matchers.IsCollectionContaining.hasItem;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
