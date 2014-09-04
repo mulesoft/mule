@@ -12,12 +12,10 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.util.queue.QueueConfiguration.MAXIMUM_CAPACITY;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -27,7 +25,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Answers;
-import org.mockito.Mockito;
 
 public abstract class QueueStoreTestCase extends AbstractMuleContextTestCase
 {
@@ -40,7 +37,7 @@ public abstract class QueueStoreTestCase extends AbstractMuleContextTestCase
     public static final int SHORT_POLL_TIMEOUT = 100;
 
     @Rule
-    public static TemporaryFolder temporaryFolder = new TemporaryFolder();
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Test
     public void offerAndPollSingleValue() throws InterruptedException, ObjectStoreException

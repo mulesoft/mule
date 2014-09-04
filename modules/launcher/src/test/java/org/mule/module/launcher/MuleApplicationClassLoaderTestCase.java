@@ -54,8 +54,11 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase
     {
         // Create directories structure
         previousMuleHome = System.setProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, tempMuleHome.getRoot().getAbsolutePath());
-        domainDir = tempMuleHome.newFolder(String.format("domains/%s", DOMAIN_NAME));
-        classesDir = tempMuleHome.newFolder(String.format("apps/%s/classes", APP_NAME));
+
+        domainDir = createDirectory("domains/%s", DOMAIN_NAME);
+
+        classesDir = createDirectory("apps/%s/classes", APP_NAME);
+
         File libDir = tempMuleHome.newFolder(String.format("apps/%s/lib", APP_NAME));
 
         // Add jar file with resources in lib dir
@@ -75,6 +78,13 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase
         // Create app class loader
         domainCL = new MuleSharedDomainClassLoader(DOMAIN_NAME, Thread.currentThread().getContextClassLoader());
         appCL = new MuleApplicationClassLoader(APP_NAME, domainCL);
+    }
+
+    private File createDirectory(String format, Object... args)
+    {
+        File file = new File(tempMuleHome.getRoot(), String.format(format, args));
+        file.mkdirs();
+        return file;
     }
 
     @After
