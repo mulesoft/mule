@@ -276,7 +276,10 @@ public abstract class Controller
     public File getLog(String appName)
     {
         File log = org.mule.util.FileUtils.newFile(String.format("%s/logs/mule-app-%s.log", muleHome, appName));
-        if (log.exists() && log.isFile()) return log;
+        if (log.exists() && log.isFile())
+        {
+            return log;
+        }
         throw new MuleControllerException(String.format("There is no mule log available at %s/logs/", muleHome));
     }
 }
