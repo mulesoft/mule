@@ -695,9 +695,8 @@
 /mule-standalone-${productVersion}/lib/opt/stax2-api-3.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/staxon-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/stringtemplate-3.2.1.jar
-/mule-standalone-${productVersion}/lib/opt/catalina-6.0.29.jar
-/mule-standalone-${productVersion}/lib/opt/coyote-6.0.29.jar
-/mule-standalone-${productVersion}/lib/opt/servlet-api-6.0.29.jar
+/mule-standalone-${productVersion}/lib/opt/tomcat-apr-5.5.23.jar
+/mule-standalone-${productVersion}/lib/opt/tomcat-util-5.5.23.jar
 /mule-standalone-${productVersion}/lib/opt/uuid-3.4.0.jar
 /mule-standalone-${productVersion}/lib/opt/woodstox-core-asl-4.1.4.jar
 /mule-standalone-${productVersion}/lib/opt/wsdl4j-1.6.2.jar
