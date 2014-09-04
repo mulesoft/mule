@@ -10,7 +10,6 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.source.MessageSource;
 import org.mule.construct.Flow;
-import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.jms.filters.JmsSelectorFilter;
 
@@ -44,16 +43,7 @@ public class JmsSelectorDetectionTestCase extends FunctionalTestCase
 
     private InboundEndpoint getEnpoint(MessageSource source, InboundEndpoint ep)
     {
-        if (source instanceof InboundEndpoint)
-        {
-            ep = (InboundEndpoint) source;
-        }
-        else if (source instanceof ServiceCompositeMessageSource)
-        {
-            ep = ((ServiceCompositeMessageSource) source).getEndpoints().get(0);
-        }
-
-        return ep;
+        return (InboundEndpoint) source;
     }
 
     private MessageSource getSource()

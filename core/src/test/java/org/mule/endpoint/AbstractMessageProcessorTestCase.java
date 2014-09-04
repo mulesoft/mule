@@ -28,9 +28,9 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.security.SecurityFilter;
-import org.mule.api.service.Service;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
+import org.mule.construct.Flow;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.context.notification.ServerNotificationManager;
@@ -141,7 +141,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("prop1", "value1");
         return new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, props, muleContext), endpoint,
-            getTestService(), getTestSession(null, muleContext));
+            getTestFlow(), getTestSession(null, muleContext));
     }
 
     protected OutboundEndpoint createTestOutboundEndpoint(Transformer transformer,
@@ -220,7 +220,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
         props.put("prop1", "value1");
         props.put("port", 12345);
 
-        Service svc = getTestService();
+        Flow svc = getTestFlow();
         if (exceptionListener != null)
         {
             svc.setExceptionListener(exceptionListener);

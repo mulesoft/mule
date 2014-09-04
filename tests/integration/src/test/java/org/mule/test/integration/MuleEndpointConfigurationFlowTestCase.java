@@ -140,14 +140,14 @@ public class MuleEndpointConfigurationFlowTestCase extends FunctionalTestCase
 
         // Test MuleEvent timeout proporgation
         MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("hello", muleContext),
-            (InboundEndpoint) ep, getTestService(), MuleTestUtils.getTestSession(muleContext));
+            (InboundEndpoint) ep, getTestFlow(), MuleTestUtils.getTestSession(muleContext));
         assertEquals(2002, event.getTimeout());
 
         ImmutableEndpoint ep2 = muleContext.getEndpointFactory().getInboundEndpoint(
             "test://hello?connector=testConnector1");
 
         event = new DefaultMuleEvent(new DefaultMuleMessage("hello", muleContext), (InboundEndpoint) ep2,
-            getTestService(), MuleTestUtils.getTestSession(muleContext));
+            getTestFlow(), MuleTestUtils.getTestSession(muleContext));
         // default event timeout set in the test config file
         assertEquals(1001, event.getTimeout());
     }

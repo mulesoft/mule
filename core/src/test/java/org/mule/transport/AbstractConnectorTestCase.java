@@ -11,16 +11,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
-
 import org.mule.api.DefaultMuleException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.exception.SystemExceptionHandler;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageDispatcherFactory;
 import org.mule.api.transport.MessageRequesterFactory;
 import org.mule.api.transport.MuleMessageFactory;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
@@ -140,7 +139,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleContextTestC
     {
         Connector connector = getConnectorAndAssert();
 
-        Service service = getTestService("anApple", Apple.class);
+        Flow service = getTestFlow("anApple", Apple.class);
 
         InboundEndpoint endpoint =
             muleContext.getEndpointFactory().getInboundEndpoint(getTestEndpointURI());

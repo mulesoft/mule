@@ -15,6 +15,7 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
+import org.mule.api.component.Component;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.MuleContextAware;
@@ -22,8 +23,8 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
-import org.mule.api.service.Service;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
@@ -32,13 +33,10 @@ import org.mule.component.DefaultJavaComponent;
 import org.mule.construct.Flow;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.model.seda.SedaModel;
-import org.mule.model.seda.SedaService;
 import org.mule.object.SingletonObjectFactory;
 import org.mule.routing.MessageFilter;
 import org.mule.session.DefaultMuleSession;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.mule.TestAgent;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
@@ -47,6 +45,7 @@ import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.ClassUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -433,16 +432,10 @@ public final class MuleTestUtils
      */
     public static MuleEvent getTestEvent(Object data, MuleContext context) throws Exception
     {
-        return getTestEvent(data, getTestService(context), MessageExchangePattern.REQUEST_RESPONSE, context);
+        return getTestEvent(data, getTestFlow(context), MessageExchangePattern.REQUEST_RESPONSE, context);
     }
 
     public static MuleEvent getTestEvent(Object data, MessageExchangePattern mep, MuleContext context)
-            throws Exception
-    {
-        return getTestEvent(data, getTestService(context), mep, context);
-    }
-
-    public static MuleEvent getTestEventUsingFlow(Object data, MessageExchangePattern mep, MuleContext context)
             throws Exception
     {
         return getTestEvent(data, getTestFlow(context), mep, context);
@@ -460,15 +453,6 @@ public final class MuleTestUtils
     //        return getTestInboundEvent(data, getTestService(context), mep, context);
     //    }
 
-    /**
-     * Supply service but no endpoint
-     */
-    @Deprecated
-    public static MuleEvent getTestEvent(Object data, Service service, MuleContext context) throws Exception
-    {
-        return getTestEvent(data, service, getTestInboundEndpoint("test1",
-                                                                  MessageExchangePattern.REQUEST_RESPONSE, context, null), context);
-    }
 
     public static MuleEvent getTestEvent(Object data,
                                          FlowConstruct flowConstruct,
@@ -499,7 +483,7 @@ public final class MuleTestUtils
     public static MuleEvent getTestEvent(Object data, InboundEndpoint endpoint, MuleContext context)
             throws Exception
     {
-        return getTestEvent(data, getTestService(context), endpoint, context);
+        return getTestEvent(data, getTestFlow(context), endpoint, context);
     }
 
     public static MuleEvent getTestEvent(Object data,
@@ -523,7 +507,7 @@ public final class MuleTestUtils
         final MuleMessageFactory factory = endpoint.getConnector().createMuleMessageFactory();
         final MuleMessage message = factory.create(data, endpoint.getEncoding(), context);
 
-        return new DefaultMuleEvent(message, endpoint, getTestService(context), session);
+        return new DefaultMuleEvent(message, endpoint, getTestFlow(context), session);
     }
 
     public static MuleEventContext getTestEventContext(Object data,
@@ -567,28 +551,20 @@ public final class MuleTestUtils
         return testConnector;
     }
 
-    @Deprecated
-    public static Service getTestService(MuleContext context) throws Exception
-    {
-        return getTestService(APPLE_SERVICE, Apple.class, context);
-    }
-
     public static Flow getTestFlow(MuleContext context) throws Exception
     {
         return getTestFlow(APPLE_FLOW, context);
     }
 
-    @Deprecated
-    public static Service getTestService(String name, Class<?> clazz, MuleContext context) throws Exception
+    public static Flow getTestFlow(String name, Class<?> clazz, MuleContext context) throws Exception
     {
-        return getTestService(name, clazz, null, context);
+        return getTestFlow(name, clazz, null, context);
     }
 
-    @Deprecated
-    public static Service getTestService(String name, Class<?> clazz, Map props, MuleContext context)
+    public static Flow getTestFlow(String name, Class<?> clazz, Map props, MuleContext context)
             throws Exception
     {
-        return getTestService(name, clazz, props, context, true);
+        return getTestFlow(name, clazz, props, context, true);
     }
 
     public static Flow getTestFlow(String name, MuleContext context) throws Exception
@@ -596,31 +572,18 @@ public final class MuleTestUtils
         return getTestFlow(name, context, true);
     }
 
-    @Deprecated
-    public static Service getTestService(String name,
+    public static Flow getTestFlow(String name,
                                          Class<?> clazz,
                                          Map props,
                                          MuleContext context,
                                          boolean initialize) throws Exception
     {
-        final SedaModel model = new SedaModel();
-        model.setMuleContext(context);
-        context.getRegistry().applyLifecycle(model);
-
-        final Service service = new SedaService(context);
-        service.setName(name);
         final SingletonObjectFactory of = new SingletonObjectFactory(clazz, props);
         of.initialise();
         final JavaComponent component = new DefaultJavaComponent(of);
         ((MuleContextAware) component).setMuleContext(context);
-        service.setComponent(component);
-        service.setModel(model);
-        if (initialize)
-        {
-            context.getRegistry().registerService(service);
-        }
 
-        return service;
+        return getTestFlow(name, component, initialize, context);
     }
 
     public static Flow getTestFlow(String name, MuleContext context, boolean initialize)
@@ -632,6 +595,27 @@ public final class MuleTestUtils
             context.getRegistry().registerFlowConstruct(flow);
         }
 
+        return flow;
+    }
+
+    public static Flow getTestFlow(String name, Object component,  boolean initialize, MuleContext context)
+            throws Exception
+    {
+        final Flow flow = new Flow(name, context);
+        flow.setMessageProcessors(new ArrayList<MessageProcessor>());
+        if (component instanceof Component)
+        {
+            flow.getMessageProcessors().add((MessageProcessor) component);
+        }
+        else
+        {
+            flow.getMessageProcessors().add(new DefaultJavaComponent(new SingletonObjectFactory(component)));
+
+        }
+        if (initialize)
+        {
+            context.getRegistry().registerFlowConstruct(flow);
+        }
         return flow;
     }
 

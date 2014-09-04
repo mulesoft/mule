@@ -175,6 +175,12 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
             }, builder, muleContext);
     }
 
+    @Override
+    protected void doStart() throws MuleException
+    {
+        super.doStart();
+    }
+
     /**
      * {@inheritDoc}
      */

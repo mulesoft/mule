@@ -37,7 +37,7 @@ public class DummyInitialContextFactory implements ObjectFactory
         c.bind("endpointRef", "vm://my.object");
         c.bind("Log4JAgent", new Log4jAgent());
         c.bind("XmlToObject", new XmlToObject());
-        FlowConstruct d = MuleTestUtils.getTestService("EchoUMO", EchoComponent.class, this.muleContext);
+        FlowConstruct d = MuleTestUtils.getTestFlow("EchoUMO", EchoComponent.class, this.muleContext);
         c.bind("EchoUMO", d);
         return c;
     }

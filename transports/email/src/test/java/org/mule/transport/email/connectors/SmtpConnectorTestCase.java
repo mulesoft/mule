@@ -120,7 +120,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         message.setOutboundProperty(MailProperties.TO_ADDRESSES_PROPERTY, EMAIL);
         MuleSession session = getTestSession(null, muleContext);
         DefaultMuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
-            getTestService("apple", Apple.class), session, new ResponseOutputStream(System.out));
+            getTestFlow("apple", Apple.class), session, new ResponseOutputStream(System.out));
         endpoint.process(event);
 
         getServers().waitForIncomingEmail(AbstractEmailFunctionalTestCase.DELIVERY_DELAY_MS, 1);

@@ -8,13 +8,12 @@ package org.mule.transport.soap.axis;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.service.Service;
 import org.mule.api.source.CompositeMessageSource;
 import org.mule.config.ExceptionHelper;
+import org.mule.construct.Flow;
 import org.mule.tck.MuleTestUtils;
 
 import org.junit.Test;
@@ -61,10 +60,10 @@ public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpoint
         try
         {
             // TODO MULE-2228 Simplify this API
-            Service c = MuleTestUtils.getTestService("testComponentWithoutInterfaces", ComponentWithoutInterfaces.class, null, muleContext, false);
+            Flow c = MuleTestUtils.getTestFlow("testComponentWithoutInterfaces", ComponentWithoutInterfaces.class, null, muleContext, false);
             InboundEndpoint ep = muleContext.getEndpointFactory().getInboundEndpoint(getComponentWithoutInterfacesEndpoint());
             ((CompositeMessageSource) c.getMessageSource()).addSource(ep);
-            muleContext.getRegistry().registerService(c);
+            muleContext.getRegistry().registerFlowConstruct(c);
             fail("Expected exception");
         }
         catch (MuleException e)

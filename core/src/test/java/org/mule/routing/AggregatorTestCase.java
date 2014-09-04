@@ -9,7 +9,6 @@ package org.mule.routing;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -19,8 +18,8 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.service.Service;
 import org.mule.api.store.ObjectStoreException;
+import org.mule.construct.Flow;
 import org.mule.routing.correlation.EventCorrelatorCallback;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -41,7 +40,7 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase
     @Test
     public void testMessageAggregator() throws Exception
     {
-        Service testService = getTestService("test", Apple.class);
+        Flow testService = getTestFlow("test", Apple.class);
         MuleSession session = getTestSession(testService, muleContext);
 
         TestEventAggregator router = new TestEventAggregator(3);

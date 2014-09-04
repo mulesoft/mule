@@ -128,7 +128,7 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
     {
         for (int i = 0; i < numMessages; i++)
         {
-            flow.process((getTestEvent("test", getTestService(), muleContext.getEndpointFactory()
+            flow.process((getTestEvent("test", getTestFlow(), muleContext.getEndpointFactory()
                     .getInboundEndpoint("test://test"))));
         }
     }

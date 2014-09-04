@@ -11,7 +11,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -22,7 +21,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.service.Service;
+import org.mule.construct.Flow;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -44,15 +43,15 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     @Test
     public void testAggregateMultipleEvents() throws Exception
     {
-        MuleSession session1 = getTestSession(getTestService(), muleContext);
+        MuleSession session1 = getTestSession(getTestFlow(), muleContext);
         session1.setProperty("key1", "value1");
-        MuleSession session2 = getTestSession(getTestService(), muleContext);
+        MuleSession session2 = getTestSession(getTestFlow(), muleContext);
         session1.setProperty("key1", "value1NEW");
         session1.setProperty("key2", "value2");
-        MuleSession session3 = getTestSession(getTestService(), muleContext);
+        MuleSession session3 = getTestSession(getTestFlow(), muleContext);
         session1.setProperty("key3", "value3");
 
-        Service testService = getTestService("test", Apple.class);
+        Flow testService = getTestFlow("test", Apple.class);
         assertNotNull(testService);
 
         SimpleCollectionAggregator router = new SimpleCollectionAggregator();
@@ -105,8 +104,8 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     @Test
     public void testAggregateSingleEvent() throws Exception
     {
-        MuleSession session = getTestSession(getTestService(), muleContext);
-        Service testService = getTestService("test", Apple.class);
+        MuleSession session = getTestSession(getTestFlow(), muleContext);
+        Flow testService = getTestFlow("test", Apple.class);
         assertNotNull(testService);
 
         SimpleCollectionAggregator router = new SimpleCollectionAggregator();
@@ -140,8 +139,8 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     @Test
     public void testAggregateMessageCollections() throws Exception
     {
-        MuleSession session = getTestSession(getTestService(), muleContext);
-        Service testService = getTestService("test", Apple.class);
+        MuleSession session = getTestSession(getTestFlow(), muleContext);
+        Flow testService = getTestFlow("test", Apple.class);
         assertNotNull(testService);
 
         SimpleCollectionAggregator router = new SimpleCollectionAggregator();

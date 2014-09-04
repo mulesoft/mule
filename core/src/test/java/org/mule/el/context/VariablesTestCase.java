@@ -79,7 +79,7 @@ public class VariablesTestCase extends AbstractELTestCase
     public void sessionVariablesMap() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
-        new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestService());
+        new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestFlow());
         message.setProperty("foo", "bar", PropertyScope.SESSION);
         assertTrue(evaluate("sessionVars", message) instanceof Map);
     }

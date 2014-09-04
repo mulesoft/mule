@@ -84,7 +84,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
     {
         UntilSuccessful untilSuccessful = new UntilSuccessful();
         untilSuccessful.setMuleContext(muleContext);
-        untilSuccessful.setFlowConstruct(getTestService());
+        untilSuccessful.setFlowConstruct(getTestFlow());
         untilSuccessful.setMaxRetries(2);
 
         if (millisBetweenRetries != null)

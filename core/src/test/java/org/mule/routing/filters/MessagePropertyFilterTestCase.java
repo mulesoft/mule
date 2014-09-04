@@ -40,7 +40,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
         MuleMessage message = new DefaultMuleMessage("blah", muleContext);
         // An event/session is needed otherwise the session properties set on the message go nowhere.
         new DefaultMuleEvent(message, getTestInboundEndpoint(MessageExchangePattern.ONE_WAY),
-            getTestService());
+            getTestFlow());
         MessagePropertyFilter filter = new MessagePropertyFilter("foo=bar");
         filter.setScope(PropertyScope.SESSION_NAME);
         assertFalse(filter.accept(message));
