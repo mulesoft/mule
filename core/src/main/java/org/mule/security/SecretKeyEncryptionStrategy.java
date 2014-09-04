@@ -27,7 +27,11 @@ import javax.crypto.spec.SecretKeySpec;
  * specify any valid algorithm supported by JCE.
  * 
  * @see SecretKeyFactory
+ * @deprecated This class is deprecated and will be removed in Mule 4.0. Use
+ * {@link PasswordBasedEncryptionStrategy} instead, which follows the correct
+ * way of transforming a string password into a cryptographic key
  */
+@Deprecated
 public class SecretKeyEncryptionStrategy extends AbstractJCEEncryptionStrategy
 {
 
