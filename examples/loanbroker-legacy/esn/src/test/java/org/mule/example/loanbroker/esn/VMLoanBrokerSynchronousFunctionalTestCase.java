@@ -7,8 +7,11 @@
 package org.mule.example.loanbroker.esn;
 
 import static org.junit.Assert.assertNotNull;
-import org.mule.construct.Flow;
+import static org.junit.Assert.assertTrue;
+
+import org.mule.api.service.Service;
 import org.mule.example.loanbroker.tests.AbstractLoanBrokerTestCase;
+import org.mule.model.seda.SedaModel;
 
 import org.junit.Test;
 
@@ -29,15 +32,19 @@ public class VMLoanBrokerSynchronousFunctionalTestCase extends AbstractLoanBroke
     @Test
     public void testBasicParsing()
     {
-        assertComponent("TheLoanBroker");
-        assertComponent("TheCreditAgencyService");
-        assertComponent("TheLenderService");
-        assertComponent("TheBankGateway");
+        Object objModel = muleContext.getRegistry().lookupModel("loan-broker");
+        assertNotNull(objModel);
+        assertTrue(objModel instanceof SedaModel);
+        SedaModel model = (SedaModel)objModel;
+        assertComponent(model, "TheLoanBroker");
+        assertComponent(model, "TheCreditAgencyService");
+        assertComponent(model, "TheLenderService");
+        assertComponent(model, "TheBankGateway");
     }
 
-    protected void assertComponent(String flowName)
+    protected void assertComponent(SedaModel model, String serviceName)
     {
-        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(flowName);
-        assertNotNull(flowName + " missing", flow);
+        Service service = muleContext.getRegistry().lookupService(serviceName);
+        assertNotNull(serviceName + " missing", service);
     }
 }

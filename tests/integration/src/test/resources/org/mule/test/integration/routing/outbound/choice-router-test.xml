@@ -61,19 +61,12 @@
         <append-string-transformer message=":default" />
     </vm:endpoint>
 
-    <flow name="fruit-service">
-        <inbound-endpoint ref="fruit-channel"/>
-        <component class="org.mule.component.simple.EchoComponent"/>
-    </flow>
+    <pattern:simple-service name="fruit-service" endpoint-ref="fruit-channel"
+        component-class="org.mule.component.simple.EchoComponent" />
 
-    <flow name="veggie-service">
-        <inbound-endpoint ref="veggie-channel"/>
-        <component class="org.mule.component.simple.EchoComponent"/>
-    </flow>
+    <pattern:simple-service name="veggie-service" endpoint-ref="veggie-channel"
+        component-class="org.mule.component.simple.EchoComponent" />
 
-    <flow name="default-service">
-        <inbound-endpoint ref="default-channel"/>
-        <component class="org.mule.component.simple.EchoComponent"/>
-    </flow>
-
+    <pattern:simple-service name="default-service" endpoint-ref="default-channel"
+        component-class="org.mule.component.simple.EchoComponent" />
 </mule>
