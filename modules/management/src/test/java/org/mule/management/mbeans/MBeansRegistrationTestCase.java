@@ -8,10 +8,19 @@ package org.mule.management.mbeans;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.mule.module.management.agent.JmxApplicationAgent;
+import org.mule.module.management.agent.JmxServerNotificationAgent;
+import org.mule.module.management.mbean.ConnectorService;
+import org.mule.module.management.mbean.EndpointService;
+import org.mule.module.management.mbean.FlowConstructService;
+import org.mule.module.management.mbean.FlowConstructStats;
+import org.mule.module.management.mbean.MuleConfigurationService;
+import org.mule.module.management.mbean.MuleService;
+import org.mule.module.management.mbean.StatisticsService;
+import org.mule.module.management.support.JmxSupport;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -21,18 +30,6 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectInstance;
 
 import org.junit.Test;
-import org.mule.module.management.agent.JmxApplicationAgent;
-import org.mule.module.management.agent.JmxServerNotificationAgent;
-import org.mule.module.management.mbean.ConnectorService;
-import org.mule.module.management.mbean.EndpointService;
-import org.mule.module.management.mbean.FlowConstructService;
-import org.mule.module.management.mbean.FlowConstructStats;
-import org.mule.module.management.mbean.ModelService;
-import org.mule.module.management.mbean.MuleConfigurationService;
-import org.mule.module.management.mbean.MuleService;
-import org.mule.module.management.mbean.StatisticsService;
-import org.mule.module.management.support.JmxSupport;
-import org.mule.tck.junit4.FunctionalTestCase;
 
 /**
  * Verify that expected MBeans are registered based on the config.
@@ -74,7 +71,6 @@ public class MBeansRegistrationTestCase extends FunctionalTestCase
         assertTrue(mbeanClasses.contains(MuleService.class.getName()));
         assertTrue(mbeanClasses.contains(MuleConfigurationService.class.getName()));
         assertTrue(mbeanClasses.contains(StatisticsService.class.getName()));
-        assertTrue(mbeanClasses.contains(ModelService.class.getName()));
 
         // Only if registerMx4jAdapter="true"
         assertTrue(mbeanClasses.contains(mx4j.tools.adaptor.http.HttpAdaptor.class.getName()));
@@ -90,7 +86,6 @@ public class MBeansRegistrationTestCase extends FunctionalTestCase
         List<String> mbeanClasses = getMBeanClasses();
 
         assertTrue(mbeanClasses.contains(ConnectorService.class.getName()));
-        assertTrue(mbeanClasses.contains(ModelService.class.getName()));
 
         assertTrue(mbeanClasses.contains(FlowConstructService.class.getName()));
         assertTrue(mbeanClasses.contains(FlowConstructStats.class.getName()));

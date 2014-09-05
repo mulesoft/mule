@@ -27,27 +27,18 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
-import org.mule.api.registry.ServiceException;
-import org.mule.api.service.Service;
-import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.ReceiveException;
 import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.DefaultMuleConfiguration;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
-import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.security.MuleCredentials;
-import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.NullPayload;
-import org.mule.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -96,8 +87,6 @@ public class MuleClient implements Disposable
      * The local MuleContext instance.
      */
     private MuleContext muleContext;
-
-    private List<RemoteDispatcher> dispatchers = new ArrayList<RemoteDispatcher>();
 
     private MuleCredentials user;
 
@@ -265,117 +254,6 @@ public class MuleClient implements Disposable
     }
 
     /**
-     * Sends an event synchronously to a component
-     *
-     * @param component the name of the Mule component to send to
-     * @param transformers a comma separated list of transformers to apply to the
-     *            result message
-     * @param payload the object that is the payload of the event
-     * @param messageProperties any properties to be associated with the payload. as
-     *            null
-     * @return the result message if any of the invocation
-     * @throws org.mule.api.MuleException if the dispatch fails or the components or
-     *             transfromers cannot be found
-     */
-    public MuleMessage sendDirect(String component, String transformers, Object payload, Map<String, Object> messageProperties)
-        throws MuleException
-    {
-        MuleMessage message = new DefaultMuleMessage(payload, messageProperties, muleContext);
-        return sendDirect(component, transformers, message);
-    }
-
-    /**
-     * Sends an event synchronously to a component
-     *
-     * @param componentName the name of the Mule component to send to
-     * @param transformers a comma separated list of transformers to apply to the
-     *            result message
-     * @param message the message to send
-     * @return the result message if any of the invocation
-     * @throws org.mule.api.MuleException if the dispatch fails or the components or
-     *             transfromers cannot be found
-     */
-    public MuleMessage sendDirect(String componentName, String transformers, MuleMessage message)
-        throws MuleException
-    {
-        Service service = muleContext.getRegistry().lookupService(componentName);
-        if (service == null)
-        {
-            throw new ServiceException(CoreMessages.objectNotRegistered("Service", componentName));
-        }
-        List<Transformer> trans = null;
-        if (transformers != null)
-        {
-            trans = TransformerUtils.getTransformers(transformers, muleContext);
-        }
-
-        InboundEndpoint endpoint = getDefaultClientEndpoint(service, message.getPayload(), true);
-        MuleEvent event = new DefaultMuleEvent(message, endpoint, service);
-
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("MuleClient sending event direct to: " + componentName + ". MuleEvent is: " + event);
-        }
-
-        MuleEvent resultEvent = service.sendEvent(event);
-        MuleMessage result = resultEvent == null || VoidMuleEvent.getInstance().equals(resultEvent)
-                                                                                                   ? null
-                                                                                                   : resultEvent.getMessage();
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Result of MuleClient sendDirect is: "
-                         + (result == null ? "null" : result.getPayload()));
-        }
-
-        if (result != null && trans != null)
-        {
-            result.applyTransformers(resultEvent, trans);
-        }
-        return result;
-    }
-
-    /**
-     * Dispatches an event asynchronously to a component
-     *
-     * @param component the name of the Mule components to dispatch to
-     * @param payload the object that is the payload of the event
-     * @param messageProperties any properties to be associated with the payload. as
-     *            null
-     * @throws org.mule.api.MuleException if the dispatch fails or the components or
-     *             transfromers cannot be found
-     */
-    public void dispatchDirect(String component, Object payload, Map<String, Object> messageProperties) throws MuleException
-    {
-        dispatchDirect(component, new DefaultMuleMessage(payload, messageProperties, muleContext));
-    }
-
-    /**
-     * Dispatches an event asynchronously to a component
-     *
-     * @param componentName the name of the Mule components to dispatch to
-     * @param message the message to send
-     * @throws org.mule.api.MuleException if the dispatch fails or the components or
-     *             transfromers cannot be found
-     */
-    public void dispatchDirect(String componentName, MuleMessage message) throws MuleException
-    {
-        Service service = muleContext.getRegistry().lookupService(componentName);
-        if (service == null)
-        {
-            throw new ServiceException(CoreMessages.objectNotRegistered("Service", componentName));
-        }
-        InboundEndpoint endpoint = getDefaultClientEndpoint(service, message.getPayload(), false);
-        MuleEvent event = new DefaultMuleEvent(message, endpoint, service);
-
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("MuleClient dispatching event direct to: " + componentName + ". MuleEvent is: " + event);
-        }
-
-        service.dispatchEvent(event);
-    }
-
-    /**
      * Sends an event request to a URL, making the result of the event trigger
      * available as a Future result that can be accessed later by client code.
      *
@@ -457,74 +335,6 @@ public class MuleClient implements Disposable
         if (muleContext.getWorkManager() != null)
         {
             result.setExecutor(muleContext.getWorkManager());
-        }
-
-        result.execute();
-        return result;
-    }
-
-    /**
-     * Sends an event to a component on a local Mule instance, while making the
-     * result of the event trigger available as a Future result that can be accessed
-     * later by client code. Users can specify a url to a remote Mule server in the
-     * constructor of a Mule client, by default the default Mule server url
-     * <code>tcp://localhost:60504</code> is used.
-     *
-     * @param component the name of the Mule components to send to
-     * @param transformers a comma separated list of transformers to apply to the
-     *            result message
-     * @param payload the object that is the payload of the event
-     * @param messageProperties any properties to be associated with the payload.
-     * @return the result message if any of the invocation
-     * @throws org.mule.api.MuleException if the dispatch fails or the components or
-     *             transfromers cannot be found
-     */
-    public FutureMessageResult sendDirectAsync(final String component,
-                                               String transformers,
-                                               final Object payload,
-                                               final Map<String, Object> messageProperties) throws MuleException
-    {
-        return sendDirectAsync(component, transformers, new DefaultMuleMessage(payload, messageProperties, muleContext));
-    }
-
-    /**
-     * Snds an event to a component on a local Mule instance, while making the result
-     * of the event trigger available as a Future result that can be accessed later
-     * by client code. Users can specify a url to a remote Mule server in the
-     * constructor of a Mule client, by default the default Mule server url
-     * <code>tcp://localhost:60504</code> is used.
-     *
-     * @param component the name of the Mule components to send to
-     * @param transformers a comma separated list of transformers to apply to the
-     *            result message
-     * @param message the message to send
-     * @return the result message if any of the invocation
-     * @throws org.mule.api.MuleException if the dispatch fails or the components or
-     *             transfromers cannot be found
-     */
-    public FutureMessageResult sendDirectAsync(final String component,
-                                               String transformers,
-                                               final MuleMessage message) throws MuleException
-    {
-        Callable<Object> call = new Callable<Object>()
-        {
-            @Override
-            public Object call() throws Exception
-            {
-                return sendDirect(component, null, message);
-            }
-        };
-
-        FutureMessageResult result = new FutureMessageResult(call, muleContext);
-
-        if (muleContext.getWorkManager() != null)
-        {
-            result.setExecutor(muleContext.getWorkManager());
-        }
-
-        if (StringUtils.isNotBlank(transformers))
-        {
-            result.setTransformers(TransformerUtils.getTransformers(transformers, muleContext));
         }
 
         result.execute();
@@ -753,50 +563,6 @@ public class MuleClient implements Disposable
         return endpoint;
     }
 
-    protected InboundEndpoint getDefaultClientEndpoint(Service service, Object payload, boolean sync)
-        throws MuleException
-    {
-        if (!(service.getMessageSource() instanceof ServiceCompositeMessageSource))
-        {
-            throw new IllegalStateException(
-                "Only 'CompositeMessageSource' is supported with MuleClient.sendDirect() and MuleClient.dispatchDirect()");
-        }
-
-        // as we are bypassing the message transport layer we need to check that
-        InboundEndpoint endpoint = ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0);
-        if (endpoint != null)
-        {
-            if (endpoint.getTransformers() != null)
-            {
-                // the original code here really did just check the first exception
-                // as far as i can tell
-                if (TransformerUtils.isSourceTypeSupportedByFirst(endpoint.getTransformers(),
-                    payload.getClass()))
-                {
-                    return endpoint;
-                }
-                else
-                {
-                    EndpointBuilder builder = new EndpointURIEndpointBuilder(endpoint);
-                    builder.setTransformers(new LinkedList());
-                    builder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
-                    return muleContext.getEndpointFactory().getInboundEndpoint(builder);
-                }
-            }
-            else
-            {
-                return endpoint;
-            }
-        }
-        else
-        {
-            EndpointBuilder builder = new EndpointURIEndpointBuilder("vm://mule.client", muleContext);
-            builder.setName("muleClientProvider");
-            endpoint = muleContext.getEndpointFactory().getInboundEndpoint(builder);
-        }
-        return endpoint;
-    }
-
     /**
      * Sends an event synchronously to a endpointUri via a Mule server without
      * waiting for the result.
@@ -880,58 +646,12 @@ public class MuleClient implements Disposable
     }
 
     /**
-     * Unregisters a previously register components. This will also unregister any
-     * listeners for the components Calling this method is equivilent to calling
-     * Model.unregisterComponent(..)
-     *
-     * @param name the name of the componet to unregister
-     * @throws MuleException if unregistering the components fails, i.e. The
-     *             underlying transport fails to unregister a listener. If the
-     *             components does not exist, this method should not throw an
-     *             exception.
-     * @see org.mule.api.model.Model
-     * @deprecated Use the RegistryContext to get the registry and unregister the
-     *             service there
-     */
-    @Deprecated
-    public void unregisterComponent(String name) throws MuleException
-    {
-        throw new UnsupportedOperationException("registerComponent");
-    }
-
-    public RemoteDispatcher getRemoteDispatcher(String serverEndpoint) throws MuleException
-    {
-        RemoteDispatcher rd = new RemoteDispatcher(serverEndpoint, muleContext);
-        rd.setExecutor(muleContext.getWorkManager());
-        dispatchers.add(rd);
-        return rd;
-    }
-
-    public RemoteDispatcher getRemoteDispatcher(String serverEndpoint, String user, String password)
-        throws MuleException
-    {
-        RemoteDispatcher rd = new RemoteDispatcher(serverEndpoint, new MuleCredentials(user,
-            password.toCharArray()), muleContext);
-        rd.setExecutor(muleContext.getWorkManager());
-        dispatchers.add(rd);
-        return rd;
-    }
-
-    /**
      * Will dispose the MuleManager instance <b>if</b> a new instance was created for this
      * client. Otherwise this method only cleans up resources no longer needed
      */
     @Override
     public void dispose()
     {
-        synchronized (dispatchers)
-        {
-            for (RemoteDispatcher remoteDispatcher : dispatchers)
-            {
-                remoteDispatcher.dispose();
-            }
-            dispatchers.clear();
-        }
         // Dispose the muleContext only if the muleContext was created for this
         // client
         if (muleContext.getConfiguration().isClientMode())

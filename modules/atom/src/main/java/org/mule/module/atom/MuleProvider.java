@@ -6,18 +6,21 @@
  */
 package org.mule.module.atom;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.construct.Flow;
 
 import org.apache.abdera.protocol.Resolver;
 import org.apache.abdera.protocol.server.RequestContext;
+import org.apache.abdera.protocol.server.RequestContext.Scope;
 import org.apache.abdera.protocol.server.ResponseContext;
 import org.apache.abdera.protocol.server.Target;
 import org.apache.abdera.protocol.server.TargetBuilder;
 import org.apache.abdera.protocol.server.WorkspaceManager;
-import org.apache.abdera.protocol.server.RequestContext.Scope;
 import org.apache.abdera.protocol.server.context.EmptyResponseContext;
 import org.apache.abdera.protocol.server.impl.AbstractProvider;
 import org.apache.commons.logging.Log;
@@ -35,8 +38,8 @@ public class MuleProvider extends AbstractProvider
         try
         {
             MuleMessage requestMessage = new DefaultMuleMessage(request, ctx.getMuleContext());
-            MuleMessage res = ctx.sendEvent(requestMessage);
-
+            MuleMessage res = ((Flow) ctx.getFlowConstruct()).process(new DefaultMuleEvent(requestMessage,
+                                                                                           MessageExchangePattern.REQUEST_RESPONSE, ctx.getFlowConstruct())).getMessage();
             return (ResponseContext) res.getPayload();
         }
         catch (MuleException e)

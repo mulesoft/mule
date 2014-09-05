@@ -12,7 +12,6 @@ package org.mule.api.registry;
 public enum ServiceType
 {
     TRANSPORT("transport", "org/mule/transport"),
-    MODEL("model", "org/mule/model"),
     EXCEPTION("exception", "org/mule/config");
 
     private String name;

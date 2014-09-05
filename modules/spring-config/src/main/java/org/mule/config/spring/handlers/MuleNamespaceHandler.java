@@ -35,12 +35,10 @@ import org.mule.config.spring.factories.SubflowMessageProcessorChainFactoryBean;
 import org.mule.config.spring.factories.TransactionalMessageProcessorsFactoryBean;
 import org.mule.config.spring.factories.WatermarkFactoryBean;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.config.spring.parsers.DeprecatedBeanDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.config.spring.parsers.delegate.InheritDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.NameTransferDefinitionParser;
@@ -51,7 +49,54 @@ import org.mule.config.spring.parsers.processors.CheckExclusiveAttributeAndText;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributesAndChildren;
 import org.mule.config.spring.parsers.processors.CheckRequiredAttributesWhenNoChildren;
-import org.mule.config.spring.parsers.specific.*;
+import org.mule.config.spring.parsers.specific.AggregatorDefinitionParser;
+import org.mule.config.spring.parsers.specific.AsyncMessageProcessorsDefinitionParser;
+import org.mule.config.spring.parsers.specific.BindingDefinitionParser;
+import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
+import org.mule.config.spring.parsers.specific.ComponentDelegatingDefinitionParser;
+import org.mule.config.spring.parsers.specific.ConfigurationDefinitionParser;
+import org.mule.config.spring.parsers.specific.DefaultNameMuleOrphanDefinitionParser;
+import org.mule.config.spring.parsers.specific.DefaultThreadingProfileDefinitionParser;
+import org.mule.config.spring.parsers.specific.ExceptionStrategyDefinitionParser;
+import org.mule.config.spring.parsers.specific.ExceptionTXFilterDefinitionParser;
+import org.mule.config.spring.parsers.specific.ExpressionComponentDefintionParser;
+import org.mule.config.spring.parsers.specific.ExpressionLanguageDefinitionParser;
+import org.mule.config.spring.parsers.specific.ExpressionTransformerDefinitionParser;
+import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
+import org.mule.config.spring.parsers.specific.FilterRefDefinitionParser;
+import org.mule.config.spring.parsers.specific.FlowDefinitionParser;
+import org.mule.config.spring.parsers.specific.FlowRefDefinitionParser;
+import org.mule.config.spring.parsers.specific.GlobalFunctionsDefintionParser;
+import org.mule.config.spring.parsers.specific.GlobalPropertyDefinitionParser;
+import org.mule.config.spring.parsers.specific.IgnoreObjectMethodsDefinitionParser;
+import org.mule.config.spring.parsers.specific.ImportMapEntryDefinitionParser;
+import org.mule.config.spring.parsers.specific.InboundRouterDefinitionParser;
+import org.mule.config.spring.parsers.specific.InterceptorDefinitionParser;
+import org.mule.config.spring.parsers.specific.InterceptorStackDefinitionParser;
+import org.mule.config.spring.parsers.specific.MessageEnricherDefinitionParser;
+import org.mule.config.spring.parsers.specific.MessageFilterDefinitionParser;
+import org.mule.config.spring.parsers.specific.MessageProcessorChainDefinitionParser;
+import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.config.spring.parsers.specific.MessagePropertiesTransformerDefinitionParser;
+import org.mule.config.spring.parsers.specific.NotificationDefinitionParser;
+import org.mule.config.spring.parsers.specific.NotificationDisableDefinitionParser;
+import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
+import org.mule.config.spring.parsers.specific.PoolingProfileDefinitionParser;
+import org.mule.config.spring.parsers.specific.QueueStoreDefinitionParser;
+import org.mule.config.spring.parsers.specific.ReferenceExceptionStrategyDefinitionParser;
+import org.mule.config.spring.parsers.specific.RegExFilterDefinitionParser;
+import org.mule.config.spring.parsers.specific.ResponseDefinitionParser;
+import org.mule.config.spring.parsers.specific.RetryNotifierDefinitionParser;
+import org.mule.config.spring.parsers.specific.RetryPolicyDefinitionParser;
+import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
+import org.mule.config.spring.parsers.specific.SecurityFilterDefinitionParser;
+import org.mule.config.spring.parsers.specific.ServiceOverridesDefinitionParser;
+import org.mule.config.spring.parsers.specific.SimpleComponentDefinitionParser;
+import org.mule.config.spring.parsers.specific.SplitterDefinitionParser;
+import org.mule.config.spring.parsers.specific.StaticComponentDefinitionParser;
+import org.mule.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
+import org.mule.config.spring.parsers.specific.TransactionDefinitionParser;
+import org.mule.config.spring.parsers.specific.TransactionManagerDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.EndpointRefParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
@@ -80,8 +125,6 @@ import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.model.resolvers.MethodHeaderPropertyEntryPointResolver;
 import org.mule.model.resolvers.NoArgumentsEntryPointResolver;
 import org.mule.model.resolvers.ReflectionEntryPointResolver;
-import org.mule.model.seda.SedaModel;
-import org.mule.model.seda.SedaService;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.object.SingletonObjectFactory;
 import org.mule.processor.IdempotentRedeliveryPolicy;
@@ -142,7 +185,6 @@ import org.mule.security.PasswordBasedEncryptionStrategy;
 import org.mule.security.SecretKeyEncryptionStrategy;
 import org.mule.security.UsernamePasswordAuthenticationFilter;
 import org.mule.security.filters.MuleEncryptionEndpointSecurityFilter;
-import org.mule.service.ForwardingConsumer;
 import org.mule.service.ServiceAsyncReplyCompositeMessageSource;
 import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.transaction.XaTransactionFactory;
@@ -382,10 +424,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         // Poll overrides
         registerBeanDefinitionParser("watermark", new ChildDefinitionParser("override", WatermarkFactoryBean.class));
 
-        // Models
-        registerBeanDefinitionParser("model", new ModelDefinitionParser());
-        registerBeanDefinitionParser("seda-model", new InheritDefinitionParser(new OrphanDefinitionParser(SedaModel.class, true), new NamedDefinitionParser()));
-
         registerBeanDefinitionParser("entry-point-resolver-set", new ChildDefinitionParser("entryPointResolverSet", DefaultEntryPointResolverSet.class));
         registerBeanDefinitionParser("legacy-entry-point-resolver-set", new ChildDefinitionParser("entryPointResolverSet", LegacyEntryPointResolverSet.class));
         registerBeanDefinitionParser("custom-entry-point-resolver-set", new ChildDefinitionParser("entryPointResolverSet"));
@@ -400,11 +438,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("include-entry-point", new ParentDefinitionParser());
         registerMuleBeanDefinitionParser("exclude-entry-point", new ParentDefinitionParser()).addAlias("method", "ignoredMethod");
         registerMuleBeanDefinitionParser("exclude-object-methods", new IgnoreObjectMethodsDefinitionParser());
-
-        // Services
-        registerBeanDefinitionParser("seda-service", new ServiceDefinitionParser(SedaService.class));
-        registerBeanDefinitionParser("service", new ServiceDefinitionParser(SedaService.class));
-        registerBeanDefinitionParser("custom-service", new ServiceDefinitionParser());
 
         // Flow Constructs
         registerBeanDefinitionParser("flow", new FlowDefinitionParser());
@@ -463,7 +496,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("async-reply", new ChildDefinitionParser("asyncReplyMessageSource", ServiceAsyncReplyCompositeMessageSource.class, true));
 
         //Inbound Routers
-        registerBeanDefinitionParser("forwarding-router", new InboundRouterDefinitionParser(ForwardingConsumer.class));
         registerBeanDefinitionParser("idempotent-receiver-router", new InboundRouterDefinitionParser(IdempotentMessageFilter.class));
         registerBeanDefinitionParser("idempotent-secure-hash-receiver-router", new InboundRouterDefinitionParser(IdempotentSecureHashMessageFilter.class));
         registerBeanDefinitionParser("selective-consumer-router", new InboundRouterDefinitionParser(MessageFilter.class));

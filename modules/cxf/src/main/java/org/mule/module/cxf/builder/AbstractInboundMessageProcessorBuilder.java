@@ -15,7 +15,6 @@ import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.processor.MessageProcessorBuilder;
-import org.mule.api.service.ServiceAware;
 import org.mule.module.cxf.CxfConfiguration;
 import org.mule.module.cxf.CxfInboundMessageProcessor;
 import org.mule.module.cxf.MuleInvoker;
@@ -251,7 +250,6 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         addIgnoredMethods(svcFac, Callable.class.getName());
         addIgnoredMethods(svcFac, Initialisable.class.getName());
         addIgnoredMethods(svcFac, Disposable.class.getName());
-        addIgnoredMethods(svcFac, ServiceAware.class.getName());
 
         svcFac.getServiceConfigurations().add(0, new MuleServiceConfiguration(this));
 

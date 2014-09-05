@@ -14,8 +14,6 @@
 
     </mule:mule>
 
-    <bean name="_muleAnnotationsProcessor" class="org.mule.config.spring.processors.DecoratingFlowAnnotationsBeanProcessor"/>
-
     <bean name="_muleTransformerAnnotationProcessor" class="org.mule.config.spring.processors.TransformerAnnotatedBeanProcessor"/>
 
     <bean name="_muleSecurityManager" class="org.mule.security.MuleSecurityManager"/>

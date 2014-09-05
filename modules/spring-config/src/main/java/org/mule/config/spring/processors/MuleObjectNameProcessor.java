@@ -7,8 +7,6 @@
 package org.mule.config.spring.processors;
 
 import org.mule.api.agent.Agent;
-import org.mule.api.model.Model;
-import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 
@@ -40,20 +38,6 @@ public class MuleObjectNameProcessor implements BeanPostProcessor
             if (((Transformer)o).getName() == null || overwrite)
             {
                ((Transformer)o).setName(s);
-            }
-        }
-        else if (o instanceof Service)
-        {
-            if (((Service)o).getName() == null || overwrite)
-            {
-                ((Service)o).setName(s);
-            }
-        }
-        else if (o instanceof Model)
-        {
-            if (((Model)o).getName() == null || overwrite)
-            {
-                ((Model)o).setName(s);
             }
         }
         else if (o instanceof Agent)

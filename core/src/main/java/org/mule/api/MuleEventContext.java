@@ -134,32 +134,6 @@ public interface MuleEventContext
     void markTransactionForRollback() throws TransactionException;
 
     /**
-     * This will send an event via the configured outbound router on the service
-     * 
-     * @param message the message to send
-     * @return the result of the send if any
-     * @throws MuleException if there is no outbound endpoint configured on the
-     *             service or the events fails during dispatch
-     * @deprecated
-     */
-    @Deprecated
-    MuleMessage sendEvent(Object message) throws MuleException;
-
-    /**
-     * Depending on the session state this methods either Passes an event
-     * synchronously to the next available Mule component in the pool or via the endpoint
-     * configured for the event
-     * 
-     * @param message the message payload to send
-     * @return the return Message from the call or null if there was no result
-     * @throws MuleException if the event fails to be processed by the service or
-     *             the transport for the endpoint
-     * @deprecated
-     */
-    @Deprecated
-    MuleMessage sendEvent(MuleMessage message) throws MuleException;
-
-    /**
      * Depending on the session state this methods either Passes an event
      * synchronously to the next available Mule component in the pool or via the endpoint
      * configured for the event
@@ -211,42 +185,6 @@ public interface MuleEventContext
      * with the invocation, which is the maximum time in milli-seconds that the
      * invocation should take to complete
      * 
-     * @param message the object that is the payload of the event
-     * @param timeout how long to block in milliseconds waiting for a result
-     * @return the result message if any of the invocation
-     * @throws org.mule.api.MuleException if the dispatch fails or the components or
-     *             transfromers cannot be found
-     * @see FutureMessageResult
-     */
-    FutureMessageResult sendEventAsync(Object message, int timeout) throws MuleException;
-
-    /**
-     * sends an event request via the configured outbound router for this service.
-     * This method return immediately, but the result of the event invocation
-     * available from the returned a Future result that can be accessed later by the
-     * the returned FutureMessageResult. the Future messageResult can be queried at
-     * any time to check that the invocation has completed. A timeout is associated
-     * with the invocation, which is the maximum time in milli-seconds that the
-     * invocation should take to complete
-     * 
-     * @param message the MuleMessage of the event
-     * @param timeout how long to block in milliseconds waiting for a result
-     * @return the result message if any of the invocation
-     * @throws org.mule.api.MuleException if the dispatch fails or the components or
-     *             transfromers cannot be found
-     * @see FutureMessageResult
-     */
-    FutureMessageResult sendEventAsync(MuleMessage message, int timeout) throws MuleException;
-
-    /**
-     * sends an event request via the configured outbound router for this service.
-     * This method return immediately, but the result of the event invocation
-     * available from the returned a Future result that can be accessed later by the
-     * the returned FutureMessageResult. the Future messageResult can be queried at
-     * any time to check that the invocation has completed. A timeout is associated
-     * with the invocation, which is the maximum time in milli-seconds that the
-     * invocation should take to complete
-     * 
      * @param message the MuleMessage of the event
      * @param endpoint the endpointUri to dispatch to
      * @param timeout how long to block in milliseconds waiting for a result
@@ -279,30 +217,6 @@ public interface MuleEventContext
      */
     FutureMessageResult sendEventAsync(MuleMessage message, String endpointName, int timeout)
         throws MuleException;
-
-    /**
-     * This will dispatch an event asynchronously via the configured outbound
-     * endpoint on the service for this session
-     * 
-     * @param message the message to send
-     * @throws MuleException if there is no outbound endpoint configured on the
-     *             service or the events fails during dispatch
-     * @deprecated
-     */
-    @Deprecated
-    void dispatchEvent(MuleMessage message) throws MuleException;
-
-    /**
-     * This will dispatch an event asynchronously via the configured outbound
-     * endpoint on the service for this session
-     * 
-     * @param payload the message payloadto send
-     * @throws MuleException if there is no outbound endpoint configured on the
-     *             service or the events fails during dispatch
-     * @deprecated
-     */
-    @Deprecated
-    void dispatchEvent(Object payload) throws MuleException;
 
     /**
      * Depending on the session state this methods either Passes an event

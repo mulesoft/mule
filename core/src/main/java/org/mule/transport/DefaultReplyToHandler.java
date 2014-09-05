@@ -17,12 +17,10 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.management.stats.ServiceStatistics;
 import org.mule.transport.service.TransportFactory;
 import org.mule.util.ObjectNameHelper;
 import org.mule.util.store.DeserializationPostInitialisable;
@@ -105,14 +103,6 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
         // dispatch the event
         try
         {
-            if (event.getFlowConstruct() instanceof Service)
-            {
-                ServiceStatistics stats = ((Service) event.getFlowConstruct()).getStatistics();
-                if (stats.isEnabled())
-                {
-                    stats.incSentReplyToEvent();
-                }
-            }
             endpoint.process(replyToEvent);
             if (logger.isInfoEnabled())
             {
