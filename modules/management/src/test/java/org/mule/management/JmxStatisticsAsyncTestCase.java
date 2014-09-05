@@ -60,6 +60,8 @@ public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
     {
         ServiceStatistics stats = getServiceStatistics();
         assertEquals(1, stats.getAverageQueueSize());
+        FlowConstructStatistics fstats = getFlowConstructStatistics();
+        assertEquals(1, fstats.getAverageQueueSize());
     }
 
     @Test
