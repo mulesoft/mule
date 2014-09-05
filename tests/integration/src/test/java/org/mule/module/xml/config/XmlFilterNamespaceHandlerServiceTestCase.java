@@ -50,7 +50,7 @@ public class XmlFilterNamespaceHandlerServiceTestCase extends FunctionalTestCase
     {
         Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("filter xml for content");
 
-        List<MessageProcessor> processors = service.getMessageProcessors();
+        List<MessageProcessor> processors = flow.getMessageProcessors();
 
         assertEquals(1, processors.size());
         assertEquals(JXPathFilter.class, ((MessageFilter) processors.get(0)).getFilter().getClass());
