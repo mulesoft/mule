@@ -22,7 +22,7 @@ public class InboundMessageLossClientAckTestCase extends InboundMessageLossTestC
     {
         return new String[] {
             "reliability/activemq-clientack-config.xml",
-            "reliability/inbound-message-loss.xml"
+            "reliability/inbound-message-loss-flow.xml"
         };
     }
 }

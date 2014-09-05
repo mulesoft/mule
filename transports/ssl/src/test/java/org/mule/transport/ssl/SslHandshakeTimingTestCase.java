@@ -15,8 +15,8 @@ import static org.mockito.Mockito.when;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.service.Service;
 import org.mule.config.DefaultMuleConfiguration;
+import org.mule.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.lang.reflect.InvocationTargetException;
@@ -80,8 +80,7 @@ public class SslHandshakeTimingTestCase extends AbstractMuleContextTestCase
         when(endpoint.getEncoding()).thenReturn(new DefaultMuleConfiguration().getDefaultEncoding());
         when(endpoint.getMuleContext()).thenReturn(muleContext);
 
-        Service service = mock(Service.class);
-        return new SslMessageReceiver(connector, service, endpoint);
+        return new SslMessageReceiver(connector, mock(Flow.class), endpoint);
     }
 
     private void callPreRoute(SslMessageReceiver receiver, MuleMessage message) throws Exception

@@ -29,47 +29,38 @@
 
     <vm:endpoint path="test.inbound" name="inboundEndpoint" exchange-pattern="request-response"/>
 
-    <jms:endpoint queue="external.app" name="ExternalEndpoint" exchange-pattern="request-response" responseTimeout="3000"/>
+    <jms:endpoint queue="external.app" name="ExternalEndpoint" exchange-pattern="request-response"
+                  responseTimeout="3000"/>
 
-    <model>
-        <service name="In-Optional-Out_Out-Optional-In-Service">
-            <inbound>
-                <vm:inbound-endpoint ref="inboundEndpoint"/>
-            </inbound>
-            <script:component>
-                <script:script engine="groovy">
-                    if (message.getProperty("foo", org.mule.api.transport.PropertyScope.INBOUND) != null)
-                    {
-                        message.setProperty("bar", "baz")
-                        return message
-                    }
-                    else
-                        return message
-                </script:script>
-            </script:component>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="ExternalEndpoint"/>
-                    <!-- Mule will automatically listen on this destination when synchronous is true. If this is not set, a temporary destination is set up -->
-                    <!--<reply-to address="jms://reply"/>-->
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="In-Optional-Out_Out-Optional-In-Service">
+        <vm:inbound-endpoint ref="inboundEndpoint"/>
+        <script:component>
+            <script:script engine="groovy">
+                if (message.getProperty("foo", org.mule.api.transport.PropertyScope.INBOUND) != null)
+                {
+                message.setProperty("bar", "baz")
+                return message
+                }
+                else
+                return message
+            </script:script>
+        </script:component>
+        <outbound-endpoint ref="ExternalEndpoint"/>
+        <!-- Mule will automatically listen on this destination when synchronous is true. If this is not set, a temporary destination is set up -->
+        <!--<reply-to address="jms://reply"/>-->
+    </flow>
 
-        <service name="Mock-External-App">
-            <inbound>
-                <inbound-endpoint ref="ExternalEndpoint"/>
-            </inbound>
-            <script:component>
-                <script:script engine="groovy">
-                    message.setProperty("externalApp", "Received")
-                    if (message.getProperty("bar", org.mule.api.transport.PropertyScope.INBOUND) != null)
-                        return "bar header received"
-                    else
-                        return null
-                </script:script>
-            </script:component>
-        </service>
-    </model>
+    <flow name="Mock-External-App">
+        <inbound-endpoint ref="ExternalEndpoint"/>
+        <script:component>
+            <script:script engine="groovy">
+                message.setProperty("externalApp", "Received")
+                if (message.getProperty("bar", org.mule.api.transport.PropertyScope.INBOUND) != null)
+                return "bar header received"
+                else
+                return null
+            </script:script>
+        </script:component>
+    </flow>
     <!--// END SNIPPET: full-config -->
 </mule>

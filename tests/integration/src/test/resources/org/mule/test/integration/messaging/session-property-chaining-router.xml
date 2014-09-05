@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans"
-    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-    xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-    xmlns:http="http://www.mulesoft.org/schema/mule/http"
-    xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
@@ -15,46 +15,35 @@
     <vm:connector name="vmConnector"/>
     <http:connector name="httpConnector"/>
 
-    <spring:bean id="nonSerializable" class="org.mule.tck.NonSerializableObject" />
+    <spring:bean id="nonSerializable" class="org.mule.tck.NonSerializableObject"/>
 
-    <model>
-        <service name="Service1">
-            <inbound>
-                <vm:inbound-endpoint path="in" exchange-pattern="request-response">
-                    <message-properties-transformer scope="session">
-                        <add-message-property key="foo" value-ref="nonSerializable" />
-                    </message-properties-transformer>
-                    <response>
-      					<expression-transformer expression="session:foo" evaluator="header" />
-      				</response>
-                </vm:inbound-endpoint>
-            </inbound>
-            <outbound>
-                <chaining-router>
-                    <outbound-endpoint exchange-pattern="request-response" 
-                        address="http://localhost:${serverPort}/services/EchoUMO">
-                        <cxf:simple-client serviceClass="org.mule.api.component.simple.EchoService" operation="echo" />
-                    </outbound-endpoint>
-                    <vm:outbound-endpoint path="service3" exchange-pattern="request-response"/>
-                </chaining-router>
-            </outbound>
-        </service>
+    <flow name="Service1">
+        <vm:inbound-endpoint path="in" exchange-pattern="request-response">
+            <message-properties-transformer scope="session">
+                <add-message-property key="foo" value-ref="nonSerializable"/>
+            </message-properties-transformer>
+            <response>
+                <expression-transformer expression="session:foo" evaluator="header"/>
+            </response>
+        </vm:inbound-endpoint>
+        <outbound-endpoint exchange-pattern="request-response"
+                           address="http://localhost:${serverPort}/services/EchoUMO">
+            <cxf:simple-client serviceClass="org.mule.api.component.simple.EchoService" operation="echo"/>
+        </outbound-endpoint>
+        <vm:outbound-endpoint path="service3" exchange-pattern="request-response"/>
+    </flow>
 
-        <service name="Service2">
-            <inbound>
-                <inbound-endpoint exchange-pattern="request-response"
-                    address="http://localhost:${serverPort}/services/EchoUMO">
-                        <cxf:simple-service serviceClass="org.mule.api.component.simple.EchoService" />
-                </inbound-endpoint>
-            </inbound>
-            <echo-component />
-        </service>
+    <flow name="Service2">
+        <inbound-endpoint exchange-pattern="request-response"
+                          address="http://localhost:${serverPort}/services/EchoUMO">
+            <cxf:simple-service serviceClass="org.mule.api.component.simple.EchoService"/>
+        </inbound-endpoint>
+        <echo-component/>
+    </flow>
 
-        <service name="Service3">
-            <inbound>
-                <vm:inbound-endpoint path="service3" exchange-pattern="request-response" />
-            </inbound>
-            <echo-component />
-        </service>
-    </model>
+    <flow name="Service3">
+        <vm:inbound-endpoint path="service3" exchange-pattern="request-response"/>
+        <echo-component/>
+    </flow>
+
 </mule>

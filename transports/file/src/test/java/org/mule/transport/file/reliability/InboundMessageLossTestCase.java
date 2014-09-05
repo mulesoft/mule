@@ -10,14 +10,19 @@ import static org.junit.Assert.fail;
 import static org.mule.transport.file.FileTestUtils.createDataFile;
 import static org.mule.transport.file.FileTestUtils.createFolder;
 
+import org.mule.api.MuleEventContext;
 import org.mule.api.context.notification.ExceptionNotificationListener;
+import org.mule.construct.Flow;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.exception.DefaultSystemExceptionStrategy;
 import org.mule.routing.filters.WildcardFilter;
+import org.mule.tck.functional.EventCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.transport.file.AbstractFileMoveDeleteTestCase;
+import org.mule.util.concurrent.Latch;
 
 import java.io.File;
 import java.util.concurrent.CountDownLatch;
@@ -42,7 +47,7 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
     @Override
     protected String getConfigFile()
     {
-        return "reliability/inbound-message-loss.xml";
+        return "reliability/inbound-message-loss-flow.xml";
     }
 
     @Override
@@ -74,50 +79,6 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
             public String describeFailure()
             {
                 return "File should be gone";
-            }
-        });
-    }
-
-    @Test
-    public void testTransformerException() throws Exception
-    {
-        tmpDir = createFolder(getFileInsideWorkingDirectory("transformerException").getAbsolutePath());
-        final File file = createDataFile(tmpDir, "test1.txt");
-        prober.check(new Probe()
-        {
-            @Override
-            public boolean isSatisfied()
-            {
-                // Delivery failed so message should have been restored at the source
-                return file.exists();
-            }
-
-            @Override
-            public String describeFailure()
-            {
-                return "File should have been restored";
-            }
-        });
-    }
-
-    @Test
-    public void testRouterException() throws Exception
-    {
-        tmpDir = createFolder(getFileInsideWorkingDirectory("routerException").getAbsolutePath());
-        final File file = createDataFile(tmpDir, "test1.txt");
-        prober.check(new Probe()
-        {
-            @Override
-            public boolean isSatisfied()
-            {
-                // Delivery failed so message should have been restored at the source
-                return file.exists();
-            }
-
-            @Override
-            public String describeFailure()
-            {
-                return "File should have been restored";
             }
         });
     }
@@ -228,5 +189,91 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
             }
         });
     }
+
+    @Test
+    public void testRouterException() throws Exception
+    {
+        tmpDir = createFolder(getFileInsideWorkingDirectory("routerException").getAbsolutePath());
+        final File file = createDataFile(tmpDir, "test1.txt");
+        prober.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                // Exception occurs after the SEDA queue for an asynchronous request, so from the client's
+                // perspective, the message has been delivered successfully.
+                // Note that this behavior is different from services because the exception occurs before
+                // the SEDA queue for services.
+                return !file.exists();
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "File should be gone";
+            }
+        });
+    }
+
+    @Test
+    public void testTransformerException() throws Exception
+    {
+        tmpDir = createFolder(getFileInsideWorkingDirectory("transformerException").getAbsolutePath());
+        final File file = createDataFile(tmpDir, "test1.txt");
+        prober.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                // Exception occurs after the SEDA queue for an asynchronous request, so from the client's
+                // perspective, the message has been delivered successfully.
+                // Note that this behavior is different from services because the exception occurs before
+                // the SEDA queue for services.
+                return !file.exists();
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "File should be gone";
+            }
+        });
+    }
+
+    @Test
+    public void testFlowRefException() throws Exception
+    {
+        final Latch exceptionThrownLatch = new Latch();
+        tmpDir = createFolder(getFileInsideWorkingDirectory("flowRefException").getAbsolutePath());
+        final File file = createDataFile(tmpDir, "test1.txt");
+        FunctionalTestComponent ftc = getFunctionalTestComponent("failingFlow");
+        ftc.setEventCallback(new EventCallback()
+        {
+            @Override
+            public void eventReceived(MuleEventContext context, Object component) throws Exception
+            {
+                exceptionThrownLatch.release();
+                throw new RuntimeException();
+            }
+        });
+        Flow flow = (Flow)getFlowConstruct("FlowRefException");
+        flow.stop();
+        prober.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                // Delivery failed so message should have been restored at the source
+                return file.exists();
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "File should have been restored";
+            }
+        });
+    }
+
 
 }

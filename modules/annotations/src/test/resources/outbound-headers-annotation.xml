@@ -8,30 +8,23 @@
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <model name="main">
-        <service name="headers1">
-            <inbound>
-                <inbound-endpoint address="vm://header?method=processHeaders" exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.OutboundHeadersAnnotationComponent"/>
-        </service>
+    <flow name="headers1">
+        <inbound-endpoint address="vm://header?method=processHeaders" exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.OutboundHeadersAnnotationComponent"/>
+    </flow>
 
-        <service name="headers2">
-            <inbound>
-                <inbound-endpoint address="vm://header2?method=processHeaders" exchange-pattern="request-response">
-                    <message-properties-transformer scope="outbound">
-                        <add-message-property key="foo" value="changeme"/>
-                    </message-properties-transformer>
-                </inbound-endpoint>
-            </inbound>
-            <component class="org.mule.api.annotations.param.OutboundHeadersAnnotationComponent"/>
-        </service>
+    <flow name="headers2">
+        <inbound-endpoint address="vm://header2?method=processHeaders" exchange-pattern="request-response">
+            <message-properties-transformer scope="outbound">
+                <add-message-property key="foo" value="changeme"/>
+            </message-properties-transformer>
+        </inbound-endpoint>
+        <component class="org.mule.api.annotations.param.OutboundHeadersAnnotationComponent"/>
+    </flow>
 
-        <service name="headers3">
-            <inbound>
-                <inbound-endpoint address="vm://invalid?method=invalidParamType" exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.api.annotations.param.OutboundHeadersAnnotationComponent"/>
-        </service>
-    </model>
+    <flow name="headers3">
+        <inbound-endpoint address="vm://invalid?method=invalidParamType" exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.OutboundHeadersAnnotationComponent"/>
+    </flow>
+
 </mule>

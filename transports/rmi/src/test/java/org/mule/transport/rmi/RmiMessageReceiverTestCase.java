@@ -138,7 +138,7 @@ public class RmiMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     {
         if (messageReceiver == null)
         {
-            messageReceiver = new RmiMessageReceiver(this.connector, getTestService(),
+            messageReceiver = new RmiMessageReceiver(this.connector, getTestFlow(),
                 this.getEndpoint(), 5000)
             {
                 @Override

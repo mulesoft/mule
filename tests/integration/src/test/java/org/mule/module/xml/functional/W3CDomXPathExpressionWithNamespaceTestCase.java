@@ -29,9 +29,7 @@ public class W3CDomXPathExpressionWithNamespaceTestCase extends AbstractXmlPrope
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
-        p.setProperty("selector.expression", "/foo:endpoint");
-        p.setProperty("selector.evaluator", "xpath");
-
+        p.setProperty("selector.expression", "xpath:/foo:endpoint");
         return p;
     }
 

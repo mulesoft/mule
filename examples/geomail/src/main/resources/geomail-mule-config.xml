@@ -62,163 +62,121 @@
     <vm:endpoint name="Positions" path="channels/positions" exchange-pattern="one-way"/>
     <vm:endpoint name="Storage" path="channels/storage" exchange-pattern="one-way"/>
     <vm:endpoint name="Aggregator" path="channels/positions/aggregator" exchange-pattern="one-way"/>
-    
+
     <ajax:servlet-endpoint name="Output" channel="/GEOMAIL">
         <transformer ref="SenderToJson"/>
     </ajax:servlet-endpoint>
 
-    <model>
-        <service name="DataGeneratorMailService">
-            <description>
-                A service used to create test data.  It uses a quartz endpoint to trigger the test method and generates
-                random ip addresses.  This mimics the Mailservice receiving an email and retrieving the from IP address.
-            </description>
-            <inbound>
-                <inbound-endpoint ref="quartzTrigger"/>
-            </inbound>
-            <component>
-                <spring-object bean="mailGeneratorComponent"/>
-            </component>
-            <outbound>
-                <list-message-splitter-router>
-                    <outbound-endpoint ref="Gatekeeper"/>
-                </list-message-splitter-router>
-            </outbound>
-        </service>
+    <flow name="DataGeneratorMailService">
+        <description>
+            A service used to create test data. It uses a quartz endpoint to trigger the test method and generates
+            random ip addresses. This mimics the Mailservice receiving an email and retrieving the from IP address.
+        </description>
+        <inbound-endpoint ref="quartzTrigger"/>
+        <component>
+            <spring-object bean="mailGeneratorComponent"/>
+        </component>
+        <collection-splitter/>
+        <outbound-endpoint ref="Gatekeeper"/>
+    </flow>
 
-        <service name="MailService">
-            <description>
-                Component receives email and sends out the trail of IP-addresses as individual messages.
-            </description>
-            <!--<inbound>-->
-                <!-- TODO <inbound-endpoint ref="Input"/>-->
-            <!--</inbound>-->
+    <flow name="MailService">
+        <description>
+            Component receives email and sends out the trail of IP-addresses as individual messages.
+        </description>
+        <!--<inbound>-->
+        <!-- TODO <inbound-endpoint ref="Input"/>-->
+        <!--</inbound>-->
 
-            <component>
-                <spring-object bean="mailComponent"/>
-            </component>
+        <component>
+            <spring-object bean="mailComponent"/>
+        </component>
 
-            <outbound>
-                <list-message-splitter-router>
-                    <outbound-endpoint ref="Gatekeeper"/>
-                </list-message-splitter-router>
-            </outbound>
-        </service>
+        <collection-splitter/>
+        <outbound-endpoint ref="Gatekeeper"/>
+    </flow>
 
-        <service name="GatekeeperService">
-            <description>
-                Only sends IP that are not in the database on to GeoCoding
-            </description>
-            <inbound>
-                <inbound-endpoint ref="Gatekeeper"/>
-            </inbound>
+    <flow name="GatekeeperService">
+        <description>
+            Only sends IP that are not in the database on to GeoCoding
+        </description>
+        <inbound-endpoint ref="Gatekeeper"/>
 
-            <outbound>
-                <filtering-router>
-                    <outbound-endpoint ref="Geocoder"/>
-                    <not-filter>
-                        <filter ref="inCacheFilter"/>
-                    </not-filter>
-                </filtering-router>
-
-                <filtering-router>
-                    <outbound-endpoint ref="Positions">
-                        <transformer ref="IP2Sender"/>
-                    </outbound-endpoint>
+        <choice>
+            <when>
+                <outbound-endpoint ref="Geocoder"/>
+                <not-filter>
                     <filter ref="inCacheFilter"/>
-                </filtering-router>
-            </outbound>
-        </service>
+                </not-filter>
+            </when>
+            <when>
+                <outbound-endpoint ref="Positions">
+                    <transformer ref="IP2Sender"/>
+                </outbound-endpoint>
+                <filter ref="inCacheFilter"/>
+            </when>
+        </choice>
+    </flow>
 
-        <service name="HostipInfoService">
-            <description>
-                Uses the HostIP web service to lookup location information about the current IP address.  Note that
-                if the invocation of the HostIP Web Service fails, the fraudlabs web service will be used as a backup
-            </description>
-            <inbound>
-                <inbound-endpoint ref="Geocoder"/>
-            </inbound>
+    <flow name="HostipInfoService">
+        <description>
+            Uses the HostIP web service to lookup location information about the current IP address. Note that
+            if the invocation of the HostIP Web Service fails, the fraudlabs web service will be used as a backup
+        </description>
+        <inbound-endpoint ref="Geocoder"/>
 
-            <http:rest-service-component serviceUrl="http://api.hostip.info" httpMethod="GET">
-                <http:payloadParameterName value="ip"/>
-            </http:rest-service-component>
+        <http:rest-service-component serviceUrl="http://api.hostip.info" httpMethod="GET">
+            <http:payloadParameterName value="ip"/>
+        </http:rest-service-component>
 
-             <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="Storage">
-                        <transformer ref="HostIpXSLT" />
-                        <transformer ref="XmlToSender" />
-                    </outbound-endpoint>
-                </pass-through-router>
-            </outbound>
+        <outbound-endpoint ref="Storage">
+            <transformer ref="HostIpXSLT"/>
+            <transformer ref="XmlToSender"/>
+        </outbound-endpoint>
 
-            <default-exception-strategy>
-                <outbound-endpoint ref="Fraudlabs"/>
-            </default-exception-strategy>
-        </service>
+        <default-exception-strategy>
+            <outbound-endpoint ref="Fraudlabs"/>
+        </default-exception-strategy>
+    </flow>
 
-        <service name="FraudlabsService">
-            <description>
-                This is the backup GeoLocation service used to find location info for an IP address
-            </description>
-            <inbound>
-                <inbound-endpoint ref="Fraudlabs"/>
-            </inbound>
+    <flow name="FraudlabsService">
+        <description>
+            This is the backup GeoLocation service used to find location info for an IP address
+        </description>
+        <inbound-endpoint ref="Fraudlabs"/>
+        <http:rest-service-component
+                serviceUrl="http://ws.fraudlabs.com/ws.fraudlabs.com_non_ssl/ip2locationwebservice.asmx/IP2Location?LICENSE=02-J73Z-N42F"
+                httpMethod="POST">
+            <http:payloadParameterName value="IP"/>
+        </http:rest-service-component>
+        <outbound-endpoint ref="Storage">
+            <transformer ref="FraudlabsXSLT"/>
+            <transformer ref="XmlToSender"/>
+        </outbound-endpoint>
+    </flow>
 
-            <http:rest-service-component
-                    serviceUrl="http://ws.fraudlabs.com/ws.fraudlabs.com_non_ssl/ip2locationwebservice.asmx/IP2Location?LICENSE=02-J73Z-N42F"
-                    httpMethod="POST">
-                <http:payloadParameterName value="IP"/>
-            </http:rest-service-component>
-
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="Storage">
-                        <transformer ref="FraudlabsXSLT" />
-                        <transformer ref="XmlToSender"/>
-                    </outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
-
-        <service name="StorageService">
-            <description>
-                This service is responsible for storing the Sender location information so that we do not need to
-                lookup the information the next time the same IP address is used.
-            </description>
-            <inbound>
-                <inbound-endpoint ref="Storage"/>
-            </inbound>
-
-            <component>
-                <spring-object bean="storageComponent"/>
-            </component>
-
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="Aggregator"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="StorageService">
+        <description>
+            This service is responsible for storing the Sender location information so that we do not need to
+            lookup the information the next time the same IP address is used.
+        </description>
+        <inbound-endpoint ref="Storage"/>
+        <component>
+            <spring-object bean="storageComponent"/>
+        </component>
+        <outbound-endpoint ref="Aggregator"/>
+    </flow>
 
 
-        <service name="ValidPositionAggregatorService">
-            <description>
-                This service filters out any Senders that we couldn't find latitude and longitude coordinates for, it sends the valid
-                senders as an ajax event to the browser.
-            </description>
-            <inbound>
-                <inbound-endpoint ref="Aggregator"/>
-                <selective-consumer-router>
-                    <expression-filter evaluator="groovy" expression="payload.latitude != null &amp; payload.longitude != null"/>
-                </selective-consumer-router>
-            </inbound>
+    <flow name="ValidPositionAggregatorService">
+        <description>
+            This service filters out any Senders that we couldn't find latitude and longitude coordinates for, it sends
+            the valid
+            senders as an ajax event to the browser.
+        </description>
+        <inbound-endpoint ref="Aggregator"/>
+        <expression-filter evaluator="groovy" expression="payload.latitude != null &amp; payload.longitude != null"/>
+        <outbound-endpoint ref="Output"/>
+    </flow>
 
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="Output"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
 </mule>

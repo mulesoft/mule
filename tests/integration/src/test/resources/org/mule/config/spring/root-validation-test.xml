@@ -13,26 +13,21 @@
     </spring:beans>
 
     <global-property name="property" value="value"/>
-    
+
     <endpoint name="endpoint" address="test://${property}" exchange-pattern="one-way"/>
 
-    <model name="model">
-        <service name="service">
-            <inbound>
-                <inbound-endpoint ref="endpoint"/>
-            </inbound>
-            <component>
-                <spring-object bean="poot"/>
-            </component>
-        </service>
-    </model>
-    
     <flow name="service">
-        <inbound-endpoint ref="endpoint" />
-
+        <inbound-endpoint ref="endpoint"/>
         <component>
-            <spring-object bean="poot" />
+            <spring-object bean="poot"/>
         </component>
     </flow>
-    
+
+    <flow name="service">
+        <inbound-endpoint ref="endpoint"/>
+        <component>
+            <spring-object bean="poot"/>
+        </component>
+    </flow>
+
 </mule>

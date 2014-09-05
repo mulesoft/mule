@@ -95,7 +95,7 @@ public class SimpleCallableJavaComponentTestCase extends AbstractComponentTestCa
     {
         SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(
             new Apple());
-        component.setFlowConstruct(getTestService());
+        component.setFlowConstruct(getTestFlow());
         component.setMuleContext(muleContext);
         component.initialise();
         component.start();

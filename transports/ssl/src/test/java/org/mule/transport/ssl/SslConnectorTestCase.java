@@ -6,16 +6,15 @@
  */
 package org.mule.transport.ssl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
-import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.construct.Flow;
 import org.mule.transport.AbstractConnectorTestCase;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 public class SslConnectorTestCase extends AbstractConnectorTestCase
 {
@@ -59,16 +58,15 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
     @Test
     public void testValidListener() throws Exception
     {
-        Service service = getTestService("orange", Orange.class);
         Connector connector = getConnector();
 
         InboundEndpoint endpoint2 =
             muleContext.getEndpointFactory().getInboundEndpoint("ssl://localhost:30303");
 
-        connector.registerListener(endpoint2, getSensingNullMessageProcessor(), service);
+        connector.registerListener(endpoint2, getSensingNullMessageProcessor(), mock(Flow.class));
         try
         {
-            connector.registerListener(endpoint2, getSensingNullMessageProcessor(), service);
+            connector.registerListener(endpoint2, getSensingNullMessageProcessor(), mock(Flow.class));
             fail("cannot register on the same endpointUri");
         }
         catch (Exception e)

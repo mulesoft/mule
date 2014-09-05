@@ -93,8 +93,8 @@ public class EndpointTranformersInAttributesTestCase extends FunctionalTestCase
     @Test
     public void testGlobalEndpoints() throws MuleException
     {
-        Object service = muleContext.getRegistry().lookupObject("globalEndpoints");
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) ((Flow) service).getMessageSource();
+        Object flow = muleContext.getRegistry().lookupObject("globalEndpoints");
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) ((Flow) flow).getMessageSource();
 
         List<MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
@@ -116,7 +116,7 @@ public class EndpointTranformersInAttributesTestCase extends FunctionalTestCase
         assertEquals(1, transformers.size());
         assertTrue(transformers.get(0) instanceof TestResponseTransformer);
 
-        endpoint = (ImmutableEndpoint) ((Flow) service).getMessageProcessors().get(0);
+        endpoint = (ImmutableEndpoint) ((Flow) flow).getMessageProcessors().get(0);
 
         processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
@@ -146,8 +146,8 @@ public class EndpointTranformersInAttributesTestCase extends FunctionalTestCase
     @Test
     public void testLocalEndpoints() throws MuleException
     {
-        Object service = muleContext.getRegistry().lookupObject("localEndpoints");
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) ((Flow) service).getMessageSource();
+        Object flow = muleContext.getRegistry().lookupObject("localEndpoints");
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) ((Flow) flow).getMessageSource();
 
         List<MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
@@ -169,7 +169,7 @@ public class EndpointTranformersInAttributesTestCase extends FunctionalTestCase
         assertEquals(1, transformers.size());
         assertTrue(transformers.get(0) instanceof TestResponseTransformer);
 
-        endpoint = (ImmutableEndpoint) ((Flow) service).getMessageProcessors().get(0);
+        endpoint = (ImmutableEndpoint) ((Flow) flow).getMessageProcessors().get(0);
 
         processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
@@ -195,8 +195,8 @@ public class EndpointTranformersInAttributesTestCase extends FunctionalTestCase
     @Test
     public void testTransformerRefsWithChildProcessors() throws MuleException
     {
-        Object service = muleContext.getRegistry().lookupObject("transformerRefsWithChildProcessors");
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) ((Flow) service).getMessageSource();
+        Object flow = muleContext.getRegistry().lookupObject("transformerRefsWithChildProcessors");
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) ((Flow) flow).getMessageSource();
 
         List<MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
@@ -211,7 +211,7 @@ public class EndpointTranformersInAttributesTestCase extends FunctionalTestCase
         assertTrue(((MessageProcessorChain)processors.get(0)).getMessageProcessors().get(0) instanceof StringAppendTransformer);
         assertTrue(processors.get(1) instanceof TestResponseTransformer);
 
-        endpoint = (ImmutableEndpoint) ((Flow) service).getMessageProcessors().get(0);
+        endpoint = (ImmutableEndpoint) ((Flow) flow).getMessageProcessors().get(0);
 
         processors = endpoint.getMessageProcessors();
         assertNotNull(processors);

@@ -6,19 +6,17 @@
  */
 package org.mule.transport.multicast;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
-import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.construct.Flow;
 import org.mule.transport.AbstractConnectorTestCase;
 
 import java.net.DatagramPacket;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class MulticastConnectorTestCase extends AbstractConnectorTestCase
 {
@@ -46,16 +44,16 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
     @Test
     public void testValidListener() throws Exception
     {
-        Service service = getTestService("orange", Orange.class);
+        Flow flow = new Flow("orange", muleContext);
         Connector connector = getConnector();
 
         InboundEndpoint endpoint2 = muleContext.getEndpointFactory()
             .getInboundEndpoint("multicast://228.2.3.4:10100");
 
-        connector.registerListener(endpoint2, getSensingNullMessageProcessor(), service);
+        connector.registerListener(endpoint2, getSensingNullMessageProcessor(), flow);
         try
         {
-            connector.registerListener(endpoint2, getSensingNullMessageProcessor(), service);
+            connector.registerListener(endpoint2, getSensingNullMessageProcessor(), flow);
             fail("cannot register on the same endpointUri");
         }
         catch (Exception e)

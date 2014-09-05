@@ -1,71 +1,61 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:spring="http://www.springframework.org/schema/beans"
-  xmlns:quartz="http://www.mulesoft.org/schema/mule/quartz"
-  xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-  xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:quartz="http://www.mulesoft.org/schema/mule/quartz"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
        http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/current/mule-quartz.xsd">
-  
-  <quartz:endpoint name="schedulerEndpoint" jobName="myService" repeatInterval="1000" 
-    repeatCount="1" exchange-pattern="request-response">
-       <quartz:scheduled-dispatch-job>
-           <quartz:job-endpoint address="vm://quartz.in"/>
-       </quartz:scheduled-dispatch-job>
-  </quartz:endpoint>
-  
-  <endpoint name="clientEndpoint" 
-      address="http://localhost:${port1}/services/greeter"
-      exchange-pattern="request-response">
-      <cxf:jaxws-client
-          clientClass="org.apache.hello_world_soap_http.SOAPService"
-          port="SoapPort"
-          wsdlLocation="classpath:/wsdl/hello_world.wsdl">
-          <cxf:inInterceptors>
-              <spring:bean id="foo1" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
-          </cxf:inInterceptors>
-          <cxf:outInterceptors>
-              <spring:bean id="foo2" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
-          </cxf:outInterceptors>
-      </cxf:jaxws-client>
-  </endpoint>
-    
-  <model name="TestCxfModel">
 
-    <service name="greeterService">
-        <inbound>
-            <inbound-endpoint address="http://localhost:${port1}/services/greeter"
-                exchange-pattern="request-response">
-                <cxf:jaxws-service />
-            </inbound-endpoint>
-        </inbound>
-        <component>
-            <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl" />
-        </component>
-    </service>
-    
-    <service name="cxfClient">
-      <inbound>
-        <inbound-endpoint address="vm://quartz.in" exchange-pattern="one-way"/>
-      </inbound>
-      <component>
-          <singleton-object class="org.mule.module.cxf.jaxws.ClientMessageGenerator"/>
-      </component>
-      <outbound>
-        <pass-through-router>
-           <outbound-endpoint address="http://localhost:${port1}/services/greeter"
+    <quartz:endpoint name="schedulerEndpoint" jobName="myService" repeatInterval="1000"
+                     repeatCount="1" exchange-pattern="request-response">
+        <quartz:scheduled-dispatch-job>
+            <quartz:job-endpoint address="vm://quartz.in"/>
+        </quartz:scheduled-dispatch-job>
+    </quartz:endpoint>
+
+    <endpoint name="clientEndpoint"
+              address="http://localhost:${port1}/services/greeter"
               exchange-pattern="request-response">
-               <cxf:jaxws-client
-                 clientClass="org.apache.hello_world_soap_http.SOAPService"
-                 port="SoapPort"
-                 wsdlLocation="classpath:/wsdl/hello_world.wsdl"
-                 operation="greetMe"
-                 />
-           </outbound-endpoint>
-        </pass-through-router>
-      </outbound>
-    </service>
-  </model>
+        <cxf:jaxws-client
+                clientClass="org.apache.hello_world_soap_http.SOAPService"
+                port="SoapPort"
+                wsdlLocation="classpath:/wsdl/hello_world.wsdl">
+            <cxf:inInterceptors>
+                <spring:bean id="foo1" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+            </cxf:inInterceptors>
+            <cxf:outInterceptors>
+                <spring:bean id="foo2" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+            </cxf:outInterceptors>
+        </cxf:jaxws-client>
+    </endpoint>
+
+    <flow name="greeterService">
+        <inbound-endpoint address="http://localhost:${port1}/services/greeter"
+                          exchange-pattern="request-response">
+            <cxf:jaxws-service/>
+        </inbound-endpoint>
+        <component>
+            <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl"/>
+        </component>
+    </flow>
+
+    <flow name="cxfClient">
+        <inbound-endpoint address="vm://quartz.in" exchange-pattern="one-way"/>
+        <component>
+            <singleton-object class="org.mule.module.cxf.jaxws.ClientMessageGenerator"/>
+        </component>
+        <outbound-endpoint address="http://localhost:${port1}/services/greeter"
+                           exchange-pattern="request-response">
+            <cxf:jaxws-client
+                    clientClass="org.apache.hello_world_soap_http.SOAPService"
+                    port="SoapPort"
+                    wsdlLocation="classpath:/wsdl/hello_world.wsdl"
+                    operation="greetMe"
+                    />
+        </outbound-endpoint>
+    </flow>
+
 </mule>

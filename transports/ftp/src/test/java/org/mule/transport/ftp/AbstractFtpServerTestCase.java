@@ -8,7 +8,6 @@ package org.mule.transport.ftp;
 
 import static org.junit.Assert.assertFalse;
 
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.ftp.server.FTPTestClient;

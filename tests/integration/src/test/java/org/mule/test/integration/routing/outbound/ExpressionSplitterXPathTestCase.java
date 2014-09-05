@@ -9,11 +9,10 @@ package org.mule.test.integration.routing.outbound;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,10 +20,17 @@ import java.util.List;
 
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-public class ExpressionSplitterXPathTestCase extends AbstractServiceAndFlowTestCase
+@RunWith(Parameterized.class)
+public class ExpressionSplitterXPathTestCase extends FunctionalTestCase
 {
+
+    protected ConfigVariant variant;
+    protected String configResources;
+
     private final String MESSAGE = "<Batch xmlns=\"http://acme.com\">\n" +
             "    <Trade>\n" +
             "        <Type>CASH</Type>\n" +
@@ -68,7 +74,8 @@ public class ExpressionSplitterXPathTestCase extends AbstractServiceAndFlowTestC
 
     public ExpressionSplitterXPathTestCase(ConfigVariant variant, String configResources)
     {
-        super(variant, configResources);
+        this.variant = variant;
+        this.configResources = configResources;
         XMLUnit.setIgnoreWhitespace(true);
     }
 
@@ -86,5 +93,16 @@ public class ExpressionSplitterXPathTestCase extends AbstractServiceAndFlowTestC
 
         assertTrue(XMLUnit.compareXML(EXPECTED_MESSAGE_1, results.get(0).toString()).identical());
         assertTrue(XMLUnit.compareXML(EXPECTED_MESSAGE_2, results.get(1).toString()).identical());
+    }
+
+    public static enum ConfigVariant
+    {
+        FLOW, FLOW_EL
+    }
+
+    @Override
+    public String getConfigResources()
+    {
+        return configResources;
     }
 }

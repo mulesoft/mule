@@ -26,8 +26,7 @@ public class Dom4jXPathExpressionWithNamespaceTestCase extends AbstractXmlProper
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
-        p.setProperty("selector.expression", "/foo:endpoint");
-        p.setProperty("selector.evaluator", "xpath");
+        p.setProperty("selector.expression", "xpath:/foo:endpoint");
 
         return p;
     }

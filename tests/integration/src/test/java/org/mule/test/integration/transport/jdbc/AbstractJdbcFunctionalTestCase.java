@@ -7,10 +7,7 @@
 package org.mule.test.integration.transport.jdbc;
 
 import org.mule.api.MuleEventContext;
-import org.mule.api.model.Model;
 import org.mule.api.transport.Connector;
-import org.mule.config.PoolingProfile;
-import org.mule.model.seda.SedaModel;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.util.MuleDerbyTestUtils;
@@ -50,7 +47,6 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleContext
     public static final String CLIENT_DRIVER_NAME = "org.apache.derby.jdbc.ClientDriver";
 
     protected Connector connector;
-    protected Model model;
     protected DataSource dataSource;
     
     private static boolean derbySetupDone = false;
@@ -78,11 +74,6 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleContext
     @Override
     protected void doSetUp() throws Exception
     {
-        SedaModel model = new SedaModel();
-        model.setName("main");
-        model.getPoolingProfile().setInitialisationPolicy(
-            PoolingProfile.INITIALISE_ONE);
-        muleContext.getRegistry().registerModel(model);
         // Create and register connector
         connector = createConnector();
         muleContext.getRegistry().registerConnector(connector);

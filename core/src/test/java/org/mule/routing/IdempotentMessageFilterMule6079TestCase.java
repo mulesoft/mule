@@ -9,17 +9,16 @@ package org.mule.routing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.service.Service;
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
+import org.mule.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.Serializable;
@@ -33,7 +32,7 @@ import org.mockito.Mockito;
 public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContextTestCase
 {
     private MuleSession session;
-    private Service service;
+    private Flow flow;
     private InboundEndpoint inboundEndpoint;
     private ObjectStore<String> objectStore;
     private IdempotentMessageFilter idempotentMessageFilter;
@@ -49,17 +48,17 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
     public void testRaceConditionOnAcceptAndProcess() throws Exception
     {
         inboundEndpoint = getTestInboundEndpoint("Test", "test://Test?exchangePattern=one-way");
-        service = getTestService();
+        flow = getTestFlow();
 
         session = Mockito.mock(MuleSession.class);
-        when(session.getFlowConstruct()).thenReturn(service);
+        when(session.getFlowConstruct()).thenReturn(flow);
 
         CountDownLatch cdl = new CountDownLatch(2);
 
         objectStore = new RaceConditionEnforcingObjectStore(cdl);
         idempotentMessageFilter = new IdempotentMessageFilter();
         idempotentMessageFilter.setIdExpression("#[header:id]");
-        idempotentMessageFilter.setFlowConstruct(service);
+        idempotentMessageFilter.setFlowConstruct(flow);
         idempotentMessageFilter.setThrowOnUnaccepted(false);
         idempotentMessageFilter.setStorePrefix("foo");
         idempotentMessageFilter.setStore(objectStore);

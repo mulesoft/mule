@@ -51,7 +51,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase
         List<Thread> threads = new ArrayList<Thread>(NUMBER_OF_ROUTES);
         for (int i = 0; i < NUMBER_OF_ROUTES; i++)
         {
-            threads.add(new Thread(new TestDriver(session, rr, NUMBER_OF_MESSAGES, getTestService())));
+            threads.add(new Thread(new TestDriver(session, rr, NUMBER_OF_MESSAGES, getTestFlow())));
         }
         for (Thread t : threads)
         {

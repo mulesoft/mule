@@ -6,12 +6,6 @@
  */
 package org.mule.test.integration.exceptions;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.junit.Test;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
@@ -26,6 +20,13 @@ import org.mule.context.notification.MuleContextNotification;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.concurrent.Latch;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.junit.Test;
+
 public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMuleTestCase
 {
 
@@ -33,12 +34,6 @@ public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMule
     public void testNamedFlowExceptionStrategyFails() throws Exception
     {
         loadConfiguration("org/mule/test/integration/exceptions/named-flow-exception-strategy.xml");
-    }
-
-    @Test(expected = ConfigurationException.class)
-    public void testNamedServiceExceptionStrategyFails() throws Exception
-    {
-        loadConfiguration("org/mule/test/integration/exceptions/named-service-exception-strategy.xml");
     }
 
     @Test(expected = ConfigurationException.class)

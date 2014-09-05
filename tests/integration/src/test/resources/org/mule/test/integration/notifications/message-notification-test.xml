@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-       xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
@@ -21,24 +21,14 @@
         <notification-listener ref="notificationLogger"/>
     </notifications>
 
-    <model name="the-model">
+    <flow name="service-1">
+        <vm:inbound-endpoint path="in-1" exchange-pattern="one-way" connector-ref="direct"/>
+        <echo-component/>
+    </flow>
 
-        <service name="service-1">
-            <inbound>
-                <vm:inbound-endpoint path="in-1" exchange-pattern="one-way" connector-ref="direct"/>
-            </inbound>
-            <echo-component/>
-        </service>
+    <flow name="service-2">
+        <vm:inbound-endpoint path="in-2" exchange-pattern="one-way" connector-ref="direct"/>
+        <vm:outbound-endpoint path="out-2" exchange-pattern="one-way" connector-ref="queue"/>
+    </flow>
 
-        <service name="service-2">
-            <inbound>
-                <vm:inbound-endpoint path="in-2" exchange-pattern="one-way" connector-ref="direct"/>
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="out-2" exchange-pattern="one-way" connector-ref="queue"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
 </mule>

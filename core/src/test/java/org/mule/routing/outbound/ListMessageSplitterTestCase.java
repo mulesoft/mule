@@ -12,14 +12,13 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.service.Service;
+import org.mule.construct.Flow;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.tck.MuleEventCheckAnswer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -41,8 +40,8 @@ public class ListMessageSplitterTestCase extends AbstractMuleContextTestCase
     @Test
     public void testCorrelationGroupSizePropertySet() throws Exception
     {
-        Service testService = getTestService("test", Apple.class);
-        MuleSession session = getTestSession(testService, muleContext);
+        Flow flow = getTestFlow("test", Apple.class);
+        MuleSession session = getTestSession(flow, muleContext);
 
         OutboundEndpoint endpoint = getTestOutboundEndpoint("Test1Endpoint",
             "test://endpoint?exchangePattern=request-response");

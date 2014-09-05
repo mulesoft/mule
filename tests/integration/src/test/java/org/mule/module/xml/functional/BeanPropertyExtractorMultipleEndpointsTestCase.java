@@ -21,8 +21,7 @@ public class BeanPropertyExtractorMultipleEndpointsTestCase extends AbstractXmlP
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
-        p.setProperty("selector.expression", "endpointsHolder.endpoints");
-        p.setProperty("selector.evaluator", "bean");
+        p.setProperty("selector.expression", "bean:endpointsHolder.endpoints");
         return p;
     }
 

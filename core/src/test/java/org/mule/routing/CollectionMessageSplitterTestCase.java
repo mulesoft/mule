@@ -7,14 +7,12 @@
 package org.mule.routing;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
@@ -24,7 +22,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.service.Service;
+import org.mule.construct.Flow;
 import org.mule.routing.outbound.IteratorMessageSequence;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -127,7 +125,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
     public void testEmptySequence() throws Exception
     {
         Object payload = Collections.emptySet();
-        Service fc = getTestService();
+        Flow fc = getTestFlow();
         MuleSession session = getTestSession(fc, muleContext);
         MuleMessage toSplit = new DefaultMuleMessage(payload, new HashMap<String, Object>(),
             new HashMap<String, Object>(), null, muleContext);
@@ -145,7 +143,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
 
     private void assertRouted(Object payload, int count, boolean counted) throws Exception, MuleException
     {
-        Service fc = getTestService();
+        Flow fc = getTestFlow();
         MuleSession session = getTestSession(fc, muleContext);
 
         Map<String, Object> inboundProps = new HashMap<String, Object>();

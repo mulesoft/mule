@@ -8,7 +8,7 @@ package org.mule.context.notification;
 
 import static org.junit.Assert.assertNotNull;
 import org.mule.api.client.MuleClient;
-import org.mule.api.service.Service;
+import org.mule.construct.Flow;
 
 import org.junit.Ignore;
 
@@ -30,9 +30,9 @@ public class ServerNotificationManagerTestCase extends AbstractNotificationTestC
     {
         MuleClient client = muleContext.getClient();
         assertNotNull(client.send("vm://in", "hello world", null));
-        Service service = muleContext.getRegistry().lookupService(SERVICE);
-        service.pause();
-        service.resume();
+        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(SERVICE);
+        flow.stop();
+        flow.start();
     }
 
     @Override

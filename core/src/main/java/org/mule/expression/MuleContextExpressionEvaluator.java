@@ -54,17 +54,6 @@ public class MuleContextExpressionEvaluator implements ExpressionEvaluator, Mule
         {
             return getEventContext().getFlowConstruct().getName();
         }
-        else if (expression.equals("modelName"))
-        {
-            if (getEventContext().getFlowConstruct() instanceof Service)
-            {
-                return ((Service) getEventContext().getFlowConstruct()).getModel().getName();
-            }
-            else
-            {
-                throw new UnsupportedOperationException("The 'modelName' function can only be used with Service");
-            }
-        }
         else if (expression.equals("inboundEndpoint"))
         {
             return getEventContext().getEndpointURI();

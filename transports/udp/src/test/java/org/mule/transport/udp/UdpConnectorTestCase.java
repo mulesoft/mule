@@ -6,18 +6,17 @@
  */
 package org.mule.transport.udp;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
-import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.construct.Flow;
 import org.mule.transport.AbstractConnectorTestCase;
 
 import java.net.DatagramPacket;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 public class UdpConnectorTestCase extends AbstractConnectorTestCase
 {
@@ -45,16 +44,15 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
     @Test
     public void testValidListener() throws Exception
     {
-        Service service = getTestService("orange", Orange.class);
         Connector connector = getConnector();
 
         InboundEndpoint endpoint2 = muleContext.getEndpointFactory()
             .getInboundEndpoint("udp://localhost:3456");
 
-        connector.registerListener(endpoint2, getSensingNullMessageProcessor(), service);
+        connector.registerListener(endpoint2, getSensingNullMessageProcessor(), mock(Flow.class));
         try
         {
-            connector.registerListener(endpoint2, getSensingNullMessageProcessor(), service);
+            connector.registerListener(endpoint2, getSensingNullMessageProcessor(), mock(Flow.class));
             fail("cannot register on the same endpointUri");
         }
         catch (Exception e)

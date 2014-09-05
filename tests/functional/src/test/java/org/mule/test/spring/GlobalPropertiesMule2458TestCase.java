@@ -26,9 +26,9 @@ public class GlobalPropertiesMule2458TestCase extends FunctionalTestCase
     @Test
     public void testProperties()
     {
-        Object service = muleContext.getRegistry().lookupObject("service");
-        assertNotNull(service);
-        ImmutableEndpoint ep = (ImmutableEndpoint) ((Flow) service).getMessageSource();
+        Object flow = muleContext.getRegistry().lookupObject("service");
+        assertNotNull(flow);
+        ImmutableEndpoint ep = (ImmutableEndpoint) ((Flow) flow).getMessageSource();
 
         assertNotNull(ep);
         assertEquals("local", ep.getProperties().get("local"));

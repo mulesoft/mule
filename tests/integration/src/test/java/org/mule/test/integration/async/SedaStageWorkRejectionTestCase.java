@@ -10,19 +10,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.listener.FlowExecutionListener;
 import org.mule.transport.NullPayload;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 public class SedaStageWorkRejectionTestCase extends FunctionalTestCase
 {

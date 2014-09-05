@@ -334,7 +334,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
 
         endpoint = endpointBuilder.buildInboundEndpoint();
         endpoint.setListener(new NullMessageProcessor());
-        endpoint.setFlowConstruct(getTestService());
+        endpoint.setFlowConstruct(getTestFlow());
         endpoint.start();
 
         ObjectAwareProcessor objectAware = (ObjectAwareProcessor) endpoint.getMessageProcessors().get(0);
@@ -354,13 +354,13 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
 
     protected MuleEvent createTestRequestEvent(InboundEndpoint ep) throws Exception
     {
-        return new DefaultMuleEvent(inMessage, ep, getTestService(), getTestSession(null, muleContext));
+        return new DefaultMuleEvent(inMessage, ep, getTestFlow(), getTestSession(null, muleContext));
     }
 
     protected MuleEvent createTestResponseEvent(InboundEndpoint ep) throws Exception
     {
         return new DefaultMuleEvent(new DefaultMuleMessage(RESPONSE_MESSAGE, muleContext),
-            ep, getTestService(), getTestSession(null, muleContext));
+            ep, getTestFlow(), getTestSession(null, muleContext));
     }
 
     protected MuleEvent assertMessageSent(boolean sync) throws MuleException

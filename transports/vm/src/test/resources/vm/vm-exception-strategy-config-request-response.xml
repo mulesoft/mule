@@ -13,148 +13,111 @@
 
     <vm:connector name="vmConnector"/>
 
-    <model name="vmExceptionStrategy">
+    <flow name="dlqExceptionInboundEndpoint">
+        <vm:inbound-endpoint path="in1" exchange-pattern="request-response">
+            <custom-transformer
+                    class="org.mule.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$FailingTransformer"/>
+            <vm:transaction action="ALWAYS_BEGIN"/>
+        </vm:inbound-endpoint>
+        <test:component/>
+        <vm:outbound-endpoint path="out" exchange-pattern="request-response">
+            <vm:transaction action="ALWAYS_JOIN"/>
+        </vm:outbound-endpoint>
+        <default-exception-strategy>
+            <commit-transaction exception-pattern="*"/>
+            <vm:outbound-endpoint path="dead.letter" exchange-pattern="request-response">
+                <vm:transaction action="ALWAYS_JOIN"/>
+            </vm:outbound-endpoint>
+        </default-exception-strategy>
+    </flow>
 
-        <service name="dlqExceptionInboundEndpoint">
-            <inbound>
-                <vm:inbound-endpoint path="in1" exchange-pattern="request-response">
-                    <custom-transformer
-                            class="org.mule.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$FailingTransformer"/>
-                    <vm:transaction action="ALWAYS_BEGIN"/>
-                </vm:inbound-endpoint>
-            </inbound>
-            <test:component/>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="out" exchange-pattern="request-response">
-                        <vm:transaction action="ALWAYS_JOIN"/>
-                    </vm:outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-            <default-exception-strategy>
-                <commit-transaction exception-pattern="*"/>
-                <vm:outbound-endpoint path="dead.letter" exchange-pattern="request-response">
-                    <vm:transaction action="ALWAYS_JOIN"/>
-                </vm:outbound-endpoint>
-            </default-exception-strategy>
-        </service>
+    <flow name="dlqExceptionInboundEndpointResponse">
+        <vm:inbound-endpoint path="in2" exchange-pattern="request-response">
+            <response>
+                <custom-transformer
+                        class="org.mule.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$FailingTransformer"/>
+            </response>
+            <vm:transaction action="ALWAYS_BEGIN"/>
+        </vm:inbound-endpoint>
+        <test:component/>
+        <vm:outbound-endpoint path="out" exchange-pattern="request-response">
+            <vm:transaction action="ALWAYS_JOIN"/>
+        </vm:outbound-endpoint>
+        <default-exception-strategy>
+            <commit-transaction exception-pattern="*"/>
+            <vm:outbound-endpoint path="dead.letter" exchange-pattern="request-response">
+                <vm:transaction action="ALWAYS_JOIN"/>
+            </vm:outbound-endpoint>
+        </default-exception-strategy>
+    </flow>
 
-        <service name="dlqExceptionInboundEndpointResponse">
-            <inbound>
-                <vm:inbound-endpoint path="in2" exchange-pattern="request-response">
-                    <response>
-                        <custom-transformer
-                                class="org.mule.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$FailingTransformer"/>
-                    </response>
-                    <vm:transaction action="ALWAYS_BEGIN"/>
-                </vm:inbound-endpoint>
-            </inbound>
-            <test:component/>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="out" exchange-pattern="request-response">
-                        <vm:transaction action="ALWAYS_JOIN"/>
-                    </vm:outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-            <default-exception-strategy>
-                <commit-transaction exception-pattern="*"/>
-                <vm:outbound-endpoint path="dead.letter" exchange-pattern="request-response">
-                    <vm:transaction action="ALWAYS_JOIN"/>
-                </vm:outbound-endpoint>
-            </default-exception-strategy>
-        </service>
+    <flow name="dlqExceptionComponent">
+        <vm:inbound-endpoint path="in3">
+            <vm:transaction action="ALWAYS_BEGIN"/>
+        </vm:inbound-endpoint>
+        <test:component throwException="true"/>
+        <vm:outbound-endpoint path="out" exchange-pattern="request-response">
+            <vm:transaction action="ALWAYS_JOIN"/>
+        </vm:outbound-endpoint>
+        <default-exception-strategy>
+            <commit-transaction exception-pattern="*"/>
+            <vm:outbound-endpoint path="dead.letter" exchange-pattern="request-response">
+                <vm:transaction action="ALWAYS_JOIN"/>
+            </vm:outbound-endpoint>
+        </default-exception-strategy>
+    </flow>
 
-        <service name="dlqExceptionComponent">
-            <inbound>
-                <vm:inbound-endpoint path="in3">
-                    <vm:transaction action="ALWAYS_BEGIN"/>
-                </vm:inbound-endpoint>
-            </inbound>
-            <test:component throwException="true"/>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="out" exchange-pattern="request-response">
-                        <vm:transaction action="ALWAYS_JOIN"/>
-                    </vm:outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-            <default-exception-strategy>
-                <commit-transaction exception-pattern="*"/>
-                <vm:outbound-endpoint path="dead.letter" exchange-pattern="request-response">
-                    <vm:transaction action="ALWAYS_JOIN"/>
-                </vm:outbound-endpoint>
-            </default-exception-strategy>
-        </service>
+    <flow name="dlqExceptionOutboundEndpoint">
+        <vm:inbound-endpoint path="in4">
+            <vm:transaction action="ALWAYS_BEGIN"/>
+        </vm:inbound-endpoint>
+        <test:component/>
+        <vm:outbound-endpoint path="out" exchange-pattern="request-response">
+            <custom-transformer
+                    class="org.mule.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$FailingTransformer"/>
+            <vm:transaction action="ALWAYS_JOIN"/>
+        </vm:outbound-endpoint>
+        <default-exception-strategy>
+            <commit-transaction exception-pattern="*"/>
+            <vm:outbound-endpoint path="dead.letter" exchange-pattern="request-response">
+                <vm:transaction action="ALWAYS_JOIN"/>
+            </vm:outbound-endpoint>
+        </default-exception-strategy>
+    </flow>
 
-        <service name="dlqExceptionOutboundEndpoint">
-            <inbound>
-                <vm:inbound-endpoint path="in4">
-                    <vm:transaction action="ALWAYS_BEGIN"/>
-                </vm:inbound-endpoint>
-            </inbound>
-            <test:component/>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="out" exchange-pattern="request-response">
-                        <custom-transformer
-                                class="org.mule.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$FailingTransformer"/>
-                        <vm:transaction action="ALWAYS_JOIN"/>
-                    </vm:outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-            <default-exception-strategy>
-                <commit-transaction exception-pattern="*"/>
-                <vm:outbound-endpoint path="dead.letter" exchange-pattern="request-response">
-                    <vm:transaction action="ALWAYS_JOIN"/>
-                </vm:outbound-endpoint>
-            </default-exception-strategy>
-        </service>
+    <flow name="dlqExceptionOutboundEndpointResponse">
+        <vm:inbound-endpoint path="in5">
+            <vm:transaction action="ALWAYS_BEGIN"/>
+        </vm:inbound-endpoint>
+        <test:component/>
+        <vm:outbound-endpoint path="out" exchange-pattern="request-response">
+            <response>
+                <custom-transformer
+                        class="org.mule.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$FailingTransformer"/>
+            </response>
+            <vm:transaction action="ALWAYS_JOIN"/>
+        </vm:outbound-endpoint>
+        <default-exception-strategy>
+            <commit-transaction exception-pattern="*"/>
+            <vm:outbound-endpoint path="dead.letter" exchange-pattern="request-response">
+                <vm:transaction action="ALWAYS_JOIN"/>
+            </vm:outbound-endpoint>
+        </default-exception-strategy>
+    </flow>
 
-        <service name="dlqExceptionOutboundEndpointResponse">
-            <inbound>
-                <vm:inbound-endpoint path="in5">
-                    <vm:transaction action="ALWAYS_BEGIN"/>
-                </vm:inbound-endpoint>
-            </inbound>
-            <test:component/>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="out" exchange-pattern="request-response">
-                        <response>
-                            <custom-transformer
-                                    class="org.mule.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$FailingTransformer"/>
-                        </response>
-                        <vm:transaction action="ALWAYS_JOIN"/>
-                    </vm:outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-            <default-exception-strategy>
-                <commit-transaction exception-pattern="*"/>
-                <vm:outbound-endpoint path="dead.letter" exchange-pattern="request-response">
-                    <vm:transaction action="ALWAYS_JOIN"/>
-                </vm:outbound-endpoint>
-            </default-exception-strategy>
-        </service>
+    <flow name="deadLetterQueueService">
+        <vm:inbound-endpoint path="dead.letter">
+            <vm:transaction action="NONE"/>
+        </vm:inbound-endpoint>
+        <component
+                class="org.mule.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$DeadLetterQueueComponent"/>
+    </flow>
 
-        <service name="deadLetterQueueService">
-            <inbound>
-                <vm:inbound-endpoint path="dead.letter">
-                    <vm:transaction action="NONE"/>
-                </vm:inbound-endpoint>
-            </inbound>
-            <component
-                    class="org.mule.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$DeadLetterQueueComponent"/>
-        </service>
-
-        <service name="outboundFlow">
-            <inbound>
-                <vm:inbound-endpoint path="out">
-                    <vm:transaction action="NONE"/>
-                </vm:inbound-endpoint>
-            </inbound>
-            <component
-                    class="org.mule.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$OutboundComponent"/>
-        </service>
-    </model>
+    <flow name="outboundFlow">
+        <vm:inbound-endpoint path="out" exchange-pattern="request-response">
+            <vm:transaction action="NONE"/>
+        </vm:inbound-endpoint>
+        <component
+                class="org.mule.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$OutboundComponent"/>
+    </flow>
 </mule>

@@ -1,9 +1,9 @@
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" 
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans" 
+      xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
       xmlns:cxf-core="http://cxf.apache.org/core"
-    xsi:schemaLocation="
+      xsi:schemaLocation="
        http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
@@ -11,33 +11,28 @@
 
     <cxf:configuration configurationLocation="META-INF/cxf/jsr250-config.xml"/>
 
-    <spring:bean id="echo" class="org.mule.module.cxf.testmodels.Echo" />
+    <spring:bean id="echo" class="org.mule.module.cxf.testmodels.Echo"/>
 
-    <model name="TestCxfModel">
-        <service name="echoService">
-            <inbound>
-                <inbound-endpoint address="http://localhost:${port1}/services/Echo"
-                    exchange-pattern="request-response">
-                    <cxf:jaxws-service >
-                        <cxf:features>
-                            <cxf-core:logging />
-                        </cxf:features>
-                    </cxf:jaxws-service>
-                </inbound-endpoint>
-            </inbound>
-            <component>
-                <spring-object bean="echo"/>
-            </component>
-        </service>
-        
-        <service name="asyncService">
-            <inbound>
-                <inbound-endpoint address="http://localhost:${port1}/services/async"
-                    exchange-pattern="request-response">
-                    <cxf:jaxws-service />
-                </inbound-endpoint>
-            </inbound>
-            <component class="org.mule.module.cxf.testmodels.AsyncService" />
-        </service>
-    </model>
+    <flow name="echoService">
+        <inbound-endpoint address="http://localhost:${port1}/services/Echo"
+                          exchange-pattern="request-response">
+            <cxf:jaxws-service serviceClass="org.mule.module.cxf.testmodels.Echo">
+                <cxf:features>
+                    <cxf-core:logging/>
+                </cxf:features>
+            </cxf:jaxws-service>
+        </inbound-endpoint>
+        <component>
+            <spring-object bean="echo"/>
+        </component>
+    </flow>
+
+    <flow name="asyncService">
+        <inbound-endpoint address="http://localhost:${port1}/services/async"
+                          exchange-pattern="request-response">
+            <cxf:jaxws-service serviceClass="org.mule.module.cxf.testmodels.AsyncService"/>
+        </inbound-endpoint>
+        <component class="org.mule.module.cxf.testmodels.AsyncService"/>
+    </flow>
+
 </mule>

@@ -6,6 +6,15 @@
  */
 package org.mule;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.ThreadSafeAccess;
@@ -14,12 +23,13 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.Credentials;
-import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.construct.Flow;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.routing.MessageFilter;
 import org.mule.routing.filters.PayloadTypeFilter;
+import org.mule.session.DefaultMuleSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.simple.ByteArrayToObject;
@@ -33,10 +43,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
 
 
 public class MuleEventTestCase extends AbstractMuleContextTestCase
@@ -137,15 +143,15 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
         // same instance
         assertNotNull(deserialized.getFlowConstruct());
 
-        Service service = (Service) event.getFlowConstruct();
-        Service deserializedService = (Service) deserialized.getFlowConstruct();
+        Flow flow = (Flow) event.getFlowConstruct();
+        Flow deserializedService = (Flow) deserialized.getFlowConstruct();
 
         // Unable to test services for equality because of need for equals() everywhere.  See MULE-3720
         // assertEquals(event.getSession().getService(), deserialized.getSession().getService());
-        assertEquals(service.getName(), deserializedService.getName());
-        assertEquals(service.getInitialState(), deserializedService.getInitialState());
-        assertEquals(service.getExceptionListener().getClass(), deserializedService.getExceptionListener().getClass());
-        assertEquals(service.getComponent().getClass(), deserializedService.getComponent().getClass());
+        assertEquals(flow.getName(), deserializedService.getName());
+        assertEquals(flow.getInitialState(), deserializedService.getInitialState());
+        assertEquals(flow.getExceptionListener().getClass(), deserializedService.getExceptionListener().getClass());
+        assertEquals(flow.getMessageProcessors(), deserializedService.getMessageProcessors());
 
     }
 
@@ -159,7 +165,9 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
         ByteArrayToObject trans = new ByteArrayToObject();
         trans.setMuleContext(muleContext);
 
-        MuleEvent event = RequestContext.setEvent(getTestEvent(TEST_PAYLOAD, endpoint));
+        MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("data", muleContext), endpoint,
+                                               getTestFlow(), new DefaultMuleSession(),
+                                               null, null, null);
         Serializable serialized = (Serializable) new SerializableToByteArray().transform(event);
         assertNotNull(serialized);
 
@@ -177,10 +185,9 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
         createAndRegisterTransformersEndpointBuilderService();
         InboundEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
             muleContext.getRegistry().lookupEndpointBuilder("epBuilderTest"));
-        Service service = muleContext.getRegistry().lookupService("appleService");
-        return RequestContext.setEvent(getTestEvent(TEST_PAYLOAD, service, endpoint));
+        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("appleService");
+        return getTestEvent(TEST_PAYLOAD);
     }
-
 
     @Test
     public void testMuleEventSerializationWithRawPayload() throws Exception
@@ -219,7 +226,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
         endpointBuilder.addMessageProcessor(new MessageFilter(filter));
         muleContext.getRegistry().registerEndpointBuilder("epBuilderTest", endpointBuilder);
 
-        getTestService();
+        getTestFlow();
     }
 
     

@@ -15,11 +15,4 @@
         address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/DIRECTORY-MISSING"
         name="InvalidEndpoint" />
 
-    <!--<model name="model">-->
-        <!-- <service name="service"> <inbound> <sftp:inbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/inbound" 
-            name="inboundEndpoint" pollingFrequency="500"/> </inbound> <outbound> <pass-through-router> 
-            <sftp:outbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/DIRECTORY-MISSING" 
-            name="outboundEndpointDirMissing" keepFileOnError="true"> </sftp:outbound-endpoint> 
-            </pass-through-router> </outbound> </service> -->
-    <!--</model>-->
 </mule>

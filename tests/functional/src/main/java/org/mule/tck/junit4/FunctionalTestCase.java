@@ -7,7 +7,6 @@
 package org.mule.tck.junit4;
 
 import static org.junit.Assert.fail;
-
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -19,7 +18,6 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.schedule.Schedulers;
-import org.mule.api.service.Service;
 import org.mule.component.AbstractJavaComponent;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
@@ -132,11 +130,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
      */
     protected Object getComponent(FlowConstruct flowConstruct) throws Exception
     {
-        if (flowConstruct instanceof Service)
-        {
-            return getComponentObject(((Service) flowConstruct).getComponent());
-        }
-        else if (flowConstruct instanceof AbstractPipeline)
+        if (flowConstruct instanceof AbstractPipeline)
         {
             AbstractPipeline flow = (AbstractPipeline) flowConstruct;
             // Retrieve the first component
@@ -198,16 +192,8 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     protected void stopFlowConstruct(String flowName) throws Exception
     {
         FlowConstruct flowConstruct = getFlowConstruct(flowName);
-        if (flowConstruct instanceof Service)
-        {
-            Service service = (Service) flowConstruct;
-            service.stop();
-        }
-        else
-        {
-            Flow flow = (Flow) flowConstruct;
-            flow.stop();
-        }
+        Flow flow = (Flow) flowConstruct;
+        flow.stop();
     }
 
     /**

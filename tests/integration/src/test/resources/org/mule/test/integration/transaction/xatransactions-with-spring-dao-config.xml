@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
-       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-       xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc"
-       xmlns:jbossts="http://www.mulesoft.org/schema/mule/jbossts"
-       xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc"
+      xmlns:jbossts="http://www.mulesoft.org/schema/mule/jbossts"
+      xsi:schemaLocation="
            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
@@ -25,22 +25,15 @@
 
     <vm:connector name="VMQueue"/>
 
-    <model name="model">
-        <service name="JmsToJdbc">
-            <inbound>
-                <jms:inbound-endpoint queue="my.queue" exchange-pattern="request-response" 
-                    connector-ref="jmsXAConnector">
-                    <xa-transaction action="ALWAYS_BEGIN"/>
-                </jms:inbound-endpoint>
-            </inbound>
-            <component>
-                <spring-object bean="MyComponent"/>
-            </component>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="output" exchange-pattern="one-way"/>
-                </pass-through-router>
-            </outbound>
-        </service>    
-    </model>
+    <flow name="JmsToJdbc">
+        <jms:inbound-endpoint queue="my.queue" exchange-pattern="request-response"
+                              connector-ref="jmsXAConnector">
+            <xa-transaction action="ALWAYS_BEGIN"/>
+        </jms:inbound-endpoint>
+        <component>
+            <spring-object bean="MyComponent"/>
+        </component>
+        <vm:outbound-endpoint path="output" exchange-pattern="one-way"/>
+    </flow>
+
 </mule>

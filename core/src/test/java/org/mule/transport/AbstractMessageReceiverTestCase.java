@@ -6,32 +6,30 @@
  */
 package org.mule.transport;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
 public abstract class AbstractMessageReceiverTestCase extends AbstractMuleContextTestCase
 {
-    protected Service service;
+    protected Flow flow;
     protected InboundEndpoint endpoint;
 
     protected void doSetUp() throws Exception
     {
-        service = getTestService("orange", Orange.class);
+        flow = getTestFlow("orange", Orange.class);
         endpoint = getEndpoint();
     }
 
     @Test
     public void testCreate() throws Exception
     {
-        Service service = getTestService("orange", Orange.class);
         InboundEndpoint endpoint = getTestInboundEndpoint("Test");
         MessageReceiver receiver = getMessageReceiver();
 

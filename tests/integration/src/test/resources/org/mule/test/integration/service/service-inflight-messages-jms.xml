@@ -20,48 +20,18 @@
 
     <jms:endpoint name="out" queue="out" connector-ref="outPersistentConnector" exchange-pattern="one-way"/>
 
-    <model name="TestModel">
+    <flow name="TestService">
+        <test:component waitTime="30"/>
+        <jms:outbound-endpoint ref="out"/>
+    </flow>
 
-        <service name="TestService">
-            <test:component waitTime="30"/>
-            <outbound>
-                <pass-through-router>
-                    <jms:outbound-endpoint ref="out"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-        
-        <service name="PausedTestService" initialState="paused">
-            <test:component waitTime="30"/>
-            <outbound>
-                <pass-through-router>
-                    <jms:outbound-endpoint ref="out"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-        
-        <service name="TestPersistentQueueService">
-            <test:component waitTime="30"/>
-            <outbound>
-                <pass-through-router>
-                    <jms:outbound-endpoint ref="out"/>
-                </pass-through-router>
-            </outbound>
-            <queue-profile >
-                <default-persistent-queue-store/>
-            </queue-profile>
-        </service>
-        
-        <service name="PausedTestPersistentQueueService" initialState="paused">
-            <test:component waitTime="30"/>
-            <outbound>
-                <pass-through-router>
-                    <jms:outbound-endpoint ref="out"/>
-                </pass-through-router>
-            </outbound>
-            <queue-profile >
-                <default-persistent-queue-store/>
-            </queue-profile>
-        </service>
-    </model>
+    <flow name="TestPersistentQueueService" processingStrategy="TestPersistentQueueServicePS">
+        <test:component waitTime="30"/>
+        <jms:outbound-endpoint ref="out"/>
+    </flow>
+
+    <queued-asynchronous-processing-strategy name="TestPersistentQueueServicePS">
+        <default-persistent-queue-store/>
+    </queued-asynchronous-processing-strategy>
+
 </mule>

@@ -10,15 +10,12 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <model name="main">
-        <custom-service name="/foo" class="org.mule.tck.testmodels.mule.TestSedaService">
-            <inbound>
-                <http:inbound-endpoint address="http://localhost:${port1}/foo" exchange-pattern="request-response" name="inMain"/>
-            </inbound>
+        <flow name="/foo">
+            <http:inbound-endpoint address="http://localhost:${port1}/foo" exchange-pattern="request-response" name="inMain"/>
             <component>
                 <singleton-object class="org.mule.transport.http.functional.PartialReadComponent"/>
             </component>
-        </custom-service>
-    </model>
+        </flow>
+
 </mule>
 

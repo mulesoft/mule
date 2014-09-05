@@ -12,72 +12,49 @@
 
     <vm:connector name="vm"/>
 
-    <model name="test">
-        <service name="Distributor">
-            <inbound>
-                <vm:inbound-endpoint path="distributor.queue" exchange-pattern="one-way"/>
-            </inbound>
-            <outbound>
-                <multicasting-router>
-                    <vm:outbound-endpoint path="service1.queue" exchange-pattern="one-way">
-                        <expression-transformer>
-                            <return-argument evaluator="groovy" expression="payload.fruit[0]"/>
-                        </expression-transformer>
-                    </vm:outbound-endpoint>
-                    <vm:outbound-endpoint path="service2.queue" exchange-pattern="one-way">
-                        <expression-transformer>
-                            <return-argument evaluator="groovy" expression="payload.fruit[1]"/>
-                        </expression-transformer>
-                    </vm:outbound-endpoint>
-                    <vm:outbound-endpoint path="service3.queue" exchange-pattern="one-way">
-                        <expression-transformer>
-                            <return-argument evaluator="groovy" expression="payload.fruit[2]"/>
-                        </expression-transformer>
-                    </vm:outbound-endpoint>
-                </multicasting-router>
-            </outbound>
-        </service>
-        
-        <service name="ServiceOne">
-            <inbound>
-                <vm:inbound-endpoint path="service1.queue" exchange-pattern="one-way"/>
-            </inbound>
-            <test:component>
-                <test:return-data>#[function:shortPayloadClass] Received</test:return-data>
-            </test:component>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="collector.queue" exchange-pattern="one-way"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="Distributor">
+        <vm:inbound-endpoint path="distributor.queue" exchange-pattern="one-way"/>
+        <all>
+            <vm:outbound-endpoint path="service1.queue" exchange-pattern="one-way">
+                <expression-transformer>
+                    <return-argument evaluator="groovy" expression="payload.fruit[0]"/>
+                </expression-transformer>
+            </vm:outbound-endpoint>
+            <vm:outbound-endpoint path="service2.queue" exchange-pattern="one-way">
+                <expression-transformer>
+                    <return-argument evaluator="groovy" expression="payload.fruit[1]"/>
+                </expression-transformer>
+            </vm:outbound-endpoint>
+            <vm:outbound-endpoint path="service3.queue" exchange-pattern="one-way">
+                <expression-transformer>
+                    <return-argument evaluator="groovy" expression="payload.fruit[2]"/>
+                </expression-transformer>
+            </vm:outbound-endpoint>
+        </all>
+    </flow>
 
-        <service name="ServiceTwo">
-            <inbound>
-                <vm:inbound-endpoint path="service2.queue" exchange-pattern="one-way"/>
-            </inbound>
-            <test:component>
-                <test:return-data>#[function:shortPayloadClass] Received</test:return-data>
-            </test:component>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="collector.queue" exchange-pattern="one-way"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="ServiceOne">
+        <vm:inbound-endpoint path="service1.queue" exchange-pattern="one-way"/>
+        <test:component>
+            <test:return-data>#[function:shortPayloadClass] Received</test:return-data>
+        </test:component>
+        <vm:outbound-endpoint path="collector.queue" exchange-pattern="one-way"/>
+    </flow>
 
-        <service name="ServiceThree">
-            <inbound>
-                <vm:inbound-endpoint path="service3.queue" exchange-pattern="one-way"/>
-            </inbound>
-            <test:component>
-                <test:return-data>#[function:shortPayloadClass] Received</test:return-data>
-            </test:component>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="collector.queue" exchange-pattern="one-way"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
+    <flow name="ServiceTwo">
+        <vm:inbound-endpoint path="service2.queue" exchange-pattern="one-way"/>
+        <test:component>
+            <test:return-data>#[function:shortPayloadClass] Received</test:return-data>
+        </test:component>
+        <vm:outbound-endpoint path="collector.queue" exchange-pattern="one-way"/>
+    </flow>
+
+    <flow name="ServiceThree">
+        <vm:inbound-endpoint path="service3.queue" exchange-pattern="one-way"/>
+        <test:component>
+            <test:return-data>#[function:shortPayloadClass] Received</test:return-data>
+        </test:component>
+        <vm:outbound-endpoint path="collector.queue" exchange-pattern="one-way"/>
+    </flow>
+
 </mule>

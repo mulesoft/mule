@@ -16,19 +16,14 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <test:connector name="testConnector">
-        <spring:property name="initialStateStopped" value="true" />
-        <spring:property name="failAtStartup" value="true" />
+        <spring:property name="initialStateStopped" value="true"/>
+        <spring:property name="failAtStartup" value="true"/>
     </test:connector>
 
-    <model name="TestModel">
-        <custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy" />
+    <flow name="Polling" initialState="stopped">
+        <file:inbound-endpoint path="/a/b/c" pollingFrequency="1000"/>
+        <log-component/>
+        <custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy"/>
+    </flow>
 
-        <service name="Polling" initialState="stopped">
-            <inbound>
-                <file:inbound-endpoint path="/a/b/c" pollingFrequency="1000"/>
-            </inbound>
-            <log-component />
-        </service>
-
-    </model>
 </mule>

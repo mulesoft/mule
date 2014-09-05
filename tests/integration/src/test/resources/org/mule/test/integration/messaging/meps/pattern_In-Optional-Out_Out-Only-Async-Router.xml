@@ -39,46 +39,32 @@
     <vm:endpoint path="test.external.app" name="externalEndpoint" exchange-pattern="one-way"/>
     <vm:endpoint path="test.reply" name="replyEndpoint" exchange-pattern="one-way"/>
 
-    <model>
-        <service name="In-Out_Out-Only-Async-Service">
-            <inbound>
-                <inbound-endpoint ref="inboundEndpoint"/>
-            </inbound>
-            <script:component>
-                <script:script engine="groovy">
-                    if (message.getProperty("foo", org.mule.api.transport.PropertyScope.INBOUND) != null)
-                        return message
-                    else
-                    {
-                        //This shouldn't be needed but null does not stop the async-reply...
-                        eventContext.setStopFurtherProcessing(true)
-                        return null
-                    }
-                </script:script>
-            </script:component>
+    <flow name="In-Out_Out-Only-Async-Service">
+        <inbound-endpoint ref="inboundEndpoint"/>
+        <script:component>
+            <script:script engine="groovy">
+                if (message.getProperty("foo", org.mule.api.transport.PropertyScope.INBOUND) != null)
+                return message
+                else
+                {
+                //This shouldn't be needed but null does not stop the async-reply...
+                eventContext.setStopFurtherProcessing(true)
+                return null
+                }
+            </script:script>
+        </script:component>
 
-            <outbound>
-                <filtering-router>
-                    <outbound-endpoint ref="externalEndpoint"/>
-                    <reply-to ref="replyEndpoint"/>
-                </filtering-router>
-            </outbound>
+        <request-reply failOnTimeout="false" timeout="2000">
+            <outbound-endpoint ref="externalEndpoint"/>
+            <inbound-endpoint ref="replyEndpoint"/>
+        </request-reply>
+    </flow>
 
-            <async-reply failOnTimeout="false" timeout="2000">
-                <inbound-endpoint ref="replyEndpoint"/>
-                <single-async-reply-router/>
-            </async-reply>
-
-        </service>
-
-        <service name="ExternalApp">
-            <inbound>
-                <inbound-endpoint ref="externalEndpoint"/>
-            </inbound>
-            <test:component>
-                <test:return-data>got it!</test:return-data>
-            </test:component>
-        </service>
-    </model>
+    <flow name="ExternalApp">
+        <inbound-endpoint ref="externalEndpoint"/>
+        <test:component>
+            <test:return-data>got it!</test:return-data>
+        </test:component>
+    </flow>
     <!--// END SNIPPET: full-config -->
 </mule>

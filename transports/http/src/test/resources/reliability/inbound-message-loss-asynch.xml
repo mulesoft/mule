@@ -9,46 +9,40 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <model>
-        <service name="NoException">
-            <inbound>
-                <http:inbound-endpoint address="http://localhost:${port1}/noException" exchange-pattern="one-way" />
-            </inbound>
-            <test:component>
-            	<test:return-data>Here you go</test:return-data>
-            </test:component>
-        </service>
-        <service name="TransformerException">
-            <inbound>
-                <http:inbound-endpoint address="http://localhost:${port1}/transformerException" exchange-pattern="one-way" />
-                <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer" />
-            </inbound>
-            <test:component>
-            	<test:return-data>Here you go</test:return-data>
-            </test:component>
-        </service>
-        <service name="RouterException">
-            <inbound>
-                <http:inbound-endpoint address="http://localhost:${port1}/routerException" exchange-pattern="one-way" />
-                <custom-inbound-router class="org.mule.tck.testmodels.mule.FailingRouter" />
-            </inbound>
-            <test:component>
-            	<test:return-data>Here you go</test:return-data>
-            </test:component>
-        </service>
-        <service name="ComponentException">
-            <inbound>
-                <http:inbound-endpoint address="http://localhost:${port1}/componentException" exchange-pattern="one-way" />
-            </inbound>
-            <test:component throwException="true">
-                <test:return-data>Here you go</test:return-data>
-            </test:component>
-        </service>
-    </model>
+    <flow name="NoException">
+        <http:inbound-endpoint address="http://localhost:${port1}/noException" exchange-pattern="one-way"/>
+        <test:component>
+            <test:return-data>Here you go</test:return-data>
+        </test:component>
+    </flow>
+
+    <flow name="TransformerException">
+        <http:inbound-endpoint address="http://localhost:${port1}/transformerException" exchange-pattern="one-way"/>
+        <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer"/>
+        <test:component>
+            <test:return-data>Here you go</test:return-data>
+        </test:component>
+    </flow>
+
+    <flow name="RouterException">
+        <http:inbound-endpoint address="http://localhost:${port1}/routerException" exchange-pattern="one-way"/>
+        <custom-processor class="org.mule.tck.testmodels.mule.FailingRouter" />
+        <test:component>
+            <test:return-data>Here you go</test:return-data>
+        </test:component>
+    </flow>
+
+    <flow name="ComponentException">
+        <http:inbound-endpoint address="http://localhost:${port1}/componentException" exchange-pattern="one-way"/>
+        <test:component throwException="true">
+            <test:return-data>Here you go</test:return-data>
+        </test:component>
+    </flow>
 
     <flow name="HandledTransformerException">
-        <http:inbound-endpoint address="http://localhost:${port1}/handledTransformerException" exchange-pattern="one-way">
-            <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer" />
+        <http:inbound-endpoint address="http://localhost:${port1}/handledTransformerException"
+                               exchange-pattern="one-way">
+            <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer"/>
         </http:inbound-endpoint>
         <echo-component/>
         <custom-exception-strategy
@@ -56,8 +50,9 @@
     </flow>
 
     <flow name="FailToHandledTransformerException">
-        <http:inbound-endpoint address="http://localhost:${port1}/notHandledTransformerException" exchange-pattern="one-way">
-            <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer" />
+        <http:inbound-endpoint address="http://localhost:${port1}/notHandledTransformerException"
+                               exchange-pattern="one-way">
+            <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer"/>
         </http:inbound-endpoint>
         <echo-component/>
         <custom-exception-strategy

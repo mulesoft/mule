@@ -1,26 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
-       xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
 
     <jms:activemq-connector name="jmsConnector"/>
-    
-    <model name="model">
-        <service name="TestReceiverUMO">
-            <inbound>
-                <inbound-endpoint address="jms://test.queue" exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.tck.testmodels.services.TestReceiver"/>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint address="stdio://System.out" exchange-pattern="one-way"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
+
+    <flow name="TestReceiverUMO">
+        <inbound-endpoint address="jms://test.queue" exchange-pattern="request-response"/>
+        <component class="org.mule.tck.testmodels.services.TestReceiver"/>
+        <outbound-endpoint address="stdio://System.out" exchange-pattern="one-way"/>
+    </flow>
+
 </mule>

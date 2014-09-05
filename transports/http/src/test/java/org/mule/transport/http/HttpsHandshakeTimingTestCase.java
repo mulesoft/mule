@@ -7,11 +7,8 @@
 package org.mule.transport.http;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -19,8 +16,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
+import org.mule.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.ssl.MockHandshakeCompletedEvent;
 import org.mule.transport.ssl.MockSslSocket;
@@ -95,8 +92,7 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleContextTestCase
         when(inboundEndpoint.getConnector()).thenReturn(httpsConnector);
         when(inboundEndpoint.getProperties()).thenReturn(properties);
 
-        Service service = mock(Service.class);
-        return new MockHttpsMessageReceiver(httpsConnector, service, inboundEndpoint);
+        return new MockHttpsMessageReceiver(httpsConnector, mock(Flow.class), inboundEndpoint);
     }
 
     private static class MockHttpsMessageReceiver extends HttpsMessageReceiver
