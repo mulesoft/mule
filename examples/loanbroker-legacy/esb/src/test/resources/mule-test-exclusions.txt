@@ -1,6 +1,0 @@
-#
-# Test cases listed in this file are not run.
-#
-
-# MULE-3711
-org.mule.example.loanbroker.esb.LoanBrokerEsbProgramaticTestCase

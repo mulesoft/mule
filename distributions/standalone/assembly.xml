@@ -104,8 +104,6 @@
                 <exclude>**/derby.log</exclude>
                 <!-- Exclude this example until someone gets it working -->
                 <exclude>geomail/**</exclude>
-                <!-- Legacy LoanBroker example, used for testing only -->
-                <exclude>loanbroker-legacy/**</exclude>
                 <!-- Exclude examples that are not Studio compliant -->
                 <exclude>cep/**</exclude>
                 <exclude>errorhandler/**</exclude>

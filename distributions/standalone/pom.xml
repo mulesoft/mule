@@ -158,10 +158,6 @@
                 </exclusion>
                 <exclusion>
                     <groupId>org.mule.examples</groupId>
-                    <artifactId>mule-example-loanbroker-legacy</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.mule.examples</groupId>
                     <artifactId>mule-example-notifications</artifactId>
                 </exclusion>
             </exclusions>
