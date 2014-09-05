@@ -32,7 +32,6 @@
         <module>notifications</module>
         <module>scripting</module>
         <module>stockquote</module>
-        <module>loanbroker-legacy</module>
     </modules>
 
     <build>
