@@ -14,23 +14,14 @@
 
     <vm:connector name="vmConnector"/>
 
-    <model name="Model">
-        <service name="JmsQueueComponent">
-            <inbound>
-                <inbound-endpoint address="vm://in" exchange-pattern="request-response"/>
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="out"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="JmsQueueComponent">
+        <inbound-endpoint address="vm://in" exchange-pattern="request-response"/>
+        <outbound-endpoint ref="out"/>
+    </flow>
 
-        <service name="EchoComponent">
-            <inbound>
-                <inbound-endpoint ref="out"/>
-            </inbound>
-            <test:component appendString=" Received"/>
-        </service>
-    </model>
+    <flow name="EchoComponent">
+        <inbound-endpoint ref="out"/>
+        <test:component appendString=" Received"/>
+    </flow>
+
 </mule>

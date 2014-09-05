@@ -11,17 +11,11 @@
 
     <jms:activemq-connector name="jmsConnector"/>
 
-    <model name="Synchronous_Message_Pattern">
-        <service name="SynchronousService">
-            <inbound>
-                <vm:inbound-endpoint path="input" exchange-pattern="request-response"/>
-            </inbound>
+    <flow name="SynchronousService">
+        <vm:inbound-endpoint path="input" exchange-pattern="request-response"/>
 
-            <outbound>
-                <pass-through-router>
-                    <jms:outbound-endpoint connector-ref="jmsConnector" queue="#[header:INBOUND:queueName]" exchange-pattern="request-response"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
+        <jms:outbound-endpoint connector-ref="jmsConnector" queue="#[header:INBOUND:queueName]"
+                               exchange-pattern="request-response"/>
+    </flow>
+
 </mule>

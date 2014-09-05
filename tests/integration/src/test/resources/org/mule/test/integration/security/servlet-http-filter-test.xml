@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-       xmlns:mule-ss="http://www.mulesoft.org/schema/mule/spring-security"
-       xmlns:ss="http://www.springframework.org/schema/security"
-    xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:mule-ss="http://www.mulesoft.org/schema/mule/spring-security"
+      xmlns:ss="http://www.springframework.org/schema/security"
+      xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
@@ -16,8 +16,8 @@
         <ss:authentication-manager alias="authenticationManager">
             <ss:authentication-provider>
                 <ss:user-service id="userService">
-                    <ss:user name="ross" password="ross" authorities="ROLE_ADMIN" />
-                    <ss:user name="anon" password="anon" authorities="ROLE_ANONYMOUS" />
+                    <ss:user name="ross" password="ross" authorities="ROLE_ADMIN"/>
+                    <ss:user name="anon" password="anon" authorities="ROLE_ANONYMOUS"/>
                 </ss:user-service>
             </ss:authentication-provider>
         </ss:authentication-manager>
@@ -27,15 +27,11 @@
         <mule-ss:delegate-security-provider name="memory-dao" delegate-ref="authenticationManager"/>
     </mule-ss:security-manager>
 
-    <model name="http secured test model">
-        <service name="SecureUMO">
-            <inbound>
-                <inbound-endpoint address="servlet://test" exchange-pattern="request-response">
-                    <mule-ss:http-security-filter realm="mule-realm"/>
-                </inbound-endpoint>
-            </inbound>
-            <echo-component />
-        </service>
-    </model>
+    <flow name="SecureUMO">
+        <inbound-endpoint address="servlet://test" exchange-pattern="request-response">
+            <mule-ss:http-security-filter realm="mule-realm"/>
+        </inbound-endpoint>
+        <echo-component/>
+    </flow>
 
 </mule>

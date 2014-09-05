@@ -9,8 +9,8 @@ package org.mule.transport.multicast;
 import static org.mockito.Mockito.mock;
 
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.construct.Flow;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractMessageReceiverTestCase;
 
@@ -19,9 +19,8 @@ public class MulticastMessageReceiverTestCase extends AbstractMessageReceiverTes
     @Override
     public MessageReceiver getMessageReceiver() throws Exception
     {
-        Service mockService = mock(Service.class);
         AbstractConnector connector = (AbstractConnector)endpoint.getConnector();
-        return new MulticastMessageReceiver(connector, mockService, endpoint);
+        return new MulticastMessageReceiver(connector,  mock(Flow.class), endpoint);
     }
 
     @Override

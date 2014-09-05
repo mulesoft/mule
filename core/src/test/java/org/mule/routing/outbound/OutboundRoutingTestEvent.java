@@ -212,7 +212,7 @@ public class OutboundRoutingTestEvent implements MuleEvent
     {
         try
         {
-            return MuleTestUtils.getTestService(message.getMuleContext());
+            return MuleTestUtils.getTestFlow(message.getMuleContext());
         }
         catch (Exception e)
         {

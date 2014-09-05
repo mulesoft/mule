@@ -6,14 +6,18 @@
  */
 package org.mule.transport.file;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.construct.Flow;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.AbstractConnectorTestCase;
@@ -23,11 +27,6 @@ import java.io.File;
 import java.util.Arrays;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class FileConnectorTestCase extends AbstractConnectorTestCase
 {
@@ -94,8 +93,8 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
         connector.setPollingFrequency(POLLING_FREQUENCY);
 
         InboundEndpoint endpoint = getTestInboundEndpoint("simple");
-        Service service = getTestService();
-        MessageReceiver receiver = connector.createReceiver(service, endpoint);
+        Flow flow = getTestFlow();
+        MessageReceiver receiver = connector.createReceiver(flow, endpoint);
         assertEquals("Connector's polling frequency must not be ignored.", POLLING_FREQUENCY,
                 ((FileMessageReceiver) receiver).getFrequency());
     }
@@ -115,8 +114,8 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
         // Endpoint wants String-typed properties
         endpoint.getProperties().put(FileConnector.PROPERTY_POLLING_FREQUENCY, String.valueOf(POLLING_FREQUENCY_OVERRIDE));
 
-        Service service = getTestService();
-        MessageReceiver receiver = connector.createReceiver(service, endpoint);
+        Flow flow = getTestFlow();
+        MessageReceiver receiver = connector.createReceiver(flow, endpoint);
         assertEquals("Polling frequency endpoint override must not be ignored.", POLLING_FREQUENCY_OVERRIDE,
                 ((FileMessageReceiver) receiver).getFrequency());
     }

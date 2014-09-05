@@ -45,7 +45,7 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     public void setInvocationPropertyUsingAPIGetInFlow() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestService());
+        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestFlow());
 
         message.setProperty("P1", "P1_VALUE", PropertyScope.INVOCATION);
 
@@ -56,7 +56,7 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     public void setInvocationPropertyInFlowGetUsingAPI() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestService());
+        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestFlow());
 
         Flow flowA = (Flow) muleContext.getRegistry().lookupFlowConstruct("SetInvocationPropertyInFlow");
         MuleEvent result = flowA.process(event);
@@ -68,7 +68,7 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     public void overwritePropertyValueInFlow() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestService());
+        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestFlow());
 
         message.setProperty("P1", "P1_VALUE", PropertyScope.INVOCATION);
 
@@ -108,7 +108,7 @@ public class InvocationPropertiesTestCase extends org.mule.tck.junit4.Functional
     public void propagationThroughOneWayFlowSedaQueue() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestService());
+        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestFlow());
 
         Object nonSerializable = new Object();
         message.setInvocationProperty("P1", "value");

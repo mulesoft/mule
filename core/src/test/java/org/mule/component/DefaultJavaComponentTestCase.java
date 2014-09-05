@@ -6,21 +6,19 @@
  */
 package org.mule.component;
 
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.object.ObjectFactory;
-import org.mule.api.service.Service;
-import org.mule.lifecycle.LifecycleTrackerComponent;
-import org.mule.model.seda.SedaService;
-import org.mule.object.PrototypeObjectFactory;
-import org.mule.tck.testmodels.fruit.Orange;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.object.ObjectFactory;
+import org.mule.construct.Flow;
+import org.mule.lifecycle.LifecycleTrackerComponent;
+import org.mule.object.PrototypeObjectFactory;
+import org.mule.tck.testmodels.fruit.Orange;
+
+import org.junit.Test;
 
 public class DefaultJavaComponentTestCase extends AbstractComponentTestCase
 {
@@ -48,13 +46,13 @@ public class DefaultJavaComponentTestCase extends AbstractComponentTestCase
     public void testLifecycle() throws Exception
     {
         DefaultJavaComponent component = new DefaultJavaComponent(createObjectFactory());
-        component.setFlowConstruct(getTestService());
+        component.setFlowConstruct(getTestFlow());
         component.setMuleContext(muleContext);
         component.initialise();
         component.start();
 
         assertNotSame(component.borrowComponentLifecycleAdaptor(),
-            component.borrowComponentLifecycleAdaptor());
+                      component.borrowComponentLifecycleAdaptor());
 
         Object obj = component.getObjectFactory().getInstance(muleContext);
         assertNotNull(obj);
@@ -63,8 +61,8 @@ public class DefaultJavaComponentTestCase extends AbstractComponentTestCase
         component.start();
 
         assertNotSame(
-            ((DefaultComponentLifecycleAdapter) component.borrowComponentLifecycleAdaptor()).componentObject,
-            ((DefaultComponentLifecycleAdapter) component.borrowComponentLifecycleAdaptor()).componentObject);
+                ((DefaultComponentLifecycleAdapter) component.borrowComponentLifecycleAdaptor()).componentObject,
+                ((DefaultComponentLifecycleAdapter) component.borrowComponentLifecycleAdaptor()).componentObject);
 
     }
 
@@ -72,33 +70,29 @@ public class DefaultJavaComponentTestCase extends AbstractComponentTestCase
     public void testComponentDisposal() throws Exception
     {
         DefaultJavaComponent component = new DefaultJavaComponent(
-            createObjectFactory());
-        
-        component.setFlowConstruct(getTestService());
+                createObjectFactory());
+
+        component.setFlowConstruct(getTestFlow());
         component.setMuleContext(muleContext);
         component.initialise();
         component.start();
 
-        DefaultComponentLifecycleAdapter lifecycleAdapter = (DefaultComponentLifecycleAdapter) 
-            component.borrowComponentLifecycleAdaptor();
+        DefaultComponentLifecycleAdapter lifecycleAdapter = (DefaultComponentLifecycleAdapter)
+                component.borrowComponentLifecycleAdaptor();
         component.returnComponentLifecycleAdaptor(lifecycleAdapter);
         component.stop();
         component.dispose();
 
         assertNull(lifecycleAdapter.componentObject);
     }
-    
+
     @Test
-    public void testServicePropagatedLifecycle() throws InitialisationException
+    public void testServicePropagatedLifecycle() throws Exception
     {
-        Service service = new SedaService(muleContext);
-        service.setName("service");
-        service.setModel(muleContext.getRegistry().lookupSystemModel());
+
         LifecycleTrackerComponent component = new LifecycleTrackerComponent();
-        service.setComponent(component);
-        
-        service.initialise();
-        
+        Flow flow = getTestFlow(component);
+        flow.initialise();
         assertTrue(component.getTracker().contains("initialise"));
     }
 

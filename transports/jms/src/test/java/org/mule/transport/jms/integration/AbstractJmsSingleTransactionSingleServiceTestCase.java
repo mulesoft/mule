@@ -6,6 +6,8 @@
  */
 package org.mule.transport.jms.integration;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy.ExceptionCallback;
 import org.mule.util.ExceptionUtils;
@@ -15,9 +17,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * This tests single resource transactions through a single service definition (even
@@ -157,7 +156,7 @@ public abstract class AbstractJmsSingleTransactionSingleServiceTestCase extends 
             }
         };
         TestExceptionStrategy exceptionStrategy = (TestExceptionStrategy) muleContext.getRegistry()
-            .lookupService(serviceName)
+            .lookupFlowConstruct(serviceName)
             .getExceptionListener();
         exceptionStrategy.setExceptionCallback(exceptionCallback);
 

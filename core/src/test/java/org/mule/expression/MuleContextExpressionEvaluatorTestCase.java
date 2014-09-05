@@ -6,6 +6,9 @@
  */
 package org.mule.expression;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
@@ -16,17 +19,13 @@ import org.mule.tck.testmodels.fruit.Apple;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
 public class MuleContextExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
 {
     @Override
     protected void doSetUp() throws Exception
     {
         MuleEvent event = getTestEvent("testing",
-                getTestService("apple", Apple.class),
+                getTestFlow("apple", Apple.class),
                 getTestInboundEndpoint("test", "test://foo"));
         RequestContext.setEvent(event);
     }
@@ -40,9 +39,6 @@ public class MuleContextExpressionEvaluatorTestCase extends AbstractMuleContextT
 
         Object o = extractor.evaluate("serviceName", message);
         assertEquals("apple", o);
-
-        o = extractor.evaluate("modelName", message);
-        assertNotNull(o);
 
         o = extractor.evaluate("inboundEndpoint", message);
         assertEquals("test://foo", o.toString());
@@ -76,9 +72,6 @@ public class MuleContextExpressionEvaluatorTestCase extends AbstractMuleContextT
         MuleMessage message = new DefaultMuleMessage("test", muleContext);
         Object o = muleContext.getExpressionManager().evaluate("context:serviceName", message);
         assertEquals("apple", o);
-
-        o = muleContext.getExpressionManager().evaluate("context:modelName", message);
-        assertNotNull(o);
 
         o = muleContext.getExpressionManager().evaluate("context:inboundEndpoint", message);
         assertEquals("test://foo", o.toString());

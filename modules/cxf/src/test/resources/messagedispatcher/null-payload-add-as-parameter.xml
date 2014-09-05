@@ -1,39 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:spring="http://www.springframework.org/schema/beans"
-    xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-    xmlns:http="http://www.mulesoft.org/schema/mule/http"
-    xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <cxf:endpoint name="greetMeOutboundEndpoint"
-        address="http://localhost:63081/services/greeter" clientClass="org.apache.hello_world_soap_http.SOAPService"
-        wsdlPort="SoapPort" wsdlLocation="classpath:/wsdl/hello_world.wsdl"
-        operation="greetMe" payloadToArguments="nullPayloadAsParameter" 
-        exchange-pattern="request-response">
+                  address="http://localhost:63081/services/greeter"
+                  clientClass="org.apache.hello_world_soap_http.SOAPService"
+                  wsdlPort="SoapPort" wsdlLocation="classpath:/wsdl/hello_world.wsdl"
+                  operation="greetMe" payloadToArguments="nullPayloadAsParameter"
+                  exchange-pattern="request-response">
     </cxf:endpoint>
 
     <cxf:endpoint name="sayHiOutboundEndpoint"
-        address="http://localhost:63081/services/greeter" clientClass="org.apache.hello_world_soap_http.SOAPService"
-        wsdlPort="SoapPort" wsdlLocation="classpath:/wsdl/hello_world.wsdl"
-        operation="sayHi" payloadToArguments="nullPayloadAsParameter" 
-        exchange-pattern="request-response">
+                  address="http://localhost:63081/services/greeter"
+                  clientClass="org.apache.hello_world_soap_http.SOAPService"
+                  wsdlPort="SoapPort" wsdlLocation="classpath:/wsdl/hello_world.wsdl"
+                  operation="sayHi" payloadToArguments="nullPayloadAsParameter"
+                  exchange-pattern="request-response">
     </cxf:endpoint>
 
-    <model>
-        <service name="greeterService">
-            <inbound>
-                <cxf:inbound-endpoint
-                    address="http://localhost:63081/services/greeter"
-                    exchange-pattern="request-response"/>
-            </inbound>
-            <component>
-                <singleton-object
-                    class="org.apache.hello_world_soap_http.GreeterImpl" />
-            </component>
-        </service>
-    </model>
+    <flow name="greeterService">
+        <cxf:inbound-endpoint
+                address="http://localhost:63081/services/greeter"
+                exchange-pattern="request-response"/>
+        <component>
+            <singleton-object
+                    class="org.apache.hello_world_soap_http.GreeterImpl"/>
+        </component>
+    </flow>
+
 </mule>

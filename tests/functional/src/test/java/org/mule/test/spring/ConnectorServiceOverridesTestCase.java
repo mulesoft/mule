@@ -48,7 +48,7 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
 
         // see if we get the overridden message receiver
         MessageReceiver receiver = serviceDescriptor.createMessageReceiver(connector,
-            getTestService(), endpoint);
+            getTestFlow(), endpoint);
         assertEquals(TestMessageReceiver.class, receiver.getClass());
     }
 

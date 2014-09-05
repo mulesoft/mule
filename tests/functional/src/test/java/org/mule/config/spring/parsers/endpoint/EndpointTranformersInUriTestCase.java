@@ -90,8 +90,8 @@ public class EndpointTranformersInUriTestCase extends FunctionalTestCase
     @Test
     public void testGlobalEndpoints() throws MuleException
     {
-        Object service = muleContext.getRegistry().lookupObject("globalEndpoints");
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) ((Flow) service).getMessageSource();
+        Object flow = muleContext.getRegistry().lookupObject("globalEndpoints");
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) ((Flow) flow).getMessageSource();
 
         List <MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
@@ -114,7 +114,7 @@ public class EndpointTranformersInUriTestCase extends FunctionalTestCase
         assertTrue(transformers.get(0) instanceof TestResponseTransformer);    
 
 
-        endpoint = (ImmutableEndpoint) ((Flow) service).getMessageProcessors().get(0);
+        endpoint = (ImmutableEndpoint) ((Flow) flow).getMessageProcessors().get(0);
 
                 
         processors = endpoint.getMessageProcessors();
@@ -145,8 +145,8 @@ public class EndpointTranformersInUriTestCase extends FunctionalTestCase
    @Test
     public void testLocalEndpoints() throws MuleException
     {              
-        Object service = muleContext.getRegistry().lookupObject("localEndpoints");
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) ((Flow) service).getMessageSource();
+        Object flow = muleContext.getRegistry().lookupObject("localEndpoints");
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) ((Flow) flow).getMessageSource();
 
         List <MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
@@ -168,7 +168,7 @@ public class EndpointTranformersInUriTestCase extends FunctionalTestCase
         assertEquals(1, transformers.size());
         assertTrue(transformers.get(0) instanceof TestResponseTransformer);
 
-        endpoint = (ImmutableEndpoint) ((Flow) service).getMessageProcessors().get(0);
+        endpoint = (ImmutableEndpoint) ((Flow) flow).getMessageProcessors().get(0);
 
         processors = endpoint.getMessageProcessors();
         assertNotNull(processors);

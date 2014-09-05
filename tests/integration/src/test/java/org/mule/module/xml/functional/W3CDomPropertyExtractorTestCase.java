@@ -27,9 +27,7 @@ public class W3CDomPropertyExtractorTestCase extends AbstractXmlPropertyExtracto
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
-        p.setProperty("selector.expression", "/endpoint");
-        p.setProperty("selector.evaluator", "xpath");
-
+        p.setProperty("selector.expression", "xpath:/endpoint");
         return p;
     }
 

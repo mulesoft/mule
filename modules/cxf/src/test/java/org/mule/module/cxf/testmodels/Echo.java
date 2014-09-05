@@ -20,7 +20,7 @@ public class Echo
 {
     @Resource
     private WebServiceContext context;
-    
+
     @WebResult(name = "text")
     @WebMethod
     public String echo(@WebParam(name = "text") String s)

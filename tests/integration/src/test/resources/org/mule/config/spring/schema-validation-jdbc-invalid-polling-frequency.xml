@@ -8,19 +8,12 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
        http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/3.1/mule-jdbc.xsd">
 
-    <model name="test">
-        <service name="bridgeB">
-            <inbound>
-                <jdbc:inbound-endpoint pollingFrequency="1000" queryKey="getTest?type=1" exchange-pattern="one-way">
-                    <append-string-transformer message=" Received"/>
-                </jdbc:inbound-endpoint>
-            </inbound>
-            <test:component/>
-            <outbound>
-                <pass-through-router>
-                    <jdbc:outbound-endpoint pollingFrequency="1000" queryKey="writeTest?type=2" exchange-pattern="one-way"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
+    <flow name="bridgeB">
+        <jdbc:inbound-endpoint pollingFrequency="1000" queryKey="getTest?type=1" exchange-pattern="one-way">
+            <append-string-transformer message=" Received"/>
+        </jdbc:inbound-endpoint>
+        <test:component/>
+        <jdbc:outbound-endpoint pollingFrequency="1000" queryKey="writeTest?type=2" exchange-pattern="one-way"/>
+    </flow>
+
 </mule>

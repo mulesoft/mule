@@ -14,78 +14,41 @@
 
     <vm:connector name="vmConnector"/>
 
-    <model>
-        <service name="QueueFromJndi">
-            <inbound>
-                <!-- this queue is looked up from JNDI -->
-                <inbound-endpoint ref="ep_jndi-queue" />
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="out" exchange-pattern="one-way"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="QueueFromJndi">
+        <!-- this queue is looked up from JNDI -->
+        <inbound-endpoint ref="ep_jndi-queue"/>
+        <vm:outbound-endpoint path="out" exchange-pattern="one-way"/>
+    </flow>
 
-        <service name="TopicFromJndi">
-            <inbound>
-                <!-- this topic is looked up from JNDI -->
-                <inbound-endpoint ref="ep_jndi-topic" />
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="out" exchange-pattern="one-way"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="TopicFromJndi">
+        <!-- this topic is looked up from JNDI -->
+        <inbound-endpoint ref="ep_jndi-topic"/>
+        <vm:outbound-endpoint path="out" exchange-pattern="one-way"/>
+    </flow>
 
-        <service name="NonJndiQueue">
-            <inbound>
-                <inbound-endpoint ref="ep_non-jndi-queue" />
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="out" exchange-pattern="one-way"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="NonJndiQueue">
+        <inbound-endpoint ref="ep_non-jndi-queue"/>
+        <vm:outbound-endpoint path="out" exchange-pattern="one-way"/>
+    </flow>
 
 
-         <!-- Similar services but using JndiNameResolvers instead of JmsConnector properties -->
+    <!-- Similar services but using JndiNameResolvers instead of JmsConnector properties -->
 
-        <service name="QueueFromJndiWithJndiNameResolver">
-            <inbound>
-                <!-- this queue is looked up from JNDI -->
-                <inbound-endpoint ref="ep_jndi-queue-with-jndi-name-resolver" />
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="out"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="QueueFromJndiWithJndiNameResolver">
+        <!-- this queue is looked up from JNDI -->
+        <inbound-endpoint ref="ep_jndi-queue-with-jndi-name-resolver"/>
+        <vm:outbound-endpoint path="out"/>
+    </flow>
 
-        <service name="TopicFromJndiWithJndiNameResolver">
-            <inbound>
-                <!-- this topic is looked up from JNDI -->
-                <inbound-endpoint ref="ep_jndi-topic-with-jndi-name-resolver" />
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="out"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="TopicFromJndiWithJndiNameResolver">
+        <!-- this topic is looked up from JNDI -->
+        <inbound-endpoint ref="ep_jndi-topic-with-jndi-name-resolver"/>
+        <vm:outbound-endpoint path="out"/>
+    </flow>
 
-        <service name="NonJndiQueueWithJndiNameResolver">
-            <inbound>
-                <inbound-endpoint ref="ep_non-jndi-queue-with-jndi-name-resolver" />
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="out"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
+    <flow name="NonJndiQueueWithJndiNameResolver">
+        <inbound-endpoint ref="ep_non-jndi-queue-with-jndi-name-resolver"/>
+        <vm:outbound-endpoint path="out"/>
+    </flow>
+
 </mule>

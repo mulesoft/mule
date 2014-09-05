@@ -11,45 +11,26 @@
     <endpoint name="out" address="${outbound.destination}" exchange-pattern="one-way"/>
     <endpoint name="topic" address="${broadcast.topic.destination}" exchange-pattern="one-way"/>
 
-    <model name="echoSample">
-        <service name="InputPart">
-            <inbound>
-                <inbound-endpoint ref="in"/>
-            </inbound>
-            <test:component/>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="topic"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="InputPart">
+        <inbound-endpoint ref="in"/>
+        <test:component/>
+        <outbound-endpoint ref="topic"/>
+    </flow>
 
-        <service name="Topic1">
-            <inbound>
-                <inbound-endpoint ref="topic"/>
-            </inbound>
-            <test:component>
-                <test:return-data>OUTPUT MESSAGE</test:return-data>
-            </test:component>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="out"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="Topic1">
+        <inbound-endpoint ref="topic"/>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <outbound-endpoint ref="out"/>
+    </flow>
 
-        <service name="Topic2">
-            <inbound>
-                <inbound-endpoint ref="topic"/>
-            </inbound>
-            <test:component>
-                <test:return-data>OUTPUT MESSAGE</test:return-data>
-            </test:component>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="out"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
+    <flow name="Topic2">
+        <inbound-endpoint ref="topic"/>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <outbound-endpoint ref="out"/>
+    </flow>
+
 </mule>

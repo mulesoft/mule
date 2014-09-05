@@ -26,7 +26,7 @@ public class FlowTestCase extends AbstractELTestCase
     public void flowName() throws Exception
     {
         MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("", muleContext),
-            MessageExchangePattern.ONE_WAY, getTestService("flowName", Object.class));
+            MessageExchangePattern.ONE_WAY, getTestFlow("flowName", Object.class));
         assertEquals("flowName", evaluate("flow.name", event));
     }
 
@@ -34,7 +34,7 @@ public class FlowTestCase extends AbstractELTestCase
     public void assignToFlowName() throws Exception
     {
         MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("", muleContext),
-            MessageExchangePattern.ONE_WAY, getTestService("flowName", Object.class));
+            MessageExchangePattern.ONE_WAY, getTestFlow("flowName", Object.class));
         assertFinalProperty("flow.name='foo'", event);
     }
 

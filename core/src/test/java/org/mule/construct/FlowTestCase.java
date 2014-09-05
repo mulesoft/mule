@@ -8,11 +8,9 @@ package org.mule.construct;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
-
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -75,11 +73,13 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase
     {
         flow.initialise();
         flow.start();
-        MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello",
-            MessageExchangePattern.ONE_WAY, muleContext));
+        MuleEvent event = MuleTestUtils.getTestEvent("hello",
+                                                     MessageExchangePattern.ONE_WAY, muleContext);
+        MuleEvent response = directInboundMessageSource.process(event);
         Thread.sleep(50);
 
-        assertNull(response);
+        // While a SedaService returns null, a Flow echos the request when there is async hand-off
+        assertEquals(event, response);
 
         assertEquals("helloabc", sensingMessageProcessor.event.getMessageAsString());
         assertNotSame(Thread.currentThread(), sensingMessageProcessor.event.getMessage().getOutboundProperty(

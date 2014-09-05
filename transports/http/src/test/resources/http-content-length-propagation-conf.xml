@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:mxml="http://www.mulesoft.org/schema/mule/xml"
-       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-    xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:mxml="http://www.mulesoft.org/schema/mule/xml"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
@@ -12,30 +12,16 @@
 
     <mxml:xslt-transformer name="Xslt" xsl-file="stylesheet.xsl"/>
 
-    <model name="PSMaxIntegration">
-        
-        <service name="PSMaxMsg1">
-            <inbound>
-                <http:inbound-endpoint name="httpEndpoint" host="localhost" port="${port1}"
-                                       contentType="text/xml">
-                    <transformer ref="Xslt" />
-                </http:inbound-endpoint>
-                <forwarding-router/>
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <http:outbound-endpoint host="localhost" port="${port2}"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="PSMaxMsg1">
+        <http:inbound-endpoint name="httpEndpoint" host="localhost" port="${port1}"
+                               contentType="text/xml">
+            <transformer ref="Xslt"/>
+        </http:inbound-endpoint>
+        <http:outbound-endpoint host="localhost" port="${port2}"/>
+    </flow>
 
-        <service name="PSMaxMsg2">
-            <inbound>
-                <inbound-endpoint address="http://localhost:${port2}"/>
-                <forwarding-router/>
-            </inbound>
-        </service>
-
-    </model>
+    <flow name="PSMaxMsg2">
+        <inbound-endpoint address="http://localhost:${port2}"/>
+    </flow>
 
 </mule>

@@ -14,19 +14,16 @@
 
     <vm:connector name="vmConnector"/>
 
-    <model>
-        <service name="QuartzEventGenerator">
+        <flow name="QuartzEventGenerator">
             <component class="org.mule.transport.quartz.ScheduleComponent"/>
-            <outbound matchAll="true">
-                <filtering-router>
+            <choice>
+                <when expression="#[payload.contains('interval')]">
                     <vm:outbound-endpoint path="intervalQueue" exchange-pattern="one-way"/>
-                    <expression-filter evaluator="groovy" expression="payload.contains('interval')"/>
-                </filtering-router>
-                <filtering-router>
+                </when>
+                <when expression="#[payload.contains('cron')]">
                     <vm:outbound-endpoint path="cronQueue" exchange-pattern="one-way"/>
-                    <expression-filter evaluator="groovy" expression="payload.contains('cron')"/>
-                </filtering-router>
-            </outbound>
-        </service>
-    </model>
+                </when>
+            </choice>
+        </flow>
+
 </mule>

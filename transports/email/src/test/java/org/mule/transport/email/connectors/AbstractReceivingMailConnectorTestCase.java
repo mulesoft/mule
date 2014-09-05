@@ -6,25 +6,26 @@
  */
 package org.mule.transport.email.connectors;
 
+import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleEventContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.service.Service;
-import org.mule.api.source.CompositeMessageSource;
-import org.mule.tck.MuleTestUtils;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.component.DefaultJavaComponent;
+import org.mule.construct.Flow;
+import org.mule.object.SingletonObjectFactory;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.transport.email.transformers.EmailMessageToString;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * Given an endpoint ({@link #getTestEndpointURI()}) this waits for up to 10 seconds,
@@ -33,6 +34,7 @@ import static org.junit.Assert.assertTrue;
  */
 public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMailConnectorFunctionalTestCase
 {
+
     public static final int POLL_PERIOD_MS = 2000;
     public static final int WAIT_PERIOD_MS = 4 * POLL_PERIOD_MS;
 
@@ -46,8 +48,7 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
     {
         final CountDownLatch countDown = new CountDownLatch(1);
 
-        HashMap props = new HashMap();
-        props.put("eventCallback", new EventCallback()
+        EventCallback eventCallback = new EventCallback()
         {
             public synchronized void eventReceived(MuleEventContext context, Object component)
             {
@@ -65,14 +66,18 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
                     logger.error(e.getMessage(), e);
                 }
             }
-        });
+        };
 
-        Service service = MuleTestUtils.getTestService(uniqueName("testComponent"), FunctionalTestComponent.class, props, muleContext, /*initialize*/false);
+        Flow flowConstruct = new Flow("testComponent", muleContext);
+        flowConstruct.setMessageProcessors(new ArrayList<MessageProcessor>());
+        FunctionalTestComponent component = new FunctionalTestComponent();
+        component.setEventCallback(eventCallback);
+        flowConstruct.getMessageProcessors().add(new DefaultJavaComponent(new SingletonObjectFactory(component)));
         EndpointBuilder eb = muleContext.getEndpointFactory().getEndpointBuilder(getTestEndpointURI());
         eb.setDisableTransportTransformer(true);
         InboundEndpoint ep = eb.buildInboundEndpoint();
-        ((CompositeMessageSource) service.getMessageSource()).addSource(ep);
-        muleContext.getRegistry().registerService(service);
+        flowConstruct.setMessageSource(ep);
+        muleContext.getRegistry().registerFlowConstruct(flowConstruct);
         if (!muleContext.isStarted())
         {
             muleContext.start();
@@ -86,7 +91,7 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
     {
         Map serviceOverrides = new HashMap();
         serviceOverrides.put(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER,
-                EmailMessageToString.class.getName());
+                             EmailMessageToString.class.getName());
         return serviceOverrides;
     }
 

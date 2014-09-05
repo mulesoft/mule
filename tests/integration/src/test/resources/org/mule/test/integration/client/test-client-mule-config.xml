@@ -10,17 +10,10 @@
 
     <endpoint name="vmEndpoint" address="vm://test.queue" exchange-pattern="request-response"/>
 
-    <model name="model">
-        <service name="TestReceiverUMO">
-            <inbound>
-                <inbound-endpoint ref="vmEndpoint"/>
-            </inbound>
-            <test:component appendString=" Received"/>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint address="stdio://System.out" exchange-pattern="one-way"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
+    <flow name="TestReceiverUMO">
+        <inbound-endpoint ref="vmEndpoint"/>
+        <test:component appendString=" Received"/>
+        <outbound-endpoint address="stdio://System.out" exchange-pattern="one-way"/>
+    </flow>
+
 </mule>

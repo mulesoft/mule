@@ -23,12 +23,12 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.filter.Filter;
-import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
+import org.mule.construct.Flow;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.context.notification.MuleContextNotification;
@@ -36,7 +36,6 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.TestingWorkListener;
 import org.mule.tck.TriggerableMessageSource;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
@@ -54,7 +53,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 
 /**
@@ -412,11 +410,6 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         return MuleTestUtils.getTestEvent(data, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
     }
 
-    public static MuleEvent getTestEventUsingFlow(Object data) throws Exception
-    {
-        return MuleTestUtils.getTestEventUsingFlow(data, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
-    }
-
     public static MuleEvent getTestEvent(Object data, MessageExchangePattern mep) throws Exception
     {
         return MuleTestUtils.getTestEvent(data, mep, muleContext);
@@ -447,17 +440,15 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         return MuleTestUtils.getTestEvent(data, endpoint, muleContext);
     }
 
-    @Deprecated
-    public static MuleEvent getTestEvent(Object data, Service service, InboundEndpoint endpoint)
+    public static MuleEvent getTestEvent(Object data, Flow flow, InboundEndpoint endpoint)
             throws Exception
     {
-        return MuleTestUtils.getTestEvent(data, service, endpoint, muleContext);
+        return MuleTestUtils.getTestEvent(data, flow, endpoint, muleContext);
     }
 
-    @Deprecated
-    public static MuleSession getTestSession(Service service, MuleContext context)
+    public static MuleSession getTestSession(Flow flow, MuleContext context)
     {
-        return MuleTestUtils.getTestSession(service, context);
+        return MuleTestUtils.getTestSession(flow, context);
     }
 
     public static TestConnector getTestConnector() throws Exception
@@ -465,22 +456,24 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         return MuleTestUtils.getTestConnector(muleContext);
     }
 
-    @Deprecated
-    public static Service getTestService() throws Exception
+    public static Flow getTestFlow() throws Exception
     {
-        return MuleTestUtils.getTestService(muleContext);
+        return MuleTestUtils.getTestFlow(muleContext);
     }
 
-    @Deprecated
-    public static Service getTestService(String name, Class<?> clazz) throws Exception
+    public static Flow getTestFlow(String name, Class<?> clazz) throws Exception
     {
-        return MuleTestUtils.getTestService(name, clazz, muleContext);
+        return MuleTestUtils.getTestFlow(name, clazz, muleContext);
     }
 
-    @Deprecated
-    public static Service getTestService(String name, Class<?> clazz, Map<?, ?> props) throws Exception
+    public static Flow getTestFlow(String name, Class<?> clazz, Map<?, ?> props) throws Exception
     {
-        return MuleTestUtils.getTestService(name, clazz, props, muleContext);
+        return MuleTestUtils.getTestFlow(name, clazz, props, muleContext);
+    }
+
+    public static Flow getTestFlow(Object component) throws Exception
+    {
+        return MuleTestUtils.getTestFlow(MuleTestUtils.APPLE_FLOW, component, false, muleContext);
     }
 
     protected boolean isStartContext()

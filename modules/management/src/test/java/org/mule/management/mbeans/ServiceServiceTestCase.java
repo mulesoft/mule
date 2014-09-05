@@ -6,21 +6,20 @@
  */
 package org.mule.management.mbeans;
 
-import org.mule.api.config.ThreadingProfile;
+import static org.junit.Assert.assertEquals;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.component.DefaultJavaComponent;
+import org.mule.construct.Flow;
 import org.mule.management.AbstractMuleJmxTestCase;
-import org.mule.model.seda.SedaModel;
-import org.mule.model.seda.SedaService;
-import org.mule.module.management.mbean.ServiceService;
+import org.mule.module.management.mbean.FlowConstructService;
 import org.mule.object.SingletonObjectFactory;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 import javax.management.ObjectName;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class ServiceServiceTestCase extends AbstractMuleJmxTestCase
 {
@@ -29,24 +28,18 @@ public class ServiceServiceTestCase extends AbstractMuleJmxTestCase
     {
         final String domainOriginal = "TEST_DOMAIN_1";
 
-        final SedaService service = new SedaService(muleContext);
-        service.setName("TEST_SERVICE");
+        final Flow flow = new Flow("TEST_SERVICE", muleContext);
         SingletonObjectFactory factory = new SingletonObjectFactory(Object.class);
         final DefaultJavaComponent component = new DefaultJavaComponent(factory);
         component.setMuleContext(muleContext);
-        service.setComponent(component);
+        flow.setMessageProcessors(new ArrayList<MessageProcessor>());
+        flow.getMessageProcessors().add(component);
 
-        ThreadingProfile defaultThreadingProfile = ThreadingProfile.DEFAULT_THREADING_PROFILE;
-        defaultThreadingProfile.setMuleContext(muleContext);
-        service.setThreadingProfile(defaultThreadingProfile);
-        SedaModel model = new SedaModel();
-        model.setMuleContext(muleContext);
-        service.setModel(model);
-        muleContext.getRegistry().registerModel(model);
-        muleContext.getRegistry().registerService(service);
+        muleContext.getRegistry().registerFlowConstruct(flow);
         muleContext.start();
 
-        final ServiceService jmxService = new ServiceService("TEST_SERVICE", muleContext);
+        final FlowConstructService jmxService = new FlowConstructService("TEST_SERVICE", flow.getName(), muleContext,
+                                                                         null);
         final ObjectName name = ObjectName.getInstance(domainOriginal + ":type=TEST_SERVICE");
         mBeanServer.registerMBean(jmxService, name);
         Set mbeans = mBeanServer.queryMBeans(ObjectName.getInstance(domainOriginal + ":*"), null);
@@ -54,9 +47,7 @@ public class ServiceServiceTestCase extends AbstractMuleJmxTestCase
         // Expecting following mbeans to be registered:
         // 1) org.mule.management.mbeans.ServiceService@TEST_DOMAIN_1:type=TEST_SERVICE
         // 2) org.mule.management.mbeans.ServiceStats@TEST_DOMAIN_1:type=org.mule.Statistics,service=TEST_SERVICE
-        // 3) org.mule.management.mbeans.RouterStats@TEST_DOMAIN_1:type=org.mule.Statistics,service=TEST_SERVICE,router=inbound
-        // 4) org.mule.management.mbeans.RouterStats@TEST_DOMAIN_1:type=org.mule.Statistics,service=TEST_SERVICE,router=outbound
-        assertEquals("Unexpected number of components registered in the domain.", 4, mbeans.size());
+        assertEquals("Unexpected number of components registered in the domain.", 2, mbeans.size());
 
         mBeanServer.unregisterMBean(name);
 

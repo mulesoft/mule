@@ -11,24 +11,14 @@
     <vm:endpoint name="dispatch" path="bridge" exchange-pattern="one-way"/>
     <vm:endpoint name="receive" path="result" exchange-pattern="one-way"/>
 
-    <model name="scribblingTestModel">
-        <service name="bridge">
-            <inbound>
-                <inbound-endpoint ref="dispatch"/>
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="responder"
-                                          exchange-pattern="request-response"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="bridge">
+        <inbound-endpoint ref="dispatch"/>
+        <vm:outbound-endpoint path="responder" exchange-pattern="request-response"/>
+    </flow>
 
-        <service name="responder">
-            <inbound>
-                <vm:inbound-endpoint path="responder" exchange-pattern="request-response"/>
-            </inbound>
-            <test:component appendString=" Received" logMessageDetails="true"/>
-        </service>
-    </model>
+    <flow name="responder">
+        <vm:inbound-endpoint path="responder" exchange-pattern="request-response"/>
+        <test:component appendString=" Received" logMessageDetails="true"/>
+    </flow>
+
 </mule>

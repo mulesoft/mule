@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:test="http://www.mulesoft.org/schema/mule/test"
-    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-    xsi:schemaLocation="
+      xmlns:spring="http://www.springframework.org/schema/beans" xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
         http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
@@ -13,57 +13,25 @@
     </configuration>
 
     <vm:connector name="outPersistentConnector">
-        <vm:queue-profile >
+        <vm:queue-profile>
             <default-persistent-queue-store/>
         </vm:queue-profile>
     </vm:connector>
 
-    <vm:endpoint name="out" path="out" exchange-pattern="one-way" />
+    <vm:endpoint name="out" path="out" exchange-pattern="one-way"/>
 
-    <model name="TestModel">
+    <flow name="TestService">
+        <test:component waitTime="30"/>
+        <vm:outbound-endpoint ref="out"/>
+    </flow>
 
-        <service name="TestService">
-            <test:component waitTime="30" />
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint ref="out" />
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="TestPersistentQueueService" processingStrategy="TestPersistentQueueServicePS">
+        <test:component waitTime="30"/>
+        <vm:outbound-endpoint ref="out"/>
+    </flow>
 
-        <service name="PausedTestService" initialState="paused">
-            <test:component waitTime="30" />
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint ref="out" />
-                </pass-through-router>
-            </outbound>
-        </service>
+    <queued-asynchronous-processing-strategy name="TestPersistentQueueServicePS">
+        <default-persistent-queue-store/>
+    </queued-asynchronous-processing-strategy>
 
-        <service name="TestPersistentQueueService">
-            <test:component waitTime="30" />
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint ref="out" />
-                </pass-through-router>
-            </outbound>
-            <queue-profile>
-                <default-persistent-queue-store/>
-            </queue-profile>
-        </service>
-
-        <service name="PausedTestPersistentQueueService" initialState="paused">
-            <test:component waitTime="30" />
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint ref="out" />
-                </pass-through-router>
-            </outbound>
-            <queue-profile >
-                <default-persistent-queue-store/>
-            </queue-profile>
-        </service>
-
-
-    </model>
 </mule>

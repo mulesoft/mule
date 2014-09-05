@@ -1,37 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
- 
-     <description>Mock web services to process the message</description>
- 
-    <model>
-        <service name="BadResponse">
-            <inbound>
-                <inbound-endpoint address="http://localhost:8888/services/BadResponse" 
-                    exchange-pattern="request-response"/>
-            </inbound>
-            <static-component>
-                <return-data>
-                    <![CDATA[
+
+    <description>Mock web services to process the message</description>
+
+    <flow name="BadResponse">
+        <inbound-endpoint address="http://localhost:8888/services/BadResponse"
+                          exchange-pattern="request-response"/>
+        <static-component>
+            <return-data>
+                <![CDATA[
                         <Response>
                             <Data />
                             <ErrorStatus>Internal server fault (#345200)</ErrorStatus>
                         </Response>
                     ]]>
-                </return-data>
-            </static-component>
-        </service>
+            </return-data>
+        </static-component>
+    </flow>
 
-        <service name="GoodService">
-            <inbound>
-                <inbound-endpoint address="http://localhost:8890/services/GoodOne" 
-                    exchange-pattern="request-response"/>
-            </inbound>
-            <static-component>
-                <return-data>
-                    <![CDATA[
+    <flow name="GoodService">
+        <inbound-endpoint address="http://localhost:8890/services/GoodOne"
+                          exchange-pattern="request-response"/>
+        <static-component>
+            <return-data>
+                <![CDATA[
                         <Response>
                             <Data>
                                 <ID>1005</ID>
@@ -39,8 +34,8 @@
                             <ErrorStatus>Success</ErrorStatus>
                         </Response>
                     ]]>
-                </return-data>
-            </static-component>
-        </service>
-    </model>
+            </return-data>
+        </static-component>
+    </flow>
+
 </mule>

@@ -32,7 +32,7 @@ public class JSR250LifecycleTrackerComponentFunctionalTestCase extends Functiona
     @Test
     public void testSingletonServiceLifecycle() throws Exception
     {
-        testComponentLifecycle("MuleSingletonService", "[setProperty, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
+        testComponentLifecycle("MuleSingletonService", "[setProperty, setFlowConstruct, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
     }
 
     /**
@@ -44,7 +44,7 @@ public class JSR250LifecycleTrackerComponentFunctionalTestCase extends Functiona
     @Test
     public void testMulePrototypeServiceLifecycle() throws Exception
     {
-        testComponentLifecycle("MulePrototypeService", "[setProperty, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
+        testComponentLifecycle("MulePrototypeService", "[setProperty, setFlowConstruct, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
     }
 
     /**
@@ -56,7 +56,7 @@ public class JSR250LifecycleTrackerComponentFunctionalTestCase extends Functiona
     @Test
     public void testMulePooledPrototypeServiceLifecycle() throws Exception
     {
-        testComponentLifecycle("MulePooledPrototypeService", "[setProperty, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
+        testComponentLifecycle("MulePooledPrototypeService", "[setProperty, setFlowConstruct, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
     }
 
     /**
@@ -71,7 +71,7 @@ public class JSR250LifecycleTrackerComponentFunctionalTestCase extends Functiona
     public void testMulePooledSingletonServiceLifecycle() throws Exception
     {
         testComponentLifecycle("MulePooledSingletonService",
-                               "[setProperty, setMuleContext, jsr250 initialise, jsr250 initialise, jsr250 initialise, start, start, start, stop, stop, stop, jsr250 dispose, jsr250 dispose, jsr250 dispose]");
+                               "[setProperty, setFlowConstruct, setMuleContext, jsr250 initialise, jsr250 initialise, jsr250 initialise, start, start, start, stop, stop, stop, jsr250 dispose, jsr250 dispose, jsr250 dispose]");
     }
 
     private void testComponentLifecycle(final String serviceName, final String expectedLifeCycle)

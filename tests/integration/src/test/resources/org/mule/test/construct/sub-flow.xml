@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-    xmlns:script="http://www.mulesoft.org/schema/mule/scripting" xmlns:test="http://www.mulesoft.org/schema/mule/test"
-    xsi:schemaLocation="
+      xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:script="http://www.mulesoft.org/schema/mule/scripting" xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
                http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.1/mule-scripting.xsd
@@ -10,137 +10,133 @@
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd">
 
     <flow name="ProcessorChainViaProcessorRef">
-        <vm:inbound-endpoint path="ProcessorChainViaProcessorRef" exchange-pattern="request-response" />
-        <append-string-transformer message="1" />
-        <processor ref="chain" />
-        <append-string-transformer message="2" />
+        <vm:inbound-endpoint path="ProcessorChainViaProcessorRef" exchange-pattern="request-response"/>
+        <append-string-transformer message="1"/>
+        <processor ref="chain"/>
+        <append-string-transformer message="2"/>
     </flow>
 
     <flow name="ProcessorChainViaFlowRef">
-        <vm:inbound-endpoint path="ProcessorChainViaFlowRef" exchange-pattern="request-response" />
-        <append-string-transformer message="1" />
-        <flow-ref name="chain" />
-        <append-string-transformer message="2" />
+        <vm:inbound-endpoint path="ProcessorChainViaFlowRef" exchange-pattern="request-response"/>
+        <append-string-transformer message="1"/>
+        <flow-ref name="chain"/>
+        <append-string-transformer message="2"/>
     </flow>
-    
+
     <flow name="SubFlowViaProcessorRef">
-        <vm:inbound-endpoint path="SubFlowViaProcessorRef" exchange-pattern="request-response" />
-        <append-string-transformer message="1" />
-        <processor ref="sub-flow" />
-        <append-string-transformer message="2" />
+        <vm:inbound-endpoint path="SubFlowViaProcessorRef" exchange-pattern="request-response"/>
+        <append-string-transformer message="1"/>
+        <processor ref="sub-flow"/>
+        <append-string-transformer message="2"/>
     </flow>
 
     <flow name="SubFlowViaFlowRef">
-        <vm:inbound-endpoint path="SubFlowViaFlowRef" exchange-pattern="request-response" />
-        <append-string-transformer message="1" />
-        <flow-ref name="sub-flow" />
-        <append-string-transformer message="2" />
+        <vm:inbound-endpoint path="SubFlowViaFlowRef" exchange-pattern="request-response"/>
+        <append-string-transformer message="1"/>
+        <flow-ref name="sub-flow"/>
+        <append-string-transformer message="2"/>
     </flow>
 
     <flow name="FlowViaFlowRef">
-        <vm:inbound-endpoint path="FlowViaFlowRef" exchange-pattern="request-response" />
-        <append-string-transformer message="1" />
-        <flow-ref name="childFlow" />
-        <append-string-transformer message="2" />
+        <vm:inbound-endpoint path="FlowViaFlowRef" exchange-pattern="request-response"/>
+        <append-string-transformer message="1"/>
+        <flow-ref name="childFlow"/>
+        <append-string-transformer message="2"/>
     </flow>
 
     <flow name="ServiceViaFlowRef">
-        <vm:inbound-endpoint path="ServiceViaFlowRef" exchange-pattern="request-response" />
-        <append-string-transformer message="1" />
-        <flow-ref name="service" />
-        <append-string-transformer message="2" />
+        <vm:inbound-endpoint path="ServiceViaFlowRef" exchange-pattern="request-response"/>
+        <append-string-transformer message="1"/>
+        <flow-ref name="service"/>
+        <append-string-transformer message="2"/>
     </flow>
-    
+
     <flow name="flowWithsubFlowWithComponent">
-        <vm:inbound-endpoint path="flowWithsubFlowWithComponent" exchange-pattern="request-response" />
+        <vm:inbound-endpoint path="flowWithsubFlowWithComponent" exchange-pattern="request-response"/>
         <flow-ref name="subFlowWithComponent"/>
     </flow>
-    
+
     <processor-chain name="subFlowWithComponent">
         <echo-component/>
     </processor-chain>
 
     <flow name="flowWithSameSubFlowTwice">
         <vm:inbound-endpoint path="flowWithSameSubFlowTwice"
-           exchange-pattern="request-response" />
-        <flow-ref name="sub-flow" />
-        <flow-ref name="sub-flow" />
+                             exchange-pattern="request-response"/>
+        <flow-ref name="sub-flow"/>
+        <flow-ref name="sub-flow"/>
     </flow>
 
     <flow name="flowWithSameSubFlowSingletonTwice">
         <vm:inbound-endpoint path="flowWithSameSubFlowSingletonTwice"
-           exchange-pattern="request-response" />
-        <flow-ref name="sub-flow-singleton" />
-        <flow-ref name="sub-flow-singleton" />
+                             exchange-pattern="request-response"/>
+        <flow-ref name="sub-flow-singleton"/>
+        <flow-ref name="sub-flow-singleton"/>
     </flow>
 
     <flow name="flowWithSameGlobalChainTwice">
         <vm:inbound-endpoint path="flowWithSameGlobalChainTwice"
-           exchange-pattern="request-response" />
-        <flow-ref name="chain" />
-        <flow-ref name="chain" />
+                             exchange-pattern="request-response"/>
+        <flow-ref name="chain"/>
+        <flow-ref name="chain"/>
     </flow>
 
     <flow name="flowWithSameGlobalChainSingletonTwice">
         <vm:inbound-endpoint path="flowWithSameGlobalChainSingletonTwice"
-           exchange-pattern="request-response" />
-        <flow-ref name="chain-singleton" />
-        <flow-ref name="chain-singleton" />
+                             exchange-pattern="request-response"/>
+        <flow-ref name="chain-singleton"/>
+        <flow-ref name="chain-singleton"/>
     </flow>
 
     <!-- Child flows/sub-flows -->
 
     <processor-chain name="chain">
-        <custom-processor class="org.mule.lifecycle.LifecycleTrackerProcessor" />
-        <append-string-transformer message="x" />
-        <append-string-transformer message="y" />
-        <append-string-transformer message="z" />
+        <custom-processor class="org.mule.lifecycle.LifecycleTrackerProcessor"/>
+        <append-string-transformer message="x"/>
+        <append-string-transformer message="y"/>
+        <append-string-transformer message="z"/>
         <echo-component/>
     </processor-chain>
-    
+
     <processor-chain name="chain-singleton">
-        <custom-processor class="org.mule.lifecycle.LifecycleTrackerProcessor" />
-        <append-string-transformer message="x" />
-        <append-string-transformer message="y" />
-        <append-string-transformer message="z" />
+        <custom-processor class="org.mule.lifecycle.LifecycleTrackerProcessor"/>
+        <append-string-transformer message="x"/>
+        <append-string-transformer message="y"/>
+        <append-string-transformer message="z"/>
         <component>
             <singleton-object class="org.mule.lifecycle.LifecycleTrackerCheckComponent"/>
         </component>
     </processor-chain>
-    
-   <sub-flow name="sub-flow">
-        <custom-processor class="org.mule.lifecycle.LifecycleTrackerProcessor" />
-        <append-string-transformer message="x" />
-        <append-string-transformer message="y" />
-        <append-string-transformer message="z" />
+
+    <sub-flow name="sub-flow">
+        <custom-processor class="org.mule.lifecycle.LifecycleTrackerProcessor"/>
+        <append-string-transformer message="x"/>
+        <append-string-transformer message="y"/>
+        <append-string-transformer message="z"/>
         <echo-component/>
     </sub-flow>
 
     <flow name="childFlow">
-        <custom-processor class="org.mule.lifecycle.LifecycleTrackerProcessor" />
-        <append-string-transformer message="x" />
-        <append-string-transformer message="y" />
-        <append-string-transformer message="z" />
+        <custom-processor class="org.mule.lifecycle.LifecycleTrackerProcessor"/>
+        <append-string-transformer message="x"/>
+        <append-string-transformer message="y"/>
+        <append-string-transformer message="z"/>
         <echo-component/>
     </flow>
 
-   <sub-flow name="sub-flow-singleton">
-        <custom-processor class="org.mule.lifecycle.LifecycleTrackerProcessor" />
-        <append-string-transformer message="x" />
-        <append-string-transformer message="y" />
-        <append-string-transformer message="z" />
+    <sub-flow name="sub-flow-singleton">
+        <custom-processor class="org.mule.lifecycle.LifecycleTrackerProcessor"/>
+        <append-string-transformer message="x"/>
+        <append-string-transformer message="y"/>
+        <append-string-transformer message="z"/>
         <component>
             <singleton-object class="org.mule.lifecycle.LifecycleTrackerCheckComponent"/>
         </component>
     </sub-flow>
 
-    <model>
-        <service name="service">
-            <inbound>
-                <inbound-endpoint address="vm://null" />
-            </inbound>
-            <test:component appendString="xyz"/>
-        </service>
-    </model>
+    <flow name="service">
+        <inbound-endpoint address="vm://null"/>
+        <test:component appendString="xyz"/>
+    </flow>
 
 </mule>

@@ -37,7 +37,7 @@ public class TransientLifecycleTrackerComponentFunctionalTestCase extends Functi
     @Test
     public void testSpringBeanServiceLifecycle() throws Exception
     {
-        String expectedLifeCycle = "[setProperty, setMuleContext, springInitialize, start, stop, springDestroy]";
+        String expectedLifeCycle = "[setProperty, setMuleContext, springInitialize, setFlowConstruct, start, stop, springDestroy]";
 
         testComponentLifecycle("SpringBeanService", expectedLifeCycle);
     }
@@ -52,7 +52,7 @@ public class TransientLifecycleTrackerComponentFunctionalTestCase extends Functi
     @Test
     public void testSpringBeanService2Lifecycle() throws Exception
     {
-        String expectedLifeCycle = "[setProperty, setMuleContext, start, stop]";
+        String expectedLifeCycle = "[setProperty, setMuleContext, setFlowConstruct, start, stop]";
 
         testComponentLifecycle("SpringBeanService2", expectedLifeCycle);
     }
@@ -64,7 +64,7 @@ public class TransientLifecycleTrackerComponentFunctionalTestCase extends Functi
     @Test
     public void testSingletonServiceLifecycle() throws Exception
     {
-        String expectedLifeCycle = "[setProperty, setMuleContext, initialise, start, stop, dispose]";
+        String expectedLifeCycle = "[setProperty, setFlowConstruct, setMuleContext, initialise, start, stop, dispose]";
 
         testComponentLifecycle("MuleSingletonService", expectedLifeCycle);
     }
@@ -76,7 +76,7 @@ public class TransientLifecycleTrackerComponentFunctionalTestCase extends Functi
     @Test
     public void testMulePrototypeServiceLifecycle() throws Exception
     {
-        String expectedLifeCycle = "[setProperty, setMuleContext, initialise, start, stop, dispose]";
+        String expectedLifeCycle = "[setProperty, setFlowConstruct, setMuleContext, initialise, start, stop, dispose]";
 
         testComponentLifecycle("MulePrototypeService", expectedLifeCycle);
     }
@@ -88,7 +88,7 @@ public class TransientLifecycleTrackerComponentFunctionalTestCase extends Functi
     @Test
     public void testMulePooledPrototypeServiceLifecycle() throws Exception
     {
-        String expectedLifeCycle = "[setProperty, setMuleContext, initialise, start, stop, dispose]";
+        String expectedLifeCycle = "[setProperty, setFlowConstruct, setMuleContext, initialise, start, stop, dispose]";
 
         testComponentLifecycle("MulePooledPrototypeService", expectedLifeCycle);
     }
@@ -101,7 +101,7 @@ public class TransientLifecycleTrackerComponentFunctionalTestCase extends Functi
     @Test
     public void testMulePooledSingletonServiceLifecycle() throws Exception
     {
-        String expectedLifeCycle = "[setProperty, setMuleContext, initialise, initialise, initialise, start, start, start, stop, stop, stop, dispose, dispose, dispose]";
+        String expectedLifeCycle = "[setProperty, setFlowConstruct, setMuleContext, initialise, initialise, initialise, start, start, start, stop, stop, stop, dispose, dispose, dispose]";
 
         testComponentLifecycle("MulePooledSingletonService", expectedLifeCycle);
     }

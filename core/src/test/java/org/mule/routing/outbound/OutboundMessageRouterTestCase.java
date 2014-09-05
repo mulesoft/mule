@@ -177,7 +177,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleContextTestCase
         FilteringOutboundRouter filterRouter = new FilteringOutboundRouter();
         MuleMessage message = new DefaultMuleMessage(new StringBuilder(), muleContext);
         OutboundEndpoint endpoint = getTestOutboundEndpoint("test");
-        filterRouter.setMessageProperties(getTestService(), message, endpoint);
+        filterRouter.setMessageProperties(getTestFlow(), message, endpoint);
         assertNotNull(message.getCorrelationId());
     }
 }

@@ -8,14 +8,13 @@ package org.mule.interceptor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.interceptor.Interceptor;
-import org.mule.api.service.Service;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.component.AbstractComponent;
+import org.mule.construct.Flow;
 import org.mule.management.stats.ProcessingTime;
-import org.mule.model.seda.SedaService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
@@ -42,14 +41,14 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
     @Test
     public void testSingleInterceptor() throws Exception
     {
-        Service service = createUninitializedService();
-        TestComponent component = (TestComponent) service.getComponent();
+        Flow flow = createUninitializedFlow();
+        TestComponent component = (TestComponent) flow.getMessageProcessors().get(0);
 
         List<Interceptor> interceptors = new ArrayList<Interceptor>();
         interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
         component.setInterceptors(interceptors);
-        service.initialise();
-        service.start();
+        flow.initialise();
+        flow.start();
 
         MuleEvent result = component.process(getTestEvent(""));
 
@@ -59,16 +58,16 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
     @Test
     public void testMultipleInterceptor() throws Exception
     {
-        Service service = createUninitializedService();
-        TestComponent component = (TestComponent) service.getComponent();
+        Flow flow = createUninitializedFlow();
+        TestComponent component = (TestComponent) flow.getMessageProcessors().get(0);
 
         List<Interceptor> interceptors = new ArrayList<Interceptor>();
         interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
         interceptors.add(new TestInterceptor(INTERCEPTOR_TWO));
         interceptors.add(new TestInterceptor(INTERCEPTOR_THREE));
         component.setInterceptors(interceptors);
-        service.initialise();
-        service.start();
+        flow.initialise();
+        flow.start();
 
         MuleEvent result = component.process(getTestEvent(""));
 
@@ -78,16 +77,16 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
     @Test
     public void testSingleInterceptorStack() throws Exception
     {
-        Service service = createUninitializedService();
-        TestComponent component = (TestComponent) service.getComponent();
+        Flow flow = createUninitializedFlow();
+        TestComponent component = (TestComponent) flow.getMessageProcessors().get(0);
 
         List<Interceptor> interceptors = new ArrayList<Interceptor>();
         List<Interceptor> stackInterceptors = new ArrayList<Interceptor>();
         stackInterceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
         interceptors.add(new InterceptorStack(stackInterceptors));
         component.setInterceptors(interceptors);
-        service.initialise();
-        service.start();
+        flow.initialise();
+        flow.start();
 
         MuleEvent result = component.process(getTestEvent(""));
 
@@ -97,8 +96,8 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
     @Test
     public void testMultipleInterceptorStack() throws Exception
     {
-        Service service = createUninitializedService();
-        TestComponent component = (TestComponent) service.getComponent();
+        Flow flow = createUninitializedFlow();
+        TestComponent component = (TestComponent) flow.getMessageProcessors().get(0);
 
         List<Interceptor> interceptors = new ArrayList<Interceptor>();
         interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
@@ -107,8 +106,8 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
         stackInterceptors.add(new TestInterceptor(INTERCEPTOR_THREE));
         interceptors.add(new InterceptorStack(stackInterceptors));
         component.setInterceptors(interceptors);
-        service.initialise();
-        service.start();
+        flow.initialise();
+        flow.start();
 
         MuleEvent result = component.process(getTestEvent(""));
 
@@ -118,8 +117,8 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
     @Test
     public void testMultipleInterceptorStack2() throws Exception
     {
-        Service service = createUninitializedService();
-        TestComponent component = (TestComponent) service.getComponent();
+        Flow flow = createUninitializedFlow();
+        TestComponent component = (TestComponent) flow.getMessageProcessors().get(0);
 
         List<Interceptor> interceptors = new ArrayList<Interceptor>();
         interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
@@ -131,8 +130,8 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
         stackInterceptors.add(new TestInterceptor(INTERCEPTOR_THREE));
         interceptors.add(new InterceptorStack(stackInterceptors));
         component.setInterceptors(interceptors);
-        service.initialise();
-        service.start();
+        flow.initialise();
+        flow.start();
 
         MuleEvent result = component.process(getTestEvent(""));
 
@@ -189,14 +188,13 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
         }
     }
 
-    protected Service createUninitializedService() throws Exception
+    protected Flow createUninitializedFlow() throws Exception
     {
         TestComponent component = new TestComponent();
-        Service service = new SedaService(muleContext);
-        service.setName("name");
-        service.setComponent(component);
-        service.setModel(muleContext.getRegistry().lookupSystemModel());
-        return service;
+        Flow flow = new Flow("name",muleContext);
+        flow.setMessageProcessors(new ArrayList<MessageProcessor>());
+        flow.getMessageProcessors().add(component);
+        return flow;
     }
 
     class TestComponent extends AbstractComponent

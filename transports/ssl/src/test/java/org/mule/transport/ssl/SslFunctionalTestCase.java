@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.api.service.Service;
+import org.mule.construct.Flow;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -70,7 +70,7 @@ public class SslFunctionalTestCase extends FunctionalTestCase
             assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
         }
 
-        Service c = muleContext.getRegistry().lookupService("testComponent2");
+        Flow c = (Flow) muleContext.getRegistry().lookupFlowConstruct("testComponent2");
         //assertTrue("Service should be a TestSedaService", c instanceof TestSedaService);
         Object ftc = getComponent(c);
         assertNotNull("Functional Test Service not found in the model.", ftc);
