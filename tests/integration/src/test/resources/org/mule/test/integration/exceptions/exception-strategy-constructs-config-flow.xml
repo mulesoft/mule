@@ -31,16 +31,18 @@
         </default-exception-strategy>
     </flow>
 
-    <pattern:simple-service name="testSS1" address="vm://inss1">
+    <flow name="testSS1">
+        <inbound-endpoint address="vm://inss1" />
         <test:component throwException="true"/>
         <default-exception-strategy>
             <vm:outbound-endpoint path="ss1out" exchange-pattern="one-way" connector-ref="vmConnector"/>
         </default-exception-strategy>
-    </pattern:simple-service>
+    </flow>
 
-    <pattern:simple-service name="testSS2" address="vm://inss2">
+    <flow name="testSS2">
+        <inbound-endpoint address="vm://inss2" />
         <test:component throwException="true"/>
-    </pattern:simple-service>
+    </flow>
 
     <flow name="testflow1">
         <vm:inbound-endpoint path="inflow1" exchange-pattern="one-way"/>
