@@ -42,7 +42,7 @@ public class StdioMessageReceiverTestCase extends AbstractMessageReceiverTestCas
 
     public MessageReceiver getMessageReceiver() throws CreateException
     {
-        return new StdioMessageReceiver(endpoint.getConnector(), service, endpoint, 1000);
+        return new StdioMessageReceiver(endpoint.getConnector(), flow, endpoint, 1000);
     }
 
     public InboundEndpoint getEndpoint() throws Exception
