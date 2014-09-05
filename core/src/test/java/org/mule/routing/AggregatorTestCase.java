@@ -40,12 +40,12 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase
     @Test
     public void testMessageAggregator() throws Exception
     {
-        Flow testService = getTestFlow("test", Apple.class);
-        MuleSession session = getTestSession(testService, muleContext);
+        Flow flow = getTestFlow("test", Apple.class);
+        MuleSession session = getTestSession(flow, muleContext);
 
         TestEventAggregator router = new TestEventAggregator(3);
         router.setMuleContext(muleContext);
-        router.setFlowConstruct(testService);
+        router.setFlowConstruct(flow);
         router.initialise();
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
         MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
@@ -55,9 +55,9 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase
         message3.setCorrelationId(message1.getUniqueId());
 
         InboundEndpoint endpoint = MuleTestUtils.getTestInboundEndpoint(MessageExchangePattern.ONE_WAY, muleContext);
-        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, testService, session);
-        MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, testService, session);
-        MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, testService, session);
+        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, flow, session);
+        MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, flow, session);
+        MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, flow, session);
 
         assertNull(router.process(event1));
         assertNull(router.process(event2));

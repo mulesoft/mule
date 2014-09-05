@@ -40,8 +40,8 @@ public class ListMessageSplitterTestCase extends AbstractMuleContextTestCase
     @Test
     public void testCorrelationGroupSizePropertySet() throws Exception
     {
-        Flow testService = getTestFlow("test", Apple.class);
-        MuleSession session = getTestSession(testService, muleContext);
+        Flow flow = getTestFlow("test", Apple.class);
+        MuleSession session = getTestSession(flow, muleContext);
 
         OutboundEndpoint endpoint = getTestOutboundEndpoint("Test1Endpoint",
             "test://endpoint?exchangePattern=request-response");

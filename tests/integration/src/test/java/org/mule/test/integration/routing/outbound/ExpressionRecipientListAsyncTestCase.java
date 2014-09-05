@@ -34,11 +34,11 @@ public class ExpressionRecipientListAsyncTestCase extends FunctionalTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.FLOW,
-                        "org/mule/test/integration/routing/outbound/expression-recipient-list-async-test-flow.xml"},
-                {ConfigVariant.FLOW_EL,
-                        "org/mule/test/integration/routing/outbound/expression-recipient-list-async-test-flow-el.xml"}});
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.FLOW,
+                "org/mule/test/integration/routing/outbound/expression-recipient-list-async-test-flow.xml"},
+            {ConfigVariant.FLOW_EL,
+                "org/mule/test/integration/routing/outbound/expression-recipient-list-async-test-flow-el.xml"}});
     }
 
     public ExpressionRecipientListAsyncTestCase(ConfigVariant variant, String configResources)

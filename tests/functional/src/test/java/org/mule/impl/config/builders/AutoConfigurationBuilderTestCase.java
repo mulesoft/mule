@@ -39,9 +39,9 @@ public class AutoConfigurationBuilderTestCase extends AbstractMuleContextTestCas
         configurationBuilder.configure(muleContext);
 
         // Just a few of the asserts from AbstractConfigBuilderTestCase
-        Flow service = (Flow) muleContext.getRegistry().lookupFlowConstruct("appleComponent");
-        assertNotNull(service.getExceptionListener());
-        assertTrue(service.getExceptionListener() instanceof MessagingExceptionHandler);
+        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("appleComponent");
+        assertNotNull(flow.getExceptionListener());
+        assertTrue(flow.getExceptionListener() instanceof MessagingExceptionHandler);
     }
 
 }

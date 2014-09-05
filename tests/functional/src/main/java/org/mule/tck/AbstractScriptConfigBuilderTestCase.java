@@ -78,8 +78,8 @@ public abstract class AbstractScriptConfigBuilderTestCase extends org.mule.tck.j
         // aliases no longer possible
         assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
 
-        Flow service = (Flow) muleContext.getRegistry().lookupFlowConstruct("orangeComponent");
-        ImmutableEndpoint ep = (ImmutableEndpoint) ((CompositeMessageSource) service.getMessageSource()).getSources().get(0);
+        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("orangeComponent");
+        ImmutableEndpoint ep = (ImmutableEndpoint) ((CompositeMessageSource) flow.getMessageSource()).getSources().get(0);
         assertNotNull(ep);
         final List responseTransformers = ep.getResponseTransformers();
         assertNotNull(responseTransformers);
@@ -91,11 +91,11 @@ public abstract class AbstractScriptConfigBuilderTestCase extends org.mule.tck.j
     @Test
     public void testExceptionStrategy()
     {
-        Flow service = (Flow) muleContext.getRegistry().lookupFlowConstruct("orangeComponent");
-        assertNotNull(service.getExceptionListener());
+        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("orangeComponent");
+        assertNotNull(flow.getExceptionListener());
 
-        assertTrue(((AbstractExceptionListener) service.getExceptionListener()).getMessageProcessors().size() > 0);
-        OutboundEndpoint ep = (OutboundEndpoint) ((AbstractExceptionListener) service.getExceptionListener()).getMessageProcessors().get(0);
+        assertTrue(((AbstractExceptionListener) flow.getExceptionListener()).getMessageProcessors().size() > 0);
+        OutboundEndpoint ep = (OutboundEndpoint) ((AbstractExceptionListener) flow.getExceptionListener()).getMessageProcessors().get(0);
 
         assertEquals("test://orange.exceptions", ep.getEndpointURI().toString());
     }
@@ -152,10 +152,10 @@ public abstract class AbstractScriptConfigBuilderTestCase extends org.mule.tck.j
     public void testBindingConfig()
     {
         // test outbound message router
-        Flow service = (Flow) muleContext.getRegistry().lookupFlowConstruct("orangeComponent");
-        assertNotNull(service.getMessageProcessors().get(0));
-        assertTrue((service.getMessageProcessors().get(0) instanceof JavaComponent));
-        List<InterfaceBinding> bindings= ((JavaComponent) service.getMessageProcessors().get(0)).getInterfaceBindings();
+        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("orangeComponent");
+        assertNotNull(flow.getMessageProcessors().get(0));
+        assertTrue((flow.getMessageProcessors().get(0) instanceof JavaComponent));
+        List<InterfaceBinding> bindings= ((JavaComponent) flow.getMessageProcessors().get(0)).getInterfaceBindings();
         assertNotNull(bindings);
 
         assertEquals(2, bindings.size());

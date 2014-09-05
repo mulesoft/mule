@@ -553,9 +553,9 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
         {
             try
             {
-                Flow service = (Flow) muleContext.getRegistry().lookupFlowConstruct(serviceName);
-                service.stop();
-                services.add(service);
+                Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(serviceName);
+                flow.stop();
+                services.add(flow);
             }
             catch (Exception e)
             {

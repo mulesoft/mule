@@ -67,27 +67,6 @@ public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
         assertEquals(2, astats.getAsyncEventsReceived());
     }
 
-    //@Test
-    //public void testCorrectMaxQueueSize() throws Exception
-    //{
-    //    FlowConstructStatistics stats = getFlowConstructStatistics();
-    //    assertEquals(1, stats.getMaxQueueSize());
-    //}
-    //
-    //@Test
-    //public void testCorrectAsynchEventsSent() throws Exception
-    //{
-    //    FlowConstructStatistics stats = getFlowConstructStatistics();
-    //    assertEquals(1, stats.getAsyncEventsSent());
-    //}
-    //
-    //@Test
-    //public void testCorrectTotalEventsSent() throws Exception
-    //{
-    //    FlowConstructStatistics stats = getFlowConstructStatistics();
-    //    assertEquals(1, stats.getTotalEventsSent());
-    //}
-
     @Test
     public void testCorrectTotalEventsReceived() throws Exception
     {

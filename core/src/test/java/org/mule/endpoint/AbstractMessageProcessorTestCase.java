@@ -220,13 +220,13 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
         props.put("prop1", "value1");
         props.put("port", 12345);
 
-        Flow svc = getTestFlow();
+        Flow flow = getTestFlow();
         if (exceptionListener != null)
         {
-            svc.setExceptionListener(exceptionListener);
+            flow.setExceptionListener(exceptionListener);
         }
         return new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, props, muleContext),
-            getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE), svc, getTestSession(null,
+            getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE), flow, getTestSession(null,
                 muleContext));
     }
 

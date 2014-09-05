@@ -70,8 +70,8 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
     @Test
     public void testLocalEndpoints() throws MuleException
     {
-        Flow service = muleContext.getRegistry().lookupObject("localEndpoints");
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) service.getMessageSource();
+        Flow flow = muleContext.getRegistry().lookupObject("localEndpoints");
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) flow.getMessageSource();
 
         List<MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);

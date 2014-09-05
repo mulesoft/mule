@@ -20,11 +20,11 @@
         <scripting:text>
             if(message.getProperty("messageType").equals("sync"))
             {
-            return message.getPayloadAsString() + " OK"
+                return message.getPayloadAsString() + " OK"
             }
             else if(message.getProperty("messageType").equals("async"))
             {
-            return message.getPayloadAsString() + "'s Response sent to asyncResponse"
+                return message.getPayloadAsString() + "'s Response sent to asyncResponse"
             }
 
             return null

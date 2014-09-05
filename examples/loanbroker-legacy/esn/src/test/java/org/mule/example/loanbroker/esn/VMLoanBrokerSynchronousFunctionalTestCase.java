@@ -35,9 +35,9 @@ public class VMLoanBrokerSynchronousFunctionalTestCase extends AbstractLoanBroke
         assertComponent("TheBankGateway");
     }
 
-    protected void assertComponent(String serviceName)
+    protected void assertComponent(String flowName)
     {
-        Flow service = (Flow) muleContext.getRegistry().lookupFlowConstruct(serviceName);
-        assertNotNull(serviceName + " missing", service);
+        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(flowName);
+        assertNotNull(flowName + " missing", flow);
     }
 }

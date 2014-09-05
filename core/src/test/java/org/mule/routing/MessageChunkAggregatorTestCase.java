@@ -35,12 +35,12 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase
     public void testMessageProcessor() throws Exception
     {
         MuleSession session = getTestSession(null, muleContext);
-        Flow testService = getTestFlow("test", Apple.class);
-        assertNotNull(testService);
+        Flow flow = getTestFlow("test", Apple.class);
+        assertNotNull(flow);
 
         MessageChunkAggregator router = new MessageChunkAggregator();
         router.setMuleContext(muleContext);
-        router.setFlowConstruct(testService);
+        router.setFlowConstruct(flow);
         router.initialise();
 
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);

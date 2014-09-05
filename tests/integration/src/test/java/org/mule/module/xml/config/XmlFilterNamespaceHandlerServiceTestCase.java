@@ -34,9 +34,9 @@ public class XmlFilterNamespaceHandlerServiceTestCase extends FunctionalTestCase
     @Test
     public void testIsXmlFilter() throws Exception
     {
-        Flow service = (Flow) muleContext.getRegistry().lookupFlowConstruct("test for xml");
+        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("test for xml");
 
-        List<MessageProcessor> processors = service.getMessageProcessors();
+        List<MessageProcessor> processors = flow.getMessageProcessors();
 
         assertEquals(2, processors.size());
         assertEquals(IsXmlFilter.class, ((MessageFilter) processors.get(0)).getFilter().getClass());
@@ -48,7 +48,7 @@ public class XmlFilterNamespaceHandlerServiceTestCase extends FunctionalTestCase
     @Test
     public void testJXPathFilter()
     {
-        Flow service = (Flow) muleContext.getRegistry().lookupFlowConstruct("filter xml for content");
+        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("filter xml for content");
 
         List<MessageProcessor> processors = service.getMessageProcessors();
 

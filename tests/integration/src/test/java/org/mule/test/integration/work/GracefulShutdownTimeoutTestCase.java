@@ -48,8 +48,8 @@ public class GracefulShutdownTimeoutTestCase extends FunctionalTestCase
     {
         final Latch latch = new Latch();
 
-        FlowConstruct service = muleContext.getRegistry().lookupFlowConstruct("TestService");
-        FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent(service);
+        FlowConstruct flowConstruct = muleContext.getRegistry().lookupFlowConstruct("TestService");
+        FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent(flowConstruct);
         testComponent.setEventCallback(new EventCallback()
         {
             @Override
@@ -61,9 +61,9 @@ public class GracefulShutdownTimeoutTestCase extends FunctionalTestCase
             }
         });
 
-        ((Flow) service).process(getTestEvent("test"));
+        ((Flow) flowConstruct).process(getTestEvent("test"));
         Thread.sleep(200);
-        ((Flow) service).dispose();
+        ((Flow) flowConstruct).dispose();
         assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
     }
 }

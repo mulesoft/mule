@@ -17,9 +17,6 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.file.filters.FilenameRegexFilter;
 import org.mule.transport.file.transformers.FileToByteArray;
 import org.mule.transport.file.transformers.FileToString;
-import org.mule.util.FileUtils;
-
-import java.io.File;
 
 import org.junit.Test;
 
@@ -99,10 +96,10 @@ public class FileNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testFileFilter() throws Exception
     {
-        Object service = muleContext.getRegistry().lookupObject("Test");
-        assertNotNull(service);
+        Object flow = muleContext.getRegistry().lookupObject("Test");
+        assertNotNull(flow);
 
-        InboundEndpoint endpoint = (InboundEndpoint) ((Flow) service).getMessageSource();
+        InboundEndpoint endpoint = (InboundEndpoint) ((Flow) flow).getMessageSource();
 
         Filter filter = endpoint.getFilter();
         assertNotNull(filter);

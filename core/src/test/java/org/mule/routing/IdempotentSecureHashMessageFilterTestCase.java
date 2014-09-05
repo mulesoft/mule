@@ -34,13 +34,13 @@ public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleConte
     {
         InboundEndpoint endpoint1 = getTestInboundEndpoint("Test1Provider",
             "test://Test1Provider?exchangePattern=one-way");
-        Flow service = getTestFlow();
+        Flow flow = getTestFlow();
 
         MuleSession session = mock(MuleSession.class);
-        when(session.getFlowConstruct()).thenReturn(service);
+        when(session.getFlowConstruct()).thenReturn(flow);
 
         IdempotentSecureHashMessageFilter ir = new IdempotentSecureHashMessageFilter();
-        ir.setFlowConstruct(service);
+        ir.setFlowConstruct(flow);
         ir.setThrowOnUnaccepted(false);
         ir.setStorePrefix("foo");
         ir.setStore(new InMemoryObjectStore<String>());

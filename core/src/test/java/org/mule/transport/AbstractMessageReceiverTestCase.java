@@ -18,19 +18,18 @@ import org.junit.Test;
 
 public abstract class AbstractMessageReceiverTestCase extends AbstractMuleContextTestCase
 {
-    protected Flow service;
+    protected Flow flow;
     protected InboundEndpoint endpoint;
 
     protected void doSetUp() throws Exception
     {
-        service = getTestFlow("orange", Orange.class);
+        flow = getTestFlow("orange", Orange.class);
         endpoint = getEndpoint();
     }
 
     @Test
     public void testCreate() throws Exception
     {
-        Flow service = getTestFlow("orange", Orange.class);
         InboundEndpoint endpoint = getTestInboundEndpoint("Test");
         MessageReceiver receiver = getMessageReceiver();
 

@@ -43,12 +43,12 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase
     public void testMessageResequencer() throws Exception
     {
         MuleSession session = getTestSession(null, muleContext);
-        Flow testService = getTestFlow("test", Apple.class);
-        assertNotNull(testService);
+        Flow flow = getTestFlow("test", Apple.class);
+        assertNotNull(flow);
 
         TestEventResequencer router = new TestEventResequencer(3);
         router.setMuleContext(muleContext);
-        router.setFlowConstruct(testService);
+        router.setFlowConstruct(flow);
         router.initialise();
 
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
@@ -83,12 +83,12 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase
     public void testMessageResequencerWithComparator() throws Exception
     {
         MuleSession session = getTestSession(null, muleContext);
-        Flow testService = getTestFlow("test", Apple.class);
-        assertNotNull(testService);
+        Flow flow = getTestFlow("test", Apple.class);
+        assertNotNull(flow);
 
         TestEventResequencer router = new TestEventResequencer(3);
         router.setMuleContext(muleContext);
-        router.setFlowConstruct(testService);
+        router.setFlowConstruct(flow);
         router.initialise();
 
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
@@ -111,7 +111,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase
         router = new TestEventResequencer(3);
         router.setMuleContext(muleContext);
         router.setEventComparator(new EventPayloadComparator());
-        router.setFlowConstruct(testService);
+        router.setFlowConstruct(flow);
         router.initialise();
 
         assertNull(router.process(event2));
@@ -143,7 +143,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase
         protected EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext)
         {
             return new ResequenceMessagesCorrelatorCallback(getEventComparator(), muleContext, false,
-                                                            storePrefix)
+                storePrefix)
             {
                 @Override
                 public boolean shouldAggregateEvents(EventGroup events)

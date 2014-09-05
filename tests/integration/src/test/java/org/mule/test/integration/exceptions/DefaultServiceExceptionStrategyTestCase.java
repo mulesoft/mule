@@ -42,13 +42,13 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testDefaultExceptionStrategySingleEndpoint() throws MuleException
     {
-        FlowConstruct service = muleContext.getRegistry().lookupFlowConstruct("testService1");
+        FlowConstruct flowConstruct = muleContext.getRegistry().lookupFlowConstruct("testService1");
 
-        assertNotNull(service);
-        assertNotNull(service.getExceptionListener());
-        assertTrue(service.getExceptionListener() instanceof DefaultMessagingExceptionStrategy);
+        assertNotNull(flowConstruct);
+        assertNotNull(flowConstruct.getExceptionListener());
+        assertTrue(flowConstruct.getExceptionListener() instanceof DefaultMessagingExceptionStrategy);
         assertEquals(1,
-            ((DefaultMessagingExceptionStrategy) service.getExceptionListener()).getMessageProcessors()
+            ((DefaultMessagingExceptionStrategy) flowConstruct.getExceptionListener()).getMessageProcessors()
                 .size());
 
         MuleClient client = muleContext.getClient();
@@ -62,12 +62,12 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testDefaultExceptionStrategyMultipleEndpoints() throws MuleException
     {
-        FlowConstruct service =  muleContext.getRegistry().lookupFlowConstruct("testService2");
+        FlowConstruct flowConstruct =  muleContext.getRegistry().lookupFlowConstruct("testService2");
 
-        assertNotNull(service);
-        assertNotNull(service.getExceptionListener());
-        assertTrue(service.getExceptionListener() instanceof DefaultMessagingExceptionStrategy);
-        DefaultMessagingExceptionStrategy exceptionListener = (DefaultMessagingExceptionStrategy) service.getExceptionListener();
+        assertNotNull(flowConstruct);
+        assertNotNull(flowConstruct.getExceptionListener());
+        assertTrue(flowConstruct.getExceptionListener() instanceof DefaultMessagingExceptionStrategy);
+        DefaultMessagingExceptionStrategy exceptionListener = (DefaultMessagingExceptionStrategy) flowConstruct.getExceptionListener();
         MessageProcessor mp = exceptionListener.getMessageProcessors().iterator().next();
         assertTrue(mp.getClass().getName(), mp instanceof MulticastingRouter);
         assertEquals(2, ((MulticastingRouter) mp).getRoutes().size());
@@ -116,7 +116,7 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testStopsServiceOnException() throws MuleException, InterruptedException
     {
-        final FlowConstruct service = muleContext.getRegistry().lookupFlowConstruct("testService5");
+        final FlowConstruct flowConstruct = muleContext.getRegistry().lookupFlowConstruct("testService5");
 
         MuleClient client = muleContext.getClient();
         client.dispatch("vm://in5", "test", null);
@@ -129,7 +129,7 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
             @Override
             public boolean isSatisfied()
             {
-                return !service.getLifecycleState().isStarted();
+                return !flowConstruct.getLifecycleState().isStarted();
             }
 
             @Override

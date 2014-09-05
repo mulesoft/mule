@@ -27,16 +27,16 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleContextTestCase
     @Test
     public void testIdempotentReceiver() throws Exception
     {
-        Flow service = getTestFlow();
+        Flow flow = getTestFlow();
 
         MuleSession session = mock(MuleSession.class);
-        when(session.getFlowConstruct()).thenReturn(service);
+        when(session.getFlowConstruct()).thenReturn(flow);
 
         InboundEndpoint endpoint1 = getTestInboundEndpoint("Test1Provider", "test://Test1Provider?exchangePattern=one-way");
 
         IdempotentMessageFilter ir = new IdempotentMessageFilter();
         ir.setIdExpression("#[header:id]");
-        ir.setFlowConstruct(service);
+        ir.setFlowConstruct(flow);
         ir.setThrowOnUnaccepted(false);
         ir.setStorePrefix("foo");
         ir.setStore(new InMemoryObjectStore<String>());

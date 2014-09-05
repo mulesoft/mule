@@ -51,14 +51,14 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
         MuleSession session3 = getTestSession(getTestFlow(), muleContext);
         session1.setProperty("key3", "value3");
 
-        Flow testService = getTestFlow("test", Apple.class);
-        assertNotNull(testService);
+        Flow flow = getTestFlow("test", Apple.class);
+        assertNotNull(flow);
 
         SimpleCollectionAggregator router = new SimpleCollectionAggregator();
         SensingNullMessageProcessor sensingMessageProcessor = getSensingNullMessageProcessor();
         router.setListener(sensingMessageProcessor);
         router.setMuleContext(muleContext);
-        router.setFlowConstruct(testService);
+        router.setFlowConstruct(flow);
         router.initialise();
 
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
@@ -71,9 +71,9 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
 
         InboundEndpoint endpoint = MuleTestUtils.getTestInboundEndpoint(MessageExchangePattern.ONE_WAY,
             muleContext);
-        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, testService, session1);
-        MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, testService, session2);
-        MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, testService, session3);
+        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, flow, session1);
+        MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, flow, session2);
+        MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, flow, session3);
 
         assertNull(router.process(event1));
         assertNull(router.process(event2));
@@ -105,14 +105,14 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     public void testAggregateSingleEvent() throws Exception
     {
         MuleSession session = getTestSession(getTestFlow(), muleContext);
-        Flow testService = getTestFlow("test", Apple.class);
-        assertNotNull(testService);
+        Flow flow = getTestFlow("test", Apple.class);
+        assertNotNull(flow);
 
         SimpleCollectionAggregator router = new SimpleCollectionAggregator();
         SensingNullMessageProcessor sensingMessageProcessor = getSensingNullMessageProcessor();
         router.setListener(sensingMessageProcessor);
         router.setMuleContext(muleContext);
-        router.setFlowConstruct(testService);
+        router.setFlowConstruct(flow);
         router.initialise();
 
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
@@ -121,7 +121,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
 
         InboundEndpoint endpoint = MuleTestUtils.getTestInboundEndpoint(MessageExchangePattern.ONE_WAY,
             muleContext);
-        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, testService);
+        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, flow);
 
         MuleEvent resultEvent = router.process(event1);
         assertSame(VoidMuleEvent.getInstance(), resultEvent);
@@ -140,12 +140,12 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     public void testAggregateMessageCollections() throws Exception
     {
         MuleSession session = getTestSession(getTestFlow(), muleContext);
-        Flow testService = getTestFlow("test", Apple.class);
-        assertNotNull(testService);
+        Flow flow = getTestFlow("test", Apple.class);
+        assertNotNull(flow);
 
         SimpleCollectionAggregator router = new SimpleCollectionAggregator();
         router.setMuleContext(muleContext);
-        router.setFlowConstruct(testService);
+        router.setFlowConstruct(flow);
         router.initialise();
 
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
@@ -166,8 +166,8 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
 
         InboundEndpoint endpoint = MuleTestUtils.getTestInboundEndpoint(MessageExchangePattern.ONE_WAY,
             muleContext);
-        MuleEvent event1 = new DefaultMuleEvent(messageCollection1, endpoint, testService);
-        MuleEvent event2 = new DefaultMuleEvent(messageCollection2, endpoint, testService);
+        MuleEvent event1 = new DefaultMuleEvent(messageCollection1, endpoint, flow);
+        MuleEvent event2 = new DefaultMuleEvent(messageCollection2, endpoint, flow);
 
         assertNull(router.process(event1));
         MuleEvent resultEvent = router.process(event2);

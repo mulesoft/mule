@@ -86,9 +86,9 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     @Test
     public void testExceptionStrategy2()
     {
-        Flow service = (Flow) muleContext.getRegistry().lookupFlowConstruct("appleComponent");
-        assertNotNull(service.getExceptionListener());
-        assertTrue(service.getExceptionListener() instanceof MessagingExceptionHandler);
+        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("appleComponent");
+        assertNotNull(flow.getExceptionListener());
+        assertTrue(flow.getExceptionListener() instanceof MessagingExceptionHandler);
     }
 
     @Override
@@ -154,8 +154,8 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals(defaultThreadTTL, tp.getThreadTTL());
 
         // test per-service values
-        Flow service = (Flow) muleContext.getRegistry().lookupFlowConstruct("appleComponent2");
-        AsynchronousProcessingStrategy processingStrategy = (AsynchronousProcessingStrategy) service.getProcessingStrategy();
+        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("appleComponent2");
+        AsynchronousProcessingStrategy processingStrategy = (AsynchronousProcessingStrategy) flow.getProcessingStrategy();
         // these values are configured
         assertEquals(componentMaxBufferSize, processingStrategy.getMaxBufferSize().intValue());
         assertEquals(componentMaxThreadsActive, processingStrategy.getMaxThreads().intValue());
@@ -168,8 +168,8 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     public void testPoolingConfig()
     {
         // test per-descriptor overrides
-        Flow service = (Flow) muleContext.getRegistry().lookupFlowConstruct("appleComponent2");
-        PoolingProfile pp = ((PooledJavaComponent) service.getMessageProcessors().get(0)).getPoolingProfile();
+        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("appleComponent2");
+        PoolingProfile pp = ((PooledJavaComponent) flow.getMessageProcessors().get(0)).getPoolingProfile();
 
         assertEquals(9, pp.getMaxActive());
         assertEquals(6, pp.getMaxIdle());
@@ -182,8 +182,8 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     public void testEndpointProperties() throws Exception
     {
         // test transaction config
-        Flow service = (Flow) muleContext.getRegistry().lookupFlowConstruct("appleComponent2");
-        InboundEndpoint inEndpoint = (InboundEndpoint) ((CompositeMessageSource) service.getMessageSource()).getSources().get(1);
+        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("appleComponent2");
+        InboundEndpoint inEndpoint = (InboundEndpoint) ((CompositeMessageSource) flow.getMessageSource()).getSources().get(1);
         assertNotNull(inEndpoint);
         assertNotNull(inEndpoint.getProperties());
         assertEquals("Prop1", inEndpoint.getProperties().get("testEndpointProperty"));
@@ -220,8 +220,8 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     @Test
     public void testInterceptors()
     {
-        Flow service = (Flow) muleContext.getRegistry().lookupFlowConstruct("orangeComponent");
-        AbstractComponent component = (AbstractComponent) service.getMessageProcessors().get(0);
+        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("orangeComponent");
+        AbstractComponent component = (AbstractComponent) flow.getMessageProcessors().get(0);
         assertEquals(3, component.getInterceptors().size());
         assertEquals(LoggingInterceptor.class, component.getInterceptors().get(0).getClass());
         assertEquals(InterceptorStack.class, component.getInterceptors().get(1).getClass());

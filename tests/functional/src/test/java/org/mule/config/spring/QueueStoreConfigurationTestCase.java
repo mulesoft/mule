@@ -33,8 +33,8 @@ public class QueueStoreConfigurationTestCase extends FunctionalTestCase
     @Test
     public void testServiceDefaults()
     {
-        Flow service = lookupFlow("serviceDefault");
-        QueuedAsynchronousProcessingStrategy ps = (QueuedAsynchronousProcessingStrategy) service.getProcessingStrategy();
+        Flow flow = lookupFlow("serviceDefault");
+        QueuedAsynchronousProcessingStrategy ps = (QueuedAsynchronousProcessingStrategy) flow.getProcessingStrategy();
         assertEquals(0, ps.getMaxQueueSize().intValue());
         assertObjectStoreIsDefaultMemoryObjectStore(ps.getQueueStore());
     }
@@ -42,8 +42,8 @@ public class QueueStoreConfigurationTestCase extends FunctionalTestCase
     @Test
     public void testServiceOnlyNumberOfOutstandingMessagesConfigured()
     {
-        Flow service = lookupFlow("serviceNoObjectStore");
-        QueuedAsynchronousProcessingStrategy ps = (QueuedAsynchronousProcessingStrategy) service.getProcessingStrategy();
+        Flow flow = lookupFlow("serviceNoObjectStore");
+        QueuedAsynchronousProcessingStrategy ps = (QueuedAsynchronousProcessingStrategy) flow.getProcessingStrategy();
         assertEquals(42, ps.getMaxQueueSize().intValue());
         assertObjectStoreIsDefaultMemoryObjectStore(ps.getQueueStore());
     }
@@ -51,24 +51,24 @@ public class QueueStoreConfigurationTestCase extends FunctionalTestCase
     @Test
     public void testServiceExplicitDefaultMemoryObjectStoreConfigured()
     {
-        Flow service = lookupFlow("serviceExplicitDefaultMemoryObjectStore");
-        QueuedAsynchronousProcessingStrategy ps = (QueuedAsynchronousProcessingStrategy) service.getProcessingStrategy();
+        Flow flow = lookupFlow("serviceExplicitDefaultMemoryObjectStore");
+        QueuedAsynchronousProcessingStrategy ps = (QueuedAsynchronousProcessingStrategy) flow.getProcessingStrategy();
         assertObjectStoreIsDefaultMemoryObjectStore(ps.getQueueStore());
     }
     
     @Test
     public void testServiceExplicitDefaultPersistentObjectStoreConfigured()
     {
-        Flow service = lookupFlow("serviceExplicitDefaultPersistentObjectStore");
-        QueuedAsynchronousProcessingStrategy ps = (QueuedAsynchronousProcessingStrategy) service.getProcessingStrategy();
+        Flow flow = lookupFlow("serviceExplicitDefaultPersistentObjectStore");
+        QueuedAsynchronousProcessingStrategy ps = (QueuedAsynchronousProcessingStrategy) flow.getProcessingStrategy();
         assertObjectStoreIsDefaultPersistentObjectStore(ps.getQueueStore());
     }
 
     @Test
     public void testServiceExplicitObjectStoreConfigured()
     {
-        Flow service = lookupFlow("serviceExplicitObjectStore");
-        QueuedAsynchronousProcessingStrategy ps = (QueuedAsynchronousProcessingStrategy) service.getProcessingStrategy();
+        Flow flow = lookupFlow("serviceExplicitObjectStore");
+        QueuedAsynchronousProcessingStrategy ps = (QueuedAsynchronousProcessingStrategy) flow.getProcessingStrategy();
         assertTrue(ps.getQueueStore() instanceof TestQueueStore);
     }
 

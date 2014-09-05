@@ -143,15 +143,15 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
         // same instance
         assertNotNull(deserialized.getFlowConstruct());
 
-        Flow service = (Flow) event.getFlowConstruct();
+        Flow flow = (Flow) event.getFlowConstruct();
         Flow deserializedService = (Flow) deserialized.getFlowConstruct();
 
         // Unable to test services for equality because of need for equals() everywhere.  See MULE-3720
         // assertEquals(event.getSession().getService(), deserialized.getSession().getService());
-        assertEquals(service.getName(), deserializedService.getName());
-        assertEquals(service.getInitialState(), deserializedService.getInitialState());
-        assertEquals(service.getExceptionListener().getClass(), deserializedService.getExceptionListener().getClass());
-        assertEquals(service.getMessageProcessors(), deserializedService.getMessageProcessors());
+        assertEquals(flow.getName(), deserializedService.getName());
+        assertEquals(flow.getInitialState(), deserializedService.getInitialState());
+        assertEquals(flow.getExceptionListener().getClass(), deserializedService.getExceptionListener().getClass());
+        assertEquals(flow.getMessageProcessors(), deserializedService.getMessageProcessors());
 
     }
 
