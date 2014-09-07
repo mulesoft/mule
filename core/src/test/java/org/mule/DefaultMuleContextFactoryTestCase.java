@@ -201,7 +201,6 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_SECURITY_MANAGER));
         assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME));
         assertNotNull(context.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME));
-        assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_SYSTEM_MODEL));
         assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY));
         assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP));
     }
@@ -213,7 +212,6 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         assertNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_SECURITY_MANAGER));
         assertNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME));
         assertNull(context.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME));
-        assertNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_SYSTEM_MODEL));
         assertNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY));
         assertNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP));
     }

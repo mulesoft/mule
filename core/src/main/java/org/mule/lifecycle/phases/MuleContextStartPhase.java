@@ -13,16 +13,13 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.model.Model;
 import org.mule.api.registry.Registry;
 import org.mule.api.routing.OutboundRouter;
-import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transport.Connector;
 import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.NotificationLifecycleObject;
 import org.mule.util.queue.QueueManager;
-import org.mule.util.queue.TransactionalQueueManager;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -37,7 +34,7 @@ import java.util.Set;
  *
  * This phase is responsible for starting objects. Any object that implements {@link org.mule.api.lifecycle.Startable} will
  * have its {@link org.mule.api.lifecycle.Startable#start()} method called.  Objects are initialised in the order based on type:
- * {@link org.mule.api.transport.Connector}, {@link org.mule.api.agent.Agent}, {@link org.mule.api.model.Model}, {@link org.mule.api.service.Service}, followed
+ * {@link org.mule.api.transport.Connector}, {@link org.mule.api.agent.Agent}, {@link org.mule.api.construct.FlowConstruct}, followed
  * by any other object that implements {@link org.mule.api.lifecycle.Startable}.
  *
  * @see org.mule.api.MuleContext                                       N
@@ -50,7 +47,7 @@ public class MuleContextStartPhase extends DefaultLifecyclePhase
 {
     public MuleContextStartPhase()
     {
-        this(new Class[]{Registry.class, MuleContext.class, MessageSource.class, Component.class, OutboundRouterCollection.class, OutboundRouter.class});
+        this(new Class[]{Registry.class, MuleContext.class, MessageSource.class, Component.class, OutboundRouter.class});
     }
 
     public MuleContextStartPhase(Class<?>[] ignorredObjects)
@@ -61,7 +58,6 @@ public class MuleContextStartPhase extends DefaultLifecyclePhase
         startOrderedObjects.add(new NotificationLifecycleObject(QueueManager.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
-        startOrderedObjects.add(new NotificationLifecycleObject(Model.class));
         startOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Startable.class));
 

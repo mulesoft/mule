@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import org.mule.api.lifecycle.LifecycleException;
+import org.mule.construct.Flow;
 import org.mule.tck.testmodels.mule.TestConnector;
 
 import java.util.concurrent.TimeUnit;
@@ -46,7 +47,7 @@ public class SystemExceptionStrategyTestCase extends AbstractExceptionStrategyTe
     @Test
     public void testConnectorPolling() throws Exception
     {
-        muleContext.getRegistry().lookupService("Polling").start();
+        ((Flow) muleContext.getRegistry().lookupFlowConstruct("Polling")).start();
         Thread.sleep(3000);
         latch.await(1000, TimeUnit.MILLISECONDS);
         assertEquals(0, serviceExceptionCounter.get());

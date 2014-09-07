@@ -13,9 +13,7 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.model.Model;
 import org.mule.api.schedule.Scheduler;
-import org.mule.api.service.Service;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
@@ -79,9 +77,6 @@ public interface MuleRegistry extends Registry
 
     Transformer lookupTransformer(String name);
 
-    @Deprecated
-    Service lookupService(String name);
-
     FlowConstruct lookupFlowConstruct(String name);
 
     /**
@@ -130,27 +125,9 @@ public interface MuleRegistry extends Registry
      */
     Transformer lookupTransformer(DataType<?> source, DataType<?> result) throws TransformerException;
 
-    @Deprecated
-    Collection<Service> lookupServices(String model);
-
-    @Deprecated
-    Collection<Service> lookupServices();
-
     Collection<FlowConstruct> lookupFlowConstructs();
 
-    @Deprecated
-    Model lookupModel(String name);
-
-    @Deprecated
-    Model lookupSystemModel();
-
     Agent lookupAgent(String agentName);
-
-    /**
-     * @deprecated Use lookupModel() instead
-     */
-    @Deprecated
-    Collection<Model> getModels();
 
     /**
      * @deprecated Use lookupConnector() instead
@@ -196,21 +173,9 @@ public interface MuleRegistry extends Registry
 
     void unregisterTransformer(String transformerName) throws MuleException;
 
-    @Deprecated
-    void registerService(Service service) throws MuleException;
-
-    @Deprecated
-    void unregisterService(String serviceName) throws MuleException;
-
     void registerFlowConstruct(FlowConstruct flowConstruct) throws MuleException;
 
     void unregisterFlowConstruct(String flowConstructName) throws MuleException;
-
-    @Deprecated
-    void registerModel(Model model) throws MuleException;
-
-    @Deprecated
-    void unregisterModel(String modelName) throws MuleException;
 
     void registerAgent(Agent agent) throws MuleException;
 

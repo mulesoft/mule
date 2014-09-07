@@ -9,10 +9,8 @@ package org.mule.config.builders;
 import org.mule.DefaultMuleContext;
 import org.mule.DynamicDataTypeConversionResolver;
 import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
-import org.mule.api.model.Model;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.store.ObjectStore;
@@ -22,7 +20,6 @@ import org.mule.el.mvel.MVELExpressionLanguageWrapper;
 import org.mule.endpoint.DefaultEndpointFactory;
 import org.mule.execution.MuleMessageProcessingManager;
 import org.mule.management.stats.DefaultProcessingTimeWatcher;
-import org.mule.model.seda.SedaModel;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.security.MuleSecurityManager;
 import org.mule.util.DefaultStreamCloserService;
@@ -104,8 +101,6 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         registry.registerObject(MuleProperties.OBJECT_CONVERTER_RESOLVER,
             new DynamicDataTypeConversionResolver(muleContext));
 
-        configureSystemModel(registry);
-
         registry.registerObject(MuleProperties.OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguageWrapper(muleContext));
     }
 
@@ -138,14 +133,5 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
             new ChainedThreadingProfile(defaultThreadingProfile));
         registry.registerObject(MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE,
             new ChainedThreadingProfile(defaultThreadingProfile));
-    }
-
-    @Deprecated
-    protected void configureSystemModel(MuleRegistry registry) throws MuleException
-    {
-        Model systemModel = new SedaModel();
-        systemModel.setName(MuleProperties.OBJECT_SYSTEM_MODEL);
-
-        registry.registerModel(systemModel);
     }
 }

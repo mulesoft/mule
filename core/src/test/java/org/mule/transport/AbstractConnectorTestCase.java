@@ -208,7 +208,6 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleContextTestC
             // expected
         }
         connector.unregisterListener(endpoint, flow);
-        muleContext.getRegistry().unregisterService(flow.getName());
     }
 
     @Test

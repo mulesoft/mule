@@ -26,16 +26,6 @@
             <artifactId>mule-module-spring-config</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-        </dependency>
-        <!-- Used by RemoteDispatcher -->
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-xml</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <!-- Unit tests -->
         <dependency>

@@ -18,7 +18,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.object.ObjectFactory;
-import org.mule.api.service.Service;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
@@ -122,12 +121,6 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
             lifecycleAdapter =
                 new NullLifecycleAdapter(object, this, flowConstruct, entryPointResolverSet, muleContext);
         }
-        else if (flowConstruct instanceof Service)
-        {
-            // Inherit lifecycleAdapterFactory from model
-            lifecycleAdapter = ((Service) flowConstruct).getModel().getLifecycleAdapterFactory().create(
-                object, this, flowConstruct, entryPointResolverSet, muleContext);
-        }
         else
         {
             lifecycleAdapter = new DefaultComponentLifecycleAdapterFactory().create(object, this,
@@ -160,14 +153,7 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
         // completed and model is still in null.
         if (entryPointResolverSet == null)
         {
-            if (flowConstruct instanceof Service)
-            {
-                entryPointResolverSet = ((Service) flowConstruct).getModel().getEntryPointResolverSet();
-            }
-            else
-            {
-                entryPointResolverSet = new LegacyEntryPointResolverSet();
-            }
+            entryPointResolverSet = new LegacyEntryPointResolverSet();
         }
     }
 

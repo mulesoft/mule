@@ -12,8 +12,6 @@ import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.lifecycle.InitialisationCallback;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.object.ObjectFactory;
-import org.mule.api.service.Service;
-import org.mule.api.service.ServiceAware;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.BeanUtils;
 import org.mule.util.ClassUtils;
@@ -139,11 +137,6 @@ public abstract class AbstractObjectFactory implements ObjectFactory, FlowConstr
         if (object instanceof FlowConstructAware)
         {
             ((FlowConstructAware) object).setFlowConstruct(flowConstruct);
-        }
-
-        if (object instanceof ServiceAware && flowConstruct instanceof Service)
-        {
-            ((ServiceAware) object).setService((Service) flowConstruct);
         }
 
         if (isAutoWireObject())

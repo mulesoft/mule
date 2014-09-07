@@ -7,23 +7,16 @@
 package org.mule.module.cxf.builder;
 
 import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleException;
-import org.mule.api.component.Component;
-import org.mule.api.component.JavaComponent;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.construct.Pipeline;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.service.Service;
 import org.mule.api.source.MessageSource;
 import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.CxfInboundMessageProcessor;
 import org.mule.module.cxf.MuleJAXWSInvoker;
 import org.mule.module.cxf.i18n.CxfMessages;
-import org.mule.service.ServiceCompositeMessageSource;
-
-import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -39,9 +32,7 @@ import org.apache.cxf.service.invoker.Invoker;
  * Builds a CXF web service MessageProcessor using either the JAX-WS or
  * simple frontends.  It must be configured in the following way:
  * <ul>
- * <li>If the builder is part of a {@link Service}, then it will try to
- * detect the serviceClass from the component.</li>
- * <li>If it is not part of a {@link Service}, then the serviceClass
+ * <li>If it is part of a {@link org.mule.construct.Flow}, then the serviceClass
  * attribute must be supplied.</li>
  * <li>The builder will use the JAX-WS frontend by default.</li>
  */
@@ -53,7 +44,6 @@ public class WebServiceMessageProcessorBuilder
     private DataBinding databinding;
     private String frontend = CxfConstants.JAX_WS_FRONTEND;
     private FlowConstruct flowConstruct;
-    private Service muleService;
     private Class<?> serviceClass;
     
     @Override
@@ -76,7 +66,7 @@ public class WebServiceMessageProcessorBuilder
 
         if (serviceClass == null)
         {
-            serviceClass = getTargetClass(muleService);
+            throw new DefaultMuleException(CxfMessages.serviceClassRequiredWithPassThrough());
         }
         sfb.setServiceClass(serviceClass);
 
@@ -86,11 +76,6 @@ public class WebServiceMessageProcessorBuilder
         if (databinding != null)
         {
             sfb.setDataBinding(databinding);
-        }
-
-        if (muleService != null && muleService.getComponent() instanceof JavaComponent)
-        {
-            sfb.setServiceBean(((JavaComponent) muleService.getComponent()).getObjectFactory().getInstance(muleContext));
         }
 
         if(getService() != null && getNamespace() != null)
@@ -113,63 +98,16 @@ public class WebServiceMessageProcessorBuilder
         return invoker;
     }
 
-    /**
-     * Try to determine the target class from the Service.
-     */
-    protected Class<?> getTargetClass(Service service) throws MuleException, ClassNotFoundException
-    {
-        if (service == null)
-        {
-            throw new DefaultMuleException(CxfMessages.serviceClassRequiredWithPassThrough());
-        }
-
-        Component component = service.getComponent();
-        if (!(component instanceof JavaComponent))
-        {
-            throw new DefaultMuleException(CxfMessages.serviceClassRequiredWithPassThrough());
-        }
-
-        try
-        {
-            return ((JavaComponent) component).getObjectType();
-        }
-        catch (Exception e)
-        {
-            throw new CreateException(e, this);
-        }
-    }
-
     @Override
     protected String getAddress()
     {
         if (flowConstruct != null)
         {
-            if (flowConstruct instanceof Service)
+            MessageSource source = ((Pipeline) flowConstruct).getMessageSource();
+
+            if (source instanceof InboundEndpoint)
             {
-                MessageSource source = ((Service) flowConstruct).getMessageSource();
-
-                if (source instanceof InboundEndpoint)
-                {
-                    return ((InboundEndpoint) source).getEndpointURI().toString();
-                }
-                else if (source instanceof ServiceCompositeMessageSource)
-                {
-                    List<InboundEndpoint> endpoints = ((ServiceCompositeMessageSource) muleService.getMessageSource()).getEndpoints();
-
-                    if (endpoints.size() > 0)
-                    {
-                        return endpoints.get(0).getEndpointURI().toString();
-                    }
-                }
-            }
-            else if (flowConstruct instanceof Pipeline)
-            {
-                MessageSource source = ((Pipeline) flowConstruct).getMessageSource();
-
-                if (source instanceof InboundEndpoint)
-                {
-                    return ((InboundEndpoint) source).getEndpointURI().toString();
-                }
+                return ((InboundEndpoint) source).getEndpointURI().toString();
             }
         }
         return "http://internalMuleCxfRegistry/" + hashCode();
@@ -195,11 +133,6 @@ public class WebServiceMessageProcessorBuilder
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         this.flowConstruct = flowConstruct;
-
-        if (flowConstruct instanceof Service)
-        {
-            this.muleService = (Service) flowConstruct;
-        }
     }
     public String getFrontend()
     {
