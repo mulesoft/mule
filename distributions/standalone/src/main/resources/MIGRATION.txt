@@ -13,3 +13,4 @@ MULE-7473: The deprecated methods in the Transformer interface have been removed
            Use setReturnDataType instead of setReturnClass
            Use getReturnDataType instead of getReturnClass
            Use the DataTypeFactory class to create the DataTypes required for the above methods.
+MULE-7857: The RemoteDispatcher and related classes in the client module have been removed.
