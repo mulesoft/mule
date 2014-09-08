@@ -23,7 +23,10 @@ import org.apache.commons.logging.LogFactory;
 /**
  * <code>RemoteDispatcherAgent</code> manages the server endpoint that receives Admin and
  * remote client requests
+ *
+ * <b>Deprecated as of 3.6.0</b>
  */
+@Deprecated
 public class RemoteDispatcherAgent extends AbstractAgent
 {
     public static final String AGENT_NAME = "RemoteDispatcherServer";

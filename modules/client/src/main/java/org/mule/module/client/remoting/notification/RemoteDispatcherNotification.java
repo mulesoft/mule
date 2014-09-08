@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * <code>RemoteDispatcherNotification</code> is used to invoke actions on a remote mule server
  */
-
+@Deprecated
 public class RemoteDispatcherNotification extends ServerNotification
 {
     /**

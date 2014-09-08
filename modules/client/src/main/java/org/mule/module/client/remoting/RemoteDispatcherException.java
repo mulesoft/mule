@@ -11,7 +11,10 @@ import org.mule.config.i18n.Message;
 
 /**
  * Exceptions thrown by the Client RemoteDispatcher.
+ *
+ * <b>Deprecated as of 3.6.0</b>
  */
+@Deprecated
 public class RemoteDispatcherException extends MuleException
 {
     /**

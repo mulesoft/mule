@@ -13,6 +13,7 @@ import org.mule.api.context.notification.ServerNotificationListener;
  * objects can use to receive notifications about the state of the Mule instance and
  * its resources
  */
+@Deprecated
 public interface RemoteDispatcherNotificationListener<T extends RemoteDispatcherNotification> extends ServerNotificationListener<RemoteDispatcherNotification>
 {
     // no methods
