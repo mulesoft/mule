@@ -176,7 +176,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
             catch (Exception e)
             {
                 exception = new DispatchException(MessageFactory.createStaticMessage(String.format(
-                        "route number %d failed to be executed", routeIndex)), event, route, exception);
+                    "route number %d failed to be executed", routeIndex)), event, route, e);
             }
 
             remainingTimeout -= System.currentTimeMillis() - startedAt;
