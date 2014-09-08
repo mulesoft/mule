@@ -15,7 +15,6 @@
         <module>functional</module>
         <module>infrastructure</module>
         <module>performance</module>
-        <module>archetypes</module>
         <module>integration</module>
     </modules>
 

@@ -18,7 +18,7 @@ The Mule source code project is neatly organized into a hierarchy of sub-project
 | `examples`        | examples that come with the full Mule distribution |
 | `modules`         | non-transport extensions to Mule, such as XML processing, Spring extras, or scripting support
 | `tests`           | tests that can be run as part of the Mule build |
-| `tools`           | tools for Mule, such as the transport and project Maven archetypes |
+| `tools`           | tools for Mule |
 | `transports`      | Mule transports such as the JMS, VM, and TCP transports |
  
 
@@ -43,7 +43,6 @@ In addition to the standard properties, the following ones can change the behavi
 | `skipFunctionalTests`	   | `true`      | Skip flag for functional tests |
 | `skipSystemTests`         | `true`       | Skip flag for container level tests |
 | `skipPerformanceTests`    | `true`       | Skip flag for performance tests |
-| `skipArchetypeTests`      | `true`       | Skip flag for the archetype tests|
 | `skipVerifications`       | `false`      | Skip flag for the license check, version enforce, style checks, etc.|
 | `skipInstalls`            | `false`      | Disable installation of artifacts in the local maven repository|
 | `skipGpg`                 | `true`       | Skip artifact signing, as it does require special setup|

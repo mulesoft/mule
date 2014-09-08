@@ -110,7 +110,6 @@
         <module>distributions</module>
         <module>examples</module>
         <module>modules</module>
-        <module>tools</module>
         <module>transports</module>
         <module>tests</module>
     </modules>
@@ -124,7 +123,6 @@
         <skipIntegrationTests>false</skipIntegrationTests>
         <skipSystemTests>true</skipSystemTests>
         <skipPerformanceTests>true</skipPerformanceTests>
-        <skipArchetypeTests>true</skipArchetypeTests>
 
         <skipDistributions>true</skipDistributions>
         <skipVerifications>false</skipVerifications>
@@ -1605,18 +1603,11 @@
                             <exclude>**/*.css</exclude>
                             <exclude>**/build-number.txt</exclude>
     
-                            <exclude>**/BndMojo.java</exclude>
-                            <exclude>**/BobberArchetype.java</exclude>
-                            <exclude>**/BobberArchetypeMojo.java</exclude>
                             <exclude>**/DummySSLServerSocketFactory.java</exclude>
-                            <exclude>**/ConfigurationPatternArchetypeMojo.java</exclude>
-                            <exclude>**/ModuleArchetypeMojo.java</exclude>
                             <exclude>**/MultipartConfiguration.java</exclude>
     
                             <exclude>**/ParamReader.java</exclude>
                             <exclude>**/Part.java</exclude>
-                            <exclude>**/ProjectArchetypeMojo.java</exclude>
-                            <exclude>**/TransportArchetypeMojo.java</exclude>
                             <exclude>**/XMLStreamReaderToContentHandler.java</exclude>
                             <exclude>**/__artifactId__IBean.java</exclude>
                             <exclude>**/__artifactId__IBeanTestCase.java</exclude>
