@@ -276,7 +276,10 @@ public class MuleClient implements Disposable
      * @return the result message if any of the invocation
      * @throws org.mule.api.MuleException if the dispatch fails or the components or
      *             transfromers cannot be found
+     *
+     * <b>Deprecated from 3.6.0</b> - Only supported with Services. Sending message to remote flows is not supported.
      */
+    @Deprecated
     public MuleMessage sendDirect(String component, String transformers, Object payload, Map<String, Object> messageProperties)
         throws MuleException
     {
@@ -294,7 +297,10 @@ public class MuleClient implements Disposable
      * @return the result message if any of the invocation
      * @throws org.mule.api.MuleException if the dispatch fails or the components or
      *             transfromers cannot be found
+     *
+     * <b>Deprecated from 3.6.0</b> - Only supported with Services. Sending message to remote flows is not supported.
      */
+    @Deprecated
     public MuleMessage sendDirect(String componentName, String transformers, MuleMessage message)
         throws MuleException
     {
@@ -343,7 +349,10 @@ public class MuleClient implements Disposable
      *            null
      * @throws org.mule.api.MuleException if the dispatch fails or the components or
      *             transfromers cannot be found
+     *
+     * <b>Deprecated from 3.6.0</b> - Only supported with Services. Sending message to remote flows is not supported.
      */
+    @Deprecated
     public void dispatchDirect(String component, Object payload, Map<String, Object> messageProperties) throws MuleException
     {
         dispatchDirect(component, new DefaultMuleMessage(payload, messageProperties, muleContext));
@@ -356,7 +365,10 @@ public class MuleClient implements Disposable
      * @param message the message to send
      * @throws org.mule.api.MuleException if the dispatch fails or the components or
      *             transfromers cannot be found
+     *
+     * <b>Deprecated from 3.6.0</b> - Only supported with Services. Sending message to remote flows is not supported.
      */
+    @Deprecated
     public void dispatchDirect(String componentName, MuleMessage message) throws MuleException
     {
         Service service = muleContext.getRegistry().lookupService(componentName);
@@ -478,7 +490,10 @@ public class MuleClient implements Disposable
      * @return the result message if any of the invocation
      * @throws org.mule.api.MuleException if the dispatch fails or the components or
      *             transfromers cannot be found
+     *
+     * <b>Deprecated from 3.6.0</b> - Only supported with Services. Sending message to remote flows is not supported.
      */
+    @Deprecated
     public FutureMessageResult sendDirectAsync(final String component,
                                                String transformers,
                                                final Object payload,
@@ -501,7 +516,10 @@ public class MuleClient implements Disposable
      * @return the result message if any of the invocation
      * @throws org.mule.api.MuleException if the dispatch fails or the components or
      *             transfromers cannot be found
+     *
+     * <b>Deprecated from 3.6.0</b> - Only supported with Services. Sending message to remote flows is not supported.
      */
+    @Deprecated
     public FutureMessageResult sendDirectAsync(final String component,
                                                String transformers,
                                                final MuleMessage message) throws MuleException
