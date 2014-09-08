@@ -10,7 +10,6 @@ import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
-import org.mule.module.ws.config.spring.parsers.specific.WSProxyDefinitionParser;
 import org.mule.module.ws.consumer.WSConsumer;
 import org.mule.module.ws.consumer.WSConsumerConfig;
 import org.mule.module.ws.security.WSSecurity;
@@ -25,7 +24,6 @@ public class WSNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         // Flow Constructs
-        registerBeanDefinitionParser("proxy", new WSProxyDefinitionParser());
         registerBeanDefinitionParser("consumer-config", new OrphanDefinitionParser(WSConsumerConfig.class, true));
         registerBeanDefinitionParser("consumer", new MessageProcessorDefinitionParser(WSConsumer.class));
         registerBeanDefinitionParser("security", new ChildDefinitionParser("security", WSSecurity.class));
