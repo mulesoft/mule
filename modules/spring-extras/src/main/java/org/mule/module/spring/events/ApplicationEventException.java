@@ -8,8 +8,10 @@ package org.mule.module.spring.events;
 
 /**
  * <code>ApplicationEventException</code> TODO
+ *
+ * <b>Deprecated from 3.6.0.</b>
  */
-
+@Deprecated
 public class ApplicationEventException extends Exception
 {
     /**

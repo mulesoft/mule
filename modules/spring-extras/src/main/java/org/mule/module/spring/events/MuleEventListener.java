@@ -11,8 +11,10 @@ import org.springframework.context.ApplicationListener;
 /**
  * <code>MuleEventListener</code> is a interface that identifies an object as
  * wanting to receive Mule Events
+ *
+ * <b>Deprecated from 3.6.0.</b>
  */
-
+@Deprecated
 public interface MuleEventListener extends ApplicationListener
 {
     // just a marker
