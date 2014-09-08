@@ -398,7 +398,6 @@ public interface MuleEventContext
      * the {@link org.mule.construct.Flow#process(MuleEvent)} method once you have obtained the flow instance from the
      * {@link org.mule.api.registry.MuleRegistry}.
      */
-     */
     @Deprecated
     MuleMessage requestEvent(EndpointURI endpoint, long timeout) throws MuleException;
 
