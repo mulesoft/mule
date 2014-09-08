@@ -14,7 +14,10 @@ import java.io.Serializable;
 /**
  * The message type used for the handshake between the client {@link RemoteDispatcher} and the server
  * {@link RemoteDispatcherAgent}.
+ *
+ * <b>Deprecated as of 3.6.0</b>
  */
+@Deprecated
 public class ServerHandshake implements Serializable
 {
     public static final String SERVER_HANDSHAKE_PROPERTY = MuleProperties.PROPERTY_PREFIX + "CLIENT_HANDSHAKE";

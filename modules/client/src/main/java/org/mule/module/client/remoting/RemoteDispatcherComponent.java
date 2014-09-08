@@ -60,8 +60,10 @@ import org.apache.commons.logging.LogFactory;
  * responsible for receiving remote requests and dispatching them locally. This
  * allows developer to tunnel requests through http ssl to a Mule instance behind a
  * firewall
+ *
+ * <b>Deprecated as of 3.6.0</b>
  */
-
+@Deprecated
 public class RemoteDispatcherComponent implements Callable, Initialisable
 {
     /**

@@ -10,7 +10,10 @@ import org.mule.module.client.i18n.ClientMessages;
 
 /**
  * Exception is thrown when the server is using a wire format that the client does not support
+ *
+ * <b>Deprecated as of 3.6.0</b>
  */
+@Deprecated
 public class UnsupportedWireFormatException extends RemoteDispatcherException
 {
     public UnsupportedWireFormatException(String wireFormat, Exception e)

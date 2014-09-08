@@ -899,6 +899,7 @@ public class MuleClient implements Disposable
         throw new UnsupportedOperationException("registerComponent");
     }
 
+    @Deprecated
     public RemoteDispatcher getRemoteDispatcher(String serverEndpoint) throws MuleException
     {
         RemoteDispatcher rd = new RemoteDispatcher(serverEndpoint, muleContext);
@@ -907,6 +908,7 @@ public class MuleClient implements Disposable
         return rd;
     }
 
+    @Deprecated
     public RemoteDispatcher getRemoteDispatcher(String serverEndpoint, String user, String password)
         throws MuleException
     {

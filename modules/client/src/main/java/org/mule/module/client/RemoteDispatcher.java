@@ -53,8 +53,10 @@ import org.apache.commons.logging.LogFactory;
  * <code>RemoteDispatcher</code> is used to make and receive requests to a remote
  * Mule instance. It is used to proxy requests to Mule using the Server URL as the
  * transport channel.
+ *
+ * <b>Deprecated as of 3.6.0</b>
  */
-
+@Deprecated
 public class RemoteDispatcher implements Disposable
 {
 
