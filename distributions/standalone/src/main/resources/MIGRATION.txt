@@ -17,3 +17,4 @@ MULE-7753: The maven archetypes and maven archetype builder projects have been r
            The Mule ESB Maven Tools project contains archetypes superceeding these ones.
            The project is hosted at https://github.com/mulesoft/mule-esb-maven-tools
 MULE-7857: The RemoteDispatcher and related classes in the client module have been removed.
+MULE-7858: Support for spring events and related classes in the spring-extras module have been removed.
