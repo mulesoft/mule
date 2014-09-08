@@ -217,7 +217,12 @@ public interface MuleEventContext
      * @throws org.mule.api.MuleException if the dispatch fails or the components or
      *             transfromers cannot be found
      * @see FutureMessageResult
+     *
+     * <b>Deprecated from 3.6.0</b> - Only supported with Services. To invoke a flow directly you need to invoke
+     * the {@link org.mule.construct.Flow#process(MuleEvent)} method once you have obtained the flow instance from the
+     * {@link org.mule.api.registry.MuleRegistry}.
      */
+    @Deprecated
     FutureMessageResult sendEventAsync(Object message, int timeout) throws MuleException;
 
     /**
@@ -235,7 +240,12 @@ public interface MuleEventContext
      * @throws org.mule.api.MuleException if the dispatch fails or the components or
      *             transfromers cannot be found
      * @see FutureMessageResult
+     *
+     * <b>Deprecated from 3.6.0</b> - Only supported with Services. To invoke a flow directly you need to invoke
+     * the {@link org.mule.construct.Flow#process(MuleEvent)} method once you have obtained the flow instance from the
+     * {@link org.mule.api.registry.MuleRegistry}.
      */
+    @Deprecated
     FutureMessageResult sendEventAsync(MuleMessage message, int timeout) throws MuleException;
 
     /**
@@ -287,7 +297,10 @@ public interface MuleEventContext
      * @param message the message to send
      * @throws MuleException if there is no outbound endpoint configured on the
      *             service or the events fails during dispatch
-     * @deprecated
+     *
+     * <b>Deprecated from 3.6.0</b> - Only supported with Services. To invoke a flow directly you need to invoke
+     * the {@link org.mule.construct.Flow#process(MuleEvent)} method once you have obtained the flow instance from the
+     * {@link org.mule.api.registry.MuleRegistry}.
      */
     @Deprecated
     void dispatchEvent(MuleMessage message) throws MuleException;
@@ -299,7 +312,10 @@ public interface MuleEventContext
      * @param payload the message payloadto send
      * @throws MuleException if there is no outbound endpoint configured on the
      *             service or the events fails during dispatch
-     * @deprecated
+     *
+     * <b>Deprecated from 3.6.0</b> - Only supported with Services. To invoke a flow directly you need to invoke
+     * the {@link org.mule.construct.Flow#process(MuleEvent)} method once you have obtained the flow instance from the
+     * {@link org.mule.api.registry.MuleRegistry}.
      */
     @Deprecated
     void dispatchEvent(Object payload) throws MuleException;
@@ -314,7 +330,10 @@ public interface MuleEventContext
      *            configuration and then on the mule manager configuration
      * @throws MuleException if the event fails to be processed by the service or
      *             the transport for the endpoint
-     * @deprecated
+     *
+     * <b>Deprecated from 3.6.0</b> - Only supported with Services. To invoke a flow directly you need to invoke
+     * the {@link org.mule.construct.Flow#process(MuleEvent)} method once you have obtained the flow instance from the
+     * {@link org.mule.api.registry.MuleRegistry}.
      */
     @Deprecated
     void dispatchEvent(MuleMessage message, EndpointURI endpoint) throws MuleException;
@@ -374,7 +393,11 @@ public interface MuleEventContext
      * @param timeout time in milliseconds before the request timesout
      * @return The requested event or null if the request times out
      * @throws MuleException if the request operation fails
-     * @deprecated
+     *
+     * <b>Deprecated from 3.6.0</b> - Only supported with Services. To invoke a flow directly you need to invoke
+     * the {@link org.mule.construct.Flow#process(MuleEvent)} method once you have obtained the flow instance from the
+     * {@link org.mule.api.registry.MuleRegistry}.
+     */
      */
     @Deprecated
     MuleMessage requestEvent(EndpointURI endpoint, long timeout) throws MuleException;
