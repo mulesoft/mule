@@ -16,3 +16,4 @@ MULE-7473: The deprecated methods in the Transformer interface have been removed
 MULE-7753: The maven archetypes and maven archetype builder projects have been removed.
            The Mule ESB Maven Tools project contains archetypes superceeding these ones.
            The project is hosted at https://github.com/mulesoft/mule-esb-maven-tools
+MULE-7857: The RemoteDispatcher and related classes in the client module have been removed.
