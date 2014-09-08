@@ -18,8 +18,10 @@ import org.springframework.context.ApplicationListener;
  * <code>AsynchronousEventListener</code> will proces a received MuleEvent in a
  * separate Thread. The thread pool passed in the constructor will determine how many
  * threads can be executed at any time.
- */
-
+ *
+ * <b>Deprecated from 3.6.0.</b>
+*/
+@Deprecated
 public class AsynchronousEventListener implements MuleEventListener
 {
     /**

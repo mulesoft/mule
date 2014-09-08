@@ -108,7 +108,10 @@ import org.springframework.context.event.ContextRefreshedEvent;
  * @see MuleEventListener
  * @see MuleSubscriptionEventListener
  * @see ApplicationEventMulticaster
+ *
+ * <b>Deprecated from 3.6.0.</b>
  */
+@Deprecated
 public class MuleEventMulticaster
     implements ApplicationEventMulticaster, ApplicationContextAware, MuleContextAware, Callable, Initialisable
 {

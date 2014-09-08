@@ -19,8 +19,10 @@ import org.springframework.context.ApplicationEvent;
 /**
  * <code>MuleApplicationEvent</code> is an Spring ApplicationEvent used to wrap a
  * DefaultMuleEvent
+ *
+ * <b>Deprecated from 3.6.0.</b>
  */
-
+@Deprecated
 public class MuleApplicationEvent extends ApplicationEvent
 {
     /**
