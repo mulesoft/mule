@@ -211,6 +211,7 @@
         <jsr181Version>1.0-MR1</jsr181Version>
         <jsr250AnnotationVerson>1.0</jsr250AnnotationVerson>
         <log4jVersion>1.2.16</log4jVersion>
+        <junitVersion>4.11</junitVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <!-- TODO EE-1395 -->
         <mqSeriesVersion>6.0</mqSeriesVersion>
@@ -509,7 +510,7 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.11</version>
+                <version>${junitVersion}</version>
             </dependency>
             <dependency>
                 <groupId>xmlunit</groupId>
