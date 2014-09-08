@@ -45,7 +45,6 @@ import org.mule.transformer.TransformerUtils;
 import org.mule.transport.NullPayload;
 import org.mule.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -96,8 +95,6 @@ public class MuleClient implements Disposable
      * The local MuleContext instance.
      */
     private MuleContext muleContext;
-
-    private List<RemoteDispatcher> dispatchers = new ArrayList<RemoteDispatcher>();
 
     private MuleCredentials user;
 
@@ -899,24 +896,6 @@ public class MuleClient implements Disposable
         throw new UnsupportedOperationException("registerComponent");
     }
 
-    public RemoteDispatcher getRemoteDispatcher(String serverEndpoint) throws MuleException
-    {
-        RemoteDispatcher rd = new RemoteDispatcher(serverEndpoint, muleContext);
-        rd.setExecutor(muleContext.getWorkManager());
-        dispatchers.add(rd);
-        return rd;
-    }
-
-    public RemoteDispatcher getRemoteDispatcher(String serverEndpoint, String user, String password)
-        throws MuleException
-    {
-        RemoteDispatcher rd = new RemoteDispatcher(serverEndpoint, new MuleCredentials(user,
-            password.toCharArray()), muleContext);
-        rd.setExecutor(muleContext.getWorkManager());
-        dispatchers.add(rd);
-        return rd;
-    }
-
     /**
      * Will dispose the MuleManager instance <b>if</b> a new instance was created for this
      * client. Otherwise this method only cleans up resources no longer needed
@@ -924,14 +903,6 @@ public class MuleClient implements Disposable
     @Override
     public void dispose()
     {
-        synchronized (dispatchers)
-        {
-            for (RemoteDispatcher remoteDispatcher : dispatchers)
-            {
-                remoteDispatcher.dispose();
-            }
-            dispatchers.clear();
-        }
         // Dispose the muleContext only if the muleContext was created for this
         // client
         if (muleContext.getConfiguration().isClientMode())
