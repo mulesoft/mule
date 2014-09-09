@@ -39,6 +39,7 @@ import org.mule.module.launcher.domain.MuleDomainClassLoaderRepository;
 import org.mule.module.launcher.domain.TestDomainFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
@@ -2460,9 +2461,26 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertStatus(app, status);
     }
 
-    private void assertStatus(Application application, ApplicationStatus status)
+    private void assertStatus(final Application application, final ApplicationStatus status)
     {
-        assertThat(application.getStatus(), is(status));
+        Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
+        prober.check(new JUnitProbe()
+        {
+            @Override
+            protected boolean test() throws Exception
+            {
+                assertThat(application.getStatus(), is(status));
+                return true;
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return String.format("Application %s was expected to be in status %s but was %s instead",
+                                     application.getArtifactName(), status.name(), application.getStatus().name());
+            }
+        });
+
     }
 
     private void assertDeploymentFailure(final DeploymentListener listener, final String artifactName, final VerificationMode mode)
