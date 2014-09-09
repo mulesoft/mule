@@ -66,7 +66,7 @@ public class CatchExceptionStrategyFlowRefTestCase extends FunctionalTestCase
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             Transaction tx = TransactionCoordination.getInstance().getTransaction();
-            assertThat(tx, IsNull.<Object>notNullValue());
+            assertThat(tx, IsNull.notNullValue());
             assertThat(tx.isRollbackOnly(), Is.is(false));
             return event;
         }

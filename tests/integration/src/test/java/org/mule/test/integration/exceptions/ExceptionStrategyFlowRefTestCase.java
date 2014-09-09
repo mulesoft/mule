@@ -33,7 +33,7 @@ public class ExceptionStrategyFlowRefTestCase extends FunctionalTestCase
         LocalMuleClient client = muleContext.getClient();
         client.send("vm://inExceptionBlock", MESSAGE, null, TIMEOUT);
         MuleMessage response = client.request("jms://dlq", TIMEOUT);
-        assertThat(response, IsNull.<Object>notNullValue());
+        assertThat(response, IsNull.notNullValue());
         assertThat(response.<String>getInboundProperty("mainEs"), Is.is("yes"));
         assertThat(response.<String>getInboundProperty("flowRefEs"), Is.is("yes"));
     }

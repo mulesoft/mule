@@ -61,9 +61,9 @@ public class JmsConcurrentConsumerExecutionTestCase extends FunctionalTestCase
         Flow flowWithTxConfigured = (Flow) getFlowConstruct("flowWithTxConfigured");
         flowWithTxConfigured.stop();
         MuleMessage muleMessage = muleClient.request("jms://in", TIMEOUT);
-        assertThat(muleMessage, IsNull.<Object>notNullValue());
+        assertThat(muleMessage, IsNull.notNullValue());
         muleMessage = muleClient.request("jms://in", TIMEOUT);
-        assertThat(muleMessage, IsNull.<Object>nullValue());
+        assertThat(muleMessage, IsNull.nullValue());
     }
 
     public static class SuccessComponent implements Callable

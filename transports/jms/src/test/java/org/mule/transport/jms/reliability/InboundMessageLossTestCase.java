@@ -133,7 +133,7 @@ public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase
         {
             fail("Message should have been redelivered");
         }
-        assertThat(muleContext.getClient().request("jms://rollbackOnException?connector=jmsConnectorNoRedelivery", RECEIVE_TIMEOUT / 10), IsNull.<Object>nullValue());
+        assertThat(muleContext.getClient().request("jms://rollbackOnException?connector=jmsConnectorNoRedelivery", RECEIVE_TIMEOUT / 10), IsNull.nullValue());
     }
 
     @Test

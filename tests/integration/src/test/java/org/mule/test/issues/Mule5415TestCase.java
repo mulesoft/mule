@@ -38,6 +38,6 @@ public class Mule5415TestCase extends FunctionalTestCase
         HashMap<String, Object> properties = new HashMap<String, Object>();
         properties.put("Content-Type","application/x-www-form-urlencoded");
         MuleMessage message = client.send(String.format("http://localhost:%s?param1=1&param2=3", port1.getNumber()), "message", properties);
-        assertThat(message.getExceptionPayload(), IsNull.<Object>nullValue());
+        assertThat(message.getExceptionPayload(), IsNull.nullValue());
     }
 }

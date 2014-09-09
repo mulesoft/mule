@@ -68,9 +68,9 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase
     @Test
     public void testGetNonMuleExceptionCause()
     {
-        assertThat(ExceptionHelper.getNonMuleException(new ResolverException(CoreMessages.failedToBuildMessage(), null)), IsNull.<Object>nullValue());
+        assertThat(ExceptionHelper.getNonMuleException(new ResolverException(CoreMessages.failedToBuildMessage(), null)), IsNull.nullValue());
         assertThat(ExceptionHelper.getNonMuleException(new ResolverException(CoreMessages.failedToBuildMessage(),
-                new ConfigurationException(CoreMessages.failedToBuildMessage(), null))), IsNull.<Object>nullValue());
+                new ConfigurationException(CoreMessages.failedToBuildMessage(), null))), IsNull.nullValue());
         assertThat(ExceptionHelper.getNonMuleException(new ResolverException(CoreMessages.failedToBuildMessage(),
                 new ConfigurationException(CoreMessages.failedToBuildMessage(),
                         new IllegalArgumentException()))), IsInstanceOf.instanceOf(IllegalArgumentException.class));

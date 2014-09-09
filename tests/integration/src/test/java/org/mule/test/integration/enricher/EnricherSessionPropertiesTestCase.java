@@ -38,9 +38,9 @@ public class EnricherSessionPropertiesTestCase extends FunctionalTestCase
         System.setProperty("mule.enricher.propagateSession", "true");
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in", "some message", null, 3000);
-        assertThat(response, IsNull.<Object> notNullValue());
+        assertThat(response, IsNull. notNullValue());
         assertThat(response.getPayloadAsString(), is("some message"));
-        assertThat(response.getExceptionPayload(), IsNull.<Object> nullValue());
+        assertThat(response.getExceptionPayload(), IsNull.nullValue());
     }
 
     public static class Spy implements MessageProcessor

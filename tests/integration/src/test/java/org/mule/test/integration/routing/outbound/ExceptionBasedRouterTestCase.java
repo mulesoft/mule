@@ -117,11 +117,11 @@ public class ExceptionBasedRouterTestCase extends AbstractServiceAndFlowTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("jms://in", "some message", null, RECEIVE_TIMEOUT);
-        assertThat(result, IsNull.<Object>notNullValue());
+        assertThat(result, IsNull.notNullValue());
         assertThat((NullPayload) result.getPayload(), is(NullPayload.getInstance()));
-        assertThat(result.getExceptionPayload(), IsNull.<Object>nullValue());
+        assertThat(result.getExceptionPayload(), IsNull.nullValue());
         MuleMessage outputMessage = client.request("jms://out",RECEIVE_TIMEOUT);
-        assertThat(outputMessage, IsNull.<Object>notNullValue());
+        assertThat(outputMessage, IsNull.notNullValue());
         assertThat(outputMessage.getPayloadAsString(), is("some message"));
     }
 }

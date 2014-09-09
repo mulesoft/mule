@@ -45,8 +45,8 @@ public class HttpVmSessionPropertiesTestCase extends FunctionalTestCase
 
         Map<String, Object> properties = Collections.emptyMap();
         MuleMessage message = client.send("http://localhost:" + dynamicPort1.getNumber() + "/http-inbound-flow", "some message", properties);
-        assertThat(message, IsNull.<Object>notNullValue());
-        assertThat(message.getExceptionPayload(), IsNull.<Object>nullValue());
+        assertThat(message, IsNull.notNullValue());
+        assertThat(message.getExceptionPayload(), IsNull.nullValue());
     }
 
     /**
@@ -59,7 +59,7 @@ public class HttpVmSessionPropertiesTestCase extends FunctionalTestCase
 
         Map<String, Object> properties = Collections.emptyMap();
         MuleMessage message = client.send("vm://vm-inbound-flow", "some message", properties);
-        assertThat(message, IsNull.<Object>notNullValue());
-        assertThat(message.getExceptionPayload(), IsNull.<Object>nullValue());
+        assertThat(message, IsNull.notNullValue());
+        assertThat(message.getExceptionPayload(), IsNull.nullValue());
     }
 }
