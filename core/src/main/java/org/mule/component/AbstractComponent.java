@@ -29,7 +29,6 @@ import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
-import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
@@ -346,11 +345,8 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
             sb.append(".");
         }
         sb.append("component");
-        if (!(flowConstruct instanceof Service))
-        {
-            sb.append(".");
-            sb.append(System.identityHashCode(this));
-        }
+        sb.append(".");
+        sb.append(System.identityHashCode(this));
         return sb.toString();
     }
 

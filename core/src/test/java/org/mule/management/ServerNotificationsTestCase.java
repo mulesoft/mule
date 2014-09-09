@@ -12,19 +12,15 @@ import static org.junit.Assert.assertTrue;
 import org.mule.api.context.notification.CustomNotificationListener;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.context.notification.ServiceNotificationListener;
 import org.mule.context.notification.CustomNotification;
-import org.mule.context.notification.FlowConstructNotification;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class ServerNotificationsTestCase extends AbstractMuleContextTestCase
@@ -89,62 +85,6 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase
 
         assertTrue(managerStopped.get());
         assertEquals(1, managerStoppedEvents.get());
-    }
-
-    @Test
-    @Ignore // Flow doesn't fire lifecycle notifications
-    public void testStandardNotificationsWithSubscription() throws Exception
-    {
-        final CountDownLatch latch = new CountDownLatch(1);
-        muleContext.registerListener(new ServiceNotificationListener()
-        {
-            public void onNotification(ServerNotification notification)
-            {
-                if (notification.getAction() == FlowConstructNotification.FLOW_CONSTRUCT_STARTED)
-                {
-                    componentStartedCount.incrementAndGet();
-                    assertEquals("component1", notification.getResourceIdentifier());
-                    latch.countDown();
-                }
-            }
-        }, "component1");
-
-        getTestFlow("component2", Apple.class);
-        getTestFlow("component1", Apple.class);
-
-
-        // Wait for the notifcation event to be fired as they are queued
-        latch.await(20000, TimeUnit.MILLISECONDS);
-        assertEquals(1, componentStartedCount.get());
-    }
-
-    @Test
-    @Ignore // Flow doesn't fire lifecycle notifications
-    public void testStandardNotificationsWithWildcardSubscription() throws Exception
-    {
-        final CountDownLatch latch = new CountDownLatch(2);
-
-        muleContext.registerListener(new ServiceNotificationListener()
-        {
-            public void onNotification(ServerNotification notification)
-            {
-                if (notification.getAction() == FlowConstructNotification.FLOW_CONSTRUCT_STARTED)
-                {
-                    componentStartedCount.incrementAndGet();
-                    assertFalse("noMatchComponent".equals(notification.getResourceIdentifier()));
-                    latch.countDown();
-                }
-            }
-        }, "component*");
-
-        //Components automatically get registered
-        getTestFlow("component2", Apple.class);
-        getTestFlow("component1", Apple.class);
-        getTestFlow("noMatchComponent", Apple.class);
-
-        // Wait for the notifcation event to be fired as they are queued
-        latch.await(2000, TimeUnit.MILLISECONDS);
-        assertEquals(2, componentStartedCount.get());
     }
 
     @Test

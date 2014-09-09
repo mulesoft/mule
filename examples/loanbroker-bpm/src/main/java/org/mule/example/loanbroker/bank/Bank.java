@@ -8,8 +8,6 @@ package org.mule.example.loanbroker.bank;
 
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
-import org.mule.api.service.Service;
-import org.mule.api.service.ServiceAware;
 import org.mule.example.loanbroker.LocaleMessage;
 import org.mule.example.loanbroker.messages.LoanBrokerQuoteRequest;
 import org.mule.example.loanbroker.messages.LoanQuote;
@@ -24,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
  * quotes.
  */
 
-public class Bank implements ServiceAware, FlowConstructAware, Serializable, BankService
+public class Bank implements FlowConstructAware, Serializable, BankService
 {
     /**
      * Serial version
@@ -47,11 +45,6 @@ public class Bank implements ServiceAware, FlowConstructAware, Serializable, Ban
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         this.bankName = flowConstruct.getName(); 
-    }
-
-    public void setService(Service service)
-    {
-        this.bankName = service.getName(); 
     }
 
     public LoanQuote getLoanQuote(LoanBrokerQuoteRequest request)

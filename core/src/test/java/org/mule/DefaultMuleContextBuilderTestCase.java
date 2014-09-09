@@ -8,7 +8,6 @@ package org.mule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleContext;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.notification.AsyncMessageNotificationListener;
@@ -17,7 +16,6 @@ import org.mule.api.context.notification.ConnectionNotificationListener;
 import org.mule.api.context.notification.CustomNotificationListener;
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.api.context.notification.ManagementNotificationListener;
-import org.mule.api.context.notification.ModelNotificationListener;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.PipelineMessageNotificationListener;
 import org.mule.api.context.notification.RegistryNotificationListener;
@@ -25,7 +23,6 @@ import org.mule.api.context.notification.RoutingNotificationListener;
 import org.mule.api.context.notification.SecurityNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
-import org.mule.api.context.notification.ServiceNotificationListener;
 import org.mule.api.context.notification.TransactionNotificationListener;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.context.DefaultMuleContextBuilder;
@@ -35,14 +32,12 @@ import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.CustomNotification;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.context.notification.ManagementNotification;
-import org.mule.context.notification.ModelNotification;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.PipelineMessageNotification;
 import org.mule.context.notification.RegistryNotification;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.context.notification.ServerNotificationManager;
-import org.mule.context.notification.ServiceNotification;
 import org.mule.context.notification.TransactionNotification;
 import org.mule.lifecycle.MuleContextLifecycleManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -101,9 +96,7 @@ public class DefaultMuleContextBuilderTestCase extends AbstractMuleTestCase
                 muleContext.getNotificationManager().getInterfaceToTypes();
 
         assertEquals(MuleContextNotification.class, interfaces.get(MuleContextNotificationListener.class).toArray()[0]);
-        assertEquals(ModelNotification.class, interfaces.get(ModelNotificationListener.class).toArray()[0]);
         assertEquals(RoutingNotification.class, interfaces.get(RoutingNotificationListener.class).toArray()[0]);
-        assertEquals(ServiceNotification.class, interfaces.get(ServiceNotificationListener.class).toArray()[0]);
         assertEquals(SecurityNotification.class, interfaces.get(SecurityNotificationListener.class).toArray()[0]);
         assertEquals(ManagementNotification.class, interfaces.get(ManagementNotificationListener.class).toArray()[0]);
         assertEquals(CustomNotification.class, interfaces.get(CustomNotificationListener.class).toArray()[0]);

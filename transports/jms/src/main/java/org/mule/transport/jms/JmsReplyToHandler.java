@@ -12,11 +12,9 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.management.stats.ServiceStatistics;
 import org.mule.transport.DefaultReplyToHandler;
 import org.mule.transport.jms.i18n.JmsMessages;
 import org.mule.transport.jms.transformers.ObjectToJMSMessage;
@@ -127,15 +125,6 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             {
                 correlationIDString = eventMsg.getInboundProperty(JmsConstants.JMS_MESSAGE_ID);
                 replyToMessage.setJMSCorrelationID(correlationIDString);
-            }
-
-            if (event.getFlowConstruct() instanceof Service)
-            {
-                ServiceStatistics stats = ((Service) event.getFlowConstruct()).getStatistics();
-                if (stats.isEnabled())
-                {
-                    stats.incSentReplyToEvent();
-                }
             }
 
             if (ttlString == null && priorityString == null && persistentDeliveryString == null)

@@ -21,13 +21,11 @@ import org.mule.api.context.notification.CustomNotificationListener;
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.api.context.notification.ExceptionStrategyNotificationListener;
 import org.mule.api.context.notification.ManagementNotificationListener;
-import org.mule.api.context.notification.ModelNotificationListener;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.PipelineMessageNotificationListener;
 import org.mule.api.context.notification.RegistryNotificationListener;
 import org.mule.api.context.notification.RoutingNotificationListener;
 import org.mule.api.context.notification.SecurityNotificationListener;
-import org.mule.api.context.notification.ServiceNotificationListener;
 import org.mule.api.context.notification.TransactionNotificationListener;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.client.DefaultLocalMuleClient;
@@ -42,14 +40,12 @@ import org.mule.context.notification.CustomNotification;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.context.notification.ExceptionStrategyNotification;
 import org.mule.context.notification.ManagementNotification;
-import org.mule.context.notification.ModelNotification;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.PipelineMessageNotification;
 import org.mule.context.notification.RegistryNotification;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.context.notification.ServerNotificationManager;
-import org.mule.context.notification.ServiceNotification;
 import org.mule.context.notification.TransactionNotification;
 import org.mule.exception.DefaultSystemExceptionStrategy;
 import org.mule.expression.DefaultExpressionManager;
@@ -286,10 +282,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         ServerNotificationManager manager = new ServerNotificationManager();
         manager.addInterfaceToType(MuleContextNotificationListener.class,
                                    MuleContextNotification.class);
-        manager.addInterfaceToType(ModelNotificationListener.class, ModelNotification.class);
         manager.addInterfaceToType(RoutingNotificationListener.class, RoutingNotification.class);
-        manager.addInterfaceToType(ServiceNotificationListener.class,
-                                   ServiceNotification.class);
         manager.addInterfaceToType(SecurityNotificationListener.class,
                                    SecurityNotification.class);
         manager.addInterfaceToType(ManagementNotificationListener.class,

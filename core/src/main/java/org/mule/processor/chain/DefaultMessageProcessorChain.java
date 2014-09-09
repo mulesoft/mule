@@ -15,12 +15,10 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.Pipeline;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.RequestReplyReplierMessageProcessor;
-import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.construct.Flow;
 import org.mule.execution.MessageProcessorExecutionTemplate;
@@ -80,13 +78,12 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
         else
         {
             FlowConstruct flowConstruct = event.getFlowConstruct();
-            boolean flowConstructIsNotAService = !(flowConstruct instanceof Service);
             MuleEvent copy = null;
             
             for (int i = 0; i < processors.size(); i++)
             {
                 MessageProcessor processor = processors.get(i);
-                if (flowConstructIsNotAService && processorMayReturnNull(processor))
+                if (processorMayReturnNull(processor))
                 {
                     copy = OptimizedRequestContext.criticalSetEvent(event);
                 }
@@ -95,15 +92,7 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
 
                 if (VoidMuleEvent.getInstance().equals(event))
                 {
-                    if (flowConstructIsNotAService)
-                    {
                         event = copy;
-                    }
-                    else
-                    {
-                        // But in a service we don't do any implicit branching.
-                        return null;
-                    }
                 }
                 else if (event == null)
                 {

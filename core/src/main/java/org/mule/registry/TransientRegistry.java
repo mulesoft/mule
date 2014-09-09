@@ -12,13 +12,11 @@ import org.mule.api.agent.Agent;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.model.Model;
 import org.mule.api.registry.InjectProcessor;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.ObjectProcessor;
 import org.mule.api.registry.PreInitProcessor;
 import org.mule.api.registry.RegistrationException;
-import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.MessageFactory;
@@ -83,8 +81,6 @@ public class TransientRegistry extends AbstractRegistry
         applyProcessors(lookupObjects(Transformer.class), null);
         applyProcessors(lookupObjects(ImmutableEndpoint.class), null);
         applyProcessors(lookupObjects(Agent.class), null);
-        applyProcessors(lookupObjects(Model.class), null);
-        applyProcessors(lookupObjects(Service.class), null);
         applyProcessors(lookupObjects(Object.class), null);
     }
 

@@ -136,7 +136,6 @@
             <xsd:element ref="abstract-flow-construct" />
             <xsd:element ref="flow" />
             <xsd:element ref="sub-flow" />
-            <xsd:element ref="abstract-model"/>
             <xsd:element ref="abstract-interceptor-stack"/>
             <xsd:element ref="abstract-filter"/>
             <xsd:element ref="abstract-transformer"/>
@@ -1507,22 +1506,6 @@
     <xsd:simpleType name="notificationTypes">
         <xsd:restriction base="xsd:NMTOKEN">
             <xsd:enumeration value="CONTEXT"/>
-            <xsd:enumeration value="MODEL">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        DEPRECATED: The use of 'model' and 'service' is deprecated in Mule 3.4 and will be removed in Mule 4.0. As such this
-                        notification is also deprecated and will be removed in Mule 4.0.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:enumeration>
-            <xsd:enumeration value="SERVICE">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        DEPRECATED: The use of 'model' and 'service' is deprecated in Mule 3.4 and will be removed in Mule 4.0. As such this
-                        notification is also deprecated and will be removed in Mule 4.0.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:enumeration>
             <xsd:enumeration value="SECURITY"/>
             <xsd:enumeration value="ASYNC-MESSAGE"/>
             <xsd:enumeration value="ENDPOINT-MESSAGE"/>
@@ -1539,77 +1522,6 @@
             <xsd:enumeration value="ROUTING"/>
         </xsd:restriction>
     </xsd:simpleType>
-    <!--==============================================================-->
-    <!-- Models                                                       -->
-    <!--==============================================================-->
-
-    <xsd:element name="abstract-model" abstract="true" type="abstractModelType">
-        <xsd:annotation>
-            <xsd:documentation>
-                DEPRECATED: The 'model' element is deprecated in Mule 3.4 and will be removed in Mule 4.0.  Flows do not need to be configured inside a 'model' element. 
-                A placeholder for model elements. A model provides basic settings and processing for all the services it contains.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="abstractModelType">
-        <xsd:complexContent>
-            <xsd:extension base="annotatedType">
-                <xsd:sequence>
-                    <xsd:element ref="legacy-abstract-exception-strategy" minOccurs="0"/>
-                    <xsd:group ref="entryPointResolvers"/>
-                    <xsd:element ref="abstract-service" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-                <xsd:attribute name="name" type="nonBlankString">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The name used to identify this model.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="seda-model" type="sedaModelType" substitutionGroup="abstract-model">
-        <xsd:annotation>
-            <xsd:documentation>
-                DEPRECATED: The 'model' element is deprecated in Mule 3.4 and will be removed in Mule 4.0.  Flows do not need to be configured inside a 'model' element. 
-                A staged event-driven architecture (SEDA) model has separate threads and queues for each service.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="sedaModelType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractModelType">
-                <xsd:sequence>
-                    <xsd:element ref="abstract-queue-profile" minOccurs="0"/>
-                </xsd:sequence>
-                <xsd:attribute name="inherit" type="xsd:boolean">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            If true, this model element is an extension of a previous model element with the same name.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="model" type="defaultModelType" substitutionGroup="abstract-model">
-        <xsd:annotation>
-            <xsd:documentation>
-                DEPRECATED: The 'model' element is deprecated in Mule 3.4 and will be removed in Mule 4.0.  Flows do not need to be configured inside a 'model' element. 
-                The container for a set of services, providing basic settings and processing for all the services it contains.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="defaultModelType">
-        <xsd:complexContent>
-            <xsd:extension base="sedaModelType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <!-- Model elements -->
 
     <xsd:element name="abstract-queue-profile" abstract="true" type="abstractQueueProfileType">
         <xsd:annotation>
@@ -1876,108 +1788,6 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-    </xsd:complexType>
-
-    <!--==============================================================-->
-    <!--  Services                                                    -->
-    <!--==============================================================-->
-
-    <xsd:element name="abstract-service" abstract="true" type="abstractServiceType">
-        <xsd:annotation>
-            <xsd:documentation>
-                DEPRECATED: Services are deprecated in Mule 3.4 and will be removed in Mule 4.0. 
-                A placeholder for a service element. Services combine message routing with a component (typically a POJO).
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="abstractServiceType">
-        <xsd:complexContent>
-            <xsd:extension base="annotatedType">
-                <xsd:attribute name="name" type="nonBlankString" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The name used to identify this service.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="baseServiceType">
-        <xsd:annotation>
-            <xsd:documentation>
-                Base support for a model-based wrapper around the POJO service (SEDA, Streaming, etc.)
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexContent>
-            <xsd:extension base="abstractServiceType">
-                <xsd:sequence>
-                    <xsd:element name="description" type="descriptionType" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                This can hold any kind of documentation related to the service. It is intended to be "human readable" only and is not used by the system.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                    <xsd:element name="inbound" type="inboundCollectionType" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                The elements within 'inbound' describe how a service receives messages.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                    <!-- minOccurs="0" to allow for <forwarding-router/> and/or default component -->
-                    <xsd:element ref="abstract-component" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                The service component that is invoked when incoming messages are received. If this element is not present, the service simply bridges the inbound and outbound using a pass-through component.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                    <xsd:element name="outbound" type="outboundCollectionType" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                The elements within 'outbound' describe how a service sends or dispatches messages.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                    <xsd:element name="async-reply" type="asyncReplyCollectionType" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                The elements within 'async-reply' describe how asynchronous replies are handled.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                    <xsd:element ref="legacy-abstract-exception-strategy" minOccurs="0"/>
-                    <xsd:element ref="abstract-message-info-mapping" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                The message info mapper used to extract key bits of the message
-                                information, such as Message ID or Correlation ID. these
-                                properties
-                                are used by some routers and this mapping information tells Mule
-                                where to get the information from in the current message.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                </xsd:sequence>
-                <xsd:attribute name="initialState" default="started">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The initial state of the service. Usually a service is started automatically ("started"), but this attribute can be used to disable initial startup ("stopped") or start the service in a paused state ("paused").
-                        </xsd:documentation>
-                    </xsd:annotation>
-                    <xsd:simpleType>
-                        <xsd:restriction base="xsd:NMTOKEN">
-                            <xsd:enumeration value="started"/>
-                            <xsd:enumeration value="stopped"/>
-                            <xsd:enumeration value="paused"/>
-                        </xsd:restriction>
-                    </xsd:simpleType>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
     </xsd:complexType>
 
     <!-- This is left in for backwards-compatibility only, remove for next major version. -->
@@ -2268,63 +2078,6 @@
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="abstractAsyncReplyRouterType"/>
-
-    <xsd:element name="service" type="sedaServiceType" substitutionGroup="abstract-service">
-        <xsd:annotation>
-            <xsd:documentation>
-                DEPRECATED: Services are deprecated in Mule 3.4 and will be removed in Mule 4.0.
-                Describes how to receive messages, deliver them to a component, and handle the results (if any).
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="sedaServiceType">
-        <xsd:complexContent>
-            <xsd:extension base="baseServiceType">
-                <xsd:sequence>
-                    <xsd:element ref="abstract-service-threading-profile" minOccurs="0"/>
-                    <xsd:element ref="abstract-queue-profile" minOccurs="0"/>
-                </xsd:sequence>
-                <xsd:attribute name="queueTimeout" type="substitutableInt">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The timeout used when taking messages from the service queue.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="custom-service" type="customServiceType" substitutionGroup="abstract-service">
-        <xsd:annotation>
-            <xsd:documentation>
-                DEPRECATED: Services are deprecated in Mule 3.4 and will be removed in Mule 4.0.
-                A user-implemented service (typically used only in testing).
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="customServiceType">
-        <xsd:complexContent>
-            <xsd:extension base="baseServiceType">
-                <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Spring-style property element for custom configuration.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The class to use for the service.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
 
     <xsd:element name="abstract-service-threading-profile" abstract="true"
                  type="abstractServiceThreadingProfileType">

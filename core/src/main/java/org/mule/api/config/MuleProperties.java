@@ -90,13 +90,6 @@ public class MuleProperties
 
     /**
      * *****************************************************************************
-     * Model Service descriptor properties
-     * *****************************************************************************
-     */
-    public static final String MODEL_CLASS = "model";
-
-    /**
-     * *****************************************************************************
      * Transport Service descriptor properties
      * *****************************************************************************
      */
@@ -128,7 +121,6 @@ public class MuleProperties
 
     // Object Name Keys
     public static final String OBJECT_MULE_CONTEXT = "_muleContext";
-    public static final String OBJECT_SYSTEM_MODEL = "_muleSystemModel";
     public static final String OBJECT_MULE_CONTEXT_PROCESSOR = "_muleContextProcessor";
     public static final String OBJECT_PROPERTY_PLACEHOLDER_PROCESSOR = "_mulePropertyPlaceholderProcessor";
     public static final String OBJECT_OBJECT_NAME_PROCESSOR = "_muleObjectNameProcessor";

@@ -7,7 +7,6 @@
 package org.mule;
 
 import org.mule.api.FutureMessageResult;
-import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
@@ -18,17 +17,13 @@ import org.mule.api.client.LocalMuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.EndpointNotFoundException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transaction.TransactionCoordination;
@@ -206,19 +201,6 @@ public class DefaultMuleEventContext implements MuleEventContext
     }
 
     /**
-     * This will send an event via the configured outbound router on the service
-     *
-     * @param message the message to send
-     * @return the result of the send if any
-     * @throws org.mule.api.MuleException if there is no outbound endpoint configured
-     *             on the service or the events fails during dispatch
-     */
-    public MuleMessage sendEvent(Object message) throws MuleException
-    {
-        return sendEvent(new DefaultMuleMessage(message, event.getMessage(), event.getMuleContext()));
-    }
-
-    /**
      * Depending on the session state this methods either Passes an event
      * synchronously to the next available Mule component in the pool or via the
      * endpoint configured for the event
@@ -232,34 +214,6 @@ public class DefaultMuleEventContext implements MuleEventContext
     public MuleMessage sendEvent(MuleMessage message, OutboundEndpoint endpoint) throws MuleException
     {
         return clientInterface.process(endpoint, message);
-    }
-
-    /**
-     * Depending on the session state this methods either Passes an event
-     * synchronously to the next available Mule component in the pool or via the
-     * endpoint configured for the event
-     *
-     * @param message the message payload to send
-     * @return the return Message from the call or null if there was no result
-     * @throws org.mule.api.MuleException if the event fails to be processed by the
-     *             service or the transport for the endpoint
-     */
-    public MuleMessage sendEvent(MuleMessage message) throws MuleException
-    {
-        if (event.getFlowConstruct() instanceof Service)
-        {
-            Service service = (Service) event.getFlowConstruct();
-            DefaultMuleEvent eventToSend = new DefaultMuleEvent(message,
-                MessageExchangePattern.REQUEST_RESPONSE, service, session);
-            MuleEvent event = service.sendEvent(eventToSend);
-            return event == null || VoidMuleEvent.getInstance().equals(event) ? null : event.getMessage();
-        }
-        else
-        {
-            throw new MessagingException(
-                CoreMessages.createStaticMessage("FlowConstuct is not a 'Service', MuleEventContext cannot send this message"),
-                event);
-        }
     }
 
     /**
@@ -289,73 +243,6 @@ public class DefaultMuleEventContext implements MuleEventContext
 
         OutboundEndpoint endpoint = getMuleContext().getEndpointFactory().getOutboundEndpoint(builder);
         return clientInterface.process(endpoint, message);
-    }
-
-    /**
-     * sends an event request via the configured outbound router for this service.
-     * This method return immediately, but the result of the event invocation
-     * available from the returned a Future result that can be accessed later by the
-     * the returned FutureMessageResult. the Future messageResult can be queried at
-     * any time to check that the invocation has completed. A timeout is associated
-     * with the invocation, which is the maximum time in milli-seconds that the
-     * invocation should take to complete
-     *
-     * @param message the object that is the payload of the event
-     * @param timeout how long to block in milliseconds waiting for a result
-     * @return the result message if any of the invocation
-     * @throws org.mule.api.MuleException if the dispatch fails or the components or
-     *             transfromers cannot be found
-     * @see org.mule.api.FutureMessageResult
-     */
-    public FutureMessageResult sendEventAsync(final Object message, final int timeout) throws MuleException
-    {
-        Callable callable = new Callable()
-        {
-            public Object call() throws Exception
-            {
-                MuleMessage muleMessage = new DefaultMuleMessage(message, event.getMessage(),
-                    event.getMuleContext());
-                muleMessage.setOutboundProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, timeout);
-                return sendEvent(muleMessage);
-            }
-        };
-
-        FutureMessageResult result = new FutureMessageResult(callable, event.getMuleContext());
-        result.execute();
-        return result;
-    }
-
-    /**
-     * sends an event request via the configured outbound router for this service.
-     * This method return immediately, but the result of the event invocation
-     * available from the returned a Future result that can be accessed later by the
-     * the returned FutureMessageResult. the Future messageResult can be queried at
-     * any time to check that the invocation has completed. A timeout is associated
-     * with the invocation, which is the maximum time in milli-seconds that the
-     * invocation should take to complete
-     *
-     * @param message the MuleMessage of the event
-     * @param timeout how long to block in milliseconds waiting for a result
-     * @return the result message if any of the invocation
-     * @throws org.mule.api.MuleException if the dispatch fails or the components or
-     *             transfromers cannot be found
-     * @see org.mule.api.FutureMessageResult
-     */
-    public FutureMessageResult sendEventAsync(final MuleMessage message, final int timeout)
-        throws MuleException
-    {
-        Callable callable = new Callable()
-        {
-            public Object call() throws Exception
-            {
-                message.setOutboundProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, timeout);
-                return sendEvent(message);
-            }
-        };
-
-        FutureMessageResult result = new FutureMessageResult(callable, event.getMuleContext());
-        result.execute();
-        return result;
     }
 
     /**
@@ -459,38 +346,6 @@ public class DefaultMuleEventContext implements MuleEventContext
     public void dispatchEvent(Object message) throws MuleException
     {
         dispatchEvent(new DefaultMuleMessage(message, muleContext));
-    }
-
-    /**
-     * This will dispatch an event asynchronously via the configured outbound
-     * endpoint on the service for this session
-     *
-     * @param message the message to send
-     * @throws org.mule.api.MuleException if there is no outbound endpoint configured
-     *             on the service or the events fails during dispatch
-     */
-    public void dispatchEvent(MuleMessage message) throws MuleException
-    {
-        FlowConstruct flowConstruct = event.getFlowConstruct();
-        if (flowConstruct == null)
-        {
-            throw new IllegalStateException(CoreMessages.objectIsNull("flowConstruct").getMessage());
-        }
-        else if (!(flowConstruct instanceof Service))
-        {
-            throw new UnsupportedOperationException(
-                "EventContext.dispatchEvent is only supported when flow constuct is a Service");
-        }
-        else
-        {
-            MessageProcessor processor = ((Service) flowConstruct).getOutboundMessageProcessor();
-            if (processor == null)
-            {
-                throw new EndpointNotFoundException(
-                    CoreMessages.noOutboundRouterSetOn(flowConstruct.getName()));
-            }
-            processor.process(new DefaultMuleEvent(message, RequestContext.getEvent()));
-        }
     }
 
     /**
