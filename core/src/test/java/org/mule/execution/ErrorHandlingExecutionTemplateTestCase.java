@@ -7,6 +7,7 @@
 package org.mule.execution;
 
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -16,7 +17,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.transaction.TransactionTemplateTestUtils.getEmptyTransactionCallback;
-
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -34,7 +34,6 @@ import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.TransactionTemplateTestUtils;
 
 import org.hamcrest.core.Is;
-import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -212,7 +211,7 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
         mockTransaction.setXA(true);
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
         TransactionCoordination.getInstance().suspendCurrentTransaction();
-        assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
+        assertThat(TransactionCoordination.getInstance().getTransaction(), nullValue());
         configureExceptionListener(null,null);
         ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
         try
@@ -225,7 +224,7 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
         verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
         verify(mockTransaction, VerificationModeFactory.times(0)).commit();
         verify(mockTransaction, VerificationModeFactory.times(0)).setRollbackOnly();
-        assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
+        assertThat(TransactionCoordination.getInstance().getTransaction(), nullValue());
     }
 
     @Test
@@ -234,7 +233,7 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
         mockTransaction.setXA(true);
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
         TransactionCoordination.getInstance().suspendCurrentTransaction();
-        assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
+        assertThat(TransactionCoordination.getInstance().getTransaction(), nullValue());
         configureExceptionListener(null,null);
         ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
         final Transaction mockNewTransaction = spy(new TestTransaction(mockMuleContext));
@@ -251,7 +250,7 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
         verify(mockNewTransaction, VerificationModeFactory.times(1)).rollback();
         verify(mockNewTransaction, VerificationModeFactory.times(0)).commit();
         verify(mockNewTransaction, VerificationModeFactory.times(1)).setRollbackOnly();
-        assertThat(TransactionCoordination.getInstance().getTransaction(),IsNull.<Object>nullValue());
+        assertThat(TransactionCoordination.getInstance().getTransaction(), nullValue());
     }
 
     @Test
@@ -268,7 +267,7 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
         verify(mockTransaction, VerificationModeFactory.times(1)).setRollbackOnly();
         verify(mockTransaction, VerificationModeFactory.times(1)).rollback();
         verify(mockTransaction, VerificationModeFactory.times(0)).commit();
-        assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
+        assertThat(TransactionCoordination.getInstance().getTransaction(), nullValue());
     }
 
     private void configureExceptionListener(final String rollbackFilter,final String commitFilter)

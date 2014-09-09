@@ -7,8 +7,9 @@
 package org.mule.test.integration.enricher;
 
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
-
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -17,7 +18,6 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import org.hamcrest.core.IsNull;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -38,9 +38,9 @@ public class EnricherSessionPropertiesTestCase extends FunctionalTestCase
         System.setProperty("mule.enricher.propagateSession", "true");
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in", "some message", null, 3000);
-        assertThat(response, IsNull.<Object> notNullValue());
+        assertThat(response, notNullValue());
         assertThat(response.getPayloadAsString(), is("some message"));
-        assertThat(response.getExceptionPayload(), IsNull.<Object> nullValue());
+        assertThat(response.getExceptionPayload(), nullValue());
     }
 
     public static class Spy implements MessageProcessor

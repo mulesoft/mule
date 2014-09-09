@@ -7,12 +7,11 @@
 package org.mule.transport.jms.integration;
 
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 
-import org.hamcrest.core.IsNull;
 import org.junit.Test;
 
 public class JmsObjectToMessageTransformerInResponseTestCase extends AbstractJmsFunctionalTestCase
@@ -30,7 +29,7 @@ public class JmsObjectToMessageTransformerInResponseTestCase extends AbstractJms
     {
         MuleClient muleClient = muleContext.getClient();
         MuleMessage response = muleClient.send("inWithTransformers", "A message", null, TIMEOUT);
-        assertThat(response, IsNull.<Object>notNullValue());
+        assertThat(response, notNullValue());
         assertThat(response.getPayloadAsString(), is("A message with something more"));
     }
 }

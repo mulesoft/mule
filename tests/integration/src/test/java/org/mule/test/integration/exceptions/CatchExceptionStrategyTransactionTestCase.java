@@ -6,9 +6,10 @@
  */
 package org.mule.test.integration.exceptions;
 
-import org.hamcrest.core.IsNull;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assert.assertThat;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.context.notification.ExceptionNotificationListener;
@@ -20,8 +21,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
 
 public class CatchExceptionStrategyTransactionTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -58,7 +59,7 @@ public class CatchExceptionStrategyTransactionTestCase extends AbstractServiceAn
         messageConsumed.await(TIMEOUT, TimeUnit.MILLISECONDS);
         stopFlowConstruct("singleTransactionBehavior");
         MuleMessage request = client.request("jms://in?connector=activeMq", TIMEOUT);
-        assertThat(request, IsNull.<Object>nullValue());
+        assertThat(request, nullValue());
     }
 
     @Test
@@ -76,12 +77,12 @@ public class CatchExceptionStrategyTransactionTestCase extends AbstractServiceAn
         messageConsumed.await(TIMEOUT, TimeUnit.MILLISECONDS);
         stopFlowConstruct("xaTransactionBehavior");
         MuleMessage outMessage = client.request("jms://out2?connector=activeMq", TIMEOUT);
-        assertThat(outMessage,IsNull.<Object>notNullValue());
+        assertThat(outMessage, notNullValue());
         assertThat(outMessage.getPayloadAsString(), is(MESSAGE));
         MuleMessage inMessage = client.request("jms://in2?connector=activeMq", TIMEOUT);
-        assertThat(inMessage,IsNull.<Object>nullValue());
+        assertThat(inMessage, nullValue());
         MuleMessage inVmMessage = client.request("vm://vmIn2",TIMEOUT);
-        assertThat(inVmMessage, IsNull.<Object>notNullValue());
+        assertThat(inVmMessage, notNullValue());
         assertThat(inVmMessage.getPayloadAsString(), is(MESSAGE));
     }
 
