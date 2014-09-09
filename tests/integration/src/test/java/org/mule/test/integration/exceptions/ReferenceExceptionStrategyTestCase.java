@@ -41,7 +41,7 @@ public class ReferenceExceptionStrategyTestCase extends FunctionalTestCase
     {
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in", JSON_REQUEST, null, 5000);
-        assertThat(response, IsNull.<Object>notNullValue());
+        assertThat(response, IsNull.notNullValue());
         // compare the structure and values but not the attributes' order
         ObjectMapper mapper = new ObjectMapper();
         JsonNode actualJsonNode = mapper.readTree(response.getPayloadAsString());
@@ -54,9 +54,9 @@ public class ReferenceExceptionStrategyTestCase extends FunctionalTestCase
     {
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in2", JSON_REQUEST, null, 5000);
-        assertThat(response, IsNull.<Object>notNullValue());
+        assertThat(response, IsNull.notNullValue());
         assertThat((NullPayload) response.getPayload(), is(NullPayload.getInstance()));
-        assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
+        assertThat(response.getExceptionPayload(), IsNull.notNullValue());
     }
 
     @Test

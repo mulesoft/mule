@@ -105,7 +105,7 @@ public class ExceptionStrategyCommonScenariosTestCase extends AbstractServiceAnd
             fail("Message never received by mule");
         }
         MuleMessage response = client.request("jms://dead.letter1?connector=jmsConnector", TIMEOUT);
-        assertThat(response, IsNull.<Object>notNullValue());
+        assertThat(response, IsNull.notNullValue());
         assertThat(response.getPayloadAsString(), is(MESSAGE_MODIFIED));
     }
 
@@ -129,7 +129,7 @@ public class ExceptionStrategyCommonScenariosTestCase extends AbstractServiceAnd
             fail("Message never received by mule");
         }
         MuleMessage response = client.request("jms://dead.letter2?connector=jmsConnector", TIMEOUT);
-        assertThat(response, IsNull.<Object>notNullValue());
+        assertThat(response, IsNull.notNullValue());
         assertThat(response.getPayloadAsString(), is(MESSAGE_TO_SEND));
     }
 
@@ -153,12 +153,12 @@ public class ExceptionStrategyCommonScenariosTestCase extends AbstractServiceAnd
             fail("Message never received by mule");
         }
         MuleMessage response = client.request("jms://dead.letter3?connector=jmsConnector", TIMEOUT);
-        assertThat(response, IsNull.<Object>notNullValue());
+        assertThat(response, IsNull.notNullValue());
         assertThat(response.getPayloadAsString(), is(MESSAGE_TO_SEND));
-        assertThat(client.request("jms://exceptions?connector=jmsConnector", TIMEOUT), IsNull.<Object>notNullValue());
+        assertThat(client.request("jms://exceptions?connector=jmsConnector", TIMEOUT), IsNull.notNullValue());
         assertThat(client.request("jms://exceptions?connector=jmsConnector", TIMEOUT), IsNull.notNullValue());
         MuleMessage exceptionResponse = client.request("jms://exceptions?connector=jmsConnector", TIMEOUT);
-        assertThat(exceptionResponse, IsNull.<Object>notNullValue());
+        assertThat(exceptionResponse, IsNull.notNullValue());
         assertThat(exceptionResponse.getPayload(), instanceOf(ExceptionMessage.class));
     }
 
@@ -167,7 +167,7 @@ public class ExceptionStrategyCommonScenariosTestCase extends AbstractServiceAnd
     {
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in4", MESSAGE_TO_SEND, null, TIMEOUT);
-        assertThat(response, IsNull.<Object>notNullValue());
+        assertThat(response, IsNull.notNullValue());
         assertThat(response.getPayloadAsString(), is(MESSAGE_MODIFIED));
     }
 
@@ -178,7 +178,7 @@ public class ExceptionStrategyCommonScenariosTestCase extends AbstractServiceAnd
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in5", MESSAGE_TO_SEND, null, TIMEOUT);
         assertThat((NullPayload) response.getPayload(), is(NullPayload.getInstance()));
-        assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
+        assertThat(response.getExceptionPayload(), IsNull.notNullValue());
         try
         {
             client.send("vm://in5", MESSAGE_TO_SEND, null, TIMEOUT);
@@ -213,7 +213,7 @@ public class ExceptionStrategyCommonScenariosTestCase extends AbstractServiceAnd
         endMessageProcessorExecuted.await(TIMEOUT, TimeUnit.MILLISECONDS);
         ((Lifecycle) getFlowConstruct("RollbackTransactionAndSendEmail")).stop();
         MuleMessage response = client.request("jms://in6?connector=jmsConnectorNoRedelivery", TIMEOUT);
-        assertThat(response, IsNull.<Object>notNullValue());
+        assertThat(response, IsNull.notNullValue());
         assertThat(response.getPayloadAsString(), is(MESSAGE_TO_SEND));
         greenMailSupport.getServers().waitForIncomingEmail(AbstractEmailFunctionalTestCase.DELIVERY_DELAY_MS, 1);
         MimeMessage[] messages = greenMailSupport.getServers().getReceivedMessages();

@@ -39,7 +39,7 @@ public class JdbcEndpointSessionPropertiesEe2323TestCase extends AbstractJdbcFun
     {
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://Flow1s1", new DefaultMuleMessage(new Object(), muleContext));
-        assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(response.getExceptionPayload(), IsNull.<Object>nullValue());
+        assertThat(response, IsNull.notNullValue());
+        assertThat(response.getExceptionPayload(), IsNull.nullValue());
     }
 }

@@ -7,8 +7,8 @@
 
 package org.mule.transport.jms;
 
-import static org.hamcrest.core.IsCollectionContaining.hasItems;
-import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.CoreMatchers.equalTo;
+
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
@@ -55,7 +55,7 @@ public class JmsTransactionalCachingTestCase extends FunctionalTestCase
         response = client.request("vm://testOut", RECEIVE_TIMEOUT);
         responses.add(response.getPayloadAsString());
 
-        assertThat(responses, hasItems(equalTo(TEST_MESSAGE_1), equalTo(TEST_MESSAGE_3)));
+        assertThat(responses, org.hamcrest.CoreMatchers.<String>hasItems(equalTo(TEST_MESSAGE_1), equalTo(TEST_MESSAGE_3)));
     }
 
     public static class AbortMessageOnEventCount

@@ -6,8 +6,6 @@
  */
 package org.mule.transport.jms;
 
-
-import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleMessage;
@@ -50,7 +48,7 @@ public class JmsCachingTestCase extends FunctionalTestCase
         response = client.request("vm://testOut", RECEIVE_TIMEOUT);
         responses.add(response.getPayloadAsString());
 
-        assertThat(responses, hasItems(equalTo(TEST_MESSAGE_1), equalTo(TEST_MESSAGE_2)));
+        assertThat(responses, org.hamcrest.CoreMatchers.<String>hasItems(equalTo(TEST_MESSAGE_1), equalTo(TEST_MESSAGE_2)));
     }
 
 }

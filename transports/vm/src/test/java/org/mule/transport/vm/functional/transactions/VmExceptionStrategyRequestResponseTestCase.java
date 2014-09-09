@@ -62,11 +62,11 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
             fail("dead letter queue must be reached");
         }
         assertThat(outboundComponentReached, Is.is(false));
-        assertThat(response, IsNull.<Object>notNullValue());
+        assertThat(response, IsNull.notNullValue());
         assertThat(response.getPayload(),IsInstanceOf.instanceOf(NullPayload.class));
-        assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
+        assertThat(response.getExceptionPayload(), IsNull.notNullValue());
         assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
-        assertThat(muleClient.request("vm://out1", TINY_TIMEOUT), IsNull.<Object>nullValue());
+        assertThat(muleClient.request("vm://out1", TINY_TIMEOUT), IsNull.nullValue());
     }
 
     @Test
@@ -78,11 +78,11 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
         /*if (!deadLetterQueueLatch.await(TIMEOUT, MILLISECONDS)) {
             fail("dead letter queue must be reached");
         }*/
-        assertThat(response, IsNull.<Object>notNullValue());
+        assertThat(response, IsNull.notNullValue());
         assertThat(response.getPayload(),IsInstanceOf.instanceOf(NullPayload.class));
-        assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
+        assertThat(response.getExceptionPayload(), IsNull.notNullValue());
         assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
-        assertThat(muleClient.request("vm://out2", TINY_TIMEOUT), IsNull.<Object>nullValue());
+        assertThat(muleClient.request("vm://out2", TINY_TIMEOUT), IsNull.nullValue());
         if (!outboundComponentLatch.await(TINY_TIMEOUT, TimeUnit.MILLISECONDS))
         {
             fail("outbound component not reached");
@@ -98,11 +98,11 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
             fail("dead letter queue must be reached");
         }
         assertThat(outboundComponentReached, Is.is(false));
-        assertThat(response, IsNull.<Object>notNullValue());
+        assertThat(response, IsNull.notNullValue());
         assertThat(response.getPayload(),IsInstanceOf.instanceOf(NullPayload.class));
-        assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
+        assertThat(response.getExceptionPayload(), IsNull.notNullValue());
         assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
-        assertThat(muleClient.request("vm://out3", TINY_TIMEOUT), IsNull.<Object>nullValue());
+        assertThat(muleClient.request("vm://out3", TINY_TIMEOUT), IsNull.nullValue());
     }
 
     @Test
@@ -114,11 +114,11 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
             fail("dead letter queue must be reached");
         }
         assertThat(outboundComponentReached, Is.is(false));
-        assertThat(response, IsNull.<Object>notNullValue());
+        assertThat(response, IsNull.notNullValue());
         assertThat(response.getPayload(),IsInstanceOf.instanceOf(NullPayload.class));
-        assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
+        assertThat(response.getExceptionPayload(), IsNull.notNullValue());
         assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
-        assertThat(muleClient.request("vm://out4", TINY_TIMEOUT), IsNull.<Object>nullValue());
+        assertThat(muleClient.request("vm://out4", TINY_TIMEOUT), IsNull.nullValue());
     }
 
     @Test
@@ -131,7 +131,7 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
         assertThat(response.getPayload(),IsInstanceOf.instanceOf(NullPayload.class));
         assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
         assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));*/
-        assertThat(muleClient.request("vm://out5", TINY_TIMEOUT), IsNull.<Object>nullValue());
+        assertThat(muleClient.request("vm://out5", TINY_TIMEOUT), IsNull.nullValue());
         if (!outboundComponentLatch.await(TINY_TIMEOUT, TimeUnit.MILLISECONDS))
         {
             fail("outbound component not reached");
@@ -158,8 +158,8 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
         {
             deadLetterQueueLatch.release();
             MuleMessage message = eventContext.getMessage();
-            assertThat(message, IsNull.<Object>notNullValue());
-            assertThat(message.getExceptionPayload(), IsNull.<Object>nullValue());
+            assertThat(message, IsNull.notNullValue());
+            assertThat(message.getExceptionPayload(), IsNull.nullValue());
             assertThat(message.getPayload(), IsInstanceOf.instanceOf(ExceptionMessage.class));
             return eventContext.getMessage();
         }

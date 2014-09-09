@@ -6,15 +6,12 @@
  */
 package org.mule.execution;
 
-import org.hamcrest.core.Is;
-import org.hamcrest.core.IsNull;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Answers;
-import org.mockito.internal.verification.VerificationModeFactory;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.execution.ExecutionCallback;
@@ -33,12 +30,15 @@ import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.TransactionTemplateTestUtils;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import org.hamcrest.core.Is;
+import org.hamcrest.core.IsNull;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Answers;
+import org.mockito.internal.verification.VerificationModeFactory;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -125,7 +125,7 @@ public class TransactionalErrorHandlingExecutionTemplateTestCase extends Transac
         }
         verify(mockTransaction, VerificationModeFactory.times(0)).commit();
         verify(mockTransaction, VerificationModeFactory.times(1)).rollback();
-        assertThat( TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
+        assertThat( TransactionCoordination.getInstance().getTransaction(), IsNull.nullValue());
     }
     
     @Test
@@ -144,7 +144,7 @@ public class TransactionalErrorHandlingExecutionTemplateTestCase extends Transac
         }
         verify(mockTransaction, VerificationModeFactory.times(0)).commit();
         verify(mockTransaction, VerificationModeFactory.times(1)).rollback();
-        assertThat( TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
+        assertThat( TransactionCoordination.getInstance().getTransaction(), IsNull.nullValue());
     }
 
     @Test
@@ -163,7 +163,7 @@ public class TransactionalErrorHandlingExecutionTemplateTestCase extends Transac
         }
         verify(mockTransaction, VerificationModeFactory.times(0)).commit();
         verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
-        assertThat( TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>notNullValue());
+        assertThat( TransactionCoordination.getInstance().getTransaction(), IsNull.notNullValue());
     }
 
     @Override
