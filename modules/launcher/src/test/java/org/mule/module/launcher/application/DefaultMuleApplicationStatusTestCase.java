@@ -9,17 +9,23 @@ package org.mule.module.launcher.application;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.when;
 import org.mule.context.notification.MuleContextNotification;
+import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * This tests verifies that the {@link org.mule.module.launcher.application.DefaultMuleApplication}
  * status is set correctly depending on its {@link org.mule.api.MuleContext}'s lifecycle phase
  */
+@RunWith(MockitoJUnitRunner.class)
 public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTestCase
 {
 
@@ -28,10 +34,15 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
 
     private DefaultMuleApplication application;
 
+    @Mock
+    private ApplicationDescriptor descriptor;
+
     @Override
     protected void doSetUp() throws Exception
     {
-        application = new DefaultMuleApplication(null, null, null);
+        when(descriptor.getAppName()).thenReturn(getClass().getName());
+
+        application = new DefaultMuleApplication(descriptor, null, null);
         application.setMuleContext(muleContext);
     }
 
@@ -75,6 +86,8 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
     @Test
     public void deploymentFailedOnInit()
     {
+        when(descriptor.getAppName()).thenReturn(getClass().getName());
+        application = new DefaultMuleApplication(descriptor, null, null);
         try
         {
             application.init();
@@ -87,8 +100,18 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
     }
 
     @Test
-    public void deploymentFailedOnStart()
+    public void deploymentFailedOnStart() throws Exception
     {
+        // force a failure
+        try
+        {
+            application.setMuleContext(null);
+        }
+        catch (NullPointerException e)
+        {
+            // that's fine... part of the error condition we're forcing
+        }
+
         try
         {
             application.start();
