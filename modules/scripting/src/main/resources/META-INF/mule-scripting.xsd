@@ -37,26 +37,6 @@
                 |id|the current event id.|
                 |result|a placeholder object where the result of the script can be written to. Usually it's better to just return a value from the script unless the script method doesn't have a return value.|
             </schemadoc:additional-documentation>
-
-            <schemadoc:additional-documentation where="after-specific-elements">
-                h2. Script Configuration Builder
-
-                The {javadoc:mule/module/scripting/builders|ScriptConfigurationBuilder}ScriptConfigurationBuilder{javadoc} allows developers to create a Mule instance from a JSR-223 compliant script. To load the manager from Groovy:
-
-                {code:java}
-                ConfigurationBuilder builder = new ScriptConfigurationBuilder("groovy", "../conf/mule-config.groovy");
-                MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext(builder);
-                {code}
-
-                Or to start the server from the command line:
-                {code}
-                mule -M-Dorg.mule.script.engine=groovy
-                -builder org.mule.module.scripting.builders.ScriptConfigurationBuilder
-                -config ../conf/mule-config.groovy
-                {code}
-
-                For more information about configuring a Mule instance from code or script see [Configuration Overview].
-            </schemadoc:additional-documentation>
         </xsd:appinfo>
     </xsd:annotation>
 
