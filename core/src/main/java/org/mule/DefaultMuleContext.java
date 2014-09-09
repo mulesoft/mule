@@ -669,7 +669,6 @@ public class DefaultMuleContext implements MuleContext
         return this.processingTimeWatcher;
     }
 
-    @Override
     public boolean waitUtilStarted(int timeout) throws InterruptedException
     {
         return startLatch.await(timeout, MILLISECONDS);
