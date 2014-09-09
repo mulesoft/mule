@@ -15,12 +15,10 @@ import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.api.context.notification.ExceptionStrategyNotificationListener;
 import org.mule.api.context.notification.ManagementNotificationListener;
 import org.mule.api.context.notification.MessageProcessorNotificationListener;
-import org.mule.api.context.notification.ModelNotificationListener;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.RegistryNotificationListener;
 import org.mule.api.context.notification.RoutingNotificationListener;
 import org.mule.api.context.notification.SecurityNotificationListener;
-import org.mule.api.context.notification.ServiceNotificationListener;
 import org.mule.api.context.notification.TransactionNotificationListener;
 import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
@@ -36,13 +34,11 @@ import org.mule.context.notification.ExceptionNotification;
 import org.mule.context.notification.ExceptionStrategyNotification;
 import org.mule.context.notification.ManagementNotification;
 import org.mule.context.notification.MessageProcessorNotification;
-import org.mule.context.notification.ModelNotification;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.PipelineMessageNotification;
 import org.mule.context.notification.RegistryNotification;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.context.notification.SecurityNotification;
-import org.mule.context.notification.ServiceNotification;
 import org.mule.context.notification.TransactionNotification;
 
 import java.util.HashMap;
@@ -72,8 +68,6 @@ public class NotificationDefinitionParser extends ChildMapEntryDefinitionParser
     {
         EVENT_MAP = new HashMap();
         EVENT_MAP.put("CONTEXT", MuleContextNotification.class.getName());
-        EVENT_MAP.put("MODEL", ModelNotification.class.getName());
-        EVENT_MAP.put("SERVICE", ServiceNotification.class.getName());
         EVENT_MAP.put("SECURITY", SecurityNotification.class.getName());
         EVENT_MAP.put("ENDPOINT-MESSAGE", EndpointMessageNotification.class.getName());
         EVENT_MAP.put("COMPONENT-MESSAGE", ComponentMessageNotification.class.getName());
@@ -91,8 +85,6 @@ public class NotificationDefinitionParser extends ChildMapEntryDefinitionParser
 
         INTERFACE_MAP = new HashMap();
         INTERFACE_MAP.put("CONTEXT", MuleContextNotificationListener.class.getName());
-        INTERFACE_MAP.put("MODEL", ModelNotificationListener.class.getName());
-        INTERFACE_MAP.put("SERVICE", ServiceNotificationListener.class.getName());
         INTERFACE_MAP.put("SECURITY", SecurityNotificationListener.class.getName());
         INTERFACE_MAP.put("MANAGEMENT", ManagementNotificationListener.class.getName());
         INTERFACE_MAP.put("MESSAGE-PROCESSOR", MessageProcessorNotificationListener.class.getName());

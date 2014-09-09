@@ -405,18 +405,21 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
 
             if (serviceName != null && !(serviceName.length() == 0))
             {
-                muleContext.getRegistry().lookupService(serviceName).setExceptionListener(
-                    new MessagingExceptionHandler()
-                    {
-                        @Override
-                        public MuleEvent handleException(Exception e, MuleEvent event)
+                ((Flow) muleContext.getRegistry().lookupFlowConstruct(serviceName)).setExceptionListener(
+                        new MessagingExceptionHandler()
                         {
-                            if (logger.isInfoEnabled()) logger.info("expected exception occurred: " + e, e);
-                            exceptionHolder.value = e;
-                            latch.countDown();
-                            return event;
-                        }
-                    });
+                            @Override
+                            public MuleEvent handleException(Exception e, MuleEvent event)
+                            {
+                                if (logger.isInfoEnabled())
+                                {
+                                    logger.info("expected exception occurred: " + e, e);
+                                }
+                                exceptionHolder.value = e;
+                                latch.countDown();
+                                return event;
+                            }
+                        });
             }
         }
 
@@ -781,9 +784,9 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
             };
 
             currentMessagingListener = muleContext.getRegistry()
-                .lookupService(serviceName)
+                .lookupFlowConstruct(serviceName)
                 .getExceptionListener();
-            muleContext.getRegistry().lookupService(serviceName).setExceptionListener(messagingListener);
+            ((Flow)muleContext.getRegistry().lookupFlowConstruct(serviceName)).setExceptionListener(messagingListener);
 
             // Now register an exception-listener on the connector that expects to
             // fail
@@ -835,8 +838,8 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
         {
             // Always reset the current listener
             muleContext.setExceptionListener(currentExceptionListener);
-            muleContext.getRegistry().lookupService(serviceName).setExceptionListener(
-                currentMessagingListener);
+            ((Flow) muleContext.getRegistry().lookupFlowConstruct(serviceName)).setExceptionListener(
+                    currentMessagingListener);
         }
 
         return exceptionHolder.value;

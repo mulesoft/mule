@@ -12,7 +12,6 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.model.Model;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.source.MessageSource;
@@ -36,7 +35,7 @@ import javax.annotation.PostConstruct;
  * <p/>
  * This phase is responsible for initialising objects. Any object that implements {@link org.mule.api.lifecycle.Initialisable} will
  * have its {@link org.mule.api.lifecycle.Initialisable#initialise()} method called.  Objects are initialised in the order based on type:
- * {@link org.mule.api.transport.Connector}, {@link org.mule.api.agent.Agent}, {@link org.mule.api.model.Model}, {@link org.mule.api.service.Service}, followed
+ * {@link org.mule.api.transport.Connector}, {@link org.mule.api.agent.Agent}, {@link org.mule.api.construct.FlowConstruct}, followed
  * by any other object that implements {@link org.mule.api.lifecycle.Initialisable}.
  *
  * @see org.mule.api.MuleContext
@@ -54,7 +53,6 @@ public class MuleContextInitialisePhase extends DefaultLifecyclePhase
         Set<LifecycleObject> startOrderedObjects = new LinkedHashSet<LifecycleObject>();
         startOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
-        startOrderedObjects.add(new NotificationLifecycleObject(Model.class));
         startOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Initialisable.class));
         setOrderedLifecycleObjects(startOrderedObjects);

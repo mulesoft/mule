@@ -23,15 +23,9 @@
 
     </a:provider>
 
-    <mule:model name="testModel">
-
-        <mule:service name="customerService">
-            <mule:inbound>
-                <mule:inbound-endpoint address="http://localhost:9002" exchange-pattern="request-response"/>
-            </mule:inbound>
-            <atom:component provider-ref="customerProvider"/>
-        </mule:service>
-
-    </mule:model>
+    <mule:flow name="customerService">
+        <mule:inbound-endpoint address="http://localhost:9002" exchange-pattern="request-response"/>
+        <atom:component provider-ref="customerProvider"/>
+    </mule:flow>
 
 </beans>

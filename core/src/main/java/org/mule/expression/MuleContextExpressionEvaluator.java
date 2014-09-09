@@ -13,7 +13,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionEvaluator;
-import org.mule.api.service.Service;
 import org.mule.config.i18n.CoreMessages;
 
 /**

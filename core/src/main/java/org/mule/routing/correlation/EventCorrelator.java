@@ -21,7 +21,6 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.RoutingException;
-import org.mule.api.service.Service;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectDoesNotExistException;
@@ -433,14 +432,9 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                         }
                         else
                         {
-                            final FlowConstruct service = group.toArray(false)[0].getFlowConstruct();
-                            if (!(service instanceof Service))
-                            {
-                                throw new UnsupportedOperationException(
-                                        "EventAggregator is only supported with Service");
-                            }
-
-                            ((Service) service).dispatchEvent(newEvent);
+                            throw new MessagingException(CoreMessages.createStaticMessage(
+                                    MessageFormat.format("Group {0} timed out, but no timeout message processor was " +
+                                                         "configured.", group.getGroupId())), newEvent);
                         }
                         expiredAndDispatchedGroups.store((Serializable) group.getGroupId(),
                                                          group.getCreated());

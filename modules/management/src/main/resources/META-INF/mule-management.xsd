@@ -230,20 +230,6 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="ignoreModelNotifications" type="mule:substitutableBoolean" default="false">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Whether to ignore notifications for state changes on models such as models initializing, starting, and stopping or components being registered or unregistered.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="ignoreComponentNotifications" type="mule:substitutableBoolean" default="false">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Whether to ignore notifications for state changes on components such as when a component is started, stopped, paused, or resumed..
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <xsd:attribute name="ignoreConnectionNotifications" type="mule:substitutableBoolean" default="false">
                     <xsd:annotation>
                         <xsd:documentation>

@@ -13,17 +13,13 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.model.Model;
 import org.mule.api.registry.Registry;
 import org.mule.api.routing.OutboundRouter;
-import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transport.Connector;
-import org.mule.context.notification.MuleContextNotification;
 import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.NotificationLifecycleObject;
 import org.mule.util.queue.QueueManager;
-import org.mule.util.queue.TransactionalQueueManager;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -38,7 +34,7 @@ import java.util.Set;
  *
  * This phase is responsible for disposing objects. Any object that implements {@link org.mule.api.lifecycle.Stoppable} will
  * have its {@link org.mule.api.lifecycle.Stoppable#stop()} ()} method called.  Objects are initialised in the order based on type:
- * {@link org.mule.api.service.Service}, {@link org.mule.api.model.Model}, {@link org.mule.api.agent.Agent}, {@link org.mule.api.transport.Connector}, followed
+ * {@link org.mule.api.construct.FlowConstruct}, {@link org.mule.api.agent.Agent}, {@link org.mule.api.transport.Connector}, followed
  * by any other object that implements {@link org.mule.api.lifecycle.Stoppable}.
  *
  * @see org.mule.api.MuleContext
@@ -51,7 +47,7 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase
 {
     public MuleContextStopPhase()
     {
-        this(new Class[]{Registry.class, MuleContext.class, MessageSource.class, Component.class, OutboundRouterCollection.class, OutboundRouter.class});
+        this(new Class[]{Registry.class, MuleContext.class, MessageSource.class, Component.class, OutboundRouter.class});
     }
 
     public MuleContextStopPhase(Class<?>[] ignorredObjects)
@@ -61,7 +57,6 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase
         Set<LifecycleObject> stopOrderedObjects = new LinkedHashSet<LifecycleObject>();
         // Stop in the opposite order to start
         stopOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
-        stopOrderedObjects.add(new NotificationLifecycleObject(Model.class, MuleContextNotification.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(QueueManager.class));
