@@ -8,8 +8,8 @@ package org.mule.test.integration.exceptions;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.exception.MessagingExceptionHandler;
@@ -21,7 +21,6 @@ import org.mule.transport.NullPayload;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.hamcrest.core.IsNot;
-import org.hamcrest.core.IsNull;
 import org.junit.Test;
 
 public class ReferenceExceptionStrategyTestCase extends FunctionalTestCase
@@ -41,7 +40,7 @@ public class ReferenceExceptionStrategyTestCase extends FunctionalTestCase
     {
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in", JSON_REQUEST, null, 5000);
-        assertThat(response, IsNull.<Object>notNullValue());
+        assertThat(response, notNullValue());
         // compare the structure and values but not the attributes' order
         ObjectMapper mapper = new ObjectMapper();
         JsonNode actualJsonNode = mapper.readTree(response.getPayloadAsString());
@@ -54,9 +53,9 @@ public class ReferenceExceptionStrategyTestCase extends FunctionalTestCase
     {
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in2", JSON_REQUEST, null, 5000);
-        assertThat(response, IsNull.<Object>notNullValue());
+        assertThat(response, notNullValue());
         assertThat((NullPayload) response.getPayload(), is(NullPayload.getInstance()));
-        assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
+        assertThat(response.getExceptionPayload(), notNullValue());
     }
 
     @Test

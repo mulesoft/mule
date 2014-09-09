@@ -6,8 +6,9 @@
  */
 package org.mule.test.properties;
 
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -16,7 +17,6 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import java.util.Collections;
 import java.util.Map;
 
-import org.hamcrest.core.IsNull;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -45,8 +45,8 @@ public class HttpVmSessionPropertiesTestCase extends FunctionalTestCase
 
         Map<String, Object> properties = Collections.emptyMap();
         MuleMessage message = client.send("http://localhost:" + dynamicPort1.getNumber() + "/http-inbound-flow", "some message", properties);
-        assertThat(message, IsNull.<Object>notNullValue());
-        assertThat(message.getExceptionPayload(), IsNull.<Object>nullValue());
+        assertThat(message, notNullValue());
+        assertThat(message.getExceptionPayload(), nullValue());
     }
 
     /**
@@ -59,7 +59,7 @@ public class HttpVmSessionPropertiesTestCase extends FunctionalTestCase
 
         Map<String, Object> properties = Collections.emptyMap();
         MuleMessage message = client.send("vm://vm-inbound-flow", "some message", properties);
-        assertThat(message, IsNull.<Object>notNullValue());
-        assertThat(message.getExceptionPayload(), IsNull.<Object>nullValue());
+        assertThat(message, notNullValue());
+        assertThat(message.getExceptionPayload(), nullValue());
     }
 }

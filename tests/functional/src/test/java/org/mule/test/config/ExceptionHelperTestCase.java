@@ -6,11 +6,11 @@
  */
 package org.mule.test.config;
 
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-
 import org.mule.api.DefaultMuleException;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.registry.ResolverException;
@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.hamcrest.core.IsInstanceOf;
-import org.hamcrest.core.IsNull;
 import org.junit.Test;
 
 @SmallTest
@@ -68,9 +67,9 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase
     @Test
     public void testGetNonMuleExceptionCause()
     {
-        assertThat(ExceptionHelper.getNonMuleException(new ResolverException(CoreMessages.failedToBuildMessage(), null)), IsNull.<Object>nullValue());
+        assertThat(ExceptionHelper.getNonMuleException(new ResolverException(CoreMessages.failedToBuildMessage(), null)), nullValue());
         assertThat(ExceptionHelper.getNonMuleException(new ResolverException(CoreMessages.failedToBuildMessage(),
-                new ConfigurationException(CoreMessages.failedToBuildMessage(), null))), IsNull.<Object>nullValue());
+                new ConfigurationException(CoreMessages.failedToBuildMessage(), null))), nullValue());
         assertThat(ExceptionHelper.getNonMuleException(new ResolverException(CoreMessages.failedToBuildMessage(),
                 new ConfigurationException(CoreMessages.failedToBuildMessage(),
                         new IllegalArgumentException()))), IsInstanceOf.instanceOf(IllegalArgumentException.class));
