@@ -231,8 +231,6 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertApplicationAnchorFileDoesNotExists(brokenAppDescriptor.id);
 
-        deploymentService.getApplications();
-
         final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
         assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
         final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
