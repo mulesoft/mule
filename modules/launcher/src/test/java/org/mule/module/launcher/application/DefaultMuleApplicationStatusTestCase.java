@@ -11,6 +11,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.probe.JUnitProbe;
+import org.mule.tck.probe.PollingProber;
 
 import org.junit.Test;
 
@@ -20,6 +22,9 @@ import org.junit.Test;
  */
 public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTestCase
 {
+
+    private static final int PROBER_TIMEOUT = 1000;
+    private static final int PROBER_INTERVAL = 100;
 
     private DefaultMuleApplication application;
 
@@ -95,8 +100,24 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
         }
     }
 
-    private void assertStatus(ApplicationStatus status)
+    private void assertStatus(final ApplicationStatus status)
     {
-        assertThat(application.getStatus(), is(status));
+        PollingProber prober = new PollingProber(PROBER_TIMEOUT, PROBER_INTERVAL);
+        prober.check(new JUnitProbe()
+        {
+            @Override
+            protected boolean test() throws Exception
+            {
+                assertThat(application.getStatus(), is(status));
+                return true;
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return String.format("Application remained at status %s instead of moving to %s", application.getStatus().name(), status.name());
+            }
+        });
+
     }
 }
