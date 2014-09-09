@@ -15,6 +15,7 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
 /**
@@ -48,7 +49,7 @@ public class JmsCachingTestCase extends FunctionalTestCase
         response = client.request("vm://testOut", RECEIVE_TIMEOUT);
         responses.add(response.getPayloadAsString());
 
-        assertThat(responses, org.hamcrest.CoreMatchers.<String>hasItems(equalTo(TEST_MESSAGE_1), equalTo(TEST_MESSAGE_2)));
+        assertThat(responses, CoreMatchers.<String>hasItems(equalTo(TEST_MESSAGE_1), equalTo(TEST_MESSAGE_2)));
     }
 
 }
