@@ -9,11 +9,13 @@ package org.mule.util.queue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+@SmallTest
 public class RandomAccessFileQueueStoreTestCase extends AbstractMuleTestCase
 {
 
@@ -52,6 +54,6 @@ public class RandomAccessFileQueueStoreTestCase extends AbstractMuleTestCase
 
     private RandomAccessFileQueueStore createRandomAccessFileQueueStore()
     {
-        return new RandomAccessFileQueueStore(temporaryFolder.getRoot(), "datafile");
+        return new RandomAccessFileQueueStore(new QueueFileProvider(temporaryFolder.getRoot(), "datafile"));
     }
 }

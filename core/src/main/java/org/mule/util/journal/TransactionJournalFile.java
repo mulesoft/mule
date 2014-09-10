@@ -217,7 +217,12 @@ class TransactionJournalFile<T, K extends JournalEntry<T>>
                 }
                 catch(Exception e)
                 {
-                    throw new MuleRuntimeException(e);
+                    logger.warn("Exception reading transaction content. This is normal if the mule server was shutdown due to a failure" + e.getMessage());
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug(e);
+                    }
+                    break;
                 }
             }
         }
