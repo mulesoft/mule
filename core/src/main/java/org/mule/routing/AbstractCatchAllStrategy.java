@@ -28,7 +28,10 @@ import org.apache.commons.logging.LogFactory;
  *
  * @see org.mule.routing.LoggingCatchAllStrategy
  * @see org.mule.routing.ForwardingCatchAllStrategy
+ *
+ * Deprecated from 3.6.0.  This functionality is specific to Services.
  */
+@Deprecated
 public abstract class AbstractCatchAllStrategy implements OutboundRouterCatchAllStrategy, RouterStatisticsRecorder
 {
     /**

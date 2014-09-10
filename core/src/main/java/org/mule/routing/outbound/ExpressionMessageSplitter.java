@@ -15,7 +15,10 @@ import java.util.List;
 
 /**
  * Evaluates a single expression and adds the results of the expression as individual message parts.
+ *
+ * Deprecated from 3.6.0.  This functionality is specific to Services.
  */
+@Deprecated
 public class ExpressionMessageSplitter extends AbstractRoundRobinMessageSplitter
 {
     protected ExpressionConfig config = new ExpressionConfig();

@@ -13,7 +13,10 @@ import org.mule.component.AbstractComponent;
  * <code>PassThroughComponent</code> will simply return the payload back as the
  * result. This typically you don't need to specify this, since it is used by
  * default.
+ *
+ * Deprecated from 3.6.0.  To achieve the same behaviour simply don't configure this component.
  */
+@Deprecated
 public class PassThroughComponent extends AbstractComponent
 {
 

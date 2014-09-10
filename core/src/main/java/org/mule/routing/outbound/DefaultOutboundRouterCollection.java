@@ -40,8 +40,10 @@ import org.apache.commons.logging.LogFactory;
  * DefaultOutboundRouterCollection must have atleast one router. By default the first
  * matching router is used to route an event though it is possible to match on all
  * routers meaning that the message will get sent over all matching routers.
+ *
+ * Deprecated from 3.6.0.  This functionality is specific to Services.
  */
-
+@Deprecated
 public class DefaultOutboundRouterCollection implements OutboundRouterCollection, MessagingExceptionHandlerAware
 {
     /**

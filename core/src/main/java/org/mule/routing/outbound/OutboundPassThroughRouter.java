@@ -18,7 +18,10 @@ import java.util.List;
  * <code>OutboundPassThroughRouter</code> allows outbound routing over a single
  * endpoint without any filtering. This class is used by Mule when a single outbound
  * router is set on a Service.
+ *
+ * Deprecated from 3.6.0.  This functionality is specific to Services.
  */
+@Deprecated
 public class OutboundPassThroughRouter extends FilteringOutboundRouter
 {
     public OutboundPassThroughRouter()

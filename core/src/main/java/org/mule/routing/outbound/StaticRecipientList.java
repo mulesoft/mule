@@ -18,10 +18,13 @@ import java.util.List;
  * <code>StaticRecipientList</code> is used to dispatch a single event to multiple
  * recipients over the same transport. The recipient targets for this router can be
  * configured statically on the router itself.
+ *
+ * Deprecated from 3.6.0.  This functionality is specific to Services.
  */
 
 // TODO I think the ExpressionRecipientList router does everything this router does and more.
 // Perhaps we should rename it to simply "RecipientList Router" and remove this one?
+@Deprecated
 public class StaticRecipientList extends AbstractRecipientList
 {
     public static final String RECIPIENTS_PROPERTY = "recipients";

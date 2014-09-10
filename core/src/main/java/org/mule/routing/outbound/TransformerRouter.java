@@ -22,8 +22,10 @@ import org.mule.routing.AbstractRoutingStrategy;
 /**
  * Simply applies a transformer before continuing on to the next router.
  * This can be useful with the {@link ChainingRouter}.
- * @deprecated
+ *
+ * Deprecated from 3.6.0.  This functionality is specific to Services.
  */
+@Deprecated
 public class TransformerRouter extends AbstractOutboundRouter
 {
     private Transformer transformer;

@@ -19,8 +19,10 @@ import java.util.List;
  * on this router to route unwanted or unfiltered events. If a catch strategy is not
  * set, the router just returns null. <code>OutboundRouterCollection</code> is
  * responsible for holding all outbound routers for a service service.
+ *
+ * Deprecated from 3.6.0.  This functionality is specific to Services.
  */
-
+@Deprecated
 public interface OutboundRouterCollection
     extends MatchingRouter, RouterStatisticsRecorder, Initialisable, Disposable, MuleContextAware
 {
