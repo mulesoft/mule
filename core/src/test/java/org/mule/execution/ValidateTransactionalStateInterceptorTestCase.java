@@ -6,8 +6,14 @@
  */
 package org.mule.execution;
 
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
+import org.hamcrest.core.Is;
+import org.hamcrest.core.IsInstanceOf;
+import org.hamcrest.core.IsNull;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.mockito.Mockito;
 import org.mule.api.MuleEvent;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.transaction.Transaction;
@@ -23,13 +29,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hamcrest.core.Is;
-import org.hamcrest.core.IsInstanceOf;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.Mockito;
+import static org.junit.Assert.assertThat;
 
 @RunWith(Parameterized.class)
 @SmallTest
@@ -134,7 +134,7 @@ public class ValidateTransactionalStateInterceptorTestCase extends AbstractMuleT
         }
         if (shouldThrowException)
         {
-            assertThat(thrownException, notNullValue());
+            assertThat(thrownException, IsNull.<Object>notNullValue());
             assertThat(thrownException, IsInstanceOf.instanceOf(IllegalTransactionStateException.class));
         } else
         {

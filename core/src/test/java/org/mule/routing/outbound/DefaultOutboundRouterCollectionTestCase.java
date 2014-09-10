@@ -240,11 +240,12 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleContext
         getOutboundRouterCollection().addRoute(new TestRequiresNewMessageOutboundRouter(true));
         getOutboundRouterCollection().addRoute(new TestRequiresNewMessageOutboundRouter(false));
 
-        TestRequiresNewMessageOutboundRouter.latch = new CountDownLatch(3);
+        TestDoesNotRequireNewMessageOutboundRouter.latch = new CountDownLatch(3);
 
         testService.sendEvent(testEvent);
 
-        assertTrue(TestRequiresNewMessageOutboundRouter.latch.await(LATCH_AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS));
+        assertTrue(TestRequiresNewMessageOutboundRouter.latch.await(LATCH_AWAIT_TIMEOUT_MS,
+            TimeUnit.MILLISECONDS));
     }
 
     // MIX

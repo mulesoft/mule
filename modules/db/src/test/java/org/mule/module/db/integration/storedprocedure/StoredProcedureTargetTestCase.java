@@ -8,7 +8,6 @@
 package org.mule.module.db.integration.storedprocedure;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
 import static org.mule.module.db.integration.DbTestUtil.selectData;
@@ -59,7 +58,7 @@ public class StoredProcedureTargetTestCase extends AbstractDbIntegrationTestCase
         MuleMessage response = client.send("vm://storedProcedureCustomTarget", TEST_MESSAGE, null);
 
         assertThat(response.getPayloadAsString(), equalTo(TEST_MESSAGE));
-        assertThat(response.<StatementResultIterator>getInboundProperty("statementResult"), CoreMatchers.is(instanceOf(Map.class)));
+        assertThat(response.<StatementResultIterator>getInboundProperty("statementResult"), CoreMatchers.is(Map.class));
         verifyUpdatedRecord();
     }
 

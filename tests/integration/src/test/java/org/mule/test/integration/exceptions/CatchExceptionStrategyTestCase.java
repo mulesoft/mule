@@ -7,7 +7,6 @@
 package org.mule.test.integration.exceptions;
 
 
-import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -33,6 +32,7 @@ import javax.jws.WebService;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.hamcrest.core.Is;
+import org.hamcrest.core.IsNull;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -91,7 +91,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
     {
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send(endpointUri, JSON_REQUEST, null, TIMEOUT);
-        assertThat(response, notNullValue());
+        assertThat(response, IsNull.<Object>notNullValue());
         // compare the structure and values but not the attributes' order
         ObjectMapper mapper = new ObjectMapper();
         JsonNode actualJsonNode = mapper.readTree(response.getPayloadAsString());
@@ -108,7 +108,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
 	    LocalMuleClient client = muleContext.getClient();
 	    client.dispatch("vm://in2","some message",null);
         MuleMessage result = client.send("vm://in2", MESSAGE, null, TIMEOUT);
-        assertThat(result, notNullValue());
+        assertThat(result,IsNull.<Object>notNullValue());
         assertThat(result.getPayloadAsString(), Is.is(MESSAGE + " Caught"));
 	}
 
@@ -118,7 +118,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
         LocalMuleClient client = muleContext.getClient();
         MuleMessage result = null;
         result = client.send("vm://in3", MESSAGE, null, TIMEOUT);
-        assertThat(result, notNullValue());
+        assertThat(result,IsNull.<Object>notNullValue());
         assertThat(result.getPayloadAsString(), Is.is(MESSAGE + " apt1 apt2 groovified"));
     }
 

@@ -7,10 +7,18 @@
 package org.mule.test.integration.exceptions;
 
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.lang.mutable.MutableInt;
+import org.hamcrest.core.IsNull;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -28,16 +36,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.apache.commons.lang.mutable.MutableInt;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -129,7 +127,7 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
         }
         assertThat(deliveredTimes.intValue(), is(EXPECTED_DELIVERED_TIMES));
         MuleMessage dlqMessage = client.request("jms://dlq?connector=activeMq", TIMEOUT);
-        assertThat(dlqMessage, notNullValue());
+        assertThat(dlqMessage, IsNull.<Object>notNullValue());
         assertThat(dlqMessage.getPayloadAsString(), is(MESSAGE_EXPECTED));
     }
 
@@ -151,7 +149,7 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
 	        fail("message should have been delivered at least 5 times");
 	    }
         MuleMessage result = client.send("vm://in5", MESSAGE, null, TIMEOUT);
-        assertThat(result, notNullValue());
+        assertThat(result,IsNull.<Object>notNullValue());
         assertThat(result.getPayloadAsString(),is(MESSAGE + " Rolled Back"));
 	}
 
@@ -163,12 +161,12 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
         for (int i = 1; i <= EXPECTED_SHORT_DELIVERED_TIMES; i++)
         {
             result = client.send("vm://in6", MESSAGE, null, TIMEOUT);
-            assertThat(result, notNullValue());
-            assertThat(result.getExceptionPayload(), notNullValue());
+            assertThat(result,IsNull.<Object>notNullValue());
+            assertThat(result.getExceptionPayload(),IsNull.<Object>notNullValue());
             assertThat(result.getPayloadAsString(),is(MESSAGE + " apt1 apt2 apt3"));
         }
         result = client.send("vm://in6", MESSAGE, null, TIMEOUT);
-        assertThat(result, notNullValue());
+        assertThat(result,IsNull.<Object>notNullValue());
         assertThat(result.getPayloadAsString(),is(MESSAGE + " apt4 groovified"));
     }
 
@@ -193,7 +191,7 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
         }
         assertThat(deliveredTimes.intValue(), is(EXPECTED_DELIVERED_TIMES));
         MuleMessage dlqMessage = client.request("jms://dlq?connector=activeMq", TIMEOUT);
-        assertThat(dlqMessage, notNullValue());
+        assertThat(dlqMessage, IsNull.<Object>notNullValue());
         assertThat(dlqMessage.getPayloadAsString(), is(MESSAGE_EXPECTED));
     }
 
@@ -204,7 +202,7 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send(String.format("http://localhost:%s", dynamicPort1.getNumber()), JSON_REQUEST, null, TIMEOUT);
         assertThat(response.<String>getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY),is("500"));
-        assertThat(response.getExceptionPayload(), notNullValue());
+        assertThat(response.getExceptionPayload(),IsNull.<Object>notNullValue());
     }
 
     @Test
@@ -229,7 +227,7 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
         }
         response = client.send(String.format("http://localhost:%s", dynamicPort2.getNumber()), MESSAGE, null, TIMEOUT);
         assertThat(response.<String>getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY),is("200"));
-        assertThat(response.getExceptionPayload(), nullValue());
+        assertThat(response.getExceptionPayload(),IsNull.<Object>nullValue());
         assertThat(response.getPayloadAsString(), is(MESSAGE_EXPECTED));
     }
 
@@ -260,12 +258,12 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
         for (int i = 1; i <= EXPECTED_SHORT_DELIVERED_TIMES; i++)
         {
             result = client.send("vm://in2", MESSAGE, null, TIMEOUT);
-            assertThat(result, notNullValue());
-            assertThat(result.getExceptionPayload(), notNullValue());
+            assertThat(result,IsNull.<Object>notNullValue());
+            assertThat(result.getExceptionPayload(),IsNull.<Object>notNullValue());
             assertThat(result.getPayloadAsString(),is(MESSAGE + " apt1 apt2 apt3"));
         }
         result = client.send("vm://in2", MESSAGE, null, TIMEOUT);
-        assertThat(result, notNullValue());
+        assertThat(result,IsNull.<Object>notNullValue());
         assertThat(result.getPayloadAsString(),is(MESSAGE + " apt4 apt5"));
     }
 

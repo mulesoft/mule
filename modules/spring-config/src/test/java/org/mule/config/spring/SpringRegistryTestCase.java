@@ -7,7 +7,6 @@
 package org.mule.config.spring;
 
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 
 import org.mule.api.registry.Registry;
@@ -52,7 +51,7 @@ public class SpringRegistryTestCase extends AbstractRegistryTestCase
         createSpringRegistryWithParentContext();
         applicationContext.registerSingleton(BEAN_KEY, String.class);
         parentApplicationContext.registerSingleton(BEAN_KEY, Integer.class);
-        assertThat(springRegistry.get(BEAN_KEY), is(instanceOf(String.class)));
+        assertThat(springRegistry.get(BEAN_KEY), Is.is(String.class));
     }
 
     @Test

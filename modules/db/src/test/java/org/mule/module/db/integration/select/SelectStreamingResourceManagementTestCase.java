@@ -10,7 +10,6 @@ package org.mule.module.db.integration.select;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
@@ -61,7 +60,7 @@ public class SelectStreamingResourceManagementTestCase extends AbstractDbIntegra
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://selectStreaming", TEST_MESSAGE, null);
 
-        assertThat(response.getPayload(), is(instanceOf(ResultSetIterator.class)));
+        assertThat(response.getPayload(), is(ResultSetIterator.class));
         assertRecords(response.getInboundProperty("processedRecords"), getAllPlanetRecords());
     }
 
@@ -80,6 +79,6 @@ public class SelectStreamingResourceManagementTestCase extends AbstractDbIntegra
 
         assertThat(response.getExceptionPayload(), notNullValue());
         assertThat(response.getExceptionPayload().getRootException().getMessage(), equalTo("Failing test on purpose"));
-        assertThat(response.getPayload(), is(instanceOf(NullPayload.class)));
+        assertThat(response.getPayload(), is(NullPayload.class));
     }
 }

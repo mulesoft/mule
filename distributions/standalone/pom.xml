@@ -265,7 +265,7 @@
             <exclusions>
                 <exclusion>
                     <groupId>org.mockito</groupId>
-                    <artifactId>mockito-core</artifactId>
+                    <artifactId>mockito-all</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

@@ -283,7 +283,10 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         }
 
         //When an Assumption fails then junit doesn't call @Before methods so we need to avoid executing delete if there's no root folder.
-        workingDirectory.delete();
+        if (workingDirectory.getRoot() != null)
+        {
+            workingDirectory.delete();
+        }
     }
 
     protected void doTearDownAfterMuleContextDispose() throws Exception

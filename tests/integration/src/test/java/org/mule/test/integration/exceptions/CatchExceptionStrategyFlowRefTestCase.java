@@ -7,10 +7,10 @@
 package org.mule.test.integration.exceptions;
 
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase.JSON_REQUEST;
 import static org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase.JSON_RESPONSE;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -23,6 +23,7 @@ import org.mule.transaction.TransactionCoordination;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.hamcrest.core.Is;
+import org.hamcrest.core.IsNull;
 import org.junit.Test;
 
 public class CatchExceptionStrategyFlowRefTestCase extends FunctionalTestCase
@@ -65,7 +66,7 @@ public class CatchExceptionStrategyFlowRefTestCase extends FunctionalTestCase
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             Transaction tx = TransactionCoordination.getInstance().getTransaction();
-            assertThat(tx, notNullValue());
+            assertThat(tx, IsNull.<Object>notNullValue());
             assertThat(tx.isRollbackOnly(), Is.is(false));
             return event;
         }

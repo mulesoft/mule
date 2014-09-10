@@ -6,9 +6,8 @@
  */
 package org.mule.transport.jdbc.functional;
 
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -16,6 +15,7 @@ import org.mule.api.client.MuleClient;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.hamcrest.core.IsNull;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
@@ -39,7 +39,7 @@ public class JdbcEndpointSessionPropertiesEe2323TestCase extends AbstractJdbcFun
     {
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://Flow1s1", new DefaultMuleMessage(new Object(), muleContext));
-        assertThat(response, notNullValue());
-        assertThat(response.getExceptionPayload(), nullValue());
+        assertThat(response, IsNull.<Object>notNullValue());
+        assertThat(response.getExceptionPayload(), IsNull.<Object>nullValue());
     }
 }
