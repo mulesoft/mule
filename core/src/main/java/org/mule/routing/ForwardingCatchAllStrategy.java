@@ -24,7 +24,9 @@ import org.mule.config.i18n.CoreMessages;
  * assign an endpoint to this strategy to forward all events to. This can be used as
  * a dead letter/error queue.
  *
+ * Deprecated from 3.6.0.  This functionality is specific to Services.
  */
+@Deprecated
 public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy implements MessagingExceptionHandlerAware, Initialisable, MuleContextAware
 {
     private boolean sendTransformed = false;

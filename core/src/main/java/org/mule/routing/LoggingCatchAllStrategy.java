@@ -17,8 +17,10 @@ import org.apache.commons.logging.LogFactory;
  * <code>LoggingCatchAllStrategy</code> is a simple strategy that only logs any
  * events not caught by the router associated with this strategy. This should
  * <b>not</b> be used in production unless it is acceptable for events to be lost.
+ *
+ * Deprecated from 3.6.0.  This functionality is specific to Services.
  */
-
+@Deprecated
 public class LoggingCatchAllStrategy extends AbstractCatchAllStrategy
 {
     private static final Log logger = LogFactory.getLog(DefaultMuleEvent.class);

@@ -41,7 +41,10 @@ import java.util.List;
  * &lt;/outbound&gt;
  * <p/>
  * </pre>
+ *
+ * Deprecated from 3.6.0.  This functionality is specific to Services.
  */
+@Deprecated
 public class EndpointSelector extends FilteringOutboundRouter
 {
     public static final String DEFAULT_SELECTOR_EVALUATOR = "header";

@@ -16,7 +16,9 @@ import org.mule.api.processor.MessageProcessor;
  * Think of catch all strategies as a safety net for your events to ensure that all events will get processed.  If you
  * do not use conditional routing logic, you will not need a catch all strategy.
  *
+ * Deprecated from 3.6.0.  This functionality is specific to Services.
  */
+@Deprecated
 public interface OutboundRouterCatchAllStrategy extends MessageProcessor
 {
     /**

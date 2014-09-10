@@ -31,7 +31,10 @@ import java.util.List;
  * endpoint that doesn't throw an exception. If all attempted targets fail then an
  * exception is thrown. <p/> The router will override the sync/async mode of the
  * endpoint and force the sync mode for all targets except the last one.
+ *
+ * Deprecated from 3.6.0.  This functionality is specific to Services.
  */
+@Deprecated
 public class ExceptionBasedRouter extends ExpressionRecipientList
 {
 

@@ -22,7 +22,10 @@ import org.mule.transport.NullPayload;
 /**
  * <code>ChainingRouter</code> is used to pass a Mule event through multiple
  * targets using the result of the first as the input for the second.
+ *
+ * Deprecated from 3.6.0.  This functionality is specific to Services.
  */
+@Deprecated
 public class ChainingRouter extends FilteringOutboundRouter
 {
     @Override

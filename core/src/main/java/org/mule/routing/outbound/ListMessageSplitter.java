@@ -16,7 +16,10 @@ import java.util.List;
  * <code>FilteringListMessageSplitter</code> accepts a List as a message payload
  * then routes list elements as messages over an endpoint where the endpoint's filter
  * accepts the payload.
+ *
+ * Deprecated from 3.6.0.  This functionality is specific to Services.
  */
+@Deprecated
 public class ListMessageSplitter extends AbstractRoundRobinMessageSplitter
 {
     public ListMessageSplitter()

@@ -15,7 +15,10 @@ import org.mule.api.MuleMessage;
  * message.
  * <p/>
  * Asynchronous endpoints are managed as in the {@link AbstractSequenceRouter}.
+ *
+ * Deprecated from 3.6.0.  This functionality is specific to Services.
  */
+@Deprecated
 public class SequenceRouter extends AbstractSequenceRouter
 {
 

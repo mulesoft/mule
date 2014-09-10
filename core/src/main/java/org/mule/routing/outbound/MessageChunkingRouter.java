@@ -18,7 +18,10 @@ import org.mule.config.i18n.CoreMessages;
  * A router that breaks up the current message onto smaller parts and sends them to the
  * same destination. The Destination service needs to have a MessageChunkingAggregator
  * inbound router in order to rebuild the message at the other end.
+ *
+ * Deprecated from 3.6.0.  This functionality is specific to Services.
  */
+@Deprecated
 public class MessageChunkingRouter extends FilteringOutboundRouter
 {
     private int messageSize = 0;
