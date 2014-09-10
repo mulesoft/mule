@@ -680,7 +680,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         MuleMessage result = muleContext.getClient().send("vm://customRouter-in", message);
-        assertEquals("abc", result.getPayloadAsString());
+        assertEquals("[a, b, c]", result.getPayload().toString());
     }
 
     @Test

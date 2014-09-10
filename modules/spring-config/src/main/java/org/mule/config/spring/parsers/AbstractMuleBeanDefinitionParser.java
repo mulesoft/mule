@@ -13,7 +13,6 @@ import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.routing.OutboundRouter;
-import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
@@ -267,7 +266,6 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         // Marker for MULE-4813
         // We don't want lifcycle for the following from spring
         if (!Component.class.isAssignableFrom(beanClass) && !MessageSource.class.isAssignableFrom(beanClass)
-            && !OutboundRouterCollection.class.isAssignableFrom(beanClass)
             && !OutboundRouter.class.isAssignableFrom(beanClass)
             && !AbstractMessageProcessorOwner.class.isAssignableFrom(beanClass)
             && !MessagingExceptionHandler.class.isAssignableFrom(beanClass)

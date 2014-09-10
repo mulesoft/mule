@@ -8,22 +8,17 @@ package org.mule.component;
 
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.component.InterfaceBinding;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.MessagingExceptionHandlerAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.OutboundRouter;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.routing.outbound.OutboundPassThroughRouter;
 
 import java.lang.reflect.Proxy;
 
@@ -41,12 +36,12 @@ public class DefaultInterfaceBinding implements InterfaceBinding, MessagingExcep
     private MessagingExceptionHandler messagingExceptionHandler;
 
     // The router used to actually dispatch the message
-    protected OutboundRouter outboundRouter;
+    protected OutboundEndpoint endpoint;
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         OptimizedRequestContext.unsafeRewriteEvent(event.getMessage());
-        return outboundRouter.process(RequestContext.getEvent());
+        return endpoint.process(RequestContext.getEvent());
     }
 
     public void setInterface(Class<?> interfaceClass)
@@ -92,10 +87,7 @@ public class DefaultInterfaceBinding implements InterfaceBinding, MessagingExcep
     {
         if (e instanceof OutboundEndpoint)
         {
-            outboundRouter = new OutboundPassThroughRouter();
-            outboundRouter.addRoute((OutboundEndpoint) e);
-            outboundRouter.setTransactionConfig(e.getTransactionConfig());
-            outboundRouter.setMuleContext(e.getMuleContext());
+            endpoint = (OutboundEndpoint) e;
         }
         else
         {
@@ -121,10 +113,9 @@ public class DefaultInterfaceBinding implements InterfaceBinding, MessagingExcep
 
     public ImmutableEndpoint getEndpoint()
     {
-        if (outboundRouter != null)
+        if (endpoint != null)
         {
-            MessageProcessor target = outboundRouter.getRoutes().get(0);
-            return target instanceof ImmutableEndpoint ? (ImmutableEndpoint) target : null;
+            return endpoint;
         }
         else
         {
@@ -135,14 +126,7 @@ public class DefaultInterfaceBinding implements InterfaceBinding, MessagingExcep
     @Override
     public void initialise() throws InitialisationException
     {
-        if (outboundRouter instanceof MessagingExceptionHandlerAware)
-        {
-            ((MessagingExceptionHandlerAware) outboundRouter).setMessagingExceptionHandler(messagingExceptionHandler);
-        }
-        if (outboundRouter instanceof Initialisable)
-        {
-            outboundRouter.initialise();
-        }
+        endpoint.setMessagingExceptionHandler(messagingExceptionHandler);
     }
 
     @Override
