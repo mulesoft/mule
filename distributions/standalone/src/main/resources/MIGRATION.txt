@@ -10,7 +10,7 @@ MULE-7774: All date related headers for the HTTP transport are now in GMT follow
 MULE-7755: Patterns module is deprecated and will be removed in Mule 4.0.
 MULE-7857: The RemoteDispatcher and related classes in the client module have been deprecated and will be removed in Mule 4.0.
 MULE-7858: Support for spring events and related classes in the spring-extras module has been deprecated and will be removed in Mule 4.0.
-MULE-7723: ScriptConfigurationBuilder, AutoConfigurationBuilder and related resources have been deprecated and will be removed in Mule 4.0.
+MULE-7723: ScriptConfigurationBuilder and related resources have been deprecated and will be removed in Mule 4.0.
 
 Migration changes from 3.4.x to 3.5.x
 
