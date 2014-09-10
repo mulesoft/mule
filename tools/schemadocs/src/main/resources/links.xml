@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><links xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
-    <link><item>mule:model</item><page>Configuring+Models</page></link>
-    <link><item>mule:service</item><page>Configuring+Models</page></link>
-    <link><item>mule:custom-service</item><page>Configuring+Models</page></link>
-    <link><item>mule:inbound</item><page>Configuring+Models</page></link>
-    <link><item>mule:outbound</item><page>Configuring+Models</page></link>
-    <link><item>mule:async-reply</item><page>Configuring+Models</page></link>
     <link><item>mule:component</item><page>Configuring+Models</page></link>
     <link><item>mule:threading-profile</item><page>Configuring+Models</page></link>
-    <link><item>mule:bridge-component</item><page>Configuring+Models</page></link>
     <link><item>mule:echo-component</item><page>Configuring+Models</page></link>
     <link><item>mule:log-component</item><page>Configuring+Models</page></link>
     <link><item>mule:null-component</item><page>Configuring+Models</page></link>
@@ -28,36 +21,12 @@
     <link><item>mule:exclude-entry-point</item><page>Configuring+Models</page></link>
     <link><item>mule:include-entry-point</item><page>Configuring+Models</page></link>
     <link><item>mule:queue-profile</item><page>Configuring+Models</page></link>
-    <link><item>mule:logging-catch-all-strategy</item><page>Configuring+Models</page></link>
-    <link><item>mule:custom-catch-all-strategy</item><page>Configuring+Models</page></link>
-    <link><item>mule:forwarding-catch-all-strategy</item><page>Configuring+Models</page></link>
-    <link><item>mule:custom-forwarding-catch-all-strategy</item><page>Configuring+Models</page></link>
-    <link><item>mule:idempotent-secure-hash-receiver-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:idempotent-receiver-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:wire-tap-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:forwarding-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:selective-consumer-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:correlation-resequencer-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:message-chunking-aggregator-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:custom-correlation-aggregator-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:custom-inbound-router</item><page>Configuring+Models</page></link>
     <link><item>mule:spring-object</item><page>Configuring+Models</page></link>
     <link><item>mule:singleton-object</item><page>Configuring+Models</page></link>
     <link><item>mule:prototype-object</item><page>Configuring+Models</page></link>
     <link><item>mule:pooled-object</item><page>Configuring+Models</page></link>
     <link><item>mule:binding</item><page>Configuring+Models</page></link>
     <link><item>mule:pooling-profile</item><page>Configuring+Models</page></link>
-    <link><item>mule:pass-through-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:filtering-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:chaining-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:exception-based-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:multicasting-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:template-endpoint-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:endpoint-selector-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:list-message-splitter-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:message-chunking-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:static-recipient-list-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:custom-outbound-router</item><page>Configuring+Models</page></link>
 
     <link><item>mule:property</item><page>Additional+Configuration</page></link>
     <link><item>mule:properties</item><page>Additional+Configuration</page></link>

@@ -7,11 +7,9 @@
 package org.mule.config.spring.parsers.specific;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleContext;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.config.ConfigurationBuilder;
@@ -22,7 +20,6 @@ import org.mule.component.AbstractJavaComponent;
 import org.mule.component.DefaultInterfaceBinding;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.component.PooledJavaComponent;
-import org.mule.component.simple.PassThroughComponent;
 import org.mule.config.PoolingProfile;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.config.spring.parsers.specific.ComponentDelegatingDefinitionParser.CheckExclusiveClassAttributeObjectFactoryException;
@@ -253,7 +250,6 @@ public class ComponentDefinitionParserFlowTestCase extends AbstractMuleTestCase
     {
         assertNotNull(flow);
         assertNotNull(flow.getMessageProcessors().get(0));
-        assertFalse(flow.getMessageProcessors().get(0) instanceof PassThroughComponent);
         assertTrue(flow.getMessageProcessors().get(0) instanceof JavaComponent);
         assertEquals(DummyComponentWithBinding.class, ((JavaComponent) flow.getMessageProcessors().get(0)).getObjectType());
         assertNotNull(((JavaComponent) flow.getMessageProcessors().get(0)).getInterfaceBindings());

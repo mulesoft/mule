@@ -8,11 +8,10 @@ package org.mule.transport.jms.integration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleMessage;
-import org.mule.routing.outbound.StaticRecipientList;
+import org.mule.routing.outbound.ExpressionRecipientList;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.jms.transformers.AbstractJmsTransformer;
@@ -69,7 +68,7 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
 
         // Check that transformer 1 set message property ok.
         assertEquals("vm://recipient1, vm://recipient1, vm://recipient3",
-                     result1.getOutboundProperty("recipients"));
+                     result1.getOutboundProperty(ExpressionRecipientList.DEFAULT_SELECTOR_PROPERTY));
 
         AbstractJmsTransformer trans2 = new SessionEnabledObjectToJMSMessage(session);
         Message result2 = (Message) trans2.transform(result1);
@@ -101,7 +100,7 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
 
             String recipients = "vm://recipient1, vm://recipient1, vm://recipient3";
             logger.debug("Setting recipients to '" + recipients + "'");
-            message.setOutboundProperty(StaticRecipientList.RECIPIENTS_PROPERTY, recipients);
+            message.setOutboundProperty(ExpressionRecipientList.DEFAULT_SELECTOR_PROPERTY, recipients);
             return message;
         }
 
