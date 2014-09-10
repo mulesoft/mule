@@ -6,6 +6,8 @@
  */
 package org.mule.util.queue;
 
+import org.mule.api.MuleRuntimeException;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -32,7 +34,8 @@ public class QueueControlDataFile
      * Creates a QueueControlDataFile for storing / retrieving information
      *
      * @param queueFileProvider file provider to use to store control data
-     * @param firstFile  file to be used for write and read in case there is no control data yet.
+     * @param firstFile  first queue file. Used for write and read in case there is no control data yet.
+     * @param secondFile second queue file.
      */
     public QueueControlDataFile(QueueFileProvider queueFileProvider, File firstFile, File secondFile)
     {
@@ -89,7 +92,7 @@ public class QueueControlDataFile
         }
         catch (IOException e)
         {
-            throw new RuntimeException(e);
+            throw new MuleRuntimeException(e);
         }
     }
 
@@ -122,7 +125,11 @@ public class QueueControlDataFile
         return new String(stringAsBytes);
     }
 
-    //useful for testing
+    /**
+     * useful for testing
+     *
+     * @return the QueueFileProvider used for storing the content
+     */
     QueueFileProvider getQueueFileProvider()
     {
         return queueFileProvider;

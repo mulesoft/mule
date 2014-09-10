@@ -11,7 +11,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
 import org.mule.api.MuleContext;
-import org.mule.tck.SystemPropertyExecutionContext;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -58,11 +58,11 @@ public class DualRandomAccessFileQueueStoreDelegateTestCase extends AbstractMule
     @Test
     public void readQueueFileMessagesInOrder() throws Exception
     {
-        new SystemPropertyExecutionContext().addSystemProperty(DualRandomAccessFileQueueStoreDelegate.MAX_LENGTH_PER_FILE_PROPERTY_KEY,
-                                                               String.valueOf(MAXIMUM_NUMBER_OF_BYTES)).execute(new SystemPropertyExecutionContext.TestMethod()
+        MuleTestUtils.testWithSystemProperty(DualRandomAccessFileQueueStoreDelegate.MAX_LENGTH_PER_FILE_PROPERTY_KEY,
+                                             String.valueOf(MAXIMUM_NUMBER_OF_BYTES), new MuleTestUtils.TestCallback()
         {
             @Override
-            public void execute() throws Exception
+            public void run() throws Exception
             {
                 int lastInsertedMessageIndex = writeDataUntilSecondFileContainsNextMessages();
                 verifyNextMessage(lastInsertedMessageIndex);
@@ -73,11 +73,11 @@ public class DualRandomAccessFileQueueStoreDelegateTestCase extends AbstractMule
     @Test
     public void readQueueFileMessagesInOrderWhenControlFileIsCorrupted() throws Exception
     {
-        new SystemPropertyExecutionContext().addSystemProperty(DualRandomAccessFileQueueStoreDelegate.MAX_LENGTH_PER_FILE_PROPERTY_KEY,
-                                                               String.valueOf(MAXIMUM_NUMBER_OF_BYTES)).execute(new SystemPropertyExecutionContext.TestMethod()
+        MuleTestUtils.testWithSystemProperty(DualRandomAccessFileQueueStoreDelegate.MAX_LENGTH_PER_FILE_PROPERTY_KEY,
+                                             String.valueOf(MAXIMUM_NUMBER_OF_BYTES), new MuleTestUtils.TestCallback()
         {
             @Override
-            public void execute() throws Exception
+            public void run() throws Exception
             {
                 int lastInsertedMessageIndex = writeDataUntilSecondFileContainsNextMessages();
                 corruptQueueControlData();

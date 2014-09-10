@@ -222,7 +222,7 @@ class TransactionJournalFile<T, K extends JournalEntry<T>>
                     {
                         logger.debug(e);
                     }
-                    break;
+                    logEntryCreationFailed = true;
                 }
             }
         }

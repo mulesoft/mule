@@ -39,6 +39,7 @@ public class QueueFileProvider
         }
         catch(IOException e)
         {
+            //if file system does not support the name provided then use a hex representation of the name.
             this.file = new File(storeDirectory, toHex(fileName));
             try
             {
