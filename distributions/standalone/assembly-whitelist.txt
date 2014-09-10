@@ -580,7 +580,7 @@
 /mule-standalone-${productVersion}/lib/opt/grabbag-1.8.1.jar
 /mule-standalone-${productVersion}/lib/opt/groovy-all-1.8.6.jar
 /mule-standalone-${productVersion}/lib/opt/guava-16.0.1.jar
-/mule-standalone-${productVersion}/lib/opt/hamcrest-core-1.3.jar
+/mule-standalone-${productVersion}/lib/opt/hamcrest-core-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/hibernate-commons-annotations-3.2.0.Final.jar
 /mule-standalone-${productVersion}/lib/opt/hibernate-core-3.6.0.Final.jar
 /mule-standalone-${productVersion}/lib/opt/hibernate-jpa-2.0-api-1.0.0.Final.jar
@@ -709,7 +709,7 @@
 /mule-standalone-${productVersion}/lib/shared
 /mule-standalone-${productVersion}/lib/shared/README.txt
 /mule-standalone-${productVersion}/lib/user
-/mule-standalone-${productVersion}/lib/user/junit-4.11.jar
+/mule-standalone-${productVersion}/lib/user/junit-4.9.jar
 /mule-standalone-${productVersion}/lib/user/mule-tests-functional-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/user/README.txt
 /mule-standalone-${productVersion}/lib/user/xmlunit-1.1.jar
