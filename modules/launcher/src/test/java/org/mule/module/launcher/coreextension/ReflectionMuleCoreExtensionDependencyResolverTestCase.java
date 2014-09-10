@@ -8,6 +8,7 @@ package org.mule.module.launcher.coreextension;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -52,7 +53,7 @@ import org.mockito.Matchers;
         verify(dependencyDiscoverer).findDependencies(Matchers.<MuleCoreExtension>anyObject());
 
         assertThat(resolvedCoreExtensions.size(), equalTo(1));
-        assertThat(resolvedCoreExtensions.get(0), is(TestCoreExtension.class));
+        assertThat(resolvedCoreExtensions.get(0), is(instanceOf(TestCoreExtension.class)));
     }
 
     @Test
@@ -76,8 +77,8 @@ import org.mockito.Matchers;
         verify(dependantCoreExtension).setTestCoreExtension(testCoreExtension);
 
         assertThat(resolvedCoreExtensions.size(), equalTo(2));
-        assertThat(resolvedCoreExtensions.get(0), is(TestCoreExtension.class));
-        assertThat(resolvedCoreExtensions.get(1), is(TestCoreExtensionDependency.class));
+        assertThat(resolvedCoreExtensions.get(0), is(instanceOf(TestCoreExtension.class)));
+        assertThat(resolvedCoreExtensions.get(1), is(instanceOf(TestCoreExtensionDependency.class)));
     }
 
     @Test
@@ -101,8 +102,8 @@ import org.mockito.Matchers;
         verify(dependantCoreExtension).setTestCoreExtension(testCoreExtension);
 
         assertThat(resolvedCoreExtensions.size(), equalTo(2));
-        assertThat(resolvedCoreExtensions.get(0), is(TestCoreExtension.class));
-        assertThat(resolvedCoreExtensions.get(1), is(TestCoreExtensionDependency.class));
+        assertThat(resolvedCoreExtensions.get(0), is(instanceOf(TestCoreExtension.class)));
+        assertThat(resolvedCoreExtensions.get(1), is(instanceOf(TestCoreExtensionDependency.class)));
     }
 
     @Test(expected = UnresolveableDependencyException.class)

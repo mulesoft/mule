@@ -9,6 +9,7 @@ package org.mule.module.db.integration.vendor.oracle;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecord;
 import org.mule.api.MuleMessage;
@@ -65,7 +66,7 @@ public class OracleStoredProcedureXmlParamTestCase extends AbstractOracleXmlType
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://xmlTypeOutputParam", "ET", null);
 
-        assertThat(response.getPayload(), is(Map.class));
+        assertThat(response.getPayload(), is(instanceOf(Map.class)));
 
         Map<String, Object> mapPayload = (Map) response.getPayload();
 
@@ -89,7 +90,7 @@ public class OracleStoredProcedureXmlParamTestCase extends AbstractOracleXmlType
 
             MuleMessage response = client.send("vm://xmlTypeInputParam", TEST_MESSAGE, messageProperties);
 
-            assertThat(response.getPayload(), is(Map.class));
+            assertThat(response.getPayload(), is(instanceOf(Map.class)));
             Map<String, Object> mapPayload = (Map) response.getPayload();
             assertThat(mapPayload.size(), equalTo(0));
 

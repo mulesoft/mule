@@ -228,7 +228,10 @@ public interface MuleEventContext
      *            configuration and then on the mule manager configuration
      * @throws MuleException if the event fails to be processed by the service or
      *             the transport for the endpoint
-     * @deprecated
+     *
+     * <b>Deprecated from 3.6.0</b> - Only supported with Services. To invoke a flow directly you need to invoke
+     * the {@link org.mule.construct.Flow#process(MuleEvent)} method once you have obtained the flow instance from the
+     * {@link org.mule.api.registry.MuleRegistry}.
      */
     @Deprecated
     void dispatchEvent(MuleMessage message, EndpointURI endpoint) throws MuleException;
@@ -288,7 +291,10 @@ public interface MuleEventContext
      * @param timeout time in milliseconds before the request timesout
      * @return The requested event or null if the request times out
      * @throws MuleException if the request operation fails
-     * @deprecated
+     *
+     * <b>Deprecated from 3.6.0</b> - Only supported with Services. To invoke a flow directly you need to invoke
+     * the {@link org.mule.construct.Flow#process(MuleEvent)} method once you have obtained the flow instance from the
+     * {@link org.mule.api.registry.MuleRegistry}.
      */
     @Deprecated
     MuleMessage requestEvent(EndpointURI endpoint, long timeout) throws MuleException;

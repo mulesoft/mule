@@ -204,6 +204,7 @@
         <jschVersion>0.1.51</jschVersion>
         <jsr181Version>1.0-MR1</jsr181Version>
         <jsr250AnnotationVerson>1.0</jsr250AnnotationVerson>
+        <junitVersion>4.11</junitVersion>
         <log4jVersion>2.0.2</log4jVersion>
         <disruptorVersion>3.2.1</disruptorVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
@@ -508,7 +509,7 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.9</version>
+                <version>${junitVersion}</version>
             </dependency>
             <dependency>
                 <groupId>xmlunit</groupId>
@@ -667,8 +668,14 @@
 
             <dependency>
                 <groupId>org.mockito</groupId>
-                <artifactId>mockito-all</artifactId>
+                <artifactId>mockito-core</artifactId>
                 <version>1.9.0</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.hamcrest</groupId>
+                        <artifactId>hamcrest-core</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <!-- More info: http://www.cs.umd.edu/projects/PL/multithreadedtc/overview.html  -->
