@@ -26,10 +26,7 @@ import java.util.Properties;
  * Configures Mule from a configuration resource or comma seperated list of configuration resources by
  * auto-detecting the ConfigurationBuilder to use for each resource. This is resolved by either checking the
  * classpath for config modules e.g. spring-config or by using the file extention or a combination.
- *
- * @deprecated This class is deprecated and will be removed in Mule 4.0
  */
-@Deprecated
 public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuilder implements DomainMuleContextAwareConfigurationBuilder
 {
     private MuleContext domainContext;
