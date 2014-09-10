@@ -6,10 +6,9 @@
  */
 package org.mule.transport.vm.functional.transactions;
 
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -27,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsInstanceOf;
+import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -61,9 +61,9 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase
             fail("dead letter queue must be reached");
         }
         assertThat(outboundComponentReached, Is.is(false));
-        assertThat(response, notNullValue());
+        assertThat(response, IsNull.<Object>notNullValue());
         assertThat(response.getPayload(),IsInstanceOf.instanceOf(NullPayload.class));
-        assertThat(response.getExceptionPayload(), notNullValue());
+        assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
         assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
     }
 
@@ -76,9 +76,9 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase
         /*if (!deadLetterQueueLatch.await(TIMEOUT, MILLISECONDS)) {
             fail("dead letter queue must be reached");
         }*/
-        assertThat(response, notNullValue());
+        assertThat(response, IsNull.<Object>notNullValue());
         assertThat(response.getPayload(),IsInstanceOf.instanceOf(NullPayload.class));
-        assertThat(response.getExceptionPayload(), notNullValue());
+        assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
         assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
         if (!outboundComponentLatch.await(TIMEOUT, TimeUnit.MILLISECONDS))
         {
@@ -95,9 +95,9 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase
             fail("dead letter queue must be reached");
         }
         assertThat(outboundComponentReached, Is.is(false));
-        assertThat(response, notNullValue());
+        assertThat(response, IsNull.<Object>notNullValue());
         assertThat(response.getPayload(),IsInstanceOf.instanceOf(NullPayload.class));
-        assertThat(response.getExceptionPayload(), notNullValue());
+        assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
         assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
     }
 
@@ -110,9 +110,9 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase
             fail("dead letter queue must be reached");
         }
         assertThat(outboundComponentReached, Is.is(false));
-        assertThat(response, notNullValue());
+        assertThat(response, IsNull.<Object>notNullValue());
         assertThat(response.getPayload(),IsInstanceOf.instanceOf(NullPayload.class));
-        assertThat(response.getExceptionPayload(), notNullValue());
+        assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
         assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
     }
 
@@ -132,8 +132,8 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase
         {
             deadLetterQueueLatch.release();
             MuleMessage message = eventContext.getMessage();
-            assertThat(message, notNullValue());
-            assertThat(message.getExceptionPayload(), nullValue());
+            assertThat(message, IsNull.<Object>notNullValue());
+            assertThat(message.getExceptionPayload(), IsNull.<Object>nullValue());
             assertThat(message.getPayload(), IsInstanceOf.instanceOf(ExceptionMessage.class));
             return eventContext.getMessage();
         }

@@ -7,11 +7,10 @@
 package org.mule.test.integration.routing.outbound;
 
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -24,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hamcrest.core.IsNull;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
@@ -117,11 +117,11 @@ public class ExceptionBasedRouterTestCase extends AbstractServiceAndFlowTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("jms://in", "some message", null, RECEIVE_TIMEOUT);
-        assertThat(result, notNullValue());
+        assertThat(result, IsNull.<Object>notNullValue());
         assertThat((NullPayload) result.getPayload(), is(NullPayload.getInstance()));
-        assertThat(result.getExceptionPayload(), nullValue());
+        assertThat(result.getExceptionPayload(), IsNull.<Object>nullValue());
         MuleMessage outputMessage = client.request("jms://out",RECEIVE_TIMEOUT);
-        assertThat(outputMessage, notNullValue());
+        assertThat(outputMessage, IsNull.<Object>notNullValue());
         assertThat(outputMessage.getPayloadAsString(), is("some message"));
     }
 }

@@ -6,8 +6,10 @@
  */
 package org.mule.test.integration.routing.replyto;
 
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
+import org.hamcrest.core.Is;
+import org.hamcrest.core.IsNull;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -16,9 +18,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
-import org.hamcrest.core.Is;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
+import static org.junit.Assert.assertThat;
 
 public class ReplyToChainIntegration5TestCase extends AbstractServiceAndFlowTestCase
 {
@@ -60,7 +60,7 @@ public class ReplyToChainIntegration5TestCase extends AbstractServiceAndFlowTest
         client.dispatch("jms://jmsIn1", muleMessage);
         flowExecutedLatch.await(TIMEOUT, TimeUnit.MILLISECONDS);
         org.mule.api.MuleMessage response = client.request("jms://response", TIMEOUT);
-        assertThat(response, notNullValue());
+        assertThat(response, IsNull.<Object>notNullValue());
         assertThat(response.getPayloadAsString(), Is.is(EXPECTED_PAYLOAD));
     }
 }
