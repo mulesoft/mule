@@ -7,7 +7,6 @@
 
 package org.mule.transport.jms;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
@@ -46,7 +45,7 @@ public class CustomCachingConnectionFactoryTestCase extends AbstractMuleTestCase
 
         Connection actualConnection = cachingConnectionFactory.createConnection();
 
-        assertThat(actualConnection, is(instanceOf(Proxy.class)));
+        assertThat(actualConnection, is(Proxy.class));
         verify(delegate.createConnection());
     }
 
@@ -60,7 +59,7 @@ public class CustomCachingConnectionFactoryTestCase extends AbstractMuleTestCase
 
         Connection actualConnection = cachingConnectionFactory.createConnection();
 
-        assertThat(actualConnection, is(instanceOf(Proxy.class)));
+        assertThat(actualConnection, is(Proxy.class));
         verify(delegate.createConnection(USERNAME, null));
     }
 
@@ -74,7 +73,7 @@ public class CustomCachingConnectionFactoryTestCase extends AbstractMuleTestCase
 
         Connection actualConnection = cachingConnectionFactory.createConnection();
 
-        assertThat(actualConnection, is(instanceOf(Proxy.class)));
+        assertThat(actualConnection, is(Proxy.class));
         verify(delegate.createConnection(null, PASSWORD));
     }
 
@@ -88,7 +87,7 @@ public class CustomCachingConnectionFactoryTestCase extends AbstractMuleTestCase
 
         Connection actualConnection = cachingConnectionFactory.createConnection();
 
-        assertThat(actualConnection, is(instanceOf(Proxy.class)));
+        assertThat(actualConnection, is(Proxy.class));
         verify(delegate.createConnection(USERNAME, PASSWORD));
     }
 

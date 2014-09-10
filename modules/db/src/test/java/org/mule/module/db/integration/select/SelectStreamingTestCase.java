@@ -8,7 +8,6 @@
 package org.mule.module.db.integration.select;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
@@ -50,7 +49,7 @@ public class SelectStreamingTestCase extends AbstractDbIntegrationTestCase
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://selectStreaming", TEST_MESSAGE, null);
 
-        assertThat(response.getPayload(), is(instanceOf(ResultSetIterator.class)));
+        assertThat(response.getPayload(), is(ResultSetIterator.class));
         assertRecords(response.getInboundProperty("processedRecords"), getAllPlanetRecords());
     }
 }

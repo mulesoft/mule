@@ -58,7 +58,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
         initMockMuleContext();
     }
 
-    private void initMockMuleContext() throws IOException
+    private void initMockMuleContext()
     {
         persistenceFolder = tempFolder.newFolder("persistence");
 

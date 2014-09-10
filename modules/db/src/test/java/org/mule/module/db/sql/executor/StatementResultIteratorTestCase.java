@@ -9,7 +9,6 @@ package org.mule.module.db.sql.executor;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -105,7 +104,7 @@ public class StatementResultIteratorTestCase extends AbstractMuleTestCase
 
         Object nextResult = iterator.next();
 
-        assertThat(nextResult, is(instanceOf(ResultSetResult.class)));
+        assertThat(nextResult, is(ResultSetResult.class));
         ResultSetResult resultSetResult = (ResultSetResult) nextResult;
         assertThat(resultSetResult.getName(), equalTo("resultSet1"));
         assertThat((ResultSet) resultSetResult.getResult(), equalTo(resultSet));
@@ -119,7 +118,7 @@ public class StatementResultIteratorTestCase extends AbstractMuleTestCase
 
         Object nextResult = iterator.next();
 
-        assertThat(nextResult, is(instanceOf(UpdateCountResult.class)));
+        assertThat(nextResult, is(UpdateCountResult.class));
         UpdateCountResult updateCountResult = (UpdateCountResult) nextResult;
         assertThat(updateCountResult.getName(), equalTo("updateCount1"));
         assertThat((Integer) updateCountResult.getResult(), equalTo(updateCount));
@@ -142,7 +141,7 @@ public class StatementResultIteratorTestCase extends AbstractMuleTestCase
 
         Object nextResult = iterator.next();
 
-        assertThat(nextResult, is(instanceOf(OutputParamResult.class)));
+        assertThat(nextResult, is(OutputParamResult.class));
         OutputParamResult outputParamResult = (OutputParamResult) nextResult;
         assertThat(outputParamResult.getName(), equalTo("param1"));
         assertThat((Integer) outputParamResult.getResult(), equalTo(paramValue));

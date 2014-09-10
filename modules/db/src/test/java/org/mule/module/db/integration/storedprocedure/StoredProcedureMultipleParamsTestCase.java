@@ -9,7 +9,6 @@ package org.mule.module.db.integration.storedprocedure;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
@@ -51,7 +50,7 @@ public class StoredProcedureMultipleParamsTestCase extends AbstractDbIntegration
 
         MuleMessage response = client.send("vm://multiplyInts", TEST_MESSAGE, null);
 
-        assertThat(response.getPayload(), is(instanceOf(Map.class)));
+        assertThat(response.getPayload(), is(Map.class));
         Map payload = (Map) response.getPayload();
         // Apparently Derby has a bug: when there are no resultset returned, then
         // there is a fake updateCount=0 that is returned. Check how this works in other DB vendors.
@@ -68,7 +67,7 @@ public class StoredProcedureMultipleParamsTestCase extends AbstractDbIntegration
 
         MuleMessage response = client.send("vm://concatenateStrings", TEST_MESSAGE, null);
 
-        assertThat(response.getPayload(), is(instanceOf(Map.class)));
+        assertThat(response.getPayload(), is(Map.class));
         Map payload = (Map) response.getPayload();
         // Apparently Derby has a bug: when there are no resultset returned, then
         // there is a fake updateCount=0 that is returned. Check how this works in other DB vendors.

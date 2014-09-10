@@ -9,7 +9,6 @@ package org.mule;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import org.mule.api.MuleException;
-
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.log4j.ArtifactAwareRepositorySelector;
 import org.mule.test.infrastructure.deployment.AbstractFakeMuleServerTestCase;

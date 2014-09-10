@@ -9,7 +9,6 @@ package org.mule.module.db.integration.storedprocedure;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.db.integration.DbTestUtil.selectData;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
@@ -41,7 +40,7 @@ public abstract class AbstractStoredProcedureUpdateTestCase extends AbstractDbIn
         LocalMuleClient client = muleContext.getClient();
 
         MuleMessage response = client.send("vm://testRequestResponse", TEST_MESSAGE, null);
-        assertThat(response.getPayload(), is(instanceOf(Map.class)));
+        assertThat(response.getPayload(), is(Map.class));
         Map mapPayload = (Map) response.getPayload();
         int expectedUpdateCount = testDatabase instanceof DerbyTestDatabase ? 0 : 1;
         assertThat((Integer) mapPayload.get("updateCount1"), equalTo(expectedUpdateCount));

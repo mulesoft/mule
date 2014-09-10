@@ -10,7 +10,6 @@ package org.mule.module.db.integration.storedprocedure;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
@@ -69,8 +68,8 @@ public class StoredProcedureStreamingResourceManagementTestCase extends Abstract
         Map payload = (Map) response.getPayload();
 
         assertThat(payload.size(), IsEqual.equalTo(1));
-        assertThat(payload.get("resultSet1"), is(instanceOf(ResultSetIterator.class)));
-        assertThat(response.getInboundProperty("processedResults"), is(instanceOf(List.class)));
+        assertThat(payload.get("resultSet1"), is(ResultSetIterator.class));
+        assertThat(response.getInboundProperty("processedResults"), is(List.class));
         assertRecords(response.getInboundProperty("processedResults"), getAllPlanetRecords());
     }
 
@@ -89,7 +88,7 @@ public class StoredProcedureStreamingResourceManagementTestCase extends Abstract
 
         assertThat(response.getExceptionPayload(), notNullValue());
         assertThat(response.getExceptionPayload().getRootException().getMessage(), equalTo("Failing test on purpose"));
-        assertThat(response.getPayload(), is(instanceOf(NullPayload.class)));
+        assertThat(response.getPayload(), is(NullPayload.class));
     }
 
     @Before

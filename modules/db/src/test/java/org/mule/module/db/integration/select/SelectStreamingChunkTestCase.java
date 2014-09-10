@@ -8,7 +8,6 @@
 package org.mule.module.db.integration.select;
 
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
@@ -54,9 +53,9 @@ public class SelectStreamingChunkTestCase extends AbstractDbIntegrationTestCase
 
         List<MuleMessage> chunks = (List<MuleMessage>) response.getPayload();
         assertEquals(2, chunks.size());
-        assertThat(chunks.get(0), is(instanceOf(List.class)));
+        assertThat(chunks.get(0), is(List.class));
         assertRecords(chunks.get(0), getVenusRecord(), getEarthRecord());
-        assertThat(chunks.get(1), is(instanceOf(List.class)));
+        assertThat(chunks.get(1), is(List.class));
         assertRecords(chunks.get(1), getMarsRecord());
     }
 }
