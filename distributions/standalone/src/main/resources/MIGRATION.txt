@@ -20,3 +20,4 @@ MULE-7857: The RemoteDispatcher and related classes in the client module have be
 MULE-7858: Support for spring events and related classes in the spring-extras module have been removed.
 MULE-7470: Model/Service interfaces and implementations have been removed, as have the associated configuration elements.
            Use Mule Flow's which provide the same functionality with more flexibility.
+MULE-7723: ScriptConfigurationBuilder and related resources have been removed
