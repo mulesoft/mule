@@ -16,6 +16,11 @@
     <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
                 schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.5/mule-schemadoc.xsd"/>
 
+    <!--
+    We include all the elements defined in the schema of the new HTTP connector into this namespace.
+    -->
+    <xsd:include schemaLocation="http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd" />
+
     <xsd:annotation>
         <xsd:documentation>The HTTP transport provides support for exposing services over HTTP and making HTTP client requests from Mule services to external services as part of service event flows. Mule supports inbound, outbound, and polling HTTP endpooints. These endpoints support all common features of the HTTP spec, such as ETag processing, cookies, and keepalive. Both HTTP 1.0 and 1.1 are supported.</xsd:documentation>
         <xsd:appinfo>
