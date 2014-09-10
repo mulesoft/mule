@@ -116,6 +116,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-db-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-devkit-support-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-drools-${productVersion}.jar
+/mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-http-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-jaas-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-jbossts-${productVersion}.jar
 /mule-standalone-nodocs-${productVersion}/lib/mule/mule-module-jbpm-${productVersion}.jar
@@ -283,6 +284,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/jersey-server-2.11.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jettison-1.3.3.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jetty-annotations-9.0.7.v20131107.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/jetty-client-9.0.7.v20131107.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jetty-continuation-9.0.7.v20131107.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jetty-deploy-9.0.7.v20131107.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jetty-http-9.0.7.v20131107.jar
