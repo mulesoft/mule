@@ -98,6 +98,11 @@
             <artifactId>joda-time</artifactId>
             <version>${jodaTimeVersion}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-http</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- Unit tests -->
         <dependency>

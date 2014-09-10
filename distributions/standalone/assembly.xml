@@ -234,6 +234,7 @@
                 <include>org.mule.modules:mule-module-db</include>
                 <include>org.mule.modules:mule-module-devkit-support</include>
                 <include>org.mule.modules:mule-module-drools</include>
+                <include>org.mule.modules:mule-module-http</include>
                 <include>org.mule.modules:mule-module-jaas</include>
                 <include>org.mule.modules:mule-module-jersey</include>
                 <include>org.mule.modules:mule-module-jbossts</include>
@@ -307,6 +308,7 @@
                 <exclude>org.mule.modules:mule-module-db</exclude>
                 <exclude>org.mule.modules:mule-module-devkit-support</exclude>
                 <exclude>org.mule.modules:mule-module-drools</exclude>
+                <exclude>org.mule.modules:mule-module-http</exclude>
                 <exclude>org.mule.modules:mule-module-jaas</exclude>
                 <exclude>org.mule.modules:mule-module-jersey</exclude>
                 <exclude>org.mule.modules:mule-module-jbossts</exclude>
