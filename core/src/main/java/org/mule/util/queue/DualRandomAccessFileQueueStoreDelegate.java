@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * {@link TransactionalQueueStoreDelegate} implementation using two files for storing the
  * queue data.
- *
+ * <p/>
  * Entries are stored in the queue file until a certain size in the file. After that size is reached a new file is created
  * and used to store new entries until the previous file queue entries are consumed, in which case the file is cleaned and reused
  * for new entries once the second files gets full.
@@ -34,15 +34,18 @@ import org.apache.commons.logging.LogFactory;
 public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDelegate implements TransactionalQueueStoreDelegate
 {
 
-    private static final String QUEUE_STORE_DIRECTORY = "queuestore";
+    public static final String MAX_LENGTH_PER_FILE_PROPERTY_KEY = "mule.queue.maxlength";
     private static final int ONE_MEGABYTE = 1024 * 1024;
-    private static final Integer MAXIMUM_QUEUE_FILE_SIZE_IN_BYTES = Integer.valueOf(System.getProperty("mule.queue.maxlength", Integer.valueOf(ONE_MEGABYTE).toString()));
+    private static final String QUEUE_STORE_DIRECTORY = "queuestore";
+    private static final Integer MAXIMUM_QUEUE_FILE_SIZE_IN_BYTES = Integer.valueOf(System.getProperty(MAX_LENGTH_PER_FILE_PROPERTY_KEY, Integer.valueOf(ONE_MEGABYTE).toString()));
     private static final String QUEUE_STORE_1_SUFFIX = "-1";
     private static final String QUEUE_STORE_2_SUFFIX = "-2";
+    private static final Object QUEUE_DATA_CONTROL_SUFFIX = "-crl";
 
     protected final Log logger = LogFactory.getLog(this.getClass());
     private final MuleContext muleContext;
     private final ReadWriteLock filesLock;
+    private final QueueControlDataFile queueControlDataFile;
     private RandomAccessFileQueueStore writeFile;
     private RandomAccessFileQueueStore readFile;
     private RandomAccessFileQueueStore randomAccessFileQueueStore1;
@@ -57,15 +60,22 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
         {
             Preconditions.checkState(queuesDirectory.mkdirs(), "Could not create queue store directory " + queuesDirectory.getAbsolutePath());
         }
-        randomAccessFileQueueStore1 = new RandomAccessFileQueueStore(queuesDirectory, queueName + QUEUE_STORE_1_SUFFIX);
-        randomAccessFileQueueStore2 = new RandomAccessFileQueueStore(queuesDirectory, queueName + QUEUE_STORE_2_SUFFIX);
-        writeFile = randomAccessFileQueueStore1;
-        readFile = randomAccessFileQueueStore1;
+        randomAccessFileQueueStore1 = new RandomAccessFileQueueStore(new QueueFileProvider(queuesDirectory, queueName + QUEUE_STORE_1_SUFFIX));
+        randomAccessFileQueueStore2 = new RandomAccessFileQueueStore(new QueueFileProvider(queuesDirectory, queueName + QUEUE_STORE_2_SUFFIX));
+        queueControlDataFile = new QueueControlDataFile(new QueueFileProvider(queuesDirectory, queueName + QUEUE_DATA_CONTROL_SUFFIX), randomAccessFileQueueStore1.getFile(), randomAccessFileQueueStore2.getFile());
+        writeFile = queueControlDataFile.getCurrentWriteFile().getAbsolutePath().equals(randomAccessFileQueueStore1.getFile().getAbsolutePath()) ? randomAccessFileQueueStore1 : randomAccessFileQueueStore2;
+        readFile = queueControlDataFile.getCurrentReadFile().getAbsolutePath().equals(randomAccessFileQueueStore1.getFile().getAbsolutePath()) ? randomAccessFileQueueStore1 : randomAccessFileQueueStore2;
         if (logger.isDebugEnabled())
         {
             logger.debug(String.format("Queue %s has %s messages", queueName, getSize()));
         }
         filesLock = new ReentrantReadWriteLock();
+    }
+
+    //only for testing.
+    QueueControlDataFile getQueueControlDataFile()
+    {
+        return queueControlDataFile;
     }
 
     private static File getQueuesDirectory(String workingDirectory)
@@ -214,7 +224,7 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
             {
                 values.add(deserialize(valueAsByte));
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 logger.warn("Failure trying to deserialize value " + e.getMessage());
                 if (logger.isDebugEnabled())
@@ -281,6 +291,7 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
         {
             randomAccessFileQueueStore1.close();
             randomAccessFileQueueStore2.close();
+            queueControlDataFile.close();
         }
         finally
         {
@@ -295,6 +306,7 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
             logger.debug("switching read file. Random 1 size: " + randomAccessFileQueueStore1.getSize() + " , Random 2 size: " + randomAccessFileQueueStore2.getSize());
         }
         readFile = nextReadFile();
+        queueControlDataFile.writeControlData(writeFile.getFile(), readFile.getFile());
     }
 
     private void switchWriteFileIfFull()
@@ -316,6 +328,7 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
                         logger.debug("switching write file. Random 1 size: " + randomAccessFileQueueStore1.getLength() + " , Random 2 size: " + randomAccessFileQueueStore2.getLength());
                     }
                     writeFile = (writeFile == randomAccessFileQueueStore1 ? randomAccessFileQueueStore2 : randomAccessFileQueueStore1);
+                    queueControlDataFile.writeControlData(writeFile.getFile(), readFile.getFile());
                 }
             }
             finally

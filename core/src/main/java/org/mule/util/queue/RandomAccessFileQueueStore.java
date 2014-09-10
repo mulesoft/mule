@@ -33,45 +33,23 @@ class RandomAccessFileQueueStore
     protected static final int CONTROL_DATA_SIZE = 5;
     private static final byte NOT_REMOVED = 0;
     private static final byte REMOVED = 1;
+    private final QueueFileProvider queueFileProvider;
 
-    private File file;
-    private RandomAccessFile queueFile;
     private LinkedList<Long> orderedKeys = new LinkedList<Long>();
     private long fileTotalSpace = 0;
 
-    public RandomAccessFileQueueStore(File directory, String filename)
+    public RandomAccessFileQueueStore(QueueFileProvider queueFileProvider)
     {
-        this.file = new File(directory, filename);
-        try
-        {
-            createQueueFile();
-        }
-        catch(IOException e)
-        {
-            this.file = new File(directory, toHex(filename));
-            try
-            {
-                createQueueFile();
-            }
-            catch (IOException e2)
-            {
-                throw new MuleRuntimeException(e2);
-            }
-        }
+        this.queueFileProvider = queueFileProvider;
         initialise();
     }
 
-    private static String toHex(String filename)
+    /**
+     * @return the File where the content is stored.
+     */
+    public File getFile()
     {
-        try
-        {
-            return new BigInteger(filename.getBytes("UTF-8")).toString(16);
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            // This should never happen
-            return filename;
-        }
+        return this.queueFileProvider.getFile();
     }
 
     /**
@@ -99,8 +77,8 @@ class RandomAccessFileQueueStore
                 return null;
             }
             Long filePosition = orderedKeys.getFirst();
-            queueFile.seek(filePosition);
-            queueFile.writeByte(RandomAccessFileQueueStore.REMOVED);
+            queueFileProvider.getRandomAccessFile().seek(filePosition);
+            queueFileProvider.getRandomAccessFile().writeByte(RandomAccessFileQueueStore.REMOVED);
             byte[] data = readDataInCurrentPosition();
             orderedKeys.removeFirst();
             return data;
@@ -148,11 +126,10 @@ class RandomAccessFileQueueStore
     {
         try
         {
-            queueFile.close();
+            queueFileProvider.getRandomAccessFile().close();
             orderedKeys.clear();
             fileTotalSpace = 0;
-            FileUtils.deleteQuietly(file);
-            createQueueFile();
+            queueFileProvider.recreate();
         }
         catch (IOException e)
         {
@@ -184,10 +161,10 @@ class RandomAccessFileQueueStore
         List<byte[]> elements = new LinkedList<byte[]>();
         try
         {
-            queueFile.seek(0);
+            queueFileProvider.getRandomAccessFile().seek(0);
             while (true)
             {
-                boolean removed = queueFile.readBoolean();
+                boolean removed = queueFileProvider.getRandomAccessFile().readBoolean();
                 if (!removed)
                 {
                     elements.add(readDataInCurrentPosition());
@@ -227,18 +204,18 @@ class RandomAccessFileQueueStore
     {
         try
         {
-            queueFile.seek(0);
+            queueFileProvider.getRandomAccessFile().seek(0);
             while (true)
             {
-                long currentPosition = queueFile.getFilePointer();
-                byte removed = queueFile.readByte();
+                long currentPosition = queueFileProvider.getRandomAccessFile().getFilePointer();
+                byte removed = queueFileProvider.getRandomAccessFile().readByte();
                 if (removed == 0)
                 {
                     byte[] data = readDataInCurrentPosition();
                     if (rawDataSelector.isSelectedData(data))
                     {
-                        queueFile.seek(currentPosition);
-                        queueFile.writeByte(REMOVED);
+                        queueFileProvider.getRandomAccessFile().seek(currentPosition);
+                        queueFileProvider.getRandomAccessFile().writeByte(REMOVED);
                         orderedKeys.remove(currentPosition);
                         return true;
                     }
@@ -268,7 +245,7 @@ class RandomAccessFileQueueStore
     {
         try
         {
-            this.queueFile.close();
+            this.queueFileProvider.close();
         }
         catch (IOException e)
         {
@@ -282,19 +259,10 @@ class RandomAccessFileQueueStore
 
     private byte[] readDataInCurrentPosition() throws IOException
     {
-        int serializedValueSize = queueFile.readInt();
+        int serializedValueSize = queueFileProvider.getRandomAccessFile().readInt();
         byte[] data = new byte[serializedValueSize];
-        queueFile.read(data, 0, serializedValueSize);
+        queueFileProvider.getRandomAccessFile().read(data, 0, serializedValueSize);
         return data;
-    }
-
-    private void createQueueFile() throws IOException
-    {
-        if (!file.exists())
-        {
-            file.createNewFile();
-        }
-        queueFile = new RandomAccessFile(file, "rw");
     }
 
     private long writeData(byte[] data)
@@ -303,15 +271,15 @@ class RandomAccessFileQueueStore
         {
             if (getSize() > 0)
             {
-                queueFile.seek(fileTotalSpace);
+                queueFileProvider.getRandomAccessFile().seek(fileTotalSpace);
             }
-            long filePointer = queueFile.getFilePointer();
+            long filePointer = queueFileProvider.getRandomAccessFile().getFilePointer();
             int totalBytesRequired = CONTROL_DATA_SIZE + data.length;
             ByteBuffer byteBuffer = ByteBuffer.allocate(totalBytesRequired);
             byteBuffer.put(NOT_REMOVED);
             byteBuffer.putInt(data.length);
             byteBuffer.put(data);
-            queueFile.write(byteBuffer.array());
+            queueFileProvider.getRandomAccessFile().write(byteBuffer.array());
             fileTotalSpace += totalBytesRequired;
             return filePointer;
         }
@@ -325,11 +293,11 @@ class RandomAccessFileQueueStore
     {
         try
         {
-            queueFile.seek(0);
+            queueFileProvider.getRandomAccessFile().seek(0);
             while (true)
             {
-                long position = queueFile.getFilePointer();
-                byte removed = queueFile.readByte();
+                long position = queueFileProvider.getRandomAccessFile().getFilePointer();
+                byte removed = queueFileProvider.getRandomAccessFile().readByte();
                 if (removed == NOT_REMOVED)
                 {
                     orderedKeys.add(position);
@@ -368,8 +336,8 @@ class RandomAccessFileQueueStore
                 return null;
             }
             Long filePointer = orderedKeys.getFirst();
-            queueFile.seek(filePointer);
-            queueFile.readByte(); //Always true since it's a key
+            queueFileProvider.getRandomAccessFile().seek(filePointer);
+            queueFileProvider.getRandomAccessFile().readByte(); //Always true since it's a key
             return readDataInCurrentPosition();
         }
         catch (IOException e)
@@ -380,8 +348,8 @@ class RandomAccessFileQueueStore
 
     private void moveFilePointerToNextData() throws IOException
     {
-        int serializedValueSize = queueFile.readInt();
-        queueFile.seek(queueFile.getFilePointer() + serializedValueSize);
+        int serializedValueSize = queueFileProvider.getRandomAccessFile().readInt();
+        queueFileProvider.getRandomAccessFile().seek(queueFileProvider.getRandomAccessFile().getFilePointer() + serializedValueSize);
     }
 
     /**
@@ -402,10 +370,10 @@ class RandomAccessFileQueueStore
     {
         try
         {
-            queueFile.seek(0);
+            queueFileProvider.getRandomAccessFile().seek(0);
             while (true)
             {
-                byte removed = queueFile.readByte();
+                byte removed = queueFileProvider.getRandomAccessFile().readByte();
                 if (removed == NOT_REMOVED)
                 {
                     byte[] data = readDataInCurrentPosition();
