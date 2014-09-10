@@ -39,7 +39,7 @@
             </schemadoc:additional-documentation>
 
             <schemadoc:additional-documentation where="after-specific-elements">
-                h2. Script Configuration Builder
+                h2. Script Configuration Builder (Deprecated, will be removed as of Mule 4.0)
 
                 The {javadoc:mule/module/scripting/builders|ScriptConfigurationBuilder}ScriptConfigurationBuilder{javadoc} allows developers to create a Mule instance from a JSR-223 compliant script. To load the manager from Groovy:
 

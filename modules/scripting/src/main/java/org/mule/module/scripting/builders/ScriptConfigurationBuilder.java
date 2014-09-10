@@ -15,7 +15,12 @@ import org.mule.module.scripting.component.Scriptable;
 
 import javax.script.Bindings;
 
-/** Configures Mule from one or more script files. */
+/**
+ * Configures Mule from one or more script files.
+ *
+ * @deprecated This class is deprecated and will be removed in Mule 4.0
+ */
+@Deprecated
 public class ScriptConfigurationBuilder extends AbstractResourceConfigurationBuilder
 {
     public static final String SCRIPT_ENGINE_NAME_PROPERTY = "org.mule.script.engine";
