@@ -12,7 +12,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
+import org.mule.DefaultMuleEvent;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -28,7 +28,6 @@ import org.mule.util.store.SimpleMemoryObjectStore;
 
 import java.io.ByteArrayInputStream;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
@@ -130,7 +129,6 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    @Ignore("MULE-6926: flaky test")
     public void testSuccessfulDeliveryAckExpression() throws Exception
     {
         untilSuccessful.setAckExpression("#[string:ACK]");
@@ -138,7 +136,9 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
         untilSuccessful.start();
 
         final MuleEvent testEvent = getTestEvent("test_data");
-        assertEquals("ACK", untilSuccessful.process(testEvent).getMessageAsString());
+        // UntilSuccessful mutates event to set ACK expression, so need to use a copy for asserting message received by
+        // target process.
+        assertEquals("ACK", untilSuccessful.process(DefaultMuleEvent.copy(testEvent)).getMessageAsString());
         ponderUntilEventProcessed(testEvent);
     }
 
@@ -276,27 +276,43 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
 
 
     private void ponderUntilEventProcessed(final MuleEvent testEvent)
-        throws InterruptedException, MuleException
+            throws InterruptedException, MuleException
     {
-        while (targetMessageProcessor.getEventReceived() == null)
+        pollingProber.check(new JUnitProbe()
         {
-            Thread.yield();
-            Thread.sleep(250L);
-        }
+            @Override
+            protected boolean test() throws Exception
+            {
+                return targetMessageProcessor.getEventReceived() != null  && objectStore.allKeys().isEmpty();
+            }
 
-        assertEquals(0, objectStore.allKeys().size());
+            @Override
+            public String describeFailure()
+            {
+                return "Event not received by target";
+            }
+        });
         assertLogicallyEqualEvents(testEvent, targetMessageProcessor.getEventReceived());
     }
 
     private void ponderUntilEventAborted(final MuleEvent testEvent)
-        throws InterruptedException, MuleException
+            throws InterruptedException, MuleException
     {
-        while (targetMessageProcessor.getEventCount() <= untilSuccessful.getMaxRetries())
+        pollingProber.check(new JUnitProbe()
         {
-            Thread.yield();
-            Thread.sleep(250L);
-        }
+            @Override
+            protected boolean test() throws Exception
+            {
+                return targetMessageProcessor.getEventCount() > untilSuccessful.getMaxRetries()
+                       &&  objectStore.allKeys().isEmpty();
+            }
 
+            @Override
+            public String describeFailure()
+            {
+                return String.format("Processing not retried %s times.",untilSuccessful.getMaxRetries());
+            }
+        });
         assertEquals(0, objectStore.allKeys().size());
         assertEquals(targetMessageProcessor.getEventCount(), 1 + untilSuccessful.getMaxRetries());
     }
