@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:tns="http://consumer.ws.module.mule.org/"
+                  targetNamespace="http://consumer.ws.module.mule.org/">
+
+    <wsdl:types>
+        <xsd:schema targetNamespace="http://consumer.ws.module.mule.org/">
+            <xsd:element name="noParams" type="tns:noParams"/>
+            <xsd:complexType name="noParams">
+                <xsd:sequence/>
+            </xsd:complexType>
+            <xsd:complexType name="noParamsResponse">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="text" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:schema>
+    </wsdl:types>
+    <wsdl:message name="noParams">
+        <wsdl:part element="tns:noParams" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="noParamsResponse">
+        <wsdl:part element="tns:noParamsResponse" name="parameters"/>
+    </wsdl:message>
+    <wsdl:portType name="TestParamsService">
+        <wsdl:operation name="noParams">
+            <wsdl:input message="tns:noParams" name="noParams"/>
+            <wsdl:output message="tns:noParamsResponse" name="noParamsResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+
+</wsdl:definitions>

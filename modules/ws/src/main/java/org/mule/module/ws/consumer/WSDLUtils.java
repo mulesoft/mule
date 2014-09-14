@@ -6,6 +6,8 @@
  */
 package org.mule.module.ws.consumer;
 
+import org.mule.util.StringUtils;
+
 import java.io.File;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -54,7 +56,11 @@ public class WSDLUtils
         List<String> schemas = new ArrayList<String>();
         List<Types> typesList = new ArrayList<Types>();
 
-        extractWsdlTypes(wsdlDefinition, typesList);
+        // Add current types definition if present
+        if (wsdlDefinition.getTypes() != null)
+        {
+            typesList.add(wsdlDefinition.getTypes());
+        }
 
         for (Types types : typesList)
         {
@@ -65,7 +71,10 @@ public class WSDLUtils
                     Schema schema = (Schema) o;
                     for (Map.Entry<String, String> entry : wsdlNamespaces.entrySet())
                     {
-                        if (!schema.getElement().hasAttribute(XML_NS_PREFIX + entry.getKey()))
+                        boolean isDefault = StringUtils.isEmpty(entry.getKey());
+                        boolean containsNamespace = schema.getElement().hasAttribute(XML_NS_PREFIX + entry.getKey());
+
+                        if (!isDefault && !containsNamespace)
                         {
                             schema.getElement().setAttribute(XML_NS_PREFIX + entry.getKey(), entry.getValue());
                         }
@@ -82,29 +91,17 @@ public class WSDLUtils
                 }
             }
         }
-        return schemas;
-    }
-
-    /**
-     * Extracts the "Types" definition from a WSDL and recursively from all the imports. The types are
-     * added to the typesList argument.
-     */
-    private static void extractWsdlTypes(Definition wsdlDefinition, List<Types> typesList)
-    {
-        // Add current types definition if present
-        if (wsdlDefinition.getTypes() != null)
-        {
-            typesList.add(wsdlDefinition.getTypes());
-        }
 
         // Allow importing types from other wsdl
         for (Object wsdlImportList : wsdlDefinition.getImports().values())
         {
             for (Import wsdlImport : (List<Import>) wsdlImportList)
             {
-                extractWsdlTypes(wsdlImport.getDefinition(), typesList);
+                schemas.addAll(getSchemas(wsdlImport.getDefinition()));
             }
         }
+
+        return schemas;
     }
 
     /**
