@@ -143,7 +143,7 @@ public class StringToEmailMessage extends AbstractMessageTransformer
                 email.setHeader(entry.getKey().toString(), entry.getValue().toString());
             }
 
-            setContent(message.getPayload(), email, contentType, message);
+            setContent(message.getPayload(), email, contentType + "; charset=" + outputEncoding, message);
 
             return email;
         }
