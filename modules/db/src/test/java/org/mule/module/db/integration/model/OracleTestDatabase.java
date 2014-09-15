@@ -55,6 +55,21 @@ public class OracleTestDatabase extends AbstractTestDatabase
     }
 
     @Override
+    public void createFunctionGetRecords(DataSource dataSource) throws SQLException
+    {
+        String query = "CREATE OR REPLACE FUNCTION getTestRecordsFunction\n" +
+                       "RETURN SYS_REFCURSOR\n" +
+                       "IS planet_cursor SYS_REFCURSOR;\n" +
+                       "BEGIN\n" +
+                       "  OPEN planet_cursor FOR\n" +
+                       "  SELECT * FROM planet;\n" +
+                       "  RETURN planet_cursor;\n" +
+                       "END;";
+
+        executeDdl(dataSource, query);
+    }
+
+    @Override
     public void createStoredProcedureUpdateTestType1(DataSource dataSource) throws SQLException
     {
         final String sql = "CREATE OR REPLACE PROCEDURE updateTestType1 (p_retVal OUT INTEGER)\n" +
