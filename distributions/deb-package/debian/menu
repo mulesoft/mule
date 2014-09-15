@@ -1,2 +1,0 @@
-?package(mule):needs="X11|text|vc|wm" section="Applications/Development"\
-  title="Mule" command="/usr/bin/mule"
