@@ -90,4 +90,20 @@ public class ExceptionToMessagingExceptionExecutionInterceptorTestCase extends A
             assertThat((RuntimeException) e.getCause(), is(runtimeException));
         }
     }
+
+    @Test
+    public void testErrorThrown() throws MuleException
+    {
+        Error error = new Error();
+        Mockito.when(mockMessageProcessor.process(mockMuleEvent)).thenThrow(error);
+        try
+        {
+            cut.execute(mockMessageProcessor, mockMuleEvent);
+            fail("Exception should be thrown");
+        }
+        catch (MessagingException e)
+        {
+            assertThat((Error) e.getCause(), is(error));
+        }
+    }
 }

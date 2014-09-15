@@ -27,7 +27,7 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
         {
             throw messagingException;
         }
-        catch (Exception ex)
+        catch (Throwable ex)
         {
             throw new MessagingException(event,ex,messageProcessor);
         }
