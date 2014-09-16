@@ -2,18 +2,18 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:atom="http://www.mulesoft.org/schema/mule/atom"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:file="http://www.mulesoft.org/schema/mule/file"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/atom http://www.mulesoft.org/schema/mule/atom/current/mule-atom.xsd
-        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <flow name="feedConsumer">
-        <poll frequency="1000">
-            <http:outbound-endpoint address="http://rossmason.blogspot.com/feeds/posts/default" method="GET"/>
-        </poll>
+        <file:inbound-endpoint  path="./target/test-classes" pollingFrequency="1000" >
+            <file:filename-wildcard-filter pattern="sample-consume-feed.atom"/>
+        </file:inbound-endpoint>
         <atom:feed-splitter/>
         <test:component/>
     </flow>
