@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://cxf.module.mule.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="TestService" targetNamespace="http://cxf.module.mule.org/">
+
+    <!--
+    This is another WSDL for the TestService, but imports the types from a separate WSDL "TestTypeDefinitions.wsdl".
+    -->
+
+    <wsdl:import namespace="http://cxf.module.mule.org/" location="TestTypeDefinitions.wsdl"/>
+    <wsdl:types />
+    <wsdl:binding name="TestServiceSoapBinding" type="tns:TestService">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="echo">
+            <soap:operation soapAction="echo" style="document"/>
+            <wsdl:input name="echo">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="echoResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="TestService">
+        <wsdl:port binding="tns:TestServiceSoapBinding" name="TestPort">
+            <soap:address location="http://localhost:5804/services/Test"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
+
+    <flow name="proxy-wsdl">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="${port1}" path="test"/>
+        <cxf:proxy-service namespace="http://cxf.module.mule.org/" payload="envelope" service="TestService" wsdlLocation="issues/TestImportedTypes.wsdl" soapVersion="1.2" validationEnabled="true"/>
+    </flow>
+
+</mule>
