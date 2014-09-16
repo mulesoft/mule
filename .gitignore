@@ -1,17 +1,37 @@
-core/objectstore
-/ObjectStore
-/classes
-/.clover
+# Maven
+target/
+.project
+.settings
+.gitignore
+
+# Eclipse files
 /.classpath
 /.project
-target/
+/workspace/
+
+# IntelliJ Idea files
 *.iml
 *.ipr
 *.iws
-/.idea/
+/.idea
+
+# Mac
 .DS_Store
+
+
+# Test remnants
+objectstore/
+.mule/
+*.log
+temp/
+repository/
+muleEmbeddedDB/
+activemq-data
+testdir/
+hostkey.ser
+*.h2.db
+
 /build.properties
-/workspace
 /.mule
 /ActiveMQ
 /xdocs
@@ -19,4 +39,3 @@ target/
 /svnmerge-commit-message.txt
 /activemq-data
 
-/modules/launcher/src/it/test-01-plugin-impl-1/build.log
