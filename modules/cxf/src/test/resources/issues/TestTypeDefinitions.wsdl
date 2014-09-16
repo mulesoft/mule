@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://consumer.ws.module.mule.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="TestService" targetNamespace="http://consumer.ws.module.mule.org/">
+
+    <!--
+    This WSDL contains the type definitions for the TestService, and imports the schema from a separate file "TestSchema.xsd".
+    -->
+
+    <wsdl:types>
+        <xsd:schema targetNamespace="http://consumer.ws.module.mule.org/">
+            <xsd:import schemaLocation="TestSchema.xsd" namespace="http://consumer.ws.module.mule.org/"/>
+        </xsd:schema>
+    </wsdl:types>
+    <wsdl:message name="noParamsWithHeader">
+        <wsdl:part element="tns:noParamsWithHeader" name="parameters">
+        </wsdl:part>
+        <wsdl:part element="tns:header" name="header">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="failResponse">
+        <wsdl:part element="tns:failResponse" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="echoResponse">
+        <wsdl:part element="tns:echoResponse" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="echo">
+        <wsdl:part element="tns:echo" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="noParams">
+        <wsdl:part element="tns:noParams" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="EchoException">
+        <wsdl:part element="tns:EchoException" name="EchoException">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="noParamsResponse">
+        <wsdl:part element="tns:noParamsResponse" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="echoWithHeadersResponse">
+        <wsdl:part element="tns:echoWithHeadersResponse" name="result">
+        </wsdl:part>
+        <wsdl:part element="tns:headerOut" name="headerOut">
+        </wsdl:part>
+        <wsdl:part element="tns:headerInOut" name="headerInOut">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="echoWithHeaders">
+        <wsdl:part element="tns:echoWithHeaders" name="parameters">
+        </wsdl:part>
+        <wsdl:part element="tns:headerIn" name="headerIn">
+        </wsdl:part>
+        <wsdl:part element="tns:headerInOut" name="headerInOut">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="fail">
+        <wsdl:part element="tns:fail" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="noParamsWithHeaderResponse">
+        <wsdl:part element="tns:noParamsWithHeaderResponse" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="TestService">
+        <wsdl:operation name="fail">
+            <wsdl:input message="tns:fail" name="fail">
+            </wsdl:input>
+            <wsdl:output message="tns:failResponse" name="failResponse">
+            </wsdl:output>
+            <wsdl:fault message="tns:EchoException" name="EchoException">
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="noParamsWithHeader">
+            <wsdl:input message="tns:noParamsWithHeader" name="noParamsWithHeader">
+            </wsdl:input>
+            <wsdl:output message="tns:noParamsWithHeaderResponse" name="noParamsWithHeaderResponse">
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="echoWithHeaders">
+            <wsdl:input message="tns:echoWithHeaders" name="echoWithHeaders">
+            </wsdl:input>
+            <wsdl:output message="tns:echoWithHeadersResponse" name="echoWithHeadersResponse">
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="noParams">
+            <wsdl:input message="tns:noParams" name="noParams">
+            </wsdl:input>
+            <wsdl:output message="tns:noParamsResponse" name="noParamsResponse">
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="echo">
+            <wsdl:input message="tns:echo" name="echo">
+            </wsdl:input>
+            <wsdl:output message="tns:echoResponse" name="echoResponse">
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+</wsdl:definitions>
