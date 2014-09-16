@@ -1,9 +1,0 @@
-/target
-/.mule
-/.classpath
-/.project
-/.fbwarnings
-/.settings
-/*.log
-/cobertura.ser
-/*.iml
