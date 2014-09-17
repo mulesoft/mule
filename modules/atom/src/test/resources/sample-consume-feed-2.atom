@@ -1,0 +1,863 @@
+<?xml version='1.0' encoding='UTF-8'?><?xml-stylesheet href="http://www.blogger.com/styles/atom.css" type="text/css"?>
+<feed xmlns='http://www.w3.org/2005/Atom' xmlns:openSearch='http://a9.com/-/spec/opensearchrss/1.0/'
+      xmlns:georss='http://www.georss.org/georss' xmlns:thr='http://purl.org/syndication/thread/1.0'>
+    <id>tag:blogger.com,1999:blog-1425601518852438157</id>
+    <updated>2010-08-23T01:59:20.306-07:00</updated>
+    <title type='text'>Notes from a (very) small Island</title>
+    <subtitle type='html'></subtitle>
+    <link rel='http://schemas.google.com/g/2005#feed' type='application/atom+xml'
+          href='http://rossmason.blogspot.com/feeds/posts/default'/>
+    <link rel='self' type='application/atom+xml' href='http://www.blogger.com/feeds/1425601518852438157/posts/default'/>
+    <link rel='alternate' type='text/html' href='http://rossmason.blogspot.com/'/>
+    <link rel='hub' href='http://pubsubhubbub.appspot.com/'/>
+    <link rel='next' type='application/atom+xml'
+          href='http://www.blogger.com/feeds/1425601518852438157/posts/default?start-index=26&amp;max-results=25'/>
+    <author>
+        <name>Ross Mason</name>
+        <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+        <email>noreply@blogger.com</email>
+    </author>
+    <generator version='7.00' uri='http://www.blogger.com'>Blogger</generator>
+    <openSearch:totalResults>97</openSearch:totalResults>
+    <openSearch:startIndex>1</openSearch:startIndex>
+    <openSearch:itemsPerPage>25</openSearch:itemsPerPage>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-4273899232700727333</id>
+        <published>2010-03-16T11:10:00.000-07:00</published>
+        <updated>2010-03-16T12:18:10.740-07:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='rest'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='SOA'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='esb'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='Architecture'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='web services'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='Mashups'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='Web 2.0'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='messaging'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='ibeans'/>
+        <title type='text'>Mashups and ESBs at Qcon</title>
+        <summary type='text'>I had a great time at Qcon London last week, it really is one of the more forward thinking
+            conferences out there for the enterprise. I gave two talks on ESBs and Enterprise Mashups so I figured I'd
+            share the slides.ESB or not to ESBThe ESB has become synonymous with integration. While the ESB grew from
+            the needs of enterprise integration, the landscape has changed and not every project that
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/4273899232700727333/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=4273899232700727333'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/4273899232700727333'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/4273899232700727333'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2010/03/mashups-and-esbs-at-qcon.html'
+              title='Mashups and ESBs at Qcon'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-232035011836938188</id>
+        <published>2009-12-04T09:40:00.000-08:00</published>
+        <updated>2009-12-04T09:49:21.385-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='atom'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='jackson'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='flickr'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='release'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='s3'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='json'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='jaxb'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='twitter'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='ibeans'/>
+        <title type='text'>What's new in iBeans?</title>
+        <summary type='text'>Before I get into the new stuff, here is a quick introduction. iBeans is a project I've
+            been working on that aims to make integration for web applications much easier than it is today. It does
+            this by focusing on simplicity and task-based integration and avoids technical jargon and new concepts
+            wherever possible. In a nutshell iBeans offers –Easy to use integration for doing things like -
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/232035011836938188/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=232035011836938188'
+              title='1 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/232035011836938188'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/232035011836938188'/>
+        <link rel='alternate' type='text/html' href='http://rossmason.blogspot.com/2009/12/whats-new-in-ibeans.html'
+              title='What&apos;s new in iBeans?'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>1</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-5448685382217594444</id>
+        <published>2009-10-29T03:48:00.000-07:00</published>
+        <updated>2009-10-29T04:01:30.151-07:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='integration'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='mulesoft'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='tcat'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='ibeans'/>
+        <title type='text'>New iBeans Release; Simple Web Integration</title>
+        <summary type='text'>I have been busy the last few months with the MuleSoft team working on a new project called
+            iBeans that aims to greatly simplify integration for applications on the web. Today we're pleased to
+            announce the 1.0-beta-8 release of iBeans. What is iBeans?iBeans is a service that simplifies integration
+            for web applications. iBeans exposes its API as a small collection of Annotations which can be used
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/5448685382217594444/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=5448685382217594444'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/5448685382217594444'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/5448685382217594444'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/10/new-ibeans-release-simple-web.html'
+              title='New iBeans Release; Simple Web Integration'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <media:thumbnail xmlns:media='http://search.yahoo.com/mrss/'
+                         url='http://4.bp.blogspot.com/_1J_NEXtTKV0/Sul105wp6TI/AAAAAAAAALE/m7XQ0navxAM/s72-c/ibeans-diag.png'
+                         height='72' width='72'/>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-5764869749122314835</id>
+        <published>2009-07-03T06:48:00.000-07:00</published>
+        <updated>2009-07-04T05:49:44.668-07:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='esb'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='mule'/>
+        <title type='text'>To ESB or not to ESB</title>
+        <summary type='text'>Many of us have had to ponder this question. Technology selection is notoriously difficult
+            in the enterprise space since the criteria and complexity of the problem is often not fully understood until
+            later in the development process.There is an interesting post from ThoughtWorker Erik Dörnenburg with the
+            unfortunate title “Making the ESB pain Visible”. Erik provides a real-world example of when
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/5764869749122314835/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=5764869749122314835'
+              title='6 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/5764869749122314835'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/5764869749122314835'/>
+        <link rel='alternate' type='text/html' href='http://rossmason.blogspot.com/2009/07/to-esb-or-not-to-esb.html'
+              title='To ESB or not to ESB'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <media:thumbnail xmlns:media='http://search.yahoo.com/mrss/'
+                         url='http://1.bp.blogspot.com/_-uGpx0_gPO8/RtCrI7tb_VI/AAAAAAAAAG8/D7rLdrgDmbs/s72-c/HamletSkullHCSealous.jpg'
+                         height='72' width='72'/>
+        <thr:total>6</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-8270993961347010273</id>
+        <published>2009-06-01T07:38:00.001-07:00</published>
+        <updated>2009-06-01T08:04:38.043-07:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='miscellaneous'/>
+        <title type='text'>Fatherhood is fantastic, but not for blogging</title>
+        <summary type='text'>My wife and I became parents for the first time a couple of months ago. It’s been an
+            amazing experience so far and has changed our lives beyond recognition - mostly in a good way. Part of me
+            wants to pour all over this, but I’ll leave that to the blogging dads that have the emotional maturity to
+            describe their feelings above and beyond “a kinda fuzzy, cuddly sensation”. Instead I thought I’d
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/8270993961347010273/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=8270993961347010273'
+              title='2 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/8270993961347010273'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/8270993961347010273'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/06/fatherhood-is-fantastic-but-not-for.html'
+              title='Fatherhood is fantastic, but not for blogging'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <media:thumbnail xmlns:media='http://search.yahoo.com/mrss/'
+                         url='http://3.bp.blogspot.com/_1J_NEXtTKV0/SiPoB_G2_NI/AAAAAAAAAKs/rXexAWLiyqo/s72-c/Day3.jpg'
+                         height='72' width='72'/>
+        <thr:total>2</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-8625725720679301661</id>
+        <published>2009-03-09T10:20:00.000-07:00</published>
+        <updated>2009-04-13T06:41:46.937-07:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='best practices'/>
+        <title type='text'>Ten Tips for Technical Presentations</title>
+        <summary type='text'>Today I attended the morning session of Sun’s open source day in Malta. I was pretty
+            disappointed by the quality of the sessions. These sorts of events cost time and money, doing them badly can
+            do more harm than good. I don’t think Sun did themselves any favours today.I thought I’d share some tips
+            that I have picked up over the years that would have made today a better experience for the
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/8625725720679301661/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=8625725720679301661'
+              title='2 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/8625725720679301661'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/8625725720679301661'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/03/ten-tips-for-technical-presentations.html'
+              title='Ten Tips for Technical Presentations'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>2</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-9158453442325432471</id>
+        <published>2009-02-26T14:18:00.000-08:00</published>
+        <updated>2009-02-26T14:44:22.806-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='cloud'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='gmail'/>
+        <title type='text'>Gmail Fails, Cloud Computing Fails</title>
+        <summary type='text'>While I don't go to the MotleyFool for my tech news, they ran an article this week about
+            the Gmail Fail (or #gfail on Twitter). The Fool was in praise of Gmail because even though the service was
+            down for a few hours some interfaces such as IMAP for the iPhone kept working (though this wasn't true for
+            me). To me the fact that Gmail went down and affected people in Europe and the US was a big blow
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/9158453442325432471/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=9158453442325432471'
+              title='5 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/9158453442325432471'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/9158453442325432471'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/02/gmail-fails-cloud-computing-fails.html'
+              title='Gmail Fails, Cloud Computing Fails'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>5</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-8505372469367405117</id>
+        <published>2009-02-25T10:15:00.000-08:00</published>
+        <updated>2009-02-25T11:20:04.100-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='SOA'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='cloud'/>
+        <title type='text'>How SOA paved the way for Cloud</title>
+        <summary type='text'>Though some think SOA failed and others see it only as a partial success, this has been
+            because of the approach to SOA not its underlying principles. SOA (or what I’d rather call Service
+            Orientation, but that doesn’t fit our obsession with TLAs) is responsible for beginning a new evolution in
+            the way we build software. This change is as fundamental as the shift to OO programming but essentially a
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/8505372469367405117/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=8505372469367405117'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/8505372469367405117'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/8505372469367405117'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/02/how-soa-paved-way-for-cloud.html'
+              title='How SOA paved the way for Cloud'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-6119224543389184661</id>
+        <published>2009-02-24T01:38:00.000-08:00</published>
+        <updated>2009-02-24T02:21:19.487-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='crowd'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='twitter'/>
+        <title type='text'>Twitter is Changing Community Dynamics</title>
+        <summary type='text'>It seems the mirco-blogging platform is being used for a lot more than just posting links
+            and banal commentary on the days events. I am an avid user of TripIt for organizing my frequent travel
+            schedules. TripIt works by allowing users to forward their travel arrangement emails to TripIt, which will
+            then parse the emails and create a travel schedule for you. Genius. A couple of weeks ago I booked
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/6119224543389184661/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=6119224543389184661'
+              title='3 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/6119224543389184661'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/6119224543389184661'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/02/twitter-is-changing-community-dynamics.html'
+              title='Twitter is Changing Community Dynamics'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>3</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-9177142550122469311</id>
+        <published>2009-02-23T16:22:00.000-08:00</published>
+        <updated>2009-02-23T16:38:01.926-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='mulesource'/>
+        <title type='text'>A New Chapter for MuleSource</title>
+        <summary type='text'>It’s been an exciting couple of months for MuleSource. We began the year with 2 blowout
+            quarters behind us. Last week we announced that Mark Burton, the former executive vice president of Sales
+            from MySQL has joined the MuleSource board of directors. Mark brings a wealth of sales operating experience
+            from one of the most successful open source companies to date. Mark has an excellent
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/9177142550122469311/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=9177142550122469311'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/9177142550122469311'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/9177142550122469311'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/02/new-chapter-for-mulesource.html'
+              title='A New Chapter for MuleSource'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-3258820940080178228</id>
+        <published>2009-02-20T09:47:00.000-08:00</published>
+        <updated>2009-02-20T10:10:51.208-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='govenance'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='SOA'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='mule galaxy'/>
+        <title type='text'>Pragmatic SOA Governance</title>
+        <summary type='text'>I recently wrote an article that appeared in eBizQ on the topic of SOA governance. In this
+            article, I argue that the primary reason that many pundits have declared “SOA is dead” is that the
+            traditional “top-down” approach to SOA and governance have failed. Vendors have for too long evangelized a
+            “big bang” re-architecture of development processes, using their tools to enforce new behaviors from
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/3258820940080178228/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=3258820940080178228'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/3258820940080178228'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/3258820940080178228'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/02/pragmatic-soa-governance.html'
+              title='Pragmatic SOA Governance'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-284775976148135926</id>
+        <published>2009-02-09T21:37:00.000-08:00</published>
+        <updated>2009-02-10T05:34:22.629-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='iphone'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='android'/>
+        <title type='text'>Android Predictions</title>
+        <summary type='text'>Android is getting momentum with more phone vendors gearing up to release Android phones
+            this year. While I don’t think Android is at par with the iPhone yet, it is a much more compelling platform
+            for innovation. The openness of Android is a blessing and a curse. The community around Android will
+            flourish since developers and startups will be more comfortable investing in an open platform.
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/284775976148135926/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=284775976148135926'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/284775976148135926'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/284775976148135926'/>
+        <link rel='alternate' type='text/html' href='http://rossmason.blogspot.com/2009/02/android-predictions.html'
+              title='Android Predictions'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-5240907584529602819</id>
+        <published>2009-02-06T02:39:00.000-08:00</published>
+        <updated>2009-02-06T06:37:05.274-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='cloud'/>
+        <title type='text'>Cloud: Defining the Undefinable</title>
+        <summary type='text'>Given that the definition of cloud is still somewhat fuzzy and the terminology is already
+            spiraling (yes we have Private clouds, federated clouds and heavenly cloud cakes), I decided (for my own
+            understanding), to map out where IaaS, PaaS and SaaS sit. The bit I was struggling with was that PaaS has
+            multiple layers. Big thanks to Alexis for helping to organize my thoughts on this.The cloud
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/5240907584529602819/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=5240907584529602819'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/5240907584529602819'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/5240907584529602819'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/02/cloud-defining-indefinable.html'
+              title='Cloud: Defining the Undefinable'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <media:thumbnail xmlns:media='http://search.yahoo.com/mrss/'
+                         url='http://4.bp.blogspot.com/_1J_NEXtTKV0/SYwU4_eCCDI/AAAAAAAAAKY/eon-v2E_q0s/s72-c/the-cloud-1.2.png'
+                         height='72' width='72'/>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-8420506891645524820</id>
+        <published>2009-02-06T02:01:00.000-08:00</published>
+        <updated>2009-02-06T02:17:56.900-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='cloud'/>
+        <title type='text'>Making The Same Mistakes With Cloud</title>
+        <summary type='text'>I’m watching the rise of the cloud with some disappointment. It was inevitable but still I
+            hoped that we would take a more pragmatic approach to defining the cloud. The term cloud is being bounded
+            around by almost all vendors, analysts and many technologists, but following the forums and blogs it’s clear
+            we have very different views what the cloud means. I do find it amazing that so many
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/8420506891645524820/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=8420506891645524820'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/8420506891645524820'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/8420506891645524820'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/02/making-same-mistakes-with-cloud.html'
+              title='Making The Same Mistakes With Cloud'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-1414450822697878955</id>
+        <published>2009-01-26T02:55:00.000-08:00</published>
+        <updated>2009-01-26T03:18:59.229-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='twitter'/>
+        <title type='text'>Stephen Fry on Twitter</title>
+        <summary type='text'>I just posted about Twitter and then just found a link from @Scobleizer on Twitter showing
+            and interview with Stephen Fry about why he uses Twitter.Stephen Fry is not the only celebrity on Twitter,
+            many others including Barack Obama was on twitter (until his account got hacked). Check out CelebTwitter for
+            a full list folks you might know. I am currently following Johnathan Ross (@wossy), William
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/1414450822697878955/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=1414450822697878955'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/1414450822697878955'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/1414450822697878955'/>
+        <link rel='alternate' type='text/html' href='http://rossmason.blogspot.com/2009/01/stephen-fry-on-twitter.html'
+              title='Stephen Fry on Twitter'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-8943519628099182404</id>
+        <published>2009-01-26T02:19:00.000-08:00</published>
+        <updated>2009-01-26T02:53:16.870-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='twitter'/>
+        <title type='text'>Why Twitter?</title>
+        <summary type='text'>I started using Twitter around the middle of last year as an experiment to see what the
+            fuss was about. The idea of micro-blogging seemed banal to me, I couldn't understand the popularity of
+            Twitter so decided to give it a go. Needless to say I have been sucked in by it for the same reason most
+            other people. It provides a platform for effortless communication. I can ask things and get real
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/8943519628099182404/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=8943519628099182404'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/8943519628099182404'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/8943519628099182404'/>
+        <link rel='alternate' type='text/html' href='http://rossmason.blogspot.com/2009/01/why-twitter.html'
+              title='Why Twitter?'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-7866099042278871238</id>
+        <published>2009-01-23T03:36:00.000-08:00</published>
+        <updated>2009-01-23T03:53:30.341-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='miscellaneous'/>
+        <title type='text'>Friday Fun: Beer</title>
+        <summary type='text'>Heineken does it again!What goes through your mind when someone says "lets go for a
+            drink?"
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/7866099042278871238/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=7866099042278871238'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/7866099042278871238'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/7866099042278871238'/>
+        <link rel='alternate' type='text/html' href='http://rossmason.blogspot.com/2009/01/friday-fun-beer.html'
+              title='Friday Fun: Beer'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-265892759168864204</id>
+        <published>2009-01-21T06:07:00.000-08:00</published>
+        <updated>2009-01-21T06:29:37.085-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='iphone'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='android'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='G1'/>
+        <title type='text'>iPhone is from Mars, G1 is from Venus</title>
+        <summary type='text'>I recently got my hands on a shiny new G1 phone. Despite being a little jaded by all the
+            promises made by phone providers in the past, I was excited about getting this phone. I am a fan of the
+            iPhone for the most part and I had high hopes because the iPhone has been out for a while now giving vendors
+            time to replicate and improve. However, the G1 is a completely different experience. The G1 has a
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/265892759168864204/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=265892759168864204'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/265892759168864204'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/265892759168864204'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/01/iphone-is-from-mars-g1-is-from-venus.html'
+              title='iPhone is from Mars, G1 is from Venus'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-1388056601995479567</id>
+        <published>2009-01-20T00:55:00.000-08:00</published>
+        <updated>2009-01-20T04:50:50.814-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='sun'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='marketing'/>
+        <title type='text'>The Server Formerly Known as Prince</title>
+        <summary type='text'>I was in the pub the other night discussing Sun’s innate ability to confuse its customers.
+            Sun has just announced that they are releasing a version of the Sun Java System Web Server version 7 as open
+            source software under a BSD license, which is a shining example of a confusing product strategy. For those
+            who aren’t watching carefully, or just don’t care this server has had more name changes
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/1388056601995479567/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=1388056601995479567'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/1388056601995479567'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/1388056601995479567'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/01/server-formerly-known-as-prince.html'
+              title='The Server Formerly Known as Prince'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-1106493661534528664</id>
+        <published>2009-01-12T00:59:00.001-08:00</published>
+        <updated>2009-01-12T01:43:14.190-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='SOA'/>
+        <title type='text'>How to Define Services</title>
+        <summary type='text'>Defining what constitutes a service when building service-orientated applications seems to
+            be a common problem for developers and architects who are new to building services. The main issue seems to
+            be the scope, i.e. what is the granularity of the service. This is actually quite difficult since the
+            granularity of a service can vary depending on the application. The trick with any fuzzy problem
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/1106493661534528664/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=1106493661534528664'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/1106493661534528664'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/1106493661534528664'/>
+        <link rel='alternate' type='text/html' href='http://rossmason.blogspot.com/2009/01/how-to-define-services.html'
+              title='How to Define Services'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <media:thumbnail xmlns:media='http://search.yahoo.com/mrss/'
+                         url='http://2.bp.blogspot.com/_1J_NEXtTKV0/SWsHAYeX0TI/AAAAAAAAAJA/DrYgQ-w2EKU/s72-c/service-layers.png'
+                         height='72' width='72'/>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-1814301625685212562</id>
+        <published>2009-01-11T10:16:00.001-08:00</published>
+        <updated>2009-01-11T12:41:27.683-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='miscellaneous'/>
+        <title type='text'>Got the kites, now where's the wind?</title>
+        <summary type='text'>I finally got my kiteboarding stuff yesterday after a TNT mix-up between New Zealand and
+            here. I'm proud owner of 2 Slingshot Rev 2 kites and and an Underground FLX 35 board. What I need now is a
+            App for the iPhone and/or Android for tracking the wind. Everyone I know uses WindFinder. They have good
+            mobile browser support and there is a great OS X Dashboard widget, but alas I haven't found any
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/1814301625685212562/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=1814301625685212562'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/1814301625685212562'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/1814301625685212562'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/01/got-kites-now-wheres-wind.html'
+              title='Got the kites, now where&apos;s the wind?'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <media:thumbnail xmlns:media='http://search.yahoo.com/mrss/'
+                         url='http://1.bp.blogspot.com/_1J_NEXtTKV0/SWo3oMEwIEI/AAAAAAAAAIw/7seMsrnPRhg/s72-c/kiteboard.jpg'
+                         height='72' width='72'/>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-2694346899545448946</id>
+        <published>2009-01-08T07:58:00.000-08:00</published>
+        <updated>2009-01-08T12:10:50.449-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='SOA'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='marketing'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='industry'/>
+        <title type='text'>Did SOA Just Die?</title>
+        <summary type='text'>There is an interesting post by Anne Thomas Maines from Burton Group exclaiming that SOA
+            has gone the way of the Dodo: Once thought to be the savior of IT, SOA instead turned into a great failed
+            experiment—at least for most organizations. SOA was supposed to reduce costs and increase agility on a
+            massive scale. Except in rare situations, SOA has failed to deliver its promised benefits. After
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/2694346899545448946/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=2694346899545448946'
+              title='2 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/2694346899545448946'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/2694346899545448946'/>
+        <link rel='alternate' type='text/html' href='http://rossmason.blogspot.com/2009/01/did-soa-just-die.html'
+              title='Did SOA Just Die?'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>2</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-4280936985993771717</id>
+        <published>2008-12-16T06:13:00.000-08:00</published>
+        <updated>2008-12-16T06:34:26.532-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='twitter'/>
+        <title type='text'>Make $1 million using Twitter</title>
+        <summary type='text'>Thought it couldn't be done? Apparently, Dell have had some success with their Twitter feed
+            and report they made one million dollars through Twitter. That's not a huge amount of cash for Dell, but its
+            a glimmer of hope that there some viable business models for Twitter and, more importantly, the consumer
+            market might be ready for them. Looking at the followers on Twitter for Dell tweets, there
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/4280936985993771717/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=4280936985993771717'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/4280936985993771717'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/4280936985993771717'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2008/12/make-1-million-using-twitter.html'
+              title='Make $1 million using Twitter'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-718825877461588842</id>
+        <published>2008-12-16T02:38:00.000-08:00</published>
+        <updated>2008-12-16T03:42:48.710-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='java'/>
+        <title type='text'>Is Java Dying a Slow Death?</title>
+        <summary type='text'>There have been numerous reports of the demise of Java ever since the language gained
+            popularity. However with SUN's market cap at $3 billion there have been renewed speculations that because
+            SUN is in trouble Java is too. First off, Java is a lot bigger than SUN, its out in the ethyr. Nobody
+            controls Java (except the Java community) is its own entity. This is obviously a good thing for companies
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/718825877461588842/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=718825877461588842'
+              title='5 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/718825877461588842'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/718825877461588842'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2008/12/is-java-dying-slow-death.html'
+              title='Is Java Dying a Slow Death?'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>5</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-6101490854635104494</id>
+        <published>2008-12-12T05:22:00.000-08:00</published>
+        <updated>2008-12-12T05:42:33.933-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='mulesource'/>
+        <title type='text'>Strategy is Something You Can Only Learn</title>
+        <summary type='text'>There is a great post by Mike Cannon-Brookes of Altassian, which talks about how they came
+            up with the stellar business strategy that has that has driven the iconic company from strength to strength.
+            Mike raises some interesting points, which are relevant to any tech start-up or indeed any industry that
+            deals with progressive change, which are almost all industries. I believe open source
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/6101490854635104494/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=6101490854635104494'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/6101490854635104494'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/6101490854635104494'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2008/12/strategy-is-something-you-can-only.html'
+              title='Strategy is Something You Can &lt;i&gt;Only&lt;/i&gt; Learn'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+</feed>

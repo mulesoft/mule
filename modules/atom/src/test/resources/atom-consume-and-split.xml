@@ -12,7 +12,7 @@
 
     <flow name="feedConsumer">
         <file:inbound-endpoint  path="./target/test-classes" pollingFrequency="1000" >
-            <file:filename-wildcard-filter pattern="sample-consume-feed.atom"/>
+            <file:filename-wildcard-filter pattern="sample-consume-feed-2.atom"/>
         </file:inbound-endpoint>
         <atom:feed-splitter/>
         <test:component/>
