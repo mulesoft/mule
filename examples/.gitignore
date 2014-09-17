@@ -1,8 +1,0 @@
-/target
-/.classpath
-/.project
-/bin
-/weblogic
-/*.iml
-/.mule
-/*.log

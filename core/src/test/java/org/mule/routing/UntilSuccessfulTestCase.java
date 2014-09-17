@@ -28,6 +28,7 @@ import org.mule.util.store.SimpleMemoryObjectStore;
 
 import java.io.ByteArrayInputStream;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
@@ -128,6 +129,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
         ponderUntilEventProcessed(testEvent);
     }
 
+    @Ignore
     @Test
     public void testSuccessfulDeliveryAckExpression() throws Exception
     {

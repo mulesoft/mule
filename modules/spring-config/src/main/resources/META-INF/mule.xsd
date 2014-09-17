@@ -6543,6 +6543,26 @@
         </xsd:union>
     </xsd:simpleType>
 
+    <xsd:simpleType name="expression">
+        <xsd:annotation>
+            <xsd:documentation>
+                A custom xsd:string-like type that represents a MEL expresions.
+                Attributes should use this type to declare that they support expressions.
+                Those which don't will be assumed not to support them
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="propertyPlaceholderType"/>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:pattern value=".*[^ ]+.*"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
+
     <xsd:simpleType name="substitutableName">
         <xsd:annotation>
             <xsd:documentation>

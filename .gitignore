@@ -1,39 +1,30 @@
-core/objectstore
-/ObjectStore
-/classes
-/.clover
-/.classpath
-*.classpath
-/.project
-*.project
+
+# Maven
 target/
+
+
+# Eclipse files
+/.classpath
+/.project
+/workspace/
+
+# IntelliJ Idea files
 *.iml
 *.ipr
 *.iws
-/.idea/
+/.idea
+
+# Mac
 .DS_Store
-/build.properties
-/workspace
-/.mule
-/ActiveMQ
-/xdocs
-/*.log
-*.settings
-/svnmerge-commit-message.txt
-/activemq-data
-bin/
-/modules/launcher/src/it/test-01-plugin-impl-1/build.log
 
-.pom.xml.swp
-
-examples/flight-reservation/.classpath
-
-examples/flight-reservation/.project
-
-examples/flight-reservation/.settings/org.eclipse.jdt.core.prefs
-
-examples/foreach/.classpath
-
-examples/foreach/.project
-
-examples/foreach/.settings/org.eclipse.jdt.core.prefs
+# Test remnants
+objectstore/
+.mule/
+*.log
+temp/
+repository/
+muleEmbeddedDB/
+activemq-data/
+testdir/
+hostkey.ser
+*.h2.db

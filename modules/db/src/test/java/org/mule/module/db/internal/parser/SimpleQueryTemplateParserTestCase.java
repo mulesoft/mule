@@ -7,11 +7,14 @@
 
 package org.mule.module.db.internal.parser;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.mule.module.db.internal.domain.param.InputQueryParam;
+import org.mule.module.db.internal.domain.param.QueryParam;
 import org.mule.module.db.internal.domain.query.QueryTemplate;
 import org.mule.module.db.internal.domain.query.QueryType;
 import org.mule.module.db.internal.domain.type.UnknownDbType;
@@ -107,6 +110,18 @@ public class SimpleQueryTemplateParserTestCase extends AbstractMuleTestCase
     }
 
     @Test
+    public void detectsDdl() throws Exception
+    {
+        String sql = "drop table PLANET";
+
+        QueryTemplate queryTemplate = parser.parse(sql);
+
+        assertThat(queryTemplate.getType(), equalTo(QueryType.DDL));
+        assertThat(queryTemplate.getSqlText(), equalTo(sql));
+        assertThat(queryTemplate.getParams().size(), equalTo(0));
+    }
+
+    @Test
     public void detectsStoredProcedureWithBrackets() throws Exception
     {
         doStoredProcedureParsingTest("{ call getTestRecords() }");
@@ -128,6 +143,47 @@ public class SimpleQueryTemplateParserTestCase extends AbstractMuleTestCase
     public void detectsStoredProcedureWithLineBreak() throws Exception
     {
         doStoredProcedureParsingTest("{ call \ngetTestRecords() } ");
+    }
+
+    @Test
+    public void detectsStoredProcedureAssignment() throws Exception
+    {
+        String sql = "{ :out = call getTestRecords() } ";
+
+        QueryTemplate queryTemplate = parser.parse(sql);
+
+        assertThat(queryTemplate.getType(), equalTo(QueryType.STORE_PROCEDURE_CALL));
+        assertThat(queryTemplate.getSqlText(), equalTo("{ ? = call getTestRecords() }"));
+        assertThat(queryTemplate.getParams().size(), equalTo(1));
+
+        QueryParam param1 = queryTemplate.getParams().get(0);
+        assertThat(param1.getName(), equalTo("out"));
+        assertThat(param1.getType(), equalTo(UnknownDbType.getInstance()));
+    }
+
+    @Test
+    public void detectsMissingOutParamStoredProcedureAssignmentAsDdl() throws Exception
+    {
+
+        doIncompleteStoredProcedureAssingmentTest("{  = call getTestRecords() } ");
+    }
+
+    @Test
+    public void detectsMissingParamNameStoredProcedureAssignmentAsDdl() throws Exception
+    {
+        doIncompleteStoredProcedureAssingmentTest("{ : = call getTestRecords() } ");
+    }
+
+    @Test
+    public void detectsMissingParamEscapingStoredProcedureAssignmentAsDdl() throws Exception
+    {
+        doIncompleteStoredProcedureAssingmentTest("{ a = call getTestRecords() } ");
+    }
+
+    private void doIncompleteStoredProcedureAssingmentTest(String sql)
+    {
+        QueryTemplate queryTemplate = parser.parse(sql);
+        assertThat(queryTemplate.getType(), equalTo(QueryType.DDL));
     }
 
     @Test

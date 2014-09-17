@@ -287,7 +287,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
             for (Element el : elementList) {
                 String sl = el.getAttribute("location");
                 if (mp.containsKey(URLDecoder.decode(sl, "utf-8"))) {
-                    el.setAttribute("location", rewriteSchemaLocation(base, sl));
+                    el.setAttribute("location", base + "?wsdl=" + sl.replace(" ", "%20"));
                 }
             }
         } catch (UnsupportedEncodingException e) {

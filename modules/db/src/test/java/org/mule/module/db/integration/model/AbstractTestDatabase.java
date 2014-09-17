@@ -27,6 +27,7 @@ public abstract class AbstractTestDatabase
 
     private static final Log logger = LogFactory.getLog(AbstractTestDatabase.class);
     public static final String NO_SQLXML_SUPPORT_ERROR = "Database does not support SQLXML type";
+    public static final String NO_RESULSET_FROM_FUNCTION_SUPPORT_ERROR = "Database does not support returning a resultset from a function";
 
     public void deletePlanetTable(Connection connection) throws SQLException
     {
@@ -193,6 +194,11 @@ public abstract class AbstractTestDatabase
     }
 
     public abstract void createStoredProcedureGetRecords(DataSource dataSource) throws SQLException;
+
+    public void createFunctionGetRecords(DataSource dataSource) throws SQLException
+    {
+        throw new UnsupportedOperationException(NO_RESULSET_FROM_FUNCTION_SUPPORT_ERROR);
+    }
 
     public abstract void createStoredProcedureUpdateTestType1(DataSource dataSource) throws SQLException;
 

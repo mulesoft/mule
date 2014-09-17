@@ -8,7 +8,6 @@ package org.mule.transport.http.config;
 
 
 
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
@@ -27,6 +26,7 @@ import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpPollingConnector;
 import org.mule.transport.http.builder.HttpCookiesDefinitionParser;
+import org.mule.transport.http.builder.HttpHeaderDefinitionParser;
 import org.mule.transport.http.builder.HttpResponseDefinitionParser;
 import org.mule.transport.http.components.HttpResponseBuilder;
 import org.mule.transport.http.components.RestServiceWrapper;
@@ -41,8 +41,11 @@ import org.mule.transport.http.transformers.ObjectToHttpClientMethodRequest;
 
 /**
  * Reigsters a Bean Definition Parser for handling <code><http:connector></code> elements.
+ *
+ * This namespace handler now extends HttpNamespaceHandler from mule-module-http so that both projects can
+ * register bean definition parsers for the same namespace (http).
  */
-public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
+public class HttpNamespaceHandler extends org.mule.module.http.config.HttpNamespaceHandler
 {
     public void init()
     {
@@ -72,15 +75,13 @@ public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
                 new MessageProcessorDefinitionParser(StaticResourceMessageProcessor.class));
 
         registerBeanDefinitionParser("response-builder", new MessageProcessorDefinitionParser(HttpResponseBuilder.class));
-        registerMuleBeanDefinitionParser("header", new ChildMapEntryDefinitionParser("headers", "name", "value")).addCollection("headers");
+        registerMuleBeanDefinitionParser("header", new HttpHeaderDefinitionParser()).addCollection("headers");
         registerMuleBeanDefinitionParser("set-cookie", new HttpCookiesDefinitionParser("cookie", CookieWrapper.class)).registerPreProcessor(new CheckExclusiveAttributes(new String[][] {new String[] {"maxAge"}, new String[] {"expiryDate"}}));
         registerMuleBeanDefinitionParser("body", new TextDefinitionParser("body"));
         registerMuleBeanDefinitionParser("location", new HttpResponseDefinitionParser("header"));
         registerMuleBeanDefinitionParser("cache-control", new ChildDefinitionParser("cacheControl", CacheControlHeader.class));
         registerMuleBeanDefinitionParser("expires", new HttpResponseDefinitionParser("header"));
 
-
-
-
+        super.init();
     }
 }

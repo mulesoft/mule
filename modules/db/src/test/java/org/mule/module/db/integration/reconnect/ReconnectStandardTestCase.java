@@ -41,7 +41,7 @@ public class ReconnectStandardTestCase extends AbstractDbIntegrationTestCase
     @Parameterized.Parameters
     public static List<Object[]> parameters()
     {
-        return TestDbConfig.getResources();
+        return TestDbConfig.getDerbyResource();
     }
 
     @Override

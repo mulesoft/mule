@@ -38,6 +38,7 @@ public class RequestBodyGeneratorTestCase extends AbstractMuleTestCase
     private static final String SERVICE_NAME = "TestParamsService";
     private static final String VALID_WSDL_FILE = "TestParams.wsdl";
     private static final String INVALID_WSDL_FILE = "TestParamsInvalid.wsdl";
+    private static final String IMPORTED_TYPES_WSDL_FILE = "TestParamsImportedTypes.wsdl";
 
     private String port;
 
@@ -88,6 +89,16 @@ public class RequestBodyGeneratorTestCase extends AbstractMuleTestCase
         // create any request body (because we are unable to get the type for the XML element).
         String requestBody = generateRequestBody(INVALID_WSDL_FILE, SERVICE_NAME, port, "noParams");
         assertNull(requestBody);
+    }
+
+    @Test
+    public void requestBodyGeneratedForOperationWithNoParametersImportedTypes() throws Exception
+    {
+        // This WSDL imports types from another WSDL with a different namespace. If this fails, the request body
+        // generator will assume the operation requires parameters and it will return null. If the imports are resolved
+        // correctly, then it will detect that the operation doesn't require parameters and a body will be generated.
+        String requestBody = generateRequestBody(IMPORTED_TYPES_WSDL_FILE, SERVICE_NAME, port, "noParams");
+        assertEquals(String.format(EXPECTED_BODY_PATTERN, "noParams"), requestBody);
     }
 
     private String generateRequestBody(String wsdlLocation, String serviceName, String portName, String operationName) throws Exception

@@ -19,7 +19,6 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.email.GreenMailUtilities;
 import org.mule.transport.email.ImapConnector;
-import org.mule.transport.email.MailProperties;
 import org.mule.transport.email.Pop3Connector;
 import org.mule.util.SystemUtils;
 
@@ -28,10 +27,8 @@ import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.activation.CommandMap;
 import javax.activation.MailcapCommandMap;
@@ -151,21 +148,15 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
         }
 
         MuleClient client = muleContext.getClient();
-        Map<String, Object> props = null;
-        if (charset != null)
-        {
-            props = new HashMap<String, Object>();
-            props.put(MailProperties.CONTENT_TYPE_PROPERTY, "text/plain; charset=" + charset);
-        }
         if (addAttachments)
         {
-            MuleMessage muleMessage = new DefaultMuleMessage(msg, props, muleContext);
+            MuleMessage muleMessage = new DefaultMuleMessage(msg, muleContext);
             createOutboundAttachments(muleMessage);
             client.dispatch("vm://send", muleMessage);
         }
         else
         {
-            client.dispatch("vm://send", msg, props);
+            client.dispatch("vm://send", msg, null);
         }
 
         server.waitForIncomingEmail(DELIVERY_DELAY_MS, 1);
