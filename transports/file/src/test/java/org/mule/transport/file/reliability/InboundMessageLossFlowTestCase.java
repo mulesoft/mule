@@ -30,7 +30,7 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
     @Override
     public void testTransformerException() throws Exception
     {
-        tmpDir = createFolder(".mule/transformerException");
+        tmpDir = createFolder(tempRootFolder.getRoot(), "transformerException");
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {
@@ -56,7 +56,7 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
     @Override
     public void testRouterException() throws Exception
     {
-        tmpDir = createFolder(".mule/routerException");
+        tmpDir = createFolder(tempRootFolder.getRoot(), "routerException");
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {

@@ -8,6 +8,7 @@ package org.mule.transport.file.reliability;
 
 import org.mule.exception.DefaultSystemExceptionStrategy;
 import org.mule.routing.filters.WildcardFilter;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
@@ -15,7 +16,10 @@ import org.mule.transport.file.AbstractFileMoveDeleteTestCase;
 
 import java.io.File;
 
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 /**
  * Verify that no inbound messages are lost when exceptions occur. The message must
@@ -27,6 +31,13 @@ import org.junit.Test;
  */
 public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
 {
+
+    @ClassRule
+    public static TemporaryFolder tempRootFolder = new TemporaryFolder();
+
+    @Rule
+    public SystemProperty tempRootFolderProperty = new SystemProperty("tempRootFolderProperty", tempRootFolder.getRoot().getAbsolutePath());
+
     /** Polling mechanism to replace Thread.sleep() for testing a delayed result. */
     protected Prober prober = new PollingProber(10000, 100);
 
@@ -56,7 +67,7 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
     @Test
     public void testNoException() throws Exception
     {
-        tmpDir = createFolder(".mule/noException");
+        tmpDir = createFolder(tempRootFolder.getRoot(), "noException");
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {
@@ -78,7 +89,7 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
     @Test
     public void testTransformerException() throws Exception
     {
-        tmpDir = createFolder(".mule/transformerException");
+        tmpDir = createFolder(tempRootFolder.getRoot(), "transformerException");
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {
@@ -100,7 +111,7 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
     @Test
     public void testRouterException() throws Exception
     {
-        tmpDir = createFolder(".mule/routerException");
+        tmpDir = createFolder(tempRootFolder.getRoot(), "routerException");
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {
@@ -122,7 +133,7 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
     @Test
     public void testComponentException() throws Exception
     {
-        tmpDir = createFolder(".mule/componentException");
+        tmpDir = createFolder(tempRootFolder.getRoot(), "componentException");
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {

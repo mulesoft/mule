@@ -140,9 +140,16 @@ public abstract class AbstractFileFunctionalTestCase extends AbstractServiceAndF
 
     }
 
-    protected File createFolder(String name)
+    /**
+     * Creates a folder that will be deleted when the JVM finalizes
+     *
+     * @param parent folder that contains the created folder
+     * @param name name of the file
+     * @return the new folder
+     */
+    public static File createFolder(File parent, String name)
     {
-        File result = FileUtils.newFile(name);
+        File result = FileUtils.newFile(parent, name);
         result.delete();
         result.mkdir();
         result.deleteOnExit();

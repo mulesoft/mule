@@ -9,32 +9,32 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
        http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.2/mule-file.xsd">
 
-    <file:connector name="fileConnector" streaming="false" workDirectory=".mule/tmp" />
+    <file:connector name="fileConnector" streaming="false" workDirectory="${tempRootFolderProperty}/tmp" />
     
     <model>
         <service name="NoException">
             <inbound>
-                <file:inbound-endpoint path=".mule/noException" />
+                <file:inbound-endpoint path="${tempRootFolderProperty}/noException" />
             </inbound>
             <test:component />
         </service>
         <service name="TransformerException">
             <inbound>
-                <file:inbound-endpoint path=".mule/transformerException" />
+                <file:inbound-endpoint path="${tempRootFolderProperty}/transformerException" />
                 <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer" />
             </inbound>
             <test:component />
         </service>
         <service name="RouterException">
             <inbound>
-                <file:inbound-endpoint path=".mule/routerException" />
+                <file:inbound-endpoint path="${tempRootFolderProperty}/routerException" />
                 <custom-inbound-router class="org.mule.tck.testmodels.mule.FailingRouter" />
             </inbound>
             <test:component />
         </service>
         <service name="ComponentException">
             <inbound>
-                <file:inbound-endpoint path=".mule/componentException" />
+                <file:inbound-endpoint path="${tempRootFolderProperty}/componentException" />
             </inbound>
             <test:component throwException="true" />
         </service>
