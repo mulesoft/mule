@@ -9,7 +9,9 @@
                http://www.mulesoft.org/schema/mule/atom http://www.mulesoft.org/schema/mule/atom/current/mule-atom.xsd
                http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
-    
+
+    <file:connector name="keepFileConnector" autoDelete="false" pollingFrequency="1000" />
+
     <flow name="feedConsumer">
     <!--  remove and use a file endpoint instead to see if it makes the test more stable-->
     <!--
@@ -18,7 +20,7 @@
         </atom:inbound-endpoint>
     -->
     <!-- limit to our sample atom file for the test -->
-        <file:inbound-endpoint  path="./target/test-classes" pollingFrequency="1000" >
+        <file:inbound-endpoint path="./target/test-classes" connector-ref="keepFileConnector" >
             <file:filename-wildcard-filter pattern="sample-consume-feed.atom"/>
             <atom:feed-splitter/>
         </file:inbound-endpoint>
