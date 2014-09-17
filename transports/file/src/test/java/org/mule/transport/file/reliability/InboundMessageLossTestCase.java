@@ -13,6 +13,7 @@ import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.exception.DefaultSystemExceptionStrategy;
 import org.mule.routing.filters.WildcardFilter;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
@@ -22,8 +23,11 @@ import java.io.File;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.ClassRule;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 /**
  * Verify that no inbound messages are lost when exceptions occur. The message must
@@ -35,6 +39,13 @@ import org.junit.Test;
  */
 public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
 {
+
+    @ClassRule
+    public static TemporaryFolder tempRootFolder = new TemporaryFolder();
+
+    @Rule
+    public SystemProperty tempRootFolderProperty = new SystemProperty("tempRootFolderProperty", tempRootFolder.getRoot().getAbsolutePath());
+
     /** Polling mechanism to replace Thread.sleep() for testing a delayed result. */
     protected Prober prober = new PollingProber(10000, 100);
 
@@ -64,7 +75,7 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
     @Test
     public void testNoException() throws Exception
     {
-        tmpDir = createFolder(".mule/noException");
+        tmpDir = createFolder(tempRootFolder.getRoot(), "noException");
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {
@@ -86,7 +97,7 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
     @Test
     public void testTransformerException() throws Exception
     {
-        tmpDir = createFolder(".mule/transformerException");
+        tmpDir = createFolder(tempRootFolder.getRoot(), "transformerException");
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {
@@ -108,7 +119,7 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
     @Test
     public void testRouterException() throws Exception
     {
-        tmpDir = createFolder(".mule/routerException");
+        tmpDir = createFolder(tempRootFolder.getRoot(), "routerException");
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {
@@ -130,7 +141,7 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
     @Test
     public void testComponentException() throws Exception
     {
-        tmpDir = createFolder(".mule/componentException");
+        tmpDir = createFolder(tempRootFolder.getRoot(), "componentException");
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {
@@ -154,7 +165,7 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
     @Test
     public void testCatchExceptionStrategyConsumesMessage() throws Exception
     {
-        tmpDir = createFolder(".mule/exceptionHandled");
+        tmpDir = createFolder(tempRootFolder.getRoot(), "exceptionHandled");
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {
@@ -178,7 +189,7 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
     @Test
     public void testDefaultExceptionStrategyConsumesMessage() throws Exception
     {
-        tmpDir = createFolder(".mule/commitOnException");
+        tmpDir = createFolder(tempRootFolder.getRoot(), "commitOnException");
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {
@@ -211,7 +222,7 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
                 exceptionStrategyLatch.countDown();
             }
         });
-        tmpDir = createFolder(".mule/rollbackOnException");
+        tmpDir = createFolder(tempRootFolder.getRoot(), "rollbackOnException");
         final File file = createDataFile(tmpDir, "test1.txt");
         if (!exceptionStrategyLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS))
         {

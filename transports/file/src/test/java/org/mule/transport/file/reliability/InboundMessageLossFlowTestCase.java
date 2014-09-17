@@ -13,13 +13,11 @@ import org.mule.construct.Flow;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.probe.Probe;
+import org.mule.util.concurrent.Latch;
 
 import java.io.File;
 
 import org.junit.Test;
-
-import org.mule.transport.file.FileTestUtils;
-import org.mule.util.concurrent.Latch;
 
 
 public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
@@ -38,7 +36,7 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
     @Test
     public void testTransformerException() throws Exception
     {
-        tmpDir = createFolder(".mule/transformerException");
+        tmpDir = createFolder(tempRootFolder.getRoot(), "transformerException");
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {
@@ -63,7 +61,7 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
     @Test
     public void testRouterException() throws Exception
     {
-        tmpDir = createFolder(".mule/routerException");
+        tmpDir = createFolder(tempRootFolder.getRoot(), "routerException");
         final File file = createDataFile(tmpDir, "test1.txt");
         prober.check(new Probe()
         {
@@ -93,7 +91,7 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
             return;
         }
         final Latch exceptionThrownLatch = new Latch();
-        tmpDir = createFolder(".mule/flowRefException");
+        tmpDir = createFolder(tempRootFolder.getRoot(), "flowRefException");
         final File file = createDataFile(tmpDir, "test1.txt");
         FunctionalTestComponent ftc = getFunctionalTestComponent("failingFlow");
         ftc.setEventCallback(new EventCallback()
