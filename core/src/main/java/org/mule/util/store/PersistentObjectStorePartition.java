@@ -6,6 +6,8 @@
  */
 package org.mule.util.store;
 
+import static org.mule.api.store.ObjectStoreManager.UNBOUNDED;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.store.ExpirableObjectStore;
@@ -172,6 +174,12 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
             }
         });
         int startIndex = trimToMaxSize(files, maxEntries);
+
+        if (entryTTL == UNBOUNDED)
+        {
+            return;
+        }
+
         final long now = System.currentTimeMillis();
         for (int i = startIndex; i < files.length; i++)
         {
@@ -397,7 +405,7 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
 
     private int trimToMaxSize(File[] files, int maxEntries) throws ObjectStoreException
     {
-        if (maxEntries < 0)
+        if (maxEntries == UNBOUNDED)
         {
             return 0;
         }

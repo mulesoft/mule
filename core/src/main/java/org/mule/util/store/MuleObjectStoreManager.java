@@ -19,6 +19,7 @@ import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.store.PartitionableExpirableObjectStore;
 import org.mule.api.store.PartitionableObjectStore;
+import org.mule.util.Preconditions;
 import org.mule.util.concurrent.DaemonThreadFactory;
 
 import java.io.Serializable;
@@ -54,7 +55,7 @@ public class MuleObjectStoreManager
     @Override
     public <T extends ObjectStore<? extends Serializable>> T getObjectStore(String name, boolean isPersistent)
     {
-        return internalCreateStore(getBaseStore(isPersistent), name, 0, 0, 0);
+        return internalCreateStore(getBaseStore(isPersistent), name, UNBOUNDED, UNBOUNDED, 0);
     }
 
     @Override
@@ -65,7 +66,7 @@ public class MuleObjectStoreManager
 
     public <T extends ObjectStore<? extends Serializable>> T getUserObjectStore(String name, boolean isPersistent)
     {
-        return internalCreateStore(getBaseUserStore(isPersistent), name, 0, 0, 0);
+        return internalCreateStore(getBaseUserStore(isPersistent), name, UNBOUNDED, UNBOUNDED, 0);
     }
 
     public <T extends ObjectStore<? extends Serializable>> T getUserObjectStore(String name, boolean isPersistent, int maxEntries, int entryTTL, int expirationInterval)
@@ -80,11 +81,16 @@ public class MuleObjectStoreManager
                                                                                               int entryTTL,
                                                                                               int expirationInterval)
     {
+
+        Preconditions.checkArgument(maxEntries >= UNBOUNDED, String.format("maxEntries cannot be lower than %d", UNBOUNDED));
+        Preconditions.checkArgument(entryTTL >= UNBOUNDED, String.format("entryTTL cannot be lower than %d", UNBOUNDED));
+
         if (stores.containsKey(name))
         {
             return (T) stores.get(name);
         }
-        T store= null;
+
+        T store = null;
         try
         {
             store = this.getPartitionFromBaseObjectStore(baseStore,name);
@@ -94,7 +100,7 @@ public class MuleObjectStoreManager
             //TODO In order to avoid breaking backward compatibility. In the future this method must throw object store creation exception
             throw new MuleRuntimeException(e);
         }
-        if (maxEntries == 0)
+        if (maxEntries == UNBOUNDED && entryTTL == UNBOUNDED)
         {
             return putInStoreMap(name,store);
         }

@@ -6,6 +6,8 @@
  */
 package org.mule.util.store;
 
+import static org.mule.api.store.ObjectStoreManager.UNBOUNDED;
+
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStoreException;
@@ -168,6 +170,11 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
 
         trimToMaxSize(store, maxEntries, partition);
 
+        if (entryTTL == UNBOUNDED)
+        {
+            return;
+        }
+
         while ((oldestEntry = store.firstEntry()) != null)
         {
             Long oldestKey = oldestEntry.getKey();
@@ -195,10 +202,11 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
                                int maxEntries,
                                ConcurrentMap<Serializable, T> partition)
     {
-        if (maxEntries < 0)
+        if (maxEntries == UNBOUNDED)
         {
             return;
         }
+
         int currentSize = store.size();
         int excess = (currentSize - maxEntries);
         if (excess > 0)
