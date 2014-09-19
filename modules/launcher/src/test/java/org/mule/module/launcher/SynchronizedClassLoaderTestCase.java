@@ -33,7 +33,7 @@ public class SynchronizedClassLoaderTestCase extends AbstractMuleTestCase
     @Test
     public void synchronizesLoadClassInMuleApplicationClassLoader() throws Exception
     {
-        doLoadClassSynchronizationTest(new MuleApplicationClassLoader("test", new TestClassLoader()));
+        doLoadClassSynchronizationTest(new MuleApplicationClassLoader("test", new TestClassLoader(), null));
     }
 
     private void doLoadClassSynchronizationTest(ClassLoader classLoader) throws InterruptedException

@@ -19,6 +19,7 @@ import org.mule.module.launcher.domain.Domain;
 import org.mule.module.launcher.domain.DomainClassLoaderRepository;
 import org.mule.module.launcher.domain.DomainFactory;
 import org.mule.module.launcher.domain.MuleDomainClassLoaderRepository;
+import org.mule.module.launcher.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.module.launcher.util.DebuggableReentrantLock;
 import org.mule.module.launcher.util.ObservableList;
 import org.mule.util.Preconditions;
@@ -68,7 +69,7 @@ public class MuleDeploymentService implements DeploymentService
     {
         DomainClassLoaderRepository domainClassLoaderRepository = new MuleDomainClassLoaderRepository();
 
-        ApplicationClassLoaderFactory applicationClassLoaderFactory = new MuleApplicationClassLoaderFactory(domainClassLoaderRepository);
+        ApplicationClassLoaderFactory applicationClassLoaderFactory = new MuleApplicationClassLoaderFactory(domainClassLoaderRepository, new DefaultNativeLibraryFinderFactory());
         applicationClassLoaderFactory = new CompositeApplicationClassLoaderFactory(applicationClassLoaderFactory, pluginClassLoaderManager);
 
         DefaultDomainFactory domainFactory = new DefaultDomainFactory(domainClassLoaderRepository);
