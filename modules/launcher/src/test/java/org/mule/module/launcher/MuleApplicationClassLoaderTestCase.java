@@ -77,7 +77,7 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase
 
         // Create app class loader
         domainCL = new MuleSharedDomainClassLoader(DOMAIN_NAME, Thread.currentThread().getContextClassLoader());
-        appCL = new MuleApplicationClassLoader(APP_NAME, domainCL);
+        appCL = new MuleApplicationClassLoader(APP_NAME, domainCL, null);
     }
 
     private File createDirectory(String format, Object... args)

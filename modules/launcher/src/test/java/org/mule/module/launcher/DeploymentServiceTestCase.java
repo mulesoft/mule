@@ -37,6 +37,7 @@ import org.mule.module.launcher.application.TestApplicationFactory;
 import org.mule.module.launcher.domain.Domain;
 import org.mule.module.launcher.domain.MuleDomainClassLoaderRepository;
 import org.mule.module.launcher.domain.TestDomainFactory;
+import org.mule.module.launcher.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitProbe;
@@ -918,7 +919,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         addPackedAppFromResource(emptyAppDescriptor.zipPath);
 
-        TestApplicationFactory appFactory = new TestApplicationFactory(new MuleApplicationClassLoaderFactory(new MuleDomainClassLoaderRepository()));
+        TestApplicationFactory appFactory = new TestApplicationFactory(new MuleApplicationClassLoaderFactory(new MuleDomainClassLoaderRepository(), new DefaultNativeLibraryFinderFactory()));
         appFactory.setFailOnStopApplication(true);
 
         deploymentService.setAppFactory(appFactory);
@@ -940,7 +941,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         addPackedAppFromResource(emptyAppDescriptor.zipPath);
 
-        TestApplicationFactory appFactory = new TestApplicationFactory(new MuleApplicationClassLoaderFactory(new MuleDomainClassLoaderRepository()));
+        TestApplicationFactory appFactory = new TestApplicationFactory(new MuleApplicationClassLoaderFactory(new MuleDomainClassLoaderRepository(), new DefaultNativeLibraryFinderFactory()));
         appFactory.setFailOnDisposeApplication(true);
         deploymentService.setAppFactory(appFactory);
         deploymentService.start();
