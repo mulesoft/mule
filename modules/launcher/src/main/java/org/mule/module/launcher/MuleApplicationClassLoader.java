@@ -6,9 +6,9 @@
  */
 package org.mule.module.launcher;
 
-import org.mule.api.config.MuleProperties;
 import org.mule.module.launcher.application.ApplicationClassLoader;
 import org.mule.module.launcher.artifact.AbstractArtifactClassLoader;
+import org.mule.module.launcher.nativelib.NativeLibraryFinder;
 import org.mule.util.FileUtils;
 import org.mule.util.SystemUtils;
 
@@ -45,28 +45,31 @@ public class MuleApplicationClassLoader extends AbstractArtifactClassLoader impl
     public static final String PATH_PER_APP = "per-app";
 
     protected static final URL[] CLASSPATH_EMPTY = new URL[0];
+    //TODO(pablo.kraan): move these constants into the native library finder
+    public static final String DYLIB_EXTENSION = ".dylib";
+    public static final String JNILIB_EXTENSION = ".jnilib";
 
     private String appName;
 
     private File appDir;
     private File classesDir;
     private File libDir;
+    private NativeLibraryFinder nativeLibraryFinder;
 
-    public MuleApplicationClassLoader(String appName, ClassLoader parentCl)
+    public MuleApplicationClassLoader(String appName, ClassLoader parentCl, NativeLibraryFinder nativeLibraryFinder)
     {
-        this(appName, parentCl, Collections.<String>emptySet());
+        this(appName, parentCl, Collections.<String>emptySet(), nativeLibraryFinder);
     }
 
-    public MuleApplicationClassLoader(String appName, ClassLoader parentCl, Set<String> loaderOverrides)
+    public MuleApplicationClassLoader(String appName, ClassLoader parentCl, Set<String> loaderOverrides, NativeLibraryFinder nativeLibraryFinder)
     {
         super(CLASSPATH_EMPTY, parentCl, loaderOverrides);
         this.appName = appName;
+        this.nativeLibraryFinder = nativeLibraryFinder;
+
         try
         {
-            // get lib dir
-            final String muleHome = System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
-            String appPath = String.format("%s/apps/%s", muleHome, appName);
-            appDir = new File(appPath);
+            appDir = MuleFoldersUtil.getAppFolder(appName);
             classesDir = new File(appDir, PATH_CLASSES);
             addURL(classesDir.toURI().toURL());
 
@@ -74,7 +77,7 @@ public class MuleApplicationClassLoader extends AbstractArtifactClassLoader impl
             addJars(appName, libDir, true);
 
             // Add per-app mule modules (if any)
-            File libs = new File(muleHome, PATH_LIBRARY);
+            File libs = MuleFoldersUtil.getMuleLibFolder();
             File muleLibs = new File(libs, PATH_MULE);
             File perAppLibs = new File(muleLibs, PATH_PER_APP);
             addJars(appName, perAppLibs, false);
@@ -174,19 +177,11 @@ public class MuleApplicationClassLoader extends AbstractArtifactClassLoader impl
     @Override
     protected String findLibrary(String name)
     {
-        String parentResolvedPath = super.findLibrary(name);
+        String libraryPath = super.findLibrary(name);
 
-        if (null == parentResolvedPath)
-        {
-            final File library = new File(libDir, System.mapLibraryName(name));
+        libraryPath = nativeLibraryFinder.findLibrary(name, libraryPath);
 
-            if (library.exists())
-            {
-                parentResolvedPath = library.getAbsolutePath();
-            }
-        }
-
-        return parentResolvedPath;
+        return libraryPath;
     }
 
     @Override
