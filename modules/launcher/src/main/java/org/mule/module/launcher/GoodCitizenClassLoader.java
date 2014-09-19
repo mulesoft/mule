@@ -10,14 +10,12 @@ import org.mule.util.ClassUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
 import java.util.Collection;
-import java.util.Vector;
 import java.util.jar.JarFile;
 
 import sun.net.www.protocol.jar.Handler;
@@ -72,25 +70,6 @@ public class GoodCitizenClassLoader extends URLClassLoader implements Disposable
         catch (Throwable t)
         {
             // probably not a SUN VM
-        }
-
-        try
-        {
-            // now native libs
-            Class<ClassLoader> clazz = ClassLoader.class;
-            Field nativeLibraries = clazz.getDeclaredField("nativeLibraries");
-            nativeLibraries.setAccessible(true);
-            Vector<?> nativelib = (Vector<?>) nativeLibraries.get(this);
-            for (Object lib : nativelib)
-            {
-                Method finalize = lib.getClass().getDeclaredMethod("finalize");
-                finalize.setAccessible(true);
-                finalize.invoke(lib);
-            }
-        }
-        catch (Exception ex)
-        {
-            // ignore
         }
 
         try
