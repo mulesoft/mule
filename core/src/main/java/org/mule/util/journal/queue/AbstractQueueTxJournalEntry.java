@@ -81,7 +81,8 @@ public abstract class AbstractQueueTxJournalEntry<T> implements JournalEntry<T>
         {
             return;
         }
-        byte queueNameSize = inputStream.readByte();
+
+        int queueNameSize = toUnsignedInt(inputStream.readByte());
         byte[] queueNameAsBytes = new byte[queueNameSize];
         inputStream.read(queueNameAsBytes, 0, queueNameSize);
         int valueSize = inputStream.readInt();
@@ -169,6 +170,11 @@ public abstract class AbstractQueueTxJournalEntry<T> implements JournalEntry<T>
     public boolean isPrepare()
     {
         return Operation.PREPARE.getByteRepresentation() == getOperation();
+    }
+
+    private int toUnsignedInt(byte b)
+    {
+        return b & 0xFF;
     }
 
     /**
