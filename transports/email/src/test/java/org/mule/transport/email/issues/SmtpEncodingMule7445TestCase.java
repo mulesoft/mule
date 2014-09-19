@@ -8,11 +8,7 @@ package org.mule.transport.email.issues;
 
 import org.mule.transport.email.functional.AbstractEmailFunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 public class SmtpEncodingMule7445TestCase extends AbstractEmailFunctionalTestCase
 {
@@ -22,6 +18,12 @@ public class SmtpEncodingMule7445TestCase extends AbstractEmailFunctionalTestCas
     public SmtpEncodingMule7445TestCase()
     {
         super(STRING_MESSAGE, "smtp", DEFAULT_EMAIL, DEFAULT_USER, MESSAGE, DEFAULT_PASSWORD, null);
+    }
+
+    @Override
+    protected String getConfigFile()
+    {
+        return "smtp-functional-test-flow.xml";
     }
 
     @Test
