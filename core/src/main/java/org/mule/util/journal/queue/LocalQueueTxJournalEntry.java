@@ -10,7 +10,6 @@ import org.mule.api.MuleContext;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
@@ -20,7 +19,7 @@ import java.io.Serializable;
 public class LocalQueueTxJournalEntry extends AbstractQueueTxJournalEntry<Integer>
 {
 
-    protected LocalQueueTxJournalEntry(int txId, byte operation, String queueName, Serializable value)
+    public LocalQueueTxJournalEntry(int txId, byte operation, String queueName, Serializable value)
     {
         super(txId, operation, queueName, value);
     }
