@@ -178,26 +178,22 @@ public class FixedFrequencyScheduler<T extends Runnable> extends PollScheduler<T
                 @Override
                 public void onTransition(String phaseName, Scheduler object) throws MuleException
                 {
-                    if (!executor.isTerminated())
+                    try
                     {
-                        try
-                        {
-                            executor.awaitTermination(1000, TimeUnit.MILLISECONDS);
-                        }
-                        catch (InterruptedException e)
+                        executor.shutdown();
+                        executor.awaitTermination(1000, TimeUnit.MILLISECONDS);
+                    }
+                    catch (InterruptedException e)
+                    {
+                        executor.shutdownNow();
+                    }
+                    finally
+                    {
+                        if (!executor.isTerminated())
                         {
                             executor.shutdownNow();
                         }
-                        finally
-                        {
-                            if (!executor.isTerminated())
-                            {
-                                executor.shutdownNow();
-                            }
-                        }
                     }
-
-
                 }
             });
         }
