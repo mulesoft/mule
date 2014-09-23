@@ -119,6 +119,8 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
         }
         catch (Exception e)
         {
+            muleContext.stop();
+            muleContext.dispose();
             assertStatus(ApplicationStatus.DEPLOYMENT_FAILED);
         }
     }
