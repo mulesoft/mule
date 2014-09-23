@@ -12,11 +12,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import org.junit.Test;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+
+import org.junit.Test;
 
 public class TcpSocketKeyTestCase 
 {
@@ -49,7 +49,7 @@ public class TcpSocketKeyTestCase
         final TcpConnector tcpConnector = mock(TcpConnector.class);
         when(tcpConnector.isFailOnUnresolvedHost()).thenReturn(Boolean.TRUE);
         
-        final ImmutableEndpoint endpoint = createEndpoint(tcpConnector, "some.invented.host", 8080);
+        final ImmutableEndpoint endpoint = createEndpoint(tcpConnector, "some.invented.host_abc", 8080);
         @SuppressWarnings("unused")
         final TcpSocketKey key = new TcpSocketKey(endpoint);
     }

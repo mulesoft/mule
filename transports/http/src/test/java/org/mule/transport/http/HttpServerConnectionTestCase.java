@@ -144,8 +144,8 @@ public class HttpServerConnectionTestCase extends AbstractMuleContextTestCase
     public void getRemoteSocketAddress() throws Exception
     {
         HttpServerConnection httpServerConnection = new HttpServerConnection(mockSocket, muleContext.getConfiguration().getDefaultEncoding(), mockHttpConnector);
-        when(mockSocket.getRemoteSocketAddress()).thenReturn(new InetSocketAddress("host", 1000));
-        assertThat(httpServerConnection.getRemoteClientAddress(), is("host:1000"));
+        when(mockSocket.getRemoteSocketAddress()).thenReturn(new InetSocketAddress("host_abc", 1000));
+        assertThat(httpServerConnection.getRemoteClientAddress(), is("host_abc:1000"));
     }
 
     @Test
