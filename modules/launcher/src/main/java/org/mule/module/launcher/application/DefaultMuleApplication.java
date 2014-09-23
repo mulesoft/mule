@@ -199,6 +199,7 @@ public class DefaultMuleApplication implements Application
 
     protected void setMuleContext(final MuleContext muleContext) throws NotificationException
     {
+        this.muleContext = muleContext;
         statusListener = new MuleContextNotificationListener<MuleContextNotification>()
         {
             @Override
@@ -216,7 +217,6 @@ public class DefaultMuleApplication implements Application
         };
 
         muleContext.registerListener(statusListener);
-        this.muleContext = muleContext;
     }
 
     private void updateStatusFor(String phase)

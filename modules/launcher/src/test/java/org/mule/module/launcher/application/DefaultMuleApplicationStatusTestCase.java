@@ -9,7 +9,13 @@ package org.mule.module.launcher.application;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mule.api.MuleContext;
+import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -102,15 +108,10 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
     @Test
     public void deploymentFailedOnStart() throws Exception
     {
-        // force a failure
-        try
-        {
-            application.setMuleContext(null);
-        }
-        catch (NullPointerException e)
-        {
-            // that's fine... part of the error condition we're forcing
-        }
+        MuleContext mockContext = mock(MuleContext.class);
+        application.setMuleContext(mockContext);
+        verify(mockContext).registerListener(any(MuleContextNotificationListener.class));
+        doThrow(new RuntimeException()).when(mockContext).start();
 
         try
         {
@@ -119,8 +120,7 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
         }
         catch (Exception e)
         {
-            muleContext.stop();
-            muleContext.dispose();
+            verify(mockContext).unregisterListener(any(MuleContextNotificationListener.class));
             assertStatus(ApplicationStatus.DEPLOYMENT_FAILED);
         }
     }
