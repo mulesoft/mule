@@ -48,6 +48,7 @@ import org.junit.rules.Timeout;
  */
 public abstract class AbstractMuleTestCase
 {
+    public static final String TESTING_MODE_PROPERTY_NAME = "mule.testingMode";
 
     public static final int DEFAULT_TEST_TIMEOUT_SECS = 60;
 
@@ -78,6 +79,8 @@ public abstract class AbstractMuleTestCase
         {
             verbose = true;
         }
+
+        System.setProperty(TESTING_MODE_PROPERTY_NAME, StringUtils.EMPTY);
 
         // register the custom UrlStreamHandlerFactory.
         MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory();
