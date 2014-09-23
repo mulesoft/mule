@@ -6,7 +6,10 @@
  */
 package org.mule.endpoint;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.mule.MessageExchangePattern;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -14,8 +17,7 @@ import org.mule.api.endpoint.EndpointCache;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Callable;
 
 /**
  * Cache endpoints in order to prevent memory leaks.
@@ -25,8 +27,14 @@ import java.util.concurrent.ConcurrentMap;
 public class SimpleEndpointCache implements EndpointCache
 {
     protected MuleContext muleContext;
-    private ConcurrentMap<String, InboundEndpoint> inboundEndpointCache = new ConcurrentHashMap<String, InboundEndpoint>();
-    private ConcurrentMap<String, OutboundEndpoint> outboundEndpointCache = new ConcurrentHashMap<String, OutboundEndpoint>();
+
+    private static final int MAX_SIZE = 1000;
+
+    private Cache<String, InboundEndpoint> inboundEndpointCache =
+            CacheBuilder.newBuilder().maximumSize(MAX_SIZE).build();
+
+    private Cache<String, OutboundEndpoint> outboundEndpointCache =
+            CacheBuilder.newBuilder().maximumSize(MAX_SIZE).build();
 
     public SimpleEndpointCache(MuleContext muleContext)
     {
@@ -34,48 +42,60 @@ public class SimpleEndpointCache implements EndpointCache
     }
 
     @Override
-    public OutboundEndpoint getOutboundEndpoint(String uri,
-                                                MessageExchangePattern mep,
-                                                Long responseTimeout) throws MuleException
+    public OutboundEndpoint getOutboundEndpoint(final String uri,
+                                                final MessageExchangePattern mep,
+                                                final Long responseTimeout) throws MuleException
     {
         String key = uri + ":" + mep.toString() + ":" + responseTimeout;
-        OutboundEndpoint endpoint = outboundEndpointCache.get(key);
-        if (endpoint == null)
+
+        Callable<OutboundEndpoint> createAction = new Callable<OutboundEndpoint>()
         {
-            EndpointBuilder endpointBuilder = muleContext.getEndpointFactory()
-                .getEndpointBuilder(uri);
-            endpointBuilder.setExchangePattern(mep);
-            if (responseTimeout != null && responseTimeout > 0)
+            @Override
+            public OutboundEndpoint call() throws Exception
             {
-                endpointBuilder.setResponseTimeout(responseTimeout.intValue());
+                EndpointBuilder endpointBuilder = muleContext.getEndpointFactory().getEndpointBuilder(uri);
+                endpointBuilder.setExchangePattern(mep);
+                if (responseTimeout != null && responseTimeout > 0)
+                {
+                    endpointBuilder.setResponseTimeout(responseTimeout.intValue());
+                }
+                return muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
             }
-            endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
-            OutboundEndpoint concurrentlyAddedEndpoint = outboundEndpointCache.putIfAbsent(key, endpoint);
-            if (concurrentlyAddedEndpoint != null)
-            {
-                return concurrentlyAddedEndpoint;
-            }
+        };
+
+        try
+        {
+            return outboundEndpointCache.get(key, createAction);
         }
-        return endpoint;
+        catch (Exception e)
+        {
+            throw new DefaultMuleException("Error creating outbound endpoint", e);
+        }
     }
 
     @Override
-    public InboundEndpoint getInboundEndpoint(String uri, MessageExchangePattern mep) throws MuleException
+    public InboundEndpoint getInboundEndpoint(final String uri, final MessageExchangePattern mep) throws MuleException
     {
         String key = uri + ":" + mep.toString();
-        InboundEndpoint endpoint = inboundEndpointCache.get(key);
-        if (endpoint == null)
+
+        Callable<InboundEndpoint> createAction = new Callable<InboundEndpoint>()
         {
-            EndpointBuilder endpointBuilder = muleContext.getEndpointFactory()
-                .getEndpointBuilder(uri);
-            endpointBuilder.setExchangePattern(mep);
-            endpoint = muleContext.getEndpointFactory().getInboundEndpoint(endpointBuilder);
-            InboundEndpoint concurrentlyAddedEndpoint = inboundEndpointCache.putIfAbsent(key, endpoint);
-            if (concurrentlyAddedEndpoint != null)
+            @Override
+            public InboundEndpoint call() throws Exception
             {
-                return concurrentlyAddedEndpoint;
+                EndpointBuilder endpointBuilder = muleContext.getEndpointFactory().getEndpointBuilder(uri);
+                endpointBuilder.setExchangePattern(mep);
+                return  muleContext.getEndpointFactory().getInboundEndpoint(endpointBuilder);
             }
+        };
+
+        try
+        {
+            return inboundEndpointCache.get(key, createAction);
         }
-        return endpoint;
+        catch (Exception e)
+        {
+            throw new DefaultMuleException("Error creating inbound endpoint", e);
+        }
     }
 }
