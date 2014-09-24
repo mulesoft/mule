@@ -77,13 +77,13 @@ public class DefaultEndpointFactory implements EndpointFactory
     public InboundEndpoint getInboundEndpoint(EndpointBuilder builder) throws MuleException
     {
         InboundEndpoint endpoint = builder.buildInboundEndpoint();
+        // Only continue to cache inbound endpoints because another project uses this.
         return (InboundEndpoint) registerEndpoint(endpoint);
     }
 
     public OutboundEndpoint getOutboundEndpoint(EndpointBuilder builder) throws MuleException
     {
-        OutboundEndpoint endpoint = builder.buildOutboundEndpoint();
-        return (OutboundEndpoint) registerEndpoint(endpoint);
+        return builder.buildOutboundEndpoint();
     }
 
     /**
