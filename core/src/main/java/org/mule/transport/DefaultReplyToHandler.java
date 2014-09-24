@@ -6,16 +6,19 @@
  */
 package org.mule.transport;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointFactory;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
@@ -50,12 +53,14 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
      */
     private static final long serialVersionUID = 1L;
 
+    private static final int CACHE_MAX_SIZE = 1000;
+
     /**
      * logger used by this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    private transient Map<String, ImmutableEndpoint> endpointCache = new HashMap<String, ImmutableEndpoint>();
+    private transient LoadingCache<String, OutboundEndpoint> endpointCache;
     protected transient MuleContext muleContext;
     protected transient Connector connector;
     private transient Map<String, Object> serializedData = null;
@@ -63,6 +68,7 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
     public DefaultReplyToHandler(MuleContext muleContext)
     {
         this.muleContext = muleContext;
+        endpointCache = buildCache(muleContext);
     }
 
     @Override
@@ -129,15 +135,14 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
 
     protected synchronized OutboundEndpoint getEndpoint(MuleEvent event, String endpointUri) throws MuleException
     {
-        OutboundEndpoint endpoint = (OutboundEndpoint) endpointCache.get(endpointUri);
-        if (endpoint == null)
+        try
         {
-            EndpointFactory endpointFactory = muleContext.getEndpointFactory();
-            EndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(endpointUri);
-            endpoint = endpointFactory.getOutboundEndpoint(endpointBuilder);
-            endpointCache.put(endpointUri, endpoint);
+            return endpointCache.get(endpointUri);
         }
-        return endpoint;
+        catch (Exception e)
+        {
+            throw new DefaultMuleException(e);
+        }
     }
 
     public void initAfterDeserialisation(MuleContext context) throws MuleException
@@ -149,10 +154,11 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
             return;
         }
         this.muleContext = context;
+
         logger = LogFactory.getLog(getClass());
-        endpointCache = new HashMap<String, ImmutableEndpoint>();
         connector = findConnector();
         serializedData = null;
+        endpointCache = buildCache(muleContext);
     }
 
     public Connector getConnector()
@@ -212,5 +218,25 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
 
         serializedData.put("connectorName", in.readObject());
         serializedData.put("connectorType", in.readObject());
+    }
+
+
+    private LoadingCache<String, OutboundEndpoint> buildCache(final MuleContext muleContext)
+    {
+        return CacheBuilder.newBuilder().maximumSize(CACHE_MAX_SIZE)
+                .<String, OutboundEndpoint>build(buildCacheLoader(muleContext));
+    }
+
+    private CacheLoader buildCacheLoader(final MuleContext muleContext)
+    {
+        return new CacheLoader<String, OutboundEndpoint>()
+        {
+            public OutboundEndpoint load(String key) throws Exception
+            {
+                EndpointFactory endpointFactory = muleContext.getEndpointFactory();
+                EndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(key);
+                return endpointFactory.getOutboundEndpoint(endpointBuilder);
+            }
+        };
     }
 }
