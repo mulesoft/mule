@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.examples</groupId>
         <artifactId>mule-examples</artifactId>
-        <version>3.5.2-SNAPSHOT</version>
+        <version>3.5.3-SNAPSHOT</version>
     </parent>
     <artifactId>mule-examples-all</artifactId>
     <name>All Mule examples</name>
