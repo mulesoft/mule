@@ -133,6 +133,7 @@
         <licensePath>LICENSE_HEADER.txt</licensePath>
         <coberturaVersion>2.5</coberturaVersion>
         <eclipsePluginVersion>2.5.1</eclipsePluginVersion>
+        <groovyVersion>2.3.6</groovyVersion>
         <gmavenPluginVersion>1.4</gmavenPluginVersion>
         <javadocPluginVersion>2.9.1</javadocPluginVersion>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
@@ -185,6 +186,7 @@
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
         <geronimoSpecsWsMetadataVersion>1.1.2</geronimoSpecsWsMetadataVersion>
         <guavaVersion>16.0.1</guavaVersion>
+        <hamcrestVersion>1.3</hamcrestVersion>
         <hibernateVersion>3.6.0.Final</hibernateVersion>
         <jacksonVersion>1.9.11</jacksonVersion>
         <jerseyVersion>2.11</jerseyVersion>
@@ -510,6 +512,17 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${junitVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.hamcrest</groupId>
+                        <artifactId>hamcrest-core</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest-library</artifactId>
+                <version>${hamcrestVersion}</version>
             </dependency>
             <dependency>
                 <groupId>xmlunit</groupId>
@@ -889,7 +902,7 @@
             <dependency>
                 <groupId>org.codehaus.groovy</groupId>
                 <artifactId>groovy-all</artifactId>
-                <version>1.8.6</version>
+                <version>${groovyVersion}</version>
                 <exclusions>
                     <!--  Exclude openejb-loader as it is not needed and there are currently version inconsistancies in openejb-core pom-->
                     <exclusion>
@@ -1573,7 +1586,7 @@
                         <dependency>
                             <groupId>org.codehaus.groovy</groupId>
                             <artifactId>groovy-all</artifactId>
-                            <version>1.6.0</version>
+                            <version>${groovyVersion}</version>
                         </dependency>
                     </dependencies>
 

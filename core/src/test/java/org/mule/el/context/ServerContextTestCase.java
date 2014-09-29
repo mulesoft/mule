@@ -238,10 +238,17 @@ public class ServerContextTestCase extends AbstractELTestCase
         assertFinalProperty("server.dateTime='1'");
     }
 
+    private void checkDatePart(int expected, int tolerance, int maxValue, String expression )
+    {
+        int current = (int) evaluate(expression);
+        current = current >= expected ? current : (current + maxValue);
+        Assert.assertTrue(current-expected <= tolerance);
+    }
+
     @Test
     public void dateTimeMilliSeconds()
     {
-        Assert.assertTrue(((Long) evaluate("server.dateTime.milliSeconds")) < 1000);
+        checkDatePart(Calendar.getInstance().get(Calendar.MILLISECOND), 1000, 1000, "(int) server.dateTime.milliSeconds");
     }
 
     @Test
@@ -259,7 +266,6 @@ public class ServerContextTestCase extends AbstractELTestCase
     {
         MuleMessage message = new DefaultMuleMessage(new DateTime(Calendar.getInstance()), muleContext);
         Assert.assertTrue((Boolean) evaluate("server.dateTime.isAfter(payload)", message));
-
     }
 
     @Test
@@ -281,50 +287,43 @@ public class ServerContextTestCase extends AbstractELTestCase
     @Test
     public void dateTimeAddSeconds()
     {
-        Assert.assertEquals((Calendar.getInstance().get(Calendar.SECOND) + 1) % 60,
-            evaluate("(int) server.dateTime.plusSeconds(1).format('s')"));
+        checkDatePart((Calendar.getInstance().get(Calendar.SECOND) + 1) % 60, 1, 60, "(int) server.dateTime.plusSeconds(1).format('s')");
     }
 
     @Test
     public void dateTimeAddMinutes()
     {
-        Assert.assertEquals((Calendar.getInstance().get(Calendar.MINUTE) + 1) % 60,
-            evaluate("server.dateTime.plusMinutes(1).minutes"));
+        checkDatePart((Calendar.getInstance().get(Calendar.MINUTE) + 1) % 60, 1, 60, "(int) server.dateTime.plusMinutes(1).minutes");
     }
 
     @Test
     public void dateTimeAddHours()
     {
-        Assert.assertEquals((Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + 1) % 24,
-            evaluate("server.dateTime.plusHours(1).hours"));
+        checkDatePart((Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + 1) % 24, 1, 24, "(int) server.dateTime.plusHours(1).hours");
     }
 
     @Test
     public void dateTimeAddDays()
     {
-        Assert.assertEquals((Calendar.getInstance().get(Calendar.DAY_OF_YEAR) % 365) + 1,
-            evaluate("(int) server.dateTime.plusDays(1).dayOfYear"));
+        checkDatePart((Calendar.getInstance().get(Calendar.DAY_OF_YEAR) + 1) % 365, 1, 365, "(int) server.dateTime.plusDays(1).dayOfYear");
     }
 
     @Test
     public void dateTimeAddWeeks()
     {
-        Assert.assertEquals((Calendar.getInstance().get(Calendar.WEEK_OF_YEAR) % 52) + 1,
-            evaluate("(int) server.dateTime.plusWeeks(1).weekOfYear"));
+        checkDatePart((Calendar.getInstance().get(Calendar.WEEK_OF_YEAR) + 1) % 52, 1, 52, "(int) server.dateTime.plusWeeks(1).weekOfYear");
     }
 
     @Test
     public void dateTimeAddMonths()
     {
-        Assert.assertEquals(((Calendar.getInstance(Locale.US).get(Calendar.MONTH) + 1) % 12) + 1,
-            evaluate("(int) server.dateTime.plusMonths(1).month"));
+        checkDatePart((Calendar.getInstance(Locale.US).get(Calendar.MONTH) + 1) % 12, 1, 12, "(int) server.dateTime.plusMonths(1).month");
     }
 
     @Test
     public void dateTimeAddYears()
     {
-        Assert.assertEquals(Calendar.getInstance(Locale.US).get(Calendar.YEAR) + 1,
-            evaluate("(int) server.dateTime.plusYears(1).format('yyyy')"));
+        checkDatePart(Calendar.getInstance(Locale.US).get(Calendar.YEAR) + 1, 1, 3000, "(int) server.dateTime.plusYears(1).format('yyyy')");
     }
 
     @Test
@@ -345,25 +344,25 @@ public class ServerContextTestCase extends AbstractELTestCase
     @Test
     public void dateTimeSeconds()
     {
-        assertEquals(Calendar.getInstance().get(Calendar.SECOND), evaluate("server.dateTime.seconds"));
+        checkDatePart(Calendar.getInstance().get(Calendar.SECOND), 1, 60, "server.dateTime.seconds");
     }
 
     @Test
     public void dateTimeMinutes()
     {
-        assertEquals(Calendar.getInstance().get(Calendar.MINUTE), evaluate("server.dateTime.minutes"));
+        checkDatePart(Calendar.getInstance().get(Calendar.MINUTE), 1, 60, "server.dateTime.minutes");
     }
 
     @Test
     public void dateTimeHour()
     {
-        assertEquals(Calendar.getInstance().get(Calendar.HOUR_OF_DAY), evaluate("server.dateTime.hours"));
+        checkDatePart(Calendar.getInstance().get(Calendar.HOUR_OF_DAY), 1, 24, "server.dateTime.hours");
     }
 
     @Test
     public void dateTimeDayOfWeek()
     {
-        assertEquals(Calendar.getInstance().get(Calendar.DAY_OF_WEEK), evaluate("server.dateTime.dayOfWeek"));
+        checkDatePart(Calendar.getInstance().get(Calendar.DAY_OF_WEEK), 1, 7, "server.dateTime.dayOfWeek");
     }
 
     @Test
@@ -376,7 +375,7 @@ public class ServerContextTestCase extends AbstractELTestCase
     @Test
     public void dateTimeDayOfYear()
     {
-        assertEquals(Calendar.getInstance().get(Calendar.DAY_OF_YEAR), evaluate("server.dateTime.dayOfYear"));
+        checkDatePart(Calendar.getInstance().get(Calendar.DAY_OF_YEAR), 1, 365, "server.dateTime.dayOfYear");
     }
 
     @Test

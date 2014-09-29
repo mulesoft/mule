@@ -7,6 +7,7 @@
 package org.mule.module.launcher.application;
 
 import org.mule.module.launcher.MuleApplicationClassLoader;
+import org.mule.module.launcher.nativelib.NativeLibraryFinderFactory;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.domain.DomainClassLoaderRepository;
@@ -23,10 +24,12 @@ public class MuleApplicationClassLoaderFactory implements ApplicationClassLoader
 {
 
     private final DomainClassLoaderRepository domainClassLoaderRepository;
+    private final NativeLibraryFinderFactory nativeLibraryFinderFactory;
 
-    public MuleApplicationClassLoaderFactory(DomainClassLoaderRepository domainClassLoaderRepository)
+    public MuleApplicationClassLoaderFactory(DomainClassLoaderRepository domainClassLoaderRepository, NativeLibraryFinderFactory nativeLibraryFinderFactory)
     {
         this.domainClassLoaderRepository = domainClassLoaderRepository;
+        this.nativeLibraryFinderFactory = nativeLibraryFinderFactory;
     }
 
     @Override
@@ -49,6 +52,6 @@ public class MuleApplicationClassLoaderFactory implements ApplicationClassLoader
             parent = new MulePluginsClassLoader(parent, plugins);
         }
 
-        return new MuleApplicationClassLoader(descriptor.getAppName(), parent, descriptor.getLoaderOverride());
+        return new MuleApplicationClassLoader(descriptor.getAppName(), parent, descriptor.getLoaderOverride(), nativeLibraryFinderFactory.create(descriptor.getAppName()));
     }
 }
