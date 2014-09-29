@@ -6,7 +6,6 @@
  */
 package org.mule.transport.jdbc.xa;
 
-import static junit.framework.Assert.fail;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -20,60 +19,45 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class JdbcTransactionTestCase
 {
 
-    @Test
-    public void closeConnectionIfErrorOnCommit() throws Exception
-    {
-        performTest(Operation.COMMIT);
-    }
+    private JdbcTransaction tx;
+    private Connection connection;
 
-    @Test
-    public void closeConnectionIfErrorOnRollback() throws Exception
+    @Before
+    public void initializeMocks() throws SQLException, TransactionException
     {
-        performTest(Operation.ROLLBACK);
-    }
+        tx = new JdbcTransaction(mock(MuleContext.class));
 
-    private void performTest(Operation op) throws SQLException, TransactionException
-    {
-        JdbcTransaction tx = new JdbcTransaction(mock(MuleContext.class));
-
-        DataSource dataSource = mock(DataSource.class);
-        Connection connection = mock(Connection.class);
+        connection = mock(Connection.class);
 
         when(connection.getAutoCommit()).thenReturn(false);
 
-        tx.bindResource(dataSource, connection);
+        tx.bindResource(mock(DataSource.class), connection);
+    }
 
-        switch(op)
-        {
-            case COMMIT: doThrow(new SQLException()).when(connection).commit(); break;
-            case ROLLBACK: doThrow(new SQLException()).when(connection).rollback(); break;
-        }
-        doThrow(new SQLException()).when(connection).rollback();
-
-        try{
-            switch(op)
-            {
-                case COMMIT: tx.commit(); break;
-                case ROLLBACK: tx.rollback(); break;
-            }
-            fail();
-        } catch (TransactionException e)
-        {
-            e.printStackTrace();
-            // Expected
-        }
-
+    @After
+    public void ensureConnectionCloseWasCalled() throws SQLException
+    {
         verify(connection).close();
     }
 
-    enum Operation
+    @Test(expected = TransactionException.class)
+    public void closeConnectionIfErrorOnCommit() throws Exception
     {
-        COMMIT,
-        ROLLBACK;
+        doThrow(new SQLException()).when(connection).commit();
+        tx.commit();
+    }
+
+    @Test(expected = TransactionException.class)
+    public void closeConnectionIfErrorOnRollback() throws Exception
+    {
+        doThrow(new SQLException()).when(connection).rollback();
+        tx.rollback();
     }
 }
