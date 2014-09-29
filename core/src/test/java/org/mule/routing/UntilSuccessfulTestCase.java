@@ -6,13 +6,14 @@
  */
 package org.mule.routing;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -21,6 +22,9 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.probe.JUnitProbe;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Prober;
 import org.mule.util.store.SimpleMemoryObjectStore;
 
 import java.io.ByteArrayInputStream;
@@ -67,6 +71,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
 
     private ListableObjectStore<MuleEvent> objectStore;
     private ConfigurableMessageProcessor targetMessageProcessor;
+    private Prober pollingProber = new PollingProber(10000, 500l);
 
     @Override
     protected void doSetUp() throws Exception
@@ -117,13 +122,13 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
     @Test
     public void testSuccessfulDeliveryAckExpression() throws Exception
     {
-        untilSuccessful.setAckExpression("#[string:ACK]");
+        untilSuccessful.setAckExpression("#['ACK']");
         untilSuccessful.initialise();
         untilSuccessful.start();
 
         final MuleEvent testEvent = getTestEvent("test_data");
-        assertEquals("ACK", untilSuccessful.process(testEvent).getMessageAsString());
-        ponderUntilEventProcessed(testEvent);
+        assertThat(untilSuccessful.process(testEvent).getMessageAsString(), equalTo("ACK"));
+        waitDelivery();
     }
 
     @Test
@@ -208,14 +213,26 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
     private void ponderUntilEventProcessed(final MuleEvent testEvent)
         throws InterruptedException, MuleException
     {
-        while (targetMessageProcessor.getEventReceived() == null)
-        {
-            Thread.yield();
-            Thread.sleep(250L);
-        }
-
-        assertEquals(0, objectStore.allKeys().size());
+        waitDelivery();
         assertLogicallyEqualEvents(testEvent, targetMessageProcessor.getEventReceived());
+    }
+
+    private void waitDelivery()
+    {
+        pollingProber.check(new JUnitProbe()
+        {
+            @Override
+            protected boolean test() throws Exception
+            {
+                return targetMessageProcessor.getEventReceived() != null && objectStore.allKeys().isEmpty();
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "Event not received by target";
+            }
+        });
     }
 
     private void ponderUntilEventAborted(final MuleEvent testEvent)
