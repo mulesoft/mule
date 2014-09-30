@@ -37,20 +37,7 @@
         <delete dir="${dir.build}"/>
     </target>
 
-    <!-- Download any additional libraries needed to run the application -->
-    <target name="get.libraries">
-        <mkdir dir="${dir.build}/lib"/>
-        <get src="${url.maven.repo2}/javax/script/jython-engine/1.1/jython-engine-1.1-jdk14.jar"
-             dest="${dir.build}/jython-engine-1.1-jdk14.jar"
-             verbose="true"
-             usetimestamp="true"/>
-        <get src="${url.maven.repo}/org/python/jython/2.2.1/jython-2.2.1.jar"
-             dest="${dir.build}/jython-2.2.1.jar"
-             verbose="true"
-             usetimestamp="true"/>
-    </target>
-
-    <target name="init" depends="get.libraries">
+    <target name="init">
         <!-- Create the build directory if it doesn't exist -->
         <mkdir dir="${dir.classes}"/>
 
@@ -117,9 +104,6 @@
            description="Deploy the application to the Mule server">
 
         <muleDeploy applicationFile="${app.file}" />
-        <!-- workaround for MULE-4921 -->
-        <copy file="${dir.build}/jython-engine-1.1-jdk14.jar" todir="${dir.mule.home}/lib/user"/>
-        <copy file="${dir.build}/jython-2.2.1.jar" todir="${dir.mule.home}/lib/user"/>
     </target>
 
 </project>

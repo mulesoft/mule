@@ -51,10 +51,18 @@
             <artifactId>livetribe-jsr223</artifactId>
             <version>${javaScriptVersion}</version>
         </dependency>
-        <!-- This is the actual language implementation -->
+
+        <!--Groovy-->
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
+        </dependency>
+
+        <!--Jython-->
+        <dependency>
+            <groupId>org.python</groupId>
+            <artifactId>jython-standalone</artifactId>
+            <version>2.7-b3</version>
         </dependency>
 
         <!-- Test dependencies -->

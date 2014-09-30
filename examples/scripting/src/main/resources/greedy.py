@@ -21,9 +21,9 @@ class Change:
         if num:
             if coin in self.coin_lookup:
                 if self.result == "":
-                    self.result = '%1.0f %s' % (str(num), self.coin_lookup[coin])
+                    self.result = '%1.0f %s' % (num, self.coin_lookup[coin])
                 else:
-                    self.result = '%s, %1.0f %s' % (self.result, str(num), self.coin_lookup[coin])
+                    self.result = '%s, %1.0f %s' % (self.result, num, self.coin_lookup[coin])
 
     def recursive_change(self, rem):
         if len(self.coins) == 0:
