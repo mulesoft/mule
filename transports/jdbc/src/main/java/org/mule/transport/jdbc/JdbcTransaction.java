@@ -68,11 +68,26 @@ public class JdbcTransaction extends AbstractSingleResourceTransaction
         try
         {
             ((Connection)resource).commit();
-            ((Connection)resource).close();
         }
         catch (SQLException e)
         {
             throw new TransactionException(CoreMessages.transactionCommitFailed(), e);
+        }
+        finally
+        {
+            closeConnection();
+        }
+    }
+
+    private void closeConnection()
+    {
+        try
+        {
+            ((Connection)resource).close();
+        }
+        catch (SQLException e)
+        {
+            logger.error("Can not close connection.", e);
         }
     }
 
@@ -87,11 +102,14 @@ public class JdbcTransaction extends AbstractSingleResourceTransaction
         try
         {
             ((Connection)resource).rollback();
-            ((Connection)resource).close();
         }
         catch (SQLException e)
         {
             throw new TransactionRollbackException(CoreMessages.transactionRollbackFailed(), e);
+        }
+        finally
+        {
+            closeConnection();
         }
     }
 
