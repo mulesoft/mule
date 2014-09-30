@@ -47,19 +47,37 @@ public class FtpMuleMessageFactory extends AbstractMuleMessageFactory
         else
         {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            if (!ftpClient.retrieveFile(file.getName(), baos))
+            try
             {
-                throw new IOException(MessageFormat.format("Failed to retrieve file {0}. Ftp error: {1}",
-                    file.getName(), ftpClient.getReplyCode()));
+
+                if (!ftpClient.retrieveFile(file.getName(), baos))
+                {
+                    throw new IOException(String.format("Failed to retrieve file %s. Ftp error: %s",
+                                                               file.getName(), ftpClient.getReplyCode()));
+                }
+
+                byte[] bytes = baos.toByteArray();
+                if (bytes.length > 0)
+                {
+                    return bytes;
+                }
+                else
+                {
+                    throw new IOException("File " + file.getName() + " is empty (zero bytes)");
+                }
             }
-            byte[] bytes = baos.toByteArray();
-            if (bytes.length > 0)
+            catch (IOException e)
             {
-                return bytes;
+                throw e;
             }
-            else
+            catch (Exception e)
             {
-                throw new IOException("File " + file.getName() + " is empty (zero bytes)");
+                throw new IOException(String.format("Failed to retrieve file %s due to unexpected exception", file.getName()), e);
+            }
+            catch (OutOfMemoryError e)
+            {
+                throw new IOException(String.format("Failed to retrieve file %s because it's larger than the current memory heap. " +
+                                                    "Consider enabling streaming on the FTP connector", file.getName()), e);
             }
         }
     }
