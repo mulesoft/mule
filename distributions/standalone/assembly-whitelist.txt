@@ -656,6 +656,7 @@
 /mule-standalone-${productVersion}/lib/opt/juel-engine-2.1.0.jar
 /mule-standalone-${productVersion}/lib/opt/juel-impl-2.2.1.jar
 /mule-standalone-${productVersion}/lib/opt/juli-6.0.29.jar
+/mule-standalone-${productVersion}/lib/opt/jython-standalone-2.7-b3.jar
 /mule-standalone-${productVersion}/lib/opt/livetribe-jsr223-2.0.5.jar
 /mule-standalone-${productVersion}/lib/opt/mail-1.4.3.jar
 /mule-standalone-${productVersion}/lib/opt/mailapi-1.4.3.jar
