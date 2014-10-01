@@ -33,7 +33,9 @@ public class ScriptEnginePresenceTestCase extends AbstractMuleTestCase
     {
         return Arrays.asList(new Object[][] {
                 {"groovy", "groovy"},
-                {"jython", "py"}
+                {"jython", "py"},
+                {"jruby", "rb"},
+                {"rhino", "js"}
         });
     }
 
@@ -62,6 +64,4 @@ public class ScriptEnginePresenceTestCase extends AbstractMuleTestCase
     {
         assertThat(scriptEngineManager.getEngineByExtension(extension), notNullValue());
     }
-
-
 }
