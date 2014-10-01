@@ -7,6 +7,7 @@
 
 package org.mule.module.db.internal.domain.connection;
 
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -162,6 +163,22 @@ public class TransactionalDbConnectionFactoryTestCase extends AbstractMuleTestCa
         when(dbTransactionManager.getTransaction()).thenReturn(null);
         DbConnection connection = mock(DbConnection.class);
         when(connection.getTransactionalAction()).thenReturn(TransactionalAction.NOT_SUPPORTED);
+
+        factory = new TransactionalDbConnectionFactory(null, dbTransactionManager, null);
+
+        factory.releaseConnection(connection);
+
+        verify(connection, times(1)).commit();
+        verify(connection, times(1)).close();
+    }
+
+    @Test(expected = ConnectionCommitException.class)
+    public void closesConnectionWhenNotSupportedAndCommitFails() throws Exception
+    {
+        when(dbTransactionManager.getTransaction()).thenReturn(null);
+        DbConnection connection = mock(DbConnection.class);
+        when(connection.getTransactionalAction()).thenReturn(TransactionalAction.NOT_SUPPORTED);
+        doThrow(new SQLException()).when(connection).commit();
 
         factory = new TransactionalDbConnectionFactory(null, dbTransactionManager, null);
 

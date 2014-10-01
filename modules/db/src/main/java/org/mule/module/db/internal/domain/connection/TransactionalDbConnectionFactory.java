@@ -173,6 +173,7 @@ public class TransactionalDbConnectionFactory implements DbConnectionFactory
 
         if (closeConnection)
         {
+            RuntimeException exception = null;
             try
             {
                 if (!connection.getAutoCommit())
@@ -182,16 +183,25 @@ public class TransactionalDbConnectionFactory implements DbConnectionFactory
             }
             catch (SQLException e)
             {
-                throw new ConnectionCommitException(e);
+                exception = new ConnectionCommitException(e);
             }
-
-            try
+            finally
             {
-                connection.close();
+                try
+                {
+                    connection.close();
+                }
+                catch (SQLException e)
+                {
+                    if (exception == null)
+                    {
+                        exception = new ConnectionClosingException(e);
+                    }
+                }
             }
-            catch (SQLException e)
+            if (exception != null)
             {
-                throw new ConnectionClosingException(e);
+                throw exception;
             }
         }
     }
