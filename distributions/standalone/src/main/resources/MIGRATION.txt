@@ -45,3 +45,4 @@ MULE-7546: Implementations of org.mule.api.MuleMessage now need to implement cle
 MULE-7612: maps returned by queries using the Database connector can have different keys as now column's aliases are used instead of column's names.
 MULE-7842: Jersey was upgraded to version 2.11 which implements jax-rs 2.0. Applications using the jersey module will need upgrading. For further reference see Jersey's migration guide at https://jersey.java.net/documentation/latest/migration.html#mig-1.x
 MULE-7842: javax.annotation:javax.annotation-api was upgraded to version 1.2. We're now importing this dependency directly while before we did it through the geronimo-specs project
+MULE-6866: Groovy was upgraded to version 2.3.6. If this produces any compatibility issues with an existing script you should either update your script (recommended) or go back to a prior version by replacing the groovy jar at MULE_HOME/lib/opt
