@@ -64,30 +64,42 @@ public class JdbcTransaction extends AbstractSingleResourceTransaction
             logger.warn(CoreMessages.commitTxButNoResource(this));
             return;
         }
-        
+
+        TransactionException transactionException = null;
         try
         {
-            ((Connection)resource).commit();
+            ((Connection) resource).commit();
         }
         catch (SQLException e)
         {
-            throw new TransactionException(CoreMessages.transactionCommitFailed(), e);
+            transactionException = new TransactionException(CoreMessages.transactionCommitFailed(), e);
         }
         finally
         {
-            closeConnection();
+            closeConnection(transactionException);
         }
     }
 
-    private void closeConnection()
+    private void closeConnection(TransactionException transactionException) throws TransactionException
     {
         try
         {
-            ((Connection)resource).close();
+            ((Connection) resource).close();
         }
         catch (SQLException e)
         {
-            logger.error("Can not close connection.", e);
+            if (transactionException == null)
+            {
+                transactionException = new TransactionException(CoreMessages.createStaticMessage("Cannot close connection."), e);
+            }
+            else
+            {
+                logger.info("Cannot close connection.");
+            }
+        }
+        if (transactionException != null)
+        {
+            throw transactionException;
         }
     }
 
@@ -99,17 +111,18 @@ public class JdbcTransaction extends AbstractSingleResourceTransaction
             return;
         }
 
+        TransactionException transactionException = null;
         try
         {
-            ((Connection)resource).rollback();
+            ((Connection) resource).rollback();
         }
         catch (SQLException e)
         {
-            throw new TransactionRollbackException(CoreMessages.transactionRollbackFailed(), e);
+            transactionException = new TransactionRollbackException(CoreMessages.transactionRollbackFailed(), e);
         }
         finally
         {
-            closeConnection();
+            closeConnection(transactionException);
         }
     }
 
