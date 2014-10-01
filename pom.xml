@@ -126,6 +126,7 @@
         <skipIntegrationTests>false</skipIntegrationTests>
         <skipPerformanceTests>true</skipPerformanceTests>
         <skipArchetypeTests>true</skipArchetypeTests>
+        <skipSystemTests>true</skipSystemTests>
 
         <skipDistributions>true</skipDistributions>
         <skipVerifications>false</skipVerifications>
@@ -2121,6 +2122,20 @@
                 <skipVerifications>true</skipVerifications>
                 <skipInstalls>true</skipInstalls>
                 <skipTests>true</skipTests>
+            </properties>
+        </profile>
+        <profile>
+            <id>system</id>
+            <build>
+                <defaultGoal>verify</defaultGoal>
+            </build>
+            <properties>
+                <skipIntegrationTests>true</skipIntegrationTests>
+                <skipDistributions>true</skipDistributions>
+                <skipVerifications>true</skipVerifications>
+                <skipInstalls>true</skipInstalls>
+                <skipTests>true</skipTests>
+                <skipSystemTests>false</skipSystemTests>
             </properties>
         </profile>
         <profile>
