@@ -188,6 +188,24 @@
         <test:assert expression="#[payload == 'apple']"/>
     </flow>
 
+    <flow name="expressionFilterRoute">
+        <vm:inbound-endpoint exchange-pattern="request-response" path="expressionFilterRoute"/>
+        <set-payload value="apple" />
+
+        <scatter-gather>
+            <processor-chain>
+                <expression-filter expression="#[1 == 0 ]"/>
+                <set-payload value="kiwi" />
+            </processor-chain>
+            <set-payload value="banana"/>
+            <set-payload value="orange"/>
+        </scatter-gather>
+
+        <test:assert expression="#[payload.size() == 2]"/>
+        <test:assert expression="#[payload[0] == 'banana']"/>
+        <test:assert expression="#[payload[1] == 'orange']"/>
+    </flow>
+
     <flow name="propertyToPayload">
         <vm:inbound-endpoint exchange-pattern="request-response" path="propertyToPayload"/>
         <set-payload value="#[sessionVars.stuff]"/>
