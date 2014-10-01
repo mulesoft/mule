@@ -160,25 +160,14 @@
     <dependencies>
         <dependency>
             <groupId>javax.script</groupId>
-            <artifactId>jruby-engine</artifactId>
-            <version>1.1</version>
-            <classifier>jdk14</classifier>
-        </dependency>
-        <dependency>
-            <groupId>javax.script</groupId>
             <artifactId>js-engine</artifactId>
-            <version>1.1</version>
+            <version>${rhinoJsr223Version}</version>
             <classifier>jdk14</classifier>
         </dependency>
         <dependency>
-            <groupId>org.jruby</groupId>
-            <artifactId>jruby-complete</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>rhino</groupId>
-            <artifactId>js</artifactId>
-            <version>1.6R5</version>
+            <groupId>org.mozilla</groupId>
+            <artifactId>rhino</artifactId>
+            <version>${rhinoVersion}</version>
         </dependency>
     </dependencies>
 </project>
