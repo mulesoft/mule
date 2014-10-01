@@ -169,10 +169,6 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         }
     }
 
-    /**
-     * Not used anymore, to be removed in future
-     */
-    @Deprecated
     class AsyncMessageProcessorWorker extends AbstractMuleEventWork
     {
 
