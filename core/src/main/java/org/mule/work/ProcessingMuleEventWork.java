@@ -7,7 +7,6 @@
 
 package org.mule.work;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
@@ -39,7 +38,7 @@ public class ProcessingMuleEventWork extends AbstractMuleEventWork
 
     public ProcessingMuleEventWork(MessageProcessor messageProcessor, MuleEvent muleEvent)
     {
-        super(DefaultMuleEvent.copy(muleEvent));
+        super(muleEvent);
         this.messageProcessor = messageProcessor;
     }
 
