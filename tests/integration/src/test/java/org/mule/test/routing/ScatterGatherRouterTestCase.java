@@ -181,6 +181,13 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void expressionFilterRoute() throws Exception
+    {
+        muleContext.getClient().send("vm://expressionFilterRoute", getTestEvent("").getMessage());
+        FlowAssert.verify("expressionFilterRoute");
+    }
+
+    @Test
     public void oneWayRoutesOnly() throws Exception
     {
         muleContext.getClient().send("vm://oneWayRoutesOnly", getTestEvent("").getMessage());

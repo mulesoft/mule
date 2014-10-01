@@ -38,7 +38,7 @@ public final class AggregationContext
         @Override
         public boolean evaluate(Object object)
         {
-            if (VoidMuleEvent.getInstance().equals(object))
+            if (VoidMuleEvent.getInstance().equals(object) || object == null)
             {
                 return false;
             }
