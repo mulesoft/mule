@@ -71,7 +71,14 @@ public abstract class AbstractEndpointURIBuilder implements EndpointURIBuilder
 
     protected Properties getPropertiesForURI(URI uri, MuleContext muleContext) throws MalformedEndpointException
     {
-        Properties properties = PropertiesUtils.getPropertiesFromQueryString(uri.getQuery());
+        Properties properties = PropertiesUtils.getPropertiesFromQueryString(uri.getRawQuery());
+
+        // Decode values from the properties
+        for (String propertyName : properties.stringPropertyNames())
+        {
+            String propertyValue = decode((String) properties.get(propertyName), uri, muleContext);
+            properties.setProperty(propertyName, propertyValue);
+        }
 
         String tempEndpointName = (String) properties.get(EndpointURI.PROPERTY_ENDPOINT_NAME);
         if (tempEndpointName != null)
