@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-tests</artifactId>
-        <version>3.5.2-SNAPSHOT</version>
+        <version>3.5.2</version>
     </parent>
     <artifactId>mule-tests-integration-jdk6</artifactId>
     <name>Integration Tests running on JDK6</name>
