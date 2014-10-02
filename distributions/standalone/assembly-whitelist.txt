@@ -670,6 +670,13 @@
 /mule-standalone-${productVersion}/lib/opt/mx4j-remote-2.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/mx4j-tools-2.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/neethi-3.0.2.jar
+/mule-standalone-${productVersion}/lib/opt/netty-all-4.0.23.Final.jar
+/mule-standalone-${productVersion}/lib/opt/netty-buffer-4.0.23.Final.jar
+/mule-standalone-${productVersion}/lib/opt/netty-codec-4.0.23.Final.jar
+/mule-standalone-${productVersion}/lib/opt/netty-codec-http-4.0.23.Final.jar
+/mule-standalone-${productVersion}/lib/opt/netty-common-4.0.23.Final.jar
+/mule-standalone-${productVersion}/lib/opt/netty-handler-4.0.23.Final.jar
+/mule-standalone-${productVersion}/lib/opt/netty-transport-4.0.23.Final.jar
 /mule-standalone-${productVersion}/lib/opt/ognl-2.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/oro-2.0.8.jar
 /mule-standalone-${productVersion}/lib/opt/osgi-resource-locator-1.0.1.jar
