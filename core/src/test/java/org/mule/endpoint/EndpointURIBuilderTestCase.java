@@ -6,6 +6,10 @@
  */
 package org.mule.endpoint;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.EndpointURIBuilder;
@@ -17,8 +21,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 @SmallTest
 public class EndpointURIBuilderTestCase extends AbstractMuleTestCase
@@ -66,7 +68,17 @@ public class EndpointURIBuilderTestCase extends AbstractMuleTestCase
         UserInfoEndpointURIBuilder builder = new UserInfoEndpointURIBuilder();
         checkUriWithUsernameContainingAtSign(builder);
     }
-    
+
+    @Test
+    public void testQueryParameterWithEncodedAmpersand() throws Exception
+    {
+        UrlEndpointURIBuilder endpointURIBuilder = new UrlEndpointURIBuilder();
+        EndpointURI endpointURI = endpointURIBuilder.build(new URI("http://host/path?key=value%26test"), unusedMuleContext);
+
+        assertThat(endpointURI.getParams().size(), is(1));
+        assertThat(endpointURI.getParams().getProperty("key"), equalTo("value&test"));
+    }
+
     private void checkUriWithPlainUsername(EndpointURIBuilder builder) throws Exception
     {
         URI inputUri = new URI(PLAIN_USERNAME_URI);
