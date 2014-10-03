@@ -15,6 +15,7 @@ import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.Alien;
 import org.mule.module.db.integration.model.Field;
 import org.mule.module.db.integration.model.Record;
+import org.mule.module.db.internal.domain.type.oracle.OracleXmlType;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -52,7 +53,7 @@ public abstract class AbstractOracleXmlTypeTestCase extends AbstractDbIntegratio
             {
                 try
                 {
-                    XmlTypeUtils.getXmlTypeClass();
+                    OracleXmlType.getXmlTypeClass();
                     return true;
                 }
                 catch (ClassNotFoundException e)
@@ -64,7 +65,7 @@ public abstract class AbstractOracleXmlTypeTestCase extends AbstractDbIntegratio
             @Override
             public void describeTo(Description description)
             {
-                description.appendText(String.format("Cannot find class %s. Check that required libraries are available", XmlTypeUtils.ORACLE_XMLTYPE_CLASS));
+                description.appendText(String.format("Cannot find class %s. Check that required libraries are available", OracleXmlType.ORACLE_XMLTYPE_CLASS));
             }
         });
     }
