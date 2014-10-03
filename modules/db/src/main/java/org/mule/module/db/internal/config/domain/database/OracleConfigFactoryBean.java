@@ -7,23 +7,18 @@
 
 package org.mule.module.db.internal.config.domain.database;
 
-import org.mule.module.db.internal.domain.type.StructuredDbType;
 import org.mule.module.db.internal.domain.type.DbType;
 import org.mule.module.db.internal.domain.type.ResolvedDbType;
+import org.mule.module.db.internal.domain.type.oracle.OracleXmlType;
 
-import java.sql.CallableStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class OracleConfigFactoryBean extends AbstractVendorConfigFactoryBean
 {
 
-    public static final String CURSOR_TYPE_NAME = "CURSOR";
-    public static final int OPAQUE_TYPE_ID = 2007;
-    public static final String XML_TYPE_INTERNAL_NAME = "SYS.XMLTYPE";
-    public static final int CURSOR_TYPE_ID = -10;
-    public static final String XML_TYPE_NAME = "XMLTYPE";
+    private static final int CURSOR_TYPE_ID = -10;
+    private static final String CURSOR_TYPE_NAME = "CURSOR";
 
     private static final String DRIVER_CLASS_NAME = "oracle.jdbc.driver.OracleDriver";
     private static final String ORACLE_URL_PREFIX = "jdbc:oracle:thin:@";
@@ -44,18 +39,4 @@ public class OracleConfigFactoryBean extends AbstractVendorConfigFactoryBean
         return dbTypes;
     }
 
-    private static class OracleXmlType extends StructuredDbType
-    {
-
-        public OracleXmlType()
-        {
-            super(OracleConfigFactoryBean.OPAQUE_TYPE_ID, OracleConfigFactoryBean.XML_TYPE_NAME, OracleConfigFactoryBean.XML_TYPE_INTERNAL_NAME);
-        }
-
-        @Override
-        public Object getParameterValue(CallableStatement statement, int index) throws SQLException
-        {
-            return statement.getSQLXML(index);
-        }
-    }
 }
