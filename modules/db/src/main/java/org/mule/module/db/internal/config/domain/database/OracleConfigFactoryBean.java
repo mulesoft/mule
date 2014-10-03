@@ -7,11 +7,13 @@
 
 package org.mule.module.db.internal.config.domain.database;
 
-import org.mule.module.db.internal.domain.type.StructuredDbType;
 import org.mule.module.db.internal.domain.type.DbType;
 import org.mule.module.db.internal.domain.type.ResolvedDbType;
+import org.mule.module.db.internal.domain.type.StructuredDbType;
 
+import java.io.InputStream;
 import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +58,29 @@ public class OracleConfigFactoryBean extends AbstractVendorConfigFactoryBean
         public Object getParameterValue(CallableStatement statement, int index) throws SQLException
         {
             return statement.getSQLXML(index);
+        }
+
+        @Override
+        public void setParameterValue(PreparedStatement statement, int index, Object value) throws SQLException
+        {
+            try
+            {
+                if (value instanceof String)
+                {
+                    statement.setObject(index, XmlTypeUtils.createXmlType(statement.getConnection(), (String) value), OracleConfigFactoryBean.OPAQUE_TYPE_ID);
+                    return;
+                }
+                if (value instanceof InputStream)
+                {
+                    statement.setObject(index, XmlTypeUtils.createXmlType(statement.getConnection(), (InputStream) value), OracleConfigFactoryBean.OPAQUE_TYPE_ID);
+                    return;
+                }
+            }
+            catch (Exception e)
+            {
+                throw new SQLException(e);
+            }
+            super.setParameterValue(statement, index, value);
         }
     }
 }

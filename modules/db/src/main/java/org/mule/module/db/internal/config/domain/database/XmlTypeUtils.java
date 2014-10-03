@@ -5,8 +5,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.vendor.oracle;
+package org.mule.module.db.internal.config.domain.database;
 
+import org.mule.util.ClassUtils;
+
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.sql.Connection;
 
@@ -24,14 +27,24 @@ public class XmlTypeUtils
 
     public static Object createXmlType(Connection connection, String xml) throws Exception
     {
+        return genericCreateXmlType(connection, xml, String.class);
+    }
+
+    public static Object createXmlType(Connection connection, InputStream xml) throws Exception
+    {
+        return genericCreateXmlType(connection, xml, InputStream.class);
+    }
+
+    private static <T> Object genericCreateXmlType(Connection connection, T xml, Class<T> tClass) throws Exception
+    {
         Class<?> xmlTypeClass = getXmlTypeClass();
-        Constructor<?> xmlTypeConstructor = xmlTypeClass.getConstructor(Connection.class, String.class);
+        Constructor<?> xmlTypeConstructor = xmlTypeClass.getConstructor(Connection.class, tClass);
 
         return xmlTypeConstructor.newInstance(connection, xml);
     }
 
-    protected static Class<?> getXmlTypeClass() throws ClassNotFoundException
+    public static Class<?> getXmlTypeClass() throws ClassNotFoundException
     {
-        return OracleStoredProcedureXmlParamTestCase.class.getClassLoader().loadClass(ORACLE_XMLTYPE_CLASS);
+        return ClassUtils.getClass(ORACLE_XMLTYPE_CLASS);
     }
 }
