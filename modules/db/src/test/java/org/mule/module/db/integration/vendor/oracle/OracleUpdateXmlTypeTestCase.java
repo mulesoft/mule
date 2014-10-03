@@ -8,20 +8,15 @@
 package org.mule.module.db.integration.vendor.oracle;
 
 import static org.junit.Assert.assertEquals;
-import static org.mule.module.db.integration.DbTestUtil.selectData;
-import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.Alien;
-import org.mule.module.db.integration.model.Field;
-import org.mule.module.db.integration.model.Record;
+import org.mule.module.db.internal.config.domain.database.XmlTypeUtils;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 import javax.sql.DataSource;
 
