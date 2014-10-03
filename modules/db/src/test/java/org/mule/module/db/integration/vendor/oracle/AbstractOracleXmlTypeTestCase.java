@@ -15,6 +15,7 @@ import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.Alien;
 import org.mule.module.db.integration.model.Field;
 import org.mule.module.db.integration.model.Record;
+import org.mule.module.db.internal.config.domain.database.XmlTypeUtils;
 
 import java.sql.SQLException;
 import java.util.List;
