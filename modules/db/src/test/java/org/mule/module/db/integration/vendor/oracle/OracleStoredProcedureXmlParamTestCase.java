@@ -18,6 +18,7 @@ import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.Alien;
 import org.mule.module.db.integration.model.Record;
 import org.mule.module.db.integration.model.XmlField;
+import org.mule.module.db.internal.domain.type.oracle.OracleXmlType;
 
 import java.sql.Connection;
 import java.util.HashMap;
@@ -80,7 +81,7 @@ public class OracleStoredProcedureXmlParamTestCase extends AbstractOracleXmlType
 
         try
         {
-            Object xmlType = XmlTypeUtils.createXmlType(connection, Alien.ET.getXml());
+            Object xmlType = OracleXmlType.createXmlType(connection, Alien.ET.getXml());
 
             LocalMuleClient client = muleContext.getClient();
             Map<String, Object> messageProperties = new HashMap<String, Object>();
