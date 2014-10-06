@@ -24,4 +24,15 @@
                 requireClientAuthentication="true"/>
         <tls:protocol-handler property="foo"/>
     </tls:connector>
+
+
+    <tls:context name="tlsContext" >
+        <tls:trust-store path="testTrustStorePath" password="testTrustStorePassword"
+                         type="testTrustStoreType" algorithm="testTrustStoreAlgorithm"/>
+
+        <tls:key-store path="testKeyStorePath" keyPassword="testKeyPassword" password="testKeyStorePassword"
+                       algorithm="testKeyStoreAlgorithm" type="testKeyStoreType"/>
+    </tls:context>
+
+
 </mule>

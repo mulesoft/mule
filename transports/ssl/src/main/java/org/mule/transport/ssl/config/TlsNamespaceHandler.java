@@ -8,7 +8,6 @@ package org.mule.transport.ssl.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.specific.tls.ClientKeyStoreDefinitionParser;
-import org.mule.config.spring.parsers.specific.tls.KeyStoreDefinitionParser;
 import org.mule.config.spring.parsers.specific.tls.ProtocolHandlerDefinitionParser;
 import org.mule.config.spring.parsers.specific.tls.TrustStoreDefinitionParser;
 import org.mule.endpoint.URIBuilder;
@@ -24,10 +23,12 @@ public class TlsNamespaceHandler extends AbstractMuleNamespaceHandler
     {
         registerStandardTransportEndpoints(TlsConnector.TLS, URIBuilder.SOCKET_ATTRIBUTES);
         registerConnectorDefinitionParser(TlsConnector.class);
-        registerBeanDefinitionParser("key-store", new KeyStoreDefinitionParser());
+        registerBeanDefinitionParser("key-store", new KeyStoreParentContextDefinitionParser());
         registerBeanDefinitionParser("client", new ClientKeyStoreDefinitionParser());
         registerBeanDefinitionParser("server", new TrustStoreDefinitionParser());
         registerBeanDefinitionParser("protocol-handler", new ProtocolHandlerDefinitionParser());
+        registerBeanDefinitionParser("context", new TlsContextDefinitionParser());
+        registerBeanDefinitionParser("trust-store", new TrustStoreTlsContextDefinitionParser());
     }
 
 }
