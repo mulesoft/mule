@@ -6,10 +6,12 @@
  */
 package org.mule.transport.ssl;
 
+import static org.hamcrest.CoreMatchers.endsWith;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
@@ -44,5 +46,21 @@ public class TlsNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("mulepassword", connector.getTrustStorePassword());
         assertTrue(connector.isExplicitTrustStoreOnly());
         assertTrue(connector.isRequireClientAuthentication());
+    }
+
+    @Test
+    public void testConfigProperties() throws Exception
+    {
+        TlsConfig tlsConfig = muleContext.getRegistry().get("globalConfig");
+
+        assertThat(tlsConfig.getTrustStorePath(), endsWith("testTrustStorePath"));
+        assertThat(tlsConfig.getTrustStorePassword(), equalTo("testTrustStorePassword"));
+        assertThat(tlsConfig.getTrustStoreType(), equalTo("testTrustStoreType"));
+        assertThat(tlsConfig.getTrustManagerAlgorithm(), equalTo("testTrustStoreAlgorithm"));
+        assertThat(tlsConfig.getKeyStorePath(), endsWith("testKeyStorePath"));
+        assertThat(tlsConfig.getKeyStorePassword(), equalTo("testKeyStorePassword"));
+        assertThat(tlsConfig.getKeyStoreType(), equalTo("testKeyStoreType"));
+        assertThat(tlsConfig.getKeyManagerPassword(), equalTo("testKeyPassword"));
+        assertThat(tlsConfig.getKeyManagerAlgorithm(), equalTo("testKeyStoreAlgorithm"));
     }
 }

@@ -109,4 +109,163 @@
         <xsd:attribute name="port" type="mule:substitutablePortNumber"/>
     </xsd:attributeGroup>
 
+
+    <xsd:element name="config" type="tlsConfigType" substitutionGroup="mule:abstract-extension">
+        <xsd:annotation>
+            <xsd:documentation>
+                Reusable configuration element for TLS.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="tlsConfigType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                <xsd:sequence minOccurs="0" maxOccurs="1">
+                    <xsd:element minOccurs="0" maxOccurs="1" name="trust-store" type="trustStoreType">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Trust store configuration. If used client side, the trust store contains the certificates of the
+                                trusted servers. If used server side, it contains the certificates of the trusted clients.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element minOccurs="0" maxOccurs="1" name="key-store" type="keyStoreType">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Key store configuration. The key store contains the keys of this server/client.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+
+                <xsd:attribute name="name" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of this config.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
+    <xsd:complexType name="trustStoreType">
+        <xsd:attribute name="path" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The location (which will be resolved relative to the current classpath and file system, if possible) of the trust store.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="password" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The password used to protect the trust store.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="type" type="keystoreType">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The type of store used.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="algorithm" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The algorithm used by the trust store.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+
+    </xsd:complexType>
+
+
+    <xsd:complexType name="keyStoreType">
+        <xsd:attribute name="path" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The location (which will be resolved relative to the current classpath and file system, if possible) of the key store.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="type" type="keystoreType">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The type of key store used.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="keyPassword" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The password used to protect the private key.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="password" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The password used to protect the key store.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="algorithm" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The algorithm used by the key store.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+
+    <xsd:simpleType name="keystoreType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A type that defines a Java key store.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="jks">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The default Java KeyStore.  If no key store type is specified, "jks" will be used.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="jceks">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Used by the Java Cryptography Extension
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="pkcs12"><xsd:annotation>
+                        <xsd:documentation>
+                            A format commonly used to store private keys.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    </xsd:enumeration>
+                </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Any other keystore type.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
+
+
 </xsd:schema>
