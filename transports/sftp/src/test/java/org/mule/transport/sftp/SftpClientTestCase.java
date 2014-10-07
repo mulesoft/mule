@@ -6,14 +6,6 @@
  */
 package org.mule.transport.sftp;
 
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.SftpException;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import org.junit.Test;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
@@ -22,6 +14,16 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
+
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.SftpException;
+
+import java.io.IOException;
+import java.lang.reflect.Field;
+
+import org.junit.Test;
 
 /**
  * JUnit test for SftpClient
@@ -83,44 +85,37 @@ public class SftpClientTestCase extends AbstractMuleTestCase
     @Test
     public void causedByShouldBeAnSftpException() throws Exception
     {
-        // setup mock channel to always throw an SftpException
-        ChannelSftp mockChannel = mock(ChannelSftp.class);
-        when(mockChannel.ls(anyString())).thenThrow(new SftpException(1, destDir));
+        SftpException expectedCause = new SftpException(1, destDir);
+        SftpClient client = createSftpClientWithException(expectedCause);
         try
         {
-            SftpClient client = new SftpClient("local");
-            Field channelField = client.getClass().getDeclaredField("channelSftp");
-            channelField.setAccessible(true);
-
-            // set the mockChannel from above on the client
-            channelField.set(client, mockChannel);
-
-            /*
-             * should throw an exception, but we need to make sure the
-             * 'caused by...' portion of the exception is correctly set
-             */
             client.listFiles(destDir);
-        } catch (IOException e)
-        {
-            if (e.getCause() == null)
-            {
-                // cause was not correct, so the test fails
-                fail("no cause provided, should have been SftpException");
-            }
-            final Class actualClass = e.getCause().getClass();
-            assertEquals(actualClass, SftpException.class);
-        } catch (Exception e)
-        {
-            // wrong exception thrown, so the test fails
-            fail("cause should have been SftpException");
+            fail("IOException expected.");
         }
+        catch (IOException e)
+        {
+            assertEquals(e.getCause(), expectedCause);
+        }
+    }
+
+    private SftpClient createSftpClientWithException(SftpException exceptionToThrow) throws NoSuchFieldException, SftpException, IllegalAccessException
+    {
+        SftpClient client = new SftpClient("local");
+        Field channelField = client.getClass().getDeclaredField("channelSftp");
+        channelField.setAccessible(true);
+
+        ChannelSftp mockChannel = mock(ChannelSftp.class);
+        when(mockChannel.ls(anyString())).thenThrow(exceptionToThrow);
+        channelField.set(client, mockChannel);
+
+        return client;
     }
 
     private SftpClient getSftpClientSpy() throws IOException
     {
         SftpClient sftp = new SftpClient("local");
         SftpClient spy = spy(sftp);
-        doReturn(new String[]{fileName}).when(spy).listFiles(destDir);
+        doReturn(new String[] {fileName}).when(spy).listFiles(destDir);
         return spy;
     }
 }

@@ -6,6 +6,14 @@
  */
 package org.mule.transport.sftp;
 
+import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_DELETE_ACTION;
+import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_GET_ACTION;
+import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_PUT_ACTION;
+import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_RENAME_ACTION;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.transport.sftp.notification.SftpNotifier;
+import org.mule.util.StringUtils;
+
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
@@ -14,6 +22,7 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,16 +30,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.transport.sftp.notification.SftpNotifier;
-import org.mule.util.StringUtils;
-
-import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_DELETE_ACTION;
-import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_GET_ACTION;
-import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_PUT_ACTION;
-import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_RENAME_ACTION;
 
 /**
  * <code>SftpClient</code> Wrapper around jsch sftp library. Provides access to basic
@@ -298,7 +300,7 @@ public class SftpClient
     }
 
     private String[] listDirectory(String path, boolean includeFiles, boolean includeDirectories)
-        throws IOException
+            throws IOException
     {
         try
         {
@@ -558,7 +560,7 @@ public class SftpClient
     }
 
     public String duplicateHandling(String destDir, String filename, String duplicateHandling)
-        throws IOException
+            throws IOException
     {
         if (duplicateHandling.equals(SftpConnector.PROPERTY_DUPLICATE_HANDLING_ASS_SEQ_NO))
         {
@@ -578,7 +580,7 @@ public class SftpClient
     {
         logger.warn("listing files for: " + destDir + "/" + filename);
         String[] files = listFiles(destDir);
-        for(String file : files)
+        for (String file : files)
         {
             if (file.equals(filename))
             {
@@ -698,21 +700,21 @@ public class SftpClient
     public enum WriteMode
     {
         APPEND
-        {
-            @Override
-            public int intValue()
-            {
-                return ChannelSftp.APPEND;
-            }
-        },
+                {
+                    @Override
+                    public int intValue()
+                    {
+                        return ChannelSftp.APPEND;
+                    }
+                },
         OVERWRITE
-        {
-            @Override
-            public int intValue()
-            {
-                return ChannelSftp.OVERWRITE;
-            }
-        };
+                {
+                    @Override
+                    public int intValue()
+                    {
+                        return ChannelSftp.OVERWRITE;
+                    }
+                };
 
         public abstract int intValue();
     }
