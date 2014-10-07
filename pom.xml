@@ -186,9 +186,7 @@
         <flatpackVersion>3.1.1</flatpackVersion>
         <geronimoSpecsVersion>1.1</geronimoSpecsVersion>
         <geronimoSpecsJtaVersion>1.1.1</geronimoSpecsJtaVersion>
-        <geronimoSpecsStaxVersion>1.0.1</geronimoSpecsStaxVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
-        <geronimoSpecsWsMetadataVersion>1.1.2</geronimoSpecsWsMetadataVersion>
         <guavaVersion>16.0.1</guavaVersion>
         <hamcrestVersion>1.3</hamcrestVersion>
         <hibernateVersion>3.6.0.Final</hibernateVersion>
@@ -207,8 +205,6 @@
         <jettyVersion>9.0.7.v20131107</jettyVersion>
         <jodaTimeVersion>1.6</jodaTimeVersion>
         <jschVersion>0.1.51</jschVersion>
-        <jsr181Version>1.0-MR1</jsr181Version>
-        <jsr250AnnotationVerson>1.0</jsr250AnnotationVerson>
         <junitVersion>4.11</junitVersion>
         <log4jVersion>2.0.2</log4jVersion>
         <disruptorVersion>3.2.1</disruptorVersion>
@@ -252,11 +248,6 @@
                 <groupId>javax.annotation</groupId>
                 <artifactId>javax.annotation-api</artifactId>
                 <version>1.2</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-stax-api_1.0_spec</artifactId>
-                <version>${geronimoSpecsStaxVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -447,7 +438,7 @@
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-servlet_3.0_spec</artifactId>
-                <!-- servlet api jar is versioned differently -->
+                 <!--servlet api jar is versioned differently-->
                 <version>${geronimoSpecsServletApiVersion}</version>
             </dependency>
             <dependency>
@@ -694,11 +685,6 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-j2ee-management_1.0_spec</artifactId>
-                <version>${geronimoSpecsVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-jms_1.1_spec</artifactId>
                 <version>${geronimoSpecsVersion}</version>
             </dependency>
@@ -711,32 +697,12 @@
                 <groupId>javax.mail</groupId>
                 <artifactId>mail</artifactId>
                 <version>${javaMailVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.xml.ws</groupId>
-                <artifactId>jaxws-api</artifactId>
-                <version>${javaXmlWsVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.jws</groupId>
-                <artifactId>jsr181-api</artifactId>
-                <version>${jsr181Version}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.xml.bind</groupId>
-                <artifactId>jaxb-api</artifactId>
-                <version>${jaxbApiVersion}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>javax.xml.stream</groupId>
-                        <artifactId>stax-api</artifactId>
+                        <groupId>javax.activation</groupId>
+                        <artifactId>activation</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>javax.annotation</groupId>
-                <artifactId>jsr250-api</artifactId>
-                <version>${jsr250AnnotationVerson}</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
@@ -747,16 +713,6 @@
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-impl</artifactId>
                 <version>${javaXmlBindVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.xml.soap</groupId>
-                <artifactId>saaj-api</artifactId>
-                <version>${saajVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.sun.xml.messaging.saaj</groupId>
-                <artifactId>saaj-impl</artifactId>
-                <version>${saajVersion}</version>
             </dependency>
             <dependency>
                 <groupId>net.java.dev.stax-utils</groupId>
@@ -998,11 +954,6 @@
                         <artifactId>xstream</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>net.sf.retrotranslator</groupId>
-                <artifactId>retrotranslator-runtime</artifactId>
-                <version>1.2.1</version>
             </dependency>
             <dependency>
                 <groupId>tanukisoft</groupId>
