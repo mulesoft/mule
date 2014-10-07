@@ -10,7 +10,6 @@ import static org.mule.transport.sftp.notification.SftpTransportNotification.SFT
 import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_GET_ACTION;
 import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_PUT_ACTION;
 import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_RENAME_ACTION;
-
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.transport.sftp.notification.SftpNotifier;
 import org.mule.util.StringUtils;
@@ -106,7 +105,7 @@ public class SftpClient
     /**
      * Converts a relative path to an absolute path according to
      * http://tools.ietf.org/html/draft-ietf-secsh-scp-sftp-ssh-uri-04.
-     * 
+     *
      * @param path relative path
      * @return Absolute path
      */
@@ -301,31 +300,25 @@ public class SftpClient
     }
 
     private String[] listDirectory(String path, boolean includeFiles, boolean includeDirectories)
-        throws IOException
+            throws IOException
     {
         try
         {
-            @SuppressWarnings("unchecked")
-            Vector<String> vv = channelSftp.ls(path);
-            if (vv != null)
+            Vector<LsEntry> entries = channelSftp.ls(path);
+            if (entries != null)
             {
                 List<String> ret = new ArrayList<String>();
-                for (int i = 0; i < vv.size(); i++)
+                for (LsEntry entry : entries)
                 {
-                    Object obj = vv.elementAt(i);
-                    if (obj instanceof com.jcraft.jsch.ChannelSftp.LsEntry)
+                    if (includeFiles && !entry.getAttrs().isDir())
                     {
-                        LsEntry entry = (LsEntry) obj;
-                        if (includeFiles && !entry.getAttrs().isDir())
+                        ret.add(entry.getFilename());
+                    }
+                    if (includeDirectories && entry.getAttrs().isDir())
+                    {
+                        if (!entry.getFilename().equals(".") && !entry.getFilename().equals(".."))
                         {
                             ret.add(entry.getFilename());
-                        }
-                        if (includeDirectories && entry.getAttrs().isDir())
-                        {
-                            if (!entry.getFilename().equals(".") && !entry.getFilename().equals(".."))
-                            {
-                                ret.add(entry.getFilename());
-                            }
                         }
                     }
                 }
@@ -334,7 +327,7 @@ public class SftpClient
         }
         catch (SftpException e)
         {
-            throw new IOException(e.getMessage());
+            throw new IOException(e.getMessage(), e);
         }
         return null;
     }
@@ -453,7 +446,7 @@ public class SftpClient
 
     /**
      * Creates a directory
-     * 
+     *
      * @param directoryName The directory name
      * @throws IOException If an error occurs
      */
@@ -497,7 +490,7 @@ public class SftpClient
 
     /**
      * Setter for 'home'
-     * 
+     *
      * @param home The path to home
      */
     void setHome(String home)
@@ -518,7 +511,7 @@ public class SftpClient
      * SftpClient methods can be merged Note, this method is synchronized because it
      * in rare cases can be called from two threads at the same time and thus cause
      * an error.
-     * 
+     *
      * @param endpoint
      * @param newDir
      * @throws IOException
@@ -567,7 +560,7 @@ public class SftpClient
     }
 
     public String duplicateHandling(String destDir, String filename, String duplicateHandling)
-        throws IOException
+            throws IOException
     {
         if (duplicateHandling.equals(SftpConnector.PROPERTY_DUPLICATE_HANDLING_ASS_SEQ_NO))
         {
@@ -587,7 +580,7 @@ public class SftpClient
     {
         logger.warn("listing files for: " + destDir + "/" + filename);
         String[] files = listFiles(destDir);
-        for(String file : files)
+        for (String file : files)
         {
             if (file.equals(filename))
             {
@@ -707,21 +700,21 @@ public class SftpClient
     public enum WriteMode
     {
         APPEND
-        {
-            @Override
-            public int intValue() 
-            {
-                return ChannelSftp.APPEND;
-            }
-        },
+                {
+                    @Override
+                    public int intValue()
+                    {
+                        return ChannelSftp.APPEND;
+                    }
+                },
         OVERWRITE
-        {
-            @Override
-            public int intValue() 
-            {
-                return ChannelSftp.OVERWRITE;
-            }
-        };
+                {
+                    @Override
+                    public int intValue()
+                    {
+                        return ChannelSftp.OVERWRITE;
+                    }
+                };
 
         public abstract int intValue();
     }
