@@ -187,7 +187,7 @@
         <geronimoSpecsVersion>1.1</geronimoSpecsVersion>
         <geronimoSpecsJtaVersion>1.1.1</geronimoSpecsJtaVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
-        <guavaVersion>16.0.1</guavaVersion>
+        <guavaVersion>18.0</guavaVersion>
         <hamcrestVersion>1.3</hamcrestVersion>
         <hibernateVersion>3.6.0.Final</hibernateVersion>
         <jacksonVersion>1.9.11</jacksonVersion>

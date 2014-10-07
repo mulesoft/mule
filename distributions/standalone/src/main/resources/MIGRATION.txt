@@ -25,6 +25,8 @@ MULE-7946: The following dependencies were removed from the distribution since t
     * saaj-api-1.3.jar
     * saaj-impl-1.3.jar
 
+MULE-7949: Guava has been upgraded to version 18.0
+
 Migration changes from 3.4.x to 3.5.x
 
 MULE-6968: In the previous version, requests to "/" were only received by an HTTP endpoint when no path was defined, and rejected if path was set to "" or "/". Now requests are received by the endpoint in any of the three cases.
