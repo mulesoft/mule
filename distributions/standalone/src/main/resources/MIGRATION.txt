@@ -16,6 +16,14 @@ MULE-7842: javax.annotation:javax.annotation-api was upgraded to version 1.2. We
 MULE-6866: Groovy was upgraded to version 2.3.7. If this produces any compatibility issues with an existing script you should either update your script (recommended) or go back to a prior version by replacing the groovy jar at MULE_HOME/lib/opt
 MULE-7906: Jython 2.7.3b3 is now part of the distribution. You no longer need to install the scripting pack or include it on your app. If this produces any compatibility issues with an existing script you should either update your application/installation (recommended) or replace/delete the jython jar at MULE_HOME/lib/opt
 MULE-7740: Rhino 1.7R4 is now part of the distribution. You no longer need to install the scripting pack or include it on your app. If this produces any compatibility issues with an existing script you should either update your application/installation (recommended) or replace/delete the rhino and js-engine jars at MULE_HOME/lib/opt
+MULE-7946: The following dependencies were removed from the distribution since they're no longer necessary as 1.7 is now the minimum required JDK version for running mule:
+    * geronimo-j2ee-management_1.0_spec-1.1.jar
+    * jaxb-api-2.1.jar
+    * jaxws-api-2.2.1.jar
+    * jsr250-api-1.0.jar
+    * jsr181-api-1.0-MR1.jar
+    * saaj-api-1.3.jar
+    * saaj-impl-1.3.jar
 
 Migration changes from 3.4.x to 3.5.x
 

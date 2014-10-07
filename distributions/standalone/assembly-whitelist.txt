@@ -577,7 +577,6 @@
 /mule-standalone-${productVersion}/lib/opt/el-api-6.0.29.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-ejb_2.1_spec-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-j2ee-connector_1.5_spec-1.1.jar
-/mule-standalone-${productVersion}/lib/opt/geronimo-j2ee-management_1.0_spec-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-jms_1.1_spec-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-jta_1.1_spec-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-servlet_3.0_spec-1.0.jar
@@ -608,11 +607,9 @@
 /mule-standalone-${productVersion}/lib/opt/javax.annotation-api-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/javax.inject-2.3.0-b05.jar
 /mule-standalone-${productVersion}/lib/opt/javax.ws.rs-api-2.0.jar
-/mule-standalone-${productVersion}/lib/opt/jaxb-api-2.1.jar
 /mule-standalone-${productVersion}/lib/opt/jaxb-impl-2.1.9.jar
 /mule-standalone-${productVersion}/lib/opt/jaxb-xjc-2.1.9.jar
 /mule-standalone-${productVersion}/lib/opt/jaxen-1.1.1.jar
-/mule-standalone-${productVersion}/lib/opt/jaxws-api-2.2.1.jar
 /mule-standalone-${productVersion}/lib/opt/jboss-logging-3.0.0.Beta5.jar
 /mule-standalone-${productVersion}/lib/opt/jbossjta-4.15.0.Final.jar
 /mule-standalone-${productVersion}/lib/opt/jbpm-api-4.4.jar
@@ -653,8 +650,6 @@
 /mule-standalone-${productVersion}/lib/opt/json-schema-validator-1.2.2.jar
 /mule-standalone-${productVersion}/lib/opt/json-20140107.jar
 /mule-standalone-${productVersion}/lib/opt/jsp-api-6.0.29.jar
-/mule-standalone-${productVersion}/lib/opt/jsr181-api-1.0-MR1.jar
-/mule-standalone-${productVersion}/lib/opt/jsr250-api-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/jta-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/juel-engine-2.1.0.jar
 /mule-standalone-${productVersion}/lib/opt/juel-impl-2.2.1.jar
@@ -684,8 +679,6 @@
 /mule-standalone-${productVersion}/lib/opt/relaxngDatatype-20020414.jar
 /mule-standalone-${productVersion}/lib/opt/rhino-1.7R4.jar
 /mule-standalone-${productVersion}/lib/opt/rome-0.9.jar
-/mule-standalone-${productVersion}/lib/opt/saaj-api-1.3.jar
-/mule-standalone-${productVersion}/lib/opt/saaj-impl-1.3.jar
 /mule-standalone-${productVersion}/lib/opt/saxon-9.1.0.8.jar
 /mule-standalone-${productVersion}/lib/opt/saxon-9.1.0.8-dom.jar
 /mule-standalone-${productVersion}/lib/opt/saxon-9.1.0.8-xqj.jar
