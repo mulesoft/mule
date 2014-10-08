@@ -154,7 +154,7 @@
         -->
         <jdk7Name>JavaSE-1.7</jdk7Name>
 
-        <activemqVersion>5.5.0</activemqVersion>
+        <activemqVersion>5.7.0</activemqVersion>
         <antVersion>1.7.0</antVersion>
         <antlrVersion>3.1.1</antlrVersion>
         <asmVersion>3.3.1</asmVersion>
@@ -181,7 +181,7 @@
         <cryptixJceVersion>20050328</cryptixJceVersion>
         <cryptixVersion>20050405</cryptixVersion>
         <cxfVersion>2.5.9</cxfVersion>
-        <derbyVersion>10.9.1.0</derbyVersion>
+        <derbyVersion>10.11.1.1</derbyVersion>
         <dom4jVersion>1.6.1</dom4jVersion>
         <flatpackVersion>3.1.1</flatpackVersion>
         <geronimoSpecsVersion>1.1</geronimoSpecsVersion>
@@ -208,11 +208,13 @@
         <junitVersion>4.11</junitVersion>
         <log4jVersion>2.0.2</log4jVersion>
         <disruptorVersion>3.2.1</disruptorVersion>
+        <mockitoVersion>1.9.5</mockitoVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <!-- TODO EE-1395 -->
         <mqSeriesVersion>6.0</mqSeriesVersion>
         <muleMvelVersion>2.1.9-MULE-005</muleMvelVersion>
         <mx4jVersion>2.1.1</mx4jVersion>
+        <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
         <ognlVersion>2.7.3</ognlVersion>
         <oroVersion>2.0.8</oroVersion>
         <quartzVersion>1.8.5</quartzVersion>
@@ -231,6 +233,7 @@
         <staxApiVersion>3.1.1</staxApiVersion>
         <staxonVersion>1.2</staxonVersion>
         <sxcVersion>0.7.3</sxcVersion>
+        <testFtpServerVersion>1.0.6</testFtpServerVersion>
         <tomcatVersion>6.0.29</tomcatVersion>
         <woodstoxVersion>4.1.4</woodstoxVersion>
         <wrapperVersion>3.2.3</wrapperVersion>
@@ -519,7 +522,7 @@
             <dependency>
                 <groupId>xmlunit</groupId>
                 <artifactId>xmlunit</artifactId>
-                <version>1.1</version>
+                <version>1.5</version>
                 <exclusions>
                     <exclusion>
                         <groupId>xml-apis</groupId>
@@ -532,6 +535,10 @@
                 <artifactId>activemq-core</artifactId>
                 <version>${activemqVersion}</version>
                 <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
                     <exclusion>
                         <groupId>org.apache.geronimo.specs</groupId>
                         <artifactId>geronimo-jms_1.1_spec</artifactId>
@@ -659,7 +666,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>1.9.0</version>
+                <version>${mockitoVersion}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.hamcrest</groupId>
