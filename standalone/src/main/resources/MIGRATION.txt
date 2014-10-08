@@ -31,6 +31,7 @@ MULE-7950: The following Apache Commons dependencies were upgraded:
     * commons-codec: from version 1.3 to 1.9
     * commons-exec: from version 1.1 to 1.2
     * commons-net: from version 2.0 to 2.2
+MULE-7951: xmlunit has been upgraded to version 1.5
 
 Migration changes from 3.4.x to 3.5.x
 
