@@ -164,9 +164,9 @@
         <bouncycastleVersion>1.46</bouncycastleVersion>
         <cglibVersion>2.2</cglibVersion>
         <cometdVersion>6.1.26</cometdVersion>
-        <commonsBeanUtilsVersion>1.8.0</commonsBeanUtilsVersion>
+        <commonsBeanUtilsVersion>1.9.2</commonsBeanUtilsVersion>
         <commonsCliVersion>1.2</commonsCliVersion>
-        <commonsCodecVersion>1.3</commonsCodecVersion>
+        <commonsCodecVersion>1.9</commonsCodecVersion>
         <commonsCollectionsVersion>3.2.1</commonsCollectionsVersion>
         <commonsDbcpVersion>1.4</commonsDbcpVersion>
         <commonsDbUtilsVersion>1.2</commonsDbUtilsVersion>
@@ -174,7 +174,7 @@
         <commonsIoVersion>2.4</commonsIoVersion>
         <commonsJxpathVersion>1.3</commonsJxpathVersion>
         <commonsLangVersion>2.4</commonsLangVersion>
-        <commonsNetVersion>2.0</commonsNetVersion>
+        <commonsNetVersion>2.2</commonsNetVersion>
         <!-- TODO There is a more modern version of cryptix available:
         http://mirrors.ibiblio.org/pub/mirrors/maven2/cryptix/cryptix/3.2.0/cryptix-3.2.0.jar
         but the PGP module would need some work in order to use it -->
@@ -740,6 +740,11 @@
                 <groupId>commons-collections</groupId>
                 <artifactId>commons-collections</artifactId>
                 <version>${commonsCollectionsVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-net</groupId>
+                <artifactId>commons-net</artifactId>
+                <version>${commonsNetVersion}</version>
             </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
@@ -1313,6 +1318,16 @@
                 <groupId>commons-dbcp</groupId>
                 <artifactId>commons-dbcp</artifactId>
                 <version>${commonsDbcpVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>xml-apis</groupId>
+                        <artifactId>xml-apis</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>xerces</groupId>
+                        <artifactId>xerces</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -1806,7 +1821,7 @@
                                 <links>
                                     <link>http://docs.oracle.com/javase/7/docs/api/</link>
                                     <link>http://java.sun.com/j2ee/sdk_1.3/techdocs/api/</link>
-                                    <link>http://jakarta.apache.org/commons/beanutils/commons-beanutils-1.7.0/docs/api/</link>
+                                    <link>http://jakarta.apache.org/commons/beanutils/commons-beanutils-1.9.2/docs/api/</link>
                                     <link>http://jakarta.apache.org/commons/collections/api-3.2/</link>
                                     <link>http://jakarta.apache.org/httpcomponents/httpclient-3.x/apidocs/</link>
                                     <link>http://jakarta.apache.org/commons/io/api-1.2/</link>

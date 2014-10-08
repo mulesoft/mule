@@ -22,7 +22,18 @@
 
     <properties>
         <licensePath>../LICENSE_HEADER.txt</licensePath>
+        <commonsExecVersion>1.2</commonsExecVersion>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-exec</artifactId>
+                <version>${commonsExecVersion}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>
