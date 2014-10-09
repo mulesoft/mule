@@ -33,8 +33,8 @@
     <!-- Download any additional libraries needed to run the application -->
     <target name="get.libraries">
         <!-- ActiveMQ -->            
-        <get src="${url.maven.repo2}/org/apache/activemq/activemq-core/4.1.2/activemq-core-4.1.2.jar"
-             dest="${dir.user.lib}/activemq-core-4.1.2.jar"
+        <get src="${url.maven.repo2}/org/apache/activemq/activemq-core/5.7.0/activemq-core-5.7.0.jar"
+             dest="${dir.user.lib}/activemq-core-5.7.0.jar"
              verbose="true"
              usetimestamp="true"/>
 
