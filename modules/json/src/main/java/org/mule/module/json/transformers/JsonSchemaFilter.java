@@ -9,6 +9,7 @@ package org.mule.module.json.transformers;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.routing.filter.Filter;
+import org.mule.module.json.validation.JsonSchemaValidator;
 
 import java.util.Map;
 
@@ -20,6 +21,10 @@ import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 
+/**
+ * @deprecated This class is deprecated and will be removed in Mule 4.0. Use {@link JsonSchemaValidator} instead
+ */
+@Deprecated
 public interface JsonSchemaFilter extends Filter, Initialisable, MuleContextAware
 {
 
