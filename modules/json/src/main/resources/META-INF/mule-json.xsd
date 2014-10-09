@@ -33,6 +33,15 @@
         </xsd:appinfo>
     </xsd:annotation>
 
+    <xsd:element name="validate-schema" type="validateSchemaType" substitutionGroup="mule:abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Validates that the message payload represents a Json compliant with a
+                given Json schema.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
     <xsd:element name="is-json-filter" type="jsonFilterType" substitutionGroup="mule:abstract-filter">
         <xsd:annotation>
             <xsd:documentation>
@@ -101,7 +110,8 @@
     <xsd:element name="json-schema-validation-filter" type="mxml:schemaValidationFilterType" substitutionGroup="mule:abstract-filter">
         <xsd:annotation>
             <xsd:documentation>
-                Validate JSON against an XML schema
+                Validate JSON against an XML schema.
+                This element is deprecated. Use validate-schema instead
             </xsd:documentation>
          </xsd:annotation>
     </xsd:element>
@@ -181,6 +191,77 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:complexType name="validateSchemaType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:element name="schema-redirects" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Allows to redirect any given URI in the Schema (or even the schema
+                                location itself) to any other specific URI. The most common use case for this
+                                feature is to map external namespace URIs without the need to a local resource
+                            </xsd:documentation>
+                        </xsd:annotation>
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="schema-redirect" minOccurs="1" maxOccurs="unbounded" type="schemaRedirectType" />
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="schemaLocation" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The location in which the schema to validate against is to be found. This attribute
+                            supports URI representations such as "http://org.mule/schema.json" or
+                            "resource:/schema.json". It also supports a most common classpath reference
+                            such as simply "schema.json"
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="dereferencing" type="dereferencingType" use="optional" default="CANONICAL">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Draft v4 defines two dereferencing modes: canonical and inline. Canonical will be the default option but INLINE can also be specified.
+                            When validating a v3 draft this attribute is ignored.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="schemaRedirectType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A redirection between a "from" and a "to" location
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:attribute name="from" type="xsd:string" use="required" />
+        <xsd:attribute name="to" type="xsd:string" use="required" />
+    </xsd:complexType>
+
+    <xsd:simpleType name="dereferencingType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A dereferencing type that also allows property placeholders.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="mule:propertyPlaceholderType"/>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="CANONICAL"/>
+                    <xsd:enumeration value="INLINE"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
+
 
     <xsd:complexType name="jsonToObjectTransformerType">
         <xsd:complexContent>
