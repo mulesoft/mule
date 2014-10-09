@@ -109,4 +109,115 @@
         <xsd:attribute name="port" type="mule:substitutablePortNumber"/>
     </xsd:attributeGroup>
 
+
+    <xsd:element name="context" type="tlsContextType" substitutionGroup="mule:abstract-extension">
+        <xsd:annotation>
+            <xsd:documentation>
+                Reusable configuration element for TLS.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="tlsContextType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                <xsd:sequence minOccurs="0" maxOccurs="1">
+                    <xsd:element minOccurs="0" maxOccurs="1" name="trust-store" type="tlsContextTrustStoreType">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Trust store configuration. If used client side, the trust store contains the certificates of the
+                                trusted servers. If used server side, it contains the certificates of the trusted clients.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element minOccurs="0" maxOccurs="1" name="key-store" type="tlsContextKeyStoreType">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Key store configuration. The key store contains the keys of this server/client.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="name" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of this context.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
+    <xsd:complexType name="tlsContextTrustStoreType">
+        <xsd:attribute name="path" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The location (which will be resolved relative to the current classpath and file system, if possible) of the trust store.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="password" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The password used to protect the trust store.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="type" type="mule:keystoreType">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The type of store used.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="algorithm" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The algorithm used by the trust store.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+
+    <xsd:complexType name="tlsContextKeyStoreType">
+        <xsd:attribute name="path" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The location (which will be resolved relative to the current classpath and file system, if possible) of the key store.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="type" type="mule:keystoreType">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The type of key store used.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="keyPassword" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The password used to protect the private key.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="password" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The password used to protect the key store.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="algorithm" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The algorithm used by the key store.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
 </xsd:schema>
