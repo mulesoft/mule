@@ -7,6 +7,8 @@
 package org.mule.module.launcher.log4j2;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.IsNot.not;
@@ -15,11 +17,15 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mule.api.config.MuleProperties;
 import org.mule.module.launcher.application.CompositeApplicationClassLoader;
 import org.mule.module.launcher.artifact.ShutdownListener;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.io.File;
+
+import org.apache.logging.log4j.core.LoggerContext;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,16 +38,20 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase
 {
+
+    private static final File CONFIG_LOCATION = new File("my/local/log4j2.xml");
+
     private ArtifactAwareContextSelector selector;
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private CompositeApplicationClassLoader classLoader;
 
     @Before
-    public void before()
+    public void before() throws Exception
     {
         selector = new ArtifactAwareContextSelector();
         when(classLoader.getArtifactName()).thenReturn(getClass().getName());
+        when(classLoader.findLocalResource("log4j2.xml")).thenReturn(CONFIG_LOCATION.toURI().toURL());
     }
 
     @Test
@@ -71,5 +81,32 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase
         assertThat(context, not(selector.getContext("", classLoader, true)));
     }
 
+    @Test
+    public void returnsMuleLoggerContext()
+    {
+        LoggerContext ctx = selector.getContext("", classLoader, true);
+        assertThat(ctx, instanceOf(MuleLoggerContext.class));
+        assertConfigurationLocation(ctx);
+    }
 
+    @Test
+    public void simpleLogContext() throws Exception
+    {
+        System.setProperty(MuleProperties.MULE_SIMPLE_LOG, "true");
+        try
+        {
+            LoggerContext ctx = selector.getContext("", classLoader, true);
+            assertThat(ctx, not(instanceOf(MuleLoggerContext.class)));
+            assertConfigurationLocation(ctx);
+        }
+        finally
+        {
+            System.clearProperty(MuleProperties.MULE_SIMPLE_LOG);
+        }
+    }
+
+    private void assertConfigurationLocation(LoggerContext ctx)
+    {
+        assertThat(ctx.getConfigLocation(), equalTo(CONFIG_LOCATION.toURI()));
+    }
 }

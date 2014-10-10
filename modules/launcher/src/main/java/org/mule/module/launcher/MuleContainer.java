@@ -8,7 +8,6 @@ package org.mule.module.launcher;
 
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
-import org.mule.api.config.MuleProperties;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.StartupContext;
 import org.mule.config.i18n.CoreMessages;
@@ -65,11 +64,7 @@ public class MuleContainer
 
     static
     {
-        if (System.getProperty(MuleProperties.MULE_SIMPLE_LOG) == null)
-        {
-            LogManager.setFactory(new MuleLog4jContextFactory());
-        }
-
+        LogManager.setFactory(new MuleLog4jContextFactory());
         logger = LogFactory.getLog(MuleContainer.class);
     }
     /**
