@@ -165,6 +165,7 @@
         <cglibVersion>2.2</cglibVersion>
         <cometdVersion>6.1.26</cometdVersion>
         <commonsBeanUtilsVersion>1.9.2</commonsBeanUtilsVersion>
+        <commonsExecVersion>1.2</commonsExecVersion>
         <commonsCliVersion>1.2</commonsCliVersion>
         <commonsCodecVersion>1.9</commonsCodecVersion>
         <commonsCollectionsVersion>3.2.1</commonsCollectionsVersion>
@@ -784,6 +785,11 @@
                 <groupId>commons-lang</groupId>
                 <artifactId>commons-lang</artifactId>
                 <version>${commonsLangVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-exec</artifactId>
+                <version>${commonsExecVersion}</version>
             </dependency>
             <dependency>
                 <groupId>commons-cli</groupId>
