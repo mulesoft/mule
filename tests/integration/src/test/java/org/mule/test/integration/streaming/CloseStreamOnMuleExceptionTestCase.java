@@ -13,6 +13,8 @@ import org.mule.module.xml.stax.DelegateXMLStreamReader;
 import org.mule.module.xml.stax.StaxSource;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
 import org.mule.util.concurrent.Latch;
 
 import java.io.ByteArrayInputStream;
@@ -28,7 +30,6 @@ import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.xml.sax.InputSource;
@@ -115,8 +116,7 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
 
         client.dispatch("vm://inEcho?connector=vm", stream, null);
 
-        Thread.sleep(timeoutMs);
-        assertTrue(((TestByteArrayInputStream) stream.getInputSource().getByteStream()).isClosed());
+        verifyInputStreamIsClosed(((TestByteArrayInputStream) stream.getInputSource().getByteStream()));
     }
 
     @Test
@@ -128,16 +128,14 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
 
         client.dispatch("vm://inEcho?connector=vm", stream, null);
 
-        Thread.sleep(timeoutMs);
-        assertTrue(((TestXMLStreamReader) stream.getXMLStreamReader()).isClosed());
+        verifyInputStreamIsClosed(((TestXMLStreamReader) stream.getXMLStreamReader()));
     }
 
     @Test
     public void testCloseStreamOnDispatcherException() throws Exception
     {
         client.dispatch("vm://dispatcherExceptionBridge?connector=vm", inputStream, null);
-        Thread.sleep(timeoutMs);
-        assertTrue(inputStream.isClosed());
+        verifyInputStreamIsClosed(inputStream);
     }
 
     @Test
@@ -145,12 +143,34 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
     {
         client.dispatch("vm://inboundFilterExceptionBridge?connector=vm", inputStream, null);
 
-        Thread.sleep(1000);
-
-        assertTrue(inputStream.isClosed());
+        verifyInputStreamIsClosed(inputStream);
     }
 
-    static class TestByteArrayInputStream extends ByteArrayInputStream
+    private void verifyInputStreamIsClosed(final ClosableInputStream is)
+    {
+        final PollingProber pollingProber = new PollingProber(timeoutMs, 100);
+        pollingProber.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return is.isClosed();
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "Input stream was never closed";
+            }
+        });
+    }
+
+    interface ClosableInputStream
+    {
+        boolean isClosed();
+    }
+
+    static class TestByteArrayInputStream extends ByteArrayInputStream implements ClosableInputStream
     {
         private boolean closed;
 
@@ -178,7 +198,7 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
         }
     }
 
-    static class TestXMLStreamReader extends DelegateXMLStreamReader
+    static class TestXMLStreamReader extends DelegateXMLStreamReader implements ClosableInputStream
     {
         private boolean closed;
 
