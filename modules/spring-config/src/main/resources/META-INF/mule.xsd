@@ -6493,7 +6493,7 @@
                                 </xsd:documentation>
                             </xsd:annotation>
                         </xsd:element>
-                        <xsd:element name="threading-profile" type="asynchronousThreadingProfileType" minOccurs="0">
+                        <xsd:element name="threading-profile" type="threadingProfileType" minOccurs="0">
                             <xsd:annotation>
                                 <xsd:documentation>
                                     Threading profile used to process the message processors inside the until-successful.

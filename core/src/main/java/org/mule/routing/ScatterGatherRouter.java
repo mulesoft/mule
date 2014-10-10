@@ -33,6 +33,7 @@ import org.mule.routing.outbound.MulticastingRouter;
 import org.mule.util.Preconditions;
 import org.mule.util.concurrent.ThreadNameHelper;
 import org.mule.work.ProcessingMuleEventWork;
+import org.mule.work.SerialWorkManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -250,9 +251,16 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
                 timeout = Long.MAX_VALUE;
             }
 
-            workManager = threadingProfile.createWorkManager(
-                ThreadNameHelper.getPrefix(muleContext) + "ScatterGatherWorkManager",
-                muleContext.getConfiguration().getShutdownTimeout());
+            if (threadingProfile.isDoThreading())
+            {
+                workManager = threadingProfile.createWorkManager(
+                        ThreadNameHelper.getPrefix(muleContext) + "ScatterGatherWorkManager",
+                        muleContext.getConfiguration().getShutdownTimeout());
+            }
+            else
+            {
+                workManager = new SerialWorkManager();
+            }
         }
         catch (Exception e)
         {
