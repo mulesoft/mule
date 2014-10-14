@@ -50,6 +50,7 @@
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
+            <classifier>indy</classifier>
         </dependency>
 
         <!--Jython-->
