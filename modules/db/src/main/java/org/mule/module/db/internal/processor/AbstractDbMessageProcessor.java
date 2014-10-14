@@ -173,7 +173,7 @@ public abstract class AbstractDbMessageProcessor extends AbstractInterceptingMes
         List<QueryType> validTypes = getValidQueryTypes();
         if (validTypes == null || !validTypes.contains(queryTemplate.getType()))
         {
-            throw new IllegalArgumentException(String.format("Query type must me '%s' but was '%s'", validTypes, queryTemplate.getType()));
+            throw new IllegalArgumentException(String.format("Query type must be one of '%s' but was '%s'", validTypes, queryTemplate.getType()));
         }
     }
 

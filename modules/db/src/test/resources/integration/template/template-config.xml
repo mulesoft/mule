@@ -20,6 +20,26 @@
         <db:in-param name="position" defaultValue="1"/>
     </db:template-query>
 
+    <db:template-query name="testParamOverride">
+        <db:template-query-ref name="testFileQuery"/>
+        <db:in-param name="position" defaultValue="2"/>
+    </db:template-query>
+
+    <db:template-query name="testFilePlaceholderQuery">
+        <db:parameterized-query file="${file}"/>
+        <db:in-param name="position" defaultValue="1"/>
+    </db:template-query>
+
+    <db:template-query name="testPlaceholderQuery">
+        <db:parameterized-query>${query}</db:parameterized-query>
+        <db:in-param name="position" defaultValue="1"/>
+    </db:template-query>
+
+    <db:template-query name="testPlaceholderParam">
+        <db:parameterized-query>SELECT * FROM PLANET WHERE POSITION = :position</db:parameterized-query>
+        <db:in-param name="position" defaultValue="${param}"/>
+    </db:template-query>
+
     <db:template-query name="testFileQueryAndEmptyContent">
         <db:parameterized-query file="integration/template/template-query.sql">
 
@@ -29,6 +49,10 @@
 
     <db:template-query name="testDynamicQuery">
         <db:dynamic-query>SELECT * FROM PLANET WHERE POSITION = #[position]</db:dynamic-query>
+    </db:template-query>
+
+    <db:template-query name="testDynamicPlaceholderQuery">
+        <db:dynamic-query>${dynamicQuery}</db:dynamic-query>
     </db:template-query>
 
     <db:template-query name="testNullParamsQuery">
