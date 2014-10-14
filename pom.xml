@@ -863,6 +863,7 @@
                 <groupId>org.codehaus.groovy</groupId>
                 <artifactId>groovy-all</artifactId>
                 <version>${groovyVersion}</version>
+                <classifier>indy</classifier>
                 <exclusions>
                     <!--  Exclude openejb-loader as it is not needed and there are currently version inconsistancies in openejb-core pom-->
                     <exclusion>
