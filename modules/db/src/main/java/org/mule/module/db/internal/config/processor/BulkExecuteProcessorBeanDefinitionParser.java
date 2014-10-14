@@ -12,8 +12,8 @@ import org.mule.module.db.internal.domain.executor.BulkUpdateExecutorFactory;
 import org.mule.module.db.internal.metadata.BulkExecuteMetadataProvider;
 import org.mule.module.db.internal.parser.SimpleQueryTemplateParser;
 import org.mule.module.db.internal.processor.BulkExecuteMessageProcessor;
-import org.mule.module.db.internal.util.DefaultFileReader;
 import org.mule.module.db.internal.resolver.query.FileBulkQueryResolver;
+import org.mule.module.db.internal.util.DefaultFileReader;
 import org.mule.util.StringUtils;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -54,18 +54,23 @@ public class BulkExecuteProcessorBeanDefinitionParser extends AbstractAdvancedDb
     private void parseBulkQuery(Element element, BeanDefinitionBuilder builder)
     {
         String file = element.getAttribute("file");
-        String queryText = element.getTextContent();
+
+        BeanDefinitionBuilder bulkQueryResolver;
 
         if (StringUtils.isEmpty(file))
         {
-            BeanDefinitionBuilder sqlParamResolverFactory = BeanDefinitionBuilder.genericBeanDefinition(BulkQueryResolverFactoryBean.class);
-            sqlParamResolverFactory.addConstructorArgValue(queryText);
-            builder.addConstructorArgValue(sqlParamResolverFactory.getBeanDefinition());
+            bulkQueryResolver = BeanDefinitionBuilder.genericBeanDefinition(BulkQueryResolverFactoryBean.class);
+            bulkQueryResolver.addConstructorArgValue(element.getTextContent());
         }
         else
         {
-            builder.addConstructorArgValue(new FileBulkQueryResolver(file, new SimpleQueryTemplateParser(), new DefaultFileReader()));
+            bulkQueryResolver = BeanDefinitionBuilder.genericBeanDefinition(FileBulkQueryResolver.class);
+            bulkQueryResolver.addConstructorArgValue(file);
+            bulkQueryResolver.addConstructorArgValue(new SimpleQueryTemplateParser());
+            bulkQueryResolver.addConstructorArgValue(new DefaultFileReader());
         }
+
+        builder.addConstructorArgValue(bulkQueryResolver.getBeanDefinition());
     }
 
     @Override
