@@ -29,7 +29,7 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
     Application findApplication(String appName);
 
     /**
-     * Lists all deployed applications.
+     * Lists all applications deployed or in process of being deployed.
      *
      * @return immutable applications list
      */
