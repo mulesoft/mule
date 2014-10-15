@@ -7,6 +7,7 @@
 package org.mule.module.launcher.log4j2;
 
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.config.MuleProperties;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.ClassUtils;
@@ -74,9 +75,9 @@ final class LoggerContextConfigurer
     {
         disableShutdownHook(context);
         configureMonitor(context);
+        boolean forceConsoleLog = System.getProperty(MuleProperties.MULE_FORCE_CONSOLE_LOG) != null;
 
-
-        if (context.getConfigFile() == null)
+        if (context.getConfigFile() == null && !forceConsoleLog)
         {
             removeConsoleAppender(context);
         }
@@ -88,6 +89,11 @@ final class LoggerContextConfigurer
         else if (!context.isStandlone())
         {
             addDefaultAppender(context, "mule-main.log");
+        }
+
+        if (forceConsoleLog && !hasAppender(context, ConsoleAppender.class))
+        {
+            forceConsoleAppender(context);
         }
     }
 
@@ -145,15 +151,24 @@ final class LoggerContextConfigurer
     private void addDefaultAppender(MuleLoggerContext context, String logFilePath)
     {
         RollingFileAppender appender = createRollingFileAppender(logFilePath, "'.'%d{yyyy-MM-dd}", "defaultFileAppender", context.getConfiguration());
-        appender.start();
+        doAddAppender(context, appender);
+    }
 
+    private void forceConsoleAppender(MuleLoggerContext context)
+    {
+        Appender appender = ConsoleAppender.createAppender(createLayout(context.getConfiguration()), null, null, "Forced-Console", null, null);
+        doAddAppender(context, appender);
+    }
+
+    private void doAddAppender(LoggerContext context, Appender appender)
+    {
+        appender.start();
         context.getConfiguration().addAppender(appender);
         getRootLogger(context).addAppender(appender, Level.INFO, null);
     }
 
     private RollingFileAppender createRollingFileAppender(String logFilePath, String filePattern, String appenderName, Configuration configuration)
     {
-        Layout<? extends Serializable> layout = PatternLayout.createLayout(PATTERN_LAYOUT, configuration, null, null, true, false, null, null);
         TriggeringPolicy triggeringPolicy = TimeBasedTriggeringPolicy.createPolicy("1", "true");
         RolloverStrategy rolloverStrategy = DefaultRolloverStrategy.createStrategy("30", "1", null, String.valueOf(Deflater.NO_COMPRESSION), configuration);
 
@@ -165,10 +180,16 @@ final class LoggerContextConfigurer
                                                   null, null,
                                                   triggeringPolicy,
                                                   rolloverStrategy,
-                                                  layout,
+                                                  createLayout(configuration),
                                                   null, null, null, null,
                                                   configuration);
     }
+
+    private Layout<? extends Serializable> createLayout(Configuration configuration)
+    {
+        return PatternLayout.createLayout(PATTERN_LAYOUT, configuration, null, null, true, false, null, null);
+    }
+
 
     private void addDefaultArtifactContext(MuleLoggerContext context)
     {
@@ -212,21 +233,25 @@ final class LoggerContextConfigurer
             {
                 removeAppender(context, appender);
                 getRootLogger(context).removeAppender(appender.getName());
-
-                break;
             }
         }
     }
 
     private boolean hasFileAppender(LoggerContext context)
     {
+        return hasAppender(context, FileAppender.class, RollingFileAppender.class, RandomAccessFileAppender.class);
+    }
+
+    private boolean hasAppender(LoggerContext context, Class<? extends Appender>... appenderTypes)
+    {
         for (Appender appender : getRootLogger(context).getAppenders().values())
         {
-            if (appender instanceof FileAppender ||
-                appender instanceof RollingFileAppender ||
-                appender instanceof RandomAccessFileAppender)
+            for (Class<? extends Appender> appenderType : appenderTypes)
             {
-                return true;
+                if (appenderType.isInstance(appender))
+                {
+                    return true;
+                }
             }
         }
 
