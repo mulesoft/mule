@@ -36,19 +36,19 @@ public class DefaultParamTypeResolver implements ParamTypeResolver
 
     public Map<Integer, DbType> getParameterTypes(DbConnection connection, QueryTemplate queryTemplate) throws SQLException
     {
-        Map<Integer, DbType> metadataParamTypes = getParamTypesUsingMetadata(connection, queryTemplate);
-
-        return resolveParamTypes(connection, queryTemplate, metadataParamTypes);
-    }
-
-    protected Map<Integer, DbType> resolveParamTypes(DbConnection connection, QueryTemplate queryTemplate, Map<Integer, DbType> metadataParamTypes)
-    {
         Map<Integer, DbType> resolvedParamTypes = new HashMap<Integer, DbType>();
+
+        Map<Integer, DbType> metadataParamTypes = null;
 
         for (QueryParam queryParam : queryTemplate.getParams())
         {
             if (queryParam.getType() instanceof UnknownDbType)
             {
+                if (metadataParamTypes == null)
+                {
+                    metadataParamTypes = getParamTypesUsingMetadata(connection, queryTemplate);
+                }
+
                 resolvedParamTypes.put(queryParam.getIndex(), metadataParamTypes.get(queryParam.getIndex()));
             }
             else if (queryParam.getType() instanceof DynamicDbType)
