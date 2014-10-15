@@ -143,6 +143,7 @@ public class QueryTemplateBeanDefinitionParser extends AbstractMuleBeanDefinitio
             }
             queryTemplateFactory.addConstructorArgValue(sqlText);
         }
+        element.removeChild(sqlElem);
 
         List<Object> params = new ManagedList<Object>();
         List<Element> childElementsByTagName = DomUtils.getChildElementsByTagName(element, IN_PARAM_ELEMENT);
@@ -158,8 +159,6 @@ public class QueryTemplateBeanDefinitionParser extends AbstractMuleBeanDefinitio
         queryTemplateFactory.addConstructorArgValue(new SimpleQueryTemplateParser());
 
         builder.addConstructorArgValue(queryTemplateFactory.getBeanDefinition());
-
-        element.removeChild(sqlElem);
     }
 
     private BeanDefinition parseParameter(ParserContext nestedCtx, Element param)
