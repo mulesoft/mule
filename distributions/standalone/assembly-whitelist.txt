@@ -582,6 +582,9 @@
 /mule-standalone-${productVersion}/lib/opt/geronimo-servlet_3.0_spec-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-stax-api_1.0_spec-1.0.1.jar
 /mule-standalone-${productVersion}/lib/opt/grabbag-1.8.1.jar
+/mule-standalone-${productVersion}/lib/opt/grizzly-framework-2.3.16.jar
+/mule-standalone-${productVersion}/lib/opt/grizzly-http-2.3.16.jar
+/mule-standalone-${productVersion}/lib/opt/grizzly-http-server-2.3.16.jar
 /mule-standalone-${productVersion}/lib/opt/groovy-all-2.3.7-indy.jar
 /mule-standalone-${productVersion}/lib/opt/guava-18.0.jar
 /mule-standalone-${productVersion}/lib/opt/hamcrest-core-1.3.jar
@@ -665,13 +668,6 @@
 /mule-standalone-${productVersion}/lib/opt/mx4j-remote-2.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/mx4j-tools-2.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/neethi-3.0.2.jar
-/mule-standalone-${productVersion}/lib/opt/netty-all-4.0.23.Final.jar
-/mule-standalone-${productVersion}/lib/opt/netty-buffer-4.0.23.Final.jar
-/mule-standalone-${productVersion}/lib/opt/netty-codec-4.0.23.Final.jar
-/mule-standalone-${productVersion}/lib/opt/netty-codec-http-4.0.23.Final.jar
-/mule-standalone-${productVersion}/lib/opt/netty-common-4.0.23.Final.jar
-/mule-standalone-${productVersion}/lib/opt/netty-handler-4.0.23.Final.jar
-/mule-standalone-${productVersion}/lib/opt/netty-transport-4.0.23.Final.jar
 /mule-standalone-${productVersion}/lib/opt/ognl-2.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/oro-2.0.8.jar
 /mule-standalone-${productVersion}/lib/opt/osgi-resource-locator-1.0.1.jar
