@@ -173,7 +173,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
     {
         targetMessageProcessor.setNumberOfFailuresToSimulate(Integer.MAX_VALUE);
         EndpointBuilder dlqEndpointBuilder = mock(EndpointBuilder.class);
-        OutboundEndpoint dlqEndpoint = mock(OutboundEndpoint.class);
+        final OutboundEndpoint dlqEndpoint = mock(OutboundEndpoint.class);
         when(dlqEndpointBuilder.buildOutboundEndpoint()).thenReturn(dlqEndpoint);
         untilSuccessful.setDeadLetterQueue(dlqEndpointBuilder);
         untilSuccessful.initialise();
@@ -181,9 +181,22 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
 
         final MuleEvent testEvent = getTestEvent("ERROR");
         assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(testEvent));
-        ponderUntilEventAborted(testEvent);
 
-        verify(dlqEndpoint).process(any(MuleEvent.class));
+        pollingProber.check(new JUnitProbe()
+        {
+            @Override
+            protected boolean test() throws Exception
+            {
+                verify(dlqEndpoint).process(any(MuleEvent.class));
+                return true;
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "Dead letter queue was not called";
+            }
+        });
     }
 
     @Test
@@ -238,12 +251,21 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
     private void ponderUntilEventAborted(final MuleEvent testEvent)
         throws InterruptedException, MuleException
     {
-        while (targetMessageProcessor.getEventCount() <= untilSuccessful.getMaxRetries())
+        pollingProber.check(new JUnitProbe()
         {
-            Thread.yield();
-            Thread.sleep(250L);
-        }
+            @Override
+            protected boolean test() throws Exception
+            {
+                return targetMessageProcessor.getEventCount() > untilSuccessful.getMaxRetries()
+                       &&  objectStore.allKeys().isEmpty();
+            }
 
+            @Override
+            public String describeFailure()
+            {
+                return String.format("Processing not retried %s times.",untilSuccessful.getMaxRetries());
+            }
+        });
         assertEquals(0, objectStore.allKeys().size());
         assertEquals(targetMessageProcessor.getEventCount(), 1 + untilSuccessful.getMaxRetries());
     }
