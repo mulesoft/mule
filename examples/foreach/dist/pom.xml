@@ -11,7 +11,7 @@
     <description>This example demonstrates how to use Foreach to add information to each message in a collection using some of the new features of Mule 3.3.</description>
 
     <properties>
-        <muleVersion>3.6.0-M2-SNAPSHOT</muleVersion>
+        <muleVersion>3.6.0-M2</muleVersion>
         <activemqVersion>5.5.0</activemqVersion>
         <javaMailVersion>1.4.3</javaMailVersion>
     </properties>
