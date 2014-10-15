@@ -302,12 +302,21 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
     private void ponderUntilEventAborted(final MuleEvent testEvent)
         throws InterruptedException, MuleException
     {
-        while (targetMessageProcessor.getEventCount() <= untilSuccessful.getMaxRetries())
+        pollingProber.check(new JUnitProbe()
         {
-            Thread.yield();
-            Thread.sleep(250L);
-        }
+            @Override
+            protected boolean test() throws Exception
+            {
+                return targetMessageProcessor.getEventCount() > untilSuccessful.getMaxRetries()
+                       &&  objectStore.allKeys().isEmpty();
+            }
 
+            @Override
+            public String describeFailure()
+            {
+                return String.format("Processing not retried %s times.",untilSuccessful.getMaxRetries());
+            }
+        });
         assertEquals(0, objectStore.allKeys().size());
         assertEquals(targetMessageProcessor.getEventCount(), 1 + untilSuccessful.getMaxRetries());
     }
