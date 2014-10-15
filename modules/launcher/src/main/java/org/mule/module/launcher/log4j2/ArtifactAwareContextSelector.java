@@ -7,6 +7,7 @@
 package org.mule.module.launcher.log4j2;
 
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.config.MuleProperties;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.DirectoryResourceLocator;
 import org.mule.module.launcher.LocalResourceLocator;
@@ -134,6 +135,11 @@ final class ArtifactAwareContextSelector implements ContextSelector
         if (parameters == null)
         {
             return getDefaultContext();
+        }
+
+        if (isSimpleLogMode())
+        {
+            return new LoggerContext(parameters.contextName, null, parameters.loggerConfigFile);
         }
 
         MuleLoggerContext loggerContext = new MuleLoggerContext(parameters.contextName,
@@ -273,7 +279,14 @@ final class ArtifactAwareContextSelector implements ContextSelector
 
     private LoggerContext getDefaultContext()
     {
-        return new MuleLoggerContext("Default", this, isStandalone());
+        return isSimpleLogMode()
+               ? new LoggerContext("Default")
+               : new MuleLoggerContext("Default", this, isStandalone());
+    }
+
+    private boolean isSimpleLogMode()
+    {
+        return System.getProperty(MuleProperties.MULE_SIMPLE_LOG) != null;
     }
 
     private boolean isStandalone()
