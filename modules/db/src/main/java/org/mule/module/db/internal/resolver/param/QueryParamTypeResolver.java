@@ -12,6 +12,8 @@ import org.mule.module.db.internal.domain.param.QueryParam;
 import org.mule.module.db.internal.domain.query.QueryTemplate;
 import org.mule.module.db.internal.domain.type.DbType;
 import org.mule.module.db.internal.domain.type.DbTypeManager;
+import org.mule.module.db.internal.domain.type.ResolvedDbType;
+import org.mule.module.db.internal.domain.type.UnknownDbTypeException;
 
 import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
@@ -45,7 +47,16 @@ public class QueryParamTypeResolver implements ParamTypeResolver
         {
             int parameterTypeId = parameterMetaData.getParameterType(queryParam.getIndex());
             String parameterTypeName = parameterMetaData.getParameterTypeName(queryParam.getIndex());
-            DbType dbType = dbTypeManager.lookup(connection, parameterTypeId, parameterTypeName);
+            DbType dbType;
+            try
+            {
+                dbType = dbTypeManager.lookup(connection, parameterTypeId, parameterTypeName);
+            }
+            catch (UnknownDbTypeException e)
+            {
+                // Type was not found in the type manager, but the DB knows about it
+                dbType = new ResolvedDbType(parameterTypeId, parameterTypeName);
+            }
             paramTypes.put(queryParam.getIndex(), dbType);
         }
 
