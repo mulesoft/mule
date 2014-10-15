@@ -54,6 +54,7 @@ public class TemplateQueryConfigTestCase extends FunctionalTestCase
         assertEquals(UnknownDbType.getInstance(), param1.getType());
         assertEquals("position", param1.getName());
         assertEquals("0", param1.getValue());
+        assertEquals(1, param1.getIndex());
     }
 
     @Test
@@ -69,6 +70,7 @@ public class TemplateQueryConfigTestCase extends FunctionalTestCase
         assertEquals(UnknownDbType.getInstance(), param1.getType());
         assertEquals("id", param1.getName());
         assertEquals("0", param1.getValue());
+        assertEquals(1, param1.getIndex());
     }
 
     @Test
@@ -143,6 +145,7 @@ public class TemplateQueryConfigTestCase extends FunctionalTestCase
         assertEquals(UnknownDbType.getInstance(), param1.getType());
         assertEquals("position", param1.getName());
         assertEquals(null, param1.getValue());
+        assertEquals(1, param1.getIndex());
     }
 
     private void doQueryFromFileTest(Object queryTemplateBean, String paramValue)
@@ -156,5 +159,6 @@ public class TemplateQueryConfigTestCase extends FunctionalTestCase
         assertEquals(UnknownDbType.getInstance(), param1.getType());
         assertEquals("position", param1.getName());
         assertEquals(paramValue, param1.getValue());
+        assertEquals(1, param1.getIndex());
     }
 }
