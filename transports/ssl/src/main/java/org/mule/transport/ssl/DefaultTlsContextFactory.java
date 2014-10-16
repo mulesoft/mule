@@ -7,14 +7,14 @@
 package org.mule.transport.ssl;
 
 
+import org.mule.api.lifecycle.CreateException;
 import org.mule.api.security.tls.TlsConfiguration;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 
-import javax.net.ssl.SSLServerSocketFactory;
-import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.SSLContext;
 
 /**
  * Default implementation of the {@code TlsContextFactory} interface, which delegates all its operations to a
@@ -22,6 +22,7 @@ import javax.net.ssl.SSLSocketFactory;
  */
 public class DefaultTlsContextFactory implements TlsContextFactory
 {
+
     private String name;
 
     private TlsConfiguration tlsConfiguration = new TlsConfiguration(null);
@@ -35,6 +36,8 @@ public class DefaultTlsContextFactory implements TlsContextFactory
     {
         this.name = name;
     }
+
+    private boolean initialized = false;
 
     public String getKeyStorePath()
     {
@@ -126,16 +129,36 @@ public class DefaultTlsContextFactory implements TlsContextFactory
         tlsConfiguration.setTrustManagerAlgorithm(trustManagerAlgorithm);
     }
 
+
     @Override
-    public SSLSocketFactory getSocketFactory() throws NoSuchAlgorithmException, KeyManagementException
+    public SSLContext createSslContext() throws KeyManagementException, NoSuchAlgorithmException, CreateException
     {
-        return tlsConfiguration.getSocketFactory();
+        synchronized (this)
+        {
+            if (!initialized)
+            {
+                tlsConfiguration.initialise(null == getKeyStorePath(), TlsConfiguration.JSSE_NAMESPACE);
+                initialized = true;
+            }
+        }
+        return tlsConfiguration.getSslContext();
     }
 
     @Override
-    public SSLServerSocketFactory getServerSocketFactory() throws NoSuchAlgorithmException, KeyManagementException
+    public String[] getEnabledCipherSuites()
     {
-        return tlsConfiguration.getServerSocketFactory();
+        return tlsConfiguration.getEnabledCipherSuites();
     }
 
+    @Override
+    public String[] getEnabledProtocols()
+    {
+        return tlsConfiguration.getEnabledProtocols();
+    }
+
+    @Override
+    public boolean isKeyStoreConfigured()
+    {
+        return tlsConfiguration.getKeyStore() != null;
+    }
 }

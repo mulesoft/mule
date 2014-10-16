@@ -6,11 +6,12 @@
  */
 package org.mule.transport.ssl;
 
+import org.mule.api.lifecycle.CreateException;
+
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 
-import javax.net.ssl.SSLServerSocketFactory;
-import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.SSLContext;
 
 /**
  * A factory for TLS contexts. A TLS context is configured with a key store and a trust store. The key store stores
@@ -23,8 +24,32 @@ import javax.net.ssl.SSLSocketFactory;
 public interface TlsContextFactory
 {
 
-    public SSLSocketFactory getSocketFactory() throws NoSuchAlgorithmException, KeyManagementException;
+    /**
+     * @return a new SSL Context with the configured keystore and trustore.
+     *
+     * @throws KeyManagementException
+     * @throws NoSuchAlgorithmException
+     * @throws CreateException
+     */
+    SSLContext createSslContext() throws KeyManagementException, NoSuchAlgorithmException, CreateException;
 
-    public SSLServerSocketFactory getServerSocketFactory() throws NoSuchAlgorithmException, KeyManagementException;
+    /**
+     * The list of ciphers that must be used to restrict the creation of the SSL Sockets
+     *
+     * @return ths list of enabled cipher suites
+     */
+    String[] getEnabledCipherSuites();
+
+    /**
+     * The list of enabled protocols that must be used to restrict the creation of the SSL Sockets
+     *
+     * @return the list of enabled protocols
+     */
+    String[] getEnabledProtocols();
+
+    /**
+     * @return true if the keystore was configured, false otherwise
+     */
+    boolean isKeyStoreConfigured();
 
 }
