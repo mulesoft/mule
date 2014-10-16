@@ -27,6 +27,8 @@ public class DefaultTlsContextFactory implements TlsContextFactory
 
     private TlsConfiguration tlsConfiguration = new TlsConfiguration(null);
 
+    private boolean initialized = false;
+
     public String getName()
     {
         return name;
@@ -36,8 +38,6 @@ public class DefaultTlsContextFactory implements TlsContextFactory
     {
         this.name = name;
     }
-
-    private boolean initialized = false;
 
     public String getKeyStorePath()
     {
