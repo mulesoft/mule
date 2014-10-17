@@ -12,9 +12,14 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.json.JsonData;
+import org.mule.module.json.validation.ValidateJsonSchemaMessageProcessor;
 import org.mule.util.IOUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.github.fge.jackson.JsonLoader;
+import com.github.fge.jsonschema.core.report.ProcessingReport;
+import com.github.fge.jsonschema.main.JsonSchema;
+import com.github.fge.jsonschema.main.JsonSchemaFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -27,23 +32,23 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.validation.Schema;
 import javax.xml.validation.Validator;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.eel.kitchen.jsonschema.main.JsonSchema;
-import org.eel.kitchen.jsonschema.main.JsonSchemaFactory;
-import org.eel.kitchen.jsonschema.report.ValidationReport;
-import org.eel.kitchen.jsonschema.util.JsonLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 
+/**
+ * @deprecated This class is deprecated and will be removed in Mule 4.0. Use {@link ValidateJsonSchemaMessageProcessor} instead
+ */
+@Deprecated
 public class JsonSchemaJsonValidationFilter implements JsonSchemaFilter
 {
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(JsonSchemaJsonValidationFilter.class);
 
-    protected JsonSchema jsonSchema;
-    protected String schemaLocations;
+    private JsonSchema jsonSchema;
+    private String schemaLocations;
 
     @Override
     public boolean accept(MuleMessage message)
@@ -83,17 +88,23 @@ public class JsonSchemaJsonValidationFilter implements JsonSchemaFilter
             }
             else
             {
-                logger.warn("Payload type " + input.getClass().getName() + " is not supported");
+                LOGGER.warn("Payload type " + input.getClass().getName() + " is not supported");
                 return false;
             }
+
             message.setPayload(output);
-            ValidationReport report = jsonSchema.validate(data);
-            logger.debug("JSON Schema validation report: " + report.getMessages());
+            ProcessingReport report = jsonSchema.validate(data);
+
+            if (LOGGER.isDebugEnabled())
+            {
+                LOGGER.debug("JSON Schema validation report: " + report.toString());
+            }
+
             return report.isSuccess();
         }
         catch (Exception e)
         {
-            logger.info("Unable to validate JSON!", e);
+            LOGGER.error("Unable to validate JSON!", e);
             return false;
         }
     }
@@ -111,8 +122,8 @@ public class JsonSchemaJsonValidationFilter implements JsonSchemaFilter
             InputStream inputStream = IOUtils.getResourceAsStream(schemaLocations, getClass());
             InputStreamReader reader = new InputStreamReader(inputStream);
             JsonNode jsonNode = JsonLoader.fromReader(reader);
-            JsonSchemaFactory schemaFactory = JsonSchemaFactory.defaultFactory();
-            jsonSchema = schemaFactory.fromSchema(jsonNode);
+            JsonSchemaFactory schemaFactory = JsonSchemaFactory.byDefault();
+            jsonSchema = schemaFactory.getJsonSchema(jsonNode);
         }
         catch (Exception e)
         {

@@ -32,6 +32,16 @@ MULE-7950: The following Apache Commons dependencies were upgraded:
     * commons-exec: from version 1.1 to 1.2
     * commons-net: from version 2.0 to 2.2
 MULE-7951: xmlunit has been upgraded to version 1.5
+MULE-7919: json-schema-validation-filter in the json module was deprecated and will be removed in Mule 4.0. Use the new validate-schema message processor instead.
+MULE-7919: The following classes have been deprecated. Use JsonSchemaValidator instead
+    * JsonSchemaFilter
+    * JsonSchemaJsonValidationFilter
+    * JsonSchemaValidationFilter
+    * JsonSChemaXsdValidationFilter
+MULE-7919: The follwoing dependencies were upgraded:
+    * jackson-databind: from version 2.1.1 to 2.4.3
+    * joda-time: from version 1.6 to 2.5
+MULE-7919: The dependency org.kitchen-eel:json-schema-validator was removed and replaced with com.github.fge:json-schema-validator:2.2.5. If you still need to use that dependency, you can safely add it back to your application/runtime.
 
 Migration changes from 3.4.x to 3.5.x
 
