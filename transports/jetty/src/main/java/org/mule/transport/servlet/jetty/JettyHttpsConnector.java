@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.security.Provider;
 
 import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
 import org.mortbay.jetty.AbstractConnector;
@@ -281,7 +282,13 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
     @Override
     protected AbstractConnector createJettyConnector()
     {
-        SslSocketConnector cnn = new SslSocketConnector();
+        SslSocketConnector cnn = new SslSocketConnector() {
+            @Override
+            protected SSLServerSocketFactory createFactory() throws Exception
+            {
+                return tls.getServerSocketFactory();
+            }
+        };
 
         if (SystemUtils.isIbmJDK())
         {
@@ -291,16 +298,6 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
         // get (from parent Mule connector) and set number of acceptor threads into the underlying SSL connector
         cnn.setAcceptors(getAcceptors());
 
-        // set trust and keystore params
-        if (tls.getKeyStore() != null) cnn.setKeystore(tls.getKeyStore());
-        if (tls.getKeyPassword() != null) cnn.setKeyPassword(tls.getKeyPassword());
-        if (tls.getKeyStoreType() != null) cnn.setKeystoreType(tls.getKeyStoreType());
-        if (tls.getKeyManagerAlgorithm() != null) cnn.setSslKeyManagerFactoryAlgorithm(tls.getKeyManagerAlgorithm());
-        if (tls.getProvider() != null) cnn.setProvider(tls.getProvider().getName());
-        if (tls.getTrustStorePassword() != null) cnn.setTrustPassword(tls.getTrustStorePassword());
-        if (tls.getTrustStore() != null) cnn.setTruststore(tls.getTrustStore());
-        if (tls.getTrustStoreType() != null) cnn.setTruststoreType(tls.getTrustStoreType());
-        if (tls.getTrustManagerAlgorithm() != null) cnn.setSslTrustManagerFactoryAlgorithm(tls.getTrustManagerAlgorithm());
         cnn.setNeedClientAuth(tls.isRequireClientAuthentication());
 
         return cnn;
