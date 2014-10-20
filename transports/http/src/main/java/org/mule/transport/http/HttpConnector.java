@@ -38,6 +38,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -159,7 +160,8 @@ public class HttpConnector extends TcpConnector
     public static final String HTTP_ENCODE_PARAMVALUE = HTTP_PREFIX + "encode.paramvalue";
 
     public static final Set<String> HTTP_INBOUND_PROPERTIES;
-    
+    public static final String BIND_TO_ALL_INTERFACES_IP = "0.0.0.0";
+
     protected Map<OutboundEndpoint, MessageDispatcher> endpointDispatchers = new ConcurrentHashMap<OutboundEndpoint, MessageDispatcher>();
 
     static
@@ -573,42 +575,41 @@ public class HttpConnector extends TcpConnector
 
     public HttpMessageReceiver lookupReceiver(Socket socket, RequestLine requestLine) throws NoReceiverForEndpointException
     {
-        int port = ((InetSocketAddress) socket.getLocalSocketAddress()).getPort();
-        String host = null;
+        InetSocketAddress socketAddress = (InetSocketAddress) socket.getLocalSocketAddress();
+        int port = socketAddress.getPort();
+        String host = socketAddress.getHostName();
+
+        LinkedList<MessageReceiver> selectedReceivers = new LinkedList<>();
         for (MessageReceiver messageReceiver : receivers.values())
         {
-            if (messageReceiver.getEndpointURI().getPort() == port)
+            if (messageReceiver.getEndpointURI().getPort() == port && matchesHost(messageReceiver, host))
             {
-                host = messageReceiver.getEndpointURI().getHost();
-                break;
+                selectedReceivers.add(messageReceiver);
             }
         }
-        if (host == null)
+
+        if (selectedReceivers.isEmpty())
         {
             String url = requestLine.getUrlWithoutParams();
             throw new NoReceiverForEndpointException(HttpMessages.noReceiverFoundForUrl(url));
         }
 
         String requestUriWithoutParams = requestLine.getUrlWithoutParams();
-        StringBuilder requestUri = new StringBuilder(80);
-        if (requestUriWithoutParams.indexOf("://") == -1)
+        HttpMessageReceiver receiver = null;
+
+        if (logger.isDebugEnabled())
         {
-            requestUri.append(getProtocol()).append("://").append(host).append(':').append(port);
-            if (!ROOT_PATH.equals(requestUriWithoutParams))
+            logger.debug("Primary lookup of receiver on connector: " + getName() + " for URI: " + getUri(host, port, requestUriWithoutParams));
+        }
+
+        for (MessageReceiver selectedReceiver : selectedReceivers)
+        {
+            if(matchesPath(selectedReceiver, requestUriWithoutParams))
             {
-                requestUri.append(requestUriWithoutParams);
+                receiver = (HttpMessageReceiver) selectedReceiver;
+                break;
             }
         }
-
-        String uriStr = requestUri.toString();
-        // first check that there is a receiver on the root address
-        if (logger.isTraceEnabled())
-        {
-            logger.trace("Looking up receiver on connector: " + getName() + " with URI key: "
-                         + requestUri.toString());
-        }
-
-        HttpMessageReceiver receiver = (HttpMessageReceiver) lookupReceiver(uriStr);
 
         // If no receiver on the root and there is a request path, look up the
         // received based on the root plus request path
@@ -616,25 +617,76 @@ public class HttpConnector extends TcpConnector
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Secondary lookup of receiver on connector: " + getName()
-                             + " with URI key: " + requestUri.toString());
+                logger.debug("Secondary lookup of receiver on connector: " + getName()+ " for URI: " + getUri(host, port, requestUriWithoutParams));
             }
 
-            receiver = (HttpMessageReceiver) findReceiverByStem(getReceivers(), uriStr);
+            receiver = (HttpMessageReceiver) findReceiverByStem(selectedReceivers, requestUriWithoutParams);
 
             if (receiver == null && logger.isWarnEnabled())
             {
-                logger.warn("No receiver found with secondary lookup on connector: " + getName()
-                            + " with URI key: " + requestUri.toString());
+                logger.warn("No receiver found with secondary lookup on connector: " + getName() + " for URI: " + getUri(host, port, requestUriWithoutParams));
                 logger.warn("Receivers on connector are: "
                             + MapUtils.toString(getReceivers(), true));
             }
         }
+
         if (receiver == null)
         {
             throw new NoReceiverForEndpointException(HttpMessages.noReceiverFoundForUrl(requestUriWithoutParams));
         }
         return receiver;
+    }
+
+    private String getUri(String host, int port, String path)
+    {
+        StringBuilder requestUri = new StringBuilder(80);
+        if (path.indexOf("://") == -1)
+        {
+            requestUri.append(getProtocol()).append("://").append(host).append(':').append(port);
+            if (!ROOT_PATH.equals(path))
+            {
+                requestUri.append(path);
+            }
+        }
+        return requestUri.toString();
+    }
+
+    public static MessageReceiver findReceiverByStem(LinkedList<MessageReceiver> receivers, String path)
+    {
+        int match = 0;
+        MessageReceiver receiver = null;
+        for(MessageReceiver candidate : receivers)
+        {
+            String candidatePath = candidate.getEndpointURI().getPath();
+            if (match <= candidatePath.length() && path.startsWith(candidatePath))
+            {
+                match = candidatePath.length();
+                receiver = candidate;
+            }
+        }
+        return receiver;
+    }
+
+    private boolean matchesPath(MessageReceiver messageReceiver, String path)
+    {
+        String receiverPath = messageReceiver.getEndpointURI().getPath();
+        //if there is no specific path then getPath returns "" but path is ROOT_PATH
+        boolean pathMatch;
+        if(ROOT_PATH.equals(path))
+        {
+            pathMatch =  "".equals(receiverPath);
+        }
+        else
+        {
+            pathMatch = receiverPath.equals(path);
+        }
+        return pathMatch;
+    }
+
+    private boolean matchesHost(MessageReceiver messageReceiver, String host)
+    {
+        String receiverHost = messageReceiver.getEndpointURI().getHost();
+        return BIND_TO_ALL_INTERFACES_IP.equals(receiverHost) || host.equals(receiverHost);
     }
 
     //Leave for backward compatibility
@@ -735,6 +787,22 @@ public class HttpConnector extends TcpConnector
             super.returnDispatcher(endpoint, dispatcher);
         }
     }
+
+    @Override
+    public MessageReceiver getReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint)
+    {
+        MessageReceiver receiver = super.getReceiver(flowConstruct, endpoint);
+        //check if there's an endpoint with the same path but host 0.0.0.0
+        if(receiver == null)
+        {
+            String key = (String) getReceiverKey(flowConstruct, endpoint);
+            String host = endpoint.getEndpointURI().getHost();
+            key = key.replace(host,BIND_TO_ALL_INTERFACES_IP);
+            receiver = receivers.get(key);
+        }
+        return receiver;
+    }
+
 
     protected void applyDispatcherLifecycle(MessageDispatcher dispatcher) throws MuleException
     {

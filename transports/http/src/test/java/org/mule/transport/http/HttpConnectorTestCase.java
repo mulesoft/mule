@@ -12,14 +12,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.startsWith;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
-
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
+import org.mule.api.transport.ConnectorException;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.tck.MuleTestUtils.TestCallback;
@@ -30,12 +31,15 @@ import org.mule.transport.tcp.TcpConnector;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.hamcrest.core.Is;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
@@ -44,6 +48,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class HttpConnectorTestCase extends AbstractConnectorTestCase
 {
+
+    public static final String LISTENER_ALREADY_REGISTERED = "There is already a listener registered on this connector";
+    @Rule
+    public ExpectedException thrown= ExpectedException.none();
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private HttpMessageReceiver mockServiceOrderReceiverPort5555;
@@ -77,6 +85,11 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
         return "http://localhost:60127";
     }
 
+    public String getallInterfacesEndpointURI()
+    {
+        return "http://0.0.0.0:60127";
+    }
+
     public Object getValidMessage() throws Exception
     {
         return "Hello".getBytes();
@@ -86,6 +99,24 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
     public void testValidListener() throws Exception
     {
         Service service = getTestService("orange", Orange.class);
+        InboundEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
+                getTestEndpointURI());
+
+        getConnector().registerListener(endpoint, getSensingNullMessageProcessor(), service);
+    }
+
+    @Test
+    public void testInvalidListener() throws Exception
+    {
+        thrown.expect(ConnectorException.class);
+        thrown.expectMessage(startsWith(LISTENER_ALREADY_REGISTERED));
+
+        Service service = getTestService("orange", Orange.class);
+        InboundEndpoint allInterfacesEndpoint = muleContext.getEndpointFactory().getInboundEndpoint(
+                getallInterfacesEndpointURI());
+
+        getConnector().registerListener(allInterfacesEndpoint, getSensingNullMessageProcessor(), service);
+
         InboundEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
                 getTestEndpointURI());
 
@@ -135,6 +166,30 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
     }
 
     @Test
+    public void filteredReceiversFindReceiverByStem() throws Exception
+    {
+        LinkedList<MessageReceiver> selectedReceivers = createSelectedTestReceivers();
+        assertThat((HttpMessageReceiver) HttpConnector.findReceiverByStem(selectedReceivers, "/"), Is.is(mockReceiverPort5555));
+        assertThat((HttpMessageReceiver) HttpConnector.findReceiverByStem(selectedReceivers, "/ble"), Is.is(mockReceiverPort5555));
+        assertThat((HttpMessageReceiver) HttpConnector.findReceiverByStem(selectedReceivers, "/service"), Is.is(mockServiceReceiverPort5555));
+        assertThat((HttpMessageReceiver) HttpConnector.findReceiverByStem(selectedReceivers, "/service/ble"), Is.is(mockServiceReceiverPort5555));
+        assertThat((HttpMessageReceiver) HttpConnector.findReceiverByStem(selectedReceivers, "/service/order"), Is.is(mockServiceOrderReceiverPort5555));
+        assertThat((HttpMessageReceiver) HttpConnector.findReceiverByStem(selectedReceivers, "/service/order/ble"), Is.is(mockServiceOrderReceiverPort5555));
+    }
+
+    private LinkedList<MessageReceiver> createSelectedTestReceivers()
+    {
+        LinkedList<MessageReceiver> selectedReceivers = new LinkedList<>();
+        when(mockReceiverPort5555.getEndpointURI().getPath()).thenReturn("");
+        selectedReceivers.add(mockReceiverPort5555);
+        when(mockServiceReceiverPort5555.getEndpointURI().getPath()).thenReturn("/service");
+        selectedReceivers.add(mockServiceReceiverPort5555);
+        when(mockServiceOrderReceiverPort5555.getEndpointURI().getPath()).thenReturn("/service/order");
+        selectedReceivers.add(mockServiceOrderReceiverPort5555);
+        return selectedReceivers;
+    }
+
+    @Test
     public void lookupReceiverThatDoesNotExistsInThatPort() throws Exception
     {
         testLookupReceiver("somehost", 8888, "/management", null);
@@ -151,6 +206,7 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
     {
         when(mockServiceReceiverPort5555.getEndpointURI().getPort()).thenReturn(5555);
         when(mockServiceReceiverPort5555.getEndpointURI().getHost()).thenReturn("somehost");
+        when(mockServiceReceiverPort5555.getEndpointURI().getPath()).thenReturn("/service");
         testLookupReceiver("somehost", 5555, "/service/product", mockServiceReceiverPort5555);
     }
 
@@ -159,6 +215,10 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
     {
         when(mockServiceReceiverPort5555.getEndpointURI().getPort()).thenReturn(5555);
         when(mockServiceReceiverPort5555.getEndpointURI().getHost()).thenReturn("somehost");
+        when(mockServiceReceiverPort5555.getEndpointURI().getPath()).thenReturn("/service");
+        when(mockServiceOrderReceiverPort5555.getEndpointURI().getPort()).thenReturn(5555);
+        when(mockServiceOrderReceiverPort5555.getEndpointURI().getHost()).thenReturn("somehost");
+        when(mockServiceOrderReceiverPort5555.getEndpointURI().getPath()).thenReturn("/service/order");
         testLookupReceiver("somehost", 5555, "/service/order?param1=value1", mockServiceOrderReceiverPort5555);
     }
 
@@ -179,6 +239,10 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
     {
         when(mockServiceReceiverPort5555.getEndpointURI().getPort()).thenReturn(5555);
         when(mockServiceReceiverPort5555.getEndpointURI().getHost()).thenReturn("somehost");
+        when(mockServiceReceiverPort5555.getEndpointURI().getPath()).thenReturn("/service");
+        when(mockServiceOrderReceiverPort5555.getEndpointURI().getPort()).thenReturn(5555);
+        when(mockServiceOrderReceiverPort5555.getEndpointURI().getHost()).thenReturn("somehost");
+        when(mockServiceOrderReceiverPort5555.getEndpointURI().getPath()).thenReturn("/service/order");
         testLookupReceiverByRequestLine("somehost", 5555, "/service/product", mockServiceReceiverPort5555);
     }
 
@@ -187,6 +251,10 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
     {
         when(mockServiceReceiverPort5555.getEndpointURI().getPort()).thenReturn(5555);
         when(mockServiceReceiverPort5555.getEndpointURI().getHost()).thenReturn("somehost");
+        when(mockServiceReceiverPort5555.getEndpointURI().getPath()).thenReturn("/service");
+        when(mockServiceOrderReceiverPort5555.getEndpointURI().getPort()).thenReturn(5555);
+        when(mockServiceOrderReceiverPort5555.getEndpointURI().getHost()).thenReturn("somehost");
+        when(mockServiceOrderReceiverPort5555.getEndpointURI().getPath()).thenReturn("/service/order");
         testLookupReceiverByRequestLine("somehost", 5555, "/service/order?param1=value1", mockServiceOrderReceiverPort5555);
     }
 

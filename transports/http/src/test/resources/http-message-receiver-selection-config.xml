@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:core="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:context="http://www.springframework.org/schema/context"
+      xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd">
+
+    <flow name="flowA">
+        <http:inbound-endpoint host="0.0.0.0" port="${http.port}" path="flowA"/>
+        <set-payload value="flowA" />
+    </flow>
+
+    <flow name="flowB">
+        <http:inbound-endpoint host="0.0.0.0" port="${http.port}" path="flowA/flowB"/>
+        <set-payload value="flowB" />
+    </flow>
+
+    <flow name="flowC">
+        <http:inbound-endpoint host="localhost" port="${http.port}" path="flowC"/>
+        <set-payload value="flowC" />
+    </flow>
+
+    <flow name="flowD">
+        <http:inbound-endpoint host="localhost" port="${http.port}" path="flowD"/>
+        <set-payload value="flowD" />
+    </flow>
+</mule>
