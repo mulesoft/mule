@@ -1,0 +1,22 @@
+<table>
+    <tr>
+        <th>Country</th>
+        <th>City List</th>
+        <th>Population</th>
+    </tr>
+    <tr>
+        <td>italy</td>
+        <td>milan, venice</td>
+        <td>6</td>
+    </tr>
+    <tr>
+        <td>france</td>
+        <td>paris, lyon</td>
+        <td>9</td>
+    </tr>
+    <tr>
+        <td>germany</td>
+        <td>munich</td>
+        <td>4</td>
+    </tr>
+</table>

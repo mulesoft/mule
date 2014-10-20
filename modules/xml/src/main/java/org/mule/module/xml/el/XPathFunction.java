@@ -13,17 +13,27 @@ import org.mule.api.el.ExpressionLanguageContext;
 import org.mule.api.el.ExpressionLanguageFunction;
 import org.mule.el.context.MessageContext;
 import org.mule.el.mvel.MVELExpressionLanguageContext;
+import org.mule.util.OneTimeWarning;
 import org.mule.util.Preconditions;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-class XPathFunction implements ExpressionLanguageFunction
+/**
+ * @deprecated this function is deprecated and will be removed in Mule 4.0. Use {@link XPath3Function} instead
+ */
+@Deprecated
+public class XPathFunction implements ExpressionLanguageFunction
 {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(XPathFunction.class);
     private static final String BRANCH_EVALUATOR = "xpath-branch:";
     private static final String NODE_EVALUATOR = "xpath-node:";
 
     private MuleContext muleContext;
+    private OneTimeWarning deprecationWarning = new OneTimeWarning(LOGGER, "xpath() MEL function has been deprecated in Mule 3.6.0 and will be removed " +
+                                                                           "in 4.0. Please use the new xpath3() function instead");
 
     public XPathFunction(MuleContext muleContext)
     {
@@ -34,6 +44,8 @@ class XPathFunction implements ExpressionLanguageFunction
     @Override
     public Object call(Object[] params, ExpressionLanguageContext context)
     {
+
+        deprecationWarning.warn();
 
         this.validateParams(params);
 

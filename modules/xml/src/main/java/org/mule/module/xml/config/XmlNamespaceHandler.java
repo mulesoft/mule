@@ -35,9 +35,13 @@ public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
 
     public void init()
     {
+        //Deprecated
+        registerDeprecatedBeanDefinitionParser("jxpath-filter",new FilterDefinitionParser(JXPathFilter.class), "Use an expression-filter for filtering based in a Java Object or the xpath-filter in the case of an XML document");
+        registerDeprecatedBeanDefinitionParser("jaxen-filter", new FilterDefinitionParser(JaxenFilter.class), "Use xpath-filter instead");
+        registerDeprecatedBeanDefinitionParser("jxpath-extractor-transformer", new MessageProcessorDefinitionParser(JXPathExtractor.class), "Use MEL for extracting information out of a Java Object or the xpath3() MEL function in the case of an XML document");
+
         //Filters
-        registerBeanDefinitionParser("jxpath-filter", new FilterDefinitionParser(JXPathFilter.class));
-        registerBeanDefinitionParser("jaxen-filter", new FilterDefinitionParser(JaxenFilter.class));
+
         registerBeanDefinitionParser("is-xml-filter", new FilterDefinitionParser(IsXmlFilter.class));
         registerBeanDefinitionParser("xpath-filter", new FilterDefinitionParser(XPathFilter.class));
         registerBeanDefinitionParser("schema-validation-filter", new FilterDefinitionParser(SchemaValidationFilter.class));
@@ -45,7 +49,8 @@ public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
         //Simple Xml transformers
         registerBeanDefinitionParser("dom-to-xml-transformer", new MessageProcessorDefinitionParser(DomDocumentToXml.class));
         registerBeanDefinitionParser("dom-to-output-handler-transformer", new MessageProcessorDefinitionParser(XmlToOutputHandler.class));
-        registerBeanDefinitionParser("jxpath-extractor-transformer", new MessageProcessorDefinitionParser(JXPathExtractor.class));
+
+
         registerBeanDefinitionParser("xml-to-dom-transformer", new MessageProcessorDefinitionParser(XmlToDomDocument.class));
         registerBeanDefinitionParser("xml-prettyprinter-transformer", new MessageProcessorDefinitionParser(XmlPrettyPrinter.class));
         registerBeanDefinitionParser("xpath-extractor-transformer", new MessageProcessorDefinitionParser(XPathExtractor.class));

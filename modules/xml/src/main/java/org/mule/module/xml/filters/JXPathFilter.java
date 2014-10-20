@@ -6,6 +6,8 @@
  */
 package org.mule.module.xml.filters;
 
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
@@ -30,13 +32,14 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.XPath;
 
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
-
 /**
  * <code>JXPathFilter</code> evaluates an XPath expression against a W3C Document,
  * XML string, or Java bean and returns true if the result is as expected.
+ *
+ * @deprecated This feature is deprecated and will be removed in Mule 4.0. Use an expression-filter
+ * for filtering based in a Java Object or the xpath-filter in the case of an XML document
  */
+@Deprecated
 public class JXPathFilter implements Filter, MuleContextAware, Initialisable
 {
     protected transient Log logger = LogFactory.getLog(getClass());

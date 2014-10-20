@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--// START SNIPPET: full-config -->
+<mule xmlns:mxml="http://www.mulesoft.org/schema/mule/xml"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+
+    <flow name="tryCatch">
+        <mxml:xquery-transformer>
+            <mxml:xquery-text>
+                <![CDATA[
+                   xquery version "3.0";
+                    declare variable $document external;
+                    let $x := "Hello"
+                    return
+                    try {
+                        $x cast as xs:integer
+                    } catch * {
+                        <error>Caught error {$err:code}: {$err:description}</error>
+                    }
+                ]]>
+            </mxml:xquery-text>
+        </mxml:xquery-transformer>
+    </flow>
+
+    <flow name="switch">
+        <mxml:xquery-transformer>
+            <mxml:xquery-text>
+                <![CDATA[
+                   xquery version "3.0";
+                    declare variable $document external;
+                    let $animal := "Duck"
+                    return
+                        switch ($animal)
+                            case "Cow" return <Moo />
+                            case "Cat" return <Meow/>
+                            case "Duck" return <Quack />
+                            case "Dog" case "Pitbull" return <Wuff/>
+                            default return "What's that odd noise?"
+                ]]>
+            </mxml:xquery-text>
+        </mxml:xquery-transformer>
+    </flow>
+
+    <flow name="groupBy">
+        <mxml:xquery-transformer>
+            <mxml:xquery-text>
+                <![CDATA[
+                   xquery version "3.0";
+                    declare variable $document external;
+                    for $n in 1 to 10
+                        group by $mod := $n mod 2
+                        return
+                            if ($mod = 0) then
+                                <even>{$n}</even>
+                            else
+                                <odd>{$n}</odd>
+                ]]>
+            </mxml:xquery-text>
+        </mxml:xquery-transformer>
+    </flow>
+
+    <flow name="books">
+        <mxml:xquery-transformer xquery-file="xquery/books.xq" />
+    </flow>
+
+    <flow name="multipleInputsByPath">
+        <mxml:xquery-transformer>
+            <mxml:context-property key="books" value="#[flowVars['books']]" />
+            <mxml:context-property key="cities" value="#[flowVars['cities']]" />
+            <mxml:xquery-text>
+                <![CDATA[
+                   xquery version "3.0";
+                    declare variable $document external;
+                    declare variable $cities external;
+                    declare variable $books external;
+                    <mixes>
+                    {
+                        for $b in fn:doc($books)/BOOKLIST/BOOKS/ITEM,
+                            $c in fn:doc($cities)/cities/city
+
+                        return <mix title="{$b/TITLE/text()}" city="{$c/@name}" />
+                    }
+                    </mixes>
+                ]]>
+            </mxml:xquery-text>
+        </mxml:xquery-transformer>
+    </flow>
+
+    <flow name="multipleInputsByParam">
+        <mxml:xquery-transformer>
+            <mxml:context-property key="books" value="#[flowVars['books']]" />
+            <mxml:context-property key="cities" value="#[flowVars['cities']]" />
+            <mxml:xquery-text>
+                <![CDATA[
+                   xquery version "3.0";
+                    declare variable $document external;
+                    declare variable $cities external;
+                    declare variable $books external;
+                    <mixes>
+                    {
+                        for $b in $books/BOOKLIST/BOOKS/ITEM,
+                            $c in $cities/cities/city
+
+                        return <mix title="{$b/TITLE/text()}" city="{$c/@name}" />
+                    }
+                    </mixes>
+                ]]>
+            </mxml:xquery-text>
+        </mxml:xquery-transformer>
+    </flow>
+
+</mule>

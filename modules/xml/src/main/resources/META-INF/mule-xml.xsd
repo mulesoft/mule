@@ -337,7 +337,7 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="resultType" type="xpathResultType" >
+                <xsd:attribute name="resultType" type="xpathReturnType" default="STRING">
                     <xsd:annotation>
                         <xsd:documentation>
                             The XPath result type (e.g. STRING or NODE).
@@ -348,14 +348,21 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:simpleType name="xpathResultType">
-        <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="NODESET" />
-            <xsd:enumeration value="NODE" />
-            <xsd:enumeration value="STRING" />
-            <xsd:enumeration value="BOOLEAN" />
-            <xsd:enumeration value="NUMBER" />
-        </xsd:restriction>
+    <xsd:simpleType name="xpathReturnType">
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="mule:propertyPlaceholderType"/>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="NODESET" />
+                    <xsd:enumeration value="NODE" />
+                    <xsd:enumeration value="STRING" />
+                    <xsd:enumeration value="BOOLEAN" />
+                    <xsd:enumeration value="NUMBER" />
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:union>
     </xsd:simpleType>
 
     <xsd:element name="object-to-xml-transformer" type="objectToXmlType" substitutionGroup="mule:abstract-transformer">

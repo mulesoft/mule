@@ -1,19 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-    xmlns:spring="http://www.springframework.org/schema/beans"
-    xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-    xmlns:cxf-core="http://cxf.apache.org/core"
-    xmlns:mule-xml="http://www.mulesoft.org/schema/mule/xml"
-    xmlns:http="http://www.mulesoft.org/schema/mule/http"
-    xmlns:simple="http://simple.component.mule.org/"
-    xsi:schemaLocation="
-               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule-xml="http://www.mulesoft.org/schema/mule/xml"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
-               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-               http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <mule-xml:namespace-manager includeConfigNamespaces="true"/>
     <custom-transformer
@@ -54,7 +46,11 @@
         <echo-component/>
     </flow>
     
-    
+    <flow name="extractor">
+        <inbound-endpoint address="http://localhost:${port1}/extract"
+                          exchange-pattern="request-response" transformer-refs="InputStreamToDOM" />
+        <mule-xml:xpath-extractor-transformer expression="/this/is" resultType="STRING"/>
+    </flow>
     
 
 </mule>

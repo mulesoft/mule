@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformers.xml;
+package org.mule.transformers.xml.xslt;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -20,6 +20,7 @@ import org.mule.module.xml.util.LocalURIResolver;
 import org.mule.module.xml.util.XMLTestUtils;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformers.xml.AbstractXmlTransformerTestCase;
 import org.mule.util.IOUtils;
 
 import java.io.InputStream;

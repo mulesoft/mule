@@ -6,6 +6,9 @@
  */
 package org.mule.module.xml.filters;
 
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
+import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
@@ -17,40 +20,26 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.xml.util.NamespaceManager;
+import org.mule.module.xml.xpath.SaxonXpathEvaluator;
+import org.mule.module.xml.xpath.XPathEvaluator;
 import org.mule.util.ClassUtils;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
-import javax.xml.namespace.NamespaceContext;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
-
-/**
- */
 public class XPathFilter extends AbstractJaxpFilter  implements Filter, Initialisable, MuleContextAware
 {
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     private String pattern;
     private String expectedValue;
-    private XPath xpath;
+    private XPathEvaluator xpathEvaluator;
     private Map<String, String> prefixToNamespaceMap = null;
-
     private NamespaceManager namespaceManager;
-
     private MuleContext muleContext;
 
     public XPathFilter()
@@ -80,11 +69,10 @@ public class XPathFilter extends AbstractJaxpFilter  implements Filter, Initiali
     {
         super.initialise();
 
-        if (getXpath() == null)
+        if (xpathEvaluator == null)
         {
-            setXpath(XPathFactory.newInstance().newXPath());
+            xpathEvaluator = new SaxonXpathEvaluator();
         }
-
 
         if (pattern == null)
         {
@@ -94,76 +82,23 @@ public class XPathFilter extends AbstractJaxpFilter  implements Filter, Initiali
                 this);
         }
 
-        if (muleContext != null)
+        try
         {
-            try
-            {
-                namespaceManager = muleContext.getRegistry().lookupObject(NamespaceManager.class);
-            }
-            catch (RegistrationException e)
-            {
-                throw new ExpressionRuntimeException(CoreMessages.failedToLoad("NamespaceManager"), e);
-            }
-
-            if (namespaceManager != null)
-            {
-                if (prefixToNamespaceMap == null)
-                {
-                    prefixToNamespaceMap = new HashMap<String, String>(namespaceManager.getNamespaces());
-                }
-                else
-                {
-                    prefixToNamespaceMap.putAll(namespaceManager.getNamespaces());
-                }
-            }
+            namespaceManager = muleContext.getRegistry().lookupObject(NamespaceManager.class);
+        }
+        catch (RegistrationException e)
+        {
+            throw new ExpressionRuntimeException(CoreMessages.failedToLoad("NamespaceManager"), e);
         }
 
-        final Map<String, String> prefixToNamespaceMap = this.prefixToNamespaceMap;
+        if (namespaceManager != null)
+        {
+            xpathEvaluator.registerNamespaces(namespaceManager);
+        }
+
         if (prefixToNamespaceMap != null)
         {
-            getXpath().setNamespaceContext(new NamespaceContext()
-            {
-                @Override
-                public String getNamespaceURI(String prefix)
-                {
-                    return prefixToNamespaceMap.get(prefix);
-                }
-
-                @Override
-                public String getPrefix(String namespaceURI)
-                {
-
-                    for (Map.Entry<String, String> entry : prefixToNamespaceMap.entrySet())
-                    {
-                        if (namespaceURI.equals(entry.getValue()))
-                        {
-                            return entry.getKey();
-                        }
-                    }
-
-                    return null;
-                }
-
-                @Override
-                public Iterator<String> getPrefixes(String namespaceURI)
-                {
-                    String prefix = getPrefix(namespaceURI);
-                    if (prefix == null)
-                    {
-                        return Collections.<String>emptyList().iterator();
-                    }
-                    else
-                    {
-                        return Arrays.asList(prefix).iterator();
-                    }
-                }
-            });
-        }
-
-        if (logger.isInfoEnabled())
-        {
-            logger.info("XPath implementation: " + getXpath());
-            logger.info("DocumentBuilderFactory implementation: " + getDocumentBuilderFactory());
+            xpathEvaluator.registerNamespaces(prefixToNamespaceMap);
         }
     }
 
@@ -175,7 +110,7 @@ public class XPathFilter extends AbstractJaxpFilter  implements Filter, Initiali
         {
             if (logger.isWarnEnabled())
             {
-                logger.warn("Applying " + ClassUtils.getSimpleName(getClass()) + " to null object.");
+                logger.warn("Applying {} to null object.", ClassUtils.getSimpleName(getClass()));
             }
             return false;
         }
@@ -199,8 +134,7 @@ public class XPathFilter extends AbstractJaxpFilter  implements Filter, Initiali
             {
                 if (logger.isInfoEnabled())
                 {
-                    logger.info("''expectedValue'' attribute for " + ClassUtils.getSimpleName(getClass()) +
-                                " is not set, using 'true' by default");
+                    logger.info("''expectedValue'' attribute for {} is not set, using 'true' by default", ClassUtils.getSimpleName(getClass()));
                 }
                 expectedValue = Boolean.TRUE.toString();
             }
@@ -233,7 +167,7 @@ public class XPathFilter extends AbstractJaxpFilter  implements Filter, Initiali
 
         try
         {
-            xpathResult = getXpath().evaluate(pattern, node, XPathConstants.STRING);
+            xpathResult = xpathEvaluator.evaluate(pattern, node, RequestContext.getEvent());
         }
         catch (Exception e)
         {
@@ -317,26 +251,10 @@ public class XPathFilter extends AbstractJaxpFilter  implements Filter, Initiali
         this.expectedValue = expectedValue;
     }
 
-    /**
-     * The xpath object to use to evaluate the expression.
-     *
-     * @return The xpath object to use to evaluate the expression.
-     */
-    public XPath getXpath()
+    public void setXpathEvaluator(XPathEvaluator xpathEvaluator)
     {
-        return xpath;
+        this.xpathEvaluator = xpathEvaluator;
     }
-
-    /**
-     * The xpath object to use to evaluate the expression.
-     *
-     * @param xpath The xpath object to use to evaluate the expression.
-     */
-    public void setXpath(XPath xpath)
-    {
-        this.xpath = xpath;
-    }
-
 
     /**
      * The prefix-to-namespace map for the namespace context to be applied to the
