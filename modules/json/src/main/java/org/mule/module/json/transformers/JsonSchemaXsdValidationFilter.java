@@ -10,6 +10,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.module.json.validation.ValidateJsonSchemaMessageProcessor;
 import org.mule.module.xml.filters.SchemaValidationFilter;
 import org.mule.util.IOUtils;
 
@@ -29,7 +30,10 @@ import java.io.Writer;
  * The result is that, while the ideal would be to implement this class by validating a STAXSource, that won't be
  * possible until either we can assume a JRE with bith STAX and a working Xalan fork, or there';s a xalan.jar
  * that supports StAX.
+ *
+ * @deprecated This class is deprecated and will be removed in Mule 4.0. Use {@link ValidateJsonSchemaMessageProcessor} instead
  */
+@Deprecated
 public class JsonSchemaXsdValidationFilter extends SchemaValidationFilter implements JsonSchemaFilter
 {
 
