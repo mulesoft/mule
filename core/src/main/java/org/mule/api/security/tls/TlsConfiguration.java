@@ -15,6 +15,7 @@ import org.mule.api.security.provider.AutoDiscoverySecurityProviderFactory;
 import org.mule.api.security.provider.SecurityProviderFactory;
 import org.mule.api.security.provider.SecurityProviderInfo;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.util.ArrayUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
@@ -116,6 +117,7 @@ public final class TlsConfiguration
     public static final String DEFAULT_KEYSTORE = ".keystore";
     public static final String DEFAULT_KEYSTORE_TYPE = KeyStore.getDefaultType();
     public static final String JSSE_NAMESPACE = "javax.net";
+    public static final String DEFAULT_PROPERTIES_FILE = "tls-default.conf";
 
     private Log logger = LogFactory.getLog(getClass());
 
@@ -155,6 +157,8 @@ public final class TlsConfiguration
     private TrustManagerFactory trustManagerFactory = null;
     private boolean explicitTrustStoreOnly = false;
     private boolean requireClientAuthentication = false;
+
+    private TlsProperties tlsProperties = new TlsProperties();
 
     /**
      * Support for TLS connections with a given initial value for the key store
@@ -196,6 +200,8 @@ public final class TlsConfiguration
         {
             new TlsPropertiesMapper(namespace).writeToProperties(System.getProperties(), this);
         }
+
+        tlsProperties.load(DEFAULT_PROPERTIES_FILE);
     }
 
     private void validate(boolean anon) throws CreateException
@@ -348,13 +354,24 @@ public final class TlsConfiguration
 
     public SSLSocketFactory getSocketFactory() throws NoSuchAlgorithmException, KeyManagementException
     {
-        return getSslContext().getSocketFactory();
+        return new RestrictedSSLSocketFactory(getSslContext(), getEnabledCipherSuites(), getEnabledProtocols());
     }
 
     public SSLServerSocketFactory getServerSocketFactory()
             throws NoSuchAlgorithmException, KeyManagementException
     {
-        return getSslContext().getServerSocketFactory();
+        return new RestrictedSSLServerSocketFactory(getSslContext(), getEnabledCipherSuites(), getEnabledProtocols());
+    }
+
+
+    public String[] getEnabledCipherSuites()
+    {
+        return tlsProperties.getEnabledCipherSuites();
+    }
+
+    public String[] getEnabledProtocols()
+    {
+        return tlsProperties.getEnabledProtocols();
     }
 
     public SSLContext getSslContext() throws NoSuchAlgorithmException, KeyManagementException
@@ -377,6 +394,13 @@ public final class TlsConfiguration
 
     public void setSslType(String sslType)
     {
+        String[] enabledProtocols = tlsProperties.getEnabledProtocols();
+
+        if (enabledProtocols != null && !ArrayUtils.contains(enabledProtocols, sslType))
+        {
+            throw new IllegalArgumentException(String.format("Protocol %s is not allowed in current configuration", sslType));
+        }
+
         this.sslType = sslType;
     }
 

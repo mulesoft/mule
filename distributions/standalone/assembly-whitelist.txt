@@ -40,6 +40,7 @@
 #
 /mule-standalone-${productVersion}/conf/log4j.properties
 /mule-standalone-${productVersion}/conf/wrapper.conf
+/mule-standalone-${productVersion}/conf/tls-default.conf
 
 
 #
