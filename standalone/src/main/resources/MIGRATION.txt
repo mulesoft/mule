@@ -42,6 +42,21 @@ MULE-7919: The following dependencies were upgraded:
     * jackson-databind: from version 2.1.1 to 2.4.3
     * joda-time: from version 1.6 to 2.5
 MULE-7919: The dependency org.kitchen-eel:json-schema-validator was removed and replaced with com.github.fge:json-schema-validator:2.2.5. If you still need to use that dependency, you can safely add it back to your application/runtime.
+MULE-7987: The following dependencies were upgraded:
+    * saxon: from version 9.1.0.8 to 9.6.0.1-HE
+    * woodstox-core-asl: from version 4.1.4 to 4.4.1
+    * stax2-api: from version 3.1.1 to 3.1.4
+MULE-7030: The following features have been deprecated in favor of <expression-filter>:
+    * jaxen-filter
+    * jxpath-filter
+MULE-7030: The following features have been deprecated in favor of <expression-transformer>:
+    * jxpath-extractor-transformer
+    * bean: expression evaluator
+MULE-7030: The following features have been deprecated in favor of the new xpath3() MEL Function
+    * xpath: expression evaluator
+    * xpath2: expression evaluator (in favor of the xpath3() MEL function)
+    * xpath() MEL Function
+MULE-8001: The xquery-transformer element will now always return a java List when no return type has explicitly been specified
 
 Migration changes from 3.4.x to 3.5.x
 
