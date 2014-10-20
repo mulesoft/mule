@@ -11,6 +11,7 @@ import static org.mule.module.xml.filters.SchemaValidationFilter.DEFAULT_SCHEMA_
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.module.json.validation.ValidateJsonSchemaMessageProcessor;
 
 import java.util.Map;
 
@@ -24,7 +25,10 @@ import org.xml.sax.SAXException;
 
 /**
  * Validate a JSON string against either an XML schema or Json schema depending on the schema location attribute.
+ *
+ * @deprecated This class is deprecated and will be removed in Mule 4.0. Use {@link ValidateJsonSchemaMessageProcessor} instead
  */
+@Deprecated
 public class JsonSchemaValidationFilter implements JsonSchemaFilter
 {
 
