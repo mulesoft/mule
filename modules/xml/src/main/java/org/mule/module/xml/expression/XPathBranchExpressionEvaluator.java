@@ -6,6 +6,12 @@
  */
 package org.mule.module.xml.expression;
 
+import org.mule.module.xml.el.XPath3Function;
+
+/**
+ * @deprecated This expression evaluator is deprecated and will be removed in Mule 4. Use {@link XPath3Function} instead
+ */
+@Deprecated
 public class XPathBranchExpressionEvaluator extends XPathExpressionEvaluator
 {
     public static final String NAME = "xpath-branch";
@@ -23,6 +29,12 @@ public class XPathBranchExpressionEvaluator extends XPathExpressionEvaluator
     public String getName()
     {
         return NAME;
+    }
+
+    @Override
+    protected String getDeprecationMessage()
+    {
+        return "The xpath-branch: expression evaluator has been deprecated in Mule 3.6.0 and will be removed in 4.0. Please use the xpath3() MEL function instead";
     }
 
 }

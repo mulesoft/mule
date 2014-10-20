@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformers.xml;
+package org.mule.transformers.xml.xslt;
 
 import static junit.framework.Assert.assertTrue;
 

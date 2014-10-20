@@ -6,13 +6,12 @@
  */
 package org.mule.module.xml.stax;
 
-import javanet.staxutils.StAXReaderToContentHandler;
-import javanet.staxutils.StAXSource;
-import javanet.staxutils.helpers.XMLFilterImplEx;
-
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import javanet.staxutils.StAXReaderToContentHandler;
+import javanet.staxutils.StAXSource;
+import javanet.staxutils.helpers.XMLFilterImplEx;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.DTDHandler;
 import org.xml.sax.EntityResolver;
@@ -114,6 +113,10 @@ public class StaxSource extends StAXSource
             else if ("http://xml.org/sax/features/external-parameter-entities".equals(name))
             {
                 // Pass over, XOM likes to get this feature
+            }
+            else if ("http://xml.org/sax/features/validation".equals(name))
+            {
+                // Don't really make sense when using Stax
             }
             else
             {

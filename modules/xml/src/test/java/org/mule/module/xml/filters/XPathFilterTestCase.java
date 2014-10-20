@@ -6,32 +6,58 @@
  */
 package org.mule.module.xml.filters;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import java.io.InputStream;
-import java.util.HashMap;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPathFactory;
-
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.when;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleContext;
+import org.mule.module.xml.util.NamespaceManager;
+import org.mule.module.xml.xpath.SaxonXpathEvaluator;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
+
+import java.io.InputStream;
+import java.util.HashMap;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 /**
  * @author Ryan Heaton
  */
+@SmallTest
+@RunWith(MockitoJUnitRunner.class)
 public class XPathFilterTestCase extends AbstractMuleTestCase
 {
+
+    @Mock(answer = RETURNS_DEEP_STUBS)
+    private MuleContext muleContext;
+
+    private SaxonXpathEvaluator xpathManager;
+
+    private XPathFilter filter;
+
+    @Before
+    public void before() throws Exception {
+        xpathManager = new SaxonXpathEvaluator();
+        when(muleContext.getRegistry().lookupObject(NamespaceManager.class)).thenReturn(null);
+
+        filter = new XPathFilter();
+        filter.setMuleContext(muleContext);
+        filter.setXpathEvaluator(xpathManager);
+    }
 
     /**
      * tests accepting the mule message.
@@ -80,9 +106,6 @@ public class XPathFilterTestCase extends AbstractMuleTestCase
     {
         InputStream testXml = getClass().getResourceAsStream("/test.xml");
         assertNotNull(testXml);
-        XPathFilter filter = new XPathFilter();
-
-        filter.setXpath(XPathFactory.newInstance().newXPath());
 
         filter.setPattern("/some/unknown/path");
         filter.setExpectedValue("bogus");
@@ -108,9 +131,6 @@ public class XPathFilterTestCase extends AbstractMuleTestCase
     {
         InputStream soapEnvelope = getClass().getResourceAsStream("/request.xml");
         assertNotNull(soapEnvelope);
-        XPathFilter filter = new XPathFilter();
-
-        filter.setXpath(XPathFactory.newInstance().newXPath());
 
         filter.setPattern("/soap:Envelope/soap:Body/mule:echo/mule:echo");
         filter.setExpectedValue("Hello!");

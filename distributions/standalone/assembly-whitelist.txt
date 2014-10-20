@@ -682,9 +682,8 @@
 /mule-standalone-${productVersion}/lib/opt/relaxngDatatype-20020414.jar
 /mule-standalone-${productVersion}/lib/opt/rhino-1.7R4.jar
 /mule-standalone-${productVersion}/lib/opt/rome-0.9.jar
-/mule-standalone-${productVersion}/lib/opt/saxon-9.1.0.8.jar
-/mule-standalone-${productVersion}/lib/opt/saxon-9.1.0.8-dom.jar
-/mule-standalone-${productVersion}/lib/opt/saxon-9.1.0.8-xqj.jar
+/mule-standalone-${productVersion}/lib/opt/Saxon-HE-9.6.0-1.jar
+/mule-standalone-${productVersion}/lib/opt/Saxon-HE-9.6.0-1-xqj.jar
 /mule-standalone-${productVersion}/lib/opt/signpost-core-1.2.1.2.jar
 /mule-standalone-${productVersion}/lib/opt/smack-3.1.0.jar
 /mule-standalone-${productVersion}/lib/opt/smackx-3.1.0.jar
@@ -706,7 +705,7 @@
 /mule-standalone-${productVersion}/lib/opt/spring-web-3.2.10.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/stax-api-1.0-2.jar
 /mule-standalone-${productVersion}/lib/opt/stax-utils-20080702.jar
-/mule-standalone-${productVersion}/lib/opt/stax2-api-3.1.1.jar
+/mule-standalone-${productVersion}/lib/opt/stax2-api-3.1.4.jar
 /mule-standalone-${productVersion}/lib/opt/staxon-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/stringtemplate-3.2.1.jar
 /mule-standalone-${productVersion}/lib/opt/sxc-core-0.7.3.jar
@@ -717,7 +716,7 @@
 /mule-standalone-${productVersion}/lib/opt/coyote-6.0.29.jar
 /mule-standalone-${productVersion}/lib/opt/servlet-api-6.0.29.jar
 /mule-standalone-${productVersion}/lib/opt/uuid-3.4.0.jar
-/mule-standalone-${productVersion}/lib/opt/woodstox-core-asl-4.1.4.jar
+/mule-standalone-${productVersion}/lib/opt/woodstox-core-asl-4.4.1.jar
 /mule-standalone-${productVersion}/lib/opt/wsdl4j-1.6.2.jar
 /mule-standalone-${productVersion}/lib/opt/wss4j-1.6.9.jar
 /mule-standalone-${productVersion}/lib/opt/xapool-1.5.0.jar
@@ -732,6 +731,7 @@
 /mule-standalone-${productVersion}/lib/opt/openws-1.4.2-1.jar
 /mule-standalone-${productVersion}/lib/opt/xmlbeans-2.3.0.jar
 /mule-standalone-${productVersion}/lib/opt/xmltooling-1.3.2-1.jar
+/mule-standalone-${productVersion}/lib/opt/xqj-api-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/validation-api-1.1.0.Final.jar
 /mule-standalone-${productVersion}/lib/shared
 /mule-standalone-${productVersion}/lib/shared/README.txt

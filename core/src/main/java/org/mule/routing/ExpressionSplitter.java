@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.w3c.dom.NodeList;
+
 /**
  * Splits a message using the expression provided invoking the next message processor
  * one for each split part.
@@ -88,6 +90,16 @@ public class ExpressionSplitter extends AbstractSplitter
         else if (result instanceof MuleMessage)
         {
             return Collections.singletonList((MuleMessage) result);
+        }
+        else if (result instanceof NodeList)
+        {
+            NodeList nodeList = (NodeList) result;
+            List<MuleMessage> messages = new ArrayList<>(nodeList.getLength());
+            for (int i = 0; i < nodeList.getLength(); i++)
+            {
+                messages.add(new DefaultMuleMessage(nodeList.item(i), muleContext));
+            }
+            return messages;
         }
         else if (result == null)
         {

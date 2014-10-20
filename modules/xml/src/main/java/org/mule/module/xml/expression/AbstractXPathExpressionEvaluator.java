@@ -20,9 +20,11 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
+import org.mule.module.xml.el.XPath3Function;
 import org.mule.module.xml.i18n.XmlMessages;
 import org.mule.module.xml.util.NamespaceManager;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.util.OneTimeWarning;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,24 +34,33 @@ import java.util.WeakHashMap;
 import org.dom4j.Document;
 import org.jaxen.JaxenException;
 import org.jaxen.XPath;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 
 /**
  * Provides a base class for XPath property extractors. The XPath engine used is jaxen (http://jaxen.org) which supports
  * XPath queries on other object models such as JavaBeans as well as Xml
+ *
+ * @deprecated this base class is deprecated. Use {@link XPath3Function} instead
  */
+@Deprecated
 public abstract class AbstractXPathExpressionEvaluator implements ExpressionEvaluator, Initialisable, Disposable, MuleContextAware
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractXPathExpressionEvaluator.class);
+
     private Map<String, XPath> cache = new WeakHashMap<String, XPath>(8);
 
     private MuleContext muleContext;
     private NamespaceManager namespaceManager;
+    private OneTimeWarning deprecationWarning = new OneTimeWarning(LOGGER, getDeprecationMessage());
+
+    protected abstract String getDeprecationMessage();
 
     @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
-
     }
 
     @Override
@@ -109,6 +120,7 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
     {
         try
         {
+            deprecationWarning.warn();
             Object payload = getPayloadForXPath(message);
 
             List<?> result;

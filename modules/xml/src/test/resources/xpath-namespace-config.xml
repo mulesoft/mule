@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <mulexml:namespace-manager includeConfigNamespaces="true">
+        <mulexml:namespace prefix="soap" uri="http://schemas.xmlsoap.org/soap/envelope/"/>
+        <mulexml:namespace prefix="mule" uri="http://simple.component.mule.org/"/>
+    </mulexml:namespace-manager>
+
+    <flow name="xpathWithNamespace">
+        <expression-transformer expression="xpath3('/soap:Envelope/soap:Body/mule:echo/mule:echo')" />
+    </flow>
+
+</mule>

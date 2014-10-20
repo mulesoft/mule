@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformers.xml;
+package org.mule.transformers.xml.xslt;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
@@ -15,6 +15,7 @@ import org.mule.module.xml.transformer.XsltTransformer;
 import org.mule.module.xml.util.XMLTestUtils;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformers.xml.AbstractXmlTransformerTestCase;
 import org.mule.util.IOUtils;
 
 import java.io.InputStream;
