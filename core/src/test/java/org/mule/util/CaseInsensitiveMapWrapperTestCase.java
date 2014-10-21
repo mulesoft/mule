@@ -10,19 +10,30 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.Test;
 
-public class CaseInsensitiveMapWrapperTestCase
+@SmallTest
+public class CaseInsensitiveMapWrapperTestCase extends AbstractMuleTestCase
 {
+    private Map<String, Integer> map;
+
+    @Before
+    public void initializeMap() throws Exception
+    {
+        map = new CaseInsensitiveMapWrapper(HashMap.class);
+    }
 
     @Test
     public void getIsCaseInsensitive() throws Exception
     {
-        Map<String, Integer> map = new CaseInsensitiveMapWrapper(HashMap.class);
         map.put("A", 1);
 
         assertThat(map.keySet().size(), is(1));
@@ -34,7 +45,6 @@ public class CaseInsensitiveMapWrapperTestCase
     @Test
     public void retainKeyCase() throws Exception
     {
-        Map<String, Integer> map = new CaseInsensitiveMapWrapper(HashMap.class);
         map.put("A", 1);
 
         assertThat(map.keySet().iterator().next(), is("A"));
@@ -43,7 +53,6 @@ public class CaseInsensitiveMapWrapperTestCase
     @Test
     public void clearFromKeySet() throws Exception
     {
-        Map<String, Integer> map = new CaseInsensitiveMapWrapper(HashMap.class);
         map.put("A", 1);
         map.keySet().clear();
 
@@ -53,7 +62,6 @@ public class CaseInsensitiveMapWrapperTestCase
     @Test
     public void clearFromEntrySet() throws Exception
     {
-        Map<String, Integer> map = new CaseInsensitiveMapWrapper(HashMap.class);
         map.put("A", 1);
         map.entrySet().clear();
 
@@ -63,7 +71,6 @@ public class CaseInsensitiveMapWrapperTestCase
     @Test
     public void removeFromKeySetIterator() throws Exception
     {
-        Map<String, Integer> map = new CaseInsensitiveMapWrapper(HashMap.class);
         map.put("A", 1);
         map.put("B", 2);
         map.put("C", 3);
@@ -87,7 +94,6 @@ public class CaseInsensitiveMapWrapperTestCase
     @Test
     public void removeFromEntrySetIterator() throws Exception
     {
-        Map<String, Integer> map = new CaseInsensitiveMapWrapper(HashMap.class);
         map.put("A", 1);
         map.put("B", 2);
         map.put("C", 3);
@@ -111,7 +117,6 @@ public class CaseInsensitiveMapWrapperTestCase
     @Test
     public void containsKey() throws Exception
     {
-        Map<String, Integer> map = new CaseInsensitiveMapWrapper(HashMap.class);
         map.put("A", 1);
 
         assertThat(map.containsKey("A"), is(true));
@@ -122,7 +127,6 @@ public class CaseInsensitiveMapWrapperTestCase
     @Test
     public void containsValue() throws Exception
     {
-        Map<String, Integer> map = new CaseInsensitiveMapWrapper(HashMap.class);
         map.put("A", 1);
 
         assertThat(map.containsValue(1), is(true));

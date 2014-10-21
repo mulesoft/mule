@@ -25,16 +25,20 @@ import org.mule.construct.Flow;
 import org.mule.security.DefaultMuleAuthentication;
 import org.mule.security.DefaultSecurityContextFactory;
 import org.mule.security.MuleCredentials;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 import org.mule.util.SerializationUtils;
 
 import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class DefaultMuleSessionTestCase
+@SmallTest
+public class DefaultMuleSessionTestCase extends AbstractMuleTestCase
 {
 
     @Test
@@ -244,7 +248,7 @@ public class DefaultMuleSessionTestCase
                         if (i == 2)
                         {
                             concurrentAccess.countDown();
-                            concurrentAccess.await();
+                            concurrentAccess.await(1000, TimeUnit.MILLISECONDS);
                         }
                         session.removeProperty(propertyName);
                         i++;
@@ -261,7 +265,7 @@ public class DefaultMuleSessionTestCase
         new Thread(r).start();
         new Thread(r).start();
 
-        executionComplete.await();
+        concurrentAccess.await(1000, TimeUnit.MILLISECONDS);
 
         assertThat(failed.get(), is(false));
     }

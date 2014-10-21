@@ -28,6 +28,8 @@ import java.util.Set;
  * will remains in the key set and entry set.
  *
  * @param <T> The class of the values referenced in the map.
+ *
+ * @since 3.6.0
  */
 public class CaseInsensitiveMapWrapper<T> implements Map<String, T>, Serializable
 {
@@ -125,9 +127,9 @@ public class CaseInsensitiveMapWrapper<T> implements Map<String, T>, Serializabl
     private static class CaseInsensitiveMapKey implements Serializable
     {
 
-        private String key;
-        private String keyLowerCase;
-        private int keyHash;
+        private final String key;
+        private final String keyLowerCase;
+        private final int keyHash;
 
         public CaseInsensitiveMapKey(Object key)
         {
@@ -245,7 +247,7 @@ public class CaseInsensitiveMapWrapper<T> implements Map<String, T>, Serializabl
     private static abstract class AbstractConverterIterator<A, B> implements Iterator<B>
     {
 
-        private Iterator<A> aIterator;
+        private final Iterator<A> aIterator;
 
         public AbstractConverterIterator(Set<A> set)
         {
