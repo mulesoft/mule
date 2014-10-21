@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.mulesoft.org/schema/mule/core"
+        xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+        xmlns:test="http://www.mulesoft.org/schema/mule/test"
+        xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+        ">
+
+    <flow name="main-flow">
+        <vm:inbound-endpoint exchange-pattern="request-response" path="mainQueue"/>
+        <set-payload value="#[new Integer[${test.executionsCount}]]"/>
+        <collection-splitter/>
+        <vm:outbound-endpoint exchange-pattern="one-way" path="inputQueue"/>
+    </flow>
+
+    <flow name="one-way-flow">
+        <vm:inbound-endpoint exchange-pattern="one-way" path="inputQueue"/>
+        <set-session-variable value="Var1" variableName="Session1"/>
+        <set-session-variable value="Var2" variableName="Session2"/>
+        <set-session-variable value="Var3" variableName="Session3"/>
+        <async>
+            <flow-ref name="async-referenced-flow"/>
+        </async>
+        <remove-session-variable variableName="Session1"/>
+        <remove-session-variable variableName="Session2"/>
+        <remove-session-variable variableName="Session3"/>
+        <test:component/>
+    </flow>
+
+    <flow name="async-referenced-flow">
+        <logger message="Nothing" level="DEBUG"/>
+    </flow>
+
+</mule>
