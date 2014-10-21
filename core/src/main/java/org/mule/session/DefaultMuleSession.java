@@ -247,7 +247,7 @@ public final class DefaultMuleSession implements MuleSession
 
     /**
      *
-     * @deprecated use {@link #getProperty()} and/or {@link #getPropertyNamesAsSet()} sSet} instead
+     * @deprecated use {@link #getProperty()} and/or {@link #getPropertyNamesAsSet()} instead
      */
     @Deprecated
     public Map<String, Object> getProperties()
