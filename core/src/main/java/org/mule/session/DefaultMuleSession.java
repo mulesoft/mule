@@ -11,7 +11,7 @@ import org.mule.api.MuleSession;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.security.SecurityContext;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.util.CaseInsensitiveHashMap;
+import org.mule.util.CaseInsensitiveMapExtender;
 import org.mule.util.UUID;
 
 import java.io.IOException;
@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -64,7 +65,19 @@ public final class DefaultMuleSession implements MuleSession
     public DefaultMuleSession()
     {
         id = UUID.getUUID();
-        properties = Collections.synchronizedMap(new CaseInsensitiveHashMap/* <String, Object> */());
+        createPropertiesMap();
+    }
+
+    private void createPropertiesMap()
+    {
+        try
+        {
+            properties = new CaseInsensitiveMapExtender(ConcurrentHashMap.class);
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Can not create properties map.", e);
+        }
     }
 
     public DefaultMuleSession(MuleSession session)
@@ -73,7 +86,7 @@ public final class DefaultMuleSession implements MuleSession
         this.securityContext = session.getSecurityContext();
         this.valid = session.isValid();
 
-        this.properties = Collections.synchronizedMap(new CaseInsensitiveHashMap/* <String, Object> */());
+        createPropertiesMap();
         for (String key : session.getPropertyNamesAsSet())
         {
             this.properties.put(key, session.getProperty(key));
@@ -218,7 +231,7 @@ public final class DefaultMuleSession implements MuleSession
             return;
         }
         Map<String, Object> oldProperties = this.properties;
-        this.properties = Collections.synchronizedMap(new CaseInsensitiveHashMap/* <String, Object> */());
+        createPropertiesMap();
         for (String propertyKey : updatedSession.getPropertyNamesAsSet())
         {
             this.properties.put(propertyKey, updatedSession.<Object> getProperty(propertyKey));
