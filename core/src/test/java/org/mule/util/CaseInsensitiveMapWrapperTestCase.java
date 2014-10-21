@@ -16,13 +16,13 @@ import java.util.Map;
 
 import org.junit.Test;
 
-public class CaseInsensitiveMapExtenderTestCase
+public class CaseInsensitiveMapWrapperTestCase
 {
 
     @Test
     public void getIsCaseInsensitive() throws Exception
     {
-        Map<String, Integer> map = new CaseInsensitiveMapExtender(HashMap.class);
+        Map<String, Integer> map = new CaseInsensitiveMapWrapper(HashMap.class);
         map.put("A", 1);
 
         assertThat(map.keySet().size(), is(1));
@@ -34,7 +34,7 @@ public class CaseInsensitiveMapExtenderTestCase
     @Test
     public void retainKeyCase() throws Exception
     {
-        Map<String, Integer> map = new CaseInsensitiveMapExtender(HashMap.class);
+        Map<String, Integer> map = new CaseInsensitiveMapWrapper(HashMap.class);
         map.put("A", 1);
 
         assertThat(map.keySet().iterator().next(), is("A"));
@@ -43,7 +43,7 @@ public class CaseInsensitiveMapExtenderTestCase
     @Test
     public void clearFromKeySet() throws Exception
     {
-        Map<String, Integer> map = new CaseInsensitiveMapExtender(HashMap.class);
+        Map<String, Integer> map = new CaseInsensitiveMapWrapper(HashMap.class);
         map.put("A", 1);
         map.keySet().clear();
 
@@ -53,7 +53,7 @@ public class CaseInsensitiveMapExtenderTestCase
     @Test
     public void clearFromEntrySet() throws Exception
     {
-        Map<String, Integer> map = new CaseInsensitiveMapExtender(HashMap.class);
+        Map<String, Integer> map = new CaseInsensitiveMapWrapper(HashMap.class);
         map.put("A", 1);
         map.entrySet().clear();
 
@@ -63,7 +63,7 @@ public class CaseInsensitiveMapExtenderTestCase
     @Test
     public void removeFromKeySetIterator() throws Exception
     {
-        Map<String, Integer> map = new CaseInsensitiveMapExtender(HashMap.class);
+        Map<String, Integer> map = new CaseInsensitiveMapWrapper(HashMap.class);
         map.put("A", 1);
         map.put("B", 2);
         map.put("C", 3);
@@ -87,7 +87,7 @@ public class CaseInsensitiveMapExtenderTestCase
     @Test
     public void removeFromEntrySetIterator() throws Exception
     {
-        Map<String, Integer> map = new CaseInsensitiveMapExtender(HashMap.class);
+        Map<String, Integer> map = new CaseInsensitiveMapWrapper(HashMap.class);
         map.put("A", 1);
         map.put("B", 2);
         map.put("C", 3);
@@ -111,7 +111,7 @@ public class CaseInsensitiveMapExtenderTestCase
     @Test
     public void containsKey() throws Exception
     {
-        Map<String, Integer> map = new CaseInsensitiveMapExtender(HashMap.class);
+        Map<String, Integer> map = new CaseInsensitiveMapWrapper(HashMap.class);
         map.put("A", 1);
 
         assertThat(map.containsKey("A"), is(true));
@@ -122,7 +122,7 @@ public class CaseInsensitiveMapExtenderTestCase
     @Test
     public void containsValue() throws Exception
     {
-        Map<String, Integer> map = new CaseInsensitiveMapExtender(HashMap.class);
+        Map<String, Integer> map = new CaseInsensitiveMapWrapper(HashMap.class);
         map.put("A", 1);
 
         assertThat(map.containsValue(1), is(true));

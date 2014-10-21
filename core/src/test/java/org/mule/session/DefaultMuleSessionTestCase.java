@@ -6,6 +6,15 @@
  */
 package org.mule.session;
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleSession;
@@ -19,20 +28,15 @@ import org.mule.security.MuleCredentials;
 import org.mule.util.SerializationUtils;
 
 import java.util.Collections;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
 public class DefaultMuleSessionTestCase
 {
+
     @Test
     public void create()
     {
@@ -168,18 +172,18 @@ public class DefaultMuleSessionTestCase
 
         // Serialize and then deserialize
         DefaultMuleSession after = (DefaultMuleSession) SerializationUtils.deserialize(
-            SerializationUtils.serialize(before), muleContext);
+                SerializationUtils.serialize(before), muleContext);
 
         // assertions
         assertEquals(before.getId(), after.getId());
         assertEquals(before.isValid(), after.isValid());
         assertEquals(before.getProperty("foo"), after.getProperty("foo"));
         assertEquals(before.getSecurityContext().getAuthentication().getPrincipal(),
-            after.getSecurityContext().getAuthentication().getPrincipal());
+                     after.getSecurityContext().getAuthentication().getPrincipal());
         assertEquals(before.getSecurityContext().getAuthentication().getProperties().get("key1"),
-            after.getSecurityContext().getAuthentication().getProperties().get("key1"));
+                     after.getSecurityContext().getAuthentication().getProperties().get("key1"));
         assertEquals(before.getSecurityContext().getAuthentication().getCredentials(),
-            after.getSecurityContext().getAuthentication().getCredentials());
+                     after.getSecurityContext().getAuthentication().getCredentials());
         // assertEquals(before.getSecurityContext().getAuthentication().getEvent().getId(),
         // after.getSecurityContext().getAuthentication().getEvent().getId());
 
@@ -198,7 +202,7 @@ public class DefaultMuleSessionTestCase
         before.setProperty("foo2", "bar2");
 
         MuleSession after = (DefaultMuleSession) SerializationUtils.deserialize(
-            SerializationUtils.serialize(before), getClass().getClassLoader());
+                SerializationUtils.serialize(before), getClass().getClassLoader());
 
         assertNotNull(after);
         assertNotSame(after, before);
@@ -208,9 +212,57 @@ public class DefaultMuleSessionTestCase
 
     private SecurityContext createTestAuthentication()
     {
-        Authentication auth = new DefaultMuleAuthentication(new MuleCredentials("dan", new char[]{'d', 'f'}));
+        Authentication auth = new DefaultMuleAuthentication(new MuleCredentials("dan", new char[] {'d', 'f'}));
         auth.setProperties(Collections.<String, Object>singletonMap("key1", "value1"));
         SecurityContext securityContext = new DefaultSecurityContextFactory().create(auth);
         return securityContext;
+    }
+
+    @Test
+    public void concurrentPropertiesAccess() throws InterruptedException
+    {
+        final MuleSession session = new DefaultMuleSession();
+        session.setProperty("p1", "v1");
+        session.setProperty("p2", "v2");
+        session.setProperty("p3", "v3");
+        session.setProperty("p4", "v4");
+
+        final CountDownLatch concurrentAccess = new CountDownLatch(2);
+        final CountDownLatch executionComplete = new CountDownLatch(2);
+        final AtomicBoolean failed = new AtomicBoolean(false);
+
+        Runnable r = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    int i = 0;
+                    for (String propertyName : session.getPropertyNamesAsSet())
+                    {
+                        if (i == 2)
+                        {
+                            concurrentAccess.countDown();
+                            concurrentAccess.await();
+                        }
+                        session.removeProperty(propertyName);
+                        i++;
+                    }
+                }
+                catch (Exception e)
+                {
+                    failed.set(true);
+                }
+                executionComplete.countDown();
+            }
+        };
+
+        new Thread(r).start();
+        new Thread(r).start();
+
+        executionComplete.await();
+
+        assertThat(failed.get(), is(false));
     }
 }

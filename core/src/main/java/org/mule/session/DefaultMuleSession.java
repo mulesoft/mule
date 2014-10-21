@@ -11,7 +11,7 @@ import org.mule.api.MuleSession;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.security.SecurityContext;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.util.CaseInsensitiveMapExtender;
+import org.mule.util.CaseInsensitiveConcurrentMap;
 import org.mule.util.UUID;
 
 import java.io.IOException;
@@ -23,7 +23,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -72,7 +71,7 @@ public final class DefaultMuleSession implements MuleSession
     {
         try
         {
-            properties = new CaseInsensitiveMapExtender(ConcurrentHashMap.class);
+            properties = new CaseInsensitiveConcurrentMap<>();
         }
         catch (Exception e)
         {
@@ -246,6 +245,11 @@ public final class DefaultMuleSession implements MuleSession
         }
     }
 
+    /**
+     *
+     * @deprecated use {@link getProperty} and/or {@link getPropertyNamesAsSet} instead
+     */
+    @Deprecated
     public Map<String, Object> getProperties()
     {
         return properties;
