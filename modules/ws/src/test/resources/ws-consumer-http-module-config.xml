@@ -23,7 +23,7 @@
     </http:request-config>
 
     <ws:consumer-config wsdlLocation="Test.wsdl" service="TestService" port="TestPort"
-                        serviceAddress="http://localhost:${port}/services/Test" connector-config="customConfig" name="globalConfig"/>
+                        serviceAddress="http://localhost:${port}/services/Test" connectorConfig="customConfig" name="globalConfig"/>
 
     <flow name="client">
         <inbound-endpoint address="vm://in" exchange-pattern="request-response"/>

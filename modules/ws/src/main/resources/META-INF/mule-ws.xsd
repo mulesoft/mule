@@ -290,7 +290,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="connector-config" type="xsd:string">
+                <xsd:attribute name="connectorConfig" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             A reference to a connector config that will be used by this component.
