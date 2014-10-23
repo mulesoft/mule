@@ -711,9 +711,10 @@
 /mule-standalone-${productVersion}/lib/opt/sxc-core-0.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/sxc-runtime-0.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/sxc-xpath-0.7.3.jar
-/mule-standalone-${productVersion}/lib/opt/tomcat-apr-5.5.23.jar
-/mule-standalone-${productVersion}/lib/opt/tomcat-util-5.5.23.jar
 /mule-standalone-${productVersion}/lib/opt/uri-template-0.9.jar
+/mule-standalone-${productVersion}/lib/opt/catalina-6.0.29.jar
+/mule-standalone-${productVersion}/lib/opt/coyote-6.0.29.jar
+/mule-standalone-${productVersion}/lib/opt/servlet-api-6.0.29.jar
 /mule-standalone-${productVersion}/lib/opt/uuid-3.4.0.jar
 /mule-standalone-${productVersion}/lib/opt/woodstox-core-asl-4.1.4.jar
 /mule-standalone-${productVersion}/lib/opt/wsdl4j-1.6.2.jar
