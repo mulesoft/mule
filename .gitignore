@@ -4,8 +4,9 @@ target/
 
 
 # Eclipse files
-/.classpath
-/.project
+.classpath
+.project
+.settings
 /workspace/
 
 # IntelliJ Idea files
