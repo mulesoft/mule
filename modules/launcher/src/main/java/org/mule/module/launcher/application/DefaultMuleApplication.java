@@ -299,6 +299,7 @@ public class DefaultMuleApplication implements Application
         {
             // kill any refs to the old classloader to avoid leaks
             Thread.currentThread().setContextClassLoader(null);
+            deploymentClassLoader = null;
         }
     }
 
