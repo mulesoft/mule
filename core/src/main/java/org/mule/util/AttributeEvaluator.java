@@ -6,8 +6,11 @@
  */
 package org.mule.util;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.expression.ExpressionManager;
+import org.mule.config.i18n.CoreMessages;
 
 import java.util.regex.Pattern;
 
@@ -17,11 +20,14 @@ import java.util.regex.Pattern;
  */
 public class AttributeEvaluator
 {
+
     private static final Pattern SINGLE_EXPRESSION_REGEX_PATTERN = Pattern.compile("^#\\[(?:(?!#\\[).)*\\]$");
+    private static final Pattern MULTIPLE_EXPRESSION_REGEX_PATTERN = Pattern.compile("#\\[[^\\[]*\\]");
+
 
     private enum AttributeType
     {
-        EXPRESSION, STRING
+        EXPRESSION, PARSE_EXPRESSION, STATIC_VALUE
     }
 
     private final String attributeValue;
@@ -33,37 +39,37 @@ public class AttributeEvaluator
         this.attributeValue = attributeValue;
     }
 
-    public void initialize(final ExpressionManager expressionManager)
+    public AttributeEvaluator initialize(final ExpressionManager expressionManager)
     {
         this.expressionManager = expressionManager;
         resolveAttributeType();
+        return this;
     }
 
     private void resolveAttributeType()
     {
-        if (isSingleExpression(attributeValue))
+        if (attributeValue != null && SINGLE_EXPRESSION_REGEX_PATTERN.matcher(attributeValue).matches())
         {
             this.attributeType = AttributeType.EXPRESSION;
         }
+        else if (attributeValue != null && MULTIPLE_EXPRESSION_REGEX_PATTERN.matcher(attributeValue).find())
+        {
+            this.attributeType = AttributeType.PARSE_EXPRESSION;
+        }
         else
         {
-            this.attributeType = AttributeType.STRING;
+            this.attributeType = AttributeType.STATIC_VALUE;
         }
-    }
-
-    private boolean isSingleExpression(String expression)
-    {
-        return expression != null && SINGLE_EXPRESSION_REGEX_PATTERN.matcher(expression).matches();
     }
 
     public boolean isExpression()
     {
-        return attributeType.equals(AttributeType.EXPRESSION);
+        return this.attributeType.equals(AttributeType.EXPRESSION);
     }
 
-    public boolean isString()
+    public boolean isParseExpression()
     {
-        return attributeType.equals(AttributeType.STRING);
+        return attributeType.equals(AttributeType.PARSE_EXPRESSION);
     }
 
     public Object resolveValue(MuleMessage message)
@@ -72,10 +78,61 @@ public class AttributeEvaluator
         {
             return expressionManager.evaluate(attributeValue, message);
         }
-        else
+        else if (isParseExpression())
         {
             return expressionManager.parse(attributeValue, message);
         }
+        else
+        {
+            return attributeValue;
+        }
+    }
+
+    public Object resolveValue(MuleEvent event)
+    {
+        if (isExpression())
+        {
+            return expressionManager.evaluate(attributeValue, event);
+        }
+        else if (isParseExpression())
+        {
+            return expressionManager.parse(attributeValue, event);
+        }
+        else
+        {
+            return attributeValue;
+        }
+    }
+
+    public Integer resolveIntegerValue(MuleEvent event)
+    {
+        final Object value = resolveValue(event);
+        if (value == null)
+        {
+            return null;
+        }
+        if (value instanceof Number)
+        {
+            return ((Number) value).intValue();
+        }
+        else if (value instanceof String)
+        {
+            return Integer.parseInt((String) value);
+        }
+        else
+        {
+            throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("Value was required as integer but is of type: %s", value.getClass().getName())));
+        }
+    }
+
+    public String resolveStringValue(MuleEvent event)
+    {
+        final Object value = resolveValue(event);
+        if (value == null)
+        {
+            return null;
+        }
+        return value.toString();
     }
 
     public String getRawValue()
