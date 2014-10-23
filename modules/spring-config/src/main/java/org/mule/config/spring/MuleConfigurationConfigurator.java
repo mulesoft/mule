@@ -69,6 +69,7 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
             defaultConfig.setDefaultExceptionStrategyName(config.getDefaultExceptionStrategyName());
             defaultConfig.setEnricherPropagatesSessionVariableChanges(config.isEnricherPropagatesSessionVariableChanges());
             defaultConfig.setExtensions(config.getExtensions());
+            defaultConfig.setUseHttpTransportByDefault(config.useHttpTransportByDefault());
             validateDefaultExceptionStrategy();
             return configuration;
         }
@@ -155,6 +156,11 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
     public void setExtensions(List<Object> extensions)
     {
         config.setExtensions(extensions);
+    }
+
+    public void setUseHttpTransportByDefault(boolean useHttpTransportByDefault)
+    {
+        config.setUseHttpTransportByDefault(useHttpTransportByDefault);
     }
 
 }

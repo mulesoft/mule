@@ -1371,6 +1371,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="useHttpTransportByDefault" type="substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Backwards Compatabilty Flag: Since Mule 3.6, default HTTP URIs are resolved with the new HTTP connector. If set to true, this behavior is changed so that the HTTP transport is used.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

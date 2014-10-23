@@ -6,9 +6,14 @@
  */
 package org.mule.module.ws.consumer;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.config.DefaultMuleConfiguration;
+import org.mule.module.http.HttpRequester;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.transport.http.HttpConnector;
@@ -22,11 +27,22 @@ public class WSConsumerConfigTestCase extends AbstractMuleContextTestCase
     private static final String SERVICE_ADDRESS = "http://localhost";
 
     @Test
-    public void createOutboundEndpointWithDefaultConnector() throws MuleException
+    public void createOutboundEndpointWithDefaultConnectorFromHttpTransport() throws MuleException
+    {
+        DefaultMuleConfiguration muleConfiguration = (DefaultMuleConfiguration) muleContext.getConfiguration();
+        muleConfiguration.setUseHttpTransportByDefault(true);
+
+        WSConsumerConfig config = createConsumerConfig();
+        MessageProcessor mp = config.createOutboundMessageProcessor();
+        assertThat(mp, instanceOf(OutboundEndpoint.class));
+    }
+
+    @Test
+    public void createHttpRequesterWithDefaultConfigFromHttpModule() throws MuleException
     {
         WSConsumerConfig config = createConsumerConfig();
-        OutboundEndpoint outboundEndpoint = config.createOutboundEndpoint();
-        assertEquals(SERVICE_ADDRESS, outboundEndpoint.getAddress());
+        MessageProcessor mp = config.createOutboundMessageProcessor();
+        assertThat(mp, instanceOf(HttpRequester.class));
     }
 
     @Test
@@ -35,7 +51,7 @@ public class WSConsumerConfigTestCase extends AbstractMuleContextTestCase
         WSConsumerConfig config = createConsumerConfig();
         HttpConnector httpConnector = new HttpConnector(muleContext);
         config.setConnector(httpConnector);
-        OutboundEndpoint outboundEndpoint = config.createOutboundEndpoint();
+        OutboundEndpoint outboundEndpoint = (OutboundEndpoint) config.createOutboundMessageProcessor();
         assertEquals(httpConnector, outboundEndpoint.getConnector());
     }
 
@@ -44,7 +60,7 @@ public class WSConsumerConfigTestCase extends AbstractMuleContextTestCase
     {
         WSConsumerConfig config = createConsumerConfig();
         config.setServiceAddress("unsupported://test");
-        config.createOutboundEndpoint();
+        config.createOutboundMessageProcessor();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -54,7 +70,7 @@ public class WSConsumerConfigTestCase extends AbstractMuleContextTestCase
         config.setServiceAddress("jms://test");
         HttpConnector httpConnector = new HttpConnector(muleContext);
         config.setConnector(httpConnector);
-        config.createOutboundEndpoint();
+        config.createOutboundMessageProcessor();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -62,7 +78,7 @@ public class WSConsumerConfigTestCase extends AbstractMuleContextTestCase
     {
         WSConsumerConfig config = createConsumerConfig();
         config.setServiceAddress(null);
-        config.createOutboundEndpoint();
+        config.createOutboundMessageProcessor();
     }
 
     private WSConsumerConfig createConsumerConfig()
