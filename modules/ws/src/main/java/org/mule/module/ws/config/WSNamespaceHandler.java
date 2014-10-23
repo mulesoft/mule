@@ -26,7 +26,7 @@ public class WSNamespaceHandler extends AbstractMuleNamespaceHandler
     {
         // Flow Constructs
         registerBeanDefinitionParser("proxy", new WSProxyDefinitionParser());
-        registerBeanDefinitionParser("consumer-config", new OrphanDefinitionParser(WSConsumerConfig.class, true));
+        registerBeanDefinitionParser("consumer-config", (OrphanDefinitionParser) new OrphanDefinitionParser(WSConsumerConfig.class, true).addReference("connector-config"));
         registerBeanDefinitionParser("consumer", new MessageProcessorDefinitionParser(WSConsumer.class));
         registerBeanDefinitionParser("security", new ChildDefinitionParser("security", WSSecurity.class));
         registerBeanDefinitionParser("wss-username-token", new ChildDefinitionParser("strategy", WssUsernameTokenSecurityStrategy.class));

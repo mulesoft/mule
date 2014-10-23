@@ -30,6 +30,7 @@ import org.mule.module.ws.security.SecurityStrategy;
 import org.mule.module.ws.security.WSSecurity;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.transport.http.HttpConnector;
 import org.mule.util.IOUtils;
 
 import java.net.URL;
@@ -202,13 +203,14 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
 
         chainBuilder.chain(createCxfOutboundMessageProcessor(config.getSecurity()));
 
-        // Add a MessageProcessor to remove outbound properties that are mapped to SOAP headers, so that the
-        // underlying transport does not include them as headers.
-        chainBuilder.chain(new MessageProcessor()
+        chainBuilder.chain(new AbstractInterceptingMessageProcessor()
         {
             @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
+                // Remove outbound properties that are mapped to SOAP headers, so that the
+                // underlying transport does not include them as headers.
+
                 List<String> outboundProperties = new ArrayList<String>(event.getMessage().getOutboundPropertyNames());
 
                 for (String outboundProperty : outboundProperties)
@@ -218,11 +220,22 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                         event.getMessage().removeProperty(outboundProperty, PropertyScope.OUTBOUND);
                     }
                 }
-                return event;
+
+                // Send the request through the transport/connector
+                MuleEvent result = processNext(event);
+
+                // Ensure that the http.status code inbound property (if present) is a String.
+                Object statusCode = result.getMessage().getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, null);
+                if (statusCode != null && !(statusCode instanceof String))
+                {
+                    result.getMessage().setProperty(HttpConnector.HTTP_STATUS_PROPERTY, statusCode.toString(), PropertyScope.INBOUND);
+                }
+
+                return result;
             }
         });
 
-        chainBuilder.chain(config.createOutboundEndpoint());
+        chainBuilder.chain(config.createOutboundMessageProcessor());
 
         return chainBuilder.build();
     }
@@ -371,6 +384,8 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                 attachments.add(attachment);
             }
             message.setInvocationProperty(CxfConstants.ATTACHMENTS, attachments);
+
+            message.clearAttachments();
         }
     }
 

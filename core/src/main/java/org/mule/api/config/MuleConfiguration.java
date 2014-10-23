@@ -92,4 +92,11 @@ public interface MuleConfiguration
      * @return extension configured of type extensionType, if there's no such extension then null.
      */
     <T> T getExtension(final Class<T> extensionType);
+
+    /**
+     * For the cases where HTTP needs to be used by default (no connector or endpoint is explicitly defined), this
+     * determines if the old HTTP transport should be used by default. If false, the new HTTP connector will be used.
+     * This applies, for example, when specifying an HTTP URI in MuleClient.
+     */
+    boolean useHttpTransportByDefault();
 }
