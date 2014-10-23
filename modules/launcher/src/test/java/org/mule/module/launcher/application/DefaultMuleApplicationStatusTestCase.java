@@ -7,12 +7,22 @@
 package org.mule.module.launcher.application;
 
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import org.mule.context.notification.MuleContextNotification;
+import org.mule.module.launcher.artifact.ArtifactClassLoader;
+import org.mule.module.launcher.artifact.ShutdownListener;
+import org.mule.module.launcher.descriptor.ApplicationDescriptor;
+import org.mule.module.launcher.domain.Domain;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
+
+import java.net.URL;
 
 import org.junit.Test;
 
@@ -70,6 +80,30 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
     {
         muleContext.dispose();
         assertStatus(ApplicationStatus.DESTROYED);
+    }
+
+    @Test
+    public void nullDeploymentClassLoaderAfterDispose()
+    {
+        ApplicationDescriptor descriptor = mock(ApplicationDescriptor.class);
+        when(descriptor.getAbsoluteResourcePaths()).thenReturn(new String[]{});
+
+        ApplicationClassLoaderFactory classLoaderFactory = mock(ApplicationClassLoaderFactory.class);
+        when(classLoaderFactory.create(descriptor)).thenReturn(new ArtifactClassLoader()
+        {
+            @Override public String getArtifactName() { return null; }
+            @Override public URL findResource(String resource) { return null; }
+            @Override public ClassLoader getClassLoader() { return null; }
+            @Override public void addShutdownListener(ShutdownListener listener) { }
+            @Override public void dispose() { }
+            @Override public URL findLocalResource(String resourceName) { return null; }
+        });
+
+        DefaultMuleApplication application = new DefaultMuleApplication(descriptor, classLoaderFactory, mock(Domain.class));
+        application.install();
+        assertThat(application.deploymentClassLoader, is(notNullValue()));
+        application.dispose();
+        assertThat(application.deploymentClassLoader, is(nullValue()));
     }
 
     @Test
