@@ -48,6 +48,8 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.service.factory.AbstractServiceConfiguration;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.invoker.Invoker;
+import org.apache.cxf.service.model.SchemaInfo;
+import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
@@ -203,6 +205,8 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
 
         server = sfb.create();
 
+        fixSchemasTargetNamespaces(server.getEndpoint().getService().getServiceInfos());
+
         CxfUtils.removeInterceptor(server.getEndpoint().getService().getInInterceptors(), OneWayProcessorInterceptor.class.getName());
         configureServer(server);
 
@@ -212,6 +216,23 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         processor.setWSDLQueryHandler(getWSDLQueryHandler());
 
         return processor;
+    }
+
+    private void fixSchemasTargetNamespaces(List<ServiceInfo> serviceInfos)
+    {
+        for (ServiceInfo serviceInfo : serviceInfos)
+        {
+            if (serviceInfo.getTargetNamespace() != null)
+            {
+                for (SchemaInfo schemaInfo : serviceInfo.getSchemas())
+                {
+                    if (schemaInfo.getSchema().getTargetNamespace() == null)
+                    {
+                        schemaInfo.getSchema().setTargetNamespace(serviceInfo.getTargetNamespace());
+                    }
+                }
+            }
+        }
     }
 
     protected QueryHandler getWSDLQueryHandler()

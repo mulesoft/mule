@@ -1,0 +1,45 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<wsdl:definitions name = "SalesLead"  targetNamespace="http://SalesLead/CMS" xmlns:soap = "http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns = "http://SalesLead/CMS"
+xmlns:wsdl = "http://schemas.xmlsoap.org/wsdl/" xmlns:xsd = "http://www.w3.org/2001/XMLSchema">
+	<wsdl:types>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema">
+			<import namespace="http://SalesLead/CMS" schemaLocation="xsd/SLI.xsd"/>
+		</schema>
+	</wsdl:types>
+	<wsdl:message name = "SLIRequest">
+		<wsdl:part element = "tns:SLIRequest" name = "parameters"/>
+	</wsdl:message>
+	<wsdl:message name = "SLIResponse">
+		<wsdl:part element = "tns:SLIResponse" name = "parameters"/>
+	</wsdl:message>
+	<wsdl:message name = "SLIFault">
+		<wsdl:part element = "tns:SLIFault" name = "parameters"/>
+	</wsdl:message>
+	<wsdl:portType name = "SLI">
+		<wsdl:operation name = "SLI">
+			<wsdl:input message = "tns:SLIRequest" name = "SLIRequest"/>
+			<wsdl:output message = "tns:SLIResponse" name = "SLIResponse"/>
+			<wsdl:fault message = "tns:SLIFault" name = "SLIFault"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name = "SLISoapBinding" type = "tns:SLI">
+		<soap:binding style = "document" transport = "http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name = "SLI">
+			<soap:operation soapAction = "" style = "document"/>
+			<wsdl:input name = "SLIRequest">
+				<soap:body use = "literal"/>
+			</wsdl:input>
+			<wsdl:output name = "SLIResponse">
+				<soap:body use = "literal"/>
+			</wsdl:output>
+			<wsdl:fault name = "SLIFault">
+				<soap:body use = "literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name = "SLI">
+		<wsdl:port binding = "tns:SLISoapBinding" name = "SLIPort">
+			<soap:address location = "https://localhost:8882/SLI"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>
