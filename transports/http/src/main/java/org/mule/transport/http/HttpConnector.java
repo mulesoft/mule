@@ -159,7 +159,7 @@ public class HttpConnector extends TcpConnector
     public static final String HTTP_ENCODE_PARAMVALUE = HTTP_PREFIX + "encode.paramvalue";
 
     public static final Set<String> HTTP_INBOUND_PROPERTIES;
-    
+
     protected Map<OutboundEndpoint, MessageDispatcher> endpointDispatchers = new ConcurrentHashMap<OutboundEndpoint, MessageDispatcher>();
 
     static
@@ -188,6 +188,9 @@ public class HttpConnector extends TcpConnector
     public static final String COOKIE_SPEC_RFC2109 = "rfc2109";
     public static final String ROOT_PATH = "/";
     public static final int DEFAULT_CONNECTION_TIMEOUT = 2000;
+
+    public static final String BIND_TO_ALL_INTERFACES_IP = "0.0.0.0";
+    private static final String LOOKUP_DEBUG_MESSAGE_FORMAT = "%s lookup of receiver on connector: %s with URI key: %s.";
 
     private String proxyHostname = null;
 
@@ -580,7 +583,10 @@ public class HttpConnector extends TcpConnector
             if (messageReceiver.getEndpointURI().getPort() == port)
             {
                 host = messageReceiver.getEndpointURI().getHost();
-                break;
+                if (!BIND_TO_ALL_INTERFACES_IP.equals(host))
+                {
+                     break;
+                }
             }
         }
         if (host == null)
@@ -604,8 +610,7 @@ public class HttpConnector extends TcpConnector
         // first check that there is a receiver on the root address
         if (logger.isTraceEnabled())
         {
-            logger.trace("Looking up receiver on connector: " + getName() + " with URI key: "
-                         + requestUri.toString());
+            logger.trace(String.format(LOOKUP_DEBUG_MESSAGE_FORMAT, "Primary", getName(), uriStr));
         }
 
         HttpMessageReceiver receiver = (HttpMessageReceiver) lookupReceiver(uriStr);
@@ -616,16 +621,14 @@ public class HttpConnector extends TcpConnector
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Secondary lookup of receiver on connector: " + getName()
-                             + " with URI key: " + requestUri.toString());
+                logger.debug(String.format(LOOKUP_DEBUG_MESSAGE_FORMAT, "Secondary", getName(), uriStr));
             }
 
-            receiver = (HttpMessageReceiver) findReceiverByStem(getReceivers(), uriStr);
+            receiver = (HttpMessageReceiver) findReceiverByStemConsideringMatchingHost(getReceivers(), uriStr);
 
             if (receiver == null && logger.isWarnEnabled())
             {
-                logger.warn("No receiver found with secondary lookup on connector: " + getName()
-                            + " with URI key: " + requestUri.toString());
+                logger.warn(String.format(LOOKUP_DEBUG_MESSAGE_FORMAT, "No receiver found on secondary", getName(), uriStr));
                 logger.warn("Receivers on connector are: "
                             + MapUtils.toString(getReceivers(), true));
             }
@@ -650,6 +653,56 @@ public class HttpConnector extends TcpConnector
             logger.debug("No receiver found: " + e.getMessage());
             return null;
         }
+    }
+
+    @Override
+    public MessageReceiver lookupReceiver(final String key)
+    {
+        if (key != null)
+        {
+            final URI keyUri = URI.create(key);
+            for (MessageReceiver receiver : receivers.values())
+            {
+                if (uriMatchesReceiver(keyUri, receiver.getEndpointURI().getUri()))
+                {
+                    return receiver;
+                }
+            }
+            return null;
+        }
+        else
+        {
+            throw new IllegalArgumentException("Receiver key must not be null");
+        }
+    }
+
+    public static MessageReceiver findReceiverByStemConsideringMatchingHost(Map<Object, MessageReceiver> receivers, String uri)
+    {
+        int match = -1;
+        MessageReceiver receiver = null;
+        final URI requestUri = URI.create(uri);
+
+        for (final Map.Entry<Object, MessageReceiver> e : receivers.entrySet())
+        {
+            try
+            {
+                final URI receiverUri = URI.create((String) e.getKey());
+                final MessageReceiver candidate = e.getValue();
+                int pathLength = replaceNull(receiverUri.getPath()).length();
+
+                if (uriStartsWith(requestUri, receiverUri) && match < pathLength)
+                {
+                    match = pathLength;
+                    receiver = candidate;
+                }
+            }
+            catch(IllegalArgumentException iae)
+            {
+                // Receiver key is not a valid URI, it won't match
+                continue;
+            }
+        }
+        return receiver;
     }
 
     public static MessageReceiver findReceiverByStem(Map<Object, MessageReceiver> receivers, String uriStr)
@@ -734,6 +787,45 @@ public class HttpConnector extends TcpConnector
         {
             super.returnDispatcher(endpoint, dispatcher);
         }
+    }
+
+    @Override
+    public MessageReceiver getReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint)
+    {
+        MessageReceiver receiver = super.getReceiver(flowConstruct, endpoint);
+        //if no receiver was found looking for an exact match, use lookupReceiver to see if there's one with a matching host and same port and path
+        if(receiver == null)
+        {
+            String key = (String) getReceiverKey(flowConstruct, endpoint);
+            receiver = lookupReceiver(key);
+        }
+        return receiver;
+    }
+
+    private static String replaceNull(String text)
+    {
+        return text == null? "" : text;
+    }
+
+    private static boolean uriStartsWith(URI requestUri, URI receiverUri)
+    {
+        return uriMatchesReceiverHostAndPort(requestUri, receiverUri)
+               && StringUtils.startsWith(requestUri.getPath(), receiverUri.getPath());
+    }
+
+    public static boolean uriMatchesReceiver(URI uri, URI receiverUri)
+    {
+        return uriMatchesReceiverHostAndPort(uri, receiverUri) &&
+               receiverUri.getPath().equalsIgnoreCase(uri.getPath());
+    }
+
+    private static boolean uriMatchesReceiverHostAndPort(URI uri, URI receiverUri)
+    {
+        return receiverUri.getPort() == uri.getPort() &&
+               StringUtils.equalsIgnoreCase(receiverUri.getScheme(), uri.getScheme()) &&
+               (HttpConnector.BIND_TO_ALL_INTERFACES_IP. equals(receiverUri.getHost()) ||
+                HttpConnector.BIND_TO_ALL_INTERFACES_IP.equals(uri.getHost()) ||
+                StringUtils.equalsIgnoreCase(receiverUri.getHost(), uri.getHost()));
     }
 
     protected void applyDispatcherLifecycle(MessageDispatcher dispatcher) throws MuleException
