@@ -22,8 +22,6 @@ public class AttributeEvaluator
 {
 
     private static final Pattern SINGLE_EXPRESSION_REGEX_PATTERN = Pattern.compile("^#\\[(?:(?!#\\[).)*\\]$");
-    private static final Pattern MULTIPLE_EXPRESSION_REGEX_PATTERN = Pattern.compile("#\\[[^\\[]*\\]");
-
 
     private enum AttributeType
     {
@@ -52,7 +50,7 @@ public class AttributeEvaluator
         {
             this.attributeType = AttributeType.EXPRESSION;
         }
-        else if (attributeValue != null && MULTIPLE_EXPRESSION_REGEX_PATTERN.matcher(attributeValue).find())
+        else if (attributeValue != null && isParseExpression(attributeValue))
         {
             this.attributeType = AttributeType.PARSE_EXPRESSION;
         }
@@ -60,6 +58,17 @@ public class AttributeEvaluator
         {
             this.attributeType = AttributeType.STATIC_VALUE;
         }
+    }
+
+    private boolean isParseExpression(String attributeValue)
+    {
+        final int beginExpression = attributeValue.indexOf("#[");
+        if (beginExpression == -1)
+        {
+            return false;
+        }
+        String remainingString = attributeValue.substring(beginExpression + "#[".length());
+        return remainingString.contains("]");
     }
 
     public boolean isExpression()
