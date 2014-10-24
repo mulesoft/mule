@@ -159,7 +159,7 @@ public class HttpConnector extends TcpConnector
     public static final String HTTP_ENCODE_PARAMVALUE = HTTP_PREFIX + "encode.paramvalue";
 
     public static final Set<String> HTTP_INBOUND_PROPERTIES;
-    
+
     protected Map<OutboundEndpoint, MessageDispatcher> endpointDispatchers = new ConcurrentHashMap<OutboundEndpoint, MessageDispatcher>();
 
     static
@@ -188,6 +188,9 @@ public class HttpConnector extends TcpConnector
     public static final String COOKIE_SPEC_RFC2109 = "rfc2109";
     public static final String ROOT_PATH = "/";
     public static final int DEFAULT_CONNECTION_TIMEOUT = 2000;
+
+    private static final String BIND_TO_ALL_INTERFACES_IP = "0.0.0.0";
+    private static final String LOOKUP_DEBUG_MESSAGE_FORMAT = "%s lookup of receiver on connector: %s with URI key: %s.";
 
     private String proxyHostname = null;
 
@@ -580,7 +583,10 @@ public class HttpConnector extends TcpConnector
             if (messageReceiver.getEndpointURI().getPort() == port)
             {
                 host = messageReceiver.getEndpointURI().getHost();
-                break;
+                if (!BIND_TO_ALL_INTERFACES_IP.equals(host))
+                {
+                     break;
+                }
             }
         }
         if (host == null)
@@ -604,28 +610,31 @@ public class HttpConnector extends TcpConnector
         // first check that there is a receiver on the root address
         if (logger.isTraceEnabled())
         {
-            logger.trace("Looking up receiver on connector: " + getName() + " with URI key: "
-                         + requestUri.toString());
+            logger.trace(String.format(LOOKUP_DEBUG_MESSAGE_FORMAT, "Primary", getName(), uriStr));
         }
 
         HttpMessageReceiver receiver = (HttpMessageReceiver) lookupReceiver(uriStr);
 
+        // check if there's a receiver bound to all interfaces with that path
+        if (receiver == null)
+        {
+            receiver = (HttpMessageReceiver) lookupReceiver(uriStr.replaceFirst(host, BIND_TO_ALL_INTERFACES_IP));
+        }
+
         // If no receiver on the root and there is a request path, look up the
-        // received based on the root plus request path
+        // received based on the root plus request path considering receivers bound to all interfaces
         if (receiver == null && !ROOT_PATH.equals(requestUriWithoutParams))
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Secondary lookup of receiver on connector: " + getName()
-                             + " with URI key: " + requestUri.toString());
+                logger.debug(String.format(LOOKUP_DEBUG_MESSAGE_FORMAT, "Secondary", getName(), uriStr));
             }
 
-            receiver = (HttpMessageReceiver) findReceiverByStem(getReceivers(), uriStr);
+            receiver = (HttpMessageReceiver) findReceiverByStem(getReceivers(), uriStr, host);
 
             if (receiver == null && logger.isWarnEnabled())
             {
-                logger.warn("No receiver found with secondary lookup on connector: " + getName()
-                            + " with URI key: " + requestUri.toString());
+                logger.warn(String.format(LOOKUP_DEBUG_MESSAGE_FORMAT, "No receiver found on secondary", getName(), uriStr));
                 logger.warn("Receivers on connector are: "
                             + MapUtils.toString(getReceivers(), true));
             }
@@ -652,6 +661,32 @@ public class HttpConnector extends TcpConnector
         }
     }
 
+    public static MessageReceiver findReceiverByStem(Map<Object, MessageReceiver> receivers, String uriStr, String host)
+    {
+        int match = 0;
+        MessageReceiver receiver = null;
+        String requestUri;
+        for (Map.Entry<Object, MessageReceiver> e : receivers.entrySet())
+        {
+            requestUri = uriStr;
+            String key = (String) e.getKey();
+            MessageReceiver candidate = e.getValue();
+            int pathLength = candidate.getEndpointURI().getPath().length();
+            if (BIND_TO_ALL_INTERFACES_IP.equals(candidate.getEndpointURI().getHost()))
+            {
+                requestUri = requestUri.replaceFirst(host, BIND_TO_ALL_INTERFACES_IP);
+            }
+            if (requestUri.startsWith(key) && match <= pathLength)
+                {
+                    match = pathLength;
+                    receiver = candidate;
+                }
+
+        }
+        return receiver;
+    }
+
+
     public static MessageReceiver findReceiverByStem(Map<Object, MessageReceiver> receivers, String uriStr)
     {
         int match = 0;
@@ -660,11 +695,13 @@ public class HttpConnector extends TcpConnector
         {
             String key = (String) e.getKey();
             MessageReceiver candidate = e.getValue();
-            if (uriStr.startsWith(key) && match < key.length())
+
+            if (uriStr.startsWith(key) && match <= key.length())
             {
                 match = key.length();
                 receiver = candidate;
             }
+
         }
         return receiver;
     }
@@ -734,6 +771,42 @@ public class HttpConnector extends TcpConnector
         {
             super.returnDispatcher(endpoint, dispatcher);
         }
+    }
+
+    @Override
+    public MessageReceiver getReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint)
+    {
+        MessageReceiver receiver = super.getReceiver(flowConstruct, endpoint);
+
+        if(receiver == null)
+        {
+            String key = (String) getReceiverKey(flowConstruct, endpoint);
+            EndpointURI endpointURI = endpoint.getEndpointURI();
+            if (BIND_TO_ALL_INTERFACES_IP.equals(endpointURI.getHost()))
+            {
+                //check if there's another receiver with that port and path
+                for (MessageReceiver existingReceiver : receivers.values())
+                {
+                    if (matchesPortAndPath(existingReceiver.getEndpointURI(), endpointURI))
+                    {
+                        receiver = existingReceiver;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                //check if there's an endpoint with the same port and path but host 0.0.0.0
+                String host = endpoint.getEndpointURI().getHost();
+                receiver = receivers.get(key.replaceFirst(host,BIND_TO_ALL_INTERFACES_IP));
+            }
+        }
+        return receiver;
+    }
+
+    private boolean matchesPortAndPath(EndpointURI endpointURI, EndpointURI otherEndpointURI)
+    {
+        return endpointURI.getPort() == otherEndpointURI.getPort() && endpointURI.getPath().equals(otherEndpointURI.getPath());
     }
 
     protected void applyDispatcherLifecycle(MessageDispatcher dispatcher) throws MuleException
