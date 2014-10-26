@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/oauth2"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            xmlns:http="http://www.mulesoft.org/schema/mule/http"
+            targetNamespace="http://www.mulesoft.org/schema/mule/oauth2"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.6/mule.xsd"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans/spring-beans-current.xsd"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/http"
+                schemaLocation="http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd"/>
+
+    <xsd:element name="authorization-code-config" substitutionGroup="mule:abstract-shared-extension"
+                 type="authorizationCodeConfigType">
+        <xsd:annotation>
+            <xsd:documentation>
+                OAuth configuration for authenticate using OAuth 2.0 grant type authorization code.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="authorizationCodeConfigType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                <xsd:sequence>
+                    <xsd:element name="authorization-request" minOccurs="0" maxOccurs="1" type="authorizationRequestType">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                This element configures an automatic flow created by mule to handle
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:choice>
+                        <xsd:element name="token-request" type="tokenRequestType" minOccurs="0" maxOccurs="1">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    This element configures an automatic flow created by mule that listens in the configured url by the redirectUrl attribute and process the request to
+                                    retrieve an access token from the oauth authentication server.
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:element name="custom-token-request" minOccurs="0" maxOccurs="1" type="customTokenRequestType">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    This element allows to configure flows for processing the redirectUrl callback and handle a access token refresh.
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                    </xsd:choice>
+                </xsd:sequence>
+                <xsd:attribute name="name" type="mule:substitutableName" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifier for the authorization code configuration so other elements can reference it.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="clientId" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Application identifier as defined in the oauth authentication server.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="clientSecret" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Application secret as defined in the oauth authentication server.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="redirectionUrl" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The oauth authentication server will use this url to provide the authentication code to the Mule server so the mule server can
+                            retrieve the access token. If this attribute is provided mule will automatically create an endpoint in this url to be able to
+                            store the authentication code unless there’s already an endpoint registered to manually extract the authorization code
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="oauthStateId" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifier under which the oauth authentication attributes are stored (accessToken, refreshToken, etc).
+                            This attribute is only required when the applications needs to access resources from more than one user in the OAuth authentication server.
+                            A MEL expression can be used and it will be evaluated against the request done to localAuthorizationUrl in the authorization-request element.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="requestConfig" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            References an HTTP request-config element. This allows to define trusted certificates when using SSL in the OAuth dance.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="listenerConfig" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            References and HTTP listener-config element. This allows to define the keystore and truststore to
+                            use when using HTTPS in the OAuth dance for the localAuthenticationUrl of the authoriation-request element
+                            or when listening on the redirectUrl to process the OAuth callback.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="customTokenRequestType">
+        <xsd:attribute name="refreshTokenWhen" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    After executing an API call authenticated with OAuth it may be that the access token used was expired, so this attribute allows a
+                    MEL expressions that will be evaluated against the http response of the API callback to determine if the request failed because it was done
+                    using an expired token. In case the evaluation returns true (access token expired) then mule will automatically trigger a refresh token flow and retry
+                    the API callback using a new access token. Default value evaluates if the response status code was 401 or 403.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="tokenUrlCallFlow" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Flow to use when a redirectUrl call was received from the oauth authentication server. Mule will automatically create an listener in the redirectUrl url and redirect
+                    the calls to that listener to this flow. This flow then will have to manually make a call to the oauth authentication server url to retrieve the access token, refresh token and
+                    other custom values and store them in the oauth state for that user using the oauthState MEL functions. Most likely the request received by the oauth authentication sever will receive the
+                    oauth protocol code and state in a query parameter.
+                    This attribute is optional since the user can also define a flow with a listener in the redirectUrl. In that case mule won't create the listener automatically.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="refreshTokenFlow" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Flow to use when the access token was expired. Access token will be defined as expired when the execution of the refreshTokenWhen MEL expression returns true. In that case Mule will automatically
+                    executed the refreshTokenFlow. The refreshTokenFlow can use the oauthState MEL function to retrieve the refresh token and call the token url in the oauth authentication server. Then it the flow must
+                    process the token url call response and store the new access token and refresh token using the store-authorization-code-state operation.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="tokenRequestType">
+        <xsd:sequence>
+            <xsd:element name="token-response" minOccurs="0" maxOccurs="1" type="tokenResponseType">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Configures how to handle the response from the call to tokenUrl. Allows to define expressions to extract parameters from the response.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="tokenUrl" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The oauth authentication server url to get access to the token. Mule, after receiving the authentication code from the oauth server (through the redirectUrl) will
+                    call this url to get the access token.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="refreshTokenWhen" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    After executing an API call authenticated with OAuth it may be that the access token used was expired, so this attribute allows a
+                    MEL expressions that will be evaluated against the http response of the API callback to determine if the request failed because it was done
+                    using an expired token. In case the evaluation returns true (access token expired) then mule will automatically trigger a refresh token flow and retry
+                    the API callback using a new access token. Default value evaluates if the response status code was 401 or 403.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="tokenResponseType">
+        <xsd:sequence>
+            <xsd:element name="custom-parameter-extractor" minOccurs="0" maxOccurs="unbounded" type="customParameterExtractorType">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Configures a custom parameter that must be extracted from the response of the tokenUrl url call.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="accessToken" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    MEL expression to extract the access token parameter.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="refreshToken" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    MEL expression to extract the refresh token parameter.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="expiresIn" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    MEL expression to extract the expired in parameter.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="customParameterExtractorType">
+        <xsd:attribute name="paramName" type="xsd:string"
+                       use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Identifier under which the extracted value will be stored in the OAuth authentication state.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="value" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    MEL expression to extract the parameter value. This value can be later used by using the oauthState function.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="authorizationRequestType">
+        <xsd:sequence>
+            <xsd:element name="custom-parameters" minOccurs="0" maxOccurs="1" type="customParametersType">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Custom parameters to send to the authorization request url or the oauth authorization sever.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="localAuthorizationUrl" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    If this attribute is provided mule will automatically create and endpoint in the host server that the user can hit to authenticate and grant access to the application for his account.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="authorizationUrl" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The oauth authentication server url to authorize the app for a certain user.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="scopes" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Scope required by this application to execute. Scopes define permissions over resources.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="state" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    State parameter for holding state between the authentication request and the callback done by the oauth authorization server to the redirectUrl.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="customParametersType">
+        <xsd:sequence>
+            <xsd:element name="custom-parameter" minOccurs="1" maxOccurs="unbounded">
+                <xsd:complexType>
+                    <xsd:attribute name="paramName" type="xsd:string" use="required">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Name of the additional query parameter.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="value" type="xsd:string" use="required">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Value for the request parameter. It can be a MEL expression that will be evaluated against the message received by the localAuthenticationUrl url.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="authorization-code-authentication" substitutionGroup="http:abstract-http-request-authentication-provider">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="http:abstractHttpRequestAuthenticationProvider">
+                    <xsd:attribute name="config" type="xsd:string" use="required">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Authorization code config that was used to authorize the user.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="oauthStateId" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Identifier of the oauth state (access token, refresh token etc) of a particular authorized account. A MEL expression can be used to determine
+                                the state dynamically. If not provided then the default oauth state identifier will be used.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="store-authorization-code-state" substitutionGroup="mule:abstract-message-processor">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="mule:abstractMessageProcessorType">
+                    <xsd:attribute name="config" type="xsd:string" use="required">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Authorization code config that is used to authorize the user.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="oauthStateId" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Identifier of the oauth state (access token, refresh token etc) of a particular authorized account. A MEL expression can be used to determine
+                                the state dynamically. If not provided then the default oauth state identifier will be used.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="accessToken" type="xsd:string" use="required">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The oauth access token returned by the oauth authorization sever after calling the token url.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="refreshToken" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The oauth refresh token returned by the oauth authorization sever after calling the token url.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="expiresIn" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The oauth expires in returned by the oauth authorization sever after calling the token url.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+</xsd:schema>
