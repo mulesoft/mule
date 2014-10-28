@@ -7,10 +7,13 @@
 package org.mule.module.launcher.coreextension;
 
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.MuleCoreExtension;
+import org.mule.module.launcher.ApplicationDeploymentListener;
+import org.mule.module.launcher.DomainDeploymentListener;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentService;
 import org.mule.module.launcher.DeploymentServiceAware;
@@ -28,7 +31,6 @@ import org.mockito.InOrder;
 @SmallTest
 public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCase
 {
-
     private final MuleCoreExtensionDiscoverer coreExtensionDiscoverer = mock(MuleCoreExtensionDiscoverer.class);
     private final MuleCoreExtensionDependencyResolver coreExtensionDependencyResolver = mock(MuleCoreExtensionDependencyResolver.class);
     private MuleCoreExtensionManager coreExtensionManager = new DefaultMuleCoreExtensionManager(coreExtensionDiscoverer, coreExtensionDependencyResolver);
@@ -70,6 +72,41 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
         coreExtensionManager.initialise();
 
         verify(deploymentService).addDeploymentListener(extension);
+        verify(deploymentService).addDomainDeploymentListener(extension);
+    }
+
+    @Test
+    public void initializesApplicationDeploymentListenerCoreExtension() throws Exception
+    {
+        List<MuleCoreExtension> extensions = new LinkedList<MuleCoreExtension>();
+        TestApplicationDeploymentListenerExtension extension = mock(TestApplicationDeploymentListenerExtension.class);
+        extensions.add(extension);
+        when(coreExtensionDiscoverer.discover()).thenReturn(extensions);
+
+        DeploymentService deploymentService = mock(DeploymentService.class);
+        coreExtensionManager.setDeploymentService(deploymentService);
+
+        coreExtensionManager.initialise();
+
+        verify(deploymentService).addDeploymentListener(extension);
+        verify(deploymentService, never()).addDomainDeploymentListener(extension);
+    }
+
+    @Test
+    public void initializesDomainDeploymentListenerCoreExtension() throws Exception
+    {
+        List<MuleCoreExtension> extensions = new LinkedList<MuleCoreExtension>();
+        TestDomainDeploymentListenerExtension extension = mock(TestDomainDeploymentListenerExtension.class);
+        extensions.add(extension);
+        when(coreExtensionDiscoverer.discover()).thenReturn(extensions);
+
+        DeploymentService deploymentService = mock(DeploymentService.class);
+        coreExtensionManager.setDeploymentService(deploymentService);
+
+        coreExtensionManager.initialise();
+
+        verify(deploymentService).addDomainDeploymentListener(extension);
+        verify(deploymentService, never()).addDeploymentListener(extension);
     }
 
     @Test
@@ -170,19 +207,18 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
         verify(coreExtensionDependencyResolver).resolveDependencies(extensions);
     }
 
-    public static interface TestDeploymentServiceAwareExtension extends MuleCoreExtension, DeploymentServiceAware
-    {
+    public static interface TestDeploymentServiceAwareExtension
+            extends MuleCoreExtension, DeploymentServiceAware {}
 
-    }
+    public static interface TestDeploymentListenerExtension
+            extends MuleCoreExtension, DeploymentListener {}
 
-    public static interface TestDeploymentListenerExtension extends MuleCoreExtension, DeploymentListener
-    {
+    public static interface TestApplicationDeploymentListenerExtension
+            extends MuleCoreExtension, ApplicationDeploymentListener {}
 
-    }
+    public static interface TestDomainDeploymentListenerExtension
+            extends MuleCoreExtension, DomainDeploymentListener {}
 
-    public static interface TestPluginClassLoaderManagerAwareExtension extends MuleCoreExtension, PluginClassLoaderManagerAware
-    {
-
-    }
-
+    public static interface TestPluginClassLoaderManagerAwareExtension
+            extends MuleCoreExtension, PluginClassLoaderManagerAware {}
 }
