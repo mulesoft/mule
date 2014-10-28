@@ -10,6 +10,8 @@ import org.mule.MuleCoreExtension;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.module.launcher.ApplicationDeploymentListener;
+import org.mule.module.launcher.DomainDeploymentListener;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentService;
 import org.mule.module.launcher.DeploymentServiceAware;
@@ -123,9 +125,18 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
                 ((DeploymentServiceAware) extension).setDeploymentService(deploymentService);
             }
 
-            if (extension instanceof DeploymentListener)
+            if (extension instanceof ApplicationDeploymentListener)
+            {
+                deploymentService.addDeploymentListener((ApplicationDeploymentListener) extension);
+            }
+            else if (extension instanceof DomainDeploymentListener)
+            {
+                deploymentService.addDomainDeploymentListener((DomainDeploymentListener) extension);
+            }
+            else if (extension instanceof DeploymentListener)
             {
                 deploymentService.addDeploymentListener((DeploymentListener) extension);
+                deploymentService.addDomainDeploymentListener((DeploymentListener) extension);
             }
 
             if (extension instanceof PluginClassLoaderManagerAware)
