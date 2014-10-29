@@ -7,6 +7,8 @@
 
 package org.mule.module.db.test.util;
 
+import static org.mockito.Mockito.mock;
+
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
@@ -887,7 +889,7 @@ public abstract class AbstractInMemoryResultSet implements ResultSet
     {
         checkOpenResultSet();
 
-        throw new UnsupportedOperationException();
+        return  mock(Statement.class);
     }
 
     @Override
