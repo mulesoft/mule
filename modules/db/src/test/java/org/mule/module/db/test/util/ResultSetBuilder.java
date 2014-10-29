@@ -8,6 +8,7 @@
 package org.mule.module.db.test.util;
 
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,10 +21,17 @@ public class ResultSetBuilder
 
     private final List<ColumnMetadata> columns;
     private final List<Map<String, Object>> records = new ArrayList<Map<String, Object>>();
+    private final Statement statement;
 
     public ResultSetBuilder(List<ColumnMetadata> columns)
     {
+        this(columns, null);
+    }
+
+    public ResultSetBuilder(List<ColumnMetadata> columns, Statement statement)
+    {
         this.columns = columns;
+        this.statement = statement;
     }
 
     public ResultSetBuilder with(Map<String, Object> record)
@@ -42,6 +50,6 @@ public class ResultSetBuilder
 
     public ResultSet build()
     {
-        return new InMemoryResultSet(columns, records);
+        return new InMemoryResultSet(columns, records, statement);
     }
 }
