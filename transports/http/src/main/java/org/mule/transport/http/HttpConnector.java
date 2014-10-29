@@ -823,9 +823,22 @@ public class HttpConnector extends TcpConnector
     {
         return receiverUri.getPort() == uri.getPort() &&
                StringUtils.equalsIgnoreCase(receiverUri.getScheme(), uri.getScheme()) &&
+               matchesUserInfo(uri, receiverUri) &&
                (HttpConnector.BIND_TO_ALL_INTERFACES_IP. equals(receiverUri.getHost()) ||
                 HttpConnector.BIND_TO_ALL_INTERFACES_IP.equals(uri.getHost()) ||
                 StringUtils.equalsIgnoreCase(receiverUri.getHost(), uri.getHost()));
+    }
+
+    private static boolean matchesUserInfo(URI uri, URI receiverUri)
+    {
+        if (uri.getUserInfo() == null)
+        {
+            return receiverUri.getUserInfo() == null;
+        }
+        else
+        {
+            return uri.getUserInfo().equals(receiverUri.getUserInfo());
+        }
     }
 
     protected void applyDispatcherLifecycle(MessageDispatcher dispatcher) throws MuleException
