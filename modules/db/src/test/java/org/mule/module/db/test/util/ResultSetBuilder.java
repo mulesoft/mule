@@ -18,8 +18,8 @@ import java.util.Map;
 public class ResultSetBuilder
 {
 
-    private final List<ColumnMetadata> columns;
-    private final List<Map<String, Object>> records = new ArrayList<Map<String, Object>>();
+    protected final List<ColumnMetadata> columns;
+    protected final List<Map<String, Object>> records = new ArrayList<Map<String, Object>>();
 
     public ResultSetBuilder(List<ColumnMetadata> columns)
     {

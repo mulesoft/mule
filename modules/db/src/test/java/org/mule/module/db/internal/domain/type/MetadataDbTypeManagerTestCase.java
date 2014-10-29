@@ -1,0 +1,130 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+package org.mule.module.db.internal.domain.type;
+
+import static junit.framework.TestCase.fail;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import org.mule.module.db.internal.domain.connection.DbConnection;
+import org.mule.module.db.test.util.ColumnMetadata;
+import org.mule.module.db.test.util.InMemoryResultSet;
+import org.mule.module.db.test.util.ResultSetBuilder;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
+
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.Test;
+
+@SmallTest
+public class MetadataDbTypeManagerTestCase extends AbstractMuleTestCase
+{
+
+    private static final DbType UDT_ARRAY = new ResolvedDbType(Types.ARRAY, "UDT_ARRAY");
+    private static final DbType UDT_DISTINCT = new ResolvedDbType(Types.DISTINCT, "UDT_DISTINCT");
+    private static final DbType UDT_STRUCT = new ResolvedDbType(Types.STRUCT, "UDT_STRUCT");
+    private static final DbType UDT_OK = new ResolvedDbType(1, "UDT_OK");
+
+    @Test
+    public void ignoreUserDefinedTypes() throws Exception
+    {
+        DatabaseMetaData metaData = mock(DatabaseMetaData.class);
+        when(metaData.getTypeInfo()).thenReturn(createResultSetWithUserDefinedTypes());
+
+        DbConnection connection = mock(DbConnection.class);
+        when(connection.getMetaData()).thenReturn(metaData);
+
+        MetadataDbTypeManager typeManager = new MetadataDbTypeManager();
+
+        assertThat(typeManager.lookup(connection, UDT_OK.getId(), UDT_OK.getName()), instanceOf(DbType.class));
+
+        assertNotContainsUserDefinedType(typeManager, connection, UDT_ARRAY);
+        assertNotContainsUserDefinedType(typeManager, connection, UDT_DISTINCT);
+        assertNotContainsUserDefinedType(typeManager, connection, UDT_STRUCT);
+    }
+
+    private void assertNotContainsUserDefinedType(MetadataDbTypeManager typeManager, DbConnection connection, DbType udtDbType)
+    {
+        try
+        {
+            typeManager.lookup(connection, udtDbType.getId(), udtDbType.getName());
+            fail("User defined types must not be registered by the MetadataDbTypeManager.");
+        }
+        catch(UnknownDbTypeException e)
+        {
+            // Expected
+        }
+    }
+
+    private ResultSet createResultSetWithUserDefinedTypes() throws SQLException
+    {
+        List<ColumnMetadata> columns = new ArrayList<ColumnMetadata>();
+        columns.add(new ColumnMetadata(MetadataDbTypeManager.METADATA_TYPE_ID_COLUMN, MetadataDbTypeManager.METADATA_TYPE_ID_COLUMN, 1));
+        columns.add(new ColumnMetadata(MetadataDbTypeManager.METADATA_TYPE_NAME_COLUMN, MetadataDbTypeManager.METADATA_TYPE_NAME_COLUMN, 2));
+
+        ClosableResultSetBuilder resultSetBuilder = new ClosableResultSetBuilder(columns);
+
+        addRecord(resultSetBuilder, UDT_ARRAY);
+        addRecord(resultSetBuilder, UDT_DISTINCT);
+        addRecord(resultSetBuilder, UDT_STRUCT);
+        addRecord(resultSetBuilder, UDT_OK);
+
+        return resultSetBuilder.build();
+    }
+
+    private void addRecord(ResultSetBuilder resultSetBuilder, DbType dbType)
+    {
+        Map<String, Object> record = new HashMap<String, Object>();
+        record.put(MetadataDbTypeManager.METADATA_TYPE_ID_COLUMN, dbType.getId());
+        record.put(MetadataDbTypeManager.METADATA_TYPE_NAME_COLUMN, dbType.getName());
+        resultSetBuilder.with(record);
+    }
+
+    private static class ClosableInMemoryResultSet extends InMemoryResultSet
+    {
+        private Statement closableStatement = mock(Statement.class);
+
+        public ClosableInMemoryResultSet(List<ColumnMetadata> columns, List<Map<String, Object>> records)
+        {
+            super(columns, records);
+        }
+
+        @Override
+        public Statement getStatement() throws SQLException
+        {
+            return closableStatement;
+        }
+    }
+
+    private static class ClosableResultSetBuilder extends ResultSetBuilder
+    {
+
+        public ClosableResultSetBuilder(List<ColumnMetadata> columns)
+        {
+            super(columns);
+        }
+
+        @Override
+        public ResultSet build()
+        {
+            return new ClosableInMemoryResultSet(columns, records);
+        }
+
+    }
+
+}

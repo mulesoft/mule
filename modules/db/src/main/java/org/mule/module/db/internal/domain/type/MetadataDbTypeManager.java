@@ -28,6 +28,9 @@ import org.apache.commons.logging.LogFactory;
 public class MetadataDbTypeManager implements DbTypeManager
 {
 
+    static final String METADATA_TYPE_ID_COLUMN = "DATA_TYPE";
+    static final String METADATA_TYPE_NAME_COLUMN = "TYPE_NAME";
+
     private final Log logger = LogFactory.getLog(MetadataDbTypeManager.class);
 
     private final Map<String, DbType> typesById = new HashMap<String, DbType>();
@@ -61,7 +64,7 @@ public class MetadataDbTypeManager implements DbTypeManager
             }
         }
 
-        String typeKey = name+  id;
+        String typeKey = name + id;
         if (typesById.containsKey(typeKey))
         {
             return typesById.get(typeKey);
@@ -93,13 +96,19 @@ public class MetadataDbTypeManager implements DbTypeManager
             {
                 Map<String, Object> typeRecord = resultSetIterator.next();
 
-                Number data_type = (Number) typeRecord.get("DATA_TYPE");
-                String type_name = (String) typeRecord.get("TYPE_NAME");
-                registerType(new ResolvedDbType(data_type.intValue(), type_name));
+                Number data_type = (Number) typeRecord.get(METADATA_TYPE_ID_COLUMN);
+                String type_name = (String) typeRecord.get(METADATA_TYPE_NAME_COLUMN);
 
-                if (logger.isDebugEnabled())
+                ResolvedDbType resolvedDbType = new ResolvedDbType(data_type.intValue(), type_name);
+
+                if( !isUserDefinedType(resolvedDbType) )
                 {
-                    logger.debug("Type: " + typeRecord);
+                    registerType(resolvedDbType);
+
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Type: " + typeRecord);
+                    }
                 }
             }
         }
@@ -107,5 +116,17 @@ public class MetadataDbTypeManager implements DbTypeManager
         {
             throw new IllegalStateException("Cannot process metadata information", e);
         }
+    }
+
+    private boolean isUserDefinedType(DbType dbType)
+    {
+        return sameIdDifferentName(dbType, JdbcTypes.STRUCT_DB_TYPE) ||
+               sameIdDifferentName(dbType, JdbcTypes.DISTINCT_DB_TYPE) ||
+               sameIdDifferentName(dbType, JdbcTypes.ARRAY_DB_TYPE);
+    }
+
+    private boolean sameIdDifferentName(DbType dbType1, DbType dbType2 )
+    {
+        return dbType1.getId()==dbType2.getId() && !dbType1.getName().equals(dbType2.getName());
     }
 }
