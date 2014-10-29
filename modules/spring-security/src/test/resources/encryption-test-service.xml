@@ -39,7 +39,7 @@
                 <vm:inbound-endpoint path="my.queue" exchange-pattern="request-response">
                     <encryption-security-filter strategy-ref="PBE"/>
                 </vm:inbound-endpoint>
-                <inbound-endpoint address="http://localhost:4567">
+                <inbound-endpoint address="http://localhost:${port1}">
                     <encryption-security-filter strategy-ref="PBE"/>
                 </inbound-endpoint>
             </inbound>

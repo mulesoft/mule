@@ -33,7 +33,7 @@
     <model name="http secured test model">
         <service name="SecureUMO">
             <inbound>
-                <inbound-endpoint address="http://localhost:4567" exchange-pattern="request-response" connector-ref="HttpConnector">
+                <inbound-endpoint address="http://localhost:${port1}" exchange-pattern="request-response" connector-ref="HttpConnector">
                     <mule-ss:http-security-filter realm="mule-realm"/>
                 </inbound-endpoint>
             </inbound>
