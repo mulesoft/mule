@@ -28,6 +28,9 @@ import org.apache.commons.logging.LogFactory;
 public class MetadataDbTypeManager implements DbTypeManager
 {
 
+    static final String METADATA_TYPE_ID_COLUMN = "DATA_TYPE";
+    static final String METADATA_TYPE_NAME_COLUMN = "TYPE_NAME";
+
     private final Log logger = LogFactory.getLog(MetadataDbTypeManager.class);
 
     private final Map<String, DbType> typesById = new HashMap<String, DbType>();
@@ -61,7 +64,7 @@ public class MetadataDbTypeManager implements DbTypeManager
             }
         }
 
-        String typeKey = name+  id;
+        String typeKey = name + id;
         if (typesById.containsKey(typeKey))
         {
             return typesById.get(typeKey);
@@ -93,13 +96,19 @@ public class MetadataDbTypeManager implements DbTypeManager
             {
                 Map<String, Object> typeRecord = resultSetIterator.next();
 
-                Number data_type = (Number) typeRecord.get("DATA_TYPE");
-                String type_name = (String) typeRecord.get("TYPE_NAME");
-                registerType(new ResolvedDbType(data_type.intValue(), type_name));
+                Number data_type = (Number) typeRecord.get(METADATA_TYPE_ID_COLUMN);
+                String type_name = (String) typeRecord.get(METADATA_TYPE_NAME_COLUMN);
 
-                if (logger.isDebugEnabled())
+                ResolvedDbType resolvedDbType = new ResolvedDbType(data_type.intValue(), type_name);
+
+                if (!isUserDefinedType(resolvedDbType))
                 {
-                    logger.debug("Type: " + typeRecord);
+                    registerType(resolvedDbType);
+
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Type: " + typeRecord);
+                    }
                 }
             }
         }
@@ -107,5 +116,25 @@ public class MetadataDbTypeManager implements DbTypeManager
         {
             throw new IllegalStateException("Cannot process metadata information", e);
         }
+    }
+
+    /**
+     * According to documentation STRUCT and DISTINCT types with name different than "STRUCT" and "DISTINCT" should
+     * be considered user defined types: http://docs.oracle.com/javase/7/docs/api/java/sql/DatabaseMetaData.html#getTypeInfo()
+     * Note: documentation says nothing about ARRAY types with a different name than ARRAY, but postgres returns two
+     * different user defined types for each defined table, one with the name of the table and type STRUCT, and another
+     * one with the name of the table prefixed by an underscore and type ARRAY.
+     * We assume that ARRAY is behaving the same as STRUCT and DISTINCT in this aspect.
+     */
+    private boolean isUserDefinedType(DbType dbType)
+    {
+        return isTypeDerivedFrom(dbType, JdbcTypes.STRUCT_DB_TYPE) ||
+               isTypeDerivedFrom(dbType, JdbcTypes.DISTINCT_DB_TYPE) ||
+               isTypeDerivedFrom(dbType, JdbcTypes.ARRAY_DB_TYPE);
+    }
+
+    private boolean isTypeDerivedFrom(DbType type, DbType baseType)
+    {
+        return type.getId() == baseType.getId() && !type.getName().equals(baseType.getName());
     }
 }
