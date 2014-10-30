@@ -43,6 +43,7 @@ public abstract class AbstractInMemoryResultSet implements ResultSet
     private final Map<Integer, ColumnMetadata> columnsByIndex = new HashMap<Integer, ColumnMetadata>();
     private List<ColumnMetadata> columns;
     private final List<Map<String, Object>> records;
+    private final Statement statement;
 
     private int currentColumnIndex = 0;
     private boolean closed;
@@ -54,10 +55,11 @@ public abstract class AbstractInMemoryResultSet implements ResultSet
      * @param columns column definitions
      * @param records values for each record using the order defined in the columns
      */
-    public AbstractInMemoryResultSet(List<ColumnMetadata> columns, List<Map<String, Object>> records)
+    public AbstractInMemoryResultSet(List<ColumnMetadata> columns, List<Map<String, Object>> records, Statement statement)
     {
         this.columns = columns;
         this.records = records;
+        this.statement = statement;
 
         for (ColumnMetadata column : columns)
         {
@@ -887,7 +889,7 @@ public abstract class AbstractInMemoryResultSet implements ResultSet
     {
         checkOpenResultSet();
 
-        throw new UnsupportedOperationException();
+        return statement;
     }
 
     @Override
