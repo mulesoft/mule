@@ -19,7 +19,7 @@
                http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-current.xsd">
 
     <http:request-config host="localhost" port="${port}" name="customConfig">
-        <http:basic-auth username="user" password="pass" />
+        <http:basic-authentication username="user" password="pass" />
     </http:request-config>
 
     <ws:consumer-config wsdlLocation="Test.wsdl" service="TestService" port="TestPort"
