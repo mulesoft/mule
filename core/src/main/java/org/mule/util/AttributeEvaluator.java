@@ -144,6 +144,16 @@ public class AttributeEvaluator
         return value.toString();
     }
 
+    public Boolean resolveBooleanValue(MuleEvent event)
+    {
+        final Object value = resolveValue(event);
+        if (value == null || value instanceof Boolean)
+        {
+            return (Boolean) value;
+        }
+        return Boolean.valueOf(value.toString());
+    }
+
     public String getRawValue()
     {
         return attributeValue;

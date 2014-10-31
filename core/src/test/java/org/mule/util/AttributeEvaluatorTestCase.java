@@ -7,20 +7,14 @@
 package org.mule.util;
 
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.Is.isA;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.api.MuleEvent;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import org.hamcrest.core.IsNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -134,6 +128,26 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase
         final long expectedValue = 1234l;
         when(mockExpressionManager.evaluate(Mockito.anyString(), Mockito.any(MuleEvent.class))).thenReturn(expectedValue);
         assertThat(attributeEvaluator.resolveIntegerValue(mockMuleEvent), is((int)expectedValue));
+    }
+
+    @Test
+    public void resolveBooleanWithBooleanStringValue()
+    {
+        AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[expression]");
+        attributeEvaluator.initialize(mockExpressionManager);
+        final String expectedValue = "true";
+        when(mockExpressionManager.evaluate(Mockito.anyString(), Mockito.any(MuleEvent.class))).thenReturn(expectedValue);
+        assertThat(attributeEvaluator.resolveBooleanValue(mockMuleEvent), is(Boolean.valueOf(expectedValue)));
+    }
+
+    @Test
+    public void resolveBooleanWithBooleanValue()
+    {
+        AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[expression]");
+        attributeEvaluator.initialize(mockExpressionManager);
+        final Boolean expectedValue = true;
+        when(mockExpressionManager.evaluate(Mockito.anyString(), Mockito.any(MuleEvent.class))).thenReturn(expectedValue);
+        assertThat(attributeEvaluator.resolveBooleanValue(mockMuleEvent), is(Boolean.valueOf(expectedValue)));
     }
 
     @Test(expected = NumberFormatException.class)
