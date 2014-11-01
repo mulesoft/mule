@@ -9,12 +9,20 @@ package org.mule.module.ws.consumer;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.config.ConfigurationException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.Connector;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.MuleEndpointURI;
+import org.mule.module.http.HttpRequestConfig;
+import org.mule.module.http.HttpRequester;
+import org.mule.module.http.SuccessStatusCodeValidator;
+import org.mule.module.http.request.HttpRequesterBuilder;
 import org.mule.module.ws.security.WSSecurity;
+import org.mule.transport.http.HttpConnector;
 import org.mule.util.Preconditions;
 import org.mule.util.StringUtils;
 
@@ -28,6 +36,7 @@ public class WSConsumerConfig implements MuleContextAware
     private String port;
     private String serviceAddress;
     private Connector connector;
+    private HttpRequestConfig connectorConfig;
     private WSSecurity security;
 
     @Override
@@ -39,10 +48,49 @@ public class WSConsumerConfig implements MuleContextAware
     /**
      * Creates an outbound endpoint for the service address.
      */
-    public OutboundEndpoint createOutboundEndpoint() throws MuleException
+    public MessageProcessor createOutboundMessageProcessor() throws MuleException
     {
         Preconditions.checkState(StringUtils.isNotEmpty(serviceAddress), "No serviceAddress provided in WS consumer config");
 
+        if (connectorConfig != null && connector != null)
+        {
+            throw new ConfigurationException(CoreMessages.createStaticMessage("Cannot set both connector-config and connector-ref attributes. Set either one of them, or none for default behavior."));
+        }
+
+        if (useHttpModule())
+        {
+            return createHttpRequester();
+        }
+        else
+        {
+            return createOutboundEndpoint();
+        }
+    }
+
+
+    private boolean useHttpModule()
+    {
+        if (connectorConfig != null)
+        {
+            return true;
+        }
+        if (!isHttp())
+        {
+            return false;
+        }
+        if (connector != null)
+        {
+            return false;
+        }
+        if (muleContext.getConfiguration().useHttpTransportByDefault())
+        {
+            return false;
+        }
+        return true;
+    }
+
+    private OutboundEndpoint createOutboundEndpoint() throws MuleException
+    {
         EndpointBuilder builder = muleContext.getEndpointFactory().getEndpointBuilder(serviceAddress);
 
         if (connector != null)
@@ -59,6 +107,31 @@ public class WSConsumerConfig implements MuleContextAware
         return muleContext.getEndpointFactory().getOutboundEndpoint(builder);
     }
 
+    private MessageProcessor createHttpRequester() throws MuleException
+    {
+        HttpRequesterBuilder requesterBuilder = new HttpRequesterBuilder(muleContext);
+
+        requesterBuilder.setAddress(serviceAddress).setMethod("POST").setParseResponse(false);
+
+        if (connectorConfig != null)
+        {
+            requesterBuilder.setConfig(connectorConfig);
+        }
+
+        HttpRequester httpRequester = requesterBuilder.build();
+
+        // Do not throw exception on invalid status code, let CXF process it.
+        httpRequester.setStatusCodeValidator(new SuccessStatusCodeValidator("0..599"));
+
+        httpRequester.initialise();
+
+        return httpRequester;
+    }
+
+    private boolean isHttp()
+    {
+        return serviceAddress.startsWith(HttpConnector.HTTP);
+    }
 
     public String getName()
     {
@@ -118,6 +191,16 @@ public class WSConsumerConfig implements MuleContextAware
     public void setConnector(Connector connector)
     {
         this.connector = connector;
+    }
+
+    public HttpRequestConfig getConnectorConfig()
+    {
+        return connectorConfig;
+    }
+
+    public void setConnectorConfig(HttpRequestConfig connectorConfig)
+    {
+        this.connectorConfig = connectorConfig;
     }
 
     public WSSecurity getSecurity()

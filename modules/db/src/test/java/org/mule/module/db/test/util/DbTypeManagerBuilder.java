@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import org.mule.module.db.internal.domain.connection.DbConnection;
 import org.mule.module.db.internal.domain.type.DbType;
 import org.mule.module.db.internal.domain.type.DbTypeManager;
+import org.mule.module.db.internal.domain.type.UnknownDbTypeException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,7 @@ public class DbTypeManagerBuilder
 
     private DbConnection connection;
     private List<DbType> types = new ArrayList<DbType>();
+    private List<DbType> unknownTypes = new ArrayList<DbType>();
 
     public DbTypeManagerBuilder on(DbConnection connection)
     {
@@ -39,6 +41,13 @@ public class DbTypeManagerBuilder
         return this;
     }
 
+    public DbTypeManagerBuilder unknowing(DbType type)
+    {
+        unknownTypes.add(type);
+
+        return this;
+    }
+
     public DbTypeManager build()
     {
         DbTypeManager dbTypeManager = mock(DbTypeManager.class);
@@ -46,6 +55,11 @@ public class DbTypeManagerBuilder
         for (DbType type : types)
         {
             when(dbTypeManager.lookup(connection, type.getId(), type.getName())).thenReturn(type);
+        }
+
+        for (DbType type : unknownTypes)
+        {
+            when(dbTypeManager.lookup(connection, type.getId(), type.getName())).thenThrow(new UnknownDbTypeException(type.getId(), type.getName()));
         }
 
         return dbTypeManager;

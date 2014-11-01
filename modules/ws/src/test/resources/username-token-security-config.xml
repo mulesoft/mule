@@ -10,6 +10,8 @@
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd">
 
+    <configuration useHttpTransportByDefault="${useHttpTransportByDefault}" />
+
     <ws:consumer-config serviceAddress="http://localhost:${port}/services/Test" wsdlLocation="Test.wsdl"
                         service="TestService" port="TestPort" name="configValidCredentialsText">
         <ws:security>

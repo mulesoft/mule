@@ -13,6 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.module.db.internal.domain.connection.DbConnection;
 import org.mule.module.db.internal.domain.param.DefaultInputQueryParam;
+import org.mule.module.db.internal.domain.param.QueryParam;
 import org.mule.module.db.internal.domain.query.QueryTemplate;
 import org.mule.module.db.internal.domain.query.QueryType;
 import org.mule.module.db.internal.domain.type.DbType;
@@ -27,6 +28,7 @@ import org.mule.tck.size.SmallTest;
 
 import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Map;
 
@@ -36,21 +38,16 @@ import org.junit.Test;
 public class QueryParamTypeResolverTestCase extends AbstractMuleTestCase
 {
 
+    public static final String SQL_TEXT = "select * from test where id = ?";
+
     @Test
-    public void resolvesQueryParameterTypes() throws Exception
+    public void resolvesQueryParameterKnownType() throws Exception
     {
-        final String sqlText = "select * from test where id = ?";
-
-        ParameterMetaData parameterMetaData = new ParameterMetaDataBuilder().withParameter(1, JdbcTypes.INTEGER_DB_TYPE).build();
-
-        PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        when(preparedStatement.getParameterMetaData()).thenReturn(parameterMetaData);
-
-        DbConnection connection = new DbConnectionBuilder().preparing(sqlText, preparedStatement).build();
-
-        QueryTemplate queryTemplate = new QueryTemplate(sqlText, QueryType.SELECT, Collections.<org.mule.module.db.internal.domain.param.QueryParam>singletonList(new DefaultInputQueryParam(1, UnknownDbType.getInstance(), "7", "param1")));
+        DbConnection connection = createDbConnection();
 
         DbTypeManager dbTypeManager = new DbTypeManagerBuilder().on(connection).managing(JdbcTypes.INTEGER_DB_TYPE).build();
+
+        QueryTemplate queryTemplate = createQueryTemplate();
 
         QueryParamTypeResolver paramTypeResolver = new QueryParamTypeResolver(dbTypeManager);
 
@@ -58,5 +55,38 @@ public class QueryParamTypeResolverTestCase extends AbstractMuleTestCase
 
         assertThat(parameterTypes.size(), equalTo(1));
         assertThat(parameterTypes.get(1), equalTo(JdbcTypes.INTEGER_DB_TYPE));
+    }
+
+    @Test
+    public void resolvesQueryParameterUnknownType() throws Exception
+    {
+        DbConnection connection = createDbConnection();
+
+        QueryTemplate queryTemplate = createQueryTemplate();
+
+        DbTypeManager dbTypeManager = new DbTypeManagerBuilder().on(connection).unknowing(JdbcTypes.INTEGER_DB_TYPE).build();
+
+        QueryParamTypeResolver paramTypeResolver = new QueryParamTypeResolver(dbTypeManager);
+
+        Map<Integer, DbType> parameterTypes = paramTypeResolver.getParameterTypes(connection, queryTemplate);
+
+        assertThat(parameterTypes.size(), equalTo(1));
+        assertThat(parameterTypes.get(1).getId(), equalTo(JdbcTypes.INTEGER_DB_TYPE.getId()));
+        assertThat(parameterTypes.get(1).getName(), equalTo(JdbcTypes.INTEGER_DB_TYPE.getName()));
+    }
+
+    private DbConnection createDbConnection() throws SQLException
+    {
+        ParameterMetaData parameterMetaData = new ParameterMetaDataBuilder().withParameter(1, JdbcTypes.INTEGER_DB_TYPE).build();
+
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        when(preparedStatement.getParameterMetaData()).thenReturn(parameterMetaData);
+
+        return new DbConnectionBuilder().preparing(SQL_TEXT, preparedStatement).build();
+    }
+
+    private QueryTemplate createQueryTemplate()
+    {
+        return new QueryTemplate(SQL_TEXT, QueryType.SELECT, Collections.<QueryParam>singletonList(new DefaultInputQueryParam(1, UnknownDbType.getInstance(), "7", "param1")));
     }
 }

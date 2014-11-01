@@ -12,7 +12,7 @@
 
     <properties>
         <muleVersion>4.0-SNAPSHOT</muleVersion>
-        <activemqVersion>5.5.0</activemqVersion>
+        <activemqVersion>5.7.0</activemqVersion>
         <javaMailVersion>1.4.3</javaMailVersion>
     </properties>
 

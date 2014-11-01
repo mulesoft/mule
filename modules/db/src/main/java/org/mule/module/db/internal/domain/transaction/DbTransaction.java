@@ -69,14 +69,18 @@ public class DbTransaction extends AbstractSingleResourceTransaction
             return;
         }
 
+        TransactionException transactionException = null;
         try
         {
             ((Connection) resource).commit();
-            ((Connection) resource).close();
         }
         catch (SQLException e)
         {
-            throw new TransactionException(CoreMessages.transactionCommitFailed(), e);
+            transactionException = new TransactionException(CoreMessages.transactionCommitFailed(), e);
+        }
+        finally
+        {
+            closeConnection(transactionException);
         }
     }
 
@@ -89,14 +93,41 @@ public class DbTransaction extends AbstractSingleResourceTransaction
             return;
         }
 
+        TransactionException transactionException = null;
         try
         {
             ((Connection) resource).rollback();
+        }
+        catch (SQLException e)
+        {
+            transactionException = new TransactionRollbackException(CoreMessages.transactionRollbackFailed(), e);
+        }
+        finally
+        {
+            closeConnection(transactionException);
+        }
+    }
+
+    private void closeConnection(TransactionException transactionException) throws TransactionException
+    {
+        try
+        {
             ((Connection) resource).close();
         }
         catch (SQLException e)
         {
-            throw new TransactionRollbackException(CoreMessages.transactionRollbackFailed(), e);
+            if (transactionException == null)
+            {
+                transactionException = new TransactionException(CoreMessages.createStaticMessage("Cannot close connection."), e);
+            }
+            else
+            {
+                logger.info("Cannot close connection.");
+            }
+        }
+        if (transactionException != null)
+        {
+            throw transactionException;
         }
     }
 

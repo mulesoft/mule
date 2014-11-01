@@ -45,16 +45,45 @@
             <artifactId>mule-module-xml</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- This is the engine for JSR-223 compliance, not the actual implementation -->
-        <dependency>
-            <groupId>org.livetribe</groupId>
-            <artifactId>livetribe-jsr223</artifactId>
-            <version>${javaScriptVersion}</version>
-        </dependency>
-        <!-- This is the actual language implementation -->
+
+        <!--Groovy-->
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
+            <classifier>indy</classifier>
+        </dependency>
+
+        <!--Jython-->
+        <dependency>
+            <groupId>org.python</groupId>
+            <artifactId>jython-standalone</artifactId>
+            <version>2.7-b3</version>
+        </dependency>
+
+        <!--Javascript-->
+        <dependency>
+            <groupId>javax.script</groupId>
+            <artifactId>js-engine</artifactId>
+            <version>${rhinoJsr223Version}</version>
+            <classifier>jdk14</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.mozilla</groupId>
+            <artifactId>rhino</artifactId>
+            <version>${rhinoVersion}</version>
+        </dependency>
+
+        <!--Ruby-->
+        <dependency>
+            <groupId>org.jruby</groupId>
+            <artifactId>jruby-complete</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.script</groupId>
+            <artifactId>jruby-engine</artifactId>
+            <version>1.1</version>
+            <classifier>jdk14</classifier>
         </dependency>
 
         <!-- Test dependencies -->

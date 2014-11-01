@@ -9,16 +9,11 @@ package org.mule.module.db.internal.config.domain.query;
 
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.module.db.internal.config.domain.param.InputParamDefinitionDefinitionParser;
-import org.mule.module.db.internal.domain.param.InputQueryParam;
-import org.mule.module.db.internal.domain.param.QueryParam;
 import org.mule.module.db.internal.domain.query.QueryTemplate;
-import org.mule.module.db.internal.domain.query.QueryType;
 import org.mule.module.db.internal.parser.SimpleQueryTemplateParser;
-import org.mule.util.IOUtils;
+import org.mule.module.db.internal.util.DefaultFileReader;
 
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -91,10 +86,10 @@ public class QueryTemplateBeanDefinitionParser extends AbstractMuleBeanDefinitio
 
     private void parseDynamicQuery(Element element, BeanDefinitionBuilder builder, Element sqlElem)
     {
-        String sqlText = sqlElem.getTextContent();
+        BeanDefinitionBuilder queryTemplateFactory = BeanDefinitionBuilder.genericBeanDefinition(DynamicQueryTemplateFactoryBean.class);
+        queryTemplateFactory.addConstructorArgValue(sqlElem.getTextContent());
 
-        QueryTemplate queryTemplate = new QueryTemplate(sqlText, QueryType.DDL, Collections.<QueryParam>emptyList(), true);
-        builder.addConstructorArgValue(queryTemplate);
+        builder.addConstructorArgValue(queryTemplateFactory.getBeanDefinition());
 
         element.removeChild(sqlElem);
     }
@@ -105,7 +100,7 @@ public class QueryTemplateBeanDefinitionParser extends AbstractMuleBeanDefinitio
         element.removeChild(template);
 
         List<Element> params = DomUtils.getChildElementsByTagName(element, IN_PARAM_ELEMENT);
-        List<BeanDefinition> paramList = ParameterizedQueryDefinitionParser.parseParameterValues(params, nestedCtx);
+        List<BeanDefinition> paramList = QueryDefinitionParser.parseOverriddenTemplateParameters(params, nestedCtx);
 
         BeanDefinitionBuilder queryTemplateBuilder = BeanDefinitionBuilder.genericBeanDefinition(QueryTemplateFactoryBean.class);
         queryTemplateBuilder.addConstructorArgReference(queryTemplateRef);
@@ -115,7 +110,6 @@ public class QueryTemplateBeanDefinitionParser extends AbstractMuleBeanDefinitio
 
     private void parseParameterizedQuery(Element element, BeanDefinitionBuilder builder, ParserContext nestedCtx, Element sqlElem)
     {
-        String sqlText;
         boolean hasFileAttribute = sqlElem.hasAttribute(FILE_ATTRIBUTE);
         boolean hasTextContent = !element.getTextContent().trim().isEmpty();
 
@@ -124,22 +118,21 @@ public class QueryTemplateBeanDefinitionParser extends AbstractMuleBeanDefinitio
             throw new IllegalArgumentException(String.format("Element %s cannot contain attribute file and text content simultaneously", element.getTagName()));
         }
 
+        BeanDefinitionBuilder queryTemplateFactory = BeanDefinitionBuilder.genericBeanDefinition(ParameterizedQueryTemplateFactoryBean.class);
+
         if (hasFileAttribute)
         {
             String fileName = sqlElem.getAttribute(FILE_ATTRIBUTE);
-            try
-            {
-                sqlText = IOUtils.getResourceAsString(fileName, getClass());
-            }
-            catch (IOException e)
-            {
-                throw new IllegalStateException("Unable to read query from file: " + fileName);
-            }
+            BeanDefinitionBuilder queryFileBuilder = BeanDefinitionBuilder.genericBeanDefinition(QueryFileFactoryBean.class);
+            queryFileBuilder.addConstructorArgValue(fileName);
+            queryFileBuilder.addConstructorArgValue(new DefaultFileReader());
+            queryTemplateFactory.addConstructorArgValue(queryFileBuilder.getBeanDefinition());
         }
         else
         {
             Node node = sqlElem.getFirstChild();
 
+            String sqlText;
             if (node.getNextSibling() != null && node.getNextSibling().getNodeType() == Node.CDATA_SECTION_NODE)
             {
                 sqlText = node.getNextSibling().getNodeValue();
@@ -148,54 +141,24 @@ public class QueryTemplateBeanDefinitionParser extends AbstractMuleBeanDefinitio
             {
                 sqlText = node.getNodeValue();
             }
+            queryTemplateFactory.addConstructorArgValue(sqlText);
         }
+        element.removeChild(sqlElem);
 
-        SimpleQueryTemplateParser simpleQueryParser = new SimpleQueryTemplateParser();
-        QueryTemplate queryTemplate = simpleQueryParser.parse(sqlText);
+        List<Object> params = new ManagedList<Object>();
+        List<Element> childElementsByTagName = DomUtils.getChildElementsByTagName(element, IN_PARAM_ELEMENT);
 
-        if (queryTemplate.getParams().size() > 0 && !queryTemplate.usesNamedParameters())
+        for (Element param : childElementsByTagName)
         {
-            throw new IllegalArgumentException("Templates do not support inline parameters");
+            BeanDefinition paramBean = parseParameter(nestedCtx, param);
+
+            params.add(paramBean);
         }
-        else
-        {
-            builder.addConstructorArgValue(queryTemplate.getSqlText());
-            builder.addConstructorArgValue(queryTemplate.getType());
 
-            element.removeChild(sqlElem);
+        queryTemplateFactory.addConstructorArgValue(params);
+        queryTemplateFactory.addConstructorArgValue(new SimpleQueryTemplateParser());
 
-            List<Object> params = new ManagedList<Object>();
-            List<Element> childElementsByTagName = DomUtils.getChildElementsByTagName(element, IN_PARAM_ELEMENT);
-            if (queryTemplate.usesNamedParameters())
-            {
-                for (InputQueryParam inputSqlParam : queryTemplate.getInputParams())
-                {
-                    Element param = findOverriddenParamElement(inputSqlParam.getName(), childElementsByTagName);
-
-                    if (param == null)
-                    {
-                        params.add(inputSqlParam);
-                    }
-                    else
-                    {
-                        BeanDefinition paramBean = parseParameter(nestedCtx, param);
-
-                        params.add(paramBean);
-                    }
-                }
-            }
-            else
-            {
-                for (Element param : childElementsByTagName)
-                {
-                    BeanDefinition paramBean = parseParameter(nestedCtx, param);
-
-                    params.add(paramBean);
-                }
-            }
-
-            builder.addConstructorArgValue(params);
-        }
+        builder.addConstructorArgValue(queryTemplateFactory.getBeanDefinition());
     }
 
     private BeanDefinition parseParameter(ParserContext nestedCtx, Element param)
@@ -204,20 +167,4 @@ public class QueryTemplateBeanDefinitionParser extends AbstractMuleBeanDefinitio
         return paramParser.parse(param, nestedCtx);
     }
 
-    private Element findOverriddenParamElement(String name, List<Element> paramElements)
-    {
-        if (name != null)
-        {
-
-            for (Element paramElement : paramElements)
-            {
-                if (paramElement.hasAttribute("name") && name.equals(paramElement.getAttribute("name")))
-                {
-                    return paramElement;
-                }
-            }
-        }
-
-        return null;
-    }
 }

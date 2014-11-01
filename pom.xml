@@ -133,7 +133,7 @@
         <licensePath>LICENSE_HEADER.txt</licensePath>
         <coberturaVersion>2.5</coberturaVersion>
         <eclipsePluginVersion>2.5.1</eclipsePluginVersion>
-        <groovyVersion>2.3.6</groovyVersion>
+        <groovyVersion>2.3.7</groovyVersion>
         <gmavenPluginVersion>1.4</gmavenPluginVersion>
         <javadocPluginVersion>2.9.1</javadocPluginVersion>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
@@ -150,7 +150,7 @@
         -->
         <jdk7Name>JavaSE-1.7</jdk7Name>
 
-        <activemqVersion>5.5.0</activemqVersion>
+        <activemqVersion>5.7.0</activemqVersion>
         <antVersion>1.7.0</antVersion>
         <antlrVersion>3.1.1</antlrVersion>
         <asmVersion>3.3.1</asmVersion>
@@ -160,9 +160,10 @@
         <bouncycastleVersion>1.46</bouncycastleVersion>
         <cglibVersion>2.2</cglibVersion>
         <cometdVersion>6.1.26</cometdVersion>
-        <commonsBeanUtilsVersion>1.8.0</commonsBeanUtilsVersion>
+        <commonsBeanUtilsVersion>1.9.2</commonsBeanUtilsVersion>
+        <commonsExecVersion>1.2</commonsExecVersion>
         <commonsCliVersion>1.2</commonsCliVersion>
-        <commonsCodecVersion>1.3</commonsCodecVersion>
+        <commonsCodecVersion>1.9</commonsCodecVersion>
         <commonsCollectionsVersion>3.2.1</commonsCollectionsVersion>
         <commonsDbcpVersion>1.4</commonsDbcpVersion>
         <commonsDbUtilsVersion>1.2</commonsDbUtilsVersion>
@@ -170,30 +171,28 @@
         <commonsIoVersion>2.4</commonsIoVersion>
         <commonsJxpathVersion>1.3</commonsJxpathVersion>
         <commonsLangVersion>2.4</commonsLangVersion>
-        <commonsNetVersion>2.0</commonsNetVersion>
+        <commonsNetVersion>2.2</commonsNetVersion>
         <!-- TODO There is a more modern version of cryptix available:
         http://mirrors.ibiblio.org/pub/mirrors/maven2/cryptix/cryptix/3.2.0/cryptix-3.2.0.jar
         but the PGP module would need some work in order to use it -->
         <cryptixJceVersion>20050328</cryptixJceVersion>
         <cryptixVersion>20050405</cryptixVersion>
         <cxfVersion>2.5.9</cxfVersion>
-        <derbyVersion>10.9.1.0</derbyVersion>
+        <derbyVersion>10.11.1.1</derbyVersion>
         <dom4jVersion>1.6.1</dom4jVersion>
         <flatpackVersion>3.1.1</flatpackVersion>
         <geronimoSpecsVersion>1.1</geronimoSpecsVersion>
         <geronimoSpecsJtaVersion>1.1.1</geronimoSpecsJtaVersion>
-        <geronimoSpecsStaxVersion>1.0.1</geronimoSpecsStaxVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
-        <geronimoSpecsWsMetadataVersion>1.1.2</geronimoSpecsWsMetadataVersion>
-        <guavaVersion>16.0.1</guavaVersion>
+        <guavaVersion>18.0</guavaVersion>
         <hamcrestVersion>1.3</hamcrestVersion>
         <hibernateVersion>3.6.0.Final</hibernateVersion>
         <jacksonVersion>1.9.11</jacksonVersion>
+        <jackson2Version>2.4.3</jackson2Version>
         <jerseyVersion>2.11</jerseyVersion>
         <jaxbApiVersion>2.1</jaxbApiVersion>
         <javassistVersion>3.7.ga</javassistVersion>
         <javaMailVersion>1.4.3</javaMailVersion>
-        <javaScriptVersion>2.0.5</javaScriptVersion>
         <javaXmlBindVersion>2.1.9</javaXmlBindVersion>
         <javaXmlWsVersion>2.2.1</javaXmlWsVersion>
         <jaxenVersion>1.1.1</jaxenVersion>
@@ -202,20 +201,23 @@
         <jcrVersion>1.0</jcrVersion>
         <jdomVersion>1.1.3</jdomVersion>
         <jettyVersion>9.0.7.v20131107</jettyVersion>
-        <jodaTimeVersion>1.6</jodaTimeVersion>
+        <jodaTimeVersion>2.5</jodaTimeVersion>
         <jschVersion>0.1.51</jschVersion>
-        <jsr181Version>1.0-MR1</jsr181Version>
-        <jsr250AnnotationVerson>1.0</jsr250AnnotationVerson>
         <junitVersion>4.11</junitVersion>
         <log4jVersion>2.0.2</log4jVersion>
         <disruptorVersion>3.2.1</disruptorVersion>
+        <mockitoVersion>1.9.5</mockitoVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <!-- TODO EE-1395 -->
         <mqSeriesVersion>6.0</mqSeriesVersion>
         <muleMvelVersion>2.1.9-MULE-005</muleMvelVersion>
         <mx4jVersion>2.1.1</mx4jVersion>
+        <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
+        <ognlVersion>2.7.3</ognlVersion>
         <oroVersion>2.0.8</oroVersion>
         <quartzVersion>1.8.5</quartzVersion>
+        <rhinoVersion>1.7R4</rhinoVersion>
+        <rhinoJsr223Version>1.1</rhinoJsr223Version>
         <saajVersion>1.3</saajVersion>
         <saxonVersion>9.1.0.8</saxonVersion>
         <slf4jVersion>1.7.7</slf4jVersion>
@@ -251,11 +253,6 @@
                 <groupId>javax.annotation</groupId>
                 <artifactId>javax.annotation-api</artifactId>
                 <version>1.2</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-stax-api_1.0_spec</artifactId>
-                <version>${geronimoSpecsStaxVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -446,7 +443,7 @@
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-servlet_3.0_spec</artifactId>
-                <!-- servlet api jar is versioned differently -->
+                 <!--servlet api jar is versioned differently-->
                 <version>${geronimoSpecsServletApiVersion}</version>
             </dependency>
             <dependency>
@@ -527,7 +524,7 @@
             <dependency>
                 <groupId>xmlunit</groupId>
                 <artifactId>xmlunit</artifactId>
-                <version>1.1</version>
+                <version>1.5</version>
                 <exclusions>
                     <exclusion>
                         <groupId>xml-apis</groupId>
@@ -540,6 +537,10 @@
                 <artifactId>activemq-core</artifactId>
                 <version>${activemqVersion}</version>
                 <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
                     <exclusion>
                         <groupId>org.apache.geronimo.specs</groupId>
                         <artifactId>geronimo-jms_1.1_spec</artifactId>
@@ -626,21 +627,6 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <!-- Python for scripting -->
-            <dependency>
-                <!-- This is the engine for JSR-223 compliance, not the actual implementation -->
-                <groupId>javax.script</groupId>
-                <artifactId>jython-engine</artifactId>
-                <version>1.1</version>
-                <!-- we use our own retrotranslated version -->
-                <classifier>jdk14</classifier>
-            </dependency>
-            <dependency>
-                <!-- This is the actual language implementation -->
-                <groupId>org.python</groupId>
-                <artifactId>jython</artifactId>
-                <version>2.2.1</version>
-            </dependency>
 
             <!--Logging-->
             <dependency>
@@ -682,7 +668,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>1.9.0</version>
+                <version>${mockitoVersion}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.hamcrest</groupId>
@@ -708,11 +694,6 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-j2ee-management_1.0_spec</artifactId>
-                <version>${geronimoSpecsVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-jms_1.1_spec</artifactId>
                 <version>${geronimoSpecsVersion}</version>
             </dependency>
@@ -725,32 +706,12 @@
                 <groupId>javax.mail</groupId>
                 <artifactId>mail</artifactId>
                 <version>${javaMailVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.xml.ws</groupId>
-                <artifactId>jaxws-api</artifactId>
-                <version>${javaXmlWsVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.jws</groupId>
-                <artifactId>jsr181-api</artifactId>
-                <version>${jsr181Version}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.xml.bind</groupId>
-                <artifactId>jaxb-api</artifactId>
-                <version>${jaxbApiVersion}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>javax.xml.stream</groupId>
-                        <artifactId>stax-api</artifactId>
+                        <groupId>javax.activation</groupId>
+                        <artifactId>activation</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>javax.annotation</groupId>
-                <artifactId>jsr250-api</artifactId>
-                <version>${jsr250AnnotationVerson}</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
@@ -761,16 +722,6 @@
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-impl</artifactId>
                 <version>${javaXmlBindVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.xml.soap</groupId>
-                <artifactId>saaj-api</artifactId>
-                <version>${saajVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.sun.xml.messaging.saaj</groupId>
-                <artifactId>saaj-impl</artifactId>
-                <version>${saajVersion}</version>
             </dependency>
             <dependency>
                 <groupId>net.java.dev.stax-utils</groupId>
@@ -798,6 +749,11 @@
                 <groupId>commons-collections</groupId>
                 <artifactId>commons-collections</artifactId>
                 <version>${commonsCollectionsVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-net</groupId>
+                <artifactId>commons-net</artifactId>
+                <version>${commonsNetVersion}</version>
             </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
@@ -830,6 +786,11 @@
                 <groupId>commons-lang</groupId>
                 <artifactId>commons-lang</artifactId>
                 <version>${commonsLangVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-exec</artifactId>
+                <version>${commonsExecVersion}</version>
             </dependency>
             <dependency>
                 <groupId>commons-cli</groupId>
@@ -903,6 +864,7 @@
                 <groupId>org.codehaus.groovy</groupId>
                 <artifactId>groovy-all</artifactId>
                 <version>${groovyVersion}</version>
+                <classifier>indy</classifier>
                 <exclusions>
                     <!--  Exclude openejb-loader as it is not needed and there are currently version inconsistancies in openejb-core pom-->
                     <exclusion>
@@ -1012,11 +974,6 @@
                         <artifactId>xstream</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>net.sf.retrotranslator</groupId>
-                <artifactId>retrotranslator-runtime</artifactId>
-                <version>1.2.1</version>
             </dependency>
             <dependency>
                 <groupId>tanukisoft</groupId>
@@ -1372,6 +1329,16 @@
                 <groupId>commons-dbcp</groupId>
                 <artifactId>commons-dbcp</artifactId>
                 <version>${commonsDbcpVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>xml-apis</groupId>
+                        <artifactId>xml-apis</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>xerces</groupId>
+                        <artifactId>xerces</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -1379,7 +1346,6 @@
                 <artifactId>disruptor</artifactId>
                 <version>${disruptorVersion}</version>
             </dependency>
-
         </dependencies>
     </dependencyManagement>
 
@@ -1476,6 +1442,9 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>2.8.1</version>
+                    <configuration>
+                        <deployAtEnd>true</deployAtEnd>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1824,7 +1793,7 @@
                                 <links>
                                     <link>http://docs.oracle.com/javase/7/docs/api/</link>
                                     <link>http://java.sun.com/j2ee/sdk_1.3/techdocs/api/</link>
-                                    <link>http://jakarta.apache.org/commons/beanutils/commons-beanutils-1.7.0/docs/api/</link>
+                                    <link>http://jakarta.apache.org/commons/beanutils/commons-beanutils-1.9.2/docs/api/</link>
                                     <link>http://jakarta.apache.org/commons/collections/api-3.2/</link>
                                     <link>http://jakarta.apache.org/httpcomponents/httpclient-3.x/apidocs/</link>
                                     <link>http://jakarta.apache.org/commons/io/api-1.2/</link>

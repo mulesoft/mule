@@ -65,11 +65,12 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
         queueControlDataFile = new QueueControlDataFile(new QueueFileProvider(queuesDirectory, queueName + QUEUE_DATA_CONTROL_SUFFIX), randomAccessFileQueueStore1.getFile(), randomAccessFileQueueStore2.getFile());
         writeFile = queueControlDataFile.getCurrentWriteFile().getAbsolutePath().equals(randomAccessFileQueueStore1.getFile().getAbsolutePath()) ? randomAccessFileQueueStore1 : randomAccessFileQueueStore2;
         readFile = queueControlDataFile.getCurrentReadFile().getAbsolutePath().equals(randomAccessFileQueueStore1.getFile().getAbsolutePath()) ? randomAccessFileQueueStore1 : randomAccessFileQueueStore2;
+        filesLock = new ReentrantReadWriteLock();
+
         if (logger.isDebugEnabled())
         {
             logger.debug(String.format("Queue %s has %s messages", queueName, getSize()));
         }
-        filesLock = new ReentrantReadWriteLock();
     }
 
     //only for testing.

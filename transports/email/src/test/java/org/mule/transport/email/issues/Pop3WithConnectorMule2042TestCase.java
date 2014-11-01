@@ -25,6 +25,7 @@ public class Pop3WithConnectorMule2042TestCase extends AbstractEmailFunctionalTe
     }
 
     @Test
+    @Ignore("MULE-6926: flaky test")
     public void testRequest() throws Exception
     {
         doRequest();
