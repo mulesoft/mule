@@ -230,6 +230,7 @@
         <staxUtilsVersion>20080702</staxUtilsVersion>
         <staxApiVersion>3.1.1</staxApiVersion>
         <staxonVersion>1.2</staxonVersion>
+        <testFtpServerVersion>1.0.6</testFtpServerVersion>
         <tomcatVersion>6.0.29</tomcatVersion>
         <woodstoxVersion>4.1.4</woodstoxVersion>
         <wrapperVersion>3.2.3</wrapperVersion>

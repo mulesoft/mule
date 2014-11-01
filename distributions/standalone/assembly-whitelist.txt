@@ -460,7 +460,7 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-db-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-devkit-support-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-drools-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-module-http-3.6.0-M2-SNAPSHOT.jar
+/mule-standalone-${productVersion}/lib/mule/mule-module-http-3.6.0-M3-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-jaas-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-jbossts-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-jbpm-${productVersion}.jar
@@ -517,7 +517,6 @@
 /mule-standalone-${productVersion}/lib/opt/ant-1.7.0.jar
 /mule-standalone-${productVersion}/lib/opt/ant-launcher-1.7.0.jar
 /mule-standalone-${productVersion}/lib/opt/antlr-3.1.1.jar
-/mule-standalone-${productVersion}/lib/opt/antlr-runtime-3.5.jar
 /mule-standalone-${productVersion}/lib/opt/aopalliance-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/asm-3.3.1.jar
 /mule-standalone-${productVersion}/lib/opt/asm-commons-3.1.jar
@@ -654,7 +653,6 @@
 /mule-standalone-${productVersion}/lib/opt/js-engine-1.1-jdk14.jar
 /mule-standalone-${productVersion}/lib/opt/json-schema-core-1.2.4.jar
 /mule-standalone-${productVersion}/lib/opt/json-schema-validator-2.2.5.jar
-/mule-standalone-${productVersion}/lib/opt/json-20140107.jar
 /mule-standalone-${productVersion}/lib/opt/jsp-api-6.0.29.jar
 /mule-standalone-${productVersion}/lib/opt/jta-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/juel-engine-2.1.0.jar
@@ -705,10 +703,6 @@
 /mule-standalone-${productVersion}/lib/opt/stax-utils-20080702.jar
 /mule-standalone-${productVersion}/lib/opt/stax2-api-3.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/staxon-1.2.jar
-/mule-standalone-${productVersion}/lib/opt/stringtemplate-3.2.1.jar
-/mule-standalone-${productVersion}/lib/opt/sxc-core-0.7.3.jar
-/mule-standalone-${productVersion}/lib/opt/sxc-runtime-0.7.3.jar
-/mule-standalone-${productVersion}/lib/opt/sxc-xpath-0.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/uri-template-0.9.jar
 /mule-standalone-${productVersion}/lib/opt/catalina-6.0.29.jar
 /mule-standalone-${productVersion}/lib/opt/coyote-6.0.29.jar
@@ -727,7 +721,6 @@
 /mule-standalone-${productVersion}/lib/opt/xstream-1.4.2.jar
 /mule-standalone-${productVersion}/lib/opt/opensaml-2.5.1-1.jar
 /mule-standalone-${productVersion}/lib/opt/openws-1.4.2-1.jar
-/mule-standalone-${productVersion}/lib/opt/xmlbeans-2.3.0.jar
 /mule-standalone-${productVersion}/lib/opt/xmltooling-1.3.2-1.jar
 /mule-standalone-${productVersion}/lib/opt/validation-api-1.1.0.Final.jar
 /mule-standalone-${productVersion}/lib/shared

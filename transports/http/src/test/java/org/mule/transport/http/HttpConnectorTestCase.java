@@ -26,6 +26,7 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.construct.Flow;
 import org.mule.tck.MuleTestUtils.TestCallback;
+import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transport.AbstractConnectorTestCase;
 import org.mule.transport.tcp.TcpConnector;
 
@@ -120,7 +121,7 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
         thrown.expect(ConnectorException.class);
         thrown.expectMessage(startsWith(LISTENER_ALREADY_REGISTERED));
 
-        Service service = getTestService("orange", Orange.class);
+        Flow service = getTestFlow("orange", Orange.class);
         InboundEndpoint allInterfacesEndpoint = muleContext.getEndpointFactory().getInboundEndpoint(
                 existingEndpointUri);
 
