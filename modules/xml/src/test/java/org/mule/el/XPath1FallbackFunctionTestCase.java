@@ -23,7 +23,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.junit.Test;
 
-public class XPathFunctionTestCase extends FunctionalTestCase
+public class XPath1FallbackFunctionTestCase extends FunctionalTestCase
 {
 
     private String payload;

@@ -6,12 +6,16 @@
  */
 package org.mule.transformers.xml;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.transformer.XPathExtractor;
-import org.mule.module.xml.transformer.XPathExtractor.ResultType;
 import org.mule.module.xml.util.NamespaceManager;
+import org.mule.module.xml.xpath.XPathReturnType;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -20,24 +24,17 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathFactory;
 
-import org.apache.xml.dtm.ref.DTMNodeList;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 
 public class XPathExtractorTestCase extends AbstractMuleContextTestCase
 {
@@ -80,28 +77,17 @@ public class XPathExtractorTestCase extends AbstractMuleContextTestCase
     public void badExpression() throws Exception
     {
         final String badExpression = "/$@�%$�&�$$�%";
-        final XPathExtractor extractor = initialiseExtractor(badExpression, ResultType.STRING);
+        final XPathExtractor extractor = initialiseExtractor(badExpression, XPathReturnType.STRING);
 
         final Document doc = getDocumentForString(TEST_XML_SINGLE_RESULT);
         extractor.transform(doc);
     }
 
     @Test
-    public void setingXPathEvaluator()
-    {
-        final XPathExtractor extractor = new XPathExtractor();
-        final XPath xPath = XPathFactory.newInstance().newXPath();
-
-        // just make code coverage tools happy
-        extractor.setXpath(xPath);
-        assertEquals("Wrong evaluator returned.", xPath, extractor.getXpath());
-    }
-
-    @Test
     public void nodeToStringResult() throws Exception
     {
         final String expression = "/root/node";
-        final XPathExtractor extractor = initialiseExtractor(expression, ResultType.STRING);
+        final XPathExtractor extractor = initialiseExtractor(expression, XPathReturnType.STRING);
 
         // just make code coverage tools happy
         assertEquals("Wrong expression returned.", expression, extractor.getExpression());
@@ -119,7 +105,7 @@ public class XPathExtractorTestCase extends AbstractMuleContextTestCase
     public void inputSourceToStringResult() throws Exception
     {
         final String expression = "/root/node";
-        final XPathExtractor extractor = initialiseExtractor(expression, ResultType.STRING);
+        final XPathExtractor extractor = initialiseExtractor(expression, XPathReturnType.STRING);
 
         final Document doc = getDocumentForString(TEST_XML_SINGLE_RESULT);
         final InputSource source = getInputSourceForDocument(doc);
@@ -135,7 +121,7 @@ public class XPathExtractorTestCase extends AbstractMuleContextTestCase
     public void nodeToNumberResult() throws Exception
     {
         final String expression = "/root/node2";
-        final XPathExtractor extractor = initialiseExtractor(expression, ResultType.NUMBER);
+        final XPathExtractor extractor = initialiseExtractor(expression, XPathReturnType.NUMBER);
 
         final Document doc = getDocumentForString(TEST_XML_SINGLE_RESULT);
 
@@ -150,7 +136,7 @@ public class XPathExtractorTestCase extends AbstractMuleContextTestCase
     public void nodeToBooleanResult() throws Exception
     {
         final String expression = "/root/node2";
-        final XPathExtractor extractor = initialiseExtractor(expression, ResultType.BOOLEAN);
+        final XPathExtractor extractor = initialiseExtractor(expression, XPathReturnType.BOOLEAN);
 
         final Document doc = getDocumentForString(TEST_XML_SINGLE_RESULT);
 
@@ -165,7 +151,7 @@ public class XPathExtractorTestCase extends AbstractMuleContextTestCase
     public void nodeToNodeResult() throws Exception
     {
         final String expression = "/root/node2";
-        final XPathExtractor extractor = initialiseExtractor(expression, ResultType.NODE);
+        final XPathExtractor extractor = initialiseExtractor(expression, XPathReturnType.NODE);
 
         final Document doc = getDocumentForString(TEST_XML_SINGLE_RESULT);
 
@@ -180,14 +166,14 @@ public class XPathExtractorTestCase extends AbstractMuleContextTestCase
     public void nodeToNodeSetResult() throws Exception
     {
         final String expression = "/root/node2";
-        final XPathExtractor extractor = initialiseExtractor(expression, ResultType.NODESET);
+        final XPathExtractor extractor = initialiseExtractor(expression, XPathReturnType.NODESET);
 
         final Document doc = getDocumentForString(TEST_XML_SINGLE_RESULT);
 
         final Object objResult = extractor.transform(doc);
-        assertNotNull(objResult);
+        assertThat(objResult, instanceOf(NodeList.class));
 
-        final DTMNodeList result = (DTMNodeList)objResult;
+        NodeList result = (NodeList) objResult;
         assertEquals("Wrong value extracted.", "node2", result.item(0).getNodeName());
     }
 
@@ -197,7 +183,7 @@ public class XPathExtractorTestCase extends AbstractMuleContextTestCase
         registerNamespaces();
 
         final String expression = "//f:width";
-        final XPathExtractor extractor = initialiseExtractor(expression, ResultType.STRING);
+        final XPathExtractor extractor = initialiseExtractor(expression, XPathReturnType.STRING);
 
         // just make code coverage tools happy
         assertEquals("Wrong expression returned.", expression, extractor.getExpression());
@@ -216,17 +202,10 @@ public class XPathExtractorTestCase extends AbstractMuleContextTestCase
         registerNamespaces();
 
         final String expression = "//f:width";
-        final XPathExtractor extractor = initialiseExtractor(expression, ResultType.STRING);
+        final XPathExtractor extractor = initialiseExtractor(expression, XPathReturnType.STRING);
 
-        final XPath xpath = extractor.getXpath();
-        final NamespaceContext context = xpath.getNamespaceContext();
-        assertEquals("http://www.w3schools.com/furniture", context.getNamespaceURI("f"));
-
-        assertEquals("f", context.getPrefix("http://www.w3schools.com/furniture"));
-        assertEquals(null, context.getPrefix("http://non.existent.name.space"));
-
-        assertEquals("f", context.getPrefixes("http://www.w3schools.com/furniture").next());
-        assertFalse(context.getPrefixes("http://non.existent.name.space").hasNext());
+        final Map<String, String> namespaces = extractor.getXpathEvaluator().getRegisteredNamespaces();
+        assertEquals("http://www.w3schools.com/furniture", namespaces.get("f"));
     }
 
     @Test
@@ -238,7 +217,7 @@ public class XPathExtractorTestCase extends AbstractMuleContextTestCase
         namespaces.put("g", "http://www.test.com/g");
 
         final String expression = "//f:width";
-        final XPathExtractor extractor = initialiseExtractor(expression, ResultType.STRING);
+        final XPathExtractor extractor = initialiseExtractor(expression, XPathReturnType.STRING);
         extractor.setNamespaces(namespaces);
 
         assertEquals("http://www.test.com/g", extractor.getNamespaces().get("g"));
@@ -255,7 +234,7 @@ public class XPathExtractorTestCase extends AbstractMuleContextTestCase
             namespaceManager);
     }
 
-    private XPathExtractor initialiseExtractor(final String expression, ResultType resultType)
+    private XPathExtractor initialiseExtractor(final String expression, XPathReturnType resultType)
         throws RegistrationException
     {
         final XPathExtractor extractor = new XPathExtractor();

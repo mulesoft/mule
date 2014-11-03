@@ -7,6 +7,7 @@
 package org.mule.module.xml.expression;
 
 import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.module.xml.el.XPath3Function;
 import org.mule.module.xml.i18n.XmlMessages;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -19,7 +20,10 @@ import org.w3c.dom.Document;
 
 /**
  * Will select the text of a single node based on the property name
+ *
+ * @deprecated This expression evaluator is deprecated and will be removed in Mule 4. Use {@link XPath3Function} instead
  */
+@Deprecated
 public class XPathNodeExpressionEvaluator extends XPathExpressionEvaluator
 {
     public static final String NAME = "xpath-node";
@@ -72,5 +76,11 @@ public class XPathNodeExpressionEvaluator extends XPathExpressionEvaluator
     public String getName()
     {
         return NAME;
+    }
+
+    @Override
+    protected String getDeprecationMessage()
+    {
+        return "The xpath-node: expression evaluator has been deprecated in Mule 3.6.0 and will be removed in 4.0. Please use the xpath3() MEL function instead";
     }
 }

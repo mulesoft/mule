@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+
+    <flow name="groupCities">
+        <mulexml:xslt-transformer xsl-file="cities-xslt.xsl" />
+    </flow>
+
+    <flow name="booksAsCsv">
+        <mulexml:xslt-transformer xsl-file="xsl/books-csv.xsl" />
+    </flow>
+
+    <flow name="multipleInputs">
+        <mulexml:xslt-transformer xsl-file="multiple-inputs.xsl" />
+    </flow>
+</mule>

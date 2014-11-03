@@ -62,7 +62,8 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleContextTestCase
 
         long startTime = System.currentTimeMillis();
 
-        for (int i = 0; i < getParallelThreadCount(); ++i)
+        //for (int i = 0; i < getParallelThreadCount(); ++i)
+            for (int i = 0; i < 1; ++i)
         {
             new Thread(new Runnable()
             {
