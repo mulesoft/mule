@@ -15,17 +15,19 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 
 public class XMLExpressionLanguageExtension extends org.mule.el.mvel.DataConversion
-    implements ExpressionLanguageExtension, MuleContextAware, Initialisable
+        implements ExpressionLanguageExtension, MuleContextAware, Initialisable
 {
 
     private MuleContext muleContext;
     private XMLToStringConversionHandler conversionHandler = new XMLToStringConversionHandler();
     private ExpressionLanguageFunction xpathFunction;
+    private ExpressionLanguageFunction xpath3Function;
 
     @Override
     public void initialise() throws InitialisationException
     {
         xpathFunction = new XPathFunction(muleContext);
+        xpath3Function = new XPath3Function(muleContext);
     }
 
     @Override
@@ -33,6 +35,7 @@ public class XMLExpressionLanguageExtension extends org.mule.el.mvel.DataConvers
     {
         addConversionHandler(String.class, conversionHandler);
         context.declareFunction("xpath", xpathFunction);
+        context.declareFunction("xpath3", xpath3Function);
     }
 
     @Override

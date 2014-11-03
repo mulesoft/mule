@@ -24,10 +24,10 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.tree.DefaultAttribute;
 import org.junit.Test;
 
-public class XMLExpressionLanguageExtensionTestCase extends AbstractELTestCase
+public class XPath1FunctionTestCase extends AbstractELTestCase
 {
 
-    public XMLExpressionLanguageExtensionTestCase(Variant variant, String optimizer)
+    public XPath1FunctionTestCase(Variant variant, String optimizer)
     {
         super(variant, optimizer);
     }

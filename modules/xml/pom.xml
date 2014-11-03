@@ -102,25 +102,23 @@
             <artifactId>stax-utils</artifactId>
         </dependency>
 
-        <!-- XSLT Support -->
+        <!-- XSLT and Xpath Support -->
         <dependency>
-            <groupId>net.sourceforge.saxon</groupId>
-            <artifactId>saxon</artifactId>
-            <version>${saxonVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge.saxon</groupId>
-            <artifactId>saxon</artifactId>
-            <version>${saxonVersion}</version>
-            <classifier>dom</classifier>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>Saxon-HE</artifactId>
         </dependency>
 
         <!-- XQuery support -->
         <dependency>
-            <groupId>net.sourceforge.saxon</groupId>
-            <artifactId>saxon</artifactId>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>Saxon-HE</artifactId>
             <version>${saxonVersion}</version>
             <classifier>xqj</classifier>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.xquery</groupId>
+            <artifactId>xqj-api</artifactId>
+            <version>1.0</version>
         </dependency>
 
         <!-- Unit tests -->
@@ -166,4 +164,12 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>xqj</id>
+            <name>XQJ Maven Repository</name>
+            <url>http://xqj.net/maven</url>
+        </repository>
+    </repositories>
 </project>

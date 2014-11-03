@@ -16,13 +16,14 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.module.xml.i18n.XmlMessages;
 import org.mule.module.xml.util.NamespaceManager;
 import org.mule.module.xml.util.XMLUtils;
+import org.mule.util.OneTimeWarning;
 
 import java.util.Map;
 
 import org.apache.commons.jxpath.Container;
 import org.apache.commons.jxpath.JXPathContext;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 /**
@@ -38,8 +39,10 @@ public class JXPathExpressionEvaluator implements ExpressionEvaluator, MuleConte
     /**
      * logger used by this class
      */
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
     protected transient MuleContext muleContext;
+    private OneTimeWarning deprecationWarning = new OneTimeWarning(logger, "xpath2: expression evaluator has been deprecated in Mule 3.6.0 and will be removed " +
+                                                                           "in 4.0. Please use the new xpath3() function instead");
     private NamespaceManager namespaceManager;
 
     @Override
@@ -51,6 +54,8 @@ public class JXPathExpressionEvaluator implements ExpressionEvaluator, MuleConte
     @Override
     public Object evaluate(String expression, MuleMessage message)
     {
+        deprecationWarning.warn();
+
         Document document;
         try
         {
@@ -58,7 +63,7 @@ public class JXPathExpressionEvaluator implements ExpressionEvaluator, MuleConte
         }
         catch (Exception e)
         {
-            logger.error(e);
+            logger.error("Could not parse document", e);
             return null;
         }
 

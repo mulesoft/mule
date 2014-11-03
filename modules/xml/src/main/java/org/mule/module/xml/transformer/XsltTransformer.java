@@ -41,7 +41,7 @@ import org.apache.commons.pool.impl.GenericObjectPool;
  * This transformer maintains a pool of {@link javax.xml.transform.Transformer} objects to speed up processing of concurrent requests.
  * The pool can be configured using {@link #setMaxIdleTransformers(int)}.
  * <p/>
- * Parameter can also be set as part of the transformation context and these can be mapped to conent in the current message using
+ * Parameter can also be set as part of the transformation context and these can be mapped to content in the current message using
  * property extractors or can be fixed values.
  * <p/>
  * <p/>

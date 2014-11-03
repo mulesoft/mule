@@ -74,14 +74,14 @@ public class InlineXQueryTransformerTestCase extends AbstractTransformerTestCase
     {
         if (expected instanceof Document && result instanceof Document)
         {
-            return XMLUnit.compareXML((Document)expected, (Document)result).similar();
+            return XMLUnit.compareXML((Document) expected, (Document) result).similar();
         }
         else if (expected instanceof String && result instanceof String)
         {
             try
             {
-                String expectedString = this.normalizeString((String)expected);
-                String resultString = this.normalizeString((String)result);
+                String expectedString = this.normalizeString((String) expected);
+                String resultString = this.normalizeString((String) result);
                 return XMLUnit.compareXML(expectedString, resultString).similar();
             }
             catch (Exception ex)

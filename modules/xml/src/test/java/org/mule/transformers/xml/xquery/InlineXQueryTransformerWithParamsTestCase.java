@@ -58,6 +58,7 @@ public class InlineXQueryTransformerWithParamsTestCase extends AbstractTransform
         return transformer;
     }
 
+
     @Override
     public Transformer getRoundTripTransformer() throws Exception
     {

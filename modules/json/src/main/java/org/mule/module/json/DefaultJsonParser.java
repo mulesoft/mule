@@ -9,7 +9,7 @@ package org.mule.module.json;
 import org.mule.api.MuleContext;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
+import org.mule.transformer.TransformerUtils;
 import org.mule.transformer.types.DataTypeFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -80,7 +80,7 @@ public final class DefaultJsonParser implements JsonParser
             LOGGER.debug("Input type {} was not of any supported type. Attempting with transformer resolution of the following types {}",
                          input.getClass().getName(), TRANSFORMABLE_SUPPORTED_TYPES_AS_STRING);
 
-            input = transformToSupportedType(input, TRANSFORMABLE_SUPPORTED_TYPES);
+            input = TransformerUtils.transformToAny(input, muleContext, TRANSFORMABLE_SUPPORTED_TYPES);
             jsonNode = asJsonNode(input);
 
             if (jsonNode == null)
@@ -90,56 +90,6 @@ public final class DefaultJsonParser implements JsonParser
         }
 
         return jsonNode;
-    }
-
-    private <T> Object transformToSupportedType(T input, DataType<?>... supportedTypes)
-    {
-        final DataType sourceType = DataTypeFactory.create(input.getClass());
-        Object transformedData = null;
-
-        for (DataType<?> supportedType : supportedTypes)
-        {
-            transformedData = attemptTransformation(sourceType, input, supportedType);
-            if (transformedData != null)
-            {
-                break;
-            }
-        }
-
-        return transformedData;
-    }
-
-    private <S, R> R attemptTransformation(DataType<S> sourceDataType, S source, DataType<R> resultType)
-    {
-        Transformer transformer;
-        try
-        {
-            transformer = muleContext.getRegistry().lookupTransformer(sourceDataType, resultType);
-        }
-        catch (TransformerException e)
-        {
-            LOGGER.debug("Could not find a transformer from type {} to {}", sourceDataType.getType().getName(), resultType.getType().getName());
-            return null;
-        }
-
-        LOGGER.debug("Located transformer {} from type {} to type {}. Attempting transformation...", transformer.getName(), sourceDataType.getType().getName(), resultType.getType().getName());
-
-        try
-        {
-            return (R) transformer.transform(source);
-        }
-        catch (TransformerException e)
-        {
-            if (LOGGER.isDebugEnabled())
-            {
-                LOGGER.debug(
-                        String.format("Transformer %s threw exception while trying to transform an object of type %s into a %s",
-                                      transformer.getName(), sourceDataType.getType().getName(), resultType.getType().getName())
-                        , e);
-            }
-
-            return null;
-        }
     }
 
     private JsonNode toJsonNode(Object input) throws IOException

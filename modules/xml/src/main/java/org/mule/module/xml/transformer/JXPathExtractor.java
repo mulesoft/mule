@@ -34,7 +34,11 @@ import org.dom4j.XPath;
  * {@link #singleResult} property to <code>false</code>. In this case a
  * {@link List} of values will be returned. Note the property is currently ignored
  * for non-String/XML payloads.
+ *
+ * @deprecated This feature is deprecated and will be removed in Mule 4.0. Use MEL for extracting information
+ * out of a Java Object or the xpath3() MEL function in the case of an XML document
  */
+@Deprecated
 public class JXPathExtractor extends AbstractTransformer
 {
     public static final String OUTPUT_TYPE_NODE = "NODE";

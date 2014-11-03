@@ -8,6 +8,7 @@ package org.mule.module.xml.util;
 
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.transport.OutputHandler;
 import org.mule.module.xml.stax.DelegateXMLStreamReader;
 import org.mule.module.xml.stax.StaxSource;
@@ -65,6 +66,8 @@ import org.xml.sax.InputSource;
 public class XMLUtils extends org.mule.util.XMLUtils
 {
     public static final String TRANSFORMER_FACTORY_JDK5 = "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl";
+
+    public static final String XPATH1_FALLBACK = "mule.xml.xpath10.fallback";
 
     // xml parser feature names for optional XSD validation
     public static final String APACHE_XML_FEATURES_VALIDATION_SCHEMA = "http://apache.org/xml/features/validation/schema";
@@ -427,7 +430,78 @@ public class XMLUtils extends org.mule.util.XMLUtils
             return new javax.xml.transform.stream.StreamSource(stream);
         }
     }
-    
+
+    public static Node toDOMNode(Object src, MuleEvent event) throws Exception
+    {
+        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+        builderFactory.setNamespaceAware(true);
+
+        return toDOMNode(src, event, builderFactory);
+    }
+
+    public static Node toDOMNode(Object src, MuleEvent event, DocumentBuilderFactory factory) throws Exception
+    {
+        if (src instanceof Node)
+        {
+            return (Node) src;
+        }
+        else if (src instanceof InputSource)
+        {
+            return factory.newDocumentBuilder().parse((InputSource) src);
+        }
+        else if (src instanceof org.dom4j.Document)
+        {
+            return new DOMWriter().write((org.dom4j.Document) src);
+        }
+        else if (src instanceof OutputHandler)
+        {
+            OutputHandler handler = ((OutputHandler) src);
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            handler.write(event, output);
+            InputStream stream = new ByteArrayInputStream(output.toByteArray());
+
+            return factory.newDocumentBuilder().parse(stream);
+        }
+        else if (src instanceof byte[])
+        {
+            ByteArrayInputStream stream = new ByteArrayInputStream((byte[]) src);
+            return factory.newDocumentBuilder().parse(stream);
+        }
+        else if (src instanceof InputStream)
+        {
+            return factory.newDocumentBuilder().parse((InputStream) src);
+        }
+        else if (src instanceof String)
+        {
+            return factory.newDocumentBuilder().parse(
+                    new InputSource(new StringReader((String) src)));
+        }
+        else if (src instanceof XMLStreamReader)
+        {
+            XMLStreamReader xsr = (XMLStreamReader) src;
+
+            // StaxSource requires that we advance to a start element/document event
+            if (!xsr.isStartElement() && xsr.getEventType() != XMLStreamConstants.START_DOCUMENT)
+            {
+                xsr.nextTag();
+            }
+
+            return factory.newDocumentBuilder().parse(new InputSource());
+        }
+        else if (src instanceof DelayedResult)
+        {
+            DelayedResult result = ((DelayedResult) src);
+            DOMResult domResult = new DOMResult();
+            result.write(domResult);
+            return domResult.getNode();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+
     /**
      * Copies the reader to the writer. The start and end document methods must
      * be handled on the writer manually. TODO: if the namespace on the reader

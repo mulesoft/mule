@@ -160,7 +160,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
             {
                 xpathCollection = true;
             }
-            else if (expressionConfig.getEvaluator() == null && expressionConfig.getExpression().matches("^xpath\\(.+\\)$"))
+            else if (expressionConfig.getEvaluator() == null && isXPathExpression(expressionConfig.getExpression()))
             {
                 xpathCollection = true;
             }
@@ -193,6 +193,12 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
             throw new InitialisationException(e, this);
         }
         super.initialise();
+    }
+
+    private boolean isXPathExpression(String expression)
+    {
+        return expression.matches("^xpath\\(.+\\)$") ||
+               expression.matches("^xpath3\\(.+\\)$");
     }
 
     private void checkEvaluator(ExpressionConfig expressionConfig)
