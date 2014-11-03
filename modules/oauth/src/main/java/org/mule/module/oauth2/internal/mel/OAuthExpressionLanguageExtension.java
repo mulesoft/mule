@@ -7,15 +7,12 @@
 package org.mule.module.oauth2.internal.mel;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.el.ExpressionLanguageContext;
 import org.mule.api.el.ExpressionLanguageExtension;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
-import org.mule.api.registry.RegistrationException;
-import org.mule.module.oauth2.internal.state.OAuthStateRegistry;
 
 /**
  * MEL extension for adding OAuth related functions.
@@ -23,26 +20,19 @@ import org.mule.module.oauth2.internal.state.OAuthStateRegistry;
 public class OAuthExpressionLanguageExtension implements ExpressionLanguageExtension, MuleContextAware, Startable, Initialisable
 {
 
-    private OAuthStateExpressionLanguageFunction oauthStateFunction;
+    private OAuthContextExpressionLanguageFunction oauthContextFunction;
     private MuleContext muleContext;
 
     @Override
     public void start()
     {
-        try
-        {
-            oauthStateFunction.setOAuthStateRegistry(muleContext.getRegistry().lookupObject(OAuthStateRegistry.class));
-        }
-        catch (RegistrationException e)
-        {
-            throw new MuleRuntimeException(e);
-        }
+        oauthContextFunction.setRegistry(muleContext.getRegistry());
     }
 
     @Override
     public void configureContext(final ExpressionLanguageContext context)
     {
-        context.declareFunction("oauthState", oauthStateFunction);
+        context.declareFunction("oauthContext", oauthContextFunction);
     }
 
     @Override
@@ -56,7 +46,7 @@ public class OAuthExpressionLanguageExtension implements ExpressionLanguageExten
     {
         try
         {
-            oauthStateFunction = new OAuthStateExpressionLanguageFunction();
+            oauthContextFunction = new OAuthContextExpressionLanguageFunction();
         }
         catch (Exception e)
         {

@@ -1,1 +1,1 @@
-http\://www.mulesoft.org/schema/mule/oauth2=org.mule.module.oauth2.config.OAuthNamespaceHandler
+http\://www.mulesoft.org/schema/mule/oauth2=org.mule.module.oauth2.internal.config.OAuthNamespaceHandler

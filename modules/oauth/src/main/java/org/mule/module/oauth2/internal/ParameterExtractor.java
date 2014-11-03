@@ -26,7 +26,7 @@ public class ParameterExtractor
     }
 
     /**
-     * @return name of the parameter used to store it in the oauth state.
+     * @return name of the parameter used to store it in the oauth context.
      */
     public String getParamName()
     {

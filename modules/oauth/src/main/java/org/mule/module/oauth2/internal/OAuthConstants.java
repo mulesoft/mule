@@ -19,13 +19,18 @@ public interface OAuthConstants
     String EXPIRES_IN_PARAMETER = "expires_in";
     String REFRESH_TOKEN_PARAMETER = "refresh_token";
     String STATE_PARAMETER = "state";
+    String SCOPE_PARAMETER = "scope";
 
     //Values
     String GRANT_TYPE_AUTHENTICATION_CODE = "authorization_code";
+    String GRANT_TYPE_CLIENT_CREDENTIALS = "client_credentials";
     String GRANT_TYPE_REFRESH_TOKEN = "refresh_token";
 
     //Expressions to extract parameters from standard token url response.
-    public final static String ACCESS_TOKEN_EXPRESSION = "#[regex('" + ".*\"access_token\"[ ]*:[ ]*\"([^\\\"]*)\".*" + "')]";
-    public final static String REFRESH_TOKEN_EXPRESSION = "#[regex('" + ".*\"refresh_token\"[ ]*:[ ]*\"([^\\\"]*)\".*" + "')]";
-    public final static String EXPIRATION_TIME_EXPRESSION = "#[regex('" + ".*\"expires_in\"[ ]*:[ ]*([\\\\d]*).*" + "')]";
+    String ACCESS_TOKEN_EXPRESSION = "#[regex('" + ".*\"access_token\"[ ]*:[ ]*\"([^\\\"]*)\".*" + "')]";
+    String REFRESH_TOKEN_EXPRESSION = "#[regex('" + ".*\"refresh_token\"[ ]*:[ ]*\"([^\\\"]*)\".*" + "')]";
+    String EXPIRATION_TIME_EXPRESSION = "#[regex('" + ".*\"expires_in\"[ ]*:[ ]*([\\\\d]*).*" + "')]";
+
+    String DEFAULT_REFRESH_TOKEN_WHEN_EXPRESSION = "#[message.inboundProperties['http.status'] == 401 || message.inboundProperties['http.status'] == 403]";
+
 }

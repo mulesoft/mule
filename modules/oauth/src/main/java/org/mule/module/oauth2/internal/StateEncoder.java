@@ -10,32 +10,32 @@ import org.mule.util.Preconditions;
 import org.mule.util.StringUtils;
 
 /**
- * Utility class to encode and decode an OAuthStateId in the authentication request state parameter
+ * Utility class to encode and decode an resourceOwnerId in the authentication request state parameter
  */
 public class StateEncoder
 {
 
-    public static final String OAUTH_STATE_ID_PARAM_NAME = ":oauthStateId";
+    public static final String OAUTH_STATE_ID_PARAM_NAME = ":resourceOwnerId";
     public static final String OAUTH_STATE_ID_PARAM_ASSIGN = OAUTH_STATE_ID_PARAM_NAME + "=";
 
     /**
-     * Creates an state value with the oauth state id encoded in it.
+     * Creates an state value with the resource owner id encoded in it.
      *
      * @param originalState the original state
-     * @param oauthStateId  the oauthStateId to encode
+     * @param resourceOwnerId  the resourceOwnerId to encode
      * @return an updated state with the original content plus the oath state id.
      */
-    public static final String encodeOAuthStateIdInState(final String originalState, final String oauthStateId)
+    public static final String encodeResourceOwnerIdInState(final String originalState, final String resourceOwnerId)
     {
-        Preconditions.checkArgument(oauthStateId != null, "oauthStateId parameter cannot be null");
+        Preconditions.checkArgument(resourceOwnerId != null, "resourceOwnerId parameter cannot be null");
         String newState;
-        if (originalState == null && oauthStateId != null)
+        if (originalState == null && resourceOwnerId != null)
         {
-            newState = OAUTH_STATE_ID_PARAM_ASSIGN + oauthStateId;
+            newState = OAUTH_STATE_ID_PARAM_ASSIGN + resourceOwnerId;
         }
-        else if (oauthStateId != null)
+        else if (resourceOwnerId != null)
         {
-            newState = (originalState == null ? StringUtils.EMPTY : originalState) + OAUTH_STATE_ID_PARAM_ASSIGN + oauthStateId;
+            newState = (originalState == null ? StringUtils.EMPTY : originalState) + OAUTH_STATE_ID_PARAM_ASSIGN + resourceOwnerId;
         }
         else
         {
@@ -45,7 +45,7 @@ public class StateEncoder
     }
 
     /**
-     * Decodes the original state from an encoded state using #encodeOAuthStateIdInState
+     * Decodes the original state from an encoded state using #encodeResourceOwnerIdInState
      *
      * @param state the encoded state
      * @return the original state, null if the original state was empty.
@@ -55,10 +55,10 @@ public class StateEncoder
         String originalState = state;
         if (state != null)
         {
-            final int oauthStateIdSuffixIndex = state.indexOf(OAUTH_STATE_ID_PARAM_ASSIGN);
-            if (oauthStateIdSuffixIndex != -1)
+            final int resourceOwnerIdSuffixIndex = state.indexOf(OAUTH_STATE_ID_PARAM_ASSIGN);
+            if (resourceOwnerIdSuffixIndex != -1)
             {
-                originalState = state.substring(0, oauthStateIdSuffixIndex);
+                originalState = state.substring(0, resourceOwnerIdSuffixIndex);
                 if (originalState.isEmpty())
                 {
                     originalState = null;
@@ -69,19 +69,19 @@ public class StateEncoder
     }
 
     /**
-     * Decodes the oauth state id from an encoded state using #encodeOAuthStateIdInState
+     * Decodes the resource owner id from an encoded state using #encodeResourceOwnerIdInState
      *
      * @param state the encoded state
-     * @return the oauth state id, null if there's no oauth state id encoded in it.
+     * @return the resource owner id, null if there's no oauth state id encoded in it.
      */
-    public static String decodeOAuthStateId(final String state)
+    public static String decodeResourceOwnerId(final String state)
     {
-        String oauthStateId = null;
+        String resourceOwnerId = null;
         if (state != null && state.contains(OAUTH_STATE_ID_PARAM_ASSIGN))
         {
-            final int oauthStateIdSuffixIndex = state.indexOf(OAUTH_STATE_ID_PARAM_ASSIGN);
-            oauthStateId = state.substring(oauthStateIdSuffixIndex + OAUTH_STATE_ID_PARAM_ASSIGN.length(), state.length());
+            final int resourceOwnerIdSuffixIndex = state.indexOf(OAUTH_STATE_ID_PARAM_ASSIGN);
+            resourceOwnerId = state.substring(resourceOwnerIdSuffixIndex + OAUTH_STATE_ID_PARAM_ASSIGN.length(), state.length());
         }
-        return oauthStateId;
+        return resourceOwnerId;
     }
 }

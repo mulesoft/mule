@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:oauth2="http://www.mulesoft.org/schema/mule/oauth2"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/oauth2 http://www.mulesoft.org/schema/mule/oauth2/current/mule-oauth2.xsd">
+
+    <oauth2:authorization-code-config name="multitenantConfig"
+                                clientId="${client.id}"
+                                clientSecret="${client.secret}"
+                                redirectionUrl="${redirect.url}"
+                                resourceOwnerId="#[message.inboundProperties['http.query.params']['userId']]">
+        <oauth2:authorization-request
+                state="#[message.inboundProperties['http.query.params'] == null ? '' : message.inboundProperties['http.query.params']['state']]"
+                localAuthorizationUrl="${local.authorization.url}"
+                authorizationUrl="${authorization.url}">
+        </oauth2:authorization-request>
+        <oauth2:token-request
+                tokenUrl="${token.url}"/>
+    </oauth2:authorization-code-config>
+
+</mule>
