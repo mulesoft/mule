@@ -7,7 +7,10 @@
                http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <mule-xml:namespace-manager includeConfigNamespaces="true"/>
+    <mule-xml:namespace-manager includeConfigNamespaces="true">
+        <mule-xml:namespace prefix="simple" uri="http://simple.component.mule.org/"/>
+    </mule-xml:namespace-manager>
+
     <custom-transformer
         class="org.mule.module.xml.transformer.XmlToDomDocument"
         name="InputStreamToDOM"
