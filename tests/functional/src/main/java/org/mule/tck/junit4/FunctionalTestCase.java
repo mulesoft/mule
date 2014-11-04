@@ -251,7 +251,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
      */
     protected MuleEvent runFlow(String flowName) throws Exception
     {
-        return this.runFlow(flowName, null);
+        return this.runFlow(flowName, (Object) null);
     }
 
     /**
