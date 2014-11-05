@@ -202,6 +202,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/cxf-rt-ws-security-2.3.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/cxf-tools-common-2.3.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/cxf-wstx-msv-validation-2.3.1.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/coyote-6.0.29.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/dom4j-1.6.1-osgi.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/drools-api-5.0.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/drools-compiler-5.0.1.jar
@@ -283,7 +284,6 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/saxon-xqj-8.9.0.4.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/scribe-1.0.3.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/servlet-api-2.5-20081211.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/servlet-api-6.0.29.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/smack-3.1.0.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/smackx-3.1.0.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/spring-aop-3.0.3.RELEASE.jar
