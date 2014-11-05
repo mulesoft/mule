@@ -105,6 +105,12 @@
             <groupId>org.apache.tomcat</groupId>
             <artifactId>coyote</artifactId>
             <version>${tomcatVersion}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.tomcat</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.samba.jcifs</groupId>
