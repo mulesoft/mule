@@ -248,6 +248,15 @@
         <xaPoolVersion>1.5.0</xaPoolVersion>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.googlecode.multithreadedtc</groupId>
+            <artifactId>multithreadedtc</artifactId>
+            <version>${multithreadedtcVersion}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
     <!-- Declare all dependencies that are used in more than one module here. -->
     <dependencyManagement>
         <dependencies>

@@ -98,6 +98,7 @@ public class AuthorizationRequestHandler implements MuleContextAware
                 httpListenerBuilder.setTlsContextFactory(oauthConfig.getTlsContextFactory());
             }
             this.listener = httpListenerBuilder.build();
+            this.listener.initialise();
             this.listener.start();
         }
         catch (MalformedURLException e)

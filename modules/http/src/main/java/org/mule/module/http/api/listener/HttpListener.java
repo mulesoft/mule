@@ -7,15 +7,13 @@
 package org.mule.module.http.api.listener;
 
 import org.mule.api.MuleException;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.source.MessageSource;
 
 /**
  * Represents an listener for HTTP requests.
  */
-public interface HttpListener extends MessageSource, Startable, Stoppable, Disposable
+public interface HttpListener extends MessageSource, Lifecycle
 {
 
     /**

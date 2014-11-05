@@ -206,6 +206,4 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
         }
         return true;
     }
-
-
 }

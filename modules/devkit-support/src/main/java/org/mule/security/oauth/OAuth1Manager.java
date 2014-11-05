@@ -6,6 +6,7 @@
  */
 package org.mule.security.oauth;
 
+import org.mule.api.transport.Connector;
 import org.mule.common.security.oauth.exception.NotAuthorizedException;
 import org.mule.common.security.oauth.exception.UnableToAcquireAccessTokenException;
 import org.mule.common.security.oauth.exception.UnableToAcquireRequestTokenException;
@@ -73,5 +74,7 @@ public interface OAuth1Manager extends HttpCallbackAdapter
      * @param adapter the adapter to be reset
      */
     public void reset(OAuth1Adapter adapter);
+
+    public Connector getConnector();
 
 }

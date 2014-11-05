@@ -217,7 +217,7 @@ public class HttpListenerBuilder
                 errorResponseBuilder.initialise();
                 httpListener.setErrorResponseBuilder(errorResponseBuilder);
             }
-            httpListener.initialise();
+
             return httpListener;
         }
         catch (InitialisationException e)

@@ -6,15 +6,7 @@
  */
 package org.mule.security.oauth;
 
-import oauth.signpost.OAuthConsumer;
-import oauth.signpost.OAuthProvider;
-import oauth.signpost.basic.DefaultOAuthConsumer;
-import oauth.signpost.basic.DefaultOAuthProvider;
-import oauth.signpost.exception.OAuthCommunicationException;
-import oauth.signpost.exception.OAuthExpectationFailedException;
-import oauth.signpost.exception.OAuthMessageSignerException;
-import oauth.signpost.exception.OAuthNotAuthorizedException;
-
+import org.mule.api.transport.Connector;
 import org.mule.common.security.oauth.exception.NotAuthorizedException;
 import org.mule.common.security.oauth.exception.UnableToAcquireAccessTokenException;
 import org.mule.common.security.oauth.exception.UnableToAcquireRequestTokenException;
@@ -28,6 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import oauth.signpost.OAuthConsumer;
+import oauth.signpost.OAuthProvider;
+import oauth.signpost.basic.DefaultOAuthConsumer;
+import oauth.signpost.basic.DefaultOAuthProvider;
+import oauth.signpost.exception.OAuthCommunicationException;
+import oauth.signpost.exception.OAuthExpectationFailedException;
+import oauth.signpost.exception.OAuthMessageSignerException;
+import oauth.signpost.exception.OAuthNotAuthorizedException;
 import org.slf4j.Logger;
 
 public abstract class BaseOAuth1Manager extends DefaultHttpCallbackAdapter implements OAuth1Manager
@@ -278,7 +278,13 @@ public abstract class BaseOAuth1Manager extends DefaultHttpCallbackAdapter imple
             }
         }
     }
-    
+
+    @Override
+    public Connector getConnector()
+    {
+        return (Connector) super.getConnector();
+    }
+
     /**
      * {@inheritDoc}
      */
