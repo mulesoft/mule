@@ -188,7 +188,6 @@ saxon-8.9.0.4-osgi
 saxon-dom-8.9.0.4-osgi
 saxon-xqj-8.9.0.4
 servlet-api-2.5-20081211
-servlet-api-6.0.29
 scribe-1.0.3
 smack-3.1.0
 smackx-3.1.0
