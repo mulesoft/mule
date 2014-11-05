@@ -629,7 +629,6 @@
 /mule-standalone-${productVersion}/lib/opt/saxon-xqj-8.9.0.4.jar
 /mule-standalone-${productVersion}/lib/opt/scribe-1.0.3.jar
 /mule-standalone-${productVersion}/lib/opt/servlet-api-2.5-20081211.jar
-/mule-standalone-${productVersion}/lib/opt/servlet-api-6.0.29.jar
 /mule-standalone-${productVersion}/lib/opt/smack-3.1.0.jar
 /mule-standalone-${productVersion}/lib/opt/smackx-3.1.0.jar
 /mule-standalone-${productVersion}/lib/opt/spring-aop-3.1.1.RELEASE.jar
@@ -654,6 +653,8 @@
 /mule-standalone-${productVersion}/lib/opt/sxc-core-0.7.3-osgi.jar
 /mule-standalone-${productVersion}/lib/opt/sxc-runtime-0.7.3-osgi.jar
 /mule-standalone-${productVersion}/lib/opt/sxc-xpath-0.7.3-osgi.jar
+/mule-standalone-${productVersion}/lib/opt/catalina-6.0.29.jar
+/mule-standalone-${productVersion}/lib/opt/coyote-6.0.29.jar
 /mule-standalone-${productVersion}/lib/opt/woodstox-core-asl-4.1.4.jar
 /mule-standalone-${productVersion}/lib/opt/wsdl4j-1.6.2.jar
 /mule-standalone-${productVersion}/lib/opt/wss4j-1.6.9.jar

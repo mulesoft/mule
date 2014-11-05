@@ -171,6 +171,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/bcprov-ext-jdk16-1.46.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/bcprov-jdk16-1.46.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/bctsp-jdk16-1.46.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/catalina-6.0.29.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/cglib-nodep-2.2.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/cometd-api-1.1.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/cometd-server-6.1.26.jar
@@ -184,6 +185,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/commons-lang-2.4.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/commons-net-2.0.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/commons-pool-1.5.3.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/coyote-6.0.29.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/cxf-api-2.5.9.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/cxf-rt-management-2.5.9.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/cxf-common-utilities-2.5.9.jar
@@ -314,8 +316,6 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/sxc-core-0.7.3-osgi.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/sxc-runtime-0.7.3-osgi.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/sxc-xpath-0.7.3-osgi.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/tomcat-apr-5.5.23.jar
-/mule-standalone-nodocs-${productVersion}/lib/opt/tomcat-util-5.5.23.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/woodstox-core-asl-4.1.4.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/wsdl4j-1.6.2.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/wss4j-1.6.9.jar
