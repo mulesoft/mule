@@ -6,6 +6,8 @@
  */
 package org.mule.module.xml.filters;
 
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
@@ -33,13 +35,13 @@ import org.jaxen.dom.DOMXPath;
 import org.jaxen.dom4j.Dom4jXPath;
 import org.jaxen.javabean.JavaBeanXPath;
 
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
-
 /**
  * <code>JaxenFilter</code> evaluates an XPath expression against an XML document
  * using Jaxen.
+ *
+ * @deprecated This feature is deprecated and will be removed in Mule 4.0. Use xpath-filter instead
  */
+@Deprecated
 public class JaxenFilter implements Filter, MuleContextAware
 {
     protected transient Log logger = LogFactory.getLog(getClass());

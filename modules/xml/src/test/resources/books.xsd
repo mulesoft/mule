@@ -1,0 +1,135 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning">
+    
+ <xs:element name="BOOKLIST">
+  <xs:complexType>
+   <xs:sequence>
+    <xs:element ref="BOOKS"/>
+    <xs:element ref="CATEGORIES"/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+
+ <xs:element name="BOOKS">
+  <xs:complexType>
+   <xs:sequence>
+    <xs:element ref="ITEM" maxOccurs="unbounded"/>
+   </xs:sequence>
+   <xs:assert test="count(ITEM) le 10000" vc:minVersion="1.1"/>
+  </xs:complexType> 
+ </xs:element>
+
+ <xs:element name="CATEGORIES">
+  <xs:complexType mixed="true">
+   <xs:sequence minOccurs="0" maxOccurs="unbounded">
+    <xs:element ref="CATEGORY"/>
+   </xs:sequence>
+   <xs:attribute name="DESC" type="xs:string" use="required"/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name="CATEGORY">
+  <xs:complexType>
+   <xs:attribute name="CODE" type="xs:ID" use="required"/>
+   <xs:attribute name="DESC" type="xs:string" use="required"/>
+   <xs:attribute name="NOTE" type="xs:string" use="optional"/>
+  </xs:complexType>
+ </xs:element>
+
+ <xs:element name="ITEM">
+  <xs:complexType>
+   <xs:sequence>
+    <xs:element name="TITLE" type="xs:string"/>
+    <xs:element name="AUTHOR" type="xs:string"/>
+    <xs:element name="PUBLISHER" type="xs:string"/>
+    <xs:element name="PUB-DATE" type="xs:date"/>
+    <xs:element name="LANGUAGE" type="languageType"/>
+    <xs:element name="PRICE" type="moneyType"/>
+    <xs:element name="QUANTITY" type="xs:integer"/>
+    <xs:element name="ISBN" type="ISBNType"/>                      
+    <xs:element name="PAGES" type="xs:integer"/>
+    <xs:element name="DIMENSIONS" type="dimensionsType"/>
+    <xs:element name="WEIGHT" type="weightType"/>
+   </xs:sequence>
+   <xs:attribute name="CAT" type="xs:IDREF" use="required"/>
+   <xs:attribute name="TAX" type="xs:NMTOKEN" use="optional" default="V"/>
+  </xs:complexType>
+ </xs:element>
+ 
+ <xs:simpleType name="languageType">
+  <xs:restriction base="xs:string">
+   <xs:enumeration value="English"/>
+   <xs:enumeration value="French"/>
+   <xs:enumeration value="German"/>
+   <xs:enumeration value="Spanish"/>
+  </xs:restriction>
+ </xs:simpleType>
+ 
+ <xs:complexType name="moneyType">
+  <xs:simpleContent>
+   <xs:extension base="xs:decimal">
+    <xs:attribute name="currency" type="currencyType"/>
+   </xs:extension> 
+  </xs:simpleContent>
+ </xs:complexType>
+ 
+ <xs:simpleType name="currencyType">
+  <xs:restriction base="xs:string">
+   <xs:enumeration value="USD"/>
+   <xs:enumeration value="GBP"/>
+   <xs:enumeration value="EUR"/>
+   <xs:enumeration value="CAD"/>
+  </xs:restriction>
+ </xs:simpleType> 
+ 
+ <xs:simpleType name="ISBNType">
+  <xs:restriction base="xs:string">
+   <xs:pattern value="[0-9]{9}[0-9X]"/>
+  </xs:restriction>
+ </xs:simpleType>     
+ 
+ <xs:complexType name="dimensionsType">
+  <xs:simpleContent>
+   <xs:extension base="dimensionsContentType"> 
+    <xs:attribute name="UNIT" type="lengthUnitType"/>
+   </xs:extension> 
+  </xs:simpleContent>
+ </xs:complexType>
+ 
+ <xs:simpleType name="dimensionsContentType">
+  <xs:restriction>
+   <xs:simpleType>
+    <xs:list itemType="dimensionType"/>
+   </xs:simpleType>     
+   <xs:length value="3"/>
+  </xs:restriction>
+ </xs:simpleType>  
+ 
+ <xs:simpleType name="lengthUnitType">
+  <xs:restriction base="xs:string">
+   <xs:enumeration value="in"/>
+   <xs:enumeration value="cm"/>
+  </xs:restriction>
+ </xs:simpleType> 
+ 
+ <xs:simpleType name="dimensionType">
+  <xs:restriction base="xs:decimal">
+   <xs:minExclusive value="0.00"/>
+  </xs:restriction>
+ </xs:simpleType> 
+ 
+ <xs:complexType name="weightType">
+  <xs:simpleContent>
+   <xs:extension base="xs:decimal">
+    <xs:attribute name="UNIT" type="weightUnitType"/>
+   </xs:extension> 
+  </xs:simpleContent>
+ </xs:complexType>
+ 
+ <xs:simpleType name="weightUnitType">
+  <xs:restriction base="xs:string">
+   <xs:enumeration value="oz"/>
+   <xs:enumeration value="g"/>
+  </xs:restriction>
+ </xs:simpleType>    
+    
+</xs:schema>

@@ -11,6 +11,53 @@ MULE-7755: Patterns module is deprecated and will be removed in Mule 4.0.
 MULE-7857: The RemoteDispatcher and related classes in the client module have been deprecated and will be removed in Mule 4.0.
 MULE-7858: Support for spring events and related classes in the spring-extras module has been deprecated and will be removed in Mule 4.0.
 MULE-7723: ScriptConfigurationBuilder and related resources have been deprecated and will be removed in Mule 4.0.
+MULE-7842: Jersey was upgraded to version 2.11 which implements jax-rs 2.0. Applications using the jersey module will need upgrading. For further reference see Jersey's migration guide at https://jersey.java.net/documentation/latest/migration.html#mig-1.x
+MULE-7842: javax.annotation:javax.annotation-api was upgraded to version 1.2. We're now importing this dependency directly while before we did it through the geronimo-specs project
+MULE-6866: Groovy was upgraded to version 2.3.7-indy. If this produces any compatibility issues with an existing script you should either update your script (recommended) or go back to a prior version by replacing the groovy jar at MULE_HOME/lib/opt
+MULE-7906: Jython 2.7.3b3 is now part of the distribution. You no longer need to install the scripting pack or include it on your app. If this produces any compatibility issues with an existing script you should either update your application/installation (recommended) or replace/delete the jython jar at MULE_HOME/lib/opt
+MULE-7740: Rhino 1.7R4 is now part of the distribution. You no longer need to install the scripting pack or include it on your app. If this produces any compatibility issues with an existing script you should either update your application/installation (recommended) or replace/delete the rhino and js-engine jars at MULE_HOME/lib/opt
+MULE-7946: The following dependencies were removed from the distribution since they're no longer necessary as 1.7 is now the minimum required JDK version for running mule:
+    * geronimo-j2ee-management_1.0_spec-1.1.jar
+    * jaxb-api-2.1.jar
+    * jaxws-api-2.2.1.jar
+    * jsr250-api-1.0.jar
+    * jsr181-api-1.0-MR1.jar
+    * saaj-api-1.3.jar
+    * saaj-impl-1.3.jar
+
+MULE-7949: Guava has been upgraded to version 18.0
+MULE-7950: The following Apache Commons dependencies were upgraded:
+    * commons-codec: from version 1.3 to 1.9
+    * commons-exec: from version 1.1 to 1.2
+    * commons-net: from version 2.0 to 2.2
+MULE-7951: xmlunit has been upgraded to version 1.5
+MULE-7919: json-schema-validation-filter in the json module was deprecated and will be removed in Mule 4.0. Use the new validate-schema message processor instead.
+MULE-7919: The following classes have been deprecated. Use JsonSchemaValidator instead
+    * JsonSchemaFilter
+    * JsonSchemaJsonValidationFilter
+    * JsonSchemaValidationFilter
+    * JsonSChemaXsdValidationFilter
+MULE-7919: The following dependencies were upgraded:
+    * jackson-databind: from version 2.1.1 to 2.4.3
+    * joda-time: from version 1.6 to 2.5
+MULE-7919: The dependency org.kitchen-eel:json-schema-validator was removed and replaced with com.github.fge:json-schema-validator:2.2.5. If you still need to use that dependency, you can safely add it back to your application/runtime.
+MULE-7987: The following dependencies were upgraded:
+    * saxon: from version 9.1.0.8 to 9.6.0.1-HE
+    * woodstox-core-asl: from version 4.1.4 to 4.4.1
+    * stax2-api: from version 3.1.1 to 3.1.4
+MULE-7030: The following features have been deprecated in favor of <expression-filter>:
+    * jaxen-filter
+    * jxpath-filter
+MULE-7030: The following features have been deprecated in favor of <expression-transformer>:
+    * jxpath-extractor-transformer
+    * bean: expression evaluator
+MULE-7030: The following features have been deprecated in favor of the new xpath3() MEL Function
+    * xpath: expression evaluator
+    * xpath2: expression evaluator (in favor of the xpath3() MEL function)
+    * xpath() MEL Function
+MULE-7030: The xpath-filter element is now namespace aware. If you're using it with XPath expressions which reference custom namespaces, you now have to declare them in a namespace-manager element or use a wildcard (*:/title instead of book:title)
+MULE-8001: The xquery-transformer element will now always return a java List when no return type has explicitly been specified
+
 
 Migration changes from 3.4.x to 3.5.x
 

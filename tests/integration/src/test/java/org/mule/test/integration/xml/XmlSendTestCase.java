@@ -6,8 +6,10 @@
  */
 package org.mule.test.integration.xml;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -83,5 +85,16 @@ public class XmlSendTestCase extends FunctionalTestCase
         xml = getClass().getResourceAsStream("validation3.xml");
         message = client.send("http://localhost:" + dynamicPort.getNumber() + "/validate", xml, null);
         assertEquals("200", message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+    }
+
+    @Test
+    public void testExtractor() throws Exception
+    {
+        InputStream xml = getClass().getResourceAsStream("validation1.xml");
+        MuleClient client = muleContext.getClient();
+
+        // this will submit the xml via a POST request
+        MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() + "/extract", xml, null);
+        assertThat(message.getPayloadAsString(), equalTo("some"));
     }
 }

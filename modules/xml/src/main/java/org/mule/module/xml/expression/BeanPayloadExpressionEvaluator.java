@@ -13,7 +13,10 @@ import org.jaxen.JaxenException;
 import org.jaxen.XPath;
 import org.jaxen.javabean.JavaBeanXPath;
 
-/** TODO */
+/**
+ * @deprecated This expression evaluator is deprecated and will be removed in Mule 4.0. Use MEL expressions instead
+ */
+@Deprecated
 public class BeanPayloadExpressionEvaluator extends AbstractXPathExpressionEvaluator
 {
     public static final String NAME = "bean";
@@ -43,5 +46,11 @@ public class BeanPayloadExpressionEvaluator extends AbstractXPathExpressionEvalu
     public String getName()
     {
         return NAME;
+    }
+
+    @Override
+    protected String getDeprecationMessage()
+    {
+        return "The bean: expression evaluator has been deprecated in Mule 3.6.0 and will be removed in 4.0. Please use MEL expressions instead";
     }
 }

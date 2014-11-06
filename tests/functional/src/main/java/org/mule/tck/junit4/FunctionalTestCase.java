@@ -232,21 +232,33 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
      */
     protected MuleEvent runFlow(String flowName) throws Exception
     {
-        return this.runFlow(flowName, null);
+        return this.runFlow(flowName, (Object) null);
     }
 
     /**
      * Executes the given flow with a default message carrying the payload
      * 
      * @param flowName the name of the flow to be executed
-     * @param payload the payload to use int he message
+     * @param payload the payload to use in the message
      * @return the resulting <code>MuleEvent</code>
      * @throws Exception
      */
     protected <T> MuleEvent runFlow(String flowName, T payload) throws Exception
     {
+        return runFlow(flowName, getTestEvent(payload));
+    }
+
+    /**
+     * Executes the given flow with the given {@code event}
+     *
+     * @param flowName the name of the flow to be executed
+     * @param event the event which we'll use to execute the flow
+     * @return the resulting <code>MuleEvent</code>
+     * @throws Exception
+     */
+    protected MuleEvent runFlow(String flowName, MuleEvent event) throws Exception {
         Flow flow = lookupFlowConstruct(flowName);
-        return flow.process(getTestEvent(payload));
+        return flow.process(event);
     }
 
     /**

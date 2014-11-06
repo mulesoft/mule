@@ -11,8 +11,7 @@
       http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <!--// START SNIPPET: transformer-config -->
-    <mxml:xquery-transformer name="xquery">
+    <mxml:xquery-transformer name="xquery" returnClass="java.lang.String">
         <mxml:context-property key="title" value="#[header:INBOUND:ListTitle]"/>
         <mxml:context-property key="rating" value="#[header:INBOUND:ListRating]"/>
 

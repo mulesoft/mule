@@ -17,6 +17,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.context.notification.MuleContextNotification;
+import org.mule.module.xml.el.XPath3Function;
 import org.mule.module.xml.i18n.XmlMessages;
 import org.mule.module.xml.stax.MapNamespaceContext;
 import org.mule.module.xml.util.NamespaceManager;
@@ -45,7 +46,10 @@ import org.w3c.dom.Node;
  * </code>
  * <p/>
  * Where the type can either be boolean, string, number, node or nodeset.
+ *
+ * @deprecated This expression evaluator is deprecated and will be removed in Mule 4. Use {@link XPath3Function} instead
  */
+@Deprecated
 public class JaxpXPathExpressionEvaluator implements ExpressionEvaluator, Initialisable, Disposable, MuleContextAware
 {
     private Map<String, XPathExpression> cache = new WeakHashMap<String, XPathExpression>(8);

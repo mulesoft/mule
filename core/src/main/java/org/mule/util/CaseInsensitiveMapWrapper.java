@@ -36,9 +36,16 @@ public class CaseInsensitiveMapWrapper<T> implements Map<String, T>, Serializabl
 
     private final Map<CaseInsensitiveMapKey, T> baseMap;
 
-    public CaseInsensitiveMapWrapper(Class<? extends Map> mapClass, Object... parameters) throws Exception
+    public CaseInsensitiveMapWrapper(Class<? extends Map> mapClass, Object... parameters)
     {
-        baseMap = ClassUtils.instanciateClass(mapClass, parameters);
+        try
+        {
+            baseMap = ClassUtils.instanciateClass(mapClass, parameters);
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(String.format("Can not create an instance of %s", mapClass.getCanonicalName()), e);
+        }
     }
 
     @Override

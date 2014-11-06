@@ -6,7 +6,9 @@
  */
 package org.mule.module.xml.transformer;
 
+import org.mule.RequestContext;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.lifecycle.InitialisationException;
@@ -15,21 +17,14 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.xml.util.NamespaceManager;
+import org.mule.module.xml.util.XMLUtils;
+import org.mule.module.xml.xpath.SaxonXpathEvaluator;
+import org.mule.module.xml.xpath.XPathEvaluator;
+import org.mule.module.xml.xpath.XPathReturnType;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-
-import javax.xml.namespace.NamespaceContext;
-import javax.xml.namespace.QName;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 
 import org.xml.sax.InputSource;
 
@@ -41,22 +36,10 @@ import org.xml.sax.InputSource;
  */
 public class XPathExtractor extends AbstractTransformer implements MuleContextAware
 {
-    /**
-     * Result type.
-     */
-    public enum ResultType
-    {
-        NODESET,
-        NODE,
-        STRING,
-        BOOLEAN,
-        NUMBER
-    }
-
-    private volatile XPath xpath = XPathFactory.newInstance().newXPath();
+    private XPathEvaluator xpathEvaluator;
     private volatile Map<String, String> prefixToNamespaceMap = null;
     private volatile String expression;
-    private volatile ResultType resultType = ResultType.STRING;
+    private volatile XPathReturnType resultType = XPathReturnType.STRING;
     private NamespaceManager namespaceManager;
 
     public XPathExtractor()
@@ -91,92 +74,31 @@ public class XPathExtractor extends AbstractTransformer implements MuleContextAw
                 this);
         }
 
-        if (namespaceManager != null)
+        if (xpathEvaluator == null)
         {
-            if (prefixToNamespaceMap == null)
-            {
-            	prefixToNamespaceMap = new HashMap<String, String>(namespaceManager.getNamespaces());
-            }
-            else
-            {
-            	prefixToNamespaceMap.putAll(namespaceManager.getNamespaces());
-            }
+            xpathEvaluator = new SaxonXpathEvaluator();
         }
 
-        getXpath().setNamespaceContext(new NamespaceContext()
+        if (namespaceManager != null)
         {
-        	@Override
-            public String getNamespaceURI(String prefix)
-        	{
-        		return prefixToNamespaceMap.get(prefix);
-        	}
+            xpathEvaluator.registerNamespaces(namespaceManager);
+        }
 
-        	@Override
-            public String getPrefix(String namespaceURI)
-        	{
-
-        		for (Map.Entry<String, String> entry : prefixToNamespaceMap.entrySet())
-        		{
-        			if (namespaceURI.equals(entry.getValue()))
-        			{
-        				return entry.getKey();
-        			}
-        		}
-
-        		return null;
-        	}
-
-        	@Override
-            public Iterator<?> getPrefixes(String namespaceURI)
-        	{
-        		String prefix = getPrefix(namespaceURI);
-        		if (prefix == null)
-        		{
-        			return Collections.emptyList().iterator();
-        		}
-        		else
-        		{
-        			return Arrays.asList(prefix).iterator();
-        		}
-        	}
-        });
+        if (prefixToNamespaceMap != null)
+        {
+            xpathEvaluator.registerNamespaces(prefixToNamespaceMap);
+        }
     }
 
     @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        QName resultType;
-        switch (getResultType())
-        {
-            case BOOLEAN :
-                resultType = XPathConstants.BOOLEAN;
-                break;
-            case NODE :
-                resultType = XPathConstants.NODE;
-                break;
-            case NODESET :
-                resultType = XPathConstants.NODESET;
-                break;
-            case NUMBER :
-                resultType = XPathConstants.NUMBER;
-                break;
-            default :
-                resultType = XPathConstants.STRING;
-                break;
-        }
-
+        MuleEvent event = RequestContext.getEvent();
         try
         {
-            if (src instanceof InputSource)
-            {
-                return xpath.evaluate(expression, (InputSource) src, resultType);
-            }
-            else
-            {
-                return xpath.evaluate(expression, src, resultType);
-            }
+            return xpathEvaluator.evaluate(expression, XMLUtils.toDOMNode(src, event), resultType, event);
         }
-        catch (XPathExpressionException e)
+        catch (Exception e)
         {
             throw new TransformerException(this, e);
         }
@@ -203,7 +125,7 @@ public class XPathExtractor extends AbstractTransformer implements MuleContextAw
      *
      * @return Result type from this transformer.
      */
-    public ResultType getResultType()
+    public XPathReturnType getResultType()
     {
         return resultType;
     }
@@ -213,29 +135,19 @@ public class XPathExtractor extends AbstractTransformer implements MuleContextAw
      *
      * @param resultType Result type from this transformer.
      */
-    public void setResultType(ResultType resultType)
+    public void setResultType(XPathReturnType resultType)
     {
         this.resultType = resultType;
     }
 
-    /**
-     * The XPath evaluator.
-     *
-     * @return The XPath evaluator.
-     */
-    public XPath getXpath()
+    public XPathEvaluator getXpathEvaluator()
     {
-        return xpath;
+        return xpathEvaluator;
     }
 
-    /**
-     * The XPath evaluator.
-     *
-     * @param xPath The XPath evaluator.
-     */
-    public void setXpath(XPath xPath)
+    public void setXpathEvaluator(XPathEvaluator xpathEvaluator)
     {
-        this.xpath = xPath;
+        this.xpathEvaluator = xpathEvaluator;
     }
 
     /**

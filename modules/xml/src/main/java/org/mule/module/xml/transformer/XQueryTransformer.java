@@ -17,14 +17,18 @@ import org.mule.module.xml.i18n.XmlMessages;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 
+import com.saxonica.xqj.SaxonXQDataSource;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xquery.XQConnection;
 import javax.xml.xquery.XQDataSource;
@@ -35,7 +39,6 @@ import javax.xml.xquery.XQPreparedExpression;
 import javax.xml.xquery.XQResultSequence;
 
 import net.sf.saxon.Configuration;
-import net.sf.saxon.xqj.SaxonXQDataSource;
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.dom4j.io.DOMWriter;
@@ -81,7 +84,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
         registerSourceType(DataTypeFactory.create(Document.class));
         registerSourceType(DataTypeFactory.create(Element.class));
         registerSourceType(DataTypeFactory.INPUT_STREAM);
-        setReturnDataType(DataTypeFactory.create(Element.class));
+        setReturnDataType(DataTypeFactory.create(List.class));
     }
 
     public XQueryTransformer(String xqueryFile)
@@ -147,18 +150,18 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
                 bindParameters(transformer, message);
 
                 bindDocument(message.getPayload(), transformer);
-
                 XQResultSequence result = transformer.executeQuery();
                 //No support for return Arrays yet
                 List<Object> results = new ArrayList<Object>();
+                Class<?> type = returnType.getType();
+
                 while (result.next())
                 {
                     XQItem item = result.getItem();
 
-                    Class<?> type = returnType.getType();
                     if (Node.class.isAssignableFrom(type) || Node[].class.isAssignableFrom(type))
                     {
-                        results.add(item.getNode());
+                        results.add(getItemValue(item));
                     }
                     else if (String.class.isAssignableFrom(type) || String[].class.isAssignableFrom(type))
                     {
@@ -188,28 +191,21 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
 
                         }
                     }
-                    if (!type.isArray())
+                }
+
+                if (!Collection.class.isAssignableFrom(type))
+                {
+                    if (results.isEmpty())
                     {
-                        break;
+                        return null;
                     }
-                }
-                if (returnType.getType().isArray())
-                {
-                    return results.toArray();
-                }
-                if (results.size() == 1)
-                {
-                    return results.get(0);
-                }
-                else if (results.size() == 0)
-                {
-                    return null;
+
+                    return results.size() == 1 ? results.get(0) : results.toArray();
                 }
                 else
                 {
-                    return results.toArray();
+                    return results;
                 }
-
             }
             finally
             {
@@ -230,6 +226,18 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
         }
     }
 
+    private Object getItemValue(XQItem item) throws XQException
+    {
+        try
+        {
+            return item.getNode();
+        }
+        catch (XQException e)
+        {
+            return item.getAtomicValue();
+        }
+    }
+
     protected void bindParameters(XQPreparedExpression transformer, MuleMessage message) throws XQException, TransformerException
     {
         // set transformation parameters
@@ -240,41 +248,57 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
                 String key = parameter.getKey();
                 Object o = evaluateTransformParameter(key, parameter.getValue(), message);
 
+                if (o == null)
+                {
+                    logger.warn(String.format("Cannot bind parameter '%s' because it's value resolved to null", key));
+                    continue;
+                }
+
+                QName paramKey = new QName(key);
+
                 if (o instanceof String)
                 {
-                    transformer.bindAtomicValue(new QName(key), o.toString(), connection.createAtomicType(XQItemType.XQBASETYPE_STRING));
+                    transformer.bindAtomicValue(paramKey, o.toString(), connection.createAtomicType(XQItemType.XQBASETYPE_STRING));
                 }
                 else if (o instanceof Boolean)
                 {
-                    transformer.bindBoolean(new QName(key), ((Boolean) o).booleanValue(), connection.createAtomicType(XQItemType.XQBASETYPE_BOOLEAN));
+                    transformer.bindBoolean(paramKey, ((Boolean) o).booleanValue(), connection.createAtomicType(XQItemType.XQBASETYPE_BOOLEAN));
                 }
                 else if (o instanceof Byte)
                 {
-                    transformer.bindByte(new QName(key), ((Byte) o).byteValue(), connection.createAtomicType(XQItemType.XQBASETYPE_BYTE));
+                    transformer.bindByte(paramKey, ((Byte) o).byteValue(), connection.createAtomicType(XQItemType.XQBASETYPE_BYTE));
                 }
                 else if (o instanceof Short)
                 {
-                    transformer.bindShort(new QName(key), ((Short) o).shortValue(), connection.createAtomicType(XQItemType.XQBASETYPE_SHORT));
+                    transformer.bindShort(paramKey, ((Short) o).shortValue(), connection.createAtomicType(XQItemType.XQBASETYPE_SHORT));
                 }
                 else if (o instanceof Integer)
                 {
-                    transformer.bindInt(new QName(key), ((Integer) o).intValue(), connection.createAtomicType(XQItemType.XQBASETYPE_INT));
+                    transformer.bindInt(paramKey, ((Integer) o).intValue(), connection.createAtomicType(XQItemType.XQBASETYPE_INT));
                 }
                 else if (o instanceof Long)
                 {
-                    transformer.bindLong(new QName(key), ((Long) o).longValue(), connection.createAtomicType(XQItemType.XQBASETYPE_LONG));
+                    transformer.bindLong(paramKey, ((Long) o).longValue(), connection.createAtomicType(XQItemType.XQBASETYPE_LONG));
                 }
                 else if (o instanceof Float)
                 {
-                    transformer.bindFloat(new QName(key), ((Float) o).floatValue(), connection.createAtomicType(XQItemType.XQBASETYPE_FLOAT));
+                    transformer.bindFloat(paramKey, ((Float) o).floatValue(), connection.createAtomicType(XQItemType.XQBASETYPE_FLOAT));
                 }
                 else if (o instanceof Double)
                 {
-                    transformer.bindDouble(new QName(key), ((Double) o).doubleValue(), connection.createAtomicType(XQItemType.XQBASETYPE_DOUBLE));
+                    transformer.bindDouble(paramKey, ((Double) o).doubleValue(), connection.createAtomicType(XQItemType.XQBASETYPE_DOUBLE));
+                }
+                else if (o instanceof Document)
+                {
+                    transformer.bindDocument(paramKey, new DOMSource(((Document) o).getFirstChild()), connection.createNodeType());
+                }
+                else if (o instanceof Node)
+                {
+                    transformer.bindDocument(paramKey, new DOMSource((Node) o), connection.createNodeType());
                 }
                 else
                 {
-                    logger.error("Cannot bind value: " + o + " cannot be bound to the Xquery context. Not of supported type");
+                    logger.warn(String.format("Cannot bind value for key '%s' because type '%s' is not supported", key, o.getClass().getName()));
                 }
             }
         }
@@ -488,7 +512,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
     {
         if (value instanceof String)
         {
-            return muleContext.getExpressionManager().parse(value.toString(), message);
+            return muleContext.getExpressionManager().evaluate(value.toString(), message);
         }
         return value;
     }
