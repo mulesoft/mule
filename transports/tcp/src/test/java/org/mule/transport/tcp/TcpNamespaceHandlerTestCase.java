@@ -6,9 +6,11 @@
  */
 package org.mule.transport.tcp;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.ResponseOutputStream;
@@ -135,6 +137,37 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(c);
         assertEquals(LocalSocketTcpMessageDispatcherFactory.class, c.getDispatcherFactory().getClass());
     }
+
+    @Test
+    public void testServerSocketProperties()
+    {
+        TcpServerSocketProperties properties = muleContext.getRegistry().get("serverSocketProperties");
+
+        assertThat(properties.getConnectionTimeout(), equalTo(500));
+        assertThat(properties.getKeepAlive(), equalTo(true));
+        assertThat(properties.getReceiveBacklog(), equalTo(200));
+        assertThat(properties.getReceiveBufferSize(), equalTo(1024));
+        assertThat(properties.getReuseAddress(), equalTo(true));
+        assertThat(properties.getSendBufferSize(), equalTo(2048));
+        assertThat(properties.getSendTcpNoDelay(), equalTo(true));
+        assertThat(properties.getServerSoTimeout(), equalTo(600));
+        assertThat(properties.getSocketSoLinger(), equalTo(700));
+    }
+
+    @Test
+    public void testClientSocketProperties()
+    {
+        TcpClientSocketProperties properties = muleContext.getRegistry().get("clientSocketProperties");
+
+        assertThat(properties.getConnectionTimeout(), equalTo(500));
+        assertThat(properties.getKeepAlive(), equalTo(true));
+        assertThat(properties.getReceiveBufferSize(), equalTo(1024));
+        assertThat(properties.getSendBufferSize(), equalTo(2048));
+        assertThat(properties.getSendTcpNoDelay(), equalTo(true));
+        assertThat(properties.getClientSoTimeout(), equalTo(600));
+        assertThat(properties.getSocketSoLinger(), equalTo(700));
+    }
+
 
     public static class FakeClassLoader extends ClassLoader
     {
