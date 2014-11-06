@@ -473,8 +473,7 @@ public class MuleRegistryHelper implements MuleRegistry
      */
     public final void registerTransformer(Transformer transformer) throws MuleException
     {
-        registry.registerObject(getName(transformer), transformer, Transformer.class);
-        notifyTransformerResolvers(transformer, TransformerResolver.RegistryAction.ADDED);
+        registerObject(getName(transformer), transformer, Transformer.class);
     }
 
     public void notifyTransformerResolvers(Transformer t, TransformerResolver.RegistryAction action)
@@ -774,10 +773,19 @@ public class MuleRegistryHelper implements MuleRegistry
     {
         registry.registerObject(key, value, metadata);
 
+        postObjectRegistrationActions(value);
+    }
 
+    private void postObjectRegistrationActions(Object value)
+    {
         if (value instanceof TransformerResolver)
         {
             registerTransformerResolver((TransformerResolver) value);
+        }
+
+        if (value instanceof Converter)
+        {
+            notifyTransformerResolvers((Converter) value,  TransformerResolver.RegistryAction.ADDED);
         }
     }
 
@@ -788,10 +796,7 @@ public class MuleRegistryHelper implements MuleRegistry
     {
         registry.registerObject(key, value);
 
-        if (value instanceof TransformerResolver)
-        {
-            registerTransformerResolver((TransformerResolver) value);
-        }
+        postObjectRegistrationActions(value);
     }
 
     private void registerTransformerResolver(TransformerResolver value)
@@ -818,10 +823,7 @@ public class MuleRegistryHelper implements MuleRegistry
 
         for (Object value : objects.values())
         {
-            if (value instanceof TransformerResolver)
-            {
-                registerTransformerResolver((TransformerResolver) value);
-            }
+            postObjectRegistrationActions(value);
         }
 
     }
