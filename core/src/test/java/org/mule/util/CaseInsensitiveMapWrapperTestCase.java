@@ -26,13 +26,13 @@ public class CaseInsensitiveMapWrapperTestCase extends AbstractMuleTestCase
     private Map<String, Integer> map;
 
     @Before
-    public void initializeMap() throws Exception
+    public void initializeMap()
     {
         map = new CaseInsensitiveMapWrapper(HashMap.class);
     }
 
     @Test
-    public void getIsCaseInsensitive() throws Exception
+    public void getIsCaseInsensitive()
     {
         map.put("A", 1);
 
@@ -43,7 +43,7 @@ public class CaseInsensitiveMapWrapperTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void retainKeyCase() throws Exception
+    public void retainKeyCase()
     {
         map.put("A", 1);
 
@@ -51,7 +51,7 @@ public class CaseInsensitiveMapWrapperTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void clearFromKeySet() throws Exception
+    public void clearFromKeySet()
     {
         map.put("A", 1);
         map.keySet().clear();
@@ -60,7 +60,7 @@ public class CaseInsensitiveMapWrapperTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void clearFromEntrySet() throws Exception
+    public void clearFromEntrySet()
     {
         map.put("A", 1);
         map.entrySet().clear();
@@ -69,7 +69,7 @@ public class CaseInsensitiveMapWrapperTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void removeFromKeySetIterator() throws Exception
+    public void removeFromKeySetIterator()
     {
         map.put("A", 1);
         map.put("B", 2);
@@ -92,7 +92,7 @@ public class CaseInsensitiveMapWrapperTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void removeFromEntrySetIterator() throws Exception
+    public void removeFromEntrySetIterator()
     {
         map.put("A", 1);
         map.put("B", 2);
@@ -115,7 +115,7 @@ public class CaseInsensitiveMapWrapperTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void containsKey() throws Exception
+    public void containsKey()
     {
         map.put("A", 1);
 
@@ -125,7 +125,7 @@ public class CaseInsensitiveMapWrapperTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void containsValue() throws Exception
+    public void containsValue()
     {
         map.put("A", 1);
 

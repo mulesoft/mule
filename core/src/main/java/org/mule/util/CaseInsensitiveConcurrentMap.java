@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CaseInsensitiveConcurrentMap<T> extends CaseInsensitiveMapWrapper<T>
 {
 
-    public CaseInsensitiveConcurrentMap() throws Exception
+    public CaseInsensitiveConcurrentMap()
     {
         super(ConcurrentHashMap.class);
     }
