@@ -142,6 +142,7 @@
             <xsd:element ref="abstract-transformer"/>
             <xsd:element ref="processor-chain"/>
             <xsd:element ref="custom-processor"/>
+            <xsd:element ref="abstract-empty-processor"/>
             <xsd:element ref="invoke"/>
             <xsd:element ref="abstract-global-intercepting-message-processor"/>
             <xsd:element ref="custom-queue-store" minOccurs="0" maxOccurs="unbounded"/>
@@ -538,6 +539,13 @@
                     </xsd:annotation>
                 </xsd:attribute>
             </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-empty-processor" type="abstractEmptyMessageProcessorType" substitutionGroup="abstract-message-processor"/>
+    <xsd:complexType name="abstractEmptyMessageProcessorType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType"/>
         </xsd:complexContent>
     </xsd:complexType>
 

@@ -456,71 +456,84 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="response-builder" substitutionGroup="mule:abstract-message-processor">
+    <xsd:element name="response-builder" type="globalResponseBuilderType" substitutionGroup="mule:abstract-empty-processor">
         <xsd:annotation>
             <xsd:documentation>
                 HTTP response
             </xsd:documentation>
         </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="mule:abstractMessageProcessorType">
-                    <xsd:sequence>
-                        <xsd:element name="cache-control" minOccurs="0" maxOccurs="1" type="cacheControlType">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    The Cache-Control is used to specify directives that MUST be obeyed by all caching mechanisms along the request/response chain.
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                        <xsd:element name="expires" minOccurs="0" maxOccurs="1" type="headerType">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    Specifies when the cookie expires. It must be specified in the form Wdy, DD Mon YYYY HH:MM:SS GMT
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                        <xsd:element name="location" minOccurs="0" maxOccurs="1" type="headerType">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    The Location is used to redirect the recipient to a location other than the Request-URI for completion of the request or identification of a new resource.
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                        <xsd:element name="set-cookie" minOccurs="0" maxOccurs="unbounded" type="cookieType">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    Allows to configure one or more cookies.
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                        <xsd:element name="header" minOccurs="0" maxOccurs="unbounded" type="mule:nameValueType">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    Allows to configure HTTP headers providing the name and value of each header.
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                        <xsd:element ref="mule:abstract-transformer" minOccurs="0" maxOccurs="1"/>
-                    </xsd:sequence>
-                    <xsd:attribute name="status" type="statusType">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                HTTP status code of the response
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:attribute>
-                    <xsd:attribute name="contentType" type="xsd:string">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                The content type of the response
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:attribute>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
+        <!--<xsd:complexType>-->
+            <!--<xsd:complexContent>-->
+                <!--<xsd:extension base="mule:abstractMessageProcessorType">-->
+                    <!--<xsd:sequence>-->
+                        <!--<xsd:element name="cache-control" minOccurs="0" maxOccurs="1" type="cacheControlType">-->
+                            <!--<xsd:annotation>-->
+                                <!--<xsd:documentation>-->
+                                    <!--The Cache-Control is used to specify directives that MUST be obeyed by all caching mechanisms along the request/response chain.-->
+                                <!--</xsd:documentation>-->
+                            <!--</xsd:annotation>-->
+                        <!--</xsd:element>-->
+                        <!--<xsd:element name="expires" minOccurs="0" maxOccurs="1" type="headerType">-->
+                            <!--<xsd:annotation>-->
+                                <!--<xsd:documentation>-->
+                                    <!--Specifies when the cookie expires. It must be specified in the form Wdy, DD Mon YYYY HH:MM:SS GMT-->
+                                <!--</xsd:documentation>-->
+                            <!--</xsd:annotation>-->
+                        <!--</xsd:element>-->
+                        <!--<xsd:element name="location" minOccurs="0" maxOccurs="1" type="headerType">-->
+                            <!--<xsd:annotation>-->
+                                <!--<xsd:documentation>-->
+                                    <!--The Location is used to redirect the recipient to a location other than the Request-URI for completion of the request or identification of a new resource.-->
+                                <!--</xsd:documentation>-->
+                            <!--</xsd:annotation>-->
+                        <!--</xsd:element>-->
+                        <!--<xsd:element name="set-cookie" minOccurs="0" maxOccurs="unbounded" type="cookieType">-->
+                            <!--<xsd:annotation>-->
+                                <!--<xsd:documentation>-->
+                                    <!--Allows to configure one or more cookies.-->
+                                <!--</xsd:documentation>-->
+                            <!--</xsd:annotation>-->
+                        <!--</xsd:element>-->
+                        <!--<xsd:element name="header" minOccurs="0" maxOccurs="unbounded" type="mule:nameValueType">-->
+                            <!--<xsd:annotation>-->
+                                <!--<xsd:documentation>-->
+                                    <!--Allows to configure HTTP headers providing the name and value of each header.-->
+                                <!--</xsd:documentation>-->
+                            <!--</xsd:annotation>-->
+                        <!--</xsd:element>-->
+                        <!--<xsd:element ref="mule:abstract-transformer" minOccurs="0" maxOccurs="1"/>-->
+                    <!--</xsd:sequence>-->
+                    <!--<xsd:attribute name="status" type="statusType">-->
+                        <!--<xsd:annotation>-->
+                            <!--<xsd:documentation>-->
+                                <!--HTTP status code of the response-->
+                            <!--</xsd:documentation>-->
+                        <!--</xsd:annotation>-->
+                    <!--</xsd:attribute>-->
+                    <!--<xsd:attribute name="contentType" type="xsd:string">-->
+                        <!--<xsd:annotation>-->
+                            <!--<xsd:documentation>-->
+                                <!--The content type of the response-->
+                            <!--</xsd:documentation>-->
+                        <!--</xsd:annotation>-->
+                    <!--</xsd:attribute>-->
+                <!--</xsd:extension>-->
+            <!--</xsd:complexContent>-->
+        <!--</xsd:complexType>-->
     </xsd:element>
+
+    <xsd:complexType name="globalResponseBuilderType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractEmptyMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:any namespace="##any"
+                             processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:anyAttribute namespace="##any"
+                                  processContents="skip"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
      <xsd:complexType name="headerType">
         <xsd:complexContent>
