@@ -283,9 +283,9 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this(message, rewriteEvent, rewriteEvent.getFlowConstruct(), rewriteEvent.getSession(), synchronus);
     }
 
-    public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent, boolean synchronus, boolean shareVars)
+    public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent, boolean synchronus, boolean shareFlowVars)
     {
-        this(message, rewriteEvent, rewriteEvent.getFlowConstruct(), rewriteEvent.getSession(), synchronus, shareVars);
+        this(message, rewriteEvent, rewriteEvent.getFlowConstruct(), rewriteEvent.getSession(), synchronus, shareFlowVars);
     }
 
     /**
@@ -313,9 +313,9 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                                FlowConstruct flowConstruct,
                                MuleSession session,
                                boolean synchronous,
-                               boolean shareVars)
+                               boolean shareFlowVars)
     {
-        this(message, rewriteEvent, flowConstruct, session, synchronous, rewriteEvent.getReplyToHandler(), rewriteEvent.getReplyToDestination(), shareVars);
+        this(message, rewriteEvent, flowConstruct, session, synchronous, rewriteEvent.getReplyToHandler(), rewriteEvent.getReplyToDestination(), shareFlowVars);
     }
 
     protected DefaultMuleEvent(MuleMessage message,
@@ -325,10 +325,11 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                                boolean synchronous,
                                ReplyToHandler replyToHandler,
                                Object replyToDestination,
-                               boolean shareVars)
+                               boolean shareFlowVars)
     {
         this.id = rewriteEvent.getId();
         this.flowConstruct = flowConstruct;
+        this.session = session;
 
         this.credentials = rewriteEvent.getCredentials();
         this.encoding = rewriteEvent.getEncoding();
@@ -339,21 +340,18 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         if (rewriteEvent instanceof DefaultMuleEvent)
         {
             this.processingTime = ((DefaultMuleEvent) rewriteEvent).processingTime;
-            if (shareVars)
+            if (shareFlowVars)
             {
                 this.flowVariables = ((DefaultMuleEvent) rewriteEvent).flowVariables;
-                this.session = session;
             }
             else
             {
                 this.flowVariables.putAll(((DefaultMuleEvent) rewriteEvent).flowVariables);
-                this.session = new DefaultMuleSession(session);
             }
         }
         else
         {
             this.processingTime = ProcessingTime.newInstance(this);
-            this.session = session;
         }
         setMessage(message);
         this.replyToHandler = replyToHandler;
