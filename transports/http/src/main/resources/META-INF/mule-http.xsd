@@ -456,27 +456,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="response-builder" type="globalResponseBuilderType" substitutionGroup="mule:abstract-empty-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                HTTP response
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="globalResponseBuilderType">
-        <xsd:complexContent>
-            <xsd:extension base="mule:abstractEmptyMessageProcessorType">
-                <xsd:sequence>
-                    <xsd:any namespace="##any"
-                             processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-                <xsd:anyAttribute namespace="##any"
-                                  processContents="skip"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
      <xsd:complexType name="headerType">
         <xsd:complexContent>
             <xsd:extension base="mule:annotatedType">
