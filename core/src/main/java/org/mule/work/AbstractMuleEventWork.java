@@ -7,7 +7,6 @@
 package org.mule.work;
 
 import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
 import org.mule.OptimizedRequestContext;
 import org.mule.api.MuleEvent;
 
@@ -34,7 +33,6 @@ public abstract class AbstractMuleEventWork implements Work
     {
         // Set event in RequestContext now we are in new thread (fresh copy already made in constructor)
         OptimizedRequestContext.unsafeSetEvent(event);
-        ((DefaultMuleEvent) event).resetAccessControl();
         doRun();
     }
 
