@@ -19,8 +19,9 @@ public class DefaultTcpServerSocketProperties implements TcpServerSocketProperti
     private Boolean sendTcpNoDelay;
     private Boolean reuseAddress;
     private Integer connectionTimeout;
-    private Integer serverSoTimeout;
-    private Integer socketSoLinger;
+    private Integer serverSocketTimeout;
+    private Integer clientSocketTimeout;
+    private Integer linger;
     private Boolean keepAlive;
 
     public String getName()
@@ -89,36 +90,36 @@ public class DefaultTcpServerSocketProperties implements TcpServerSocketProperti
     }
 
     @Override
-    public Integer getConnectionTimeout()
+    public Integer getSocketTimeout()
     {
-        return connectionTimeout;
+        return clientSocketTimeout;
     }
 
-    public void setConnectionTimeout(Integer connectionTimeout)
+    public void setSocketTimeout(Integer clientSocketTimeout)
     {
-        this.connectionTimeout = connectionTimeout;
-    }
-
-    @Override
-    public Integer getServerSoTimeout()
-    {
-        return serverSoTimeout;
-    }
-
-    public void setServerSoTimeout(Integer serverSoTimeout)
-    {
-        this.serverSoTimeout = serverSoTimeout;
+        this.clientSocketTimeout = clientSocketTimeout;
     }
 
     @Override
-    public Integer getSocketSoLinger()
+    public Integer getServerSocketTimeout()
     {
-        return socketSoLinger;
+        return serverSocketTimeout;
     }
 
-    public void setSocketSoLinger(Integer socketSoLinger)
+    public void setServerSocketTimeout(Integer serverSocketTimeout)
     {
-        this.socketSoLinger = socketSoLinger;
+        this.serverSocketTimeout = serverSocketTimeout;
+    }
+
+    @Override
+    public Integer getLinger()
+    {
+        return linger;
+    }
+
+    public void setLinger(Integer linger)
+    {
+        this.linger = linger;
     }
 
     @Override

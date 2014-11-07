@@ -23,11 +23,11 @@ public interface TcpServerSocketProperties
 
     public Boolean getReuseAddress();
 
-    public Integer getConnectionTimeout();
+    public Integer getServerSocketTimeout();
 
-    public Integer getServerSoTimeout();
+    public Integer getSocketTimeout();
 
-    public Integer getSocketSoLinger();
+    public Integer getLinger();
 
     public Boolean getKeepAlive();
 
