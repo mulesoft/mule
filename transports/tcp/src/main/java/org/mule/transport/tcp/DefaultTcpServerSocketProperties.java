@@ -11,17 +11,21 @@ package org.mule.transport.tcp;
  */
 public class DefaultTcpServerSocketProperties implements TcpServerSocketProperties
 {
+    private static final boolean DEFAULT_SEND_TCP_NO_DELAY = true;
+    private static final boolean DEFAULT_REUSE_ADDRESS = false;
+    private static final int DEFAULT_SERVER_TIMEOUT = 0;
+    private static final int DEFAULT_TIMEOUT = 0;
+    private static final int DEFAULT_LINGER = -1;
 
     private String name;
     private Integer sendBufferSize;
     private Integer receiveBufferSize;
     private Integer receiveBacklog;
-    private Boolean sendTcpNoDelay;
-    private Boolean reuseAddress;
-    private Integer connectionTimeout;
-    private Integer serverSocketTimeout;
-    private Integer clientSocketTimeout;
-    private Integer linger;
+    private Boolean sendTcpNoDelay = DEFAULT_SEND_TCP_NO_DELAY;
+    private Boolean reuseAddress = DEFAULT_REUSE_ADDRESS;
+    private Integer serverTimeout = DEFAULT_SERVER_TIMEOUT;
+    private Integer timeout = DEFAULT_TIMEOUT;
+    private Integer linger = DEFAULT_LINGER;
     private Boolean keepAlive;
 
     public String getName()
@@ -90,25 +94,25 @@ public class DefaultTcpServerSocketProperties implements TcpServerSocketProperti
     }
 
     @Override
-    public Integer getSocketTimeout()
+    public Integer getTimeout()
     {
-        return clientSocketTimeout;
+        return timeout;
     }
 
-    public void setSocketTimeout(Integer clientSocketTimeout)
+    public void setTimeout(Integer timeout)
     {
-        this.clientSocketTimeout = clientSocketTimeout;
+        this.timeout = timeout;
     }
 
     @Override
-    public Integer getServerSocketTimeout()
+    public Integer getServerTimeout()
     {
-        return serverSocketTimeout;
+        return serverTimeout;
     }
 
-    public void setServerSocketTimeout(Integer serverSocketTimeout)
+    public void setServerTimeout(Integer serverTimeout)
     {
-        this.serverSocketTimeout = serverSocketTimeout;
+        this.serverTimeout = serverTimeout;
     }
 
     @Override

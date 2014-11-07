@@ -149,8 +149,8 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         assertThat(properties.getReuseAddress(), equalTo(true));
         assertThat(properties.getSendBufferSize(), equalTo(2048));
         assertThat(properties.getSendTcpNoDelay(), equalTo(true));
-        assertThat(properties.getServerSocketTimeout(), equalTo(600));
-        assertThat(properties.getSocketTimeout(), equalTo(800));
+        assertThat(properties.getServerTimeout(), equalTo(600));
+        assertThat(properties.getTimeout(), equalTo(800));
         assertThat(properties.getLinger(), equalTo(700));
     }
 
@@ -164,7 +164,7 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         assertThat(properties.getReceiveBufferSize(), equalTo(1024));
         assertThat(properties.getSendBufferSize(), equalTo(2048));
         assertThat(properties.getSendTcpNoDelay(), equalTo(true));
-        assertThat(properties.getSocketTimeout(), equalTo(600));
+        assertThat(properties.getTimeout(), equalTo(600));
         assertThat(properties.getLinger(), equalTo(700));
     }
 

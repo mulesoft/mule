@@ -23,9 +23,9 @@ public interface TcpServerSocketProperties
 
     public Boolean getReuseAddress();
 
-    public Integer getServerSocketTimeout();
+    public Integer getServerTimeout();
 
-    public Integer getSocketTimeout();
+    public Integer getTimeout();
 
     public Integer getLinger();
 

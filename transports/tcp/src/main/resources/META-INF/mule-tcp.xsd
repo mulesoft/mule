@@ -434,24 +434,25 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="sendTcpNoDelay" type="mule:substitutableBoolean">
+                <xsd:attribute name="sendTcpNoDelay" type="mule:substitutableBoolean" default="true">
                     <xsd:annotation>
                         <xsd:documentation>
                             If set, transmitted data is not collected together for greater efficiency but sent immediately.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="socketTimeout" type="mule:substitutableInt">
+                <xsd:attribute name="timeout" type="mule:substitutableInt" default="0">
                     <xsd:annotation>
                         <xsd:documentation>
                             This sets the SO_TIMEOUT value on client sockets. Reading from the socket will block for up to this long (in milliseconds) before the read fails. A value of 0 (the default) causes the read to wait indefinitely (if no data arrives).
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="linger" type="mule:substitutableInt">
+                <xsd:attribute name="linger" type="mule:substitutableInt" default="-1">
                     <xsd:annotation>
                         <xsd:documentation>
                             This sets the SO_LINGER value. This is related to how long (in milliseconds) the socket will take to close so that any remaining data is transmitted correctly.
+                            A value of -1 (default) disables linger on the socket.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -469,7 +470,7 @@
     <xsd:complexType name="tcpClientSocketPropertiesType">
         <xsd:complexContent>
             <xsd:extension base="tcpAbstractSocketPropertiesType">
-                <xsd:attribute name="connectionTimeout" type="mule:substitutableInt">
+                <xsd:attribute name="connectionTimeout" type="mule:substitutableInt" default="30000">
                     <xsd:annotation>
                         <xsd:documentation>
                             Number of milliseconds to wait until an outbound connection to a remote server is successfully created. No timeout is configured by default.
@@ -484,7 +485,7 @@
     <xsd:complexType name="tcpServerSocketPropertiesType">
         <xsd:complexContent>
             <xsd:extension base="tcpAbstractSocketPropertiesType">
-                <xsd:attribute name="reuseAddress" type="mule:substitutableBoolean">
+                <xsd:attribute name="reuseAddress" type="mule:substitutableBoolean" default="false">
                     <xsd:annotation>
                         <xsd:documentation>
                             If set (the default), SO_REUSEADDRESS is set on server sockets before binding. This helps reduce "address already in use" errors when a socket is re-used.
@@ -498,10 +499,10 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="serverSocketTimeout" type="mule:substitutableInt">
+                <xsd:attribute name="serverTimeout" type="mule:substitutableInt" default="0">
                     <xsd:annotation>
                         <xsd:documentation>
-                            This sets the SO_TIMEOUT value when the socket is used as a server. Reading from the socket will block for up to this long (in milliseconds) before the read fails. A value of 0 (the default) causes the read to wait indefinitely (if no data arrives).
+                            This sets the SO_TIMEOUT value when the socket is used as a server. This is the timeout that applies to the "accept" operation. A value of 0 (the default) causes the accept to wait indefinitely (if no connection arrives).
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
