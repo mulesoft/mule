@@ -81,9 +81,9 @@ public class DefaultTcpClientSocketProperties implements TcpClientSocketProperti
         return socketTimeout;
     }
 
-    public void setSocketTimeout(Integer clientSocketTimeout)
+    public void setSocketTimeout(Integer socketTimeout)
     {
-        this.socketTimeout = clientSocketTimeout;
+        this.socketTimeout = socketTimeout;
     }
 
     @Override

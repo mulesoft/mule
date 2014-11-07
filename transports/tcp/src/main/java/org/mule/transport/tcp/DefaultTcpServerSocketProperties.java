@@ -18,9 +18,8 @@ public class DefaultTcpServerSocketProperties implements TcpServerSocketProperti
     private Integer receiveBacklog;
     private Boolean sendTcpNoDelay;
     private Boolean reuseAddress;
-    private Integer connectionTimeout;
     private Integer serverSocketTimeout;
-    private Integer clientSocketTimeout;
+    private Integer socketTimeout;
     private Integer linger;
     private Boolean keepAlive;
 
@@ -92,12 +91,12 @@ public class DefaultTcpServerSocketProperties implements TcpServerSocketProperti
     @Override
     public Integer getSocketTimeout()
     {
-        return clientSocketTimeout;
+        return socketTimeout;
     }
 
-    public void setSocketTimeout(Integer clientSocketTimeout)
+    public void setSocketTimeout(Integer socketTimeout)
     {
-        this.clientSocketTimeout = clientSocketTimeout;
+        this.socketTimeout = socketTimeout;
     }
 
     @Override
