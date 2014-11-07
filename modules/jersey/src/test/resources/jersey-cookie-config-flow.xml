@@ -11,7 +11,9 @@
     	http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
     	http://www.express-scripts.com/schema/inf/mule http://www.express-scripts.com/schema/inf/mule/inf-mule-module.xsd">
 
-	<http:connector name="httpConnector" enableCookies="true" />
+	<configuration useHttpTransportByDefault="true"/>
+
+    <http:connector name="httpConnector" enableCookies="true" />
 
 	<spring:bean id="jerseyComponent" class="org.mule.module.jersey.HelloWorldCookieResource" />
 

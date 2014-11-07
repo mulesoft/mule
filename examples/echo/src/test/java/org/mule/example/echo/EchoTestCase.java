@@ -9,17 +9,17 @@ package org.mule.example.echo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
-import org.junit.Rule;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.module.http.api.HttpConstants;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.NullPayload;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import org.junit.Rule;
 import org.junit.Test;
 
 public class EchoTestCase extends FunctionalTestCase
@@ -39,11 +39,8 @@ public class EchoTestCase extends FunctionalTestCase
     public void httpGetToFlowUrlEchoesSentMessage() throws Exception
     {
         MuleClient client = muleContext.getClient();
-
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put("http.method", "GET");
-
-        MuleMessage result = client.send("http://localhost:" + port.getNumber() +"/" + MESSAGE, "", props);
+        MuleMessage result = client.send("http://localhost:" + port.getNumber() +"/" + MESSAGE, new DefaultMuleMessage("", muleContext),
+                                         newOptions().method(HttpConstants.Methods.GET).build());
         assertNotNull(result);
         assertFalse(result.getPayload() instanceof NullPayload);
         assertEquals("/" + MESSAGE, result.getPayloadAsString());

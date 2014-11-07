@@ -9,6 +9,8 @@
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
+    <configuration useHttpTransportByDefault="true"/>
+
     <pattern:http-proxy name="direct-http-proxy"
         inboundAddress="http://localhost:${port1}/http-proxy/0" outboundAddress="http://localhost:${port2}/bar-appender" />
 

@@ -9,6 +9,7 @@ package org.mule.transport.http.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -48,7 +49,7 @@ public class HttpHeadersTestCase extends AbstractServiceAndFlowTestCase
     public void testJettyHeaders() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("clientEndpoint", null, null);
+        MuleMessage result = client.send("clientEndpoint", new DefaultMuleMessage(null, muleContext));
 
         String contentTypeProperty = result.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
         assertNotNull(contentTypeProperty);

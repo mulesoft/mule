@@ -9,6 +9,8 @@
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
+    <configuration useHttpTransportByDefault="true"/>
+
     <spring:bean name="cachingStrategy" class="org.mule.test.integration.construct.CachedHttpProxyTestCase$TestCachingStrategy" />
 
     <pattern:http-proxy name="direct-http-proxy"

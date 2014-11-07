@@ -33,7 +33,7 @@ public class DynamicEndpointWithConnectorTestCase extends FunctionalTestCase
         DefaultMuleMessage message = new DefaultMuleMessage(testMessage, muleContext);
         message.setOutboundProperty("queueName", "test.out");
 
-        MuleMessage test = client.send("vm://input", message, null);
+        MuleMessage test = client.send("vm://input", message);
         assertNotNull(test);
 
         MuleMessage response = client.request("jms://test.out", 5000);

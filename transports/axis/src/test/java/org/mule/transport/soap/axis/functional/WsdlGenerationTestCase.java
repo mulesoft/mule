@@ -10,13 +10,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.http.HttpConnector;
+import org.mule.transport.NullPayload;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.dom4j.Document;
@@ -53,8 +53,6 @@ public class WsdlGenerationTestCase extends FunctionalTestCase
     public WsdlGenerationTestCase()
     {
         super();
-        properties = new HashMap<String, Object>();
-        properties.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
     }
 
     @Test
@@ -62,7 +60,7 @@ public class WsdlGenerationTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        MuleMessage result = client.send("http://localhost:" + dynamicPort1.getNumber() + "/services/EchoService1?wsdl", null, properties);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort1.getNumber() + "/services/EchoService1?wsdl", new DefaultMuleMessage(NullPayload.getInstance(), muleContext));
         assertNotNull(result);
         String wsdl = result.getPayloadAsString();
         Document doc = DocumentHelper.parseText(wsdl);
@@ -90,7 +88,7 @@ public class WsdlGenerationTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        MuleMessage result = client.send("http://localhost:" + dynamicPort2.getNumber() + "/services/EchoService2?wsdl", null, properties);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort2.getNumber() + "/services/EchoService2?wsdl", new DefaultMuleMessage(NullPayload.getInstance(), muleContext));
         assertNotNull(result);
         String wsdl = result.getPayloadAsString();
         Document doc = DocumentHelper.parseText(wsdl);
@@ -113,7 +111,7 @@ public class WsdlGenerationTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        MuleMessage result = client.send("http://localhost:" + dynamicPort3.getNumber() + "/services/EchoService3?wsdl", null, properties);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort3.getNumber() + "/services/EchoService3?wsdl", new DefaultMuleMessage(NullPayload.getInstance(), muleContext));
         assertNotNull(result);
         String wsdl = result.getPayloadAsString();
         Document doc = DocumentHelper.parseText(wsdl);

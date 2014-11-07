@@ -12,6 +12,8 @@
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
+    <configuration useHttpTransportByDefault="true"/>
+
     <custom-transformer name="throwsException" class="org.mule.module.cxf.ExceptionStrategyTestCase$CxfTransformerThrowsExceptions"/>
 
     <!-- Test Service -->

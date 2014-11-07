@@ -2,6 +2,8 @@
 http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
+    <configuration useHttpTransportByDefault="true"/>
+
     <flow name="proxyflow">
         <http:inbound-endpoint address="http://localhost:${port1}/proxy-envelope" exchange-pattern="request-response">
             <cxf:proxy-service payload="envelope"/>

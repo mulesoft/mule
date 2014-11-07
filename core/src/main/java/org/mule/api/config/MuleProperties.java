@@ -167,6 +167,7 @@ public class MuleProperties
     public static final String OBJECT_PROCESSING_TIME_WATCHER = "_muleProcessingTimeWatcher";
     public static final String OBJECT_POLLING_CONTROLLER = "_mulePollingController";
     public static final String OBJECT_CLUSTER_CONFIGURATION = "_muleClusterConfiguration";
+    public static final String OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR = "_muleConnectorMessageProcessorLocator";
 
     // Not currently used as these need to be instance variables of the MuleContext.
     public static final String OBJECT_WORK_MANAGER = "_muleWorkManager";

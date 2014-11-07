@@ -8,9 +8,38 @@
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
+    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
+
+    <http:request-config name="requestConfig" followRedirects="false"/>
+
     <flow name="echoFlow">
-        <http:listener host="localhost" port="${port}" path="path" />
+        <http:listener path="path" config-ref="listenerConfig" />
+        <object-to-string-transformer/>
+        <copy-properties propertyName="*"/>
         <vm:outbound-endpoint path="out"/>
+    </flow>
+
+    <flow name="redirectFlow">
+        <http:listener path="redirectPath" config-ref="listenerConfig">
+            <http:response-builder statusCode="302">
+                <http:header headerName="Location" value="http://localhost:${port}/path"/>
+            </http:response-builder>
+        </http:listener>
+        <set-payload value="test-response"/>
+    </flow>
+
+    <flow name="timeoutFlow">
+        <http:listener path="timeoutPath" config-ref="listenerConfig"/>
+        <expression-component>
+            Thread.sleep(300);
+        </expression-component>
+    </flow>
+
+    <flow name="failureStatusCodeFlow">
+        <http:listener path="failurePath" config-ref="listenerConfig">
+            <http:response-builder statusCode="500" />
+        </http:listener>
+        <set-payload value="test-response"/>
     </flow>
 
 </mule>

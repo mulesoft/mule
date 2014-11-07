@@ -10,8 +10,14 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.module.http.api.HttpConstants;
+import org.mule.module.http.api.client.HttpRequestOptions;
+import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
@@ -53,12 +59,12 @@ public class XmlSendTestCase extends AbstractServiceAndFlowTestCase
         MuleClient client = muleContext.getClient();
 
         // this will submit the xml via a POST request
-        MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() + "/xml-parse", xml, null);
+        MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() + "/xml-parse", new DefaultMuleMessage(xml, muleContext));
         assertEquals("200", message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
 
         // This won't pass the filter
         xml = getClass().getResourceAsStream("validation1.xml");
-        message = client.send("http://localhost:" + dynamicPort.getNumber() + "/xml-parse", xml, null);
+        message = client.send("http://localhost:" + dynamicPort.getNumber() + "/xml-parse", new DefaultMuleMessage(xml, muleContext));
         assertEquals("406", message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
     }
 
@@ -72,7 +78,7 @@ public class XmlSendTestCase extends AbstractServiceAndFlowTestCase
         MuleClient client = muleContext.getClient();
 
         // this will submit the xml via a POST request
-        MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() + "/xml-xslt-parse", xml, null);
+        MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() + "/xml-xslt-parse", new DefaultMuleMessage(xml, muleContext));
         assertEquals("200", message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
     }
 
@@ -86,15 +92,15 @@ public class XmlSendTestCase extends AbstractServiceAndFlowTestCase
         MuleClient client = muleContext.getClient();
 
         // this will submit the xml via a POST request
-        MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() + "/validate", xml, null);
+        MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() + "/validate", new DefaultMuleMessage(xml, muleContext));
         assertEquals("200", message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
 
         xml = getClass().getResourceAsStream("validation2.xml");
-        message = client.send("http://localhost:" + dynamicPort.getNumber() + "/validate", xml, null);
+        message = client.send("http://localhost:" + dynamicPort.getNumber() + "/validate", new DefaultMuleMessage(xml, muleContext));
         assertEquals("406", message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
 
         xml = getClass().getResourceAsStream("validation3.xml");
-        message = client.send("http://localhost:" + dynamicPort.getNumber() + "/validate", xml, null);
+        message = client.send("http://localhost:" + dynamicPort.getNumber() + "/validate", new DefaultMuleMessage(xml, muleContext));
         assertEquals("200", message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
     }
 
@@ -105,7 +111,7 @@ public class XmlSendTestCase extends AbstractServiceAndFlowTestCase
         MuleClient client = muleContext.getClient();
 
         // this will submit the xml via a POST request
-        MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() + "/extract", xml, null);
+        MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() + "/extract", new DefaultMuleMessage(xml, muleContext));
         assertThat(message.getPayloadAsString(), equalTo("some"));
     }
 }

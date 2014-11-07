@@ -10,6 +10,8 @@
       http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
       http://www.mulesoft.org/schema/mule/servlet http://www.mulesoft.org/schema/mule/servlet/current/mule-servlet.xsd">
 
+    <configuration useHttpTransportByDefault="true"/>
+
     <servlet:connector name="servlet" servletUrl="http://localhost:${port1}/services"/>
 
     <model name="test">

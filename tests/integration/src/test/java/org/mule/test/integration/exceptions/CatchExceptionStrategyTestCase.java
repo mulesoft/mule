@@ -13,11 +13,16 @@ import org.hamcrest.core.IsNull;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
+
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.module.http.api.HttpConstants;
+import org.mule.module.http.api.client.HttpRequestOptions;
+import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -28,6 +33,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static org.junit.Assert.assertThat;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -88,7 +94,8 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
     private void testJsonErrorResponse(String endpointUri) throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send(endpointUri, JSON_REQUEST, null, TIMEOUT);
+        final HttpRequestOptions httpRequestOptions = newOptions().method(HttpConstants.Methods.POST).responseTimeout(TIMEOUT).build();
+        MuleMessage response = client.send(endpointUri, new DefaultMuleMessage(JSON_REQUEST, muleContext), httpRequestOptions);
         assertThat(response, IsNull.<Object>notNullValue());
         // compare the structure and values but not the attributes' order
         ObjectMapper mapper = new ObjectMapper();

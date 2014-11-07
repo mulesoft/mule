@@ -40,6 +40,8 @@
 
     <bean name="_muleProcessingTimeWatcher" class="org.mule.management.stats.DefaultProcessingTimeWatcher"/>
 
+    <bean name="_muleConnectorMessageProcessorLocator" class="org.mule.connector.MuleConnectorOperationLocator"/>
+
     <!-- Default Transformers are now loaded from META-INF/services/org/mule/config/registry-bootstrap.properties so that
     the transformers will be available even when using the TransientRegistry only -->
 

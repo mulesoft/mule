@@ -10,8 +10,8 @@ import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
 import org.mule.module.http.internal.request.DefaultHttpRequester;
+import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
 import org.mule.module.http.internal.request.ResponseValidator;
 
 public class HttpRequesterBuilder
@@ -82,6 +82,19 @@ public class HttpRequesterBuilder
         return this;
     }
 
+    public HttpRequesterBuilder setResponseTimeout(long responseTimeout)
+    {
+        this.httpRequester.setResponseTimeout(String.valueOf(responseTimeout));
+        return this;
+    }
+
+    public HttpRequesterBuilder setRequestStreamingMode(String requestStreamingMode)
+    {
+        this.httpRequester.setRequestStreamingMode(requestStreamingMode);
+        return this;
+    }
+
+
     public HttpRequester build() throws MuleException
     {
         try
@@ -106,6 +119,4 @@ public class HttpRequesterBuilder
             throw new DefaultMuleException(e);
         }
     }
-
-
 }

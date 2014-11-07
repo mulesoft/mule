@@ -9,6 +9,7 @@ package org.mule.issues;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
 import org.mule.api.client.MuleClient;
 import org.mule.api.lifecycle.Callable;
@@ -56,7 +57,7 @@ public class HttpReturnsJaxbObject5531TestCase extends AbstractServiceAndFlowTes
     {
         String testUrl = "http://localhost:" + port1.getNumber() + "/test/weather";
         MuleClient client = muleContext.getClient();
-        Object response = client.send(testUrl, "hello", null);
+        Object response = client.send(testUrl, new DefaultMuleMessage("hello", muleContext));
         assertNotNull(response);
         String stringResponse = (String) new ObjectToString().transform(response, "UTF-8");
         assertTrue(stringResponse.contains("<Success>true</Success>"));

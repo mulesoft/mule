@@ -149,7 +149,7 @@ public class ProxyMule6829TestCase extends FunctionalTestCase
         msg.setProperty("soapAction", soapAction, PropertyScope.OUTBOUND);
 
         MuleClient client = muleContext.getClient();
-        return client.send("http://localhost:" + dynamicPort.getNumber() + "/EchoService11", msg, null);
+        return client.send("http://localhost:" + dynamicPort.getNumber() + "/EchoService11", msg);
     }
 
     private MuleMessage executeSoap12Call(String msgString, String soapAction) throws MuleException
@@ -159,7 +159,7 @@ public class ProxyMule6829TestCase extends FunctionalTestCase
         msg.setProperty("Content-Type", contentType, PropertyScope.OUTBOUND);
 
         MuleClient client = muleContext.getClient();
-        return client.send("http://localhost:" + dynamicPort.getNumber() + "/EchoService12", msg, null);
+        return client.send("http://localhost:" + dynamicPort.getNumber() + "/EchoService12", msg);
     }
 }
 
