@@ -8,10 +8,16 @@ package org.mule.test.usecases.routing.response;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.store.ObjectStoreException;
+import org.mule.module.http.api.HttpConstants;
+import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.SerializationUtils;
@@ -39,7 +45,7 @@ public class SerializationOnResposeAggregatorTestCase extends FunctionalTestCase
         muleContext.getRegistry().registerObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME,
                                                  new TestObjectStore<Serializable>());
         MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() , "request", null);
+        MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() , new DefaultMuleMessage("request", muleContext), newOptions().method(POST.name()).build());
         assertNotNull(message);
         assertEquals("request processed", new String(message.getPayloadAsBytes()));
     }

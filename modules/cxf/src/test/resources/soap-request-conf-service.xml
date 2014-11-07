@@ -9,6 +9,9 @@
                http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
+
+    <configuration useHttpTransportByDefault="true"/>
+
     <model name="CXFSoapRequest">
 
         <service name="TestComponent">

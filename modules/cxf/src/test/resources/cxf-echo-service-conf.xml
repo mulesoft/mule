@@ -16,7 +16,7 @@
            http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
            http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
     
-
+    <configuration useHttpTransportByDefault="true"/>
     
     <flow name="helloService">
         <inbound-endpoint address="http://localhost:${port1}/hello" />

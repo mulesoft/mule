@@ -7,9 +7,13 @@
 package org.mule.transport.servlet.jetty.functional;
 
 import static org.junit.Assert.assertEquals;
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.servlet.jetty.AbstractWebappsTestCase;
 
@@ -48,9 +52,10 @@ public class JettyEndpointsAndWebappTestCase extends AbstractWebappsTestCase
     public void listensInEndpointsPorts() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send(String.format("http://localhost:%d/contextA", port2.getNumber()), TEST_MESSAGE, null);
+        final HttpRequestOptions httpRequestOptions = newOptions().method(POST.name()).build();
+        MuleMessage response = client.send(String.format("http://localhost:%d/contextA", port2.getNumber()), new DefaultMuleMessage(TEST_MESSAGE, muleContext), httpRequestOptions);
         assertEquals(TEST_MESSAGE, response.getPayloadAsString());
-        response = client.send(String.format("http://localhost:%d/contextB", port3.getNumber()), TEST_MESSAGE, null);
+        response = client.send(String.format("http://localhost:%d/contextB", port3.getNumber()), new DefaultMuleMessage(TEST_MESSAGE, muleContext), httpRequestOptions);
         assertEquals(TEST_MESSAGE, response.getPayloadAsString());
     }
 

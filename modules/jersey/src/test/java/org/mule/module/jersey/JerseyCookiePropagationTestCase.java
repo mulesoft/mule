@@ -28,6 +28,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import org.mule.DefaultMuleMessage;
+
 @RunWith(Parameterized.class)
 public class JerseyCookiePropagationTestCase extends FunctionalTestCase
 {
@@ -73,7 +75,7 @@ public class JerseyCookiePropagationTestCase extends FunctionalTestCase
         props.put(HttpConnector.HTTP_COOKIES_PROPERTY, cookiesObject);
 
         MuleMessage result = muleContext.getClient().send(
-                "http://localhost:" + httpPort.getNumber() + "/helloworld", "", props);
+                "http://localhost:" + httpPort.getNumber() + "/helloworld", new DefaultMuleMessage("", props, muleContext));
         assertThat(HttpStatus.SC_OK, is(equalTo(result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0))));
 
         Map<String, javax.ws.rs.core.Cookie> cookies = jerseyResource.getCookies();

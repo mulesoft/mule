@@ -8,11 +8,15 @@ package org.mule.transport.servlet.jetty;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transformer.DataType;
+import org.mule.module.http.api.client.HttpRequestOptions;
+import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -59,9 +63,9 @@ public class JettyTwoEndpointsSinglePortTestCase extends AbstractServiceAndFlowT
         sendWithResponse("http://localhost:" + dynamicPort.getNumber() + "/mycomponent1", "test", "mycomponent1", 5);
         sendWithResponse("http://localhost:" + dynamicPort.getNumber() + "/mycomponent2", "test", "mycomponent2", 5);
 
-        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/mycomponent-notfound", "test", null);
+        final HttpRequestOptions httpRequestOptions = newOptions().disableStatusCodeValidation().build();
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/mycomponent-notfound", getTestMuleMessage(), httpRequestOptions);
         assertNotNull(result);
-        assertNotNull(result.getExceptionPayload());
         final int status = result.getInboundProperty("http.status", 0);
         assertEquals(404, status);
 

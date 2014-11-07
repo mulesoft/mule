@@ -8,6 +8,8 @@
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
+    <configuration useHttpTransportByDefault="true"/>
+
     <model name="main">
 
         <service name="headers1">

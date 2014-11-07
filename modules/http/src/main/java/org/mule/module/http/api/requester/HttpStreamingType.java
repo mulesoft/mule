@@ -6,15 +6,21 @@
  */
 package org.mule.module.http.api.requester;
 
-import org.mule.api.processor.MessageProcessor;
-
-
-public interface HttpRequester extends MessageProcessor
+/**
+ * Streaming mode for HTTP. Streaming in HTTP implies using Transfer-Encoding: chunked
+ */
+public enum HttpStreamingType
 {
-
     /**
-     * @return the config for this requester.
+     * Will stream based on the message content.
      */
-    public HttpRequesterConfig getConfig();
-
+    AUTO,
+    /**
+     * Will always use streaming.
+     */
+    ALWAYS,
+    /**
+     * Will never use streaming.
+     */
+    NEVER;
 }

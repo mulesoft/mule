@@ -8,17 +8,18 @@
 package org.mule.module.jersey;
 
 import static org.junit.Assert.assertEquals;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
+import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -58,12 +59,14 @@ public class MultipleExceptionMapperTestCase extends org.mule.tck.junit4.Functio
     {
         LocalMuleClient client = muleContext.getClient();
 
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
-
-        MuleMessage result = client.send("http://localhost:" + port.getNumber() + "/helloworld/throwBadRequestException", TEST_MESSAGE, props);
+        MuleMessage result = client.send("http://localhost:" + port.getNumber() + "/helloworld/throwBadRequestException", new DefaultMuleMessage(TEST_MESSAGE, muleContext), getHttpOptions());
 
         assertEquals((Integer) HttpConstants.SC_BAD_REQUEST, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
+    }
+
+    private HttpRequestOptions getHttpOptions()
+    {
+        return newOptions().disableStatusCodeValidation().build();
     }
 
 
@@ -72,10 +75,7 @@ public class MultipleExceptionMapperTestCase extends org.mule.tck.junit4.Functio
     {
         LocalMuleClient client = muleContext.getClient();
 
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
-
-        MuleMessage result = client.send("http://localhost:" + port.getNumber() + "/helloworld/throwException", TEST_MESSAGE, props);
+        MuleMessage result = client.send("http://localhost:" + port.getNumber() + "/helloworld/throwException", new DefaultMuleMessage(TEST_MESSAGE, muleContext), getHttpOptions());
 
         assertEquals((Integer) HttpConstants.SC_SERVICE_UNAVAILABLE, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
     }

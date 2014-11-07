@@ -7,6 +7,7 @@
 
 package org.mule.module.cxf;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -48,14 +49,14 @@ public class ProxyRPCBindingTestCase extends FunctionalTestCase
     @Test
     public void proxyRPCBodyPayload() throws Exception
     {
-        MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/body", getAllRequest, null);
+        MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/body", new DefaultMuleMessage(getAllRequest, muleContext));
         assertTrue(XMLUnit.compareXML(getAllResponse, response.getPayloadAsString()).identical());
     }
 
     @Test
     public void proxyRPCBodyEnvelope() throws Exception
     {
-        MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/envelope", getAllRequest, null);
+        MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/envelope", new DefaultMuleMessage(getAllRequest, muleContext));
         assertTrue(XMLUnit.compareXML(getAllResponse, response.getPayloadAsString()).identical());
     }
 

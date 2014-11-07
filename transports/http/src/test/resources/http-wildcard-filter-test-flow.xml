@@ -8,6 +8,8 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
+    <configuration useHttpTransportByDefault="true"/>
+
     <flow name="httpIn">
         <http:inbound-endpoint host="localhost" port="${port1}" exchange-pattern="request-response"
             name="inHttpIn">
