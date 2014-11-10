@@ -59,6 +59,9 @@ public class ExceptionListenerTestCase extends AbstractServiceAndFlowTestCase
     {
         super.doSetUp();
         client = muleContext.getClient();
+
+        exceptionStrategyStartNotification = null;
+        exceptionStrategyEndNotification = null;
         muleContext.getNotificationManager().addListener(new ExceptionStrategyNotificationListener<ExceptionStrategyNotification>()
         {
             @Override
