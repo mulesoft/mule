@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 import org.mule.api.MuleContext;
 import org.mule.api.transaction.Transaction;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 import org.mule.util.xa.XaResourceFactoryHolder;
 
 import java.util.Random;
@@ -24,14 +25,16 @@ import javax.transaction.TransactionManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
+@SmallTest
 public class XaTransactionTestCase extends AbstractMuleTestCase
 {
 
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private MuleContext mockMuleContext;
     @Mock
     private TransactionManager mockTransactionManager;
@@ -44,6 +47,7 @@ public class XaTransactionTestCase extends AbstractMuleTestCase
     public void setUpMuleContext()
     {
         when(mockMuleContext.getTransactionManager()).thenReturn(mockTransactionManager);
+        when(mockMuleContext.getConfiguration().getId()).thenReturn("appName");
     }
 
     @Test
