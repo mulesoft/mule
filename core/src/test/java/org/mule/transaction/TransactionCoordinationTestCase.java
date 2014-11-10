@@ -6,29 +6,47 @@
  */
 package org.mule.transaction;
 
-import org.hamcrest.core.IsNull;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 import org.mule.api.MuleContext;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
+import org.hamcrest.core.IsNull;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 
+@SmallTest
+@RunWith(MockitoJUnitRunner.class)
 public class TransactionCoordinationTestCase extends AbstractMuleTestCase
 {
+
+    private MuleContext muleContext;
+
     private TransactionCoordination tc;
 
     @Before
     public void setUpTransaction() throws Exception
     {
         tc = TransactionCoordination.getInstance();
+        muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+        when(muleContext.getConfiguration().getId()).thenReturn("appName");
     }
 
     @After
@@ -96,7 +114,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase
     {
         assertThat(tc.getTransaction(), IsNull.<Object>nullValue());
         tc.commitCurrentTransaction();
-        TestTransaction testTransaction = spy(new TestTransaction(mock(MuleContext.class)));
+        TestTransaction testTransaction = spy(new TestTransaction(muleContext));
 
         tc.bindTransaction(testTransaction);
         tc.commitCurrentTransaction();
@@ -108,9 +126,9 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase
     public void testCommitCurrentTransactionWithSuspendedTransaction() throws Exception
     {
         assertThat(tc.getTransaction(), IsNull.<Object>nullValue());
-        TestTransaction xaTx = spy(new TestTransaction(mock(MuleContext.class)));
+        TestTransaction xaTx = spy(new TestTransaction(muleContext));
         xaTx.setXA(true);
-        Transaction tx = spy(new TestTransaction(mock(MuleContext.class)));
+        Transaction tx = spy(new TestTransaction(muleContext));
 
         tc.bindTransaction(xaTx);
         tc.suspendCurrentTransaction();
@@ -138,7 +156,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase
     {
         assertThat(tc.getTransaction(), IsNull.<Object>nullValue());
         tc.commitCurrentTransaction();
-        TestTransaction testTransaction = spy(new TestTransaction(mock(MuleContext.class)));
+        TestTransaction testTransaction = spy(new TestTransaction(muleContext));
 
         tc.bindTransaction(testTransaction);
         tc.rollbackCurrentTransaction();
@@ -150,9 +168,9 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase
     public void testRollbackCurrentTransactionWithSuspendedTransaction() throws Exception
     {
         assertThat(tc.getTransaction(), IsNull.<Object>nullValue());
-        TestTransaction xaTx = spy(new TestTransaction(mock(MuleContext.class)));
+        TestTransaction xaTx = spy(new TestTransaction(muleContext));
         xaTx.setXA(true);
-        Transaction tx = spy(new TestTransaction(mock(MuleContext.class)));
+        Transaction tx = spy(new TestTransaction(muleContext));
 
         tc.bindTransaction(xaTx);
         tc.suspendCurrentTransaction();
@@ -195,7 +213,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase
         assertThat(tc.getTransaction(), IsNull.<Object>nullValue());
         tc.resumeXaTransactionIfAvailable();
 
-        Transaction tx = spy(new TestTransaction(mock(MuleContext.class)));
+        Transaction tx = spy(new TestTransaction(muleContext));
         tc.bindTransaction(tx);
         tc.resumeXaTransactionIfAvailable();
         verify(tx, times(0)).resume();
@@ -207,7 +225,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase
         assertThat(tc.getTransaction(), IsNull.<Object>nullValue());
         tc.resumeXaTransactionIfAvailable();
 
-        TestTransaction tx = spy(new TestTransaction(mock(MuleContext.class)));
+        TestTransaction tx = spy(new TestTransaction(muleContext));
         tx.setXA(true);
         tc.bindTransaction(tx);
         tc.suspendCurrentTransaction();
@@ -220,7 +238,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase
     public void testResumeXaTransactionTwice() throws Exception
     {
         assertThat(tc.getTransaction(), IsNull.<Object>nullValue());
-        TestTransaction tx = spy(new TestTransaction(mock(MuleContext.class)));
+        TestTransaction tx = spy(new TestTransaction(muleContext));
         tx.setXA(true);
         tc.bindTransaction(tx);
         tc.resumeSuspendedTransaction();
@@ -231,7 +249,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase
     public void testResolveTransactionForRollback() throws Exception
     {
         assertThat(tc.getTransaction(), IsNull.<Object>nullValue());
-        TestTransaction tx = spy(new TestTransaction(mock(MuleContext.class)));
+        TestTransaction tx = spy(new TestTransaction(muleContext));
         tx.setXA(true);
         tc.bindTransaction(tx);
         tx.setRollbackOnly();
@@ -244,7 +262,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase
     public void testResolveTransactionForCommit() throws Exception
     {
         assertThat(tc.getTransaction(), IsNull.<Object>nullValue());
-        TestTransaction tx = spy(new TestTransaction(mock(MuleContext.class)));
+        TestTransaction tx = spy(new TestTransaction(muleContext));
         tx.setXA(true);
         tc.bindTransaction(tx);
         tc.resolveTransaction();
