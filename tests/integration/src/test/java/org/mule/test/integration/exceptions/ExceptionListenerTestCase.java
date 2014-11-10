@@ -6,15 +6,23 @@
  */
 package org.mule.test.integration.exceptions;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.api.context.notification.ExceptionStrategyNotificationListener;
+import org.mule.api.context.notification.ServerNotification;
+import org.mule.context.notification.ExceptionStrategyNotification;
 import org.mule.message.ExceptionMessage;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.probe.JUnitProbe;
+import org.mule.tck.probe.PollingProber;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,14 +32,20 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class ExceptionListenerTestCase extends AbstractServiceAndFlowTestCase
 {
+
+    private static final int TIMEOUT_MILLIS = 5000;
+    private static final int POLL_DELAY_MILLIS = 100;
+
     private MuleClient client;
+    private ServerNotification exceptionStrategyStartNotification;
+    private ServerNotification exceptionStrategyEndNotification;
 
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/exception-listener-config-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/exception-listener-config-flow.xml"}
+        return Arrays.asList(new Object[][] {
+                {ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/exception-listener-config-service.xml"},
+                {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/exception-listener-config-flow.xml"}
         });
     }
 
@@ -45,6 +59,21 @@ public class ExceptionListenerTestCase extends AbstractServiceAndFlowTestCase
     {
         super.doSetUp();
         client = muleContext.getClient();
+        muleContext.getNotificationManager().addListener(new ExceptionStrategyNotificationListener<ExceptionStrategyNotification>()
+        {
+            @Override
+            public void onNotification(ExceptionStrategyNotification notification)
+            {
+                if (notification.getAction() == ExceptionStrategyNotification.PROCESS_START)
+                {
+                    exceptionStrategyStartNotification = notification;
+                }
+                else if (notification.getAction() == ExceptionStrategyNotification.PROCESS_END)
+                {
+                    exceptionStrategyEndNotification = notification;
+                }
+            }
+        });
     }
 
     @Test
@@ -60,6 +89,37 @@ public class ExceptionListenerTestCase extends AbstractServiceAndFlowTestCase
         assertNotNull(message);
         Object payload = message.getPayload();
         assertTrue(payload instanceof ExceptionMessage);
+
+        assertNotificationsArrived();
+        assertNotificationsHaveMatchingResourceIds();
+    }
+
+    private void assertNotificationsHaveMatchingResourceIds()
+    {
+        assertThat(exceptionStrategyStartNotification.getResourceIdentifier(), is(not(nullValue())));
+        assertThat(exceptionStrategyStartNotification.getResourceIdentifier(), is("mycomponent"));
+        assertThat(exceptionStrategyStartNotification.getResourceIdentifier(), is(exceptionStrategyEndNotification.getResourceIdentifier()));
+    }
+
+    private void assertNotificationsArrived()
+    {
+        PollingProber prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
+        prober.check(new JUnitProbe()
+        {
+            @Override
+            protected boolean test() throws Exception
+            {
+                assertThat(exceptionStrategyStartNotification, is(not(nullValue())));
+                assertThat(exceptionStrategyEndNotification, is(not(nullValue())));
+                return true;
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "Did not get exception strategy notifications";
+            }
+        });
     }
 
     private void assertQueueIsEmpty(String queueName) throws MuleException

@@ -6,6 +6,7 @@
  */
 package org.mule.context.notification;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.context.notification.ServerNotification;
 
 public class ExceptionStrategyNotification extends ServerNotification
@@ -24,5 +25,9 @@ public class ExceptionStrategyNotification extends ServerNotification
     public ExceptionStrategyNotification(Object message, int action)
     {
         super(message, action);
+        if (message instanceof MuleEvent)
+        {
+            resourceIdentifier = ((MuleEvent) message).getFlowConstruct().getName();
+        }
     }
 }
