@@ -143,15 +143,15 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
     {
         TcpServerSocketProperties properties = muleContext.getRegistry().get("serverSocketProperties");
 
-        assertThat(properties.getConnectionTimeout(), equalTo(500));
         assertThat(properties.getKeepAlive(), equalTo(true));
         assertThat(properties.getReceiveBacklog(), equalTo(200));
         assertThat(properties.getReceiveBufferSize(), equalTo(1024));
         assertThat(properties.getReuseAddress(), equalTo(true));
         assertThat(properties.getSendBufferSize(), equalTo(2048));
         assertThat(properties.getSendTcpNoDelay(), equalTo(true));
-        assertThat(properties.getServerSoTimeout(), equalTo(600));
-        assertThat(properties.getSocketSoLinger(), equalTo(700));
+        assertThat(properties.getServerTimeout(), equalTo(600));
+        assertThat(properties.getTimeout(), equalTo(800));
+        assertThat(properties.getLinger(), equalTo(700));
     }
 
     @Test
@@ -164,8 +164,8 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         assertThat(properties.getReceiveBufferSize(), equalTo(1024));
         assertThat(properties.getSendBufferSize(), equalTo(2048));
         assertThat(properties.getSendTcpNoDelay(), equalTo(true));
-        assertThat(properties.getClientSoTimeout(), equalTo(600));
-        assertThat(properties.getSocketSoLinger(), equalTo(700));
+        assertThat(properties.getTimeout(), equalTo(600));
+        assertThat(properties.getLinger(), equalTo(700));
     }
 
 
