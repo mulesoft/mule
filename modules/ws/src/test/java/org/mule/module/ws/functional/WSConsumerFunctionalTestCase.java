@@ -38,6 +38,7 @@ public class WSConsumerFunctionalTestCase extends AbstractWSConsumerFunctionalTe
                              // TODO MULE-7247: Fix flaky WSConsumerFunctionalTestCase over HTTPS
                              // new Object[] {"ws-consumer-https-config.xml"},
                              new Object[] {"ws-consumer-http-custom-connector-config.xml"},
+                             new Object[] {"ws-consumer-http-dynamic-custom-connector-config.xml"},
                              new Object[] {"ws-consumer-jms-config.xml"});
     }
 
