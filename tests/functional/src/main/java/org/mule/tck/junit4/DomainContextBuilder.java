@@ -8,6 +8,7 @@ package org.mule.tck.junit4;
 
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
+import org.mule.config.bootstrap.RegistryBootstrapService;
 import org.mule.config.spring.SpringXmlDomainConfigurationBuilder;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
@@ -20,10 +21,18 @@ public class DomainContextBuilder
 
     private String domainConfig;
     private boolean disableMuleContextStart = false;
+    private RegistryBootstrapService registryBootstrapService;
 
     public DomainContextBuilder setDomainConfig(String domainConfig)
     {
         this.domainConfig = domainConfig;
+        return this;
+    }
+
+    public DomainContextBuilder setRegistryBootstrapService(RegistryBootstrapService registryBootstrapService)
+    {
+        this.registryBootstrapService = registryBootstrapService;
+
         return this;
     }
 
@@ -33,7 +42,10 @@ public class DomainContextBuilder
         ConfigurationBuilder cfgBuilder = getDomainBuilder(domainConfig);
         builders.add(cfgBuilder);
         DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-        MuleContext domainContext = muleContextFactory.createMuleContext(builders, new DefaultMuleContextBuilder());
+        muleContextFactory.setRegistryBootstrapService(registryBootstrapService);
+        DefaultMuleContextBuilder muleContextBuilder = new DefaultMuleContextBuilder();
+        muleContextBuilder.setRegistryBootstrapService(registryBootstrapService);
+        MuleContext domainContext = muleContextFactory.createMuleContext(builders, muleContextBuilder);
         if (!disableMuleContextStart)
         {
             domainContext.start();

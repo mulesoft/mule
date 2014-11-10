@@ -19,10 +19,10 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.AbstractDiscoverableTransformer;
+import org.mule.util.OrderedProperties;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import org.junit.Test;
 
@@ -32,14 +32,10 @@ public class SimpleRegistryBootstrapTransformersTest extends AbstractMuleContext
     @Test
     public void registeringTransformersWithCustomKey() throws MuleException
     {
-        Properties properties = new Properties();
-        properties.setProperty("core.transformer.1", ExpectedKeyTransformer.class.getName());
-        properties.setProperty("custom1", CustomKeyTransformer.class.getName());
-
         TestTransformerResolver transformerResolver = new TestTransformerResolver();
         muleContext.getRegistry().registerObject("testTransformerResolver", transformerResolver);
 
-        SimpleRegistryBootstrap registryBootstrap = new SimpleRegistryBootstrap(new SinglePropertiesRegistryBootstrapDiscoverer(properties));
+        SimpleRegistryBootstrap registryBootstrap = new SimpleRegistryBootstrap();
         registryBootstrap.setMuleContext(muleContext);
         registryBootstrap.initialise();
 
@@ -48,6 +44,18 @@ public class SimpleRegistryBootstrapTransformersTest extends AbstractMuleContext
         assertTrue(transformerResolver.contains(ExpectedKeyTransformer.class));
 
         assertTrue(transformerResolver.contains(CustomKeyTransformer.class));
+    }
+
+    @Override
+    protected void configureRegistryBootstrapService(RegistryBootstrapService registryBootstrapService)
+    {
+        OrderedProperties properties = new OrderedProperties();
+        properties.setProperty("core.transformer.1", ExpectedKeyTransformer.class.getName());
+        properties.setProperty("custom1", CustomKeyTransformer.class.getName());
+
+        BootstrapPropertiesService bootstrapPropertiesService = new MuleBootstrapPropertiesService(properties);
+
+        registryBootstrapService.register(bootstrapPropertiesService);
     }
 
     @Override
