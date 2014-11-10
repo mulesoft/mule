@@ -6,11 +6,13 @@
  */
 package org.mule.context.notification;
 
+import org.mule.api.MuleContext;
 import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.transaction.Transaction;
+import org.mule.util.store.DeserializationPostInitialisable;
 
-public class TransactionNotification extends ServerNotification implements BlockingServerEvent
+public class TransactionNotification extends ServerNotification implements BlockingServerEvent, DeserializationPostInitialisable
 {
     /**
      * Serial version
@@ -27,21 +29,34 @@ public class TransactionNotification extends ServerNotification implements Block
         registerAction("rollback", TRANSACTION_ROLLEDBACK);
     }
 
+    private transient MuleContext muleContext;
+
     /**
      * Ideally, that should've been a transaction's XID, but we'd need to resort to all kinds of reflection tricks to
      * get it. Still, toString() typically outputs a class name followed by the XID, so that's good enough.
      */
     private String transactionStringId;
 
-    public TransactionNotification(Transaction transaction, int action)
+    public TransactionNotification(Transaction transaction, int action, MuleContext muleContext)
     {
         super(transaction.getId(), action, transaction.getId());
         this.transactionStringId = transaction.getId();
+        this.muleContext = muleContext;
+    }
+
+    public String getApplicationName()
+    {
+        return muleContext.getConfiguration().getId();
     }
 
     public String getTransactionStringId()
     {
         return this.transactionStringId;
+    }
+
+    public void initAfterDeserialisation(MuleContext context)
+    {
+        this.muleContext = context;
     }
 
     @Override
@@ -50,5 +65,4 @@ public class TransactionNotification extends ServerNotification implements Block
         return EVENT_NAME + "{" + "action=" + getActionName(action) + ", transactionStringId=" + transactionStringId
                + ", timestamp=" + timestamp + "}";
     }
-
 }
