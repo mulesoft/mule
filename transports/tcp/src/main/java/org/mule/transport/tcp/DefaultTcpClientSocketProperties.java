@@ -17,8 +17,8 @@ public class DefaultTcpClientSocketProperties implements TcpClientSocketProperti
     private Integer receiveBufferSize;
     private Boolean sendTcpNoDelay;
     private Integer connectionTimeout;
-    private Integer clientSoTimeout;
-    private Integer socketSoLinger;
+    private Integer socketTimeout;
+    private Integer linger;
     private Boolean keepAlive;
 
     public String getName()
@@ -76,25 +76,25 @@ public class DefaultTcpClientSocketProperties implements TcpClientSocketProperti
     }
 
     @Override
-    public Integer getClientSoTimeout()
+    public Integer getSocketTimeout()
     {
-        return clientSoTimeout;
+        return socketTimeout;
     }
 
-    public void setClientSoTimeout(Integer clientSoTimeout)
+    public void setSocketTimeout(Integer socketTimeout)
     {
-        this.clientSoTimeout = clientSoTimeout;
+        this.socketTimeout = socketTimeout;
     }
 
     @Override
-    public Integer getSocketSoLinger()
+    public Integer getLinger()
     {
-        return socketSoLinger;
+        return linger;
     }
 
-    public void setSocketSoLinger(Integer socketSoLinger)
+    public void setLinger(Integer linger)
     {
-        this.socketSoLinger = socketSoLinger;
+        this.linger = linger;
     }
 
     @Override
