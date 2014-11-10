@@ -16,6 +16,9 @@ public class TransactionNotification extends ServerNotification implements Block
      * Serial version
      */
     private static final long serialVersionUID = -3245036187011582121L;
+
+    private static String UNKNOWN_APPLICATION_NAME = "unknown";
+
     public static final int TRANSACTION_BEGAN = TRANSACTION_EVENT_ACTION_START_RANGE + 1;
     public static final int TRANSACTION_COMMITTED = TRANSACTION_EVENT_ACTION_START_RANGE + 2;
     public static final int TRANSACTION_ROLLEDBACK = TRANSACTION_EVENT_ACTION_START_RANGE + 3;
@@ -27,6 +30,8 @@ public class TransactionNotification extends ServerNotification implements Block
         registerAction("rollback", TRANSACTION_ROLLEDBACK);
     }
 
+    private String applicationName;
+
     /**
      * Ideally, that should've been a transaction's XID, but we'd need to resort to all kinds of reflection tricks to
      * get it. Still, toString() typically outputs a class name followed by the XID, so that's good enough.
@@ -35,8 +40,19 @@ public class TransactionNotification extends ServerNotification implements Block
 
     public TransactionNotification(Transaction transaction, int action)
     {
+        this(transaction, action, UNKNOWN_APPLICATION_NAME);
+    }
+
+    public TransactionNotification(Transaction transaction, int action, String applicationName)
+    {
         super(transaction.getId(), action, transaction.getId());
         this.transactionStringId = transaction.getId();
+        this.applicationName = applicationName;
+    }
+
+    public String getApplicationName()
+    {
+        return applicationName;
     }
 
     public String getTransactionStringId()
@@ -50,5 +66,4 @@ public class TransactionNotification extends ServerNotification implements Block
         return EVENT_NAME + "{" + "action=" + getActionName(action) + ", transactionStringId=" + transactionStringId
                + ", timestamp=" + timestamp + "}";
     }
-
 }

@@ -63,7 +63,7 @@ public abstract class AbstractTransaction implements Transaction
         logger.debug("Beginning transaction");
         doBegin();
         TransactionCoordination.getInstance().bindTransaction(this);
-        fireNotification(new TransactionNotification(this, TransactionNotification.TRANSACTION_BEGAN));
+        fireNotification(new TransactionNotification(this, TransactionNotification.TRANSACTION_BEGAN, getApplicationName()));
     }
 
     public void commit() throws TransactionException
@@ -78,7 +78,7 @@ public abstract class AbstractTransaction implements Transaction
             }
 
             doCommit();
-            fireNotification(new TransactionNotification(this, TransactionNotification.TRANSACTION_COMMITTED));
+            fireNotification(new TransactionNotification(this, TransactionNotification.TRANSACTION_COMMITTED, getApplicationName()));
         }
         finally
         {
@@ -93,7 +93,7 @@ public abstract class AbstractTransaction implements Transaction
             logger.debug("Rolling back transaction");
             setRollbackOnly();
             doRollback();
-            fireNotification(new TransactionNotification(this, TransactionNotification.TRANSACTION_ROLLEDBACK));
+            fireNotification(new TransactionNotification(this, TransactionNotification.TRANSACTION_ROLLEDBACK, getApplicationName()));
         }
         finally
         {
@@ -176,4 +176,10 @@ public abstract class AbstractTransaction implements Transaction
         }
         return MessageFormat.format("{0}[id={1} , status={2}]", getClass().getName(), id, status);
     }
+
+    private String getApplicationName()
+    {
+        return muleContext.getConfiguration().getId();
+    }
+
 }
