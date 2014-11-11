@@ -44,7 +44,7 @@ public class TransactionalElementLifecycleTestCase extends FunctionalTestCase
     @Override
     protected void doSetUp() throws Exception
     {
-        notifications = new ArrayList<>();
+        notifications = new ArrayList<TransactionNotification>();
     }
 
     @Test
