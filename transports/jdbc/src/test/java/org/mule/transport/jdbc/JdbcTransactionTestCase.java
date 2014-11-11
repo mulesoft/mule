@@ -9,6 +9,7 @@ package org.mule.transport.jdbc;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -35,11 +36,14 @@ public class JdbcTransactionTestCase extends AbstractMuleTestCase
 
     private JdbcTransaction tx;
     private Connection connection;
+    private MuleContext muleContext;
 
     @Before
     public void initializeMocks() throws SQLException, TransactionException
     {
-        tx = new JdbcTransaction(mock(MuleContext.class));
+        muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+        when(muleContext.getConfiguration().getId()).thenReturn("myApp");
+        tx = new JdbcTransaction(muleContext);
 
         connection = mock(Connection.class);
 
