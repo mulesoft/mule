@@ -7,7 +7,6 @@
 package org.mule.test.integration.transaction;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.mule.api.MuleEventContext;
@@ -96,7 +95,7 @@ public class TransactionalElementLifecycleTestCase extends FunctionalTestCase
             @Override
             protected boolean test() throws Exception
             {
-                assertThat(notifications.size(), greaterThanOrEqualTo(2));
+                assertThat(notifications.size() >= 2, is(true));
                 return true;
             }
 
