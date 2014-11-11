@@ -10,7 +10,7 @@ import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
-import org.mule.module.http.listener.HttpResponseBuilder;
+import org.mule.module.http.internal.listener.HttpResponseBuilder;
 
 public class HttpResponseBuilderDefinitionParser extends ParentContextDefinitionParser
 {

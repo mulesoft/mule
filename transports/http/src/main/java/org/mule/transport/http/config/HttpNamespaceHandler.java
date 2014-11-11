@@ -45,7 +45,7 @@ import org.mule.transport.http.transformers.ObjectToHttpClientMethodRequest;
  * This namespace handler now extends HttpNamespaceHandler from mule-module-http so that both projects can
  * register bean definition parsers for the same namespace (http).
  */
-public class HttpNamespaceHandler extends org.mule.module.http.config.HttpNamespaceHandler
+public class HttpNamespaceHandler extends org.mule.module.http.internal.config.HttpNamespaceHandler
 {
     public void init()
     {
