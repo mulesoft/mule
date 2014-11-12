@@ -9,10 +9,8 @@ package org.mule.message.processing;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -22,25 +20,21 @@ import org.mule.api.MuleException;
 import org.mule.api.context.WorkManager;
 import org.mule.execution.AsyncResponseFlowProcessingPhase;
 import org.mule.execution.AsyncResponseFlowProcessingPhaseTemplate;
-import org.mule.execution.FlowProcessingPhase;
-import org.mule.execution.FlowProcessingPhaseTemplate;
 import org.mule.execution.MessageProcessContext;
 import org.mule.execution.MessageProcessPhase;
 import org.mule.execution.PhaseResultNotifier;
-import org.mule.execution.RequestResponseFlowProcessingPhaseTemplate;
+import org.mule.execution.ResponseCompletionCallback;
 import org.mule.execution.ResponseDispatchException;
 import org.mule.execution.ValidationPhase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkException;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
-import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -80,21 +74,21 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable
             {
-                AsyncResponseFlowProcessingPhase.ResponseCompletationCallback callback = (AsyncResponseFlowProcessingPhase.ResponseCompletationCallback) invocationOnMock.getArguments()[1];
+                ResponseCompletionCallback callback = (ResponseCompletionCallback) invocationOnMock.getArguments()[1];
                 callback.responseSentSuccessfully();
                 return null;
             }
-        }).when(mockTemplate).sendFailureResponseToClient(any(MessagingException.class), any(AsyncResponseFlowProcessingPhase.ResponseCompletationCallback.class));
+        }).when(mockTemplate).sendFailureResponseToClient(any(MessagingException.class), any(ResponseCompletionCallback.class));
         doAnswer(new Answer()
         {
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable
             {
-                AsyncResponseFlowProcessingPhase.ResponseCompletationCallback callback = (AsyncResponseFlowProcessingPhase.ResponseCompletationCallback) invocationOnMock.getArguments()[2];
+                ResponseCompletionCallback callback = (ResponseCompletionCallback) invocationOnMock.getArguments()[1];
                 callback.responseSentSuccessfully();
                 return null;
             }
-        }).when(mockTemplate).sendResponseToClient(any(AsyncResponseFlowProcessingPhaseTemplate.class), any(MuleEvent.class), any(AsyncResponseFlowProcessingPhase.ResponseCompletationCallback.class));
+        }).when(mockTemplate).sendResponseToClient(any(MuleEvent.class), any(ResponseCompletionCallback.class));
         when(mockContext.getFlowExecutionWorkManager()).thenReturn(mockWorkManager);
         doAnswer(new Answer()
         {
@@ -143,7 +137,7 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
     public void runPhaseWithSuccessfulFlowProcessing() throws Exception
     {
         phase.runPhase(mockTemplate, mockContext, mockNotifier);
-        verify(mockTemplate).sendResponseToClient(any(AsyncResponseFlowProcessingPhaseTemplate.class), any(MuleEvent.class), any(AsyncResponseFlowProcessingPhase.ResponseCompletationCallback.class));
+        verify(mockTemplate).sendResponseToClient(any(MuleEvent.class), any(ResponseCompletionCallback.class));
         verifyOnlySuccessfulWasCalled();
     }
 
@@ -153,7 +147,7 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
         when(mockTemplate.routeEvent(any(MuleEvent.class))).thenThrow(mockMessagingException);
         when(mockMessagingException.handled()).thenReturn(true);
         phase.runPhase(mockTemplate, mockContext, mockNotifier);
-        verify(mockTemplate).sendResponseToClient(any(AsyncResponseFlowProcessingPhaseTemplate.class), any(MuleEvent.class), any(AsyncResponseFlowProcessingPhase.ResponseCompletationCallback.class));
+        verify(mockTemplate).sendResponseToClient(any(MuleEvent.class), any(ResponseCompletionCallback.class));
         verifyOnlySuccessfulWasCalled();
     }
 
@@ -163,7 +157,7 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
         when(mockTemplate.routeEvent(any(MuleEvent.class))).thenThrow(mockMessagingException);
         when(mockMessagingException.handled()).thenReturn(false);
         phase.runPhase(mockTemplate, mockContext, mockNotifier);
-        verify(mockTemplate).sendFailureResponseToClient(any(MessagingException.class), any(AsyncResponseFlowProcessingPhase.ResponseCompletationCallback.class));
+        verify(mockTemplate).sendFailureResponseToClient(any(MessagingException.class), any(ResponseCompletionCallback.class));
         verifyOnlySuccessfulWasCalled();
     }
 
@@ -175,11 +169,11 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable
             {
-                AsyncResponseFlowProcessingPhase.ResponseCompletationCallback callback = (AsyncResponseFlowProcessingPhase.ResponseCompletationCallback) invocationOnMock.getArguments()[2];
-                callback.responseSentWithFailure(mockException, (MuleEvent) invocationOnMock.getArguments()[1]);
+                ResponseCompletionCallback callback = (ResponseCompletionCallback) invocationOnMock.getArguments()[1];
+                callback.responseSentWithFailure(mockException, (MuleEvent) invocationOnMock.getArguments()[0]);
                 return null;
             }
-        }).when(mockTemplate).sendResponseToClient(any(AsyncResponseFlowProcessingPhaseTemplate.class), any(MuleEvent.class), any(AsyncResponseFlowProcessingPhase.ResponseCompletationCallback.class));
+        }).when(mockTemplate).sendResponseToClient(any(MuleEvent.class), any(ResponseCompletionCallback.class));
         phase.runPhase(mockTemplate, mockContext, mockNotifier);
         verify(mockContext.getFlowConstruct().getExceptionListener()).handleException(any(Exception.class), any(MuleEvent.class));
         verifyOnlySuccessfulWasCalled();
@@ -193,13 +187,14 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable
             {
-                AsyncResponseFlowProcessingPhase.ResponseCompletationCallback callback = (AsyncResponseFlowProcessingPhase.ResponseCompletationCallback) invocationOnMock.getArguments()[1];
+                ResponseCompletionCallback callback = (ResponseCompletionCallback) invocationOnMock.getArguments()[1];
                 callback.responseSentWithFailure(mockException, ((MessagingException)invocationOnMock.getArguments()[0]).getEvent());
                 return null;
             }
-        }).when(mockTemplate).sendFailureResponseToClient(any(MessagingException.class), any(AsyncResponseFlowProcessingPhase.ResponseCompletationCallback.class));
+        }).when(mockTemplate).sendFailureResponseToClient(any(MessagingException.class), any(ResponseCompletionCallback.class));
         when(mockTemplate.routeEvent(any(MuleEvent.class))).thenThrow(mockMessagingException);
         phase.runPhase(mockTemplate, mockContext, mockNotifier);
+        verify(mockContext.getFlowConstruct().getExceptionListener()).handleException(any(Exception.class), any(MuleEvent.class));
         verifyOnlyFailureWasCalled(mockException);
     }
 

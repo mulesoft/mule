@@ -43,23 +43,20 @@ public interface AsyncResponseFlowProcessingPhaseTemplate extends MessageProcess
      * <p/>
      * This method is executed within the flow so if it fails it will trigger the exception strategy.
      *
-     *
-     *
-     * @param template
      * @param muleEvent the event with the content of the response to be sent.
-     * @param responseCompletationCallback
+     * @param responseCompletionCallback callback to be used for notifying the result of the operation
      * @throws MuleException exception thrown when processing the message to send the response. If there's a failure when writing the response
      *                       using the underlying transport or connector then the exception to throw must be a {@link ResponseDispatchException}.
      */
-    void sendResponseToClient(AsyncResponseFlowProcessingPhaseTemplate template, MuleEvent muleEvent, AsyncResponseFlowProcessingPhase.ResponseCompletationCallback responseCompletationCallback) throws MuleException;
+    void sendResponseToClient(MuleEvent muleEvent, ResponseCompletionCallback responseCompletionCallback) throws MuleException;
 
 
     /**
      *
      * @param messagingException exception thrown during the flow execution.
-     * @param responseCompletationCallback
+     * @param responseCompletionCallback callback to be used for notifying the result of the operation
      * @throws MuleException exception thrown when processing the message to send the response.
      */
-    void sendFailureResponseToClient(MessagingException messagingException, AsyncResponseFlowProcessingPhase.ResponseCompletationCallback responseCompletationCallback) throws MuleException;
+    void sendFailureResponseToClient(MessagingException messagingException, ResponseCompletionCallback responseCompletionCallback) throws MuleException;
 
 }

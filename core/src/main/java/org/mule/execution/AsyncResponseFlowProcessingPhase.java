@@ -68,7 +68,7 @@ public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<Asy
                                 return muleEvent;
                             }
                         });
-                        template.sendResponseToClient(template, response, createResponseCompletationCallback(phaseResultNotifier, exceptionHandler));
+                        template.sendResponseToClient(response, createResponseCompletationCallback(phaseResultNotifier, exceptionHandler));
                     }
                     catch (final MessagingException e)
                     {
@@ -98,9 +98,9 @@ public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<Asy
         }
     }
 
-    private ResponseCompletationCallback createSendFailureResponseCompletationCallback(final PhaseResultNotifier phaseResultNotifier)
+    private ResponseCompletionCallback createSendFailureResponseCompletationCallback(final PhaseResultNotifier phaseResultNotifier)
     {
-        return new ResponseCompletationCallback()
+        return new ResponseCompletionCallback()
         {
             @Override
             public void responseSentSuccessfully()
@@ -116,9 +116,9 @@ public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<Asy
         };
     }
 
-    private ResponseCompletationCallback createResponseCompletationCallback(final PhaseResultNotifier phaseResultNotifier, final MessagingExceptionHandler exceptionListener)
+    private ResponseCompletionCallback createResponseCompletationCallback(final PhaseResultNotifier phaseResultNotifier, final MessagingExceptionHandler exceptionListener)
     {
-        return new ResponseCompletationCallback()
+        return new ResponseCompletionCallback()
         {
             @Override
             public void responseSentSuccessfully()
@@ -142,7 +142,7 @@ public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<Asy
         };
     }
 
-    public void executeCallback(final Callback callback, PhaseResultNotifier phaseResultNotifier)
+    private void executeCallback(final Callback callback, PhaseResultNotifier phaseResultNotifier)
     {
         try
         {
@@ -171,12 +171,4 @@ public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<Asy
 
     }
 
-    public interface ResponseCompletationCallback
-    {
-
-        void responseSentSuccessfully();
-
-        void responseSentWithFailure(Exception e, MuleEvent event);
-
-    }
 }
