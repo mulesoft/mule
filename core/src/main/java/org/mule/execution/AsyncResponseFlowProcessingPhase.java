@@ -63,15 +63,8 @@ public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<Asy
                             @Override
                             public MuleEvent process() throws Exception
                             {
-                                Object message = template.getOriginalMessage();
-                                if (message == null)
-                                {
-                                    return null;
-                                }
                                 MuleEvent muleEvent = template.getMuleEvent();
-                                muleEvent = template.beforeRouteEvent(muleEvent);
                                 muleEvent = template.routeEvent(muleEvent);
-                                muleEvent = template.afterRouteEvent(muleEvent);
                                 return muleEvent;
                             }
                         });
@@ -116,10 +109,9 @@ public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<Asy
             }
 
             @Override
-            public void responseSentWithFailure(Throwable e, MuleEvent event)
+            public void responseSentWithFailure(Exception e, MuleEvent event)
             {
-                //TODO verify this
-                phaseResultNotifier.phaseFailure((Exception) e);
+                phaseResultNotifier.phaseFailure(e);
             }
         };
     }
@@ -135,15 +127,14 @@ public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<Asy
             }
 
             @Override
-            public void responseSentWithFailure(final Throwable e, final MuleEvent event)
+            public void responseSentWithFailure(final Exception e, final MuleEvent event)
             {
                 executeCallback(new Callback()
                 {
                     @Override
                     public void execute() throws Exception
                     {
-                        //TODO verify exception cast
-                        exceptionListener.handleException((Exception) e, event);
+                        exceptionListener.handleException(e, event);
                         phaseResultNotifier.phaseSuccessfully();
                     }
                 }, phaseResultNotifier);
@@ -185,7 +176,7 @@ public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<Asy
 
         void responseSentSuccessfully();
 
-        void responseSentWithFailure(Throwable e, MuleEvent event);
+        void responseSentWithFailure(Exception e, MuleEvent event);
 
     }
 }

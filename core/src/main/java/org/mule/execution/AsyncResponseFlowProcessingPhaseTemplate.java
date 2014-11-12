@@ -23,18 +23,6 @@ public interface AsyncResponseFlowProcessingPhaseTemplate extends MessageProcess
     MuleEvent getMuleEvent() throws MuleException;
 
     /**
-     * @return the original message
-     */
-    Object getOriginalMessage() throws MuleException;
-
-    /**
-     * Pre processing of the {@link org.mule.api.MuleEvent} to route
-     *
-     * @param muleEvent
-     */
-    MuleEvent beforeRouteEvent(MuleEvent muleEvent) throws MuleException;
-
-    /**
      * Routes the {@link org.mule.api.MuleEvent} through the processors chain
      *
      * @param muleEvent {@link org.mule.api.MuleEvent} created from the raw message of this context
@@ -42,13 +30,6 @@ public interface AsyncResponseFlowProcessingPhaseTemplate extends MessageProcess
      * @throws org.mule.api.MuleException
      */
     MuleEvent routeEvent(MuleEvent muleEvent) throws MuleException;
-
-    /**
-     * Post processing of the routed {@link org.mule.api.MuleEvent}
-     *
-     * @param muleEvent
-     */
-    MuleEvent afterRouteEvent(MuleEvent muleEvent) throws MuleException;
 
     /**
      * Call when the processing of the message through the flow fails in an exception strategy
