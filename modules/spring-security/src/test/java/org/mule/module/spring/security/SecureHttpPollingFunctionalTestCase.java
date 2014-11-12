@@ -15,6 +15,7 @@ import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.SecurityNotificationListener;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.util.concurrent.Latch;
 
@@ -22,11 +23,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 public class SecureHttpPollingFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
+
     public SecureHttpPollingFunctionalTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);

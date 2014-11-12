@@ -22,7 +22,7 @@
     <model name="http polling test model">
         <service name="pollingUMO_authenticated">
             <inbound>
-                <inbound-endpoint address="http://marie:marie@localhost:4567" 
+                <inbound-endpoint address="http://marie:marie@localhost:${port1}"
                     connector-ref="PollingHttpConnector" exchange-pattern="request-response"/>
             </inbound>
 
@@ -35,7 +35,7 @@
 
         <service name="pollingUMO_not_authenticated">
             <inbound>
-                <inbound-endpoint address="http://dodgy:geezer@localhost:4567" 
+                <inbound-endpoint address="http://dodgy:geezer@localhost:${port1}"
                     connector-ref="PollingHttpConnector" exchange-pattern="request-response"/>
             </inbound>
 

@@ -17,6 +17,7 @@ import org.mule.api.security.CredentialsNotSetException;
 import org.mule.api.security.CryptoFailureException;
 import org.mule.security.MuleCredentials;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
@@ -25,11 +26,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 public class EncryptionFunctionalTestCase extends AbstractServiceAndFlowTestCase
-{      
+{
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
+
     public EncryptionFunctionalTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -77,7 +82,7 @@ public class EncryptionFunctionalTestCase extends AbstractServiceAndFlowTestCase
     public void testAuthenticationFailureBadCredentialsHttp() throws Exception
     {
         Map<String, Object> props = createMessagePropertiesWithCredentials("anonX", "anonX");
-        MuleMessage m = muleContext.getClient().send("http://localhost:4567/index.html", "", props);
+        MuleMessage m = muleContext.getClient().send(getUrl(), "", props);
         assertNotNull(m);
 
         int status = m.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
@@ -88,7 +93,7 @@ public class EncryptionFunctionalTestCase extends AbstractServiceAndFlowTestCase
     public void testAuthenticationAuthorisedHttp() throws Exception
     {
         Map<String, Object> props = createMessagePropertiesWithCredentials("anon", "anon");
-        MuleMessage m = muleContext.getClient().send("http://localhost:4567/index.html", "", props);
+        MuleMessage m = muleContext.getClient().send(getUrl(), "", props);
         assertNotNull(m);
         int status = m.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
         assertEquals(HttpConstants.SC_OK, status);
@@ -101,5 +106,10 @@ public class EncryptionFunctionalTestCase extends AbstractServiceAndFlowTestCase
         String header = MuleCredentials.createHeader(username, password, "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
         return props;
+    }
+
+    private String getUrl()
+    {
+        return String.format("http://localhost:%s/index.html", port1.getNumber());
     }
 }

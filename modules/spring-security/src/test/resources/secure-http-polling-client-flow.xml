@@ -19,7 +19,7 @@
 
     <flow name="pollingUMO_authenticated">
 
-        <inbound-endpoint address="http://marie:marie@localhost:4567"
+        <inbound-endpoint address="http://marie:marie@localhost:${port1}"
             connector-ref="PollingHttpConnector" exchange-pattern="request-response" />
 
 
@@ -31,7 +31,7 @@
 
     <flow name="pollingUMO_not_authenticated">
 
-        <inbound-endpoint address="http://dodgy:geezer@localhost:4567"
+        <inbound-endpoint address="http://dodgy:geezer@localhost:${port1}"
             connector-ref="PollingHttpConnector" exchange-pattern="request-response" />
 
 

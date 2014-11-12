@@ -12,11 +12,16 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.construct.Flow;
 import org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter;
+import org.mule.tck.junit4.rule.DynamicPort;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 public class AuthenticationNamespaceHandlerFlowTestCase extends AuthenticationNamespaceHandlerServiceTestCase
 {
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
+
     @Override
     protected String getConfigFile()
     {
