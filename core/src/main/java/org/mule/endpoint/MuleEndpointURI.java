@@ -328,7 +328,13 @@ public class MuleEndpointURI implements EndpointURI
 
     public String getScheme()
     {
-        return uri.getScheme();
+        return isDynamic() ? getDynamicScheme() : uri.getScheme();
+    }
+
+    private String getDynamicScheme()
+    {
+        int colon = address.indexOf(':');
+        return address.substring(0, colon);
     }
 
     public String getFullScheme()
@@ -336,8 +342,7 @@ public class MuleEndpointURI implements EndpointURI
         String scheme;
         if (dynamic)
         {
-            int colon = address.indexOf(':');
-            scheme = address.substring(0, colon);
+            scheme = getDynamicScheme();
         }
         else
         {

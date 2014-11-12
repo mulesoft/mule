@@ -11,14 +11,18 @@ package org.mule.transport.tcp;
  */
 public class DefaultTcpClientSocketProperties implements TcpClientSocketProperties
 {
+    private static final boolean DEFAULT_SEND_TCP_NO_DELAY = true;
+    private static final int DEFAULT_CONNECTION_TIMEOUT = 30000;
+    private static final int DEFAULT_TIMEOUT = 0;
+    private static final int DEFAULT_LINGER = -1;
 
     private String name;
     private Integer sendBufferSize;
     private Integer receiveBufferSize;
-    private Boolean sendTcpNoDelay;
-    private Integer connectionTimeout;
-    private Integer clientSoTimeout;
-    private Integer socketSoLinger;
+    private Boolean sendTcpNoDelay = DEFAULT_SEND_TCP_NO_DELAY;
+    private Integer connectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
+    private Integer timeout = DEFAULT_TIMEOUT;
+    private Integer linger = DEFAULT_LINGER;
     private Boolean keepAlive;
 
     public String getName()
@@ -76,25 +80,25 @@ public class DefaultTcpClientSocketProperties implements TcpClientSocketProperti
     }
 
     @Override
-    public Integer getClientSoTimeout()
+    public Integer getTimeout()
     {
-        return clientSoTimeout;
+        return timeout;
     }
 
-    public void setClientSoTimeout(Integer clientSoTimeout)
+    public void setTimeout(Integer timeout)
     {
-        this.clientSoTimeout = clientSoTimeout;
+        this.timeout = timeout;
     }
 
     @Override
-    public Integer getSocketSoLinger()
+    public Integer getLinger()
     {
-        return socketSoLinger;
+        return linger;
     }
 
-    public void setSocketSoLinger(Integer socketSoLinger)
+    public void setLinger(Integer linger)
     {
-        this.socketSoLinger = socketSoLinger;
+        this.linger = linger;
     }
 
     @Override

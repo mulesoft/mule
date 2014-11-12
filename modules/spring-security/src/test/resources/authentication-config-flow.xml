@@ -33,7 +33,7 @@
     </spring:beans>
 
     <flow name="echo">
-        <inbound-endpoint address="http://localhost:4567" exchange-pattern="one-way">
+        <inbound-endpoint address="http://localhost:${port1}" exchange-pattern="one-way">
             <mule-ss:http-security-filter realm="mule-realm"/>
         </inbound-endpoint>
         <component class="org.mule.component.simple.EchoComponent"/>

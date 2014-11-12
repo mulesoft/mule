@@ -9,6 +9,7 @@ package org.mule.module.spring.security;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -16,11 +17,15 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class HttpFilterFunctionalTestCase extends FunctionalTestCase
 {
 
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
+    
     @Override
     protected String getConfigFile()
     {
@@ -29,7 +34,7 @@ public class HttpFilterFunctionalTestCase extends FunctionalTestCase
 
     protected String getUrl()
     {
-        return "http://localhost:4567/authenticate";
+        return "http://localhost:" + port1.getNumber() + "/authenticate";
     }
 
     @Test

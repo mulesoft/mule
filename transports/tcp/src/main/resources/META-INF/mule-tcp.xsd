@@ -27,7 +27,7 @@
             </schemadoc:transport-features>
         </xsd:appinfo>
     </xsd:annotation>
-    
+
     <xsd:element name="connector" type="tcpConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
@@ -64,18 +64,84 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:complexType name="noProtocolTcpConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
-                <xsd:attributeGroup ref="commonSocketAttributes"/>
-                <xsd:attributeGroup ref="serverSocketAttributes"/>
-                <xsd:attributeGroup ref="clientSocketAttributes"/>
-
+                <xsd:attribute name="sendBufferSize" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The size of the buffer (in bytes) used when sending data, set on the socket itself.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="receiveBufferSize" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The size of the buffer (in bytes) used when receiving data, set on the socket itself.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="receiveBacklog" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The maximum queue length for incoming connections.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="sendTcpNoDelay" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If set, transmitted data is not collected together for greater efficiency but sent immediately.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="reuseAddress" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If set (the default), SO_REUSEADDRESS is set on server sockets before binding. This helps reduce "address already in use" errors when a socket is re-used.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="connectionTimeout" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Number of milliseconds to wait until an outbound connection to a remote server is successfully created. No timeout is configured by default.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="clientSoTimeout" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            This sets the SO_TIMEOUT value when the socket is used as a client. Reading from the socket will block for up to this long (in milliseconds) before the read fails. A value of 0 (the default) causes the read to wait indefinitely (if no data arrives).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="serverSoTimeout" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            This sets the SO_TIMEOUT value when the socket is used as a server. Reading from the socket will block for up to this long (in milliseconds) before the read fails. A value of 0 (the default) causes the read to wait indefinitely (if no data arrives).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="socketSoLinger" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            This sets the SO_LINGER value. This is related to how long (in milliseconds) the socket will take to close so that any remaining data is transmitted correctly.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="keepSendSocketOpen" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
                             If set, the socket is not closed after sending a message.  This attribute only applies when sending data over a socket (Client).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="keepAlive" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Enables SO_KEEPALIVE behavior on open sockets. This automatically checks socket connections that are open but unused for long periods and closes them if the connection becomes unavailable.  This is a property on the socket itself and is used by a server socket to control whether connections to the server are kept alive before they are recycled.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -89,10 +155,10 @@
                 <xsd:attribute name="failOnUnresolvedHost" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            If set (the default), it will fail during socket creation if the host set on the endpoint cannot be resolved. However, it can be set to false to allow unresolved hosts (this is useful on some circumstances like connecting through a proxy). 
+                            If set (the default), it will fail during socket creation if the host set on the endpoint cannot be resolved. However, it can be set to false to allow unresolved hosts (this is useful on some circumstances like connecting through a proxy).
                         </xsd:documentation>
                     </xsd:annotation>
-                </xsd:attribute>                
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -208,7 +274,7 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             Allows Spring beans to be defined for class loading
-                            </xsd:documentation>
+                        </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
             </xsd:extension>
@@ -312,99 +378,21 @@
 
     <xsd:attributeGroup name="addressAttributes">
         <xsd:attribute name="host" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The host of the TCP socket.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
+            <xsd:annotation>
+                <xsd:documentation>
+                    The host of the TCP socket.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="port" type="mule:substitutablePortNumber">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The port of the TCP socket.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-    </xsd:attributeGroup>
-
-    <xsd:attributeGroup name="commonSocketAttributes">
-        <xsd:attribute name="sendBufferSize" type="mule:substitutableInt">
             <xsd:annotation>
                 <xsd:documentation>
-                    The size of the buffer (in bytes) used when sending data, set on the socket itself.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="receiveBufferSize" type="mule:substitutableInt">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The size of the buffer (in bytes) used when receiving data, set on the socket itself.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="sendTcpNoDelay" type="mule:substitutableBoolean">
-            <xsd:annotation>
-                <xsd:documentation>
-                    If set, transmitted data is not collected together for greater efficiency but sent immediately.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="connectionTimeout" type="mule:substitutableInt">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Number of milliseconds to wait until an outbound connection to a remote server is successfully created. No timeout is configured by default.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="socketSoLinger" type="mule:substitutableInt">
-            <xsd:annotation>
-                <xsd:documentation>
-                    This sets the SO_LINGER value. This is related to how long (in milliseconds) the socket will take to close so that any remaining data is transmitted correctly.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="keepAlive" type="mule:substitutableBoolean">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Enables SO_KEEPALIVE behavior on open sockets. This automatically checks socket connections that are open but unused for long periods and closes them if the connection becomes unavailable.  This is a property on the socket itself and is used by a server socket to control whether connections to the server are kept alive before they are recycled.
+                    The port of the TCP socket.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
     </xsd:attributeGroup>
 
-    <xsd:attributeGroup name="serverSocketAttributes">
-        <xsd:attribute name="receiveBacklog" type="mule:substitutableInt">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The maximum queue length for incoming connections.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="reuseAddress" type="mule:substitutableBoolean">
-            <xsd:annotation>
-                <xsd:documentation>
-                    If set (the default), SO_REUSEADDRESS is set on server sockets before binding. This helps reduce "address already in use" errors when a socket is re-used.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="serverSoTimeout" type="mule:substitutableInt">
-            <xsd:annotation>
-                <xsd:documentation>
-                    This sets the SO_TIMEOUT value when the socket is used as a server. Reading from the socket will block for up to this long (in milliseconds) before the read fails. A value of 0 (the default) causes the read to wait indefinitely (if no data arrives).
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-    </xsd:attributeGroup>
-
-    <xsd:attributeGroup name="clientSocketAttributes">
-        <xsd:attribute name="clientSoTimeout" type="mule:substitutableInt">
-            <xsd:annotation>
-                <xsd:documentation>
-                    This sets the SO_TIMEOUT value when the socket is used as a client. Reading from the socket will block for up to this long (in milliseconds) before the read fails. A value of 0 (the default) causes the read to wait indefinitely (if no data arrives).
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-    </xsd:attributeGroup>
 
     <xsd:element name="client-socket-properties" type="tcpClientSocketPropertiesType" substitutionGroup="mule:abstract-extension">
         <xsd:annotation>
@@ -414,22 +402,6 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:complexType name="tcpClientSocketPropertiesType">
-        <xsd:complexContent>
-            <xsd:extension base="mule:abstractExtensionType">
-                <xsd:attribute name="name" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The name of this properties object, so that it can be referenced by config elements.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attributeGroup ref="commonSocketAttributes" />
-                <xsd:attributeGroup ref="clientSocketAttributes" />
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:element name="server-socket-properties" type="tcpServerSocketPropertiesType" substitutionGroup="mule:abstract-extension">
         <xsd:annotation>
             <xsd:documentation>
@@ -438,7 +410,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:complexType name="tcpServerSocketPropertiesType">
+    <xsd:complexType name="tcpAbstractSocketPropertiesType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractExtensionType">
                 <xsd:attribute name="name" type="xsd:string">
@@ -448,8 +420,92 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attributeGroup ref="commonSocketAttributes" />
-                <xsd:attributeGroup ref="serverSocketAttributes" />
+                <xsd:attribute name="sendBufferSize" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The size of the buffer (in bytes) used when sending data, set on the socket itself.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="receiveBufferSize" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The size of the buffer (in bytes) used when receiving data, set on the socket itself.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="sendTcpNoDelay" type="mule:substitutableBoolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If set, transmitted data is not collected together for greater efficiency but sent immediately.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="timeout" type="mule:substitutableInt" default="0">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            This sets the SO_TIMEOUT value on client sockets. Reading from the socket will block for up to this long (in milliseconds) before the read fails. A value of 0 (the default) causes the read to wait indefinitely (if no data arrives).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="linger" type="mule:substitutableInt" default="-1">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            This sets the SO_LINGER value. This is related to how long (in milliseconds) the socket will take to close so that any remaining data is transmitted correctly.
+                            A value of -1 (default) disables linger on the socket.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="keepAlive" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Enables SO_KEEPALIVE behavior on open sockets. This automatically checks socket connections that are open but unused for long periods and closes them if the connection becomes unavailable.  This is a property on the socket itself and is used by a server socket to control whether connections to the server are kept alive before they are recycled.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="tcpClientSocketPropertiesType">
+        <xsd:complexContent>
+            <xsd:extension base="tcpAbstractSocketPropertiesType">
+                <xsd:attribute name="connectionTimeout" type="mule:substitutableInt" default="30000">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Number of milliseconds to wait until an outbound connection to a remote server is successfully created. No timeout is configured by default.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
+    <xsd:complexType name="tcpServerSocketPropertiesType">
+        <xsd:complexContent>
+            <xsd:extension base="tcpAbstractSocketPropertiesType">
+                <xsd:attribute name="reuseAddress" type="mule:substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If set (the default), SO_REUSEADDRESS is set on server sockets before binding. This helps reduce "address already in use" errors when a socket is re-used.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="receiveBacklog" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The maximum queue length for incoming connections.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="serverTimeout" type="mule:substitutableInt" default="0">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            This sets the SO_TIMEOUT value when the socket is used as a server. This is the timeout that applies to the "accept" operation. A value of 0 (the default) causes the accept to wait indefinitely (if no connection arrives).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

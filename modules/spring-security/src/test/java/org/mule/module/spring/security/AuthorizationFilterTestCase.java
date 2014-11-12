@@ -11,6 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -18,10 +19,13 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.hamcrest.core.Is;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class AuthorizationFilterTestCase extends FunctionalTestCase
 {
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
 
     @Override
     protected String getConfigFile()
@@ -55,7 +59,7 @@ public class AuthorizationFilterTestCase extends FunctionalTestCase
 
     protected String getUrl()
     {
-        return "http://localhost:4567/authorize";
+        return "http://localhost:" + port1.getNumber() + "/authorize";
     }
 
     private void doRequest(String host,
