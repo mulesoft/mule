@@ -49,6 +49,7 @@ public class MuleMessageProcessingManager implements MessageProcessingManager, M
         }
         messageProcessPhaseList.add(new ValidationPhase());
         messageProcessPhaseList.add(new FlowProcessingPhase());
+        messageProcessPhaseList.add(new AsyncResponseFlowProcessingPhase());
         Collections.sort(messageProcessPhaseList, new Comparator<MessageProcessPhase>()
         {
             @Override
