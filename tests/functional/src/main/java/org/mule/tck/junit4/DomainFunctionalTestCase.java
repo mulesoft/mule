@@ -7,6 +7,8 @@
 package org.mule.tck.junit4;
 
 import org.mule.api.MuleContext;
+import org.mule.config.bootstrap.MuleRegistryBootstrapService;
+import org.mule.config.bootstrap.RegistryBootstrapServiceUtil;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 
@@ -24,6 +26,7 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase
     private final Map<String, MuleContext> muleContexts = new HashMap<String, MuleContext>();
     private final List<MuleContext> disposedContexts = new ArrayList<MuleContext>();
     private MuleContext domainContext;
+    private MuleRegistryBootstrapService registryBootstrapService;
 
     protected abstract String getDomainConfig();
 
@@ -50,7 +53,10 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase
     @Before
     public void setUpMuleContexts() throws Exception
     {
-        domainContext = new DomainContextBuilder().setDomainConfig(getDomainConfig()).build();
+        registryBootstrapService = new MuleRegistryBootstrapService();
+        RegistryBootstrapServiceUtil.configureUsingClassPath(registryBootstrapService);
+
+        domainContext = new DomainContextBuilder().setRegistryBootstrapService(registryBootstrapService).setDomainConfig(getDomainConfig()).build();
         ApplicationConfig[] applicationConfigs = getConfigResources();
         for (ApplicationConfig applicationConfig : applicationConfigs)
         {
@@ -79,7 +85,7 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase
 
     protected MuleContext createAppMuleContext(String[] configResource) throws Exception
     {
-        return new ApplicationContextBuilder().setDomainContext(domainContext).setApplicationResources(configResource).build();
+        return new ApplicationContextBuilder().setRegistryBootstrapService(registryBootstrapService).setDomainContext(domainContext).setApplicationResources(configResource).build();
     }
 
     public abstract ApplicationConfig[] getConfigResources();

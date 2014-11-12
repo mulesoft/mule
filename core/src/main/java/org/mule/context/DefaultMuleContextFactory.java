@@ -15,6 +15,8 @@ import org.mule.api.context.MuleContextFactory;
 import org.mule.api.context.notification.MuleContextListener;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.DefaultMuleConfiguration;
+import org.mule.config.bootstrap.MuleRegistryBootstrapService;
+import org.mule.config.bootstrap.RegistryBootstrapService;
 import org.mule.config.builders.AutoConfigurationBuilder;
 import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
@@ -38,13 +40,18 @@ public class DefaultMuleContextFactory implements MuleContextFactory
 
     private List<MuleContextListener> listeners = new LinkedList<MuleContextListener>();
 
+    private RegistryBootstrapService registryBootstrapService = new MuleRegistryBootstrapService();
+
     /**
      * Use default ConfigurationBuilder, default MuleContextBuilder
      */
     public MuleContext createMuleContext() throws InitialisationException, ConfigurationException
     {
         // Configure with defaults needed for a feasible/startable MuleContext
-        return createMuleContext(new DefaultsConfigurationBuilder(), new DefaultMuleContextBuilder());
+        DefaultMuleContextBuilder muleContextBuilder = new DefaultMuleContextBuilder();
+        muleContextBuilder.setRegistryBootstrapService(registryBootstrapService);
+
+        return createMuleContext(new DefaultsConfigurationBuilder(), muleContextBuilder);
     }
 
     /**
@@ -180,6 +187,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory
         // Create MuleContext
         DefaultMuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
         contextBuilder.setMuleConfiguration(configuration);
+        contextBuilder.setRegistryBootstrapService(registryBootstrapService);
         return doCreateMuleContext(contextBuilder, new ContextConfigurator()
         {
             @Override
@@ -277,6 +285,11 @@ public class DefaultMuleContextFactory implements MuleContextFactory
         {
             listener.onConfiguration(context);
         }
+    }
+
+    public void setRegistryBootstrapService(RegistryBootstrapService registryBootstrapService)
+    {
+        this.registryBootstrapService = registryBootstrapService;
     }
 
     private abstract class ContextConfigurator

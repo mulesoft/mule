@@ -15,6 +15,8 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.config.bootstrap.MuleRegistryBootstrapService;
+import org.mule.config.bootstrap.RegistryBootstrapServiceUtil;
 import org.mule.config.builders.SimpleConfigurationBuilder;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
@@ -178,12 +180,16 @@ public class DefaultMuleApplication implements Application
                 builders.add(cfgBuilder);
 
                 DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
+                MuleRegistryBootstrapService registryBootstrapService = new MuleRegistryBootstrapService();
+                RegistryBootstrapServiceUtil.configureUsingClassPath(registryBootstrapService);
+                muleContextFactory.setRegistryBootstrapService(registryBootstrapService);
                 if (deploymentListener != null)
                 {
                     muleContextFactory.addListener(new MuleContextDeploymentListener(getArtifactName(), deploymentListener));
                 }
 
                 ApplicationMuleContextBuilder applicationContextBuilder = new ApplicationMuleContextBuilder(descriptor);
+                applicationContextBuilder.setRegistryBootstrapService(registryBootstrapService);
                 setMuleContext(muleContextFactory.createMuleContext(builders, applicationContextBuilder));
             }
         }

@@ -15,7 +15,6 @@ import static org.junit.Assert.fail;
 import static org.mule.tck.MuleAssert.assertTrue;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
@@ -24,6 +23,7 @@ import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.security.SecurityManager;
+import org.mule.config.bootstrap.MuleRegistryBootstrapService;
 import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.lifecycle.MuleContextLifecycleManager;
@@ -46,7 +46,7 @@ import org.mockito.Mockito;
 public class MuleContextLifecycleTestCase extends AbstractMuleTestCase
 {
 
-    private MuleContextBuilder ctxBuilder;
+    private DefaultMuleContextBuilder ctxBuilder;
     private SensingLifecycleManager lifecycleManager;
     private MuleContext ctx;
 
@@ -54,6 +54,7 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase
     public void setup() throws Exception
     {
         ctxBuilder = new DefaultMuleContextBuilder();
+        ctxBuilder.setRegistryBootstrapService(new MuleRegistryBootstrapService());
         lifecycleManager = new SensingLifecycleManager();
         ctxBuilder.setLifecycleManager(lifecycleManager);
         ctx = ctxBuilder.buildMuleContext();

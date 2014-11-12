@@ -31,6 +31,7 @@ import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.ImmutableThreadingProfile;
+import org.mule.config.bootstrap.RegistryBootstrapService;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.AsyncMessageNotification;
@@ -88,6 +89,8 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
 
     protected SplashScreen shutdownScreen;
 
+    protected RegistryBootstrapService registryBootstrapService;
+
     /**
      * {@inheritDoc}
      */
@@ -107,6 +110,8 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         muleContext.setLocalMuleClient(new DefaultLocalMuleClient(muleContext));
         muleContext.setExceptionListener(new DefaultSystemExceptionStrategy(muleContext));
         muleContext.setExecutionClassLoader(Thread.currentThread().getContextClassLoader());
+        muleContext.setRegistryBootstrapService(registryBootstrapService);
+
         return muleContext;
     }
 
@@ -234,6 +239,11 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
     public void setShutdownScreen(SplashScreen shutdownScreen)
     {
         this.shutdownScreen = shutdownScreen;
+    }
+
+    public void setRegistryBootstrapService(RegistryBootstrapService registryBootstrapService)
+    {
+        this.registryBootstrapService = registryBootstrapService;
     }
 
     protected DefaultMuleConfiguration createMuleConfiguration()
