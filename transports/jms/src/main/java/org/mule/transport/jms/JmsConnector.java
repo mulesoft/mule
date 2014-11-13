@@ -6,6 +6,7 @@
  */
 package org.mule.transport.jms;
 
+import org.mule.api.Closeable;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -60,13 +61,14 @@ import javax.naming.NamingException;
  * <code>JmsConnector</code> is a JMS 1.0.2b compliant connector that can be used
  * by a Mule endpoint. The connector supports all JMS functionality including topics
  * and queues, durable subscribers, acknowledgement modes and local transactions.
+ *
+ * From 3.6, JMS Sessions and Producers are reused by default when an XAConnectionFactory isn't being used and when
+ * the (default) JMS 1.1 spec is being used.
  */
-
 public class JmsConnector extends AbstractConnector implements ExceptionListener
 {
 
     public static final String JMS = "jms";
-    public static final String JMS_CONNECTION_FACTORY_DECORATOR = "JMS_CONNECTION_FACTORY_DECORATOR";
 
     /**
      * Indicates that Mule should throw an exception on any redelivery attempt.
@@ -178,6 +180,12 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
     private final CompositeConnectionFactoryDecorator connectionFactoryDecorator = new CompositeConnectionFactoryDecorator();
 
+    /**
+     * Used to ignore handling of ExceptionListener#onException when in the process of disconnecting.  This is
+     * required because the Connector LifeCycleManager does not include connection/disconnection state.
+     */
+    private volatile boolean disconnecting;
+
     ////////////////////////////////////////////////////////////////////////
     // Methods
     ////////////////////////////////////////////////////////////////////////
@@ -202,6 +210,10 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     @Override
     protected void doInitialise() throws InitialisationException
     {
+        if (jmsSupport == null)
+        {
+            jmsSupport = createJmsSupport();
+        }
         connectionFactoryDecorator.init(muleContext);
         if (topicResolver == null)
         {
@@ -240,10 +252,6 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             throw new InitialisationException(nex, this);
         }
 
-        if (jmsSupport == null)
-        {
-            jmsSupport = createJmsSupport();
-        }
     }
 
     /**
@@ -439,7 +447,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             {
                 connection.setClientID(getClientId());
             }
-            if (!embeddedMode)
+            if (!embeddedMode && connection.getExceptionListener() == null)
             {
                 connection.setExceptionListener(this);
             }
@@ -475,33 +483,36 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
     public void onException(JMSException jmsException)
     {
-        final JmsConnector jmsConnector = JmsConnector.this;
-        Map receivers = jmsConnector.getReceivers();
-        boolean isMultiConsumerReceiver = false;
-
-        if (!receivers.isEmpty())
+        if(!disconnecting)
         {
-            Map.Entry entry = (Map.Entry) receivers.entrySet().iterator().next();
-            if (entry.getValue() instanceof MultiConsumerJmsMessageReceiver)
+            final JmsConnector jmsConnector = JmsConnector.this;
+            Map receivers = jmsConnector.getReceivers();
+            boolean isMultiConsumerReceiver = false;
+
+            if (!receivers.isEmpty())
             {
-                isMultiConsumerReceiver = true;
+                Map.Entry entry = (Map.Entry) receivers.entrySet().iterator().next();
+                if (entry.getValue() instanceof MultiConsumerJmsMessageReceiver)
+                {
+                    isMultiConsumerReceiver = true;
+                }
             }
-        }
 
-        int expectedReceiverCount = isMultiConsumerReceiver ? 1 :
-                                    (jmsConnector.getReceivers().size() * jmsConnector.getNumberOfConcurrentTransactedReceivers());
+            int expectedReceiverCount = isMultiConsumerReceiver ? 1 :
+                                        (jmsConnector.getReceivers().size() * jmsConnector.getNumberOfConcurrentTransactedReceivers());
 
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("About to recycle myself due to remote JMS connection shutdown but need "
-                         + "to wait for all active receivers to report connection loss. Receiver count: "
-                         + (receiverReportedExceptionCount.get() + 1) + '/' + expectedReceiverCount);
-        }
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("About to recycle myself due to remote JMS connection shutdown but need "
+                             + "to wait for all active receivers to report connection loss. Receiver count: "
+                             + (receiverReportedExceptionCount.get() + 1) + '/' + expectedReceiverCount);
+            }
 
-        if (receiverReportedExceptionCount.incrementAndGet() >= expectedReceiverCount)
-        {
-            receiverReportedExceptionCount.set(0);
-            muleContext.getExceptionListener().handleException(new ConnectException(jmsException, this));
+            if (receiverReportedExceptionCount.incrementAndGet() >= expectedReceiverCount)
+            {
+                receiverReportedExceptionCount.set(0);
+                muleContext.getExceptionListener().handleException(new ConnectException(jmsException, this));
+            }
         }
     }
 
@@ -516,7 +527,20 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         }
         if (isStarted() || startOnConnect)
         {
-            connection.start();
+            try
+            {
+                connection.start();
+            }
+            catch (Exception e)
+            {
+                // If connection throws an exception on start and connection is cached in ConnectionFactory then
+                // close/reset connection now.
+                if (connectionFactory instanceof Closeable)
+                {
+                    ((Closeable) connectionFactory).close();
+                }
+                throw e;
+            }
         }
     }
 
@@ -527,17 +551,18 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         {
             if (connection != null)
             {
-                // Ignore exceptions while closing the connection
-                if (!embeddedMode)
-                {
-                    connection.setExceptionListener(null);
-                }
+                disconnecting = true;
                 connection.close();
+                if (connectionFactory instanceof Closeable)
+                {
+                    ((Closeable) connectionFactory).close();
+                }
             }
         }
         finally
         {
             connection = null;
+            disconnecting = false;
         }
     }
 
@@ -577,7 +602,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         final boolean topic = getTopicResolver().isTopic(endpoint);
         return getSession(endpoint.getTransactionConfig().isTransacted(), topic);
     }
-    
+
     public Session createSession(ImmutableEndpoint endpoint) throws JMSException
     {
         return createSession(endpoint.getTransactionConfig().isTransacted(),getTopicResolver().isTopic(endpoint));
