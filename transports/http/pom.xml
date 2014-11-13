@@ -58,6 +58,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <!-- needed for SSL in httpS -->
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-ssl</artifactId>
@@ -101,6 +106,16 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-http</artifactId>
             <version>3.6.0-M3-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mule</groupId>
+                    <artifactId>mule-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mule.modules</groupId>
+                    <artifactId>mule-module-spring-config</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Unit tests -->

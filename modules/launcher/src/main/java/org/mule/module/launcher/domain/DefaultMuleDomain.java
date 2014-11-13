@@ -15,6 +15,8 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.DomainMuleContextAwareConfigurationBuilder;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.config.bootstrap.MuleRegistryBootstrapService;
+import org.mule.config.bootstrap.RegistryBootstrapServiceUtil;
 import org.mule.config.builders.AutoConfigurationBuilder;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.DefaultMuleContextFactory;
@@ -163,12 +165,17 @@ public class DefaultMuleDomain implements Domain
 
                     builders.add(cfgBuilder);
 
+                    MuleRegistryBootstrapService registryBootstrapService = new MuleRegistryBootstrapService();
+                    RegistryBootstrapServiceUtil.configureUsingClassPath(registryBootstrapService);
+
                     DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
+                    muleContextFactory.setRegistryBootstrapService(registryBootstrapService);
                     if (deploymentListener != null)
                     {
                         muleContextFactory.addListener(new MuleContextDeploymentListener(getArtifactName(), deploymentListener));
                     }
                     DomainMuleContextBuilder domainMuleContextBuilder = new DomainMuleContextBuilder(name);
+                    domainMuleContextBuilder.setRegistryBootstrapService(registryBootstrapService);
                     muleContext = muleContextFactory.createMuleContext(builders, domainMuleContextBuilder);
                 }
             }
