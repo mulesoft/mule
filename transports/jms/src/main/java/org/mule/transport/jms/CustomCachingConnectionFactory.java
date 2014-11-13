@@ -7,6 +7,10 @@
 
 package org.mule.transport.jms;
 
+import org.mule.api.Closeable;
+import org.mule.api.MuleException;
+import org.mule.api.lifecycle.Disposable;
+
 import java.lang.reflect.Field;
 
 import javax.jms.Connection;
@@ -18,7 +22,7 @@ import javax.jms.TopicConnectionFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.connection.SingleConnectionFactory;
 
-public class CustomCachingConnectionFactory extends CachingConnectionFactory
+public class CustomCachingConnectionFactory extends CachingConnectionFactory implements Closeable, Disposable
 {
 
     private final String username;
@@ -87,5 +91,17 @@ public class CustomCachingConnectionFactory extends CachingConnectionFactory
         {
             throw new IllegalStateException("Unable to determine value of pubSubMode field", e);
         }
+    }
+
+    @Override
+    public void close() throws MuleException
+    {
+        resetConnection();
+    }
+
+    @Override
+    public void dispose()
+    {
+        destroy();
     }
 }

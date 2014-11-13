@@ -57,6 +57,9 @@ MULE-7030: The following features have been deprecated in favor of the new xpath
     * xpath() MEL Function
 MULE-7030: The xpath-filter element is now namespace aware. If you're using it with XPath expressions which reference custom namespaces, you now have to declare them in a namespace-manager element or use a wildcard (*:/title instead of book:title)
 MULE-8001: The xquery-transformer element will now always return a java List when no return type has explicitly been specified
+MULE-7731: The default value of the 'cacheJmsSessions' attribute in the JMS connector element is now 'true' to provide better out of the box performance.  This attribute can be set 'false' to disable caching as in 3.5.
+MULE-7731: The <jms:caching-connection-factory> has been deprecated.  It can still but used in 3.6, but it not necessary given that from Mule 3.6 JMS connections cache Sessions/Producers by default when a CachingConnectionFactory has not been configured explicitly.
+MULE-7731: org.mule.transport.jms.xa.ConnectionFactoryWrapper has been renamed to org.mule.transport.jms.xa.DefaultXAConnectionFactoryWrapper.
 
 Migration changes from 3.4.x to 3.5.x
 
