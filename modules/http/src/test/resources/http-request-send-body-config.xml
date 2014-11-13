@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:request-config name="config" host="localhost" port="${httpPort}" sendBodyMode="NEVER" />
+
+    <flow name="sendBodyAuto">
+        <http:request config-ref="config" path="requestPath" method="#[method]" sendBodyMode="AUTO" />
+    </flow>
+
+    <flow name="sendBodyAlways">
+        <http:request config-ref="config" path="requestPath" method="#[method]" sendBodyMode="ALWAYS" />
+    </flow>
+
+    <flow name="sendBodyNever">
+        <http:request config-ref="config" path="requestPath" method="#[method]" sendBodyMode="NEVER" />
+    </flow>
+
+
+</mule>

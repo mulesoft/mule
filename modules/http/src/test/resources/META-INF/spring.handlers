@@ -1,0 +1,1 @@
+http\://www.mulesoft.org/schema/mule/http=org.mule.module.http.internal.config.HttpTestNamespaceHandler

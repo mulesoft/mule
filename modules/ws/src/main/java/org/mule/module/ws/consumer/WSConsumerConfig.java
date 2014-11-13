@@ -17,9 +17,8 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.MuleEndpointURI;
+import org.mule.module.http.api.requester.HttpRequesterBuilder;
 import org.mule.module.http.internal.request.HttpRequestConfig;
-import org.mule.module.http.internal.request.HttpRequester;
-import org.mule.module.http.internal.request.HttpRequesterBuilder;
 import org.mule.module.http.internal.request.SuccessStatusCodeValidator;
 import org.mule.module.ws.security.WSSecurity;
 import org.mule.transport.http.HttpConnector;
@@ -113,19 +112,15 @@ public class WSConsumerConfig implements MuleContextAware
 
         requesterBuilder.setAddress(serviceAddress).setMethod("POST").setParseResponse(false);
 
+        // Do not throw exception on invalid status code, let CXF process it.
+        requesterBuilder.setResponseValidator(new SuccessStatusCodeValidator("0..599"));
+
         if (connectorConfig != null)
         {
             requesterBuilder.setConfig(connectorConfig);
         }
 
-        HttpRequester httpRequester = requesterBuilder.build();
-
-        // Do not throw exception on invalid status code, let CXF process it.
-        httpRequester.setStatusCodeValidator(new SuccessStatusCodeValidator("0..599"));
-
-        httpRequester.initialise();
-
-        return httpRequester;
+        return requesterBuilder.build();
     }
 
     private boolean isHttp()

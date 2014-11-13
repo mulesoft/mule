@@ -8,9 +8,9 @@ package org.mule.transport.http.builder;
 
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
+import org.mule.module.http.internal.HttpParamType;
+import org.mule.module.http.internal.HttpSingleParam;
 import org.mule.module.http.internal.config.HttpRequestSingleParamDefinitionParser;
-import org.mule.module.http.internal.request.HttpParamType;
-import org.mule.module.http.internal.request.HttpSingleParam;
 
 /**
  * Custom bean definition parser for the "header" element that works for both the old "header" element in the

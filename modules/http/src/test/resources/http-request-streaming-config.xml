@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:request-config name="requestConfig" host="localhost" port="${httpPort}" />
+
+    <flow name="streamingDefault">
+        <vm:inbound-endpoint path="streamingDefaultIn" />
+        <http:request config-ref="requestConfig"  method="POST" path="path" />
+        <vm:outbound-endpoint path="streamingDefaultOut" />
+    </flow>
+
+    <flow name="streamingTrue">
+        <vm:inbound-endpoint path="streamingTrueIn" />
+        <http:request config-ref="requestConfig"  method="POST" path="path" requestStreamingMode="ALWAYS" />
+        <vm:outbound-endpoint path="streamingTrueOut" />
+    </flow>
+
+    <flow name="streamingFalse">
+        <vm:inbound-endpoint path="streamingFalseIn" />
+        <http:request config-ref="requestConfig"  method="POST" path="path" requestStreamingMode="NEVER" />
+        <vm:outbound-endpoint path="streamingFalseOut" />
+    </flow>
+
+
+
+</mule>
