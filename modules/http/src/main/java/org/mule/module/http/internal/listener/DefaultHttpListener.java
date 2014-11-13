@@ -127,10 +127,6 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
     @Override
     public void initialise() throws InitialisationException
     {
-        if (config == null)
-        {
-            config = DefaultHttpListenerConfig.emptyConfig(muleContext);
-        }
         if (allowedMethods != null)
         {
             methodRequestMatcher = new MethodRequestMatcher(extractAllowedMethods());

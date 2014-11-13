@@ -7,11 +7,9 @@
 package org.mule.module.http.internal.listener;
 
 import static org.mule.module.http.internal.listener.HttpListenerConnectionManager.HTTP_LISTENER_CONNECTION_MANAGER;
-
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.WorkManager;
@@ -32,7 +30,6 @@ import org.mule.util.Preconditions;
 import org.mule.util.concurrent.ThreadNameHelper;
 
 import java.io.IOException;
-import java.util.Collection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +37,6 @@ import org.slf4j.LoggerFactory;
 public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisable, MuleContextAware, Startable, Stoppable
 {
 
-    public static final String HTTP_EMPTY_CONFIG_ID = "_httpEmptyListenerConfig";
-    public static final String HTTP_SSL_EMPTY_LISTENER_CONFIG = "_httpSslEmptyListenerConfig";
     public static final int DEFAULT_MAX_THREADS = 128;
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private String name;
@@ -57,6 +52,7 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
     private boolean started = false;
     private Server server;
     private WorkManager workManager;
+    private boolean initialised;
 
     public void setWorkerThreadingProfile(ThreadingProfile workerThreadingProfile)
     {
@@ -104,28 +100,13 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
         return this.basePath == null ? listenerPath : this.basePath + listenerPath;
     }
 
-    synchronized public static DefaultHttpListenerConfig emptyConfig(MuleContext muleContext)
-    {
-        try
-        {
-            DefaultHttpListenerConfig emptyConfig = muleContext.getRegistry().get(HTTP_EMPTY_CONFIG_ID);
-            if (emptyConfig == null)
-            {
-                emptyConfig = new DefaultHttpListenerConfig();
-                emptyConfig.setMuleContext(muleContext);
-                muleContext.getRegistry().registerObject(HTTP_EMPTY_CONFIG_ID, emptyConfig);
-            }
-            return emptyConfig;
-        }
-        catch (Exception e)
-        {
-            throw new MuleRuntimeException(e);
-        }
-    }
-
     @Override
-    public void initialise() throws InitialisationException
+    public synchronized void initialise() throws InitialisationException
     {
+        if (initialised)
+        {
+            return;
+        }
         basePath = HttpParser.sanitizePathWithStartSlash(this.basePath);
         connectionManager = muleContext.getRegistry().get(HTTP_LISTENER_CONNECTION_MANAGER);
         if (workerThreadingProfile == null)
@@ -145,6 +126,7 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
         {
             server = connectionManager.createSslServer(host, port, tlsContext);
         }
+        initialised = true;
     }
 
     private WorkManager createWorkManager()
@@ -165,36 +147,6 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
     public RequestHandlerManager addRequestHandler(ListenerRequestMatcher requestMatcher, RequestHandler requestHandler) throws IOException
     {
         return server.addRequestHandler(requestMatcher, requestHandler);
-    }
-
-    synchronized public static DefaultHttpListenerConfig sslConfig(final MuleContext muleContext)
-    {
-        DefaultHttpListenerConfig sslConfig = muleContext.getRegistry().get(HTTP_SSL_EMPTY_LISTENER_CONFIG);
-        if (sslConfig == null)
-        {
-            final Collection<TlsContextFactory> tlsContextFactories = muleContext.getRegistry().lookupObjects(TlsContextFactory.class);
-            if (tlsContextFactories.size() > 1)
-            {
-                throw new MuleRuntimeException(CoreMessages.createStaticMessage("More than one tls:context has been provided. You need to define it explicitly in the OAuth config"));
-            }
-            if (tlsContextFactories.isEmpty())
-            {
-                throw new MuleRuntimeException(CoreMessages.createStaticMessage("No tls:context has been configured. You need to define one globally in the config or configured it explicitly in the OAuth config"));
-            }
-            final TlsContextFactory tlsContextFactory = tlsContextFactories.iterator().next();
-            try
-            {
-                sslConfig = new DefaultHttpListenerConfig();
-                sslConfig.setMuleContext(muleContext);
-                sslConfig.setTlsContext(tlsContextFactory);
-                muleContext.getRegistry().registerObject(HTTP_SSL_EMPTY_LISTENER_CONFIG, sslConfig);
-            }
-            catch (Exception e)
-            {
-                throw new MuleRuntimeException(e);
-            }
-        }
-        return sslConfig;
     }
 
     public Boolean resolveParseRequest(Boolean listenerParseRequest)
