@@ -8,9 +8,15 @@
 package org.mule.module.db.internal.config.domain.query;
 
 import static org.apache.commons.collections.CollectionUtils.find;
+import org.mule.module.db.internal.domain.param.DefaultInOutQueryParam;
+import org.mule.module.db.internal.domain.param.DefaultInputQueryParam;
+import org.mule.module.db.internal.domain.param.DefaultOutputQueryParam;
+import org.mule.module.db.internal.domain.param.InOutQueryParam;
 import org.mule.module.db.internal.domain.param.InputQueryParam;
 import org.mule.module.db.internal.domain.param.QueryParam;
 import org.mule.module.db.internal.domain.query.QueryTemplate;
+import org.mule.module.db.internal.domain.type.DbType;
+import org.mule.module.db.internal.domain.type.UnknownDbType;
 import org.mule.module.db.internal.parser.QueryTemplateParser;
 
 import java.util.LinkedList;
@@ -43,21 +49,46 @@ public class ParameterizedQueryTemplateFactoryBean implements FactoryBean<QueryT
 
         List<QueryParam> resolvedParams = new LinkedList<QueryParam>();
 
-        for (InputQueryParam inputSqlParam : queryTemplate.getInputParams())
+        for (QueryParam templateParam : queryTemplate.getParams())
         {
-            QueryParam param = findOverriddenParam(inputSqlParam.getName(), queryParams);
+            QueryParam param = findOverriddenParam(templateParam.getName(), queryParams);
 
             if (param == null)
             {
-                resolvedParams.add(inputSqlParam);
+                resolvedParams.add(templateParam);
             }
             else
             {
-                resolvedParams.add(param);
+                resolvedParams.add(overrideParam(templateParam, param));
             }
         }
 
         return new QueryTemplate(queryTemplate.getSqlText(), queryTemplate.getType(), resolvedParams);
+    }
+
+    private QueryParam overrideParam(QueryParam templateParam, QueryParam queryParam)
+    {
+        QueryParam overriddenParam;
+        DbType paramType = templateParam.getType();
+        if (!(queryParam.getType() instanceof UnknownDbType))
+        {
+           paramType = queryParam.getType();
+        }
+
+        if (queryParam instanceof InOutQueryParam)
+        {
+            overriddenParam = new DefaultInOutQueryParam(templateParam.getIndex(), paramType, templateParam.getName(), ((InOutQueryParam) queryParam).getValue());
+        }
+        else if (queryParam instanceof InputQueryParam)
+        {
+            overriddenParam = new DefaultInputQueryParam(templateParam.getIndex(), paramType, ((InputQueryParam) queryParam).getValue(), templateParam.getName());
+        }
+        else
+        {
+            overriddenParam = new DefaultOutputQueryParam(templateParam.getIndex(), paramType, templateParam.getName());
+        }
+
+        return overriddenParam;
     }
 
     private QueryParam findOverriddenParam(final String name, List<QueryParam> queryParams)
