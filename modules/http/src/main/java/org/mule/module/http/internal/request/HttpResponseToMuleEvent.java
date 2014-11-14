@@ -59,34 +59,42 @@ public class HttpResponseToMuleEvent
 
         muleEvent.getMessage().setProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY, response.getStatusCode(), PropertyScope.INBOUND);
 
-
-        if (responseContentType != null && parseResponse.resolveBooleanValue(muleEvent) && responseContentType.startsWith("multipart/"))
-        {
-            try
-            {
-                final Collection<HttpPartDataSource> httpParts = HttpPartDataSource.createFrom(HttpParser.parseMultipartContent(responseInputStream, responseContentType));
-                DefaultMuleMessage message = (DefaultMuleMessage) muleEvent.getMessage();
-                setResponsePayload(NullPayload.getInstance(), muleEvent);
-                for (HttpPartDataSource httpPart : httpParts)
-                {
-                    message.addInboundAttachment(httpPart.getName(), new DataHandler(httpPart));
-                }
-            }
-            catch (Exception e)
-            {
-                throw new MessagingException(muleEvent, e);
-            }
-        }
-        else if (responseContentType != null && responseContentType.startsWith(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toLowerCase()))
+        if(responseContentType != null)
         {
             MediaType mediaType = MediaType.parse(responseContentType);
             String encoding = mediaType.charset().isPresent() ? mediaType.charset().get().name() : Charset.defaultCharset().name();
-            setResponsePayload(HttpParser.decodeString(IOUtils.toString(responseInputStream), encoding), muleEvent);
+            muleEvent.getMessage().setEncoding(encoding);
+            if (parseResponse.resolveBooleanValue(muleEvent) && responseContentType.startsWith("multipart/"))
+            {
+                try
+                {
+                    final Collection<HttpPartDataSource> httpParts = HttpPartDataSource.createFrom(HttpParser.parseMultipartContent(responseInputStream, responseContentType));
+                    DefaultMuleMessage message = (DefaultMuleMessage) muleEvent.getMessage();
+                    setResponsePayload(NullPayload.getInstance(), muleEvent);
+                    for (HttpPartDataSource httpPart : httpParts)
+                    {
+                        message.addInboundAttachment(httpPart.getName(), new DataHandler(httpPart));
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new MessagingException(muleEvent, e);
+                }
+            }
+            else if (responseContentType.startsWith(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toLowerCase()))
+            {
+                setResponsePayload(HttpParser.decodeString(IOUtils.toString(responseInputStream), encoding), muleEvent);
+            }
+            else
+            {
+                setResponsePayload(responseInputStream, muleEvent);
+            }
         }
         else
         {
             setResponsePayload(responseInputStream, muleEvent);
         }
+
     }
 
     /**
