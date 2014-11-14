@@ -149,7 +149,7 @@ public class HttpListenerBuilderTestCase
                 .setPort(PORT)
                 .setPath(PATH).build();
 
-        verify(mockListenerConnectionManager).createServer(new ServerAddress(HOST, PORT));
+        verify(mockListenerConnectionManager).createServer(new ServerAddress(HOST, PORT), true, DefaultHttpListenerConfig.DEFAULT_CONNECTION_IDLE_TIMEOUT);
     }
 
     @Test
@@ -168,7 +168,7 @@ public class HttpListenerBuilderTestCase
                 .setPort(PORT)
                 .setPath(PATH).build();
 
-        verify(mockListenerConnectionManager).createSslServer(new ServerAddress(HOST, PORT), mockTlsContextFactory);
+        verify(mockListenerConnectionManager).createSslServer(new ServerAddress(HOST, PORT), mockTlsContextFactory, true, DefaultHttpListenerConfig.DEFAULT_CONNECTION_IDLE_TIMEOUT);
     }
 
     @Test
