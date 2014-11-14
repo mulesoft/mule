@@ -89,9 +89,18 @@ public class ConfigOAuthContext
 
     public void clearContextForResourceOwner(String resourceOwnerId)
     {
-        if (oauthContextStore.containsKey(resourceOwnerId))
+        final ResourceOwnerOAuthContext resourceOwnerOAuthContext = getContextForResourceOwner(resourceOwnerId);
+        if (resourceOwnerOAuthContext != null)
         {
-            oauthContextStore.remove(resourceOwnerId);
+            resourceOwnerOAuthContext.getRefreshUserOAuthContextLock().lock();
+            try
+            {
+                oauthContextStore.remove(resourceOwnerId);
+            }
+            finally
+            {
+                resourceOwnerOAuthContext.getRefreshUserOAuthContextLock().unlock();
+            }
         }
     }
 }

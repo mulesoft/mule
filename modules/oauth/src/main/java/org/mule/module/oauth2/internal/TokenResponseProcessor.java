@@ -10,8 +10,8 @@ import org.mule.api.MuleEvent;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.module.oauth2.internal.authorizationcode.TokenResponseConfiguration;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Process a token url response and extracts all the oauth context variables
@@ -26,14 +26,14 @@ public class TokenResponseProcessor
     private String accessToken;
     private String refreshToken;
     private String expiresIn;
-    private List<NameValuePair> customResponseParameters;
+    private Map<String, Object> customResponseParameters;
 
     public static TokenResponseProcessor createAuthorizationCodeProcessor(final TokenResponseConfiguration tokenResponseConfiguration, final ExpressionManager expressionManager)
     {
         return new TokenResponseProcessor(tokenResponseConfiguration, expressionManager, true);
     }
 
-    public static TokenResponseProcessor createClientCredentialsrocessor(final TokenResponseConfiguration tokenResponseConfiguration, final ExpressionManager expressionManager)
+    public static TokenResponseProcessor createClientCredentialsProcessor(final TokenResponseConfiguration tokenResponseConfiguration, final ExpressionManager expressionManager)
     {
         return new TokenResponseProcessor(tokenResponseConfiguration, expressionManager, false);
     }
@@ -53,11 +53,10 @@ public class TokenResponseProcessor
             refreshToken = expressionManager.parse(tokenResponseConfiguration.getRefreshToken(), muleEvent);
         }
         expiresIn = expressionManager.parse(tokenResponseConfiguration.getExpiresIn(), muleEvent);
-
-        customResponseParameters = new ArrayList<NameValuePair>(tokenResponseConfiguration.getParameterExtractors().size());
+        customResponseParameters = new HashMap<>();
         for (ParameterExtractor parameterExtractor : tokenResponseConfiguration.getParameterExtractors())
         {
-            customResponseParameters.add(new NameValuePair(parameterExtractor.getParamName(), expressionManager.evaluate(parameterExtractor.getValue(), muleEvent)));
+            customResponseParameters.put(parameterExtractor.getParamName(), expressionManager.evaluate(parameterExtractor.getValue(), muleEvent));
         }
     }
 
@@ -76,7 +75,7 @@ public class TokenResponseProcessor
         return expiresIn;
     }
 
-    public List<NameValuePair> getCustomResponseParameters()
+    public Map<String, Object> getCustomResponseParameters()
     {
         return customResponseParameters;
     }

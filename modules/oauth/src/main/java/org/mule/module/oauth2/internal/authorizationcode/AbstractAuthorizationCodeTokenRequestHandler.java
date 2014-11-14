@@ -13,11 +13,12 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.construct.Flow;
 import org.mule.module.http.api.listener.HttpListener;
 import org.mule.module.http.api.listener.HttpListenerBuilder;
-import org.mule.module.oauth2.internal.AutoTokenRequestHandler;
+import org.mule.module.oauth2.internal.AbstractTokenRequestHandler;
 import org.mule.module.oauth2.internal.DynamicFlowFactory;
 import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 
 import org.slf4j.Logger;
@@ -26,7 +27,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Base class for token request handler.
  */
-public abstract class AbstractAuthorizationCodeTokenRequestHandler extends AutoTokenRequestHandler
+public abstract class AbstractAuthorizationCodeTokenRequestHandler extends AbstractTokenRequestHandler
 {
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
@@ -111,8 +112,8 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends AutoT
             final String flowName = "OAuthRedirectUrlFlow" + getOauthConfig().getRedirectionUrl();
             final Flow redirectUrlFlow = DynamicFlowFactory.createDynamicFlow(getMuleContext(), flowName, Arrays.asList(createRedirectUrlProcessor()));
             final HttpListenerBuilder httpListenerBuilder = new HttpListenerBuilder(getMuleContext())
-                    .setStatusCode("#[flowVars['statusCode']]")
-                    .setUrl(getOauthConfig().getRedirectionUrl())
+                    .setSuccessStatusCode("#[flowVars['statusCode']]")
+                    .setUrl(new URL(getOauthConfig().getRedirectionUrl()))
                     .setFlow(redirectUrlFlow);
             if (getOauthConfig().getTlsContextFactory() != null)
             {

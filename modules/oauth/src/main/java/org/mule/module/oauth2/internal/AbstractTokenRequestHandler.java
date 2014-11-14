@@ -7,13 +7,22 @@
 package org.mule.module.oauth2.internal;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.module.http.api.requester.HttpRequester;
+import org.mule.module.http.api.requester.HttpRequesterBuilder;
 
-public class AbstractTokenRequestHandler implements MuleContextAware
+public abstract class AbstractTokenRequestHandler implements MuleContextAware, Initialisable
 {
 
     private MuleContext muleContext;
     private String refreshTokenWhen = OAuthConstants.DEFAULT_REFRESH_TOKEN_WHEN_EXPRESSION;
+    private HttpRequester httpRequester;
+    private String tokenUrl;
+
 
     /**
      * @param refreshTokenWhen expression to use to determine if the response from a request to the API requires a new token
@@ -37,6 +46,32 @@ public class AbstractTokenRequestHandler implements MuleContextAware
     protected MuleContext getMuleContext()
     {
         return muleContext;
+    }
+
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        try
+        {
+            httpRequester = new HttpRequesterBuilder(getMuleContext())
+                    .setUrl(tokenUrl)
+                    .setMethod("POST")
+                    .build();
+        }
+        catch (Exception e)
+        {
+            throw new InitialisationException(e, this);
+        }
+    }
+
+    public void setTokenUrl(String tokenUrl)
+    {
+        this.tokenUrl = tokenUrl;
+    }
+
+    protected MuleEvent invokeTokenUrl(final MuleEvent event) throws MuleException
+    {
+        return httpRequester.process(event);
     }
 
 }

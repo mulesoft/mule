@@ -21,6 +21,14 @@ import java.util.Set;
  * Adapts the object store interface to a map interface so the client doesn't have to deal
  * with all the ObjectStoreExceptions thrown by ObjectStore.
  *
+ * This class provides limited functionality from the Map interface. It does not support some methods
+ * (see methods javadoc) that can have a big impact in performance due the underlying object store being used.
+ *
+ * The object store provided will be access for completing the map operations but the whole lifecycle of the
+ * provided object store must be handled by the user.
+ *
+ * Operations of this map are not thread safe so the user must synchronize access to this map properly.
+ *
  * @param <ValueType> store type
  */
 public class ObjectStoreToMapAdapter<ValueType extends Serializable> implements Map<Serializable, ValueType>
@@ -171,12 +179,18 @@ public class ObjectStoreToMapAdapter<ValueType extends Serializable> implements 
         }
     }
 
+    /**
+     * This method is not supported for performance reasons
+     */
     @Override
     public Collection<ValueType> values()
     {
         throw new UnsupportedOperationException("ObjectStoreToMapAdapter does not support values() method");
     }
 
+    /**
+     * This method is not supported for performance reasons
+     */
     @Override
     public Set<Entry<Serializable, ValueType>> entrySet()
     {

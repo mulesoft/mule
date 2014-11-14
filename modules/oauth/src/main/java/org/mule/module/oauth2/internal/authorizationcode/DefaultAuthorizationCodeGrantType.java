@@ -7,7 +7,6 @@
 package org.mule.module.oauth2.internal.authorizationcode;
 
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import static org.mule.module.oauth2.internal.authorizationcode.OAuthAuthenticationHeader.buildAuthorizationHeaderContent;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -21,6 +20,7 @@ import org.mule.module.http.api.HttpAuthentication;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.module.oauth2.api.RequestAuthenticationException;
+import org.mule.module.oauth2.internal.AbstractGrantType;
 import org.mule.module.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
 import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.module.oauth2.internal.tokenmanager.TokenManagerConfig;
@@ -36,7 +36,7 @@ import org.apache.commons.lang.StringUtils;
  * - If the authorization-request is defined then it will create a flow listening for an user call to begin the oauth login.
  * - If the token-request is defined then it will create a flow for listening in the redirect uri so we can get the authentication code and retrieve the access token
  */
-public class DefaultAuthorizationCodeGrantType implements Initialisable, AuthorizationCodeGrantType, Startable, MuleContextAware, HttpAuthentication
+public class DefaultAuthorizationCodeGrantType extends AbstractGrantType implements Initialisable, AuthorizationCodeGrantType, Startable, MuleContextAware
 {
 
     private String clientId;

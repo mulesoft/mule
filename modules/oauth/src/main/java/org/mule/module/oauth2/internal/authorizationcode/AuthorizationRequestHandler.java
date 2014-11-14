@@ -21,6 +21,7 @@ import org.mule.module.oauth2.internal.StateEncoder;
 import org.mule.util.AttributeEvaluator;
 
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -89,8 +90,8 @@ public class AuthorizationRequestHandler implements MuleContextAware
             final String flowName = "authorization-request-handler-" + localAuthorizationUrl;
             final Flow flow = DynamicFlowFactory.createDynamicFlow(muleContext, flowName, createLocalAuthorizationUrlListener());
             muleContext.getRegistry().registerObject(flow.getName(), flow);
-            httpListenerBuilder.setUrl(localAuthorizationUrl)
-                    .setStatusCode(REDIRECT_STATUS_CODE)
+            httpListenerBuilder.setUrl(new URL(localAuthorizationUrl))
+                    .setSuccessStatusCode(REDIRECT_STATUS_CODE)
                     .setFlow(flow);
             if (oauthConfig.getTlsContextFactory() != null)
             {
@@ -117,14 +118,14 @@ public class AuthorizationRequestHandler implements MuleContextAware
                 final String resourceOwnerId = getOauthConfig().getLocalAuthorizationUrlResourceOwnerIdEvaluator().resolveStringValue(muleEvent);
                 muleEvent.setFlowVariable(OAUTH_STATE_ID_FLOW_VAR_NAME, resourceOwnerId);
                 final String stateValue = stateEvaluator.resolveStringValue(muleEvent);
-                String currentState = stateValue;
+                final StateEncoder stateEncoder = new StateEncoder(stateValue);
                 if (resourceOwnerId != null)
                 {
-                    currentState = StateEncoder.encodeResourceOwnerIdInState(stateValue, resourceOwnerId);
+                    stateEncoder.encodeResourceOwnerIdInState(resourceOwnerId);
                 }
                 if (onCompleteRedirectToValue != null)
                 {
-                    currentState = StateEncoder.encodeOnCompleteRedirectToInState(currentState, onCompleteRedirectToValue);
+                    stateEncoder.encodeOnCompleteRedirectToInState(onCompleteRedirectToValue);
                 }
                 final String authorizationUrlWithParams = new AuthorizationRequestUrlBuilder()
                         .setAuthorizationUrl(authorizationUrl)
@@ -132,7 +133,7 @@ public class AuthorizationRequestHandler implements MuleContextAware
                         .setClientSecret(oauthConfig.getClientSecret())
                         .setCustomParameters(customParameters)
                         .setRedirectUrl(oauthConfig.getRedirectionUrl())
-                        .setState(currentState)
+                        .setState(stateEncoder.getEncodedState())
                         .setScope(scopes).buildUrl();
 
                 muleEvent.getMessage().setOutboundProperty(HttpHeaders.Names.LOCATION, authorizationUrlWithParams);

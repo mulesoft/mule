@@ -10,6 +10,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 
+import org.mule.module.oauth2.internal.StateDecoder;
 import org.mule.module.oauth2.internal.StateEncoder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -25,48 +26,61 @@ public class StateEncoderTestCase extends AbstractMuleTestCase
     @Test(expected = IllegalArgumentException.class)
     public void encodeNullOAuthStateId()
     {
-        StateEncoder.encodeResourceOwnerIdInState(ORIGINAL_STATE_VALUE, null);
+        new StateEncoder(ORIGINAL_STATE_VALUE).encodeResourceOwnerIdInState(null);
     }
 
     @Test
     public void encodeAndDecodeWithState()
     {
-        final String encodedState = StateEncoder.encodeResourceOwnerIdInState(ORIGINAL_STATE_VALUE, TEST_RESOURCE_OWNER_ID);
-        assertThat(StateEncoder.decodeResourceOwnerId(encodedState), is(TEST_RESOURCE_OWNER_ID));
-        assertThat(StateEncoder.decodeOriginalState(encodedState), is(ORIGINAL_STATE_VALUE));
+        final StateEncoder stateEncoder = new StateEncoder(ORIGINAL_STATE_VALUE);
+        stateEncoder.encodeResourceOwnerIdInState(TEST_RESOURCE_OWNER_ID);
+        final String encodedState = stateEncoder.getEncodedState();
+        final StateDecoder stateDecoder = new StateDecoder(encodedState);
+        assertThat(stateDecoder.decodeResourceOwnerId(), is(TEST_RESOURCE_OWNER_ID));
+        assertThat(stateDecoder.decodeOriginalState(), is(ORIGINAL_STATE_VALUE));
     }
 
     @Test
     public void encodeAndDecodeWithNullState()
     {
-        final String encodedState = StateEncoder.encodeResourceOwnerIdInState(null, TEST_RESOURCE_OWNER_ID);
-        assertThat(StateEncoder.decodeResourceOwnerId(encodedState), is(TEST_RESOURCE_OWNER_ID));
-        assertThat(StateEncoder.decodeOriginalState(encodedState), nullValue());
+        final StateEncoder stateEncoder = new StateEncoder(null);
+        stateEncoder.encodeResourceOwnerIdInState(TEST_RESOURCE_OWNER_ID);
+        final String encodedState = stateEncoder.getEncodedState();
+        final StateDecoder stateDecoder = new StateDecoder(encodedState);
+        assertThat(stateDecoder.decodeResourceOwnerId(), is(TEST_RESOURCE_OWNER_ID));
+        assertThat(stateDecoder.decodeOriginalState(), nullValue());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void doNotAllowNewParameterAfterOnCompleteRedirectTo()
     {
-        final String encodedState = StateEncoder.encodeOnCompleteRedirectToInState(null, TEST_ON_COMPLETE_URL);
-        StateEncoder.encodeResourceOwnerIdInState(encodedState, TEST_RESOURCE_OWNER_ID);
+        final StateEncoder stateEncoder = new StateEncoder(null);
+        stateEncoder.encodeOnCompleteRedirectToInState(TEST_ON_COMPLETE_URL);
+        stateEncoder.encodeResourceOwnerIdInState(TEST_RESOURCE_OWNER_ID);
     }
 
     @Test
     public void encodeAndDecodeOnCompleteRedirectToParameter()
     {
-        final String encodedState = StateEncoder.encodeOnCompleteRedirectToInState(null, TEST_ON_COMPLETE_URL);
-        assertThat(StateEncoder.decodeOnCompleteRedirectTo(encodedState), is(TEST_ON_COMPLETE_URL));
-        assertThat(StateEncoder.decodeOriginalState(encodedState), nullValue());
+        final StateEncoder stateEncoder = new StateEncoder(null);
+        stateEncoder.encodeOnCompleteRedirectToInState(TEST_ON_COMPLETE_URL);
+        final String encodedState = stateEncoder.getEncodedState();
+        final StateDecoder stateDecoder = new StateDecoder(encodedState);
+        assertThat(stateDecoder.decodeOnCompleteRedirectTo(), is(TEST_ON_COMPLETE_URL));
+        assertThat(stateDecoder.decodeOriginalState(), nullValue());
     }
 
     @Test
     public void encodeAndDecodeResourceOwnerAndOnCompleteRedirectToParameter()
     {
-        String encodedState = StateEncoder.encodeResourceOwnerIdInState(ORIGINAL_STATE_VALUE, TEST_RESOURCE_OWNER_ID);
-        encodedState = StateEncoder.encodeOnCompleteRedirectToInState(encodedState, TEST_ON_COMPLETE_URL);
-        assertThat(StateEncoder.decodeOnCompleteRedirectTo(encodedState), is(TEST_ON_COMPLETE_URL));
-        assertThat(StateEncoder.decodeResourceOwnerId(encodedState), is(TEST_RESOURCE_OWNER_ID));
-        assertThat(StateEncoder.decodeOriginalState(encodedState), is(ORIGINAL_STATE_VALUE));
+        final StateEncoder stateEncoder = new StateEncoder(ORIGINAL_STATE_VALUE);
+        stateEncoder.encodeResourceOwnerIdInState(TEST_RESOURCE_OWNER_ID);
+        stateEncoder.encodeOnCompleteRedirectToInState(TEST_ON_COMPLETE_URL);
+        String encodedState = stateEncoder.getEncodedState();
+        final StateDecoder stateDecoder = new StateDecoder(encodedState);
+        assertThat(stateDecoder.decodeOnCompleteRedirectTo(), is(TEST_ON_COMPLETE_URL));
+        assertThat(stateDecoder.decodeResourceOwnerId(), is(TEST_RESOURCE_OWNER_ID));
+        assertThat(stateDecoder.decodeOriginalState(), is(ORIGINAL_STATE_VALUE));
     }
 
 }

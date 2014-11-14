@@ -15,9 +15,8 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.HttpConstants;
-import org.mule.module.oauth2.internal.NameValuePair;
 import org.mule.module.oauth2.internal.OAuthConstants;
-import org.mule.module.oauth2.internal.StateEncoder;
+import org.mule.module.oauth2.internal.StateDecoder;
 import org.mule.module.oauth2.internal.TokenResponseProcessor;
 import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 
@@ -78,7 +77,8 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
                     decodeStateAndUpdateOAuthUserState(tokenUrlResposne, state);
                     event.getMessage().setPayload("Successfully retrieved access token!");
                 }
-                final String onCompleteRedirectToValue = StateEncoder.decodeOnCompleteRedirectTo(state);
+                final StateDecoder stateDecoder = new StateDecoder(state);
+                final String onCompleteRedirectToValue = stateDecoder.decodeOnCompleteRedirectTo();
                 if (!StringUtils.isEmpty(onCompleteRedirectToValue))
                 {
                     event.setFlowVariable(STATUS_CODE_FLOW_VAR_NAME, REDIRECT_STATUS_CODE);
@@ -113,8 +113,9 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
 
     private void decodeStateAndUpdateOAuthUserState(final MuleEvent tokenUrlResponse, final String originalState) throws org.mule.api.registry.RegistrationException
     {
-        String decodedState = StateEncoder.decodeOriginalState(originalState);
-        String encodedResourceOwnerId = StateEncoder.decodeResourceOwnerId(originalState);
+        final StateDecoder stateDecoder = new StateDecoder(originalState);
+        String decodedState = stateDecoder.decodeOriginalState();
+        String encodedResourceOwnerId = stateDecoder.decodeResourceOwnerId();
         String resourceOwnerId = encodedResourceOwnerId == null ? ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID : encodedResourceOwnerId;
 
         final ResourceOwnerOAuthContext stateForUser = getOauthConfig().getUserOAuthContext().getContextForResourceOwner(resourceOwnerId);
@@ -143,11 +144,13 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
             stateForUser.setState(decodedState);
         }
 
-        for (NameValuePair parameter : tokenResponseProcessor.getCustomResponseParameters())
+        final Map<String, Object> customResponseParameters = tokenResponseProcessor.getCustomResponseParameters();
+        for (String paramName : customResponseParameters.keySet())
         {
-            if (parameter.getValue() != null)
+            final Object paramValue = customResponseParameters.get(paramName);
+            if (paramValue != null)
             {
-                stateForUser.getTokenResponseParameters().put(parameter.getName(), parameter.getValue());
+                stateForUser.getTokenResponseParameters().put(paramName, paramValue);
             }
         }
 

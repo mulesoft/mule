@@ -14,12 +14,12 @@ import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.oauth2.internal.AbstractGrantType.buildAuthorizationHeaderContent;
 
 import org.mule.construct.Flow;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.module.oauth2.asserter.OAuthContextFunctionAsserter;
-import org.mule.module.oauth2.internal.authorizationcode.OAuthAuthenticationHeader;
 import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.store.SimpleMemoryObjectStore;
@@ -105,6 +105,6 @@ public class ClientCredentialsFullConfigTestCase extends AbstractOAuthAuthorizat
         verifyRequestDoneToTokenUrlForClientCredentials();
 
         wireMockRule.verify(postRequestedFor(urlEqualTo(RESOURCE_PATH))
-                                    .withHeader(HttpHeaders.Names.AUTHORIZATION, equalTo(OAuthAuthenticationHeader.buildAuthorizationHeaderContent(NEW_ACCESS_TOKEN))));
+                                    .withHeader(HttpHeaders.Names.AUTHORIZATION, equalTo(buildAuthorizationHeaderContent(NEW_ACCESS_TOKEN))));
     }
 }

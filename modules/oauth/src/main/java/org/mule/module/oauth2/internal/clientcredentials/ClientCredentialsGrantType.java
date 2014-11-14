@@ -7,7 +7,6 @@
 package org.mule.module.oauth2.internal.clientcredentials;
 
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import static org.mule.module.oauth2.internal.authorizationcode.OAuthAuthenticationHeader.buildAuthorizationHeaderContent;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -17,18 +16,17 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
-import org.mule.module.http.api.HttpAuthentication;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.module.oauth2.api.RequestAuthenticationException;
-import org.mule.module.oauth2.internal.ApplicationCredentials;
+import org.mule.module.oauth2.internal.AbstractGrantType;
 import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.module.oauth2.internal.tokenmanager.TokenManagerConfig;
 
 /**
  * Authorization element for client credentials oauth grant type
  */
-public class ClientCredentialsGrantType implements Initialisable, Startable, MuleContextAware, ApplicationCredentials, HttpAuthentication
+public class ClientCredentialsGrantType extends AbstractGrantType implements Initialisable, Startable, MuleContextAware
 {
 
     private String clientId;
