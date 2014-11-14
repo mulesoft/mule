@@ -28,20 +28,24 @@ public interface HttpServerManager
      *
      * @param host hostname or ip address of a network interface
      * @param port port of the host
+     * @param usePersistentConnections if true, the connections will be kept open for subsequent requests
+     * @param connectionIdleTimeoutInSeconds the amount of seconds to keep open an idle connection
      * @return the create Server handler
      * @throws IOException if it was not possible to create the Server. Most likely because the host and port is already in use.
      */
-    Server createServerFor(String host, int port) throws IOException;
+    Server createServerFor(String host, int port, boolean usePersistentConnections, int connectionIdleTimeoutInSeconds) throws IOException;
 
     /**
      *
      * @param tlsContextFactory
      * @param host hostname or ip address of a network interface
      * @param port port of the host
+     * @param usePersistentConnections if true, the connections will be kept open for subsequent requests
+     * @param connectionIdleTimeoutInSeconds the amount of seconds to keep open an idle connection
      * @return the create Server handler
      * @throws IOException if it was not possible to create the Server. Most likely because the host and port is already in use.
      */
-    Server createSslServerFor(TlsContextFactory tlsContextFactory, String host, int port) throws IOException;
+    Server createSslServerFor(TlsContextFactory tlsContextFactory, String host, int port, boolean usePersistentConnections, int connectionIdleTimeoutInSeconds) throws IOException;
 
     /**
      *

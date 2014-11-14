@@ -35,7 +35,7 @@ public class AbstractHttpRequestTestCase extends FunctionalTestCase
 
     public static final String DEFAULT_RESPONSE = "<h1>Response</h1>";
 
-    private Server server;
+    protected Server server;
 
     protected String method;
     protected String uri;

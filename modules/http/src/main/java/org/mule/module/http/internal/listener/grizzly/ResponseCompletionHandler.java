@@ -25,6 +25,7 @@ import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.http.HttpContent;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.glassfish.grizzly.http.HttpResponsePacket;
+import org.glassfish.grizzly.http.HttpServerFilter;
 import org.glassfish.grizzly.memory.ByteBufferWrapper;
 
 /**
@@ -105,6 +106,7 @@ public class ResponseCompletionHandler
             if (!isDone) {
                 sendResponse();
             } else {
+                ctx.notifyDownstream(HttpServerFilter.RESPONSE_COMPLETE_EVENT);
                 resume();
             }
         } catch (IOException e) {
