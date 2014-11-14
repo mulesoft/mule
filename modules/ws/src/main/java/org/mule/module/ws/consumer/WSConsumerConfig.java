@@ -18,7 +18,7 @@ import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.module.http.api.requester.HttpRequesterBuilder;
-import org.mule.module.http.internal.request.HttpRequestConfig;
+import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
 import org.mule.module.http.internal.request.SuccessStatusCodeValidator;
 import org.mule.module.ws.security.WSSecurity;
 import org.mule.transport.http.HttpConnector;
@@ -35,7 +35,7 @@ public class WSConsumerConfig implements MuleContextAware
     private String port;
     private String serviceAddress;
     private Connector connector;
-    private HttpRequestConfig connectorConfig;
+    private DefaultHttpRequesterConfig connectorConfig;
     private WSSecurity security;
 
     @Override
@@ -110,7 +110,7 @@ public class WSConsumerConfig implements MuleContextAware
     {
         HttpRequesterBuilder requesterBuilder = new HttpRequesterBuilder(muleContext);
 
-        requesterBuilder.setAddress(serviceAddress).setMethod("POST").setParseResponse(false);
+        requesterBuilder.setUrl(serviceAddress).setMethod("POST").setParseResponse(false);
 
         // Do not throw exception on invalid status code, let CXF process it.
         requesterBuilder.setResponseValidator(new SuccessStatusCodeValidator("0..599"));
@@ -188,12 +188,12 @@ public class WSConsumerConfig implements MuleContextAware
         this.connector = connector;
     }
 
-    public HttpRequestConfig getConnectorConfig()
+    public DefaultHttpRequesterConfig getConnectorConfig()
     {
         return connectorConfig;
     }
 
-    public void setConnectorConfig(HttpRequestConfig connectorConfig)
+    public void setConnectorConfig(DefaultHttpRequesterConfig connectorConfig)
     {
         this.connectorConfig = connectorConfig;
     }

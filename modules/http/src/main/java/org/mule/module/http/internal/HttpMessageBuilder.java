@@ -41,9 +41,9 @@ public class HttpMessageBuilder
         return httpParams;
     }
 
-    public void setBuilders(List<HttpBuilderRef> httpBuilderRefs)
+    public void setBuilders(List<HttpMessageBuilderRef> httpBuilderRefs)
     {
-        for (HttpBuilderRef httpBuilderRef : httpBuilderRefs)
+        for (HttpMessageBuilderRef httpBuilderRef : httpBuilderRefs)
         {
             setParams(Lists.newArrayList(httpBuilderRef.getRef().params.values()));
         }

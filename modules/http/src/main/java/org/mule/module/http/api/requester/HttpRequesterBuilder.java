@@ -10,8 +10,8 @@ import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
 import org.mule.module.http.internal.request.DefaultHttpRequester;
-import org.mule.module.http.internal.request.HttpRequestConfig;
 import org.mule.module.http.internal.request.ResponseValidator;
 
 public class HttpRequesterBuilder
@@ -52,13 +52,13 @@ public class HttpRequesterBuilder
         return this;
     }
 
-    public HttpRequesterBuilder setAddress(String address)
+    public HttpRequesterBuilder setUrl(String url)
     {
-        httpRequester.setAddress(address);
+        httpRequester.setUrl(url);
         return this;
     }
 
-    public HttpRequesterBuilder setConfig(HttpRequestConfig config)
+    public HttpRequesterBuilder setConfig(DefaultHttpRequesterConfig config)
     {
         httpRequester.setConfig(config);
         return this;
@@ -88,11 +88,11 @@ public class HttpRequesterBuilder
         {
             if (httpRequester.getConfig() == null)
             {
-                HttpRequestConfig requestConfig = muleContext.getRegistry().get(DEFAULT_HTTP_REQUEST_CONFIG_NAME);
+                DefaultHttpRequesterConfig requestConfig = muleContext.getRegistry().get(DEFAULT_HTTP_REQUEST_CONFIG_NAME);
 
                 if (requestConfig == null)
                 {
-                    requestConfig = new HttpRequestConfig();
+                    requestConfig = new DefaultHttpRequesterConfig();
                     muleContext.getRegistry().registerObject(DEFAULT_HTTP_REQUEST_CONFIG_NAME, requestConfig);
                 }
 

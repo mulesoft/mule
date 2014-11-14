@@ -52,13 +52,13 @@ public class MuleEventToHttpRequest
         this.sendBody = sendBody;
     }
 
-    public HttpRequestBuilder create(MuleEvent event, String method, String uri) throws MessagingException
+    public HttpRequestBuilder create(MuleEvent event, String resolvedMethod, String resolvedUri) throws MessagingException
     {
         HttpRequesterRequestBuilder requestBuilder = requester.getRequestBuilder();
         HttpRequestBuilder builder = new HttpRequestBuilder();
 
-        builder.setUri(uri);
-        builder.setMethod(method);
+        builder.setUri(resolvedUri);
+        builder.setMethod(resolvedMethod);
         builder.setHeaders(requestBuilder.getHeaders(event));
         builder.setQueryParams(requestBuilder.getQueryParams(event));
 
@@ -67,15 +67,15 @@ public class MuleEventToHttpRequest
             builder.addHeader(outboundProperty, event.getMessage().getOutboundProperty(outboundProperty).toString());
         }
 
-        builder.setEntity(createRequestEntity(builder, event));
+        builder.setEntity(createRequestEntity(builder, event, resolvedMethod));
 
         return builder;
     }
 
 
-    private HttpEntity createRequestEntity(HttpRequestBuilder requestBuilder, MuleEvent muleEvent) throws MessagingException
+    private HttpEntity createRequestEntity(HttpRequestBuilder requestBuilder, MuleEvent muleEvent, String resolvedMethod) throws MessagingException
     {
-        if (isEmptyBody(muleEvent, requestBuilder.getMethod()))
+        if (isEmptyBody(muleEvent, resolvedMethod))
         {
             return new EmptyHttpEntity();
         }

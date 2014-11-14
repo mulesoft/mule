@@ -6,7 +6,11 @@
  */
 package org.mule.module.http.internal;
 
-public class HttpBuilderRef
+/**
+ * Object that holds a reference to an {@code HttpMessageBuilder}, it represents the {@code <http:builder ref="..." />}
+ * element for composing request/response builders.
+ */
+public class HttpMessageBuilderRef
 {
     private HttpMessageBuilder ref;
 

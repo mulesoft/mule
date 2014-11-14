@@ -12,9 +12,15 @@ import org.mule.module.http.api.HttpAuthentication;
 import org.mule.module.http.internal.domain.request.HttpRequest;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
+
+/**
+ * Object that sends an HTTP request, and returns the response.
+ */
 public interface HttpClient extends Initialisable, Stoppable
 {
 
-    public HttpResponse send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpAuthentication authentication) throws Exception;
+    public HttpResponse send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpAuthentication authentication) throws IOException, TimeoutException;
 
 }

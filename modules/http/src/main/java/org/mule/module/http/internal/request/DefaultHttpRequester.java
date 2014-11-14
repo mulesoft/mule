@@ -36,7 +36,7 @@ public class DefaultHttpRequester implements HttpRequester, Initialisable, MuleC
     public static final String DEFAULT_PAYLOAD_EXPRESSION = "#[payload]";
     public static final String DEFAULT_FOLLOW_REDIRECTS = "true";
 
-    private HttpRequestConfig requestConfig;
+    private DefaultHttpRequesterConfig requestConfig;
     private HttpRequesterRequestBuilder requestBuilder;
     private ResponseValidator responseValidator = new SuccessStatusCodeValidator("0..399");
 
@@ -44,7 +44,7 @@ public class DefaultHttpRequester implements HttpRequester, Initialisable, MuleC
     private AttributeEvaluator port;
     private AttributeEvaluator basePath;
     private AttributeEvaluator path;
-    private AttributeEvaluator address;
+    private AttributeEvaluator url;
 
     private AttributeEvaluator method = new AttributeEvaluator("GET");
     private AttributeEvaluator followRedirects;
@@ -82,7 +82,7 @@ public class DefaultHttpRequester implements HttpRequester, Initialisable, MuleC
         muleEventToHttpRequest = new MuleEventToHttpRequest(this, muleContext, requestStreamingMode, sendBodyMode);
         httpResponseToMuleEvent = new HttpResponseToMuleEvent(this, muleContext, parseResponse);
 
-        initializeAttributeEvaluators(host, port, method, path, basePath, address, followRedirects,
+        initializeAttributeEvaluators(host, port, method, path, basePath, url, followRedirects,
                                       requestStreamingMode, sendBodyMode, parseResponse, responseTimeout);
     }
 
@@ -123,7 +123,7 @@ public class DefaultHttpRequester implements HttpRequester, Initialisable, MuleC
             setParseResponse(requestConfig.getParseResponse());
         }
 
-        if (responseTimeout == null)
+        if (responseTimeout == null && requestConfig.getResponseTimeout() != null)
         {
             setResponseTimeout(requestConfig.getResponseTimeout());
         }
@@ -131,7 +131,7 @@ public class DefaultHttpRequester implements HttpRequester, Initialisable, MuleC
 
     private void validateRequiredProperties() throws InitialisationException
     {
-        if (address == null)
+        if (url == null)
         {
             if (host == null)
             {
@@ -169,19 +169,7 @@ public class DefaultHttpRequester implements HttpRequester, Initialisable, MuleC
 
     private MuleEvent innerProcess(MuleEvent muleEvent, boolean checkRetry) throws MuleException
     {
-
-        String uri;
-
-        try
-        {
-            uri = resolveURI(muleEvent).toString();
-        }
-        catch (URISyntaxException e)
-        {
-            throw new MessagingException(CoreMessages.createStaticMessage("Invalid URI for HTTP request"), muleEvent, e);
-        }
-
-        HttpRequestBuilder builder = muleEventToHttpRequest.create(muleEvent, method.resolveStringValue(muleEvent), uri);
+        HttpRequestBuilder builder = muleEventToHttpRequest.create(muleEvent, method.resolveStringValue(muleEvent), resolveURI(muleEvent));
 
         HttpAuthentication authentication = requestConfig.getAuthentication();
 
@@ -195,7 +183,7 @@ public class DefaultHttpRequester implements HttpRequester, Initialisable, MuleC
 
         try
         {
-            response = httpClient.send(builder.build(), responseTimeout.resolveIntegerValue(muleEvent),
+            response = httpClient.send(builder.build(), resolveResponseTimeout(muleEvent),
                                        followRedirects.resolveBooleanValue(muleEvent), authentication);
         }
         catch (Exception e)
@@ -217,18 +205,40 @@ public class DefaultHttpRequester implements HttpRequester, Initialisable, MuleC
         return muleEvent;
     }
 
-    private URI resolveURI(MuleEvent muleEvent) throws URISyntaxException
+    private int resolveResponseTimeout(MuleEvent muleEvent)
     {
-        if (address != null)
+        if (responseTimeout == null)
         {
-            return new URI(address.resolveStringValue(muleEvent));
+            return muleContext.getConfiguration().getDefaultResponseTimeout();
         }
         else
         {
-            return new URI(requestConfig.getScheme(), null, host.resolveStringValue(muleEvent), port.resolveIntegerValue(muleEvent),
-                           replaceUriParams(buildPath(basePath.resolveStringValue(muleEvent), path.resolveStringValue(muleEvent)), muleEvent), null, null);
-
+            return responseTimeout.resolveIntegerValue(muleEvent);
         }
+    }
+
+    private String resolveURI(MuleEvent muleEvent) throws MessagingException
+    {
+        if (url != null)
+        {
+            return url.resolveStringValue(muleEvent);
+        }
+        else
+        {
+            URI uri;
+
+            try
+            {
+                uri = new URI(requestConfig.getScheme(), null, host.resolveStringValue(muleEvent), port.resolveIntegerValue(muleEvent),
+                              replaceUriParams(buildPath(basePath.resolveStringValue(muleEvent), path.resolveStringValue(muleEvent)), muleEvent), null, null);
+            }
+            catch (URISyntaxException e)
+            {
+                throw new MessagingException(CoreMessages.createStaticMessage("Invalid URI for HTTP request"), muleEvent, e);
+            }
+            return uri.toString();
+        }
+
     }
 
 
@@ -314,14 +324,14 @@ public class DefaultHttpRequester implements HttpRequester, Initialisable, MuleC
         this.path = new AttributeEvaluator(path);
     }
 
-    public String getAddress()
+    public String getUrl()
     {
-        return address.getRawValue();
+        return url.getRawValue();
     }
 
-    public void setAddress(String address)
+    public void setUrl(String url)
     {
-        this.address = new AttributeEvaluator(address);
+        this.url = new AttributeEvaluator(url);
     }
 
     public HttpRequesterRequestBuilder getRequestBuilder()
@@ -345,12 +355,12 @@ public class DefaultHttpRequester implements HttpRequester, Initialisable, MuleC
     }
 
     @Override
-    public HttpRequestConfig getConfig()
+    public DefaultHttpRequesterConfig getConfig()
     {
         return requestConfig;
     }
 
-    public void setConfig(HttpRequestConfig requestConfig)
+    public void setConfig(DefaultHttpRequesterConfig requestConfig)
     {
         this.requestConfig = requestConfig;
     }

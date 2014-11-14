@@ -13,9 +13,9 @@ import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
+import org.mule.module.http.internal.HttpMessageBuilderRef;
 import org.mule.module.http.internal.request.DefaultHttpRequester;
 import org.mule.module.http.internal.request.FailureStatusCodeValidator;
-import org.mule.module.http.internal.HttpBuilderRef;
 import org.mule.module.http.internal.HttpMapParam;
 import org.mule.module.http.internal.HttpParamType;
 import org.mule.module.http.internal.HttpSingleParam;
@@ -40,7 +40,7 @@ public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("request", new MessageProcessorDefinitionParser(DefaultHttpRequester.class));
         registerBeanDefinitionParser("request-builder", new HttpRequestBuilderDefinitionParser());
 
-        registerBeanDefinitionParser("builder", new ChildDefinitionParser("builder", HttpBuilderRef.class));
+        registerBeanDefinitionParser("builder", new ChildDefinitionParser("builder", HttpMessageBuilderRef.class));
 
         registerBeanDefinitionParser("query-param", new HttpRequestSingleParamDefinitionParser(HttpSingleParam.class, HttpParamType.QUERY_PARAM));
         registerBeanDefinitionParser("query-params", new HttpRequestSingleParamDefinitionParser(HttpMapParam.class, HttpParamType.QUERY_PARAM));

@@ -38,8 +38,11 @@ import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
 import com.ning.http.client.providers.grizzly.TransportCustomizer;
 
+import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -66,7 +69,6 @@ public class GrizzlyHttpClient implements HttpClient
     {
         AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
         builder.setAllowPoolingConnection(true);
-        builder.setFollowRedirects(true);
 
         if (tlsContextFactory != null)
         {
@@ -133,13 +135,13 @@ public class GrizzlyHttpClient implements HttpClient
     }
 
     @Override
-    public HttpResponse send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpAuthentication authentication) throws Exception
+    public HttpResponse send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpAuthentication authentication) throws IOException, TimeoutException
     {
 
         RequestBuilder builder = new RequestBuilder();
 
         builder.setMethod(request.getMethod());
-        builder.setUrl(request.getUri());
+        builder.setUrl(request.getUri().toString());
         builder.setFollowRedirects(followRedirects);
 
         for (String headerName : request.getHeaderNames())
@@ -204,7 +206,20 @@ public class GrizzlyHttpClient implements HttpClient
         }
 
         ListenableFuture<Response> future = asyncHttpClient.executeRequest(builder.build());
-        Response response = future.get(responseTimeout, TimeUnit.MILLISECONDS);
+        Response response = null;
+
+        try
+        {
+            response = future.get(responseTimeout, TimeUnit.MILLISECONDS);
+        }
+        catch (InterruptedException e)
+        {
+            throw new IOException(e);
+        }
+        catch (ExecutionException e)
+        {
+            throw new IOException(e);
+        }
 
         HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
         responseBuilder.setStatusCode(response.getStatusCode());

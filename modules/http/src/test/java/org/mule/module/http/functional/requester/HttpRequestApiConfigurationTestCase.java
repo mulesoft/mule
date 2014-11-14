@@ -9,7 +9,7 @@ package org.mule.module.http.functional.requester;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import org.mule.module.http.internal.request.HttpRequestConfig;
+import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
@@ -26,7 +26,7 @@ public class HttpRequestApiConfigurationTestCase extends FunctionalTestCase
     @Test
     public void parseApiConfigurationFromConfig()
     {
-        HttpRequestConfig config = muleContext.getRegistry().get("ramlConfig");
+        DefaultHttpRequesterConfig config = muleContext.getRegistry().get("ramlConfig");
 
         assertNotNull(config.getApiConfiguration());
         assertThat(config.getApiConfiguration().getLocation(), equalTo("TestFile.raml"));

@@ -7,7 +7,6 @@
 package org.mule.module.http.api.requester;
 
 import org.mule.api.processor.MessageProcessor;
-import org.mule.module.http.internal.request.HttpRequestConfig;
 
 
 public interface HttpRequester extends MessageProcessor
@@ -16,6 +15,6 @@ public interface HttpRequester extends MessageProcessor
     /**
      * @return the config for this requester.
      */
-    public HttpRequestConfig getConfig();
+    public HttpRequesterConfig getConfig();
 
 }

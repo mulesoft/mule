@@ -562,13 +562,6 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="enableCookies" type="mule:substitutableBoolean">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Determines if cookies are enabled for requests that reference this config.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <xsd:attribute name="tlsContext-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -600,7 +593,7 @@
         <xsd:attribute name="followRedirects" type="mule:substitutableBoolean">
             <xsd:annotation>
                 <xsd:documentation>
-                    Specifies whether to follow redirects or not.
+                    Specifies whether to follow redirects or not. Default value is true.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -663,6 +656,7 @@
             <xsd:annotation>
                 <xsd:documentation>
                     Maximum time that the request element will block the execution of the flow waiting for the HTTP response.
+                    If this value is not present, the default response timeout from the Mule configuration will be used.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>

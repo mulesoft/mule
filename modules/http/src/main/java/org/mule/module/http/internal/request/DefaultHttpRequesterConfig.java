@@ -12,6 +12,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.module.http.api.HttpAuthentication;
+import org.mule.module.http.api.requester.HttpRequesterConfig;
 import org.mule.module.http.internal.HttpStreamingType;
 import org.mule.module.http.internal.request.grizzly.GrizzlyHttpClient;
 import org.mule.transport.ssl.TlsContextFactory;
@@ -19,18 +20,17 @@ import org.mule.transport.tcp.DefaultTcpClientSocketProperties;
 import org.mule.transport.tcp.TcpClientSocketProperties;
 
 
-public class HttpRequestConfig implements Initialisable, Stoppable, Startable
+public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initialisable, Stoppable, Startable
 {
     private String name;
     private String host;
     private String port;
     private String basePath = "/";
-    private boolean enableCookies = false;
     private String followRedirects = Boolean.toString(true);
     private String requestStreamingMode = HttpStreamingType.AUTO.name();
     private String sendBodyMode = HttpSendBodyMode.AUTO.name();
     private String parseResponse = Boolean.toString(true);
-    private String responseTimeout = Integer.toString(30000);
+    private String responseTimeout;
 
     private HttpAuthentication authentication;
     private TlsContextFactory tlsContext;
@@ -39,8 +39,6 @@ public class HttpRequestConfig implements Initialisable, Stoppable, Startable
     private ProxyConfig proxyConfig;
 
     private HttpClient httpClient;
-    private static HttpRequestConfig defaultConfig;
-
 
     @Override
     public void initialise() throws InitialisationException
@@ -76,6 +74,7 @@ public class HttpRequestConfig implements Initialisable, Stoppable, Startable
         return httpClient;
     }
 
+    @Override
     public String getBasePath()
     {
         return basePath;
@@ -96,6 +95,7 @@ public class HttpRequestConfig implements Initialisable, Stoppable, Startable
         this.name = name;
     }
 
+    @Override
     public String getHost()
     {
         return host;
@@ -106,6 +106,7 @@ public class HttpRequestConfig implements Initialisable, Stoppable, Startable
         this.host = host;
     }
 
+    @Override
     public String getPort()
     {
         return port;
@@ -116,16 +117,7 @@ public class HttpRequestConfig implements Initialisable, Stoppable, Startable
         this.port = port;
     }
 
-    public boolean isEnableCookies()
-    {
-        return enableCookies;
-    }
-
-    public void setEnableCookies(boolean enableCookies)
-    {
-        this.enableCookies = enableCookies;
-    }
-
+    @Override
     public HttpAuthentication getAuthentication()
     {
         return authentication;
@@ -151,6 +143,7 @@ public class HttpRequestConfig implements Initialisable, Stoppable, Startable
         this.apiConfiguration = apiConfiguration;
     }
 
+    @Override
     public String getFollowRedirects()
     {
         return followRedirects;
@@ -181,6 +174,7 @@ public class HttpRequestConfig implements Initialisable, Stoppable, Startable
         this.proxyConfig = proxyConfig;
     }
 
+    @Override
     public String getRequestStreamingMode()
     {
         return requestStreamingMode;
@@ -191,6 +185,7 @@ public class HttpRequestConfig implements Initialisable, Stoppable, Startable
         this.requestStreamingMode = requestStreamingMode;
     }
 
+    @Override
     public String getSendBodyMode()
     {
         return sendBodyMode;
@@ -201,6 +196,7 @@ public class HttpRequestConfig implements Initialisable, Stoppable, Startable
         this.sendBodyMode = sendBodyMode;
     }
 
+    @Override
     public String getParseResponse()
     {
         return parseResponse;
@@ -211,6 +207,7 @@ public class HttpRequestConfig implements Initialisable, Stoppable, Startable
         this.parseResponse = parseResponse;
     }
 
+    @Override
     public String getResponseTimeout()
     {
         return responseTimeout;

@@ -7,7 +7,7 @@
 package org.mule.module.http.internal.config;
 
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.module.http.internal.request.HttpRequestConfig;
+import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
 
 
 public class HttpRequestConfigDefinitionParser extends MuleOrphanDefinitionParser
@@ -15,7 +15,7 @@ public class HttpRequestConfigDefinitionParser extends MuleOrphanDefinitionParse
 
     public HttpRequestConfigDefinitionParser()
     {
-        super(HttpRequestConfig.class, true);
+        super(DefaultHttpRequesterConfig.class, true);
         addReference("tlsContext");
         addReference("proxyConfig");
         addAlias("proxy", "proxyConfig");

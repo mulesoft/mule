@@ -22,14 +22,9 @@ public class HttpRequestBuilder
 
     public HttpRequestBuilder setUri(String uri)
     {
-        this.path = HttpParser.extractPath(uri);
+        this.path = HttpParser.extractPath(uri.toString());
         this.uri = uri;
         return this;
-    }
-
-    public String getMethod()
-    {
-        return method;
     }
 
     public HttpRequestBuilder setMethod(String method)
@@ -50,6 +45,7 @@ public class HttpRequestBuilder
         return this;
     }
 
+    // TODO: MULE-8045 Refactor MuleEventToHttpRequest so that this is getter is not needed.
     public ParameterMap getHeaders()
     {
         return headers;
