@@ -39,6 +39,11 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
 
     public static final int DEFAULT_MAX_THREADS = 128;
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    public static final String HTTP_EMPTY_CONFIG_ID = "_httpEmptyListenerConfig";
+    public static final String HTTP_SSL_EMPTY_LISTENER_CONFIG = "_httpSslEmptyListenerConfig";
+
+    private static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = -1;
+
     private String name;
     private String host;
     private Integer port;
@@ -53,6 +58,9 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
     private Server server;
     private WorkManager workManager;
     private boolean initialised;
+
+    private String usePersistentConnections;
+    private String connectionIdleTimeout;
 
     public void setWorkerThreadingProfile(ThreadingProfile workerThreadingProfile)
     {
@@ -118,13 +126,30 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
         {
             throw new InitialisationException(CoreMessages.createStaticMessage("KeyStore must be configured for server side SSL"), this);
         }
-        if (tlsContext == null)
+
+        boolean usePersistentConnectionsParsed = usePersistentConnections == null ? true : Boolean.parseBoolean(usePersistentConnections);
+        int connectionIdleTimeoutParsed = 0;
+        if ( usePersistentConnectionsParsed )
         {
-            server = connectionManager.createServer(host, port);
+            connectionIdleTimeoutParsed =
+                    connectionIdleTimeout == null ?
+                    DEFAULT_CONNECTION_IDLE_TIMEOUT :
+                    (int) Math.ceil((double)Integer.parseInt(connectionIdleTimeout) / 1000.0);
         }
         else
         {
-            server = connectionManager.createSslServer(host, port, tlsContext);
+            if( connectionIdleTimeout != null )
+            {
+                throw new InitialisationException(CoreMessages.createStaticMessage("If connections are not persistent the connectionIdleTimeout parameter can not be set."), this);
+            }
+        }
+        if (tlsContext == null)
+        {
+            server = connectionManager.createServer(host, port, usePersistentConnectionsParsed, connectionIdleTimeoutParsed);
+        }
+        else
+        {
+            server = connectionManager.createSslServer(host, port, tlsContext, usePersistentConnectionsParsed, connectionIdleTimeoutParsed);
         }
         initialised = true;
     }
@@ -224,6 +249,16 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
     WorkManager getWorkManager()
     {
         return workManager;
+    }
+
+    public void setUsePersistentConnections(String usePersistentConnections)
+    {
+        this.usePersistentConnections = usePersistentConnections;
+    }
+
+    public void setConnectionIdleTimeout(String connectionIdleTimeout)
+    {
+        this.connectionIdleTimeout = connectionIdleTimeout;
     }
 
 }

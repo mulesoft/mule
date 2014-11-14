@@ -72,13 +72,13 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
         this.muleContext = muleContext;
     }
 
-    public Server createServer(final String host, final Integer port)
+    public Server createServer(final String host, final Integer port, boolean usePersistentConnections, int connectionIdleTimeoutInSeconds)
     {
         if (!httpServerManager.containsServerFor(host, port))
         {
             try
             {
-                return httpServerManager.createServerFor(host, port);
+                return httpServerManager.createServerFor(host, port, usePersistentConnections, connectionIdleTimeoutInSeconds);
             }
             catch (IOException e)
             {
@@ -91,13 +91,13 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
         }
     }
 
-    public Server createSslServer(String host, Integer port, TlsContextFactory tlsContext)
+    public Server createSslServer(String host, Integer port, TlsContextFactory tlsContext, boolean usePersistentConnections, int connectionIdleTimeoutInSeconds)
     {
         if (!httpServerManager.containsServerFor(host, port))
         {
             try
             {
-                return httpServerManager.createSslServerFor(tlsContext, host, port);
+                return httpServerManager.createSslServerFor(tlsContext, host, port, usePersistentConnections, connectionIdleTimeoutInSeconds);
             }
             catch (IOException e)
             {
@@ -109,4 +109,5 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
             throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("A server for host(%s) and port(%s) already exists", host, port)));
         }
     }
+
 }

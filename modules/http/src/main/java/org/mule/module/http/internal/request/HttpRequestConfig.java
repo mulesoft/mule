@@ -11,6 +11,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.HttpAuthentication;
 import org.mule.module.http.internal.HttpStreamingType;
 import org.mule.module.http.internal.request.grizzly.GrizzlyHttpClient;
@@ -21,6 +22,9 @@ import org.mule.transport.tcp.TcpClientSocketProperties;
 
 public class HttpRequestConfig implements Initialisable, Stoppable, Startable
 {
+    private static final int DEFAULT_MAX_CONCURRENT_CONNECTIONS = -1;
+    private static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = 3000;
+
     private String name;
     private String host;
     private String port;
@@ -41,11 +45,34 @@ public class HttpRequestConfig implements Initialisable, Stoppable, Startable
     private HttpClient httpClient;
     private static HttpRequestConfig defaultConfig;
 
+    private String maxConcurrentConnections;
+    private String usePersistentConnections;
+    private String connectionIdleTimeout;
 
     @Override
     public void initialise() throws InitialisationException
     {
-        httpClient = new GrizzlyHttpClient(tlsContext, proxyConfig, clientSocketProperties);
+        int maxConcurrentConnectionsParsed = maxConcurrentConnections == null ? DEFAULT_MAX_CONCURRENT_CONNECTIONS : Integer.parseInt(maxConcurrentConnections);
+
+        if( maxConcurrentConnectionsParsed < -1 || maxConcurrentConnectionsParsed==0 )
+        {
+            throw new InitialisationException(CoreMessages.createStaticMessage("The maxConcurrentConnections parameter only allows positive values or -1 for unlimited concurrent connections."), this);
+        }
+
+        boolean usePersistentConnectionsParsed = usePersistentConnections == null ? true : Boolean.parseBoolean(usePersistentConnections);
+        int connectionIdleTimeoutParsed = connectionIdleTimeout == null ? DEFAULT_CONNECTION_IDLE_TIMEOUT : Integer.parseInt(connectionIdleTimeout);
+
+        if ( !usePersistentConnectionsParsed )
+        {
+            if( connectionIdleTimeout != null )
+            {
+                throw new InitialisationException(CoreMessages.createStaticMessage("If connections are not persistent the connectionIdleTimeout parameter can not be set."), this);
+            }
+            connectionIdleTimeoutParsed = 0;
+        }
+
+        httpClient = new GrizzlyHttpClient(tlsContext, proxyConfig, clientSocketProperties, maxConcurrentConnectionsParsed, usePersistentConnectionsParsed, connectionIdleTimeoutParsed);
+
         httpClient.initialise();
     }
 
@@ -229,4 +256,11 @@ public class HttpRequestConfig implements Initialisable, Stoppable, Startable
             ((Startable) this.authentication).start();
         }
     }
+
+    public void setMaxConcurrentConnections(String maxConcurrentConnections) { this.maxConcurrentConnections = maxConcurrentConnections; }
+
+    public void setUsePersistentConnections(String usePersistentConnections) { this.usePersistentConnections = usePersistentConnections; }
+
+    public void setConnectionIdleTimeout(String connectionIdleTimeout) { this.connectionIdleTimeout = connectionIdleTimeout; }
+
 }

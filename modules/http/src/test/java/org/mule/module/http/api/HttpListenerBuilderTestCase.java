@@ -134,7 +134,7 @@ public class HttpListenerBuilderTestCase
                 .setPort(PORT)
                 .setPath(PATH).build();
 
-        verify(mockListenerConnectionManager).createServer(HOST, PORT);
+        verify(mockListenerConnectionManager).createServer(HOST, PORT, true, -1);
     }
 
     @Test
@@ -152,7 +152,7 @@ public class HttpListenerBuilderTestCase
                 .setPort(PORT)
                 .setPath(PATH).build();
 
-        verify(mockListenerConnectionManager).createSslServer(HOST, PORT, mockTlsContextFactory);
+        verify(mockListenerConnectionManager).createSslServer(HOST, PORT, mockTlsContextFactory, true, -1);
     }
 
     @Test
