@@ -6,6 +6,8 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
+    <configuration useHttpTransportByDefault="true"/>
+
     <flow name="test">
         <http:inbound-endpoint address="http://localhost:${httpPort}" exchange-pattern="request-response"/>
         <echo-component />

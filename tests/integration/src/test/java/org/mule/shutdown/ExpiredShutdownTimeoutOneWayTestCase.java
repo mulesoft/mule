@@ -61,7 +61,7 @@ public class ExpiredShutdownTimeoutOneWayTestCase extends AbstractShutdownTimeou
                 try
                 {
                     DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, new HashMap<String, Object>(), muleContext);
-                    client.dispatch(url, muleMessage, null);
+                    client.dispatch(url, muleMessage);
 
                     MuleMessage response = client.request("vm://response", RECEIVE_TIMEOUT);
                     results[0] = response == null;

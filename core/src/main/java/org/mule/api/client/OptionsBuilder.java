@@ -19,7 +19,7 @@ public class OptionsBuilder extends BaseOptionsBuilder<OptionsBuilder, Options>
         return new Options()
         {
             @Override
-            public Long getTimeout()
+            public Long getResponseTimeout()
             {
                 return getTimeout();
             }

@@ -9,6 +9,6 @@ package org.mule.api.client;
 public interface Options
 {
 
-    Long getTimeout();
+    Long getResponseTimeout();
 
 }

@@ -9,8 +9,9 @@
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
 
-    <http:connector name="httpConnector" keepAlive="false" />
+    <configuration useHttpTransportByDefault="true"/>
 
+    <http:connector name="httpConnector" keepAlive="false" />
 
     <flow name="mycomponent1">
 

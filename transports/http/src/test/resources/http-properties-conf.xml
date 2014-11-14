@@ -10,6 +10,8 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
+    <configuration useHttpTransportByDefault="true"/>
+
     <flow name="testProperties" processingStrategy="synchronous">
         <http:inbound-endpoint address="http://localhost:${port1}/resources" exchange-pattern="request-response"/>
         <set-property propertyName="http.relative.path" value="#[message.inboundProperties['http.relative.path']]"/>
