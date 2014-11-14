@@ -18,6 +18,7 @@ import org.mule.module.http.internal.listener.grizzly.GrizzlyServerManager;
 import org.mule.transport.ssl.TlsContextFactory;
 import org.mule.transport.tcp.DefaultTcpServerSocketProperties;
 import org.mule.transport.tcp.TcpServerSocketProperties;
+import org.mule.util.StringUtils;
 
 import com.google.common.collect.Iterables;
 
@@ -51,13 +52,19 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
 
         try
         {
-            httpServerManager = new GrizzlyServerManager(httpListenerRegistry, tcpServerSocketProperties);
+            httpServerManager = new GrizzlyServerManager(getAppName(), httpListenerRegistry, tcpServerSocketProperties);
         }
         catch (IOException e)
         {
             throw new InitialisationException(e, this);
         }
 
+    }
+
+    private String getAppName()
+    {
+        String appName = muleContext.getConfiguration().getId();
+        return StringUtils.isEmpty(appName) ? "UNKNOWN-APP" : appName;
     }
 
     @Override

@@ -79,5 +79,4 @@ public class GrizzlyServer implements Server
     {
         return this.listenerRegistry.addRequestHandler(this, requestHandler, listenerRequestMatcher);
     }
-
 }

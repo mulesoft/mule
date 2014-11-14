@@ -21,7 +21,7 @@ public class HttpRequestConnectionsConfigurationTestCase extends AbstractMuleTes
     public void invalidMaxConcurrentConnections() throws InitialisationException
     {
         HttpRequestConfig httpRequestConfig = new HttpRequestConfig();
-        httpRequestConfig.setMaxConcurrentConnections("-2");
+        httpRequestConfig.setMaxConcurrentConnections(-2);
         httpRequestConfig.initialise();
     }
 
@@ -29,15 +29,7 @@ public class HttpRequestConnectionsConfigurationTestCase extends AbstractMuleTes
     public void invalidMaxConcurrentConnections0() throws InitialisationException
     {
         HttpRequestConfig httpRequestConfig = new HttpRequestConfig();
-        httpRequestConfig.setMaxConcurrentConnections("0");
-        httpRequestConfig.initialise();
-    }
-
-    @Test(expected=NumberFormatException.class)
-    public void invalidMaxConcurrentConnectionsNotANumber() throws InitialisationException
-    {
-        HttpRequestConfig httpRequestConfig = new HttpRequestConfig();
-        httpRequestConfig.setMaxConcurrentConnections("Not-a-number");
+        httpRequestConfig.setMaxConcurrentConnections(0);
         httpRequestConfig.initialise();
     }
 
@@ -45,8 +37,8 @@ public class HttpRequestConnectionsConfigurationTestCase extends AbstractMuleTes
     public void nonPersistentConnectionsCanNotHaveIdleTimeout() throws InitialisationException
     {
         HttpRequestConfig httpRequestConfig = new HttpRequestConfig();
-        httpRequestConfig.setUsePersistentConnections("false");
-        httpRequestConfig.setConnectionIdleTimeout("100");
+        httpRequestConfig.setUsePersistentConnections(false);
+        httpRequestConfig.setConnectionIdleTimeout(100);
         httpRequestConfig.initialise();
     }
 

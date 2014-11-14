@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.glassfish.grizzly.filterchain.TransportFilter;
@@ -38,6 +39,7 @@ import org.slf4j.LoggerFactory;
 public class GrizzlyServerManager implements HttpServerManager
 {
 
+    private static final int MAX_REQUESTS_COUNT = -1;
     private final GrizzlyAddressDelegateFilter<SSLFilter> sslFilterDelegate;
     private final GrizzlyAddressDelegateFilter<HttpServerFilter> httpServerFilterDelegate;
     private final TCPNIOTransport transport;
@@ -47,7 +49,7 @@ public class GrizzlyServerManager implements HttpServerManager
     private Map<ServerAddress, GrizzlyServer> servers = new ConcurrentHashMap<>();
     private DelayedExecutor idleTimeoutDelayedExecutor;
 
-    public GrizzlyServerManager(HttpListenerRegistry httpListenerRegistry, TcpServerSocketProperties serverSocketProperties) throws IOException
+    public GrizzlyServerManager(final String appName, HttpListenerRegistry httpListenerRegistry, TcpServerSocketProperties serverSocketProperties) throws IOException
     {
         this.httpListenerRegistry = httpListenerRegistry;
         requestHandlerFilter = new GrizzlyRequestDispatcherFilter(httpListenerRegistry);
@@ -78,7 +80,14 @@ public class GrizzlyServerManager implements HttpServerManager
         transport.setProcessor(serverFilterChainBuilder.build());
         transport.start();
 
-        idleTimeoutDelayedExecutor = new DelayedExecutor(Executors.newFixedThreadPool(1));
+        idleTimeoutDelayedExecutor = new DelayedExecutor(Executors.newCachedThreadPool(new ThreadFactory()
+        {
+            @Override
+            public Thread newThread(Runnable r)
+            {
+                return new Thread(r, appName);
+            }
+        }));
         idleTimeoutDelayedExecutor.start();
     }
 
@@ -168,6 +177,7 @@ public class GrizzlyServerManager implements HttpServerManager
     {
         transport.shutdown();
         servers.clear();
+        idleTimeoutDelayedExecutor.destroy();
     }
 
     private SSLFilter createSslFilter(final TlsContextFactory tlsContextFactory)
@@ -201,7 +211,7 @@ public class GrizzlyServerManager implements HttpServerManager
         if( usePersistentConnections )
         {
             ka = new KeepAlive();
-            ka.setMaxRequestsCount(-1);
+            ka.setMaxRequestsCount(MAX_REQUESTS_COUNT);
             ka.setIdleTimeoutInSeconds(connectionIdleTimeoutInSeconds);
         }
         return new HttpServerFilter(true, HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE, ka, idleTimeoutDelayedExecutor);
