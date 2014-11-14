@@ -9,8 +9,6 @@ package org.mule.module.http.internal.request.grizzly;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.HttpAuthentication;
-import org.mule.module.http.internal.request.NtlmProxyConfig;
-import org.mule.module.http.internal.request.ProxyConfig;
 import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.MultipartHttpEntity;
@@ -21,6 +19,8 @@ import org.mule.module.http.internal.domain.response.HttpResponseBuilder;
 import org.mule.module.http.internal.request.DefaultHttpAuthentication;
 import org.mule.module.http.internal.request.HttpAuthenticationType;
 import org.mule.module.http.internal.request.HttpClient;
+import org.mule.module.http.internal.request.NtlmProxyConfig;
+import org.mule.module.http.internal.request.ProxyConfig;
 import org.mule.transport.ssl.TlsContextFactory;
 import org.mule.transport.tcp.TcpClientSocketProperties;
 import org.mule.util.StringUtils;
@@ -50,18 +50,28 @@ import javax.servlet.http.Part;
 
 public class GrizzlyHttpClient implements HttpClient
 {
+
+    private static final int MAX_CONNECTION_LIFETIME = 30 * 60 * 1000;
+
     private final TlsContextFactory tlsContextFactory;
     private final ProxyConfig proxyConfig;
     private final TcpClientSocketProperties clientSocketProperties;
 
+    private int maxConnections;
+    private boolean usePersistentConnections;
+    private int connectionIdleTimeout;
+
     private AsyncHttpClient asyncHttpClient;
     private SSLContext sslContext;
 
-    public GrizzlyHttpClient(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig, TcpClientSocketProperties clientSocketProperties)
+    public GrizzlyHttpClient(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig, TcpClientSocketProperties clientSocketProperties, int maxConnections, boolean usePersistentConnections, int connectionIdleTimeout)
     {
         this.tlsContextFactory = tlsContextFactory;
         this.proxyConfig = proxyConfig;
         this.clientSocketProperties = clientSocketProperties;
+        this.maxConnections = maxConnections;
+        this.usePersistentConnections = usePersistentConnections;
+        this.connectionIdleTimeout = connectionIdleTimeout;
     }
 
     @Override
@@ -70,6 +80,21 @@ public class GrizzlyHttpClient implements HttpClient
         AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
         builder.setAllowPoolingConnection(true);
 
+        configureTlsContext(builder);
+
+        configureProxy(builder);
+
+        configureClientSocketProperties(builder);
+
+        configureConnections(builder);
+
+        AsyncHttpClientConfig config = builder.build();
+
+        asyncHttpClient = new AsyncHttpClient(new GrizzlyAsyncHttpProvider(config), config);
+    }
+
+    private void configureTlsContext(AsyncHttpClientConfig.Builder builder) throws InitialisationException
+    {
         if (tlsContextFactory != null)
         {
             try
@@ -95,7 +120,10 @@ public class GrizzlyHttpClient implements HttpClient
                 }
             });
         }
+    }
 
+    private void configureProxy(AsyncHttpClientConfig.Builder builder)
+    {
         if (proxyConfig != null)
         {
             ProxyServer proxyServer;
@@ -119,7 +147,9 @@ public class GrizzlyHttpClient implements HttpClient
             }
             builder.setProxyServer(proxyServer);
         }
-
+    }
+    private void configureClientSocketProperties(AsyncHttpClientConfig.Builder builder)
+    {
         if (clientSocketProperties != null)
         {
             GrizzlyAsyncHttpProviderConfig providerConfig = new GrizzlyAsyncHttpProviderConfig();
@@ -127,11 +157,18 @@ public class GrizzlyHttpClient implements HttpClient
             providerConfig.addProperty(GrizzlyAsyncHttpProviderConfig.Property.TRANSPORT_CUSTOMIZER, customizer);
             builder.setAsyncHttpClientProviderConfig(providerConfig);
         }
+    }
 
-        AsyncHttpClientConfig config = builder.build();
+    private void configureConnections(AsyncHttpClientConfig.Builder builder) throws InitialisationException
+    {
+        builder.setMaximumConnectionsTotal(maxConnections);
+        builder.setMaximumConnectionsPerHost(maxConnections);
 
-        asyncHttpClient = new AsyncHttpClient(new GrizzlyAsyncHttpProvider(config), config);
+        builder.setAllowPoolingConnection(usePersistentConnections);
+        builder.setAllowSslConnectionPool(usePersistentConnections);
 
+        builder.setMaxConnectionLifeTimeInMs(MAX_CONNECTION_LIFETIME);
+        builder.setIdleConnectionInPoolTimeoutInMs(connectionIdleTimeout);
     }
 
     @Override
