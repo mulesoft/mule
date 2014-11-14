@@ -72,13 +72,13 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
         this.muleContext = muleContext;
     }
 
-    public Server createServer(final String host, final Integer port)
+    public Server createServer(ServerAddress serverAddress)
     {
-        if (!httpServerManager.containsServerFor(host, port))
+        if (!httpServerManager.containsServerFor(serverAddress))
         {
             try
             {
-                return httpServerManager.createServerFor(host, port);
+                return httpServerManager.createServerFor(serverAddress);
             }
             catch (IOException e)
             {
@@ -87,17 +87,17 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
         }
         else
         {
-            throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("A server for host(%s) and port(%s) already exists", host, port)));
+            throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("A server for host(%s) and port(%s) already exists", serverAddress.getHost(), serverAddress.getPort())));
         }
     }
 
-    public Server createSslServer(String host, Integer port, TlsContextFactory tlsContext)
+    public Server createSslServer(ServerAddress serverAddress, TlsContextFactory tlsContext)
     {
-        if (!httpServerManager.containsServerFor(host, port))
+        if (!httpServerManager.containsServerFor(serverAddress))
         {
             try
             {
-                return httpServerManager.createSslServerFor(tlsContext, host, port);
+                return httpServerManager.createSslServerFor(tlsContext, serverAddress);
             }
             catch (IOException e)
             {
@@ -106,7 +106,7 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
         }
         else
         {
-            throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("A server for host(%s) and port(%s) already exists", host, port)));
+            throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("A server for host(%s) and port(%s) already exists", serverAddress.getHost(), serverAddress.getPort())));
         }
     }
 }

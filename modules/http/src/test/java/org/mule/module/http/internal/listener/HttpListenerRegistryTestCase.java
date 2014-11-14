@@ -32,7 +32,7 @@ import org.junit.rules.ExpectedException;
 public class HttpListenerRegistryTestCase extends AbstractMuleTestCase
 {
 
-    public static final String TEST_HOST = "test_host";
+    public static final String TEST_HOST = "localhost";
     public static final String URI_PARAM = "{uri-param}";
     public static final int TEST_PORT = 10000;
     public static final String ANOTHER_PATH = "/another-path";

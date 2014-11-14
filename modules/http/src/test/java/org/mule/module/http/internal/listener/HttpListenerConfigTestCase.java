@@ -31,7 +31,7 @@ public class HttpListenerConfigTestCase extends AbstractMuleTestCase
         httpListenerConfig.setMuleContext(mockMuleContext);
         final TlsContextFactory mockTlsContextFactory = mock(TlsContextFactory.class);
         httpListenerConfig.setTlsContext(mockTlsContextFactory);
-        when(mockMuleContext.getRegistry().get(HTTP_LISTENER_CONNECTION_MANAGER)).thenReturn(mock(HttpListenerConnectionManager.class));
+        when(mockMuleContext.getRegistry().lookupObject(HttpListenerConnectionManager.class)).thenReturn(mock(HttpListenerConnectionManager.class));
         when(mockTlsContextFactory.isKeyStoreConfigured()).thenReturn(false);
         httpListenerConfig.initialise();
     }

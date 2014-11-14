@@ -214,14 +214,6 @@ public class HttpListenerRegistry implements RequestHandlerProvider
 
         private Stack<PathMap> findPossibleRequestHandlersFromCache(String path)
         {
-            //try
-            //{
-            //    return pathMapSearchCache.get(path);
-            //}
-            //catch (ExecutionException e)
-            //{
-            //    throw new MuleRuntimeException(e);
-            //}
             return findPossibleRequestHandlers(path);
         }
 
@@ -304,9 +296,6 @@ public class HttpListenerRegistry implements RequestHandlerProvider
 
     private int getPathPartsSize(String path)
     {
-        // /{uri-param} - 2
-        // /pepe/*      - 3
-        // /pepe/       - 2
         int pathSize = path.split(SLASH).length - 1;
         pathSize += (path.endsWith(SLASH) ? 1 : 0);
         return pathSize;

@@ -11,9 +11,9 @@ import org.mule.module.http.internal.domain.HttpMessage;
 public interface HttpResponse extends HttpMessage
 {
 
-    void setStatusCode(Integer statusCode);
+    void setStatusCode(int statusCode);
 
-    Integer getStatusCode();
+    int getStatusCode();
 
     String getReasonPhrase();
 

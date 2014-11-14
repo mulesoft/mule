@@ -20,7 +20,7 @@ public enum HttpProtocol
         this.protocolName = protocolName;
     }
 
-    public String getProtocolName()
+    public String asString()
     {
         return protocolName;
     }

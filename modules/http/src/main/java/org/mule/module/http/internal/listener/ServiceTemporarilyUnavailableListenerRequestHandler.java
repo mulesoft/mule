@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 public class ServiceTemporarilyUnavailableListenerRequestHandler implements RequestHandler
 {
 
+    public static final int SERVICE_TEMPORARILY_UNAVAILABLE_STATUS_CODE = 503;
+
     private Logger logger = LoggerFactory.getLogger(ServiceTemporarilyUnavailableListenerRequestHandler.class);
 
     private static ServiceTemporarilyUnavailableListenerRequestHandler instance = new ServiceTemporarilyUnavailableListenerRequestHandler();
@@ -39,7 +41,7 @@ public class ServiceTemporarilyUnavailableListenerRequestHandler implements Requ
     public void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback)
     {
         responseCallback.responseReady(new HttpResponseBuilder()
-                                               .setStatusCode(503)
+                                               .setStatusCode(SERVICE_TEMPORARILY_UNAVAILABLE_STATUS_CODE)
                                                .setReasonPhrase("Service Temporarily Unavailable")
                                                .build(), new ResponseStatusCallback()
         {

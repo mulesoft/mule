@@ -15,8 +15,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.WorkManager;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.registry.RegistrationException;
 import org.mule.config.MutableThreadingProfile;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.listener.HttpListenerConfig;
@@ -34,14 +33,14 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisable, MuleContextAware, Startable, Stoppable
+public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisable, MuleContextAware
 {
 
     public static final int DEFAULT_MAX_THREADS = 128;
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private String name;
     private String host;
-    private Integer port;
+    private int port;
     private String basePath;
     private Boolean parseRequest;
     private MuleContext muleContext;
@@ -108,7 +107,14 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
             return;
         }
         basePath = HttpParser.sanitizePathWithStartSlash(this.basePath);
-        connectionManager = muleContext.getRegistry().get(HTTP_LISTENER_CONNECTION_MANAGER);
+        try
+        {
+            connectionManager = muleContext.getRegistry().lookupObject(HttpListenerConnectionManager.class);
+        }
+        catch (RegistrationException e)
+        {
+            throw new InitialisationException(e, this);
+        }
         if (workerThreadingProfile == null)
         {
             workerThreadingProfile = new MutableThreadingProfile(ThreadingProfile.DEFAULT_THREADING_PROFILE);
@@ -120,11 +126,11 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
         }
         if (tlsContext == null)
         {
-            server = connectionManager.createServer(host, port);
+            server = connectionManager.createServer(new ServerAddress(host, port));
         }
         else
         {
-            server = connectionManager.createSslServer(host, port, tlsContext);
+            server = connectionManager.createSslServer(new ServerAddress(host, port), tlsContext);
         }
         initialised = true;
     }
@@ -154,7 +160,7 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
         return listenerParseRequest != null ? listenerParseRequest : (parseRequest != null ? parseRequest : true);
     }
 
-    public Integer getPort()
+    public int getPort()
     {
         return port;
     }

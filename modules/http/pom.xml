@@ -9,7 +9,7 @@
     </parent>
     <artifactId>mule-module-http</artifactId>
     <packaging>jar</packaging>
-    <name>HTTP</name>
+    <name>Mule HTTP Connector</name>
     <description>Provides components for exposing and consuming HTTP services</description>
 
     <properties>

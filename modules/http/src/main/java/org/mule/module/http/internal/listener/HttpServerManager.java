@@ -18,30 +18,27 @@ public interface HttpServerManager
 {
 
     /**
-     * @param host hostname or ip address of a network interface
-     * @param port port of the host
+     * @param serverAddress address of the server
      * @return true if there's a server created for that host and port already, false otherwise.
      */
-    boolean containsServerFor(String host, int port);
+    boolean containsServerFor(ServerAddress serverAddress);
 
     /**
      *
-     * @param host hostname or ip address of a network interface
-     * @param port port of the host
+     * @param serverAddress address of the server
      * @return the create Server handler
      * @throws IOException if it was not possible to create the Server. Most likely because the host and port is already in use.
      */
-    Server createServerFor(String host, int port) throws IOException;
+    Server createServerFor(ServerAddress serverAddress) throws IOException;
 
     /**
      *
      * @param tlsContextFactory
-     * @param host hostname or ip address of a network interface
-     * @param port port of the host
+     * @param serverAddress address of the server
      * @return the create Server handler
      * @throws IOException if it was not possible to create the Server. Most likely because the host and port is already in use.
      */
-    Server createSslServerFor(TlsContextFactory tlsContextFactory, String host, int port) throws IOException;
+    Server createSslServerFor(TlsContextFactory tlsContextFactory, ServerAddress serverAddress) throws IOException;
 
     /**
      *

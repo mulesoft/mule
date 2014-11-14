@@ -22,13 +22,13 @@ public class ListenerRequestMatcher implements RequestMatcher
     {
         this.methodRequestMatcher = methodRequestMatcher;
         this.path = path;
-        if (notEndsWithWildcardPath())
+        if (doesNotEndWithWildcardPath())
         {
             this.path = this.path + "/";
         }
     }
 
-    private boolean notEndsWithWildcardPath()
+    private boolean doesNotEndWithWildcardPath()
     {
         return !this.path.endsWith("/") && !this.path.endsWith("*");
     }

@@ -6,16 +6,45 @@
  */
 package org.mule.module.http.internal.listener;
 
+import org.mule.api.MuleRuntimeException;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 public class ServerAddress
 {
 
+    private final String ip;
     private String host;
     private int port;
 
     public ServerAddress(String host, int port)
     {
-        this.host = host;
-        this.port = port;
+        try
+        {
+            this.host = host;
+            this.port = port;
+            this.ip = InetAddress.getByName(host).getHostAddress();
+        }
+        catch (UnknownHostException e)
+        {
+            throw new MuleRuntimeException(e);
+        }
+    }
+
+    public String getHost()
+    {
+        return host;
+    }
+
+    public int getPort()
+    {
+        return port;
+    }
+
+    public String getIp()
+    {
+        return ip;
     }
 
     @Override
@@ -36,7 +65,7 @@ public class ServerAddress
         {
             return false;
         }
-        if (!host.equals(that.host))
+        if (!ip.equals(that.ip))
         {
             return false;
         }
@@ -44,20 +73,10 @@ public class ServerAddress
         return true;
     }
 
-    public String getHost()
-    {
-        return host;
-    }
-
-    public int getPort()
-    {
-        return port;
-    }
-
     @Override
     public int hashCode()
     {
-        int result = host.hashCode();
+        int result = ip.hashCode();
         result = 31 * result + port;
         return result;
     }
@@ -66,7 +85,8 @@ public class ServerAddress
     public String toString()
     {
         return "ServerAddress{" +
-               "host='" + host + '\'' +
+               "ip='" + ip + '\'' +
+               ", host='" + host + '\'' +
                ", port=" + port +
                '}';
     }

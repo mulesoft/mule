@@ -30,7 +30,7 @@ import java.util.Collection;
 public class HttpListenerBuilder
 {
 
-    public static final int MAXIMUM_PORT_NUMBER = 65535;
+    private static final int MAXIMUM_PORT_NUMBER = 65535;
     private final DefaultHttpListener httpListener;
     private final MuleContext muleContext;
     private String protocol;
@@ -57,15 +57,14 @@ public class HttpListenerBuilder
      * @return the builder
      * @throws MalformedURLException
      */
-    public HttpListenerBuilder setUrl(final String url) throws MalformedURLException
+    public HttpListenerBuilder setUrl(final URL url)
     {
-        final URL listenerUrl = new URL(url);
-        String host = listenerUrl.getHost();
-        Integer port = listenerUrl.getPort();
-        this.protocol = listenerUrl.getProtocol();
+        String host = url.getHost();
+        Integer port = url.getPort();
+        this.protocol = url.getProtocol();
         setPort(port);
         setHost(host);
-        setPath(listenerUrl.getPath());
+        setPath(url.getPath());
         return this;
     }
 
@@ -76,8 +75,8 @@ public class HttpListenerBuilder
     public HttpListenerBuilder setPort(final int port)
     {
         Preconditions.checkArgument(port > 0 && port < MAXIMUM_PORT_NUMBER, "Port number out of range");
-        Preconditions.checkState(httpListenerConfig == null, "You already set a listener config. You cannot specify the port");
-        Preconditions.checkState(this.port == null, "You already specify a port");
+        Preconditions.checkState(httpListenerConfig == null, "Listener config already specified. A port cannot be specified since the one in the listener config will be used");
+        Preconditions.checkState(this.port == null, "Port already specified");
         this.port = port;
         return this;
     }
@@ -108,7 +107,7 @@ public class HttpListenerBuilder
      * @param statusCode sets the status code to use when the request processing was successful. Allows MEL expressions.
      * @return
      */
-    public HttpListenerBuilder setStatusCode(String statusCode)
+    public HttpListenerBuilder setSuccessStatusCode(String statusCode)
     {
         getResponseBuilder().setStatusCode(statusCode);
         return this;
@@ -118,7 +117,7 @@ public class HttpListenerBuilder
      * @param reasonPhrase sets the reason phrase of the response when the request processing was successful. Allows MEL expressions.
      * @return
      */
-    public HttpListenerBuilder setReasonPhrase(String reasonPhrase)
+    public HttpListenerBuilder setSuccessReasonPhrase(String reasonPhrase)
     {
         getResponseBuilder().setReasonPhrase(reasonPhrase);
         return this;
@@ -163,7 +162,7 @@ public class HttpListenerBuilder
     }
 
     /**
-     * @param tlsContextFactory tls configuration to use to set up the listener.
+     * @param tlsContextFactory TLS configuration to use to set up the listener.
      * @return the builder.
      */
     public HttpListenerBuilder setTlsContextFactory(final TlsContextFactory tlsContextFactory)
@@ -238,11 +237,11 @@ public class HttpListenerBuilder
     {
         if (this.httpListenerConfig == null)
         {
-            final Collection<DefaultHttpListenerConfig> listenerConfigs = muleContext.getRegistry().lookupObjects(DefaultHttpListenerConfig.class);
-            for (DefaultHttpListenerConfig listenerConfig : listenerConfigs)
+            final Collection<HttpListenerConfig> listenerConfigs = muleContext.getRegistry().lookupObjects(HttpListenerConfig.class);
+            for (HttpListenerConfig listenerConfig : listenerConfigs)
             {
                 if (listenerConfig.getHost().equals(this.host) &&
-                        listenerConfig.getPort().equals(this.port) &&
+                        listenerConfig.getPort() == this.port &&
                         (protocol == null || (protocol.equals(HttpConstants.Protocols.HTTPS) && listenerConfig.hasTlsConfig()) ||
                          (protocol.equals(HttpConstants.Protocols.HTTP) && !listenerConfig.hasTlsConfig())))
                 {

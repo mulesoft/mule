@@ -19,295 +19,295 @@ public abstract class HttpHeaders
     {
 
         /**
-         * {@code "Accept"}
+         * {@value "Accept"}
          */
         public static final String ACCEPT = "Accept";
         /**
-         * {@code "Accept-Charset"}
+         * {@value "Accept-Charset"}
          */
         public static final String ACCEPT_CHARSET = "Accept-Charset";
         /**
-         * {@code "Accept-Encoding"}
+         * {@value "Accept-Encoding"}
          */
         public static final String ACCEPT_ENCODING = "Accept-Encoding";
         /**
-         * {@code "Accept-Language"}
+         * {@value "Accept-Language"}
          */
         public static final String ACCEPT_LANGUAGE = "Accept-Language";
         /**
-         * {@code "Accept-Ranges"}
+         * {@value "Accept-Ranges"}
          */
         public static final String ACCEPT_RANGES = "Accept-Ranges";
         /**
-         * {@code "Accept-Patch"}
+         * {@value "Accept-Patch"}
          */
         public static final String ACCEPT_PATCH = "Accept-Patch";
         /**
-         * {@code "Access-Control-Allow-Credentials"}
+         * {@value "Access-Control-Allow-Credentials"}
          */
         public static final String ACCESS_CONTROL_ALLOW_CREDENTIALS = "Access-Control-Allow-Credentials";
         /**
-         * {@code "Access-Control-Allow-Headers"}
+         * {@value "Access-Control-Allow-Headers"}
          */
         public static final String ACCESS_CONTROL_ALLOW_HEADERS = "Access-Control-Allow-Headers";
         /**
-         * {@code "Access-Control-Allow-Methods"}
+         * {@value "Access-Control-Allow-Methods"}
          */
         public static final String ACCESS_CONTROL_ALLOW_METHODS = "Access-Control-Allow-Methods";
         /**
-         * {@code "Access-Control-Allow-Origin"}
+         * {@value "Access-Control-Allow-Origin"}
          */
         public static final String ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
         /**
-         * {@code "Access-Control-Expose-Headers"}
+         * {@value "Access-Control-Expose-Headers"}
          */
         public static final String ACCESS_CONTROL_EXPOSE_HEADERS = "Access-Control-Expose-Headers";
         /**
-         * {@code "Access-Control-Max-Age"}
+         * {@value "Access-Control-Max-Age"}
          */
         public static final String ACCESS_CONTROL_MAX_AGE = "Access-Control-Max-Age";
         /**
-         * {@code "Access-Control-Request-Headers"}
+         * {@value "Access-Control-Request-Headers"}
          */
         public static final String ACCESS_CONTROL_REQUEST_HEADERS = "Access-Control-Request-Headers";
         /**
-         * {@code "Access-Control-Request-Method"}
+         * {@value "Access-Control-Request-Method"}
          */
         public static final String ACCESS_CONTROL_REQUEST_METHOD = "Access-Control-Request-Method";
         /**
-         * {@code "Age"}
+         * {@value "Age"}
          */
         public static final String AGE = "Age";
         /**
-         * {@code "Allow"}
+         * {@value "Allow"}
          */
         public static final String ALLOW = "Allow";
         /**
-         * {@code "Authorization"}
+         * {@value "Authorization"}
          */
         public static final String AUTHORIZATION = "Authorization";
         /**
-         * {@code "Cache-Control"}
+         * {@value "Cache-Control"}
          */
         public static final String CACHE_CONTROL = "Cache-Control";
         /**
-         * {@code "Connection"}
+         * {@value "Connection"}
          */
         public static final String CONNECTION = "Connection";
         /**
-         * {@code "Content-Base"}
+         * {@value "Content-Base"}
          */
         public static final String CONTENT_BASE = "Content-Base";
         /**
-         * {@code "Content-Encoding"}
+         * {@value "Content-Encoding"}
          */
         public static final String CONTENT_ENCODING = "Content-Encoding";
         /**
-         * {@code "Content-Language"}
+         * {@value "Content-Language"}
          */
         public static final String CONTENT_LANGUAGE = "Content-Language";
         /**
-         * {@code "Content-Length"}
+         * {@value "Content-Length"}
          */
         public static final String CONTENT_LENGTH = "Content-Length";
         /**
-         * {@code "Content-Location"}
+         * {@value "Content-Location"}
          */
         public static final String CONTENT_LOCATION = "Content-Location";
         /**
-         * {@code "Content-Transfer-Encoding"}
+         * {@value "Content-Transfer-Encoding"}
          */
         public static final String CONTENT_TRANSFER_ENCODING = "Content-Transfer-Encoding";
         /**
-         * {@code "Content-MD5"}
+         * {@value "Content-MD5"}
          */
         public static final String CONTENT_MD5 = "Content-MD5";
         /**
-         * {@code "Content-Range"}
+         * {@value "Content-Range"}
          */
         public static final String CONTENT_RANGE = "Content-Range";
         /**
-         * {@code "Content-Type"}
+         * {@value "Content-Type"}
          */
         public static final String CONTENT_TYPE = "Content-Type";
         /**
-         * {@code "Cookie"}
+         * {@value "Cookie"}
          */
         public static final String COOKIE = "Cookie";
         /**
-         * {@code "Date"}
+         * {@value "Date"}
          */
         public static final String DATE = "Date";
         /**
-         * {@code "ETag"}
+         * {@value "ETag"}
          */
         public static final String ETAG = "ETag";
         /**
-         * {@code "Expect"}
+         * {@value "Expect"}
          */
         public static final String EXPECT = "Expect";
         /**
-         * {@code "Expires"}
+         * {@value "Expires"}
          */
         public static final String EXPIRES = "Expires";
         /**
-         * {@code "From"}
+         * {@value "From"}
          */
         public static final String FROM = "From";
         /**
-         * {@code "Host"}
+         * {@value "Host"}
          */
         public static final String HOST = "Host";
         /**
-         * {@code "If-Match"}
+         * {@value "If-Match"}
          */
         public static final String IF_MATCH = "If-Match";
         /**
-         * {@code "If-Modified-Since"}
+         * {@value "If-Modified-Since"}
          */
         public static final String IF_MODIFIED_SINCE = "If-Modified-Since";
         /**
-         * {@code "If-None-Match"}
+         * {@value "If-None-Match"}
          */
         public static final String IF_NONE_MATCH = "If-None-Match";
         /**
-         * {@code "If-Range"}
+         * {@value "If-Range"}
          */
         public static final String IF_RANGE = "If-Range";
         /**
-         * {@code "If-Unmodified-Since"}
+         * {@value "If-Unmodified-Since"}
          */
         public static final String IF_UNMODIFIED_SINCE = "If-Unmodified-Since";
         /**
-         * {@code "Last-Modified"}
+         * {@value "Last-Modified"}
          */
         public static final String LAST_MODIFIED = "Last-Modified";
         /**
-         * {@code "Location"}
+         * {@value "Location"}
          */
         public static final String LOCATION = "Location";
         /**
-         * {@code "Max-Forwards"}
+         * {@value "Max-Forwards"}
          */
         public static final String MAX_FORWARDS = "Max-Forwards";
         /**
-         * {@code "Origin"}
+         * {@value "Origin"}
          */
         public static final String ORIGIN = "Origin";
         /**
-         * {@code "Pragma"}
+         * {@value "Pragma"}
          */
         public static final String PRAGMA = "Pragma";
         /**
-         * {@code "Proxy-Authenticate"}
+         * {@value "Proxy-Authenticate"}
          */
         public static final String PROXY_AUTHENTICATE = "Proxy-Authenticate";
         /**
-         * {@code "Proxy-Authorization"}
+         * {@value "Proxy-Authorization"}
          */
         public static final String PROXY_AUTHORIZATION = "Proxy-Authorization";
         /**
-         * {@code "Range"}
+         * {@value "Range"}
          */
         public static final String RANGE = "Range";
         /**
-         * {@code "Referer"}
+         * {@value "Referer"}
          */
         public static final String REFERER = "Referer";
         /**
-         * {@code "Retry-After"}
+         * {@value "Retry-After"}
          */
         public static final String RETRY_AFTER = "Retry-After";
         /**
-         * {@code "Sec-WebSocket-Key1"}
+         * {@value "Sec-WebSocket-Key1"}
          */
         public static final String SEC_WEBSOCKET_KEY1 = "Sec-WebSocket-Key1";
         /**
-         * {@code "Sec-WebSocket-Key2"}
+         * {@value "Sec-WebSocket-Key2"}
          */
         public static final String SEC_WEBSOCKET_KEY2 = "Sec-WebSocket-Key2";
         /**
-         * {@code "Sec-WebSocket-Location"}
+         * {@value "Sec-WebSocket-Location"}
          */
         public static final String SEC_WEBSOCKET_LOCATION = "Sec-WebSocket-Location";
         /**
-         * {@code "Sec-WebSocket-Origin"}
+         * {@value "Sec-WebSocket-Origin"}
          */
         public static final String SEC_WEBSOCKET_ORIGIN = "Sec-WebSocket-Origin";
         /**
-         * {@code "Sec-WebSocket-Protocol"}
+         * {@value "Sec-WebSocket-Protocol"}
          */
         public static final String SEC_WEBSOCKET_PROTOCOL = "Sec-WebSocket-Protocol";
         /**
-         * {@code "Sec-WebSocket-Version"}
+         * {@value "Sec-WebSocket-Version"}
          */
         public static final String SEC_WEBSOCKET_VERSION = "Sec-WebSocket-Version";
         /**
-         * {@code "Sec-WebSocket-Key"}
+         * {@value "Sec-WebSocket-Key"}
          */
         public static final String SEC_WEBSOCKET_KEY = "Sec-WebSocket-Key";
         /**
-         * {@code "Sec-WebSocket-Accept"}
+         * {@value "Sec-WebSocket-Accept"}
          */
         public static final String SEC_WEBSOCKET_ACCEPT = "Sec-WebSocket-Accept";
         /**
-         * {@code "Server"}
+         * {@value "Server"}
          */
         public static final String SERVER = "Server";
         /**
-         * {@code "Set-Cookie"}
+         * {@value "Set-Cookie"}
          */
         public static final String SET_COOKIE = "Set-Cookie";
         /**
-         * {@code "Set-Cookie2"}
+         * {@value "Set-Cookie2"}
          */
         public static final String SET_COOKIE2 = "Set-Cookie2";
         /**
-         * {@code "TE"}
+         * {@value "TE"}
          */
         public static final String TE = "TE";
         /**
-         * {@code "Trailer"}
+         * {@value "Trailer"}
          */
         public static final String TRAILER = "Trailer";
         /**
-         * {@code "Transfer-Encoding"}
+         * {@value "Transfer-Encoding"}
          */
         public static final String TRANSFER_ENCODING = "Transfer-Encoding";
         /**
-         * {@code "Upgrade"}
+         * {@value "Upgrade"}
          */
         public static final String UPGRADE = "Upgrade";
         /**
-         * {@code "User-Agent"}
+         * {@value "User-Agent"}
          */
         public static final String USER_AGENT = "User-Agent";
         /**
-         * {@code "Vary"}
+         * {@value "Vary"}
          */
         public static final String VARY = "Vary";
         /**
-         * {@code "Via"}
+         * {@value "Via"}
          */
         public static final String VIA = "Via";
         /**
-         * {@code "Warning"}
+         * {@value "Warning"}
          */
         public static final String WARNING = "Warning";
         /**
-         * {@code "WebSocket-Location"}
+         * {@value "WebSocket-Location"}
          */
         public static final String WEBSOCKET_LOCATION = "WebSocket-Location";
         /**
-         * {@code "WebSocket-Origin"}
+         * {@value "WebSocket-Origin"}
          */
         public static final String WEBSOCKET_ORIGIN = "WebSocket-Origin";
         /**
-         * {@code "WebSocket-Protocol"}
+         * {@value "WebSocket-Protocol"}
          */
         public static final String WEBSOCKET_PROTOCOL = "WebSocket-Protocol";
         /**
-         * {@code "WWW-Authenticate"}
+         * {@value "WWW-Authenticate"}
          */
         public static final String WWW_AUTHENTICATE = "WWW-Authenticate";
 
@@ -323,132 +323,132 @@ public abstract class HttpHeaders
     {
 
         /**
-         * {@code "application/x-www-form-urlencoded"}
+         * {@value "application/x-www-form-urlencoded"}
          */
         public static final String APPLICATION_X_WWW_FORM_URLENCODED =
                 "application/x-www-form-urlencoded";
         /**
-         * {@code "base64"}
+         * {@value "base64"}
          */
         public static final String BASE64 = "base64";
         /**
-         * {@code "binary"}
+         * {@value "binary"}
          */
         public static final String BINARY = "binary";
         /**
-         * {@code "boundary"}
+         * {@value "boundary"}
          */
         public static final String BOUNDARY = "boundary";
         /**
-         * {@code "bytes"}
+         * {@value "bytes"}
          */
         public static final String BYTES = "bytes";
         /**
-         * {@code "charset"}
+         * {@value "charset"}
          */
         public static final String CHARSET = "charset";
         /**
-         * {@code "chunked"}
+         * {@value "chunked"}
          */
         public static final String CHUNKED = "chunked";
         /**
-         * {@code "close"}
+         * {@value "close"}
          */
         public static final String CLOSE = "close";
         /**
-         * {@code "compress"}
+         * {@value "compress"}
          */
         public static final String COMPRESS = "compress";
         /**
-         * {@code "100-continue"}
+         * {@value "100-continue"}
          */
         public static final String CONTINUE = "100-continue";
         /**
-         * {@code "deflate"}
+         * {@value "deflate"}
          */
         public static final String DEFLATE = "deflate";
         /**
-         * {@code "gzip"}
+         * {@value "gzip"}
          */
         public static final String GZIP = "gzip";
         /**
-         * {@code "identity"}
+         * {@value "identity"}
          */
         public static final String IDENTITY = "identity";
         /**
-         * {@code "keep-alive"}
+         * {@value "keep-alive"}
          */
         public static final String KEEP_ALIVE = "keep-alive";
         /**
-         * {@code "max-age"}
+         * {@value "max-age"}
          */
         public static final String MAX_AGE = "max-age";
         /**
-         * {@code "max-stale"}
+         * {@value "max-stale"}
          */
         public static final String MAX_STALE = "max-stale";
         /**
-         * {@code "min-fresh"}
+         * {@value "min-fresh"}
          */
         public static final String MIN_FRESH = "min-fresh";
         /**
-         * {@code "multipart/form-data"}
+         * {@value "multipart/form-data"}
          */
         public static final String MULTIPART_FORM_DATA = "multipart/form-data";
         /**
-         * {@code "must-revalidate"}
+         * {@value "must-revalidate"}
          */
         public static final String MUST_REVALIDATE = "must-revalidate";
         /**
-         * {@code "no-cache"}
+         * {@value "no-cache"}
          */
         public static final String NO_CACHE = "no-cache";
         /**
-         * {@code "no-store"}
+         * {@value "no-store"}
          */
         public static final String NO_STORE = "no-store";
         /**
-         * {@code "no-transform"}
+         * {@value "no-transform"}
          */
         public static final String NO_TRANSFORM = "no-transform";
         /**
-         * {@code "none"}
+         * {@value "none"}
          */
         public static final String NONE = "none";
         /**
-         * {@code "only-if-cached"}
+         * {@value "only-if-cached"}
          */
         public static final String ONLY_IF_CACHED = "only-if-cached";
         /**
-         * {@code "private"}
+         * {@value "private"}
          */
         public static final String PRIVATE = "private";
         /**
-         * {@code "proxy-revalidate"}
+         * {@value "proxy-revalidate"}
          */
         public static final String PROXY_REVALIDATE = "proxy-revalidate";
         /**
-         * {@code "public"}
+         * {@value "public"}
          */
         public static final String PUBLIC = "public";
         /**
-         * {@code "quoted-printable"}
+         * {@value "quoted-printable"}
          */
         public static final String QUOTED_PRINTABLE = "quoted-printable";
         /**
-         * {@code "s-maxage"}
+         * {@value "s-maxage"}
          */
         public static final String S_MAXAGE = "s-maxage";
         /**
-         * {@code "trailers"}
+         * {@value "trailers"}
          */
         public static final String TRAILERS = "trailers";
         /**
-         * {@code "Upgrade"}
+         * {@value "Upgrade"}
          */
         public static final String UPGRADE = "Upgrade";
         /**
-         * {@code "WebSocket"}
+         * {@value "WebSocket"}
          */
         public static final String WEBSOCKET = "WebSocket";
 

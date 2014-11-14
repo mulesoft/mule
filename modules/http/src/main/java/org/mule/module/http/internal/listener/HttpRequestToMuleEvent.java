@@ -53,13 +53,14 @@ public class HttpRequestToMuleEvent
                 inboundProperties.put(headerName, values);
             }
         }
-        final HttpMessageProperties httpMessageProperties = new HttpMessagePropertiesBuilder()
+
+        new HttpMessagePropertiesResolver()
                 .setMethod(request.getMethod())
-                .setProtocol(request.getProtocol().getProtocolName())
+                .setProtocol(request.getProtocol().asString())
                 .setUri(request.getUri())
                 .setListenerPath(listenerPath)
-                .setRemoteHostAddress(requestContext.getRemoteHostAddress().toString()).build();
-        httpMessageProperties.addPropertiesTo(inboundProperties);
+                .setRemoteHostAddress(requestContext.getRemoteHostAddress().toString())
+                .addPropertiesTo(inboundProperties);
 
         final Map<String, DataHandler> inboundAttachments = new HashMap<>();
         Object payload = NullPayload.getInstance();

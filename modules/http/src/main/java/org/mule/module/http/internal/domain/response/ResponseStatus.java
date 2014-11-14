@@ -8,8 +8,8 @@ package org.mule.module.http.internal.domain.response;
 
 public class ResponseStatus
 {
-    public Integer statusCode;
-    public String reasonPhrase;
+    private int statusCode;
+    private String reasonPhrase;
 
     public ResponseStatus()
     {
@@ -33,7 +33,7 @@ public class ResponseStatus
         return reasonPhrase;
     }
 
-    public void setStatusCode(Integer statusCode)
+    public void setStatusCode(int statusCode)
     {
         this.statusCode = statusCode;
     }

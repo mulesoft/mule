@@ -17,7 +17,6 @@ import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
 import org.mule.util.Preconditions;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 import org.glassfish.grizzly.Buffer;
 import org.glassfish.grizzly.WriteResult;
@@ -25,7 +24,7 @@ import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.http.HttpContent;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.glassfish.grizzly.http.HttpResponsePacket;
-import org.glassfish.grizzly.memory.ByteBufferWrapper;
+import org.glassfish.grizzly.memory.Buffers;
 
 /**
  * {@link org.glassfish.grizzly.CompletionHandler}, responsible for asynchronous response writing
@@ -58,7 +57,7 @@ public class ResponseCompletionHandler
         {
             if (body instanceof ByteArrayHttpEntity)
             {
-                grizzlyBuffer = new ByteBufferWrapper(ByteBuffer.wrap(((ByteArrayHttpEntity)body).getContent()));
+                grizzlyBuffer = Buffers.wrap(ctx.getMemoryManager(), ((ByteArrayHttpEntity) body).getContent());
             }
             else
             {
@@ -73,7 +72,8 @@ public class ResponseCompletionHandler
      *
      * @throws java.io.IOException
      */
-    public void start() throws IOException {
+    public void start() throws IOException
+    {
         sendResponse();
     }
 
@@ -97,17 +97,25 @@ public class ResponseCompletionHandler
 
     /**
      * Method gets called, when the message part was successfully sent.
+     *
      * @param result the result
      */
     @Override
-    public void completed(WriteResult result) {
-        try {
-            if (!isDone) {
+    public void completed(WriteResult result)
+    {
+        try
+        {
+            if (!isDone)
+            {
                 sendResponse();
-            } else {
+            }
+            else
+            {
                 resume();
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             failed(e);
         }
     }
@@ -116,17 +124,20 @@ public class ResponseCompletionHandler
      * The method will be called, when http message transferring was canceled
      */
     @Override
-    public void cancelled() {
+    public void cancelled()
+    {
         responseStatusCallback.responseSendFailure(new Exception("http response transferring cancelled"));
         resume();
     }
 
     /**
      * The method will be called, if http message transferring was failed.
+     *
      * @param throwable the cause
      */
     @Override
-    public void failed(Throwable throwable) {
+    public void failed(Throwable throwable)
+    {
         responseStatusCallback.responseSendFailure(throwable);
         resume();
     }
@@ -134,7 +145,8 @@ public class ResponseCompletionHandler
     /**
      * Resume the HttpRequestPacket processing
      */
-    private void resume() {
+    private void resume()
+    {
         ctx.resume(ctx.getStopAction());
     }
 }

@@ -29,7 +29,6 @@ import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.grizzly.ssl.SSLFilter;
 import org.glassfish.grizzly.strategies.SameThreadIOStrategy;
-import org.glassfish.grizzly.utils.ChunkingFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,13 +53,11 @@ public class GrizzlyServerManager implements HttpServerManager
         serverFilterChainBuilder.add(sslFilterDelegate);
         KeepAlive ka = new KeepAlive();
         ka.setMaxRequestsCount(-1);
-        serverFilterChainBuilder.add(new ChunkingFilter(1024));
         serverFilterChainBuilder.add(new HttpServerFilter(true, HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE, ka, null));
         serverFilterChainBuilder.add(requestHandlerFilter);
 
         //Initialize Transport
         TCPNIOTransportBuilder transportBuilder = TCPNIOTransportBuilder.newInstance()
-                .setSelectorRunnersCount((Runtime.getRuntime().availableProcessors() * 2) + 1)
                 .setOptimizedForMultiplexing(true)
                 .setIOStrategy(SameThreadIOStrategy.getInstance());
 
@@ -68,7 +65,6 @@ public class GrizzlyServerManager implements HttpServerManager
 
         transport = transportBuilder.build();
 
-        //transport.setWorkerThreadPool(workerExecutorService);
         transport.setNIOChannelDistributor(new RoundRobinConnectionDistributor(transport, true, true));
 
         // Set filterchain as a Transport Processor
@@ -117,41 +113,39 @@ public class GrizzlyServerManager implements HttpServerManager
     }
 
     @Override
-    public boolean containsServerFor(String host, int port)
+    public boolean containsServerFor(final ServerAddress serverAddress)
     {
-        return servers.containsKey(new ServerAddress(host, port));
+        return servers.containsKey(serverAddress);
     }
 
-    public Server createSslServerFor(TlsContextFactory tlsContextFactory, String host, int port) throws IOException
+    public Server createSslServerFor(TlsContextFactory tlsContextFactory, final ServerAddress serverAddress) throws IOException
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug("Creating https server socket for host %s and path %s", host, port);
+            logger.debug("Creating https server socket for host %s and path %s", serverAddress.getHost(), serverAddress.getPort());
         }
-        final ServerAddress serverAddress = new ServerAddress(host, port);
         if (servers.containsKey(servers))
         {
             throw new IllegalStateException(String.format("Could not create a server for %s since there's already one.", serverAddress));
         }
         final SSLFilter sslFilter = createSslFilter(tlsContextFactory);
         sslFilterDelegate.addSslFilterForAddress(serverAddress, sslFilter);
-        final GrizzlyServer grizzlyServer = new GrizzlyServer(host, port, transport, httpListenerRegistry);
+        final GrizzlyServer grizzlyServer = new GrizzlyServer(serverAddress, transport, httpListenerRegistry);
         servers.put(serverAddress, grizzlyServer);
         return grizzlyServer;
     }
 
-    public Server createServerFor(String host, int port) throws IOException
+    public Server createServerFor(ServerAddress serverAddress) throws IOException
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug("Creating http server socket for host %s and path %s", host, port);
+            logger.debug("Creating http server socket for host %s and path %s", serverAddress.getHost(), serverAddress.getPort());
         }
-        final ServerAddress serverAddress = new ServerAddress(host, port);
         if (servers.containsKey(servers))
         {
             throw new IllegalStateException(String.format("Could not create a server for %s since there's already one.", serverAddress));
         }
-        final GrizzlyServer grizzlyServer = new GrizzlyServer(host, port, transport, httpListenerRegistry);
+        final GrizzlyServer grizzlyServer = new GrizzlyServer(serverAddress, transport, httpListenerRegistry);
         servers.put(serverAddress, grizzlyServer);
         return grizzlyServer;
     }

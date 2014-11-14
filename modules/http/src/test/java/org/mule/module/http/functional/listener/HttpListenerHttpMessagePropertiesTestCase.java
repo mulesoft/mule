@@ -77,7 +77,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends FunctionalTestCas
         assertThat(queryParams, IsNull.notNullValue());
         assertThat(queryParams.size(), is(0));
         assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY), is("GET"));
-        assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_VERSION_PROPERTY), is(HttpProtocol.HTTP_1_1.getProtocolName()));
+        assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_VERSION_PROPERTY), is(HttpProtocol.HTTP_1_1.asString()));
         assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_REMOTE_ADDRESS), is(CoreMatchers.notNullValue()));
     }
 
@@ -143,7 +143,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends FunctionalTestCas
         Request.Put(url).version(HttpVersion.HTTP_1_0).connectTimeout(1000).execute();
         final MuleMessage message = muleContext.getClient().request("vm://out", 1000);
         assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY), is("PUT"));
-        assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_VERSION_PROPERTY), is(HttpProtocol.HTTP_1_0.getProtocolName()));
+        assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_VERSION_PROPERTY), is(HttpProtocol.HTTP_1_0.asString()));
     }
 
     @Test

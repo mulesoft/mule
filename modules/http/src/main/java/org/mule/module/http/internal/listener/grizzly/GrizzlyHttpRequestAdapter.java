@@ -51,7 +51,7 @@ public class GrizzlyHttpRequestAdapter implements HttpRequest
     {
         if (this.protocol == null)
         {
-            this.protocol = grizzlyRequest.getProtocol().equals(Protocol.HTTP_1_0) ? HttpProtocol.HTTP_1_0 : HttpProtocol.HTTP_1_1;
+            this.protocol = grizzlyRequest.getProtocol() == Protocol.HTTP_1_0 ? HttpProtocol.HTTP_1_0 : HttpProtocol.HTTP_1_1;
         }
         return this.protocol;
     }

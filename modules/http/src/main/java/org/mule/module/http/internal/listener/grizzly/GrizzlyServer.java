@@ -28,9 +28,9 @@ public class GrizzlyServer implements Server
     private boolean stopped = true;
     private boolean stopping;
 
-    public GrizzlyServer(String host, int port, TCPNIOTransport transport, HttpListenerRegistry listenerRegistry)
+    public GrizzlyServer(ServerAddress serverAddress, TCPNIOTransport transport, HttpListenerRegistry listenerRegistry)
     {
-        this.serverAddress = new ServerAddress(host, port);
+        this.serverAddress = serverAddress;
         this.transport = transport;
         this.listenerRegistry = listenerRegistry;
     }

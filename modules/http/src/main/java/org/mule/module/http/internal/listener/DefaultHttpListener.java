@@ -13,11 +13,8 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.execution.MessageProcessingManager;
@@ -36,7 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DefaultHttpListener implements HttpListener, Initialisable, MuleContextAware, FlowConstructAware, Startable, Stoppable, Disposable
+public class DefaultHttpListener implements HttpListener, Initialisable, MuleContextAware, FlowConstructAware
 {
 
     private String path;
@@ -52,6 +49,7 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
     private HttpStreamingType responseStreamingMode = HttpStreamingType.AUTO;
     private RequestHandlerManager requestHandlerManager;
     private MessageProcessingManager messageProcessingManager;
+    private String[] parsedAllowedMethods;
 
     @Override
     public void setListener(final MessageProcessor messageProcessor)
@@ -100,7 +98,7 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
     }
 
     @Override
-    public void start() throws MuleException
+    public synchronized void start() throws MuleException
     {
         requestHandlerManager.start();
     }
@@ -121,15 +119,16 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
 
     private MuleEvent createEvent(HttpRequestContext requestContext, String listenerPath)
     {
-        return HttpRequestToMuleEvent.transform(requestContext, muleContext, flowConstruct, config.resolveParseRequest(parseRequest), listenerPath);
+        return HttpRequestToMuleEvent.transform(requestContext, muleContext, flowConstruct, parseRequest, listenerPath);
     }
 
     @Override
-    public void initialise() throws InitialisationException
+    public synchronized void initialise() throws InitialisationException
     {
         if (allowedMethods != null)
         {
-            methodRequestMatcher = new MethodRequestMatcher(extractAllowedMethods());
+            parsedAllowedMethods = extractAllowedMethods();
+            methodRequestMatcher = new MethodRequestMatcher(parsedAllowedMethods);
         }
         if (responseBuilder == null)
         {
@@ -143,12 +142,13 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
         path = config.resolvePath(path);
         responseBuilder.setResponseStreaming(responseStreamingMode);
         validatePath();
-        messageProcessingManager = DefaultHttpListener.this.muleContext.getRegistry().get(MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER);
+        parseRequest = config.resolveParseRequest(parseRequest);
         try
         {
+            messageProcessingManager = DefaultHttpListener.this.muleContext.getRegistry().lookupObject(MessageProcessingManager.class);
             requestHandlerManager = this.config.addRequestHandler(new ListenerRequestMatcher(methodRequestMatcher, path), getRequestHandler());
         }
-        catch (IOException e)
+        catch (Exception e)
         {
             throw new InitialisationException(e, this);
         }
@@ -205,7 +205,7 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
     }
 
     @Override
-    public void stop() throws MuleException
+    public synchronized void stop() throws MuleException
     {
         requestHandlerManager.stop();
     }
@@ -214,5 +214,15 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
     public void dispose()
     {
         requestHandlerManager.dispose();
+    }
+
+    public String getPath()
+    {
+        return path;
+    }
+
+    public String[] getAllowedMethods()
+    {
+        return parsedAllowedMethods;
     }
 }

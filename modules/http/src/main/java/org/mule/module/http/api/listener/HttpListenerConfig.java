@@ -7,8 +7,10 @@
 package org.mule.module.http.api.listener;
 
 import org.mule.api.MuleException;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 
-public interface HttpListenerConfig
+public interface HttpListenerConfig extends Startable, Stoppable
 {
 
     /**
@@ -29,5 +31,15 @@ public interface HttpListenerConfig
      * @return true if the listener config has tls config which also means that the protocol used is https
      */
     boolean hasTlsConfig();
+
+    /**
+      * @return the port in which the config is listening for request.
+     */
+    public int getPort();
+
+    /**
+     * @return the host in which the config is listening for request.
+     */
+    public String getHost();
 
 }

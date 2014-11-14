@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 public class NoListenerRequestHandler implements RequestHandler
 {
 
+    public static final int RESOURCE_NOT_FOUND_STATUS_CODE = 404;
+
     private Logger logger = LoggerFactory.getLogger(NoListenerRequestHandler.class);
 
     private static NoListenerRequestHandler instance = new NoListenerRequestHandler();
@@ -39,7 +41,7 @@ public class NoListenerRequestHandler implements RequestHandler
     public void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback)
     {
         responseCallback.responseReady(new HttpResponseBuilder()
-                                               .setStatusCode(404)
+                                               .setStatusCode(RESOURCE_NOT_FOUND_STATUS_CODE)
                                                .setReasonPhrase("No listener for endpoint: " + requestContext.getRequest().getUri())
                                                .build(), new ResponseStatusCallback()
         {

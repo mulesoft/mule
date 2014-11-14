@@ -91,7 +91,7 @@
                         </xsd:restriction>
                     </xsd:simpleType>
                 </xsd:attribute>
-                <xsd:attribute name="parseRequest" type="xsd:boolean">
+                <xsd:attribute name="parseRequest" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             By default, the request will be parsed (for example, a multi part request will be mapped as a
@@ -154,7 +154,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="parseRequest" type="xsd:boolean">
+                <xsd:attribute name="parseRequest" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             By default, the request will be parsed (for example, a multi part request will be mapped as a

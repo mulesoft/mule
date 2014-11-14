@@ -6,8 +6,6 @@
  */
 package org.mule.module.http.internal.domain.request;
 
-import org.mule.module.http.internal.listener.grizzly.GrizzlyHttpRequestAdapter;
-
 import java.net.InetSocketAddress;
 
 /**
@@ -19,7 +17,7 @@ public class HttpRequestContext
     private final InetSocketAddress remoteHostAddress;
     private HttpRequest request;
 
-    public HttpRequestContext(GrizzlyHttpRequestAdapter httpRequest, InetSocketAddress remoteHostAddress)
+    public HttpRequestContext(HttpRequest httpRequest, InetSocketAddress remoteHostAddress)
     {
         this.request = httpRequest;
         this.remoteHostAddress = remoteHostAddress;

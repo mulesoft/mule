@@ -57,12 +57,12 @@ public class DefaultHttpResponse implements HttpResponse
     }
 
     @Override
-    public void setStatusCode(Integer statusCode)
+    public void setStatusCode(int statusCode)
     {
         this.responseStatus.setStatusCode(statusCode);
     }
 
-    public Integer getStatusCode()
+    public int getStatusCode()
     {
         return this.responseStatus.getStatusCode();
     }

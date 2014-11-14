@@ -26,7 +26,7 @@ org.mule.test.integration.client.MuleClientTransactionTestCase
 
 # MULE-2733
 # @ in URI is not getting replaced (1 of 3 tests fails)
-org.mule.test.integration.util.ObjectNameHelperTestCase
+#org.mule.test.integration.util.ObjectNameHelperTestCase - ignoring those methods only - leaving this line for tracking purpose.
 
 ##########################################################################
 # Low priority

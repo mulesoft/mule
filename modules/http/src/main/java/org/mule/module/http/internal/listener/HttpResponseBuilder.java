@@ -129,7 +129,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
             }
             else if (payload instanceof InputStream)
             {
-                if (responseStreaming.equals(HttpStreamingType.AUTO))
+                if (responseStreaming == HttpStreamingType.AUTO)
                 {
                     if (configuredTransferEncoding == null)
                     {

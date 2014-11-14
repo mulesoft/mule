@@ -27,6 +27,8 @@ import org.mule.module.http.internal.request.HttpAuthenticationType;
 import org.mule.module.http.internal.request.RamlApiConfiguration;
 import org.mule.module.http.internal.request.SuccessStatusCodeValidator;
 
+import java.util.concurrent.Executors;
+
 public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
 {
 
