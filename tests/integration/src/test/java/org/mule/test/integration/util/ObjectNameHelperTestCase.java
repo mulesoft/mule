@@ -48,6 +48,7 @@ public class ObjectNameHelperTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    @Ignore
     public void endpointNameGenerationWithParams() throws Exception
     {
         ImmutableEndpoint ep = muleContext.getEndpointFactory().getInboundEndpoint(
