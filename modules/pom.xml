@@ -38,6 +38,7 @@
         <module>jersey</module>
         <module>json</module>
         <module>management</module>
+        <module>oauth</module>
         <module>ognl</module>
         <module>pgp</module>
         <module>reboot</module>

@@ -11,6 +11,12 @@ import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 
 import org.w3c.dom.Element;
 
+/**
+ * This definition parser only works for maps in which each entry in the map
+ * is represented in the XML by a tag with name 'entry'.
+ *
+ * For a more customizable implementation check {@link GenericChildMapDefinitionParser}
+ */
 public class ChildMapEntryDefinitionParser extends ChildDefinitionParser
 {
 
