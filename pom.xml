@@ -159,6 +159,7 @@
         <antlrVersion>3.1.1</antlrVersion>
         <asmVersion>3.3.1</asmVersion>
         <aspectjVersion>1.7.3</aspectjVersion>
+        <asyncHttpClientVersion>1.8.14</asyncHttpClientVersion>
         <bitronixTMVersion>2.1.4</bitronixTMVersion>
         <bshVersion>2.0b4</bshVersion>
         <bouncycastleVersion>1.46</bouncycastleVersion>
@@ -188,6 +189,7 @@
         <geronimoSpecsVersion>1.1</geronimoSpecsVersion>
         <geronimoSpecsJtaVersion>1.1.1</geronimoSpecsJtaVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
+        <grizzlyVersion>2.3.16</grizzlyVersion>
         <guavaVersion>18.0</guavaVersion>
         <hamcrestVersion>1.3</hamcrestVersion>
         <hibernateVersion>3.6.0.Final</hibernateVersion>
@@ -1375,7 +1377,36 @@
                 </exclusions>
             </dependency>
 
+            <dependency>
+                <groupId>org.glassfish.grizzly</groupId>
+                <artifactId>grizzly-framework</artifactId>
+                <version>${grizzlyVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.grizzly</groupId>
+                <artifactId>grizzly-http-server</artifactId>
+                <version>${grizzlyVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.grizzly</groupId>
+                <artifactId>grizzly-websockets</artifactId>
+                <version>${grizzlyVersion}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ning</groupId>
+                <artifactId>async-http-client</artifactId>
+                <version>${asyncHttpClientVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>io.netty</groupId>
+                        <artifactId>netty</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
         </dependencies>
+
     </dependencyManagement>
 
     <distributionManagement>

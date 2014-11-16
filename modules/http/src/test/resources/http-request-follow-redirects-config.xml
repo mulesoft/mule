@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:request-config name="noFollowRedirects" host="localhost" port="${httpPort}"/>
+
+    <http:request-config name="withFollowRedirects" host="localhost" port="${httpPort}" followRedirects="false"/>
+
+    <http:request-config name="withFollowRedirectsExpression" host="localhost" port="${httpPort}" followRedirects="#[redirect]"/>
+
+    <flow name="default">
+        <http:request config-ref="noFollowRedirects" path="testPath"/>
+    </flow>
+
+    <flow name="followRedirects">
+        <http:request config-ref="noFollowRedirects" path="testPath" followRedirects="true"/>
+    </flow>
+
+    <flow name="dontFollowRedirects">
+        <http:request config-ref="noFollowRedirects" path="testPath" followRedirects="false"/>
+    </flow>
+
+    <flow name="followRedirectsExpression">
+        <http:request config-ref="noFollowRedirects" path="testPath" followRedirects="#[redirect]"/>
+    </flow>
+
+    <flow name="fromConfig">
+        <http:request config-ref="withFollowRedirects" path="testPath"/>
+    </flow>
+
+    <flow name="overrideConfig">
+        <http:request config-ref="withFollowRedirects" path="testPath" followRedirects="true"/>
+    </flow>
+
+    <flow name="fromConfigExpression">
+        <http:request config-ref="withFollowRedirectsExpression" path="testPath"/>
+    </flow>
+
+</mule>

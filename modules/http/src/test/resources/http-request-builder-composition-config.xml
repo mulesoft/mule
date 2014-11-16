@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:request-config name="requestConfig" host="localhost" port="${httpPort}" />
+
+    <http:request-builder name="req1">
+        <http:query-param paramName="queryParam1" value="testValue1" />
+        <http:query-param paramName="queryParam2" value="testValue2" />
+    </http:request-builder>
+
+    <http:request-builder name="req2">
+        <http:query-param paramName="queryParam2" value="newTestValue2" />
+        <http:query-param paramName="queryParam3" value="testValue3" />
+        <http:header headerName="testHeader1" value="headerValue1" />
+    </http:request-builder>
+
+    <flow name="testFlow">
+        <http:request config-ref="requestConfig" path="testPath" >
+            <http:request-builder>
+                <http:builder ref="req1" />
+                <http:builder ref="req2" />
+                <http:header headerName="testHeader2" value="headerValue2" />
+            </http:request-builder>
+        </http:request>
+    </flow>
+
+</mule>
