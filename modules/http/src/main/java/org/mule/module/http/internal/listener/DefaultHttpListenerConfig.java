@@ -6,7 +6,6 @@
  */
 package org.mule.module.http.internal.listener;
 
-import static org.mule.module.http.internal.listener.HttpListenerConnectionManager.HTTP_LISTENER_CONNECTION_MANAGER;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -38,6 +37,11 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
 
     public static final int DEFAULT_MAX_THREADS = 128;
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    public static final String HTTP_EMPTY_CONFIG_ID = "_httpEmptyListenerConfig";
+    public static final String HTTP_SSL_EMPTY_LISTENER_CONFIG = "_httpSslEmptyListenerConfig";
+
+    public static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = 30 * 1000;
+
     private String name;
     private String host;
     private int port;
@@ -52,6 +56,9 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
     private Server server;
     private WorkManager workManager;
     private boolean initialised;
+
+    private boolean usePersistentConnections = true;
+    private int connectionIdleTimeout = DEFAULT_CONNECTION_IDLE_TIMEOUT;
 
     public void setWorkerThreadingProfile(ThreadingProfile workerThreadingProfile)
     {
@@ -124,15 +131,26 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
         {
             throw new InitialisationException(CoreMessages.createStaticMessage("KeyStore must be configured for server side SSL"), this);
         }
+
+        verifyConnectionsParameters();
+
         if (tlsContext == null)
         {
-            server = connectionManager.createServer(new ServerAddress(host, port));
+            server = connectionManager.createServer(new ServerAddress(host, port), usePersistentConnections, connectionIdleTimeout);
         }
         else
         {
-            server = connectionManager.createSslServer(new ServerAddress(host, port), tlsContext);
+            server = connectionManager.createSslServer(new ServerAddress(host, port), tlsContext, usePersistentConnections, connectionIdleTimeout);
         }
         initialised = true;
+    }
+
+    private void verifyConnectionsParameters() throws InitialisationException
+    {
+        if (!usePersistentConnections)
+        {
+            connectionIdleTimeout = 0;
+        }
     }
 
     private WorkManager createWorkManager()
@@ -230,6 +248,16 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
     WorkManager getWorkManager()
     {
         return workManager;
+    }
+
+    public void setUsePersistentConnections(boolean usePersistentConnections)
+    {
+        this.usePersistentConnections = usePersistentConnections;
+    }
+
+    public void setConnectionIdleTimeout(int connectionIdleTimeout)
+    {
+        this.connectionIdleTimeout = connectionIdleTimeout;
     }
 
 }
