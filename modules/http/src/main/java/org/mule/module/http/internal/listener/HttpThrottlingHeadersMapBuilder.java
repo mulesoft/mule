@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transport.http;
+package org.mule.module.http.internal.listener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,9 +29,9 @@ public class HttpThrottlingHeadersMapBuilder
     public Map<String, String> build()
     {
         Map<String, String> throttlingHeaders = new HashMap<String, String>();
-        addToMapIfNotNull(throttlingHeaders, HttpMessageProcessTemplate.X_RATE_LIMIT_LIMIT_HEADER, this.maximumRequestAllowedPerPeriod);
-        addToMapIfNotNull(throttlingHeaders, HttpMessageProcessTemplate.X_RATE_LIMIT_REMAINING_HEADER, this.remainingRequestInCurrentPeriod);
-        addToMapIfNotNull(throttlingHeaders, HttpMessageProcessTemplate.X_RATE_LIMIT_RESET_HEADER, this.timeUntilNextPeriodInMillis);
+        addToMapIfNotNull(throttlingHeaders, HttpMessageProcessorTemplate.X_RATE_LIMIT_LIMIT_HEADER, this.maximumRequestAllowedPerPeriod);
+        addToMapIfNotNull(throttlingHeaders, HttpMessageProcessorTemplate.X_RATE_LIMIT_REMAINING_HEADER, this.remainingRequestInCurrentPeriod);
+        addToMapIfNotNull(throttlingHeaders, HttpMessageProcessorTemplate.X_RATE_LIMIT_RESET_HEADER, this.timeUntilNextPeriodInMillis);
         return throttlingHeaders;
     }
 
