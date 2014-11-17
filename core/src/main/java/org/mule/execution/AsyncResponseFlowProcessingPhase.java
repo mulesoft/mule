@@ -54,6 +54,8 @@ public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<Asy
                 {
                     try
                     {
+                        //since this task is going to be executed in a different thread we need to reset the access control
+                        //so the flow is able to modify the event.
                         ((DefaultMuleEvent) template.getMuleEvent()).resetAccessControl();
                         final MessagingExceptionHandler exceptionHandler = messageProcessContext.getFlowConstruct().getExceptionListener();
                         TransactionalErrorHandlingExecutionTemplate transactionTemplate = TransactionalErrorHandlingExecutionTemplate.
