@@ -7,6 +7,8 @@
 package org.mule.module.ws.consumer;
 
 
+import static org.mule.module.http.internal.request.SuccessStatusCodeValidator.alwaysSuccessValidator;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationException;
@@ -19,7 +21,6 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.module.http.api.requester.HttpRequesterBuilder;
 import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
-import org.mule.module.http.internal.request.SuccessStatusCodeValidator;
 import org.mule.module.ws.security.WSSecurity;
 import org.mule.transport.http.HttpConnector;
 import org.mule.util.Preconditions;
@@ -113,7 +114,7 @@ public class WSConsumerConfig implements MuleContextAware
         requesterBuilder.setUrl(serviceAddress).setMethod("POST").setParseResponse(false);
 
         // Do not throw exception on invalid status code, let CXF process it.
-        requesterBuilder.setResponseValidator(new SuccessStatusCodeValidator("0..599"));
+        requesterBuilder.setResponseValidator(alwaysSuccessValidator());
 
         if (connectorConfig != null)
         {

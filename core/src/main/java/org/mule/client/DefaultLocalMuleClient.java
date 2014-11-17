@@ -144,7 +144,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
 
     public void dispatch(String url, MuleMessage message) throws MuleException
     {
-        final MessageProcessor connectorMessageProcessor = getConnectorMessageProcessLocator().locateFireAndForgetConnectorOperation(url);
+        final MessageProcessor connectorMessageProcessor = getConnectorMessageProcessLocator().locateOneWayConnectorOperation(url);
         if (connectorMessageProcessor != null)
         {
             connectorMessageProcessor.process(createRequestResponseMuleEvent(message));
@@ -159,7 +159,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
     @Override
     public void dispatch(String url, MuleMessage message, Options options) throws MuleException
     {
-        final MessageProcessor connectorMessageProcessor = getConnectorMessageProcessLocator().locateFireAndForgetConnectorOperation(url, options);
+        final MessageProcessor connectorMessageProcessor = getConnectorMessageProcessLocator().locateOneWayConnectorOperation(url, options);
         if (connectorMessageProcessor != null)
         {
             connectorMessageProcessor.process(createRequestResponseMuleEvent(message));

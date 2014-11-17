@@ -74,6 +74,7 @@ public interface MuleClient
      *         components invoked explicitly sets a return as <code>null</code>.
      * @throws org.mule.api.MuleException
      */
+    @Deprecated
     MuleMessage send(String url, Object payload, Map<String, Object> messageProperties) throws MuleException;
 
     /**
@@ -120,6 +121,7 @@ public interface MuleClient
      *         components invoked explicitly sets a return as <code>null</code>.
      * @throws org.mule.api.MuleException
      */
+    @Deprecated
     MuleMessage send(String url, Object payload, Map<String, Object> messageProperties, long timeout)
         throws MuleException;
 
@@ -138,6 +140,7 @@ public interface MuleClient
      *         components invoked explicitly sets a return as <code>null</code>.
      * @throws org.mule.api.MuleException
      */
+    @Deprecated
     MuleMessage send(String url, MuleMessage message, long timeout) throws MuleException;
 
     /**

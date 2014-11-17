@@ -9,9 +9,11 @@ package org.mule.module.guice;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.registry.AbstractLifecycleTracker;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.transport.NullPayload;
 
 import com.google.inject.AbstractModule;
 
@@ -85,7 +87,7 @@ public class GuiceLifecyceTestCase extends AbstractMuleContextTestCase
     {
         MuleClient muleClient = muleContext.getClient();
         final AbstractLifecycleTracker ltc = (AbstractLifecycleTracker)muleClient.send(
-            "vm://" + serviceName + ".In", null, null).getPayload();
+                "vm://" + serviceName + ".In", new DefaultMuleMessage(NullPayload.getInstance(), muleContext)).getPayload();
 
         assertNotNull(ltc);
 

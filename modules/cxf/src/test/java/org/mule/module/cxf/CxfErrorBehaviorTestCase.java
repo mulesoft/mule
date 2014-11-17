@@ -162,6 +162,7 @@ public class CxfErrorBehaviorTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testServerClientJaxwsWithUnwrapFault() throws Exception
     {
+        //TODO - PLG - Cambiar por el nuevo.
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testUnwrapProxyFault", requestPayload, null);
         String resString = result.getPayloadAsString();

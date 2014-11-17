@@ -10,6 +10,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.ServerNotification;
@@ -69,7 +70,7 @@ public class WireTapCxfTestCase extends AbstractServiceAndFlowTestCase
                      + "<soap:Body><echo><text>foo</text></echo></soap:Body></soap:Envelope>";
 
         MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send(url, msg, null);
+        MuleMessage response = client.send(url, new DefaultMuleMessage(msg, muleContext));
         assertNotNull(response);
 
         String responseString = response.getPayloadAsString();

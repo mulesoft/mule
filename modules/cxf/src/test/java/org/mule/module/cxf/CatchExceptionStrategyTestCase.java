@@ -145,6 +145,7 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
     public void testServerClientProxyWithTransformerExceptionCatchStrategy() throws Exception
     {
         MuleClient client = muleContext.getClient();
+        //TODO - PLG - Cambiar por el nuevo.
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithTransformerExceptionCatchStrategy", requestPayload, null);
         String resString = result.getPayloadAsString();
         assertEquals(String.valueOf(HttpConstants.SC_OK), result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));

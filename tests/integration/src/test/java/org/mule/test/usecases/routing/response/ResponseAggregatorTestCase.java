@@ -9,11 +9,16 @@ package org.mule.test.usecases.routing.response;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.module.http.api.HttpConstants;
+import org.mule.module.http.api.client.HttpRequestOptions;
+import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.routing.requestreply.AbstractAsyncRequestReplyRequester;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.SensingNullMessageProcessor;
@@ -46,7 +51,8 @@ public class ResponseAggregatorTestCase extends AbstractServiceAndFlowTestCase
     public void testSyncResponse() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("http://localhost:28081", "request", null);
+        final HttpRequestOptions httpRequestOptions = newOptions().method(HttpConstants.Methods.POST).build();
+        MuleMessage message = client.send("http://localhost:28081", new DefaultMuleMessage("request", muleContext), httpRequestOptions);
         assertNotNull(message);
         assertEquals("Received: request", new String(message.getPayloadAsBytes()));
     }

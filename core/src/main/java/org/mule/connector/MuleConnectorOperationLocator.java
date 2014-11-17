@@ -66,26 +66,26 @@ public class MuleConnectorOperationLocator implements ConnectorOperationLocator,
     }
 
     @Override
-    public MessageProcessor locateFireAndForgetConnectorOperation(String url, Options options) throws MuleException
+    public MessageProcessor locateOneWayConnectorOperation(String url, Options options) throws MuleException
     {
         for (ConnectorOperationProvider connectorOperationProvider : connectorOperationProviders)
         {
             if (connectorOperationProvider.supportsUrl(url))
             {
-                return connectorOperationProvider.getFireAndForgetMessageProcessor(url, options);
+                return connectorOperationProvider.getOneWayMessageProcessor(url, options);
             }
         }
         return null;
     }
 
     @Override
-    public MessageProcessor locateFireAndForgetConnectorOperation(String url) throws MuleException
+    public MessageProcessor locateOneWayConnectorOperation(String url) throws MuleException
     {
         for (ConnectorOperationProvider connectorOperationProvider : connectorOperationProviders)
         {
             if (connectorOperationProvider.supportsUrl(url))
             {
-                return connectorOperationProvider.getFireAndForgetMessageProcessor(url);
+                return connectorOperationProvider.getOneWayMessageProcessor(url);
             }
         }
         return null;

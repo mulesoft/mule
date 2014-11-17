@@ -27,8 +27,8 @@ public interface ConnectorOperationProvider
 
     public MessageProcessor getMessageProcessor(String url, Options options) throws MuleException;
 
-    public MessageProcessor getFireAndForgetMessageProcessor(String url) throws MuleException;
+    public MessageProcessor getOneWayMessageProcessor(String url) throws MuleException;
 
-    public MessageProcessor getFireAndForgetMessageProcessor(String url, Options options) throws MuleException;
+    public MessageProcessor getOneWayMessageProcessor(String url, Options options) throws MuleException;
 
 }

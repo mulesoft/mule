@@ -8,6 +8,8 @@ package org.mule.test.usecases.routing.response;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
@@ -39,7 +41,7 @@ public class SerializationOnResposeAggregatorTestCase extends FunctionalTestCase
         muleContext.getRegistry().registerObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME,
                                                  new TestObjectStore<Serializable>());
         MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() , "request", null);
+        MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() , new DefaultMuleMessage("request", muleContext));
         assertNotNull(message);
         assertEquals("request processed", new String(message.getPayloadAsBytes()));
     }

@@ -17,12 +17,34 @@ import org.mule.api.processor.MessageProcessor;
 public interface ConnectorOperationLocator
 {
 
+    /**
+     * @param url the url that identifies the operation
+     * @param options the options to use to execute the operation
+     * @return the operation configured for the url and options
+     * @throws MuleException
+     */
     MessageProcessor locateConnectorOperation(String url, Options options) throws MuleException;
 
+    /**
+     * @param url the url that identifies the operation
+     * @return the operation configured for the url and default options
+     * @throws MuleException
+     */
     MessageProcessor locateConnectorOperation(String url) throws MuleException;
 
-    MessageProcessor locateFireAndForgetConnectorOperation(String url, Options options) throws MuleException;
+    /**
+     * @param url the url that identifies the operation
+     * @param options the options to use to execute the operation
+     * @return the operation configured for the url and options.
+     * @throws MuleException
+     */
+    MessageProcessor locateOneWayConnectorOperation(String url, Options options) throws MuleException;
 
-    MessageProcessor locateFireAndForgetConnectorOperation(String url) throws MuleException;
+    /**
+     * @param url the url that identifies the operation
+     * @return the operation configured for the url and default options
+     * @throws MuleException
+     */
+    MessageProcessor locateOneWayConnectorOperation(String url) throws MuleException;
 
 }

@@ -9,6 +9,8 @@ package org.mule.test.integration.exceptions;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -19,6 +21,8 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
+
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -26,6 +30,8 @@ import org.mule.api.client.LocalMuleClient;
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.context.notification.ExceptionNotification;
+import org.mule.module.http.api.client.HttpRequestOptions;
+import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
@@ -200,9 +206,8 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
     public void testHttpAlwaysRollbackUsingMuleClient() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send(String.format("http://localhost:%s", dynamicPort1.getNumber()), JSON_REQUEST, null, TIMEOUT);
-        assertThat(response.<String>getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY),is("500"));
-        assertThat(response.getExceptionPayload(),IsNull.<Object>notNullValue());
+        MuleMessage response = client.send(String.format("http://localhost:%s", dynamicPort1.getNumber()), new DefaultMuleMessage(JSON_REQUEST, muleContext), newOptions().disableStatusCodeValidation().responseTimeout(TIMEOUT).build());
+        assertThat(response.<Integer>getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY),is(500));
     }
 
     @Test
@@ -225,6 +230,7 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
             response = client.send(String.format("http://localhost:%s", dynamicPort2.getNumber()), MESSAGE, null, TIMEOUT);
             assertThat(response.<String>getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY),is("500"));
         }
+        //TODO - PLG - Cambiar por el nuevo.
         response = client.send(String.format("http://localhost:%s", dynamicPort2.getNumber()), MESSAGE, null, TIMEOUT);
         assertThat(response.<String>getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY),is("200"));
         assertThat(response.getExceptionPayload(),IsNull.<Object>nullValue());

@@ -12,6 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -59,26 +60,23 @@ public class LoanBrokerSyncTestCase extends FunctionalTestCase
     public void testDefaultLoanBrokerRequest() throws Exception
     {
         MuleClient client = muleContext.getClient();
-
-        @SuppressWarnings("unchecked")
-        Map<String, Object> props = new SingletonMap("http.method", HttpConstants.METHOD_GET);
-
-        MuleMessage result = client.send("http://localhost:" + loanBrokerSyncPort.getNumber() + "?name=Muley&amount=20000&term=48&ssn=1234", null, props);
+        MuleMessage result = client.send("http://localhost:" + loanBrokerSyncPort.getNumber() + "?name=Muley&amount=20000&term=48&ssn=1234", getTestMessage());
         assertNotNull("Result is null", result);
         assertFalse("Result is null", result.getPayload() instanceof NullPayload);
         assertNull(result.getExceptionPayload());
         assertTrue("Unexpected response string", result.getPayloadAsString().matches("Bank #\\d, rate: \\d\\.(\\d)*$"));
     }
 
+    private DefaultMuleMessage getTestMessage()
+    {
+        return new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
+    }
+
     @Test
     public void testIncompleteLoanBrokerRequest() throws Exception
     {
         MuleClient client = muleContext.getClient();
-
-        @SuppressWarnings("unchecked")
-        Map<String, Object> props = new SingletonMap("http.method", HttpConstants.METHOD_GET);
-
-        MuleMessage result = client.send("http://localhost:" + loanBrokerSyncPort.getNumber() + "?amount=1234", null, props);
+        MuleMessage result = client.send("http://localhost:" + loanBrokerSyncPort.getNumber() + "?amount=1234", getTestMessage());
         assertEquals("Error: incomplete request", result.getPayloadAsString());
     }
 
@@ -86,11 +84,7 @@ public class LoanBrokerSyncTestCase extends FunctionalTestCase
     public void testWrongLoanBrokerRequest() throws Exception
     {
         MuleClient client = muleContext.getClient();
-
-        @SuppressWarnings("unchecked")
-        Map<String, Object> props = new SingletonMap("http.method", HttpConstants.METHOD_GET);
-
-        MuleMessage result = client.send("http://localhost:" + loanBrokerSyncPort.getNumber() + "?name=Muley&term=48&ssn=1234&amount=abcd", null, props);
+        MuleMessage result = client.send("http://localhost:" + loanBrokerSyncPort.getNumber() + "?name=Muley&term=48&ssn=1234&amount=abcd", getTestMessage());
         assertEquals("Error processing loan request", result.getPayloadAsString());
     }
 }

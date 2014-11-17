@@ -12,6 +12,8 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
+    <configuration useHttpTransportByDefault="true"/>
+
     <flow name="Echo">
         
             <inbound-endpoint

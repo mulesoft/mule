@@ -8,12 +8,15 @@ package org.mule.test.integration.exceptions;
 
 import static org.junit.Assert.assertTrue;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.expression.ExceptionTypeExpressionEvaluator;
 import org.mule.expression.PayloadTypeExpressionEvaluator;
 import org.mule.expression.RegexExpressionEvaluator;
 import org.mule.expression.WilcardExpressionEvaluator;
+import org.mule.module.http.api.client.HttpRequestOptions;
+import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -65,7 +68,8 @@ public class InvalidFilterEvaluatorUsageTestCase extends FunctionalTestCase
     public void producesClearErrorMessage() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("http://localhost:" + port.getNumber(), "TEST", null);
+        final HttpRequestOptions httpRequestOptions = HttpRequestOptionsBuilder.newOptions().disableStatusCodeValidation().build();
+        MuleMessage response = client.send("http://localhost:" + port.getNumber(), new DefaultMuleMessage("TEST", muleContext), httpRequestOptions);
         assertTrue(response.getPayloadAsString().contains(evaluatorName));
         assertTrue(response.getPayloadAsString().contains("java.lang.UnsupportedOperationException"));
     }
