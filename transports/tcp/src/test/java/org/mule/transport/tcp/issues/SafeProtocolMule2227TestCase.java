@@ -7,14 +7,13 @@
 package org.mule.transport.tcp.issues;
 
 import org.mule.api.MuleException;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.transport.tcp.protocols.SafeProtocolTestCase;
 
 import org.junit.Test;
 
 public class SafeProtocolMule2227TestCase extends SafeProtocolTestCase
 {
-
     // this actually "works" much of the time, in that a response is received that looks reasonable.
     // that's just because the test is so simple that the length encoded string is read by the
     // server as a literal chunk of text (including the cookies and lengths!).  on the return these
@@ -37,7 +36,7 @@ public class SafeProtocolMule2227TestCase extends SafeProtocolTestCase
     @Test
     public void testSafeToUnsafe() throws MuleException
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         // this may fail, but should not crash
         try
         {
@@ -48,5 +47,4 @@ public class SafeProtocolMule2227TestCase extends SafeProtocolTestCase
             // an error is ok - we were losing the JVM before
         }
     }
-
 }

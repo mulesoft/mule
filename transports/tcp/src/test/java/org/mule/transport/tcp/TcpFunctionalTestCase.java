@@ -9,20 +9,20 @@ package org.mule.transport.tcp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
 
-public class TcpFunctionalTestCase extends AbstractServiceAndFlowTestCase 
+public class TcpFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
-
     protected static String TEST_MESSAGE = "Test TCP Request";
 
     @Rule
@@ -35,7 +35,7 @@ public class TcpFunctionalTestCase extends AbstractServiceAndFlowTestCase
     {
         super(variant, configResources);
     }
-        
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -48,7 +48,7 @@ public class TcpFunctionalTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testSend() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, null);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
     }
@@ -56,7 +56,7 @@ public class TcpFunctionalTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testDispatchAndReply() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("asyncClientEndpoint", TEST_MESSAGE, null);
         // MULE-2754
         Thread.sleep(100);
@@ -67,7 +67,7 @@ public class TcpFunctionalTestCase extends AbstractServiceAndFlowTestCase
 
     public void timeMultipleSend() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         long now = System.currentTimeMillis();
         int count = 1000;
         for (int i = 0; i < count; i++)
@@ -79,5 +79,4 @@ public class TcpFunctionalTestCase extends AbstractServiceAndFlowTestCase
         double speed = count * 1000.0 / (later - now);
         logger.error(speed + " messages per second");
     }
-
 }

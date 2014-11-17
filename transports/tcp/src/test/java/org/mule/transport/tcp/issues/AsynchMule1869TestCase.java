@@ -9,6 +9,11 @@ package org.mule.transport.tcp.issues;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,14 +22,9 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
 
 public class AsynchMule1869TestCase extends AbstractServiceAndFlowTestCase
 {
-
     protected static String TEST_MESSAGE = "Test TCP Request";
 
     @Rule
@@ -37,7 +37,7 @@ public class AsynchMule1869TestCase extends AbstractServiceAndFlowTestCase
     {
         super(variant, configResources);
     }
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -48,11 +48,13 @@ public class AsynchMule1869TestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testDispatchAndReply() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        Map props = new HashMap();
+        MuleClient client = muleContext.getClient();
+
+        Map<String, Object> props = new HashMap<String, Object>();
         client.dispatch("asyncClientEndpoint", TEST_MESSAGE, props);
         // MULE-2754
         Thread.sleep(100);
+
         MuleMessage result =  client.request("asyncClientEndpoint", 10000);
         assertNotNull("No message received", result);
         assertEquals(TEST_MESSAGE + " Received Async", result.getPayloadAsString());

@@ -11,7 +11,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -44,12 +44,12 @@ public class CustomByteProtocolTestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "custom-serialisation-mule-config-service.xml"},
             {ConfigVariant.FLOW, "custom-serialisation-mule-config-flow.xml"}
         });
-    }            
+    }
 
     @Test
     public void testCustomObject() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         NonSerializableMessageObject message = new NonSerializableMessageObject(1, "Hello", true);
 
         for (int i = 0; i < messages; i++)

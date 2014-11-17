@@ -6,9 +6,13 @@
  */
 package org.mule.transport.tcp;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -19,15 +23,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class TcpSyncTestCase extends AbstractServiceAndFlowTestCase
 {
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -44,8 +44,8 @@ public class TcpSyncTestCase extends AbstractServiceAndFlowTestCase
 
     protected MuleMessage send(Object payload) throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        return client.send(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inService")).getAddress(), payload, null);
+        MuleClient client = muleContext.getClient();
+        return client.send(((InboundEndpoint) muleContext.getRegistry().lookupObject("inService")).getAddress(), payload, null);
     }
 
     @Test

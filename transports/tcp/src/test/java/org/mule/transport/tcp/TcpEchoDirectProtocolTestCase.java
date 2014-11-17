@@ -9,17 +9,18 @@ package org.mule.transport.tcp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
 
 public class TcpEchoDirectProtocolTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -30,9 +31,9 @@ public class TcpEchoDirectProtocolTestCase extends AbstractServiceAndFlowTestCas
 
     public TcpEchoDirectProtocolTestCase(ConfigVariant variant, String configResources)
     {
-        super(variant, configResources);        
+        super(variant, configResources);
     }
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -45,13 +46,12 @@ public class TcpEchoDirectProtocolTestCase extends AbstractServiceAndFlowTestCas
     @Test
     public void testSend() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        
-        MuleMessage response = client.send(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inBounceTcpMMP")).getAddress(), 
+        MuleClient client = muleContext.getClient();
+
+        MuleMessage response = client.send(((InboundEndpoint) muleContext.getRegistry().lookupObject("inBounceTcpMMP")).getAddress(),
             TEST_MESSAGE, null);
-        
+
         assertNotNull(response);
         assertEquals(TEST_MESSAGE, response.getPayload());
     }
-
 }

@@ -6,8 +6,10 @@
  */
 package org.mule.transport.tcp.protocols;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -17,8 +19,6 @@ import java.util.Collection;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
 
 public class MuleMessageLengthTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -43,7 +43,7 @@ public class MuleMessageLengthTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testSend() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, null);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
     }

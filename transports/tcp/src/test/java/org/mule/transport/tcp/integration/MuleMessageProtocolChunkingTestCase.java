@@ -6,32 +6,31 @@
  */
 package org.mule.transport.tcp.integration;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 /**
  * This test was set for the new changes due to Mule1199
  */
 public class MuleMessageProtocolChunkingTestCase extends FunctionalTestCase
 {
-
     public static final long WAIT_MS = 3000L;
     private static int messages = 2;
     private static int messagelength = 10;
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
-    
+
     @Override
     protected String getConfigResources()
     {
@@ -65,7 +64,7 @@ public class MuleMessageProtocolChunkingTestCase extends FunctionalTestCase
     @Test
     public void testCustomObject() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         StringBuffer sBuffer = new StringBuffer();
         // send 50K of stuff;
         for (int i = 10000; i < 20000; i++)
@@ -93,7 +92,7 @@ public class MuleMessageProtocolChunkingTestCase extends FunctionalTestCase
 
     private void sendString(String message) throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
 
         for (int i = 0; i < messages; i++)
         {
@@ -105,5 +104,4 @@ public class MuleMessageProtocolChunkingTestCase extends FunctionalTestCase
             assertEquals(message, new String((byte[])msg.getPayload()));
         }
     }
-
 }
