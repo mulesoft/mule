@@ -589,7 +589,8 @@
 /mule-standalone-${productVersion}/lib/opt/grizzly-http-2.3.16.jar
 /mule-standalone-${productVersion}/lib/opt/grizzly-http-server-2.3.16.jar
 /mule-standalone-${productVersion}/lib/opt/grizzly-websockets-2.3.16.jar
-/mule-standalone-${productVersion}/lib/opt/groovy-all-2.3.7-indy.jar
+/mule-standalone-${productVersion}/lib/opt/groovy-2.3.7-indy.jar
+/mule-standalone-${productVersion}/lib/opt/groovy-jsr223-2.3.7.jar
 /mule-standalone-${productVersion}/lib/opt/guava-18.0.jar
 /mule-standalone-${productVersion}/lib/opt/hamcrest-core-1.3.jar
 /mule-standalone-${productVersion}/lib/opt/hamcrest-library-1.3.jar
