@@ -104,7 +104,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="listener-config" type="listenerConfigType" substitutionGroup="mule:abstract-extension">
+    <xsd:element name="listener-config" type="listenerConfigType" substitutionGroup="mule:abstract-shared-extension">
         <xsd:annotation>
             <xsd:documentation>
                 Grouping configuration for a set of listener elements.
@@ -492,7 +492,7 @@
 
     </xsd:complexType>
 
-    <xsd:element name="request-config" type="requestConfigType" substitutionGroup="mule:abstract-extension"/>
+    <xsd:element name="request-config" type="requestConfigType" substitutionGroup="mule:abstract-shared-extension"/>
 
     <xsd:complexType name="requestConfigType">
         <xsd:complexContent>
