@@ -18,7 +18,7 @@ import org.mule.execution.ThrottlingPhaseTemplate;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.AbstractTransportMessageProcessTemplate;
 import org.mule.transport.http.HttpConnector;
-import org.mule.transport.http.HttpThrottlingHeadersMapBuilder;
+import org.mule.module.http.internal.listener.HttpThrottlingHeadersMapBuilder;
 import org.mule.transport.servlet.ServletResponseWriter;
 
 import javax.servlet.http.HttpServletRequest;

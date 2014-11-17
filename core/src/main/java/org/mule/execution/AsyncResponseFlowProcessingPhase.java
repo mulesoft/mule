@@ -6,6 +6,7 @@
  */
 package org.mule.execution;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.exception.MessagingExceptionHandler;
@@ -53,6 +54,7 @@ public class AsyncResponseFlowProcessingPhase implements MessageProcessPhase<Asy
                 {
                     try
                     {
+                        ((DefaultMuleEvent) template.getMuleEvent()).resetAccessControl();
                         final MessagingExceptionHandler exceptionHandler = messageProcessContext.getFlowConstruct().getExceptionListener();
                         TransactionalErrorHandlingExecutionTemplate transactionTemplate = TransactionalErrorHandlingExecutionTemplate.
                                 createMainExecutionTemplate(messageProcessContext.getFlowConstruct().getMuleContext(),

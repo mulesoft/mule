@@ -16,7 +16,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.ExceptionHelper;
@@ -24,6 +23,8 @@ import org.mule.execution.EndPhaseTemplate;
 import org.mule.execution.RequestResponseFlowProcessingPhaseTemplate;
 import org.mule.execution.ResponseDispatchException;
 import org.mule.execution.ThrottlingPhaseTemplate;
+import org.mule.module.http.internal.listener.HttpMessageProcessorTemplate;
+import org.mule.module.http.internal.listener.HttpThrottlingHeadersMapBuilder;
 import org.mule.transport.AbstractTransportMessageProcessTemplate;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.i18n.HttpMessages;
@@ -40,10 +41,12 @@ import org.apache.commons.httpclient.HttpVersion;
 public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessTemplate<HttpMessageReceiver, HttpConnector> implements RequestResponseFlowProcessingPhaseTemplate, ThrottlingPhaseTemplate, EndPhaseTemplate
 {
 
-    public static final int MESSAGE_DISCARD_STATUS_CODE = Integer.valueOf(System.getProperty("mule.transport.http.throttling.discardstatuscode","429"));
-    public static final String X_RATE_LIMIT_LIMIT_HEADER = "X-RateLimit-Limit";
-    public static final String X_RATE_LIMIT_REMAINING_HEADER = "X-RateLimit-Remaining";
-    public static final String X_RATE_LIMIT_RESET_HEADER = "X-RateLimit-Reset";
+    public static final int MESSAGE_DISCARD_STATUS_CODE = HttpMessageProcessorTemplate.MESSAGE_DISCARD_STATUS_CODE;
+    public static final String MESSAGE_THROTTLED_REASON_PHRASE = "API calls exceeded";
+
+    public static final String X_RATE_LIMIT_LIMIT_HEADER = HttpMessageProcessorTemplate.X_RATE_LIMIT_LIMIT_HEADER;
+    public static final String X_RATE_LIMIT_REMAINING_HEADER = HttpMessageProcessorTemplate.X_RATE_LIMIT_REMAINING_HEADER;
+    public static final String X_RATE_LIMIT_RESET_HEADER = HttpMessageProcessorTemplate.X_RATE_LIMIT_RESET_HEADER;
 
     private final HttpServerConnection httpServerConnection;
     private HttpRequest request;
@@ -459,7 +462,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     {
         try
         {
-            sendFailureResponseToClient(MESSAGE_DISCARD_STATUS_CODE,"API calls exceeded");
+            sendFailureResponseToClient(MESSAGE_DISCARD_STATUS_CODE, MESSAGE_THROTTLED_REASON_PHRASE);
         }
         catch (IOException e)
         {

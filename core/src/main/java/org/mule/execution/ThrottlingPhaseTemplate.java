@@ -6,14 +6,20 @@
  */
 package org.mule.execution;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 
 /**
  * Template that a {@link org.mule.api.source.MessageSource} must implement
  * if it wants to participate in the throttling phase when processing a message
  */
-public interface ThrottlingPhaseTemplate extends FlowProcessingPhaseTemplate
+public interface ThrottlingPhaseTemplate extends MessageProcessTemplate
 {
+
+    /**
+     * @return a {@link org.mule.api.MuleEvent} created from the original message
+     */
+    MuleEvent getMuleEvent() throws MuleException;
 
     /**
      * Discards the message due to ThrottlingPolicy configured for the {@link org.mule.api.source.MessageSource} is exceeded
