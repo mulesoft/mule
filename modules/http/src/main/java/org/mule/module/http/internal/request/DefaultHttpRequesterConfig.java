@@ -11,6 +11,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.HttpAuthentication;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
 import org.mule.module.http.internal.HttpStreamingType;
@@ -22,6 +23,9 @@ import org.mule.transport.tcp.TcpClientSocketProperties;
 
 public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initialisable, Stoppable, Startable
 {
+    private static final int UNLIMITED_CONNECTIONS = -1;
+    private static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = 30 * 1000;
+
     private String name;
     private String host;
     private String port;
@@ -40,11 +44,31 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
 
     private HttpClient httpClient;
 
+    private int maxConnections = UNLIMITED_CONNECTIONS;
+    private boolean usePersistentConnections = true;
+    private int connectionIdleTimeout = DEFAULT_CONNECTION_IDLE_TIMEOUT;
+
     @Override
     public void initialise() throws InitialisationException
     {
-        httpClient = new GrizzlyHttpClient(tlsContext, proxyConfig, clientSocketProperties);
+        verifyConnectionsParameters();
+
+        httpClient = new GrizzlyHttpClient(tlsContext, proxyConfig, clientSocketProperties, maxConnections, usePersistentConnections, connectionIdleTimeout);
+
         httpClient.initialise();
+    }
+
+    private void verifyConnectionsParameters() throws InitialisationException
+    {
+        if (maxConnections < UNLIMITED_CONNECTIONS || maxConnections == 0)
+        {
+            throw new InitialisationException(CoreMessages.createStaticMessage("The maxConnections parameter only allows positive values or -1 for unlimited concurrent connections."), this);
+        }
+
+        if (!usePersistentConnections)
+        {
+            connectionIdleTimeout = 0;
+        }
     }
 
     @Override
@@ -226,4 +250,20 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
             ((Startable) this.authentication).start();
         }
     }
+
+    public void setMaxConnections(int maxConnections)
+    {
+        this.maxConnections = maxConnections;
+    }
+
+    public void setUsePersistentConnections(boolean usePersistentConnections)
+    {
+        this.usePersistentConnections = usePersistentConnections;
+    }
+
+    public void setConnectionIdleTimeout(int connectionIdleTimeout)
+    {
+        this.connectionIdleTimeout = connectionIdleTimeout;
+    }
+
 }
