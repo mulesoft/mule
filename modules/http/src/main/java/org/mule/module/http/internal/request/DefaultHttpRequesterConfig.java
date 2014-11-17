@@ -262,10 +262,19 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
         }
     }
 
-    public void setMaxConnections(int maxConnections) { this.maxConnections = maxConnections; }
+    public void setMaxConnections(int maxConnections)
+    {
+        this.maxConnections = maxConnections;
+    }
 
-    public void setUsePersistentConnections(boolean usePersistentConnections) { this.usePersistentConnections = usePersistentConnections; }
+    public void setUsePersistentConnections(boolean usePersistentConnections)
+    {
+        this.usePersistentConnections = usePersistentConnections;
+    }
 
-    public void setConnectionIdleTimeout(Integer connectionIdleTimeout) { this.connectionIdleTimeout = connectionIdleTimeout; }
+    public void setConnectionIdleTimeout(Integer connectionIdleTimeout)
+    {
+        this.connectionIdleTimeout = connectionIdleTimeout;
+    }
 
 }

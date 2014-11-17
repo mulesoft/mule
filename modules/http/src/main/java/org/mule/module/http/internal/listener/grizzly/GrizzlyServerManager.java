@@ -40,7 +40,8 @@ import org.slf4j.LoggerFactory;
 public class GrizzlyServerManager implements HttpServerManager
 {
 
-    private static final int MAX_REQUESTS_COUNT = -1;
+    private static final int MAX_KEEP_ALIVE_REQUESTS = -1;
+    private static final String IDLE_TIMEOUT_THREADS_PREFIX_NAME = ".HttpIdleConnectionCloser";
     private final GrizzlyAddressDelegateFilter<SSLFilter> sslFilterDelegate;
     private final GrizzlyAddressDelegateFilter<HttpServerFilter> httpServerFilterDelegate;
     private final TCPNIOTransport transport;
@@ -80,7 +81,7 @@ public class GrizzlyServerManager implements HttpServerManager
         transport.setProcessor(serverFilterChainBuilder.build());
         transport.start();
 
-        idleTimeoutExecutorService = Executors.newCachedThreadPool(new NamedThreadFactory(appName));
+        idleTimeoutExecutorService = Executors.newCachedThreadPool(new NamedThreadFactory(appName + IDLE_TIMEOUT_THREADS_PREFIX_NAME));
         idleTimeoutDelayedExecutor = new DelayedExecutor(idleTimeoutExecutorService);
         idleTimeoutDelayedExecutor.start();
     }
@@ -201,10 +202,10 @@ public class GrizzlyServerManager implements HttpServerManager
     private HttpServerFilter createHttpServerFilter(boolean usePersistentConnections, int connectionIdleTimeout)
     {
         KeepAlive ka = null;
-        if( usePersistentConnections )
+        if (usePersistentConnections)
         {
             ka = new KeepAlive();
-            ka.setMaxRequestsCount(MAX_REQUESTS_COUNT);
+            ka.setMaxRequestsCount(MAX_KEEP_ALIVE_REQUESTS);
             ka.setIdleTimeoutInSeconds(convertToSeconds(connectionIdleTimeout));
         }
         return new HttpServerFilter(true, HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE, ka, idleTimeoutDelayedExecutor);
