@@ -105,17 +105,7 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-http</artifactId>
-            <version>3.6.0-M3-SNAPSHOT</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.mule</groupId>
-                    <artifactId>mule-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.mule.modules</groupId>
-                    <artifactId>mule-module-spring-config</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>4.0-SNAPSHOT</version>
         </dependency>
 
         <!-- Unit tests -->

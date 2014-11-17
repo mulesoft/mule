@@ -239,6 +239,7 @@
                 <include>org.mule.modules:mule-module-jbpm</include>
                 <include>org.mule.modules:mule-module-json</include>
                 <include>org.mule.modules:mule-module-management</include>
+                <include>org.mule.modules:mule-module-oauth</include>
                 <include>org.mule.modules:mule-module-pgp</include>
                 <include>org.mule.modules:mule-module-rss</include>
                 <include>org.mule.modules:mule-module-scripting</include>
@@ -312,6 +313,7 @@
                 <exclude>org.mule.modules:mule-module-json</exclude>
                 <exclude>org.mule.modules:mule-module-launcher</exclude>
                 <exclude>org.mule.modules:mule-module-management</exclude>
+                <exclude>org.mule.modules:mule-module-oauth</exclude>
                 <exclude>org.mule.modules:mule-module-pgp</exclude>
                 <exclude>org.mule.modules:mule-module-reboot</exclude>
                 <exclude>org.mule.modules:mule-module-rss</exclude>

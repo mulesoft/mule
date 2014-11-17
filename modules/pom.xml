@@ -30,12 +30,14 @@
         <module>drools</module>
         <module>launcher</module>
         <module>client</module>
+        <module>http</module>
         <module>jaas</module>
         <module>jboss-transactions</module>
         <module>jbpm</module>
         <module>jersey</module>
         <module>json</module>
         <module>management</module>
+        <module>oauth</module>
         <module>pgp</module>
         <module>reboot</module>
         <module>rss</module>

@@ -10,13 +10,21 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transport.ConnectorException;
 import org.mule.tck.junit4.DomainFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class HttpSharePortTestCase extends DomainFunctionalTestCase
 {
 
@@ -27,18 +35,36 @@ public class HttpSharePortTestCase extends DomainFunctionalTestCase
     public DynamicPort dynamicPort = new DynamicPort("port1");
     @Rule
     public SystemProperty endpointScheme = getEndpointSchemeSystemProperty();
+    private String hellowWordAppConfig;
+    private String helloMuleAppConfig;
+    private String domainConfig;
+
+    public HttpSharePortTestCase(String domainConfig, String helloWorldAppConfig, String helloMuleAppConfig)
+    {
+        this.domainConfig = domainConfig;
+        this.hellowWordAppConfig = helloWorldAppConfig;
+        this.helloMuleAppConfig = helloMuleAppConfig;
+    }
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {"domain/http/transport/http-shared-connector.xml", "domain/http/transport/http-hello-world-app.xml", "domain/http/transport/http-hello-mule-app.xml"},
+                {"domain/http/http-shared-listener-config.xml", "domain/http/http-hello-world-app.xml", "domain/http/http-hello-mule-app.xml"}});
+    }
 
     @Override
     protected String getDomainConfig()
     {
-        return "domain/http/http-shared-connector.xml";
+        return domainConfig;
     }
 
     @Override
     public ApplicationConfig[] getConfigResources()
     {
-        return new ApplicationConfig[] {new ApplicationConfig(HELLO_WORLD_SERVICE_APP, new String[] {"domain/http/http-hello-world-app.xml"}),
-                new ApplicationConfig(HELLO_MULE_SERVICE_APP, new String[] {"domain/http/http-hello-mule-app.xml"})
+        return new ApplicationConfig[] {new ApplicationConfig(HELLO_WORLD_SERVICE_APP, new String[] {hellowWordAppConfig}),
+                new ApplicationConfig(HELLO_MULE_SERVICE_APP, new String[] {helloMuleAppConfig})
         };
     }
 

@@ -9,6 +9,9 @@ package org.mule.config.spring;
 import org.mule.config.spring.util.SpringXMLUtils;
 import org.mule.util.StringUtils;
 
+import java.util.List;
+import java.util.Map;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -18,11 +21,13 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
+import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.DefaultBeanDefinitionDocumentReader;
 import org.springframework.beans.factory.xml.NamespaceHandler;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.beans.factory.xml.XmlReaderContext;
+import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -254,6 +259,27 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
                 && bean.hasAttribute(flag)
                 && bean.getAttribute(flag) instanceof Boolean
                 && ((Boolean) bean.getAttribute(flag)).booleanValue();
+    }
+
+
+    /**
+     * Parse a map element.
+     */
+    public Map parseMapElement(Element mapEle, String mapElementTagName, String mapElementKeyAttributeName, String mapElementValueAttributeName) {
+        List<Element> entryEles = DomUtils.getChildElementsByTagName(mapEle, mapElementTagName);
+        ManagedMap<Object, Object> map = new ManagedMap<Object, Object>(entryEles.size());
+        map.setSource(extractSource(mapEle));
+        map.setMergeEnabled(parseMergeAttribute(mapEle));
+
+        for (Element entryEle : entryEles) {
+            // Extract key from attribute or sub-element.
+            Object key = buildTypedStringValueForMap(entryEle.getAttribute(mapElementKeyAttributeName), null, entryEle);
+            // Extract value from attribute or sub-element.
+            Object value = buildTypedStringValueForMap(entryEle.getAttribute(mapElementValueAttributeName), null, entryEle);
+            // Add final key and value to the Map.
+            map.put(key, value);
+        }
+        return map;
     }
 
 }

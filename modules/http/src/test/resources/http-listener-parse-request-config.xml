@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:listener-config name="noParserRequestAttributeConfig" host="localhost" port="${port}"/>
+
+    <flow name="listenerWithConfigWithParseRequestNoValue">
+        <http:listener path="listenerWithConfigWithParseRequestNoValue" parseRequest="false" config-ref="noParserRequestAttributeConfig"/>
+        <vm:outbound-endpoint path="out"/>
+    </flow>
+
+    <http:listener-config name="parserRequestAttributeConfig" host="localhost" port="${port2}" parseRequest="false"/>
+
+    <flow name="listenerWithConfigWithParseRequestValue">
+        <http:listener path="listenerWithConfigWithParseRequestValue" config-ref="parserRequestAttributeConfig"/>
+        <vm:outbound-endpoint path="out"/>
+    </flow>
+
+    <flow name="listenerOverridesConfigWithParseRequestValue">
+        <http:listener path="parseRequestUsingListenerValue" config-ref="parserRequestAttributeConfig" parseRequest="true"/>
+        <vm:outbound-endpoint path="out"/>
+    </flow>
+
+</mule>

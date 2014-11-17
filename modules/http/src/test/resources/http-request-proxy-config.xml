@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <!-- Global Anonymous Proxy -->
+    <http:proxy name="anonymousProxyConfig" host="localhost" port="${proxyPort}" />
+    <http:request-config name="configRefAnonymousProxy" host="localhost" port="${httpPort}" basePath="basePath" proxy-ref="anonymousProxyConfig" />
+    <flow name="refAnonymousProxy">
+        <http:request config-ref="configRefAnonymousProxy" path="requestPath" />
+    </flow>
+
+    <!-- Inner Anonymous Proxy -->
+    <http:request-config name="configInnerAnonymousProxy" host="localhost" port="${httpPort}" basePath="basePath">
+        <http:proxy host="localhost" port="${proxyPort}" />
+    </http:request-config>
+    <flow name="innerAnonymousProxy">
+        <http:request config-ref="configInnerAnonymousProxy" path="requestPath" />
+    </flow>
+
+
+    <!-- Global Username/Password Proxy -->
+    <http:proxy name="userPassProxyConfig" host="localhost" port="${proxyPort}" username="theUsername" password="thePassword" />
+    <http:request-config name="configRefUserPassProxy" host="localhost" port="${httpPort}" basePath="basePath" proxy-ref="userPassProxyConfig" />
+    <flow name="refUserPassProxy">
+        <http:request config-ref="configRefUserPassProxy" path="requestPath" />
+    </flow>
+
+    <!-- Inner Username/Password Proxy -->
+    <http:request-config name="configInnerUserPassProxy" host="localhost" port="${httpPort}" basePath="basePath">
+        <http:proxy host="localhost" port="${proxyPort}" username="theUsername" password="thePassword" />
+    </http:request-config>
+    <flow name="innerUserPassProxy">
+        <http:request config-ref="configInnerUserPassProxy" path="requestPath" />
+    </flow>
+
+
+    <!-- Global Ntlm Proxy -->
+    <http:ntlm-proxy name="ntlmProxyConfig" host="localhost" port="${proxyPort}" username="theUsername" password="thePassword" ntlmDomain="theNtlmDomain" />
+    <http:request-config name="configRefNtlmProxy" host="localhost" port="${httpPort}" basePath="basePath" proxy-ref="ntlmProxyConfig" />
+    <flow name="refNtlmProxy">
+        <http:request config-ref="configRefNtlmProxy" path="requestPath" />
+    </flow>
+
+    <!-- Inner Ntlm Proxy -->
+    <http:request-config name="configInnerNtlmProxy" host="localhost" port="${httpPort}" basePath="basePath">
+        <http:ntlm-proxy host="localhost" port="${proxyPort}" username="theUsername" password="thePassword" ntlmDomain="theNtlmDomain" />
+    </http:request-config>
+    <flow name="innerNtlmProxy">
+        <http:request config-ref="configInnerNtlmProxy" path="requestPath" />
+    </flow>
+
+</mule>

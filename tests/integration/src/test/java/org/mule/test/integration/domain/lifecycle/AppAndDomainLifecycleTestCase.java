@@ -25,7 +25,7 @@ import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class AppAndDomainLifecycleTestCase extends AbstractMuleTestCase
+public class  AppAndDomainLifecycleTestCase extends AbstractMuleTestCase
 {
 
     @Rule
@@ -44,10 +44,10 @@ public class AppAndDomainLifecycleTestCase extends AbstractMuleTestCase
         MuleContext secondAppContext = null;
         try
         {
-            domainContext = new DomainContextBuilder().setRegistryBootstrapService(registryBootstrapService).setDomainConfig("domain/http/http-shared-connector.xml").build();
-            firstAppContext = new ApplicationContextBuilder().setRegistryBootstrapService(registryBootstrapService).setApplicationResources(new String[] {"domain/http/http-hello-mule-app.xml"}).setDomainContext(domainContext).build();
+            domainContext = new DomainContextBuilder().setRegistryBootstrapService(registryBootstrapService).setDomainConfig("domain/http/trasnsport/http-shared-connector.xml").build();
+            firstAppContext = new ApplicationContextBuilder().setRegistryBootstrapService(registryBootstrapService).setApplicationResources(new String[] {"domain/http/transport/http-hello-mule-app.xml"}).setDomainContext(domainContext).build();
             ApplicationContextBuilder secondApp = new ApplicationContextBuilder().setRegistryBootstrapService(registryBootstrapService);
-            secondAppContext = secondApp.setApplicationResources(new String[] {"domain/http/http-hello-world-app.xml"}).setDomainContext(domainContext).build();
+            secondAppContext = secondApp.setApplicationResources(new String[] {"domain/http/transport/http-hello-world-app.xml"}).setDomainContext(domainContext).build();
             firstAppContext.stop();
             MuleMessage response = secondAppContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/service/helloWorld", "test", null);
             assertThat(response, notNullValue());
