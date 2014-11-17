@@ -25,6 +25,7 @@ import org.glassfish.grizzly.http.HttpContent;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.glassfish.grizzly.http.HttpResponsePacket;
 import org.glassfish.grizzly.memory.Buffers;
+import org.glassfish.grizzly.http.HttpServerFilter;
 
 /**
  * {@link org.glassfish.grizzly.CompletionHandler}, responsible for asynchronous response writing
@@ -111,6 +112,7 @@ public class ResponseCompletionHandler
             }
             else
             {
+                ctx.notifyDownstream(HttpServerFilter.RESPONSE_COMPLETE_EVENT);
                 resume();
             }
         }

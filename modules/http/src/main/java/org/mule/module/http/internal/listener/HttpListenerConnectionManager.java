@@ -18,6 +18,7 @@ import org.mule.module.http.internal.listener.grizzly.GrizzlyServerManager;
 import org.mule.transport.ssl.TlsContextFactory;
 import org.mule.transport.tcp.DefaultTcpServerSocketProperties;
 import org.mule.transport.tcp.TcpServerSocketProperties;
+import org.mule.util.concurrent.ThreadNameHelper;
 
 import com.google.common.collect.Iterables;
 
@@ -51,7 +52,7 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
 
         try
         {
-            httpServerManager = new GrizzlyServerManager(httpListenerRegistry, tcpServerSocketProperties);
+            httpServerManager = new GrizzlyServerManager(ThreadNameHelper.getPrefix(muleContext), httpListenerRegistry, tcpServerSocketProperties);
         }
         catch (IOException e)
         {
@@ -72,13 +73,13 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
         this.muleContext = muleContext;
     }
 
-    public Server createServer(ServerAddress serverAddress)
+    public Server createServer(ServerAddress serverAddress, boolean usePersistentConnections, int connectionIdleTimeout)
     {
         if (!httpServerManager.containsServerFor(serverAddress))
         {
             try
             {
-                return httpServerManager.createServerFor(serverAddress);
+                return httpServerManager.createServerFor(serverAddress, usePersistentConnections, connectionIdleTimeout);
             }
             catch (IOException e)
             {
@@ -91,13 +92,13 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
         }
     }
 
-    public Server createSslServer(ServerAddress serverAddress, TlsContextFactory tlsContext)
+    public Server createSslServer(ServerAddress serverAddress, TlsContextFactory tlsContext, boolean usePersistentConnections, int connectionIdleTimeout)
     {
         if (!httpServerManager.containsServerFor(serverAddress))
         {
             try
             {
-                return httpServerManager.createSslServerFor(tlsContext, serverAddress);
+                return httpServerManager.createSslServerFor(tlsContext, serverAddress, usePersistentConnections, connectionIdleTimeout);
             }
             catch (IOException e)
             {
@@ -109,4 +110,5 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
             throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("A server for host(%s) and port(%s) already exists", serverAddress.getHost(), serverAddress.getPort())));
         }
     }
+
 }

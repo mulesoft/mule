@@ -26,19 +26,23 @@ public interface HttpServerManager
     /**
      *
      * @param serverAddress address of the server
+     * @param usePersistentConnections if true, the connections will be kept open for subsequent requests
+     * @param connectionIdleTimeout the amount of milliseconds to keep open an idle connection
      * @return the create Server handler
      * @throws IOException if it was not possible to create the Server. Most likely because the host and port is already in use.
      */
-    Server createServerFor(ServerAddress serverAddress) throws IOException;
+    Server createServerFor(ServerAddress serverAddress, boolean usePersistentConnections, int connectionIdleTimeout) throws IOException;
 
     /**
      *
      * @param tlsContextFactory
      * @param serverAddress address of the server
+     * @param usePersistentConnections if true, the connections will be kept open for subsequent requests
+     * @param connectionIdleTimeout the amount of milliseconds to keep open an idle connection
      * @return the create Server handler
      * @throws IOException if it was not possible to create the Server. Most likely because the host and port is already in use.
      */
-    Server createSslServerFor(TlsContextFactory tlsContextFactory, ServerAddress serverAddress) throws IOException;
+    Server createSslServerFor(TlsContextFactory tlsContextFactory, ServerAddress serverAddress, boolean usePersistentConnections, int connectionIdleTimeout) throws IOException;
 
     /**
      *
