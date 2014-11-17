@@ -4,16 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.integration.domain.http;
+package org.mule.test.integration.domain.http.transport;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.ApplicationContextBuilder;
 import org.mule.tck.junit4.DomainContextBuilder;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,9 +36,9 @@ public class HttpDefaultConnectorTestCase extends AbstractMuleTestCase
         try
         {
             domainContext = new DomainContextBuilder().setDomainConfig("domain/empty-domain-config.xml").build();
-            firstApp = new ApplicationContextBuilder().setDomainContext(domainContext).setApplicationResources(new String[] {"domain/http/http-hello-world-app-no-connector.xml"}).build();
+            firstApp = new ApplicationContextBuilder().setDomainContext(domainContext).setApplicationResources(new String[] {"domain/http/transport/http-hello-world-app-no-connector.xml"}).build();
             expectedException.expect(LifecycleException.class);
-            secondApp = new ApplicationContextBuilder().setDomainContext(domainContext).setApplicationResources(new String[] {"domain/http/http-hello-mule-app-no-connector.xml"}).build();
+            secondApp = new ApplicationContextBuilder().setDomainContext(domainContext).setApplicationResources(new String[] {"domain/http/transport/http-hello-mule-app-no-connector.xml"}).build();
         }
         finally
         {
