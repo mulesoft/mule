@@ -597,10 +597,11 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="maxConnections" type="mule:substitutableInt">
+                <xsd:attribute name="maxConnections" type="mule:substitutableInt" default="-1">
                     <xsd:annotation>
                         <xsd:documentation>
                             The maximum number of outbound connections that will be kept open at the same time.
+                            By default this number has no limit, represented by the value -1.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
