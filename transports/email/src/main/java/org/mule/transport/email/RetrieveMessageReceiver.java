@@ -385,11 +385,14 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                 {
                     try
                     {
-                        folder.close(true); // close and expunge deleted messages
+                        if (folder != null && folder.isOpen())
+                        {
+                            folder.close(true); // close and expunge deleted messages
+                        }
                     }
                     catch (Exception e)
                     {
-                        logger.error("Failed to close pop3  inbox: " + e.getMessage());
+                        logger.error("Failed to close pop3 inbox: " + e.getMessage());
                     }
                 }
             }
