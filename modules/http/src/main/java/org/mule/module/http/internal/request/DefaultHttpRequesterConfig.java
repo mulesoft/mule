@@ -46,7 +46,7 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
 
     private int maxConnections = UNLIMITED_CONNECTIONS;
     private boolean usePersistentConnections = true;
-    private Integer connectionIdleTimeout;
+    private int connectionIdleTimeout = DEFAULT_CONNECTION_IDLE_TIMEOUT;
 
     @Override
     public void initialise() throws InitialisationException
@@ -67,18 +67,7 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
 
         if (!usePersistentConnections)
         {
-            if (connectionIdleTimeout != null)
-            {
-                throw new InitialisationException(CoreMessages.createStaticMessage("If connections are not persistent the connectionIdleTimeout parameter can not be set."), this);
-            }
             connectionIdleTimeout = 0;
-        }
-        else
-        {
-            if (connectionIdleTimeout == null)
-            {
-                connectionIdleTimeout = DEFAULT_CONNECTION_IDLE_TIMEOUT;
-            }
         }
     }
 
@@ -272,7 +261,7 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
         this.usePersistentConnections = usePersistentConnections;
     }
 
-    public void setConnectionIdleTimeout(Integer connectionIdleTimeout)
+    public void setConnectionIdleTimeout(int connectionIdleTimeout)
     {
         this.connectionIdleTimeout = connectionIdleTimeout;
     }

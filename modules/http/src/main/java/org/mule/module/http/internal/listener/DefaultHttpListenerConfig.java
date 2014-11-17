@@ -6,7 +6,6 @@
  */
 package org.mule.module.http.internal.listener;
 
-import static org.mule.module.http.internal.listener.HttpListenerConnectionManager.HTTP_LISTENER_CONNECTION_MANAGER;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -59,7 +58,7 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
     private boolean initialised;
 
     private boolean usePersistentConnections = true;
-    private Integer connectionIdleTimeout;
+    private int connectionIdleTimeout = DEFAULT_CONNECTION_IDLE_TIMEOUT;
 
     public void setWorkerThreadingProfile(ThreadingProfile workerThreadingProfile)
     {
@@ -150,18 +149,7 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
     {
         if (!usePersistentConnections)
         {
-            if (connectionIdleTimeout != null)
-            {
-                throw new InitialisationException(CoreMessages.createStaticMessage("If connections are not persistent the connectionIdleTimeout parameter can not be set."), this);
-            }
             connectionIdleTimeout = 0;
-        }
-        else
-        {
-            if (connectionIdleTimeout == null)
-            {
-                connectionIdleTimeout = DEFAULT_CONNECTION_IDLE_TIMEOUT;
-            }
         }
     }
 
@@ -267,7 +255,7 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
         this.usePersistentConnections = usePersistentConnections;
     }
 
-    public void setConnectionIdleTimeout(Integer connectionIdleTimeout)
+    public void setConnectionIdleTimeout(int connectionIdleTimeout)
     {
         this.connectionIdleTimeout = connectionIdleTimeout;
     }

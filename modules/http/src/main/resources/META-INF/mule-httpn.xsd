@@ -163,7 +163,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="connectionIdleTimeout" type="mule:substitutableInt">
+                <xsd:attribute name="connectionIdleTimeout" type="mule:substitutableInt" default="30000">
                     <xsd:annotation>
                         <xsd:documentation>
                             The number of milliseconds that a connection can remain idle before it is closed.
@@ -605,7 +605,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="connectionIdleTimeout" type="mule:substitutableInt">
+                <xsd:attribute name="connectionIdleTimeout" type="mule:substitutableInt" default="30000">
                     <xsd:annotation>
                         <xsd:documentation>
                             The number of milliseconds that a connection can remain idle before it is closed.

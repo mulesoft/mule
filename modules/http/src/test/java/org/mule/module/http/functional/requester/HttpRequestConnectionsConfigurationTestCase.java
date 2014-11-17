@@ -33,12 +33,12 @@ public class HttpRequestConnectionsConfigurationTestCase extends AbstractMuleTes
         httpRequesterConfig.initialise();
     }
 
-    @Test(expected=InitialisationException.class)
-    public void nonPersistentConnectionsCanNotHaveIdleTimeout() throws InitialisationException
+    @Test
+    public void ignoreIdleTimeoutIfNotPersistentConnections() throws InitialisationException
     {
         DefaultHttpRequesterConfig httpRequesterConfig = new DefaultHttpRequesterConfig();
         httpRequesterConfig.setUsePersistentConnections(false);
-        httpRequesterConfig.setConnectionIdleTimeout(100);
+        httpRequesterConfig.setConnectionIdleTimeout(-2);
         httpRequesterConfig.initialise();
     }
 
