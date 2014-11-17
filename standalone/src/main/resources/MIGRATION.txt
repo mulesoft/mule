@@ -27,6 +27,7 @@ MULE-7946: The following dependencies were removed from the distribution since t
 
 MULE-7949: Guava has been upgraded to version 18.0
 MULE-7950: The following Apache Commons dependencies were upgraded:
+    * commons-beanutils: from version 1.8.0 to 1.9.2
     * commons-codec: from version 1.3 to 1.9
     * commons-exec: from version 1.1 to 1.2
     * commons-net: from version 2.0 to 2.2
