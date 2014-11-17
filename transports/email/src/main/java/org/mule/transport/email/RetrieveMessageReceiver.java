@@ -46,6 +46,8 @@ import javax.mail.internet.MimeMessage;
  */
 public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver implements MessageCountListener
 {
+
+    private static final String FOLDER_EXCEPTION_FORMAT = "Unexpected exception %s folder %s : %s";
     private Folder folder = null;
     private Folder moveToFolder = null;
     private boolean backupEnabled;
@@ -240,9 +242,9 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                 {
                     logger.debug("Message removed: " + messages[i].getSubject());
                 }
-                catch (MessagingException ignore)
+                catch (MessagingException e)
                 {
-                    logger.debug("ignoring exception: " + ignore.getMessage());
+                    logger.debug(String.format("Unexpected exception getting subject: %s", e.getMessage()));
                 }
             }
         }
@@ -346,7 +348,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                     {
                         if (logger.isDebugEnabled())
                         {
-                            logger.debug("ignoring exception: " + e.getMessage());
+                            logger.debug(String.format(FOLDER_EXCEPTION_FORMAT, "opening", folder.getFullName(), e.getMessage()));
                         }
                     }
 
@@ -385,17 +387,16 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                 {
                     try
                     {
-                        folder.close(true); // close and expunge deleted messages
+                        closeFolder();
                     }
                     catch (Exception e)
                     {
-                        logger.error("Failed to close pop3  inbox: " + e.getMessage());
+                        logger.error("Failed to close pop3 inbox: " + e.getMessage());
                     }
                 }
             }
         }
     }
-
 
     @Override
     protected boolean pollOnPrimaryInstanceOnly()
@@ -411,18 +412,23 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
             if (null != folder)
             {
                 folder.removeMessageCountListener(this);
-                if (folder.isOpen())
+                try
                 {
-                    try
-                    {
-                        folder.close(true);
-                    }
-                    catch (Exception e)
-                    {
-                        logger.debug("ignoring exception: " + e.getMessage(), e);
-                    }
+                    closeFolder();
+                }
+                catch (Exception e)
+                {
+                    logger.debug(String.format(FOLDER_EXCEPTION_FORMAT, "closing", folder.getFullName(), e.getMessage()), e);
                 }
             }
+        }
+    }
+
+    private void closeFolder() throws MessagingException
+    {
+        if (folder != null && folder.isOpen())
+        {
+            folder.close(true); // close and expunge deleted messages
         }
     }
 
