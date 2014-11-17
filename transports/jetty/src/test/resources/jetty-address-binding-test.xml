@@ -8,6 +8,8 @@
       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
+    <configuration useHttpTransportByDefault="true"/>
+
     <jetty:connector name="httpConnector"/>
 
     <jetty:endpoint name="endpointLoopbackAddress" address="http://127.0.0.1:${port1}" exchange-pattern="request-response" />

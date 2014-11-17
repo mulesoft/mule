@@ -10,11 +10,17 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.Connector;
 import org.mule.construct.Flow;
+import org.mule.module.http.api.HttpConstants;
+import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.PollingProber;
@@ -106,8 +112,8 @@ public abstract class AbstractJettyAcceptorFunctionalTestCase extends Functional
     protected void assertRequest(final Protocol protocol) throws Exception
     {
         final MuleClient client = muleContext.getClient();
-        final MuleMessage message = client.send(String.format("%s://localhost:%s", protocol, port1.getNumber()), TEST_MESSAGE, null);
-        assertEquals("200", message.getInboundProperty("http.status"));
+        final MuleMessage message = client.send(String.format("%s://localhost:%s", protocol, port1.getNumber()), new DefaultMuleMessage(TEST_MESSAGE, muleContext), newOptions().method(POST).build());
+        assertEquals(200, message.getInboundProperty("http.status"));
         assertEquals(TEST_MESSAGE + " received", message.getPayloadAsString());
     }
 }

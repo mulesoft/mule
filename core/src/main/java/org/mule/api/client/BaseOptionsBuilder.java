@@ -6,25 +6,38 @@
  */
 package org.mule.api.client;
 
-public abstract class BaseOptionsBuilder<T extends BaseOptionsBuilder, OptionsType>
+/**
+ * Base options for every operation.
+ *
+ * @param <BuilderType> builder class
+ * @param <OptionsType> options type that this builder creates
+ */
+public abstract class BaseOptionsBuilder<BuilderType extends BaseOptionsBuilder, OptionsType>
 {
 
-    private long timeout;
+    private Long responseTimeout;
 
     protected BaseOptionsBuilder()
     {
     }
 
-    public T timeout(final long timeout)
+    /**
+     * @param timeout maximum amount of time to wait for the HTTP response
+     * @return the builder
+     */
+    public BuilderType responseTimeout(final long timeout)
     {
-        this.timeout = timeout;
-        return (T) this;
+        this.responseTimeout = timeout;
+        return (BuilderType) this;
     }
 
     public abstract OptionsType build();
 
-    protected long getTimeout()
+    /**
+     * @return configured timeout. null if no timeout was configured
+     */
+    protected Long getResponseTimeout()
     {
-        return timeout;
+        return responseTimeout;
     }
 }

@@ -20,7 +20,6 @@ public class HttpRequestOptionsBuilder extends BaseOptionsBuilder<HttpRequestOpt
     private Boolean followsRedirect;
     private HttpStreamingType requestStreamingMode;
     private HttpRequesterConfig requestConfig;
-    private Long responseTimeout;
     private boolean disableStatusCodeValidation;
 
     private HttpRequestOptionsBuilder()
@@ -92,16 +91,6 @@ public class HttpRequestOptionsBuilder extends BaseOptionsBuilder<HttpRequestOpt
     }
 
     /**
-     * @param timeout maximum amount of time to wait for the HTTP response
-     * @return the builder
-     */
-    public HttpRequestOptionsBuilder responseTimeout(long timeout)
-    {
-        this.responseTimeout = timeout;
-        return this;
-    }
-
-    /**
      * Disables the status code validation for the response
      *
      * @return the builder
@@ -151,7 +140,7 @@ public class HttpRequestOptionsBuilder extends BaseOptionsBuilder<HttpRequestOpt
             @Override
             public Long getResponseTimeout()
             {
-                return responseTimeout;
+                return HttpRequestOptionsBuilder.this.getResponseTimeout();
             }
 
             @Override

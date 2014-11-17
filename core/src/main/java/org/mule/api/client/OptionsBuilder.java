@@ -6,6 +6,9 @@
  */
 package org.mule.api.client;
 
+/**
+ * Most basic options builder that every connector must be able to use for configuration.
+ */
 public class OptionsBuilder extends BaseOptionsBuilder<OptionsBuilder, Options>
 {
 
@@ -21,11 +24,16 @@ public class OptionsBuilder extends BaseOptionsBuilder<OptionsBuilder, Options>
             @Override
             public Long getResponseTimeout()
             {
-                return getTimeout();
+                return OptionsBuilder.this.getResponseTimeout();
             }
         };
     }
 
+    /**
+     * Factory method for the buikder.
+     *
+     * @return a new options builder
+     */
     public static OptionsBuilder newOptions()
     {
         return new OptionsBuilder();

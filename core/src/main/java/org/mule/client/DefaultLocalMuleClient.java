@@ -6,6 +6,8 @@
  */
 package org.mule.client;
 
+import static org.mule.api.client.OptionsBuilder.newOptions;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -17,6 +19,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.client.Options;
+import org.mule.api.client.OptionsBuilder;
 import org.mule.api.connector.ConnectorOperationLocator;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointCache;
@@ -125,7 +128,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
         }
         else
         {
-            return send(url, message, options.getResponseTimeout());
+            return internalSend(url, message, options.getResponseTimeout());
         }
     }
 
@@ -137,6 +140,11 @@ public class DefaultLocalMuleClient implements LocalMuleClient
     }
 
     public MuleMessage send(String url, MuleMessage message, long timeout) throws MuleException
+    {
+        return send(url, message, newOptions().responseTimeout(timeout).build());
+    }
+
+    private MuleMessage internalSend(String url, MuleMessage message, long timeout) throws MuleException
     {
         OutboundEndpoint endpoint = endpointCache.getOutboundEndpoint(url, MessageExchangePattern.REQUEST_RESPONSE, timeout);
         return returnMessage(endpoint.process(createMuleEvent(message, endpoint)));

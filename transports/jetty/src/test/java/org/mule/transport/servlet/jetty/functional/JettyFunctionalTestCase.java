@@ -8,10 +8,15 @@ package org.mule.transport.servlet.jetty.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mule.module.http.api.HttpConstants.Methods.*;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.module.http.api.client.HttpRequestOptions;
+import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -64,8 +69,8 @@ public class JettyFunctionalTestCase extends FunctionalTestCase
         testComponent.setEventCallback(callback);
 
         MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/normal?param1=value1", TEST_MESSAGE, null);
-        assertEquals("200", response.getInboundProperty("http.status"));
+        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/normal?param1=value1", new DefaultMuleMessage(TEST_MESSAGE, muleContext), newOptions().method(POST).build());
+        assertEquals(200, response.getInboundProperty("http.status"));
         assertEquals(TEST_MESSAGE + " received", IOUtils.toString((InputStream) response.getPayload()));
     }
 
@@ -73,8 +78,8 @@ public class JettyFunctionalTestCase extends FunctionalTestCase
     public void testExceptionExecutionFlow() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/exception", TEST_MESSAGE, null);
-        assertEquals("500", response.getInboundProperty("http.status"));
-        assertNotNull(response.getExceptionPayload());
+        final HttpRequestOptions httpRequestOptions = newOptions().disableStatusCodeValidation().build();
+        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/exception", new DefaultMuleMessage(TEST_MESSAGE, muleContext), httpRequestOptions);
+        assertEquals(500, response.getInboundProperty("http.status"));
     }
 }

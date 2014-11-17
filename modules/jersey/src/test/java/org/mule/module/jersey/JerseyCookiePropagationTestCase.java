@@ -18,6 +18,8 @@ import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.HttpStatus;
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -51,7 +53,7 @@ public class JerseyCookiePropagationTestCase extends FunctionalTestCase
         props.put(HttpConnector.HTTP_COOKIES_PROPERTY, cookiesObject);
 
         MuleMessage result = muleContext.getClient().send(
-                "http://localhost:" + httpPort.getNumber() + "/helloworld", "", props);
+                "http://localhost:" + httpPort.getNumber() + "/helloworld", new DefaultMuleMessage("", props, muleContext));
         assertThat(HttpStatus.SC_OK, is(equalTo(result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0))));
 
         Map<String, javax.ws.rs.core.Cookie> cookies = jerseyResource.getCookies();
