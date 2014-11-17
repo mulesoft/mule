@@ -7,7 +7,7 @@
 package org.mule.api.connector;
 
 import org.mule.api.MuleException;
-import org.mule.api.client.Options;
+import org.mule.api.client.OperationOptions;
 import org.mule.api.processor.MessageProcessor;
 
 /**
@@ -23,12 +23,12 @@ public interface ConnectorOperationProvider
 
     public boolean supportsUrl(final String url);
 
-    public MessageProcessor getMessageProcessor(String url) throws MuleException;
+    public MessageProcessor getRequestResponseMessageProcessor(String url) throws MuleException;
 
-    public MessageProcessor getMessageProcessor(String url, Options options) throws MuleException;
+    public MessageProcessor getRequestResponseMessageProcessor(String url, OperationOptions operationOptions) throws MuleException;
 
     public MessageProcessor getOneWayMessageProcessor(String url) throws MuleException;
 
-    public MessageProcessor getOneWayMessageProcessor(String url, Options options) throws MuleException;
+    public MessageProcessor getOneWayMessageProcessor(String url, OperationOptions operationOptions) throws MuleException;
 
 }

@@ -6,14 +6,14 @@
  */
 package org.mule.module.http.api.client;
 
-import org.mule.api.client.BaseOptionsBuilder;
+import org.mule.api.client.AbstractBaseOptionsBuilder;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
 import org.mule.module.http.internal.HttpStreamingType;
 
 /**
  * Builder object for {@link org.mule.module.http.api.client.HttpRequestOptions}
  */
-public class HttpRequestOptionsBuilder extends BaseOptionsBuilder<HttpRequestOptionsBuilder, HttpRequestOptions>
+public class HttpRequestOptionsBuilder extends AbstractBaseOptionsBuilder<HttpRequestOptionsBuilder, HttpRequestOptions>
 {
 
     private String method;

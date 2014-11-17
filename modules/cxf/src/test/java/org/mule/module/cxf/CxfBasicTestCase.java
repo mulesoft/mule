@@ -9,6 +9,7 @@ package org.mule.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.DefaultMuleMessage;
@@ -17,7 +18,6 @@ import org.mule.api.client.MuleClient;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.config.i18n.LocaleMessageHandler;
 import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -82,7 +82,7 @@ public class CxfBasicTestCase extends AbstractServiceAndFlowTestCase
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("Content-Type", "application/soap+xml");
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
-        final HttpRequestOptions httpRequestOptions = newOptions().method(org.mule.module.http.api.HttpConstants.Methods.POST).build();
+        final HttpRequestOptions httpRequestOptions = newOptions().method(POST).build();
         MuleMessage result = client.send(((InboundEndpoint) muleContext.getRegistry()
             .lookupObject("httpInbound")).getAddress(), new DefaultMuleMessage(xml, props, muleContext), httpRequestOptions);
         assertTrue(result.getPayloadAsString().contains("Hello!"));

@@ -38,7 +38,7 @@ public class JettyCustomExceptionStrategyTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         final HttpRequestOptions httpRequestOptions = newOptions().disableStatusCodeValidation().build();
-        MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/test", new DefaultMuleMessage("test", muleContext), httpRequestOptions);
+        MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/test", getTestMuleMessage(), httpRequestOptions);
         assertNotNull(response);
         assertNotNull(response.getInboundProperty("CustomES"));
         assertEquals(response.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY), 400);

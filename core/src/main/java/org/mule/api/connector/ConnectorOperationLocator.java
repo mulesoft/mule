@@ -7,7 +7,7 @@
 package org.mule.api.connector;
 
 import org.mule.api.MuleException;
-import org.mule.api.client.Options;
+import org.mule.api.client.OperationOptions;
 import org.mule.api.processor.MessageProcessor;
 
 /**
@@ -18,30 +18,38 @@ public interface ConnectorOperationLocator
 {
 
     /**
-     * @param url the url that identifies the operation
-     * @param options the options to use to execute the operation
+     * Lookup for a request response operation from a connector
+     *
+     * @param url the URL that identifies the operation
+     * @param operationOptions the options to use to execute the operation
      * @return the operation configured for the url and options
      * @throws MuleException
      */
-    MessageProcessor locateConnectorOperation(String url, Options options) throws MuleException;
+    MessageProcessor locateRequestResponseConnectorOperation(String url, OperationOptions operationOptions) throws MuleException;
 
     /**
-     * @param url the url that identifies the operation
+     * Lookup for a request response operation from a connector using the default operation configuration
+     *
+     * @param url the URL that identifies the operation
      * @return the operation configured for the url and default options
      * @throws MuleException
      */
-    MessageProcessor locateConnectorOperation(String url) throws MuleException;
+    MessageProcessor locateRequestResponseConnectorOperation(String url) throws MuleException;
 
     /**
-     * @param url the url that identifies the operation
-     * @param options the options to use to execute the operation
+     * Lookup for a one way operation from a connector
+     *
+     * @param url the URL that identifies the operation
+     * @param operationOptions the options to use to execute the operation
      * @return the operation configured for the url and options.
      * @throws MuleException
      */
-    MessageProcessor locateOneWayConnectorOperation(String url, Options options) throws MuleException;
+    MessageProcessor locateOneWayConnectorOperation(String url, OperationOptions operationOptions) throws MuleException;
 
     /**
-     * @param url the url that identifies the operation
+     *  Lookup for a one way operation from a connector using the default operation configuration
+     *
+     * @param url the URL that identifies the operation
      * @return the operation configured for the url and default options
      * @throws MuleException
      */

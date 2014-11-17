@@ -12,12 +12,12 @@ package org.mule.api.client;
  * @param <BuilderType> builder class
  * @param <OptionsType> options type that this builder creates
  */
-public abstract class BaseOptionsBuilder<BuilderType extends BaseOptionsBuilder, OptionsType>
+public abstract class AbstractBaseOptionsBuilder<BuilderType extends AbstractBaseOptionsBuilder, OptionsType>
 {
 
     private Long responseTimeout;
 
-    protected BaseOptionsBuilder()
+    protected AbstractBaseOptionsBuilder()
     {
     }
 

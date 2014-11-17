@@ -54,9 +54,10 @@ public interface MuleClient
      * @param url the Mule URL used to determine the destination and transport of the
      *            message
      * @param message the message to send
+     * @param operationOptions the options to configure the operation
      * @throws org.mule.api.MuleException
      */
-    void dispatch(String url, MuleMessage message, Options options) throws MuleException;
+    void dispatch(String url, MuleMessage message, OperationOptions operationOptions) throws MuleException;
 
     /**
      * @deprecated use {@link #send(String, org.mule.api.MuleMessage)} instead
@@ -103,9 +104,11 @@ public interface MuleClient
      *         components invoked explicitly sets a return as <code>null</code>.
      * @throws org.mule.api.MuleException
      */
-    MuleMessage send(String url, MuleMessage message, Options options) throws MuleException;
+    MuleMessage send(String url, MuleMessage message, OperationOptions operationOptions) throws MuleException;
 
     /**
+     * @deprecated use {@link #send(String, org.mule.api.MuleMessage, OperationOptions)}
+     *
      * Sends an event synchronously to a endpointUri via a mule server and a
      * resulting message is returned.
      * 
@@ -126,7 +129,7 @@ public interface MuleClient
         throws MuleException;
 
     /**
-     * @deprecated use {@link #send(String, org.mule.api.MuleMessage, Options)} instead
+     * @deprecated use {@link #send(String, org.mule.api.MuleMessage, OperationOptions)} instead
      *
      * Sends an event synchronously to a endpointUri via a mule server and a
      * resulting message is returned.

@@ -6,13 +6,13 @@
  */
 package org.mule.module.http.api.client;
 
-import org.mule.api.client.Options;
+import org.mule.api.client.OperationOptions;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
 
 /**
  * Options that can be configured for making an http request using {@link org.mule.api.client.MuleClient}
  */
-public interface HttpRequestOptions extends Options
+public interface HttpRequestOptions extends OperationOptions
 {
 
     /**

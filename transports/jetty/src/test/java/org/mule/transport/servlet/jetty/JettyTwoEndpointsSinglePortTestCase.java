@@ -64,7 +64,7 @@ public class JettyTwoEndpointsSinglePortTestCase extends AbstractServiceAndFlowT
         sendWithResponse("http://localhost:" + dynamicPort.getNumber() + "/mycomponent2", "test", "mycomponent2", 5);
 
         final HttpRequestOptions httpRequestOptions = newOptions().disableStatusCodeValidation().build();
-        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/mycomponent-notfound", new DefaultMuleMessage("test", muleContext), httpRequestOptions);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/mycomponent-notfound", getTestMuleMessage(), httpRequestOptions);
         assertNotNull(result);
         final int status = result.getInboundProperty("http.status", 0);
         assertEquals(404, status);

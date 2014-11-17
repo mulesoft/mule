@@ -12,7 +12,7 @@ import static org.mule.module.http.internal.request.SuccessStatusCodeValidator.a
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.client.Options;
+import org.mule.api.client.OperationOptions;
 import org.mule.api.connector.ConnectorOperationProvider;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.processor.MessageProcessor;
@@ -36,7 +36,7 @@ public class HttpConnectorMessageProcessorProvider implements ConnectorOperation
     }
 
     @Override
-    public MessageProcessor getMessageProcessor(String url) throws MuleException
+    public MessageProcessor getRequestResponseMessageProcessor(String url) throws MuleException
     {
         if (muleContext.getConfiguration().useHttpTransportByDefault())
         {
@@ -46,24 +46,24 @@ public class HttpConnectorMessageProcessorProvider implements ConnectorOperation
     }
 
     @Override
-    public MessageProcessor getMessageProcessor(String url, Options options) throws MuleException
+    public MessageProcessor getRequestResponseMessageProcessor(String url, OperationOptions operationOptions) throws MuleException
     {
         if (muleContext.getConfiguration().useHttpTransportByDefault())
         {
             return null;
         }
         final HttpRequesterBuilder httpRequesterBuilder = new HttpRequesterBuilder(muleContext).setUrl(url);
-        if (options.getResponseTimeout() != null)
+        if (operationOptions.getResponseTimeout() != null)
         {
-            httpRequesterBuilder.setResponseTimeout(options.getResponseTimeout());
+            httpRequesterBuilder.setResponseTimeout(operationOptions.getResponseTimeout());
         }
         else
         {
             httpRequesterBuilder.setResponseTimeout(muleContext.getConfiguration().getDefaultResponseTimeout());
         }
-        if (options instanceof HttpRequestOptions)
+        if (operationOptions instanceof HttpRequestOptions)
         {
-            HttpRequestOptions httpRequestOptions = (HttpRequestOptions) options;
+            HttpRequestOptions httpRequestOptions = (HttpRequestOptions) operationOptions;
             if (httpRequestOptions.getMethod() != null)
             {
                 httpRequesterBuilder.setMethod(httpRequestOptions.getMethod());
@@ -99,17 +99,17 @@ public class HttpConnectorMessageProcessorProvider implements ConnectorOperation
         {
             return null;
         }
-        return new OneWayHttpRequester(getMessageProcessor(url));
+        return new OneWayHttpRequester(getRequestResponseMessageProcessor(url));
     }
 
     @Override
-    public MessageProcessor getOneWayMessageProcessor(String url, Options options) throws MuleException
+    public MessageProcessor getOneWayMessageProcessor(String url, OperationOptions operationOptions) throws MuleException
     {
         if (muleContext.getConfiguration().useHttpTransportByDefault())
         {
             return null;
         }
-        return new OneWayHttpRequester(getMessageProcessor(url, options));
+        return new OneWayHttpRequester(getRequestResponseMessageProcessor(url, operationOptions));
     }
 
     @Override

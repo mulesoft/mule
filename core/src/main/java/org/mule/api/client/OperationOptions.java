@@ -6,9 +6,15 @@
  */
 package org.mule.api.client;
 
-public interface Options
+/**
+ * Base options for every operation executed by {@link org.mule.api.client.MuleClient}
+ */
+public interface OperationOptions
 {
 
+    /**
+     * @return timeout for the operation to execute. May be null if the user didn't configure any.
+     */
     Long getResponseTimeout();
 
 }
