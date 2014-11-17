@@ -13,6 +13,9 @@
     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd">
 
+
+    <configuration useHttpTransportByDefault="true"/>
+
     <flow name="flowWithoutExceptionStrategySync">
         <http:inbound-endpoint name="httpInSync" port="${port1}" host="localhost" path="flowWithoutExceptionStrategySync" exchange-pattern="request-response"/>
         <test:component throwException="true"/>

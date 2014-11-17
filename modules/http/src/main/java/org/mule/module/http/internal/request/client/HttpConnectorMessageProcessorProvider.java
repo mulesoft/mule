@@ -57,6 +57,10 @@ public class HttpConnectorMessageProcessorProvider implements ConnectorOperation
         {
             httpRequesterBuilder.setResponseTimeout(options.getResponseTimeout());
         }
+        else
+        {
+            httpRequesterBuilder.setResponseTimeout(muleContext.getConfiguration().getDefaultResponseTimeout());
+        }
         if (options instanceof HttpRequestOptions)
         {
             HttpRequestOptions httpRequestOptions = (HttpRequestOptions) options;
