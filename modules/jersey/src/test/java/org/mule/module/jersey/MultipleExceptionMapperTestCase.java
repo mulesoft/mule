@@ -15,21 +15,42 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class MultipleExceptionMapperTestCase extends org.mule.tck.junit4.FunctionalTestCase
 {
     @Rule
     public DynamicPort port = new DynamicPort("port");
 
+    private String configFile;
+
+    public MultipleExceptionMapperTestCase(String configFile)
+    {
+        this.configFile = configFile;
+    }
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                new Object[] {"multiple-exception-mapper-config.xml"},
+                new Object[] {"multiple-exception-mapper-http-connector-config.xml"}
+        });
+    }
+
     @Override
     protected String getConfigFile()
     {
-        return "multiple-exception-mapper-config.xml";
+        return configFile;
     }
 
     @Test

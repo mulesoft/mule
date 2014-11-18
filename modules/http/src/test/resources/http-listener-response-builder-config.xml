@@ -24,6 +24,14 @@
         <echo-component/>
     </flow>
 
+    <flow name="statusResponseBuilderOverrideFlow">
+        <http:listener config-ref="listenerConfig" path="${statusResponseBuilderOverridePath}">
+            <http:response-builder reasonPhrase="everything works!"/>
+        </http:listener>
+        <set-property propertyName="http.status" value="202" />
+        <echo-component/>
+    </flow>
+
     <flow name="headerResponseBuilderFlow">
         <http:listener config-ref="listenerConfig" path="${headerResponseBuilderPath}">
             <http:response-builder>

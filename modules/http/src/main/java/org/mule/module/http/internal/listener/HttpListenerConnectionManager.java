@@ -38,14 +38,14 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
     @Override
     public void initialise() throws InitialisationException
     {
-        Collection<TcpServerSocketProperties> tcpServerSocketPropertiesesBeans = muleContext.getRegistry().lookupObjects(TcpServerSocketProperties.class);
+        Collection<TcpServerSocketProperties> tcpServerSocketPropertiesBeans = muleContext.getRegistry().lookupObjects(TcpServerSocketProperties.class);
         TcpServerSocketProperties tcpServerSocketProperties = new DefaultTcpServerSocketProperties();
 
-        if (tcpServerSocketPropertiesesBeans.size() == 1)
+        if (tcpServerSocketPropertiesBeans.size() == 1)
         {
-            tcpServerSocketProperties = Iterables.getOnlyElement(tcpServerSocketPropertiesesBeans);
+            tcpServerSocketProperties = Iterables.getOnlyElement(tcpServerSocketPropertiesBeans);
         }
-        else if (tcpServerSocketPropertiesesBeans.size() > 1)
+        else if (tcpServerSocketPropertiesBeans.size() > 1)
         {
             throw new InitialisationException(CoreMessages.createStaticMessage("Only one global TCP server socket properties bean should be defined in the config"), this);
         }

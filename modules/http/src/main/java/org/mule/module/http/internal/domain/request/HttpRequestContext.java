@@ -16,11 +16,13 @@ public class HttpRequestContext
 
     private final InetSocketAddress remoteHostAddress;
     private HttpRequest request;
+    private String scheme;
 
-    public HttpRequestContext(HttpRequest httpRequest, InetSocketAddress remoteHostAddress)
+    public HttpRequestContext(HttpRequest httpRequest, InetSocketAddress remoteHostAddress, String scheme)
     {
         this.request = httpRequest;
         this.remoteHostAddress = remoteHostAddress;
+        this.scheme = scheme;
     }
 
     /**
@@ -37,5 +39,13 @@ public class HttpRequestContext
     public InetSocketAddress getRemoteHostAddress()
     {
         return remoteHostAddress;
+    }
+
+    /**
+     * @return The scheme of the HTTP request URL (http or https)
+     */
+    public String getScheme()
+    {
+        return scheme;
     }
 }

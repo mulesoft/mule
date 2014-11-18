@@ -247,8 +247,8 @@ public class JerseyResourcesComponent extends AbstractComponent
     private ContainerRequest buildRequest(MuleEvent event) throws URISyntaxException
     {
         MuleMessage message = event.getMessage();
-        String path = message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
-        String contextPath = message.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
+        String path = resolvePath(message);
+        String contextPath = resolveContextPath(message);
         String query = null;
         int queryIdx = path.indexOf('?');
         if (queryIdx != -1)
@@ -257,22 +257,13 @@ public class JerseyResourcesComponent extends AbstractComponent
             path = path.substring(0, queryIdx);
         }
 
-        URI endpointUri = event.getMessageSourceURI();
-        String host = message.getInboundProperty("Host", endpointUri.getHost());
+        String host = message.getInboundProperty("Host", event.getMessageSourceURI().getHost());
         String method = message.getInboundProperty(HttpConnector.HTTP_METHOD_PROPERTY);
 
-        String scheme;
-        if ("servlet".equals(endpointUri.getScheme()))
-        {
-            scheme = "http";
-        }
-        else
-        {
-            scheme = endpointUri.getScheme();
-        }
+        String scheme = resolveScheme(event);
 
         URI baseUri = getBaseUri(scheme, host, contextPath);
-        URI completeUri = getCompleteUri(endpointUri, scheme, host, path, query);
+        URI completeUri = getCompleteUri(scheme, host, path, query);
 
         if (logger.isDebugEnabled())
         {
@@ -283,8 +274,68 @@ public class JerseyResourcesComponent extends AbstractComponent
         return new ContainerRequest(baseUri, completeUri, method, null, new MapPropertiesDelegate());
     }
 
-    private URI getCompleteUri(URI endpointUri,
-                               String scheme,
+
+    /**
+     * Resolves the path of the request, supporting properties from both the HTTP transport and the HTTP module.
+     */
+    private String resolvePath(MuleMessage message)
+    {
+        String path = message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+
+        if (path == null)
+        {
+            path = message.getInboundProperty(org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_URI);
+        }
+
+        return path;
+    }
+
+    /**
+     * Resolves the context path of the request, supporting properties from both the HTTP transport and
+     * the HTTP module.
+     */
+    private String resolveContextPath(MuleMessage message)
+    {
+        String contextPath = message.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
+
+        if (contextPath == null)
+        {
+            contextPath = message.getInboundProperty(org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_LISTENER_PATH);
+
+            if (contextPath != null)
+            {
+                if (contextPath.endsWith("*"))
+                {
+                    contextPath = contextPath.substring(0, contextPath.length() - 1);
+                }
+            }
+        }
+
+        return contextPath;
+    }
+
+    /**
+     * Resolves the scheme the URL in the request (http or https), supporting properties from both the HTTP transport
+     * (by reading the message source URI in the endpoint) and the HTTP module (an inbound property with the scheme).
+     */
+    private String resolveScheme(MuleEvent event)
+    {
+        String scheme = event.getMessageSourceURI().getScheme();
+
+        if (scheme == null)
+        {
+            scheme = event.getMessage().getInboundProperty(org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_SCHEME);
+        }
+
+        if ("servlet".equals(scheme))
+        {
+            scheme = org.mule.module.http.api.HttpConstants.Protocols.HTTP;
+        }
+
+        return scheme;
+    }
+
+    private URI getCompleteUri(String scheme,
                                String host,
                                String path,
                                String query) throws URISyntaxException

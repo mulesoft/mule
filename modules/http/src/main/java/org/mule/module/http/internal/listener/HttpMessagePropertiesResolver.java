@@ -21,6 +21,7 @@ public class HttpMessagePropertiesResolver
     private String protocol;
     private String remoteHostAddress;
     private String listenerPath;
+    private String scheme;
 
     public HttpMessagePropertiesResolver setUri(String uri)
     {
@@ -52,6 +53,12 @@ public class HttpMessagePropertiesResolver
         return this;
     }
 
+    public HttpMessagePropertiesResolver setScheme(String scheme)
+    {
+        this.scheme = scheme;
+        return this;
+    }
+
     public void addPropertiesTo(Map<String, Object> propertiesMap)
     {
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY, this.method);
@@ -65,6 +72,8 @@ public class HttpMessagePropertiesResolver
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_REQUEST_URI, this.uri);
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_REMOTE_ADDRESS, remoteHostAddress);
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_URI_PARAMS, getUriParams(path));
+        propertiesMap.put(HttpConstants.RequestProperties.HTTP_LISTENER_PATH, listenerPath);
+        propertiesMap.put(HttpConstants.RequestProperties.HTTP_SCHEME, scheme);
     }
 
     private ParameterMap getUriParams(String path)

@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
@@ -19,6 +20,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
@@ -28,6 +30,10 @@ import org.junit.runners.Parameterized.Parameters;
  */
 public class MultipleResourcesTestCase extends AbstractServiceAndFlowTestCase
 {
+
+    @Rule
+    public DynamicPort port = new DynamicPort("port");
+
     public MultipleResourcesTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -38,7 +44,8 @@ public class MultipleResourcesTestCase extends AbstractServiceAndFlowTestCase
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "multiple-resources-conf-service.xml"},
-            {ConfigVariant.FLOW, "multiple-resources-conf-flow.xml"}
+            {ConfigVariant.FLOW, "multiple-resources-conf-flow.xml"},
+            {ConfigVariant.FLOW, "multiple-resources-http-connector-conf-flow.xml"}
         });
     }
 
@@ -49,11 +56,11 @@ public class MultipleResourcesTestCase extends AbstractServiceAndFlowTestCase
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
-        MuleMessage result = client.send("http://localhost:63081/helloworld/sayHelloWithUri/Dan", "", props);
+        MuleMessage result = client.send(String.format("http://localhost:%d/helloworld/sayHelloWithUri/Dan", port.getNumber()), "", props);
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
         assertEquals("Hello Dan", result.getPayloadAsString());
 
-        result = client.send("http://localhost:63081/anotherworld/sayHelloWithUri/Dan", "", props);
+        result = client.send(String.format("http://localhost:%d/anotherworld/sayHelloWithUri/Dan", port.getNumber()), "", props);
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
         assertEquals("Bonjour Dan", result.getPayloadAsString());
     }
