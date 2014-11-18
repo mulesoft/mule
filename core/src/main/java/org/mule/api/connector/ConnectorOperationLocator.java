@@ -6,6 +6,7 @@
  */
 package org.mule.api.connector;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleException;
 import org.mule.api.client.OperationOptions;
 import org.mule.api.processor.MessageProcessor;
@@ -22,37 +23,10 @@ public interface ConnectorOperationLocator
      *
      * @param url the URL that identifies the operation
      * @param operationOptions the options to use to execute the operation
+     * @param exchangePattern the exchange pattern to use for the operation
      * @return the operation configured for the url and options
      * @throws MuleException
      */
-    MessageProcessor locateRequestResponseConnectorOperation(String url, OperationOptions operationOptions) throws MuleException;
-
-    /**
-     * Lookup for a request response operation from a connector using the default operation configuration
-     *
-     * @param url the URL that identifies the operation
-     * @return the operation configured for the url and default options
-     * @throws MuleException
-     */
-    MessageProcessor locateRequestResponseConnectorOperation(String url) throws MuleException;
-
-    /**
-     * Lookup for a one way operation from a connector
-     *
-     * @param url the URL that identifies the operation
-     * @param operationOptions the options to use to execute the operation
-     * @return the operation configured for the url and options.
-     * @throws MuleException
-     */
-    MessageProcessor locateOneWayConnectorOperation(String url, OperationOptions operationOptions) throws MuleException;
-
-    /**
-     *  Lookup for a one way operation from a connector using the default operation configuration
-     *
-     * @param url the URL that identifies the operation
-     * @return the operation configured for the url and default options
-     * @throws MuleException
-     */
-    MessageProcessor locateOneWayConnectorOperation(String url) throws MuleException;
+    MessageProcessor locateConnectorOperation(String url, OperationOptions operationOptions, MessageExchangePattern exchangePattern) throws MuleException;
 
 }

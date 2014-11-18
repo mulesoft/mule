@@ -8,6 +8,8 @@ package org.mule.api.client;
 
 /**
  * Base options for every operation executed by {@link org.mule.api.client.MuleClient}
+ *
+ * Implementations of this class must redefine {@link Object#hashCode()} and {@link java.lang.Object#equals(Object)} since the may be used as key in a map
  */
 public interface OperationOptions
 {

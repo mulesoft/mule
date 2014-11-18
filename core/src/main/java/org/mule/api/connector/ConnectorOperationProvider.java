@@ -6,6 +6,7 @@
  */
 package org.mule.api.connector;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleException;
 import org.mule.api.client.OperationOptions;
 import org.mule.api.processor.MessageProcessor;
@@ -21,14 +22,21 @@ import org.mule.api.processor.MessageProcessor;
 public interface ConnectorOperationProvider
 {
 
-    public boolean supportsUrl(final String url);
+    /**
+     * @param url an URL for creating an operation
+     * @return true if the provider can handle the url, false otherwise
+     */
+    boolean supportsUrl(String url);
 
-    public MessageProcessor getRequestResponseMessageProcessor(String url) throws MuleException;
-
-    public MessageProcessor getRequestResponseMessageProcessor(String url, OperationOptions operationOptions) throws MuleException;
-
-    public MessageProcessor getOneWayMessageProcessor(String url) throws MuleException;
-
-    public MessageProcessor getOneWayMessageProcessor(String url, OperationOptions operationOptions) throws MuleException;
+    /**
+     * A {@link org.mule.api.processor.MessageProcessor} that contains the behaviour for the URL
+     *
+     * @param url an URL for creating an operation
+     * @param operationOptions the operation options
+     * @param exchangePattern exchange pattern to use to execute the request.
+     * @return a {@link org.mule.api.processor.MessageProcessor} that fulfills the operation
+     * @throws MuleException
+     */
+    MessageProcessor getMessageProcessor(String url, OperationOptions operationOptions, MessageExchangePattern exchangePattern) throws MuleException;
 
 }

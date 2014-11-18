@@ -9,11 +9,11 @@ package org.mule.module.ws.consumer;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.DefaultMuleConfiguration;
-import org.mule.module.http.api.requester.HttpRequester;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.transport.http.HttpConnector;
@@ -35,14 +35,6 @@ public class WSConsumerConfigTestCase extends AbstractMuleContextTestCase
         WSConsumerConfig config = createConsumerConfig();
         MessageProcessor mp = config.createOutboundMessageProcessor();
         assertThat(mp, instanceOf(OutboundEndpoint.class));
-    }
-
-    @Test
-    public void createHttpRequesterWithDefaultConfigFromHttpModule() throws MuleException
-    {
-        WSConsumerConfig config = createConsumerConfig();
-        MessageProcessor mp = config.createOutboundMessageProcessor();
-        assertThat(mp, instanceOf(HttpRequester.class));
     }
 
     @Test

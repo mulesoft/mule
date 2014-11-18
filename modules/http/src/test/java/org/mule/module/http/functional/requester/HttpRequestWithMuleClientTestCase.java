@@ -13,17 +13,23 @@ import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transport.NullPayload;
+import org.mule.util.concurrent.Latch;
 
 import java.io.ByteArrayInputStream;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.hamcrest.core.Is;
@@ -37,6 +43,7 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
 {
 
     public static final String PUT_HTTP_METHOD = "PUT";
+    private static final long RESPONSE_TIMEOUT = 100;
     @Rule
     public DynamicPort port = new DynamicPort("port");
     @Rule
@@ -56,7 +63,7 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
         assertThat(vmMessage.getPayload(), Is.<Object>is(NullPayload.getInstance().toString()));
     }
 
-    @Ignore //TODO see MULE-8049
+    @Ignore("See MULE-8049")
     @Test
     public void dispatchHttpPostRequestWithStreamingEnabled() throws Exception
     {
@@ -77,7 +84,7 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
         assertThat(vmMessage.getInboundProperty(HttpHeaders.Names.CONTENT_LENGTH), Is.<Object>is("12"));
     }
 
-    @Ignore //TODO see MULE-8049
+    @Ignore("See MULE-8049")
     @Test
     public void sendHttpPutMethod() throws Exception
     {
@@ -106,7 +113,14 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
     public void setWithTimeout() throws Exception
     {
         expectedException.expectCause(IsInstanceOf.<Throwable>instanceOf(TimeoutException.class));
-        muleContext.getClient().send(getTimeoutUrl(), new DefaultMuleMessage(NullPayload.class, muleContext), newOptions().responseTimeout(100).build());
+        try
+        {
+            muleContext.getClient().send(getTimeoutUrl(), new DefaultMuleMessage(NullPayload.class, muleContext), newOptions().responseTimeout(RESPONSE_TIMEOUT).build());
+        }
+        finally
+        {
+            LatchMessageProcessor.latch.release();
+        }
     }
 
     @Test
@@ -125,6 +139,25 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
         final HttpRequestOptions options = newOptions().disableStatusCodeValidation().build();
         final MuleMessage response = muleContext.getClient().send(getFailureUrl(), message, options);
         assertThat(response.getInboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY), Is.<Object>is(500));
+    }
+
+    public static class LatchMessageProcessor implements MessageProcessor
+    {
+        public static Latch latch = new Latch();
+
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            try
+            {
+                latch.await(RESPONSE_TIMEOUT, TimeUnit.MILLISECONDS);
+            }
+            catch (InterruptedException e)
+            {
+                throw new DefaultMuleException(e);
+            }
+            return event;
+        }
     }
 
     private MuleMessage getMessageReceivedByFlow() throws MuleException

@@ -8,113 +8,116 @@ package org.mule.module.http.internal.request.client;
 
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
-import static org.mule.module.http.internal.request.SuccessStatusCodeValidator.alwaysSuccessValidator;
 
+import org.mule.MessageExchangePattern;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.client.OperationOptions;
 import org.mule.api.connector.ConnectorOperationProvider;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.module.http.api.requester.HttpRequesterBuilder;
-import org.mule.module.http.internal.HttpStreamingType;
-import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Provider for operations of the HTTP module.
  */
-public class HttpConnectorMessageProcessorProvider implements ConnectorOperationProvider, MuleContextAware
+public class HttpConnectorMessageProcessorProvider implements ConnectorOperationProvider, MuleContextAware, Disposable
 {
 
+    private static final int MAX_NUMBER_OF_MP_CACHED = 1000;
+    private static final int EXPIRATION_TIME_IN_MINUTES = 10;
+    private final LoadingCache<HttpRequestCacheKey, MessageProcessor> cachedMessageProcessors;
     private MuleContext muleContext;
+
+    public HttpConnectorMessageProcessorProvider()
+    {
+        cachedMessageProcessors = CacheBuilder.newBuilder()
+            .maximumSize(MAX_NUMBER_OF_MP_CACHED)
+            .expireAfterWrite(EXPIRATION_TIME_IN_MINUTES, TimeUnit.MINUTES)
+            .build(
+                    new CacheLoader<HttpRequestCacheKey, MessageProcessor>()
+                    {
+                        public MessageProcessor load(HttpRequestCacheKey cacheKey) throws MuleException
+                        {
+                            return buildMessageProcessor(cacheKey);
+                        }
+                    });
+    }
 
     @Override
     public boolean supportsUrl(String url)
     {
+        if (muleContext.getConfiguration().useHttpTransportByDefault())
+        {
+            return false;
+        }
         return url.startsWith(HTTP) || url.startsWith(HTTPS);
     }
 
     @Override
-    public MessageProcessor getRequestResponseMessageProcessor(String url) throws MuleException
+    public MessageProcessor getMessageProcessor(final String url, final OperationOptions operationOptions, final MessageExchangePattern exchangePattern) throws MuleException
     {
         if (muleContext.getConfiguration().useHttpTransportByDefault())
         {
             return null;
         }
-        return new HttpRequesterBuilder(muleContext).setUrl(url).build();
+        try
+        {
+            return cachedMessageProcessors.get(new HttpRequestCacheKey(url, operationOptions, exchangePattern));
+        }
+        catch (ExecutionException e)
+        {
+            throw new DefaultMuleException(e);
+        }
     }
 
-    @Override
-    public MessageProcessor getRequestResponseMessageProcessor(String url, OperationOptions operationOptions) throws MuleException
+    private MessageProcessor buildMessageProcessor(final HttpRequestCacheKey cacheKey) throws MuleException
     {
-        if (muleContext.getConfiguration().useHttpTransportByDefault())
-        {
-            return null;
-        }
+        final OperationOptions operationOptions = cacheKey.getOperationOptions();
+        final MessageExchangePattern exchangePattern = cacheKey.getExchangePattern();
+        final String url = cacheKey.getUrl();
         final HttpRequesterBuilder httpRequesterBuilder = new HttpRequesterBuilder(muleContext).setUrl(url);
-        if (operationOptions.getResponseTimeout() != null)
+        if (operationOptions instanceof HttpRequestOptions)
         {
-            httpRequesterBuilder.setResponseTimeout(operationOptions.getResponseTimeout());
+            httpRequesterBuilder.setOperationConfig((HttpRequestOptions) operationOptions);
         }
         else
         {
-            httpRequesterBuilder.setResponseTimeout(muleContext.getConfiguration().getDefaultResponseTimeout());
+            if (operationOptions.getResponseTimeout() != null)
+            {
+                httpRequesterBuilder.responseTimeout(operationOptions.getResponseTimeout());
+            }
+            else
+            {
+                httpRequesterBuilder.responseTimeout(muleContext.getConfiguration().getDefaultResponseTimeout());
+            }
         }
-        if (operationOptions instanceof HttpRequestOptions)
+        MessageProcessor messageProcessor = httpRequesterBuilder.build();
+        if (exchangePattern.equals(MessageExchangePattern.ONE_WAY))
         {
-            HttpRequestOptions httpRequestOptions = (HttpRequestOptions) operationOptions;
-            if (httpRequestOptions.getMethod() != null)
-            {
-                httpRequesterBuilder.setMethod(httpRequestOptions.getMethod());
-            }
-            if (httpRequestOptions.isFollowsRedirect() != null)
-            {
-                httpRequesterBuilder.setFollowRedirects(httpRequestOptions.isFollowsRedirect().toString());
-            }
-            if (httpRequestOptions.alwaysStreamRequest())
-            {
-                httpRequesterBuilder.setRequestStreamingMode(HttpStreamingType.ALWAYS.name());
-            }
-            else if (httpRequestOptions.neverStreamRequest())
-            {
-                httpRequesterBuilder.setRequestStreamingMode(HttpStreamingType.NEVER.name());
-            }
-            if (httpRequestOptions.getRequesterConfig() != null)
-            {
-                httpRequesterBuilder.setConfig((DefaultHttpRequesterConfig) httpRequestOptions.getRequesterConfig());
-            }
-            if (httpRequestOptions.isStatusCodeValidationDisabled())
-            {
-                httpRequesterBuilder.setResponseValidator(alwaysSuccessValidator());
-            }
+            messageProcessor = new OneWayHttpRequester(messageProcessor);
         }
-        return httpRequesterBuilder.build();
-    }
-
-    @Override
-    public MessageProcessor getOneWayMessageProcessor(String url) throws MuleException
-    {
-        if (muleContext.getConfiguration().useHttpTransportByDefault())
-        {
-            return null;
-        }
-        return new OneWayHttpRequester(getRequestResponseMessageProcessor(url));
-    }
-
-    @Override
-    public MessageProcessor getOneWayMessageProcessor(String url, OperationOptions operationOptions) throws MuleException
-    {
-        if (muleContext.getConfiguration().useHttpTransportByDefault())
-        {
-            return null;
-        }
-        return new OneWayHttpRequester(getRequestResponseMessageProcessor(url, operationOptions));
+        return messageProcessor;
     }
 
     @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
+    }
+
+    @Override
+    public void dispose()
+    {
+        cachedMessageProcessors.invalidateAll();
     }
 }

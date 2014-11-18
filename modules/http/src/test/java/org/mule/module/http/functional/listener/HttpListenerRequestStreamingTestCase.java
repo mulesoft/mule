@@ -7,10 +7,12 @@
 package org.mule.module.http.functional.listener;
 
 import static org.junit.Assert.assertThat;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.http.api.requester.HttpRequester;
-import org.mule.module.http.api.requester.HttpRequesterBuilder;
+import org.mule.module.http.api.HttpConstants;
+import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -21,7 +23,7 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Ignore //TODO fix - see MULE-8044
+@Ignore("see MULE-8044")
 public class HttpListenerRequestStreamingTestCase extends FunctionalTestCase
 {
 
@@ -37,10 +39,8 @@ public class HttpListenerRequestStreamingTestCase extends FunctionalTestCase
     @Test
     public void listenerReceivedChunckedRequest() throws Exception
     {
-        final HttpRequester requester = new HttpRequesterBuilder(muleContext)
-                .setUrl(String.format("http://localhost:%s/", listenPort.getNumber()))
-                .setMethod("POST").build();
-        requester.process(getTestEvent(new ByteArrayInputStream(getPayload().getBytes())));
+        final HttpRequestOptions requestOptions = newOptions().method(HttpConstants.Methods.POST).build();
+        muleContext.getClient().send(String.format("http://localhost:%s/", listenPort.getNumber()), new DefaultMuleMessage(new ByteArrayInputStream(getPayload().getBytes()), muleContext), requestOptions);
         final MuleMessage message = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
         assertThat(message.getPayloadAsString(), Is.is(getPayload()));
     }
@@ -57,9 +57,4 @@ public class HttpListenerRequestStreamingTestCase extends FunctionalTestCase
         return bigPayload.toString();
     }
 
-    @Override
-    public int getTestTimeoutSecs()
-    {
-        return 9999999;
-    }
 }

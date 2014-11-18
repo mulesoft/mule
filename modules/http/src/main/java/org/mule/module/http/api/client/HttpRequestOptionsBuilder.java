@@ -21,6 +21,7 @@ public class HttpRequestOptionsBuilder extends AbstractBaseOptionsBuilder<HttpRe
     private HttpStreamingType requestStreamingMode;
     private HttpRequesterConfig requestConfig;
     private boolean disableStatusCodeValidation;
+    private boolean disableParseResponse;
 
     private HttpRequestOptionsBuilder()
     {
@@ -59,7 +60,7 @@ public class HttpRequestOptionsBuilder extends AbstractBaseOptionsBuilder<HttpRe
     }
 
     /**
-     * calling this method will make the HTTP request to always be sent using streaming (transfer-encoding chunk).
+     * Calling this method will make the HTTP request to always be sent using streaming (transfer-encoding chunk).
      *
      * @return the builder
      */
@@ -70,7 +71,7 @@ public class HttpRequestOptionsBuilder extends AbstractBaseOptionsBuilder<HttpRe
     }
 
     /**
-     * calling this method will make the HTTP request never to be sent using streaming (transfer-encoding chunk).
+     * Calling this method will make the HTTP request never to be sent using streaming (transfer-encoding chunk).
      *
      * @return the builder
      */
@@ -101,6 +102,12 @@ public class HttpRequestOptionsBuilder extends AbstractBaseOptionsBuilder<HttpRe
         return this;
     }
 
+    public HttpRequestOptionsBuilder disableParseResponse()
+    {
+        disableParseResponse = true;
+        return this;
+    }
+
     /**
      * @return a {@link org.mule.module.http.api.client.HttpRequestOptions} instance
      */
@@ -123,6 +130,12 @@ public class HttpRequestOptionsBuilder extends AbstractBaseOptionsBuilder<HttpRe
             public boolean neverStreamRequest()
             {
                 return HttpStreamingType.NEVER.equals(requestStreamingMode);
+            }
+
+            @Override
+            public boolean isParseResponseDisabled()
+            {
+                return disableParseResponse;
             }
 
             @Override
@@ -149,6 +162,64 @@ public class HttpRequestOptionsBuilder extends AbstractBaseOptionsBuilder<HttpRe
                 return disableStatusCodeValidation;
             }
 
+            @Override
+            public boolean equals(Object o)
+            {
+                if (this == o)
+                {
+                    return true;
+                }
+                if (!(o instanceof HttpRequestOptions))
+                {
+                    return false;
+                }
+
+                HttpRequestOptions that = (HttpRequestOptions) o;
+
+                if (disableStatusCodeValidation != that.isStatusCodeValidationDisabled())
+                {
+                    return false;
+                }
+                if (followsRedirect != null ? !followsRedirect.equals(that.isFollowsRedirect()) : that.isFollowsRedirect() != null)
+                {
+                    return false;
+                }
+                if (method != null ? !method.equals(that.getMethod()) : that.getMethod() != null)
+                {
+                    return false;
+                }
+                if (requestConfig != null ? !requestConfig.equals(that.getRequesterConfig()) : that.getRequesterConfig() != null)
+                {
+                    return false;
+                }
+                if (that.alwaysStreamRequest() && requestStreamingMode.equals(HttpStreamingType.ALWAYS))
+                {
+                    return false;
+                }
+                if (that.neverStreamRequest() && requestStreamingMode.equals(HttpStreamingType.NEVER))
+                {
+                    return false;
+                }
+                if (disableParseResponse != that.isParseResponseDisabled())
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
+            @Override
+            public int hashCode()
+            {
+                int result = method != null ? method.hashCode() : 0;
+                result = 31 * result + (followsRedirect != null ? followsRedirect.hashCode() : 0);
+                result = 31 * result + (requestStreamingMode != null ? requestStreamingMode.hashCode() : 0);
+                result = 31 * result + (requestConfig != null ? requestConfig.hashCode() : 0);
+                result = 31 * result + (disableStatusCodeValidation ? 1 : 0);
+                result = 31 * result + (disableParseResponse ? 1 : 0);
+                return result;
+            }
+
         };
     }
 
@@ -159,6 +230,5 @@ public class HttpRequestOptionsBuilder extends AbstractBaseOptionsBuilder<HttpRe
     {
         return new HttpRequestOptionsBuilder();
     }
-
 
 }

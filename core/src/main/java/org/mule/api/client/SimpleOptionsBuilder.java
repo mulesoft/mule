@@ -26,11 +26,41 @@ public class SimpleOptionsBuilder extends AbstractBaseOptionsBuilder<SimpleOptio
             {
                 return SimpleOptionsBuilder.this.getResponseTimeout();
             }
+
+            @Override
+            public boolean equals(Object o)
+            {
+                if (this == o)
+                {
+                    return true;
+                }
+                if (!(o instanceof OperationOptions))
+                {
+                    return false;
+                }
+
+                OperationOptions that = (OperationOptions) o;
+
+                Long responseTimeout = getResponseTimeout();
+                if (responseTimeout != null ? !responseTimeout.equals(that.getResponseTimeout()) : that.getResponseTimeout() != null)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
+            @Override
+            public int hashCode()
+            {
+                final Long responseTimeout = getResponseTimeout();
+                return responseTimeout != null ? responseTimeout.hashCode() : 0;
+            }
         };
     }
 
     /**
-     * Factory method for the buikder.
+     * Factory method for the builder.
      *
      * @return a new options builder
      */

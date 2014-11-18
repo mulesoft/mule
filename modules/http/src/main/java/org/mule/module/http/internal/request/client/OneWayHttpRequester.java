@@ -6,6 +6,7 @@
  */
 package org.mule.module.http.internal.request.client;
 
+import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -17,7 +18,7 @@ import java.io.InputStream;
 import org.apache.commons.io.IOUtils;
 
 /**
- * Simulates a one way http reqeuest operation.
+ * Simulates a one way HTTP request operation.
  */
 public class OneWayHttpRequester implements MessageProcessor
 {
@@ -46,6 +47,6 @@ public class OneWayHttpRequester implements MessageProcessor
                 throw new MessagingException(event, e);
             }
         }
-        return null;
+        return VoidMuleEvent.getInstance();
     }
 }

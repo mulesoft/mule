@@ -30,9 +30,7 @@
 
     <flow name="timeoutFlow">
         <http:listener path="timeoutPath" config-ref="listenerConfig"/>
-        <expression-component>
-            Thread.sleep(300);
-        </expression-component>
+        <custom-processor class="org.mule.module.http.functional.requester.HttpRequestWithMuleClientTestCase$LatchMessageProcessor"/>
     </flow>
 
     <flow name="failureStatusCodeFlow">

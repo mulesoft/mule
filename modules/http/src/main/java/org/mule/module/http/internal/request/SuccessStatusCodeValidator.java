@@ -12,15 +12,11 @@ import org.mule.module.http.api.HttpConstants;
 
 public class SuccessStatusCodeValidator extends RangeStatusCodeValidator
 {
-    private static SuccessStatusCodeValidator alwaysSuccess = new SuccessStatusCodeValidator("0..599");
 
     /**
-     * @return an status code validator that allows any status code.
+     * an status code validator that allows any status code.
      */
-    public static SuccessStatusCodeValidator alwaysSuccessValidator()
-    {
-        return alwaysSuccess;
-    }
+    public static SuccessStatusCodeValidator ALWAYS_SUCCESS = new SuccessStatusCodeValidator("0..599");
 
     public SuccessStatusCodeValidator()
     {

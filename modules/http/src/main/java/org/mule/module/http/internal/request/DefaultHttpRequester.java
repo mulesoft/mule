@@ -14,9 +14,9 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.HttpAuthentication;
-import org.mule.module.http.api.requester.HttpRequester;
 import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 import org.mule.util.AttributeEvaluator;
@@ -29,7 +29,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 
-public class DefaultHttpRequester implements HttpRequester, Initialisable, MuleContextAware
+public class DefaultHttpRequester implements MessageProcessor, Initialisable, MuleContextAware
 {
 
     public static final List<String> DEFAULT_EMPTY_BODY_METHODS = Lists.newArrayList("GET", "HEAD", "OPTIONS");
@@ -209,7 +209,7 @@ public class DefaultHttpRequester implements HttpRequester, Initialisable, MuleC
     {
         if (responseTimeout == null)
         {
-            return muleContext.getConfiguration().getDefaultResponseTimeout();
+            return muleEvent.getTimeout();
         }
         else
         {
@@ -354,7 +354,6 @@ public class DefaultHttpRequester implements HttpRequester, Initialisable, MuleC
         this.method = new AttributeEvaluator(method);
     }
 
-    @Override
     public DefaultHttpRequesterConfig getConfig()
     {
         return requestConfig;

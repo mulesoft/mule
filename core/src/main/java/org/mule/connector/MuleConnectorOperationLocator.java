@@ -6,6 +6,7 @@
  */
 package org.mule.connector;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.client.OperationOptions;
@@ -42,54 +43,16 @@ public class MuleConnectorOperationLocator implements ConnectorOperationLocator,
     }
 
     @Override
-    public MessageProcessor locateRequestResponseConnectorOperation(String url, OperationOptions operationOptions) throws MuleException
+    public MessageProcessor locateConnectorOperation(String url, OperationOptions operationOptions, MessageExchangePattern exchangePattern) throws MuleException
     {
         for (ConnectorOperationProvider connectorOperationProvider : connectorOperationProviders)
         {
             if (connectorOperationProvider.supportsUrl(url))
             {
-                return connectorOperationProvider.getRequestResponseMessageProcessor(url, operationOptions);
+                return connectorOperationProvider.getMessageProcessor(url, operationOptions, exchangePattern);
             }
         }
         return null;
     }
 
-    @Override
-    public MessageProcessor locateRequestResponseConnectorOperation(String url) throws MuleException
-    {
-        for (ConnectorOperationProvider connectorOperationProvider : connectorOperationProviders)
-        {
-            if (connectorOperationProvider.supportsUrl(url))
-            {
-                return connectorOperationProvider.getRequestResponseMessageProcessor(url);
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public MessageProcessor locateOneWayConnectorOperation(String url, OperationOptions operationOptions) throws MuleException
-    {
-        for (ConnectorOperationProvider connectorOperationProvider : connectorOperationProviders)
-        {
-            if (connectorOperationProvider.supportsUrl(url))
-            {
-                return connectorOperationProvider.getOneWayMessageProcessor(url, operationOptions);
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public MessageProcessor locateOneWayConnectorOperation(String url) throws MuleException
-    {
-        for (ConnectorOperationProvider connectorOperationProvider : connectorOperationProviders)
-        {
-            if (connectorOperationProvider.supportsUrl(url))
-            {
-                return connectorOperationProvider.getOneWayMessageProcessor(url);
-            }
-        }
-        return null;
-    }
 }

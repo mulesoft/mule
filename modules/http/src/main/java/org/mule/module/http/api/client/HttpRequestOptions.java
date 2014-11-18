@@ -11,6 +11,8 @@ import org.mule.module.http.api.requester.HttpRequesterConfig;
 
 /**
  * Options that can be configured for making an http request using {@link org.mule.api.client.MuleClient}
+ *
+ * Implementations of this class must redefine {@link Object#hashCode()} and {@link java.lang.Object#equals(Object)} since the may be used as key in a map
  */
 public interface HttpRequestOptions extends OperationOptions
 {
@@ -29,6 +31,11 @@ public interface HttpRequestOptions extends OperationOptions
      * @return true if the request must never send the request using streaming
      */
     boolean neverStreamRequest();
+
+    /**
+     * @return true if the response from the request should not be parsed and return plain as an input stream.
+     */
+    boolean isParseResponseDisabled();
 
     /**
      * @return the {@link org.mule.module.http.api.requester.HttpRequesterConfig} to use for sending the request
