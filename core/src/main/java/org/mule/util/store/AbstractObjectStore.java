@@ -14,8 +14,8 @@ import org.mule.config.i18n.CoreMessages;
 
 import java.io.Serializable;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is an abstract superclass for {@link ObjectStore} implementations that conforms to the
@@ -24,8 +24,9 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractObjectStore<T extends Serializable> implements ObjectStore<T>
 {
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
+    @Override
     public boolean contains(Serializable key) throws ObjectStoreException
     {
         if (key == null)
@@ -37,6 +38,7 @@ public abstract class AbstractObjectStore<T extends Serializable> implements Obj
 
     protected abstract boolean doContains(Serializable key) throws ObjectStoreException;
 
+    @Override
     public void store(Serializable key, T value) throws ObjectStoreException
     {
         if (key == null)
@@ -54,6 +56,7 @@ public abstract class AbstractObjectStore<T extends Serializable> implements Obj
 
     protected  abstract void doStore(Serializable key, T value) throws ObjectStoreException;
 
+    @Override
     public T retrieve(Serializable key) throws ObjectStoreException
     {
         if (key == null)
@@ -72,6 +75,7 @@ public abstract class AbstractObjectStore<T extends Serializable> implements Obj
 
     protected abstract T doRetrieve(Serializable key) throws ObjectStoreException;
 
+    @Override
     public T remove(Serializable key) throws ObjectStoreException
     {
         if (key == null)

@@ -129,6 +129,7 @@ public class MuleProperties
     public static final String QUEUE_STORE_DEFAULT_IN_MEMORY_NAME = "_defaultInMemoryQueueStore";
     public static final String QUEUE_STORE_DEFAULT_PERSISTENT_NAME = "_defaultPersistentQueueStore";
     public static final String DEFAULT_USER_OBJECT_STORE_NAME = "_defaultUserObjectStore";
+    public static final String DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME = "_defaultTransientUserObjectStore";
     public static final String OBJECT_STORE_MANAGER = "_muleObjectStoreManager";
     public static final String OBJECT_STORE_SIMPLE_MEMORY_NAME = "_simpleMemoryQueueStore";
     public static final String OBJECT_STORE_FILE_NAME = "_fileQueueStore";

@@ -105,6 +105,12 @@ public class TextFileObjectStore extends InMemoryObjectStore<String>
             throw new ObjectStoreException(iox);
         }
     }
+    
+    @Override
+    public void clear()
+    {
+        throw new UnsupportedOperationException();
+    }
 
     public String getDirectory()
     {

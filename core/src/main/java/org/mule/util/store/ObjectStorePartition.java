@@ -42,6 +42,12 @@ public class ObjectStorePartition<T extends Serializable> implements ListableObj
     {
         return partitionedObjectStore.retrieve(key, partitionName);
     }
+    
+    @Override
+    public void clear() throws ObjectStoreException
+    {
+        this.partitionedObjectStore.clear(this.partitionName);
+    }
 
     @Override
     public T remove(Serializable key) throws ObjectStoreException

@@ -195,6 +195,12 @@ public class InstanceLockGroupTestCase extends AbstractMuleTestCase
         {
             return store.remove(key);
         }
+        
+        @Override
+        public void clear() throws ObjectStoreException
+        {
+            this.store.clear();
+        }
 
         @Override
         public boolean isPersistent()

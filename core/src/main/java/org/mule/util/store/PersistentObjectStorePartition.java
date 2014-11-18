@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.util.store;
 
 import org.mule.api.MuleContext;
@@ -41,7 +42,8 @@ import org.apache.commons.collections.bidimap.TreeBidiMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class PersistentObjectStorePartition<T extends Serializable> implements ListableObjectStore<T>, ExpirableObjectStore<T>
+public class PersistentObjectStorePartition<T extends Serializable>
+    implements ListableObjectStore<T>, ExpirableObjectStore<T>
 {
 
     private static final String OBJECT_FILE_EXTENSION = ".obj";
@@ -60,9 +62,10 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
         this.partitionDirectory = partitionDirectory;
     }
 
-    PersistentObjectStorePartition(MuleContext muleContext, File partitionDirectory) throws ObjectStoreNotAvaliableException
+    PersistentObjectStorePartition(MuleContext muleContext, File partitionDirectory)
+        throws ObjectStoreNotAvaliableException
     {
-        this.muleContext= muleContext;
+        this.muleContext = muleContext;
         this.partitionDirectory = partitionDirectory;
         this.partitionName = readPartitionFileName(partitionDirectory);
     }
@@ -118,6 +121,24 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
     }
 
     @Override
+    public void clear() throws ObjectStoreException
+    {
+        try
+        {
+            FileUtils.cleanDirectory(this.partitionDirectory);
+        }
+        catch (IOException e)
+        {
+            throw new ObjectStoreException(MessageFactory.createStaticMessage("Could not clear ObjectStore"), e);
+        }
+
+        if (realKeyToUUIDIndex != null)
+        {
+            realKeyToUUIDIndex.clear();
+        }
+    }
+
+    @Override
     public T retrieve(Serializable key) throws ObjectStoreException
     {
         if (!realKeyToUUIDIndex.containsKey(key))
@@ -138,7 +159,8 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
     }
 
     @Override
-    public boolean isPersistent() {
+    public boolean isPersistent()
+    {
         return true;
     }
 
@@ -189,7 +211,8 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
         }
         catch (Exception e)
         {
-            String message = String.format("Could not restore object store data from %1s", partitionDirectory.getAbsolutePath());
+            String message = String.format("Could not restore object store data from %1s",
+                partitionDirectory.getAbsolutePath());
             throw new ObjectStoreException(CoreMessages.createStaticMessage(message));
         }
     }
@@ -215,12 +238,13 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
     {
         try
         {
-            // To support concurrency we need to check if directory exists again inside
+            // To support concurrency we need to check if directory exists again
+            // inside
             // synchronized method
             if (!directory.exists() && !directory.mkdirs())
             {
                 Message message = CoreMessages.failedToCreate("object store directory "
-                        + directory.getAbsolutePath());
+                                                              + directory.getAbsolutePath());
                 throw new MuleRuntimeException(message);
             }
         }
@@ -258,7 +282,7 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
                 this.partitionName = readPartitionFileName(partitionDirectory);
                 return partitionDescriptorFile;
             }
-            FileWriter fileWriter = new FileWriter(partitionDescriptorFile.getAbsolutePath(),false);
+            FileWriter fileWriter = new FileWriter(partitionDescriptorFile.getAbsolutePath(), false);
             try
             {
                 fileWriter.write(partitionName);
@@ -312,10 +336,11 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
         try
         {
             objectInputStream = new ObjectInputStream(new FileInputStream(file));
-            StoreValue<T> storedValue = (StoreValue<T>) SerializationUtils.deserialize(objectInputStream, muleContext);
+            StoreValue<T> storedValue = (StoreValue<T>) SerializationUtils.deserialize(objectInputStream,
+                muleContext);
             if (storedValue.getValue() instanceof DeserializationPostInitialisable)
             {
-                DeserializationPostInitialisable.Implementation.init(storedValue.getValue(),muleContext);
+                DeserializationPostInitialisable.Implementation.init(storedValue.getValue(), muleContext);
             }
             return storedValue;
         }
@@ -350,7 +375,7 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
             if (!file.delete())
             {
                 Message message = CoreMessages.createStaticMessage("Deleting " + file.getAbsolutePath()
-                        + " failed");
+                                                                   + " failed");
                 throw new ObjectStoreException(message);
             }
             realKeyToUUIDIndex.removeValue(file.getName());
@@ -383,24 +408,6 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
     public String getPartitionName()
     {
         return partitionName;
-    }
-
-    public void clear() throws ObjectStoreException
-    {
-        try
-        {
-            FileUtils.cleanDirectory(this.partitionDirectory);
-        }
-        catch (IOException e)
-        {
-            throw new ObjectStoreException(MessageFactory.createStaticMessage("Could not clear ObjectStore"),
-                                           e);
-        }
-
-        if (realKeyToUUIDIndex != null)
-        {
-            realKeyToUUIDIndex.clear();
-        }
     }
 
     public static class StoreValue<T> implements Serializable

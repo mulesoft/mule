@@ -27,8 +27,8 @@ import java.util.PriorityQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The MonitoredObjectStoreWrapper wraps an ObjectStore which does not support direct
@@ -37,10 +37,11 @@ import org.apache.commons.logging.LogFactory;
 public class MonitoredObjectStoreWrapper<T extends Serializable>
     implements ListableObjectStore<T>, Runnable, MuleContextAware, Initialisable, Disposable
 {
+    private static Logger logger = LoggerFactory.getLogger(MonitoredObjectStoreWrapper.class);
+
     protected MuleContext context;
     protected ScheduledThreadPoolExecutor scheduler;
     ListableObjectStore<StoredObject<T>> baseStore;
-    private static Log logger = LogFactory.getLog(MonitoredObjectStoreWrapper.class);
 
     /**
      * the maximum number of entries that this store keeps around. Specify
@@ -101,6 +102,12 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
     public T retrieve(Serializable key) throws ObjectStoreException
     {
         return getStore().retrieve(key).getItem();
+    }
+    
+    @Override
+    public void clear() throws ObjectStoreException
+    {
+        this.getStore().clear();
     }
 
     @Override

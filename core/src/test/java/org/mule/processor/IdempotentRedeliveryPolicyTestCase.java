@@ -229,6 +229,12 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase
         {
             return false;
         }
+        
+        @Override
+        public void clear() throws ObjectStoreException
+        {
+            this.store.clear();
+        }
     }
 
     public static class InMemoryObjectStore implements ObjectStore<AtomicInteger>
@@ -257,6 +263,12 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase
         public AtomicInteger remove(Serializable key) throws ObjectStoreException
         {
             return store.remove(key);
+        }
+        
+        @Override
+        public void clear() throws ObjectStoreException
+        {
+            this.store.clear();
         }
 
         @Override
