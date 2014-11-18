@@ -180,7 +180,7 @@ public class JmsConnectorTestCase extends AbstractMuleContextTestCase
         ConnectionFactory mockConnectionFactory = mock(ConnectionFactory.class);
         JmsConnector connector = createConnectionFactoryWhenGettingConnection(mockConnectionFactory);
         assertThat(connector.getConnectionFactory(), IsInstanceOf.instanceOf(CustomCachingConnectionFactory.class));
-        assertThat(((CachingConnectionFactory)connector.getConnectionFactory()).getTargetConnectionFactory(),
+        assertThat(((CachingConnectionFactory) connector.getConnectionFactory()).getTargetConnectionFactory(),
                    is(mockConnectionFactory));
     }
 

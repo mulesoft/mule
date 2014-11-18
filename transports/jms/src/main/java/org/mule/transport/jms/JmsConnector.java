@@ -22,6 +22,7 @@ import org.mule.api.lifecycle.StartException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
+import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
@@ -62,8 +63,8 @@ import javax.naming.NamingException;
  * by a Mule endpoint. The connector supports all JMS functionality including topics
  * and queues, durable subscribers, acknowledgement modes and local transactions.
  *
- * From 3.6, JMS Sessions and Producers are reused by default when an XAConnectionFactory isn't being used and when
- * the (default) JMS 1.1 spec is being used.
+ * From 3.6, JMS Sessions and Producers are reused by default when an {@link javax.jms.XAConnectionFactory} isn't being
+ * used and when the (default) JMS 1.1 spec is being used.
  */
 public class JmsConnector extends AbstractConnector implements ExceptionListener
 {
@@ -182,7 +183,8 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
     /**
      * Used to ignore handling of ExceptionListener#onException when in the process of disconnecting.  This is
-     * required because the Connector LifeCycleManager does not include connection/disconnection state.
+     * required because the Connector {@link org.mule.api.lifecycle.LifecycleManager} does not include
+     * connection/disconnection state.
      */
     private volatile boolean disconnecting;
 
@@ -447,6 +449,9 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             {
                 connection.setClientID(getClientId());
             }
+            // Only set the exceptionListener if one isn't already set.  This is because the CachingConnectionFactory
+            // which may be in use doesn't permit exception strategy to be set, rather it is set on the ConnectionFactory
+            // itself in this case.
             if (!embeddedMode && connection.getExceptionListener() == null)
             {
                 connection.setExceptionListener(this);
@@ -483,23 +488,22 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
     public void onException(JMSException jmsException)
     {
-        if(!disconnecting)
+        if (!disconnecting)
         {
-            final JmsConnector jmsConnector = JmsConnector.this;
-            Map receivers = jmsConnector.getReceivers();
+            Map<Object, MessageReceiver> receivers = getReceivers();
             boolean isMultiConsumerReceiver = false;
 
             if (!receivers.isEmpty())
             {
-                Map.Entry entry = (Map.Entry) receivers.entrySet().iterator().next();
-                if (entry.getValue() instanceof MultiConsumerJmsMessageReceiver)
+                MessageReceiver reciever = receivers.values().iterator().next();
+                if (reciever instanceof MultiConsumerJmsMessageReceiver)
                 {
                     isMultiConsumerReceiver = true;
                 }
             }
 
             int expectedReceiverCount = isMultiConsumerReceiver ? 1 :
-                                        (jmsConnector.getReceivers().size() * jmsConnector.getNumberOfConcurrentTransactedReceivers());
+                                        (getReceivers().size() * getNumberOfConcurrentTransactedReceivers());
 
             if (logger.isDebugEnabled())
             {

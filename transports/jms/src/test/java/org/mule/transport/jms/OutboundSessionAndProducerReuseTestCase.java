@@ -8,13 +8,16 @@ package org.mule.transport.jms;
 
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -38,17 +41,13 @@ import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
-import javax.jms.QueueConnection;
-import javax.jms.QueueConnectionFactory;
 import javax.jms.QueueSession;
 import javax.jms.Session;
 
 import org.apache.activemq.command.ActiveMQTextMessage;
-import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
@@ -61,13 +60,11 @@ import org.springframework.jms.connection.SingleConnectionFactory;
 public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContextTestCase
 {
 
-    public static final String TEST_MESSAGE_1 = "test1";
-
     private JmsConnector connector;
     @Mock
-    private QueueConnectionFactory connectionFactory;
+    private ConnectionFactory connectionFactory;
     @Mock
-    private QueueConnection connection;
+    private Connection connection;
     @Mock
     private Queue queue;
 
@@ -84,16 +81,23 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
         super.doSetUp();
 
         when(connectionFactory.createConnection()).thenReturn(connection);
-        when(connectionFactory.createQueueConnection()).thenReturn(connection);
+        setupMockSession();
+
+        connector = new JmsConnector(muleContext);
+        connector.setConnectionFactory(connectionFactory);
+        SimpleRetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate();
+        retryPolicyTemplate.setMuleContext(muleContext);
+        connector.setRetryPolicyTemplate(retryPolicyTemplate);
+        connector.setJmsSupport(new Jms11Support(connector));
+
+        EndpointBuilder epBuilder = new EndpointURIEndpointBuilder("jms://out", muleContext);
+        epBuilder.setConnector(connector);
+        outboundEndpoint = epBuilder.buildOutboundEndpoint();
+    }
+
+    private void setupMockSession() throws JMSException
+    {
         when(connection.createSession(false, 1)).then(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                return createSessionMock();
-            }
-        });
-        when(connection.createQueueSession(false, 1)).then(new Answer<Object>()
         {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable
@@ -109,7 +113,7 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
                 connectionExceptionListener = (ExceptionListener) invocation.getArguments()[0];
                 return null;
             }
-        }).when(connection).setExceptionListener(Mockito.any(ExceptionListener.class));
+        }).when(connection).setExceptionListener(any(ExceptionListener.class));
         when(connection.getExceptionListener()).thenAnswer(new Answer<Object>()
         {
             @Override
@@ -126,7 +130,7 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
                 connectionClientId = (String) invocation.getArguments()[0];
                 return null;
             }
-        }).when(connection).setClientID(Mockito.any(String.class));
+        }).when(connection).setClientID(any(String.class));
         when(connection.getClientID()).thenAnswer(new Answer<Object>()
         {
             @Override
@@ -135,23 +139,12 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
                 return connectionClientId;
             }
         });
-
-        connector = new JmsConnector(muleContext);
-        connector.setConnectionFactory(connectionFactory);
-        SimpleRetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate();
-        retryPolicyTemplate.setMuleContext(muleContext);
-        connector.setRetryPolicyTemplate(retryPolicyTemplate);
-        connector.setJmsSupport(new Jms11Support(connector));
-
-        EndpointBuilder epBuilder = new EndpointURIEndpointBuilder("jms://out", muleContext);
-        epBuilder.setConnector(connector);
-        outboundEndpoint = epBuilder.buildOutboundEndpoint();
     }
 
     private QueueSession createSessionMock() throws JMSException
     {
         QueueSession mock = mock(QueueSession.class);
-        when(mock.createProducer(Mockito.any(Destination.class))).then(new Answer<Object>()
+        when(mock.createProducer(any(Destination.class))).then(new Answer<Object>()
         {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable
@@ -159,7 +152,7 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
                 return createProducerMock();
             }
         });
-        when(mock.createConsumer(Mockito.any(Destination.class))).then(new Answer<Object>()
+        when(mock.createConsumer(any(Destination.class))).then(new Answer<Object>()
         {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable
@@ -167,7 +160,7 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
                 return mock(MessageConsumer.class);
             }
         });
-        when(mock.createTextMessage(Mockito.anyString())).then(new Answer<Object>()
+        when(mock.createTextMessage(anyString())).then(new Answer<Object>()
         {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable
@@ -191,19 +184,19 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
                 messageSentLatch.countDown();
                 return null;
             }
-        }).when(mock).send(Mockito.any(Message.class),anyInt(),anyInt(), anyLong());
+        }).when(mock).send(any(Message.class),anyInt(),anyInt(), anyLong());
         return mock;
     }
 
     @Test
     public void connectionFactory() throws Exception
     {
-        assertThat(connector.getConnectionFactory(), is(CoreMatchers.<ConnectionFactory>equalTo(connectionFactory)));
+        assertThat(connector.getConnectionFactory(), is(equalTo(connectionFactory)));
         connector.initialise();
         connector.connect();
-        assertThat(connector.getConnectionFactory(), is(CoreMatchers.<ConnectionFactory>instanceOf(SingleConnectionFactory.class)));
-        assertThat(((SingleConnectionFactory)connector.getConnectionFactory()).getTargetConnectionFactory(),
-                   CoreMatchers.<ConnectionFactory>is(connectionFactory));
+        assertThat(connector.getConnectionFactory(), is(instanceOf(SingleConnectionFactory.class)));
+        assertThat(((SingleConnectionFactory) connector.getConnectionFactory()).getTargetConnectionFactory(),
+                   is(connectionFactory));
     }
 
     @Test
@@ -211,7 +204,7 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
     {
         connector.initialise();
         connector.connect();
-        assertThat(connector.getConnection(), is(not(CoreMatchers.<Connection>equalTo(connection))));
+        assertThat(connector.getConnection(), is(not(equalTo(connection))));
     }
 
 
@@ -276,7 +269,7 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
         verify(connectionFactory, times(1)).createConnection();
 
 
-        outboundEndpoint.process(getTestEvent(TEST_MESSAGE_1));
+        outboundEndpoint.process(getTestEvent(TEST_MESSAGE));
 
         verify(connectionFactory, times(1)).createConnection();
         verify(connection, times(1)).createSession(anyBoolean(), anyInt());

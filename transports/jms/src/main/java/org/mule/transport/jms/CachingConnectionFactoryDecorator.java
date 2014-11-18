@@ -13,8 +13,9 @@ import javax.jms.ConnectionFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
 
 /**
- * Decorates the jms ConnectionFactory with a {@link org.mule.transport.jms.CustomCachingConnectionFactory} in order
- * to ensure JMS session instances are reused and not recreated for every request.
+ * Decorates the JMS {@link javax.jms.ConnectionFactory} with a {@link org.mule.transport.jms.CustomCachingConnectionFactory}
+ * in order to ensure JMS session instances are reused and not recreated for every request.
+ * Note: Currently only Non-XA JMS 1.1 {@link javax.jms.ConnectionFactory}'s will be decorated to provide caching.
  */
 public class CachingConnectionFactoryDecorator extends AbstractConnectionFactoryDecorator
 {
@@ -45,6 +46,10 @@ public class CachingConnectionFactoryDecorator extends AbstractConnectionFactory
     @Override
     public boolean appliesTo(ConnectionFactory connectionFactory, MuleContext muleContext)
     {
+        // We only wrap connection factories that i) aren't instances of XAConnectionFactory ii) haven't already been
+        // wrapped.
+        // Note: we need to explicitly check for instances or CachingConnectionFactory here JMSConnection currently
+        // allows the ConnectionFactory to be decorated on each reconnection.
         return !isXaConnectionFactory(connectionFactory)
                && !isConnectionFactoryWrapper(connectionFactory)
                && !(connectionFactory instanceof CachingConnectionFactory);

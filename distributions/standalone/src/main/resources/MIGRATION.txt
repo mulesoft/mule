@@ -62,6 +62,7 @@ While this element is still permitted in configurations in Mule 3.6 for backward
     * sessionCacheSize: the number of cached sessions will be unlimited regardless of this value.  In order to limit sessions, either reduce maximum number of JMS dispatcher threads for the connector threading profile or configure limit in provider connection factory or broker instance.
     * cacheProducers: producers will always be cached.
     * username/password: these should be configured on the jms connector element.
+MULE-7731: org.mule.transport.jms.xa.ConnectionFactoryWrapper has been renamed to org.mule.transport.jms.xa.DefaultXAConnectionFactoryWrapper
 
 Migration changes from 3.4.x to 3.5.x
 
