@@ -204,7 +204,7 @@ public class JmsConnectorTestCase extends AbstractMuleContextTestCase
     {
         final Connection connection = mock(Connection.class);
 
-        JmsSupport jmsSupport = mock(JmsSupport.class);
+        JmsSupport jmsSupport = mock(Jms11Support.class);
         when(jmsSupport.createConnection(Matchers.<ConnectionFactory>any())).thenReturn(connection);
 
         JmsConnector connector = new JmsConnector(muleContext);

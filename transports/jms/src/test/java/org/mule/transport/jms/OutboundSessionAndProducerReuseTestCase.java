@@ -20,6 +20,7 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,6 +42,8 @@ import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
+import javax.jms.QueueConnection;
+import javax.jms.QueueConnectionFactory;
 import javax.jms.QueueSession;
 import javax.jms.Session;
 
@@ -189,7 +192,7 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
     }
 
     @Test
-    public void connectionFactory() throws Exception
+    public void connectionFactoryWrappedJMS11() throws Exception
     {
         assertThat(connector.getConnectionFactory(), is(equalTo(connectionFactory)));
         connector.initialise();
@@ -200,11 +203,24 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
     }
 
     @Test
+    public void connectionFactoryNotWrappedJMS102b() throws Exception
+    {
+        connectionFactory = mock(QueueConnectionFactory.class);
+        connector.setConnectionFactory(connectionFactory);
+        connector.setJmsSupport(new Jms102bSupport(connector));
+        assertThat(connector.getConnectionFactory(), is(equalTo(connectionFactory)));
+        connector.initialise();
+        connector.connect();
+        assertThat(connector.getConnectionFactory(), is(equalTo(connectionFactory)));
+    }
+
+    @Test
     public void connection() throws Exception
     {
         connector.initialise();
         connector.connect();
         assertThat(connector.getConnection(), is(not(equalTo(connection))));
+        verify(connectionFactory, times(1)).createConnection();
     }
 
 
@@ -228,6 +244,32 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
         Session session2 = connector.createSession(outboundEndpoint);
 
         assertThat(session1, equalTo(session2));
+    }
+
+    @Test
+    public void sessionNotReusedJMS102b() throws Exception
+    {
+        QueueConnectionFactory connectionFactory = mock(QueueConnectionFactory.class);
+        QueueConnection queueConnection = mock(QueueConnection.class);
+        when(connectionFactory.createQueueConnection()).thenReturn(queueConnection);
+        when(queueConnection.createQueueSession(false, 1)).then(new Answer<Object>()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable
+            {
+                return createSessionMock();
+            }
+        });
+
+        connector.setConnectionFactory(connectionFactory);
+        connector.setJmsSupport(new Jms102bSupport(connector));
+        connector.initialise();
+        connector.connect();
+        Session session1 = connector.createSession(outboundEndpoint);
+        session1.close();
+        Session session2 = connector.createSession(outboundEndpoint);
+
+        assertThat(session1, not(equalTo(session2)));
     }
 
     @Test
@@ -266,12 +308,11 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
         connector.connect();
         connector.start();
 
-        verify(connectionFactory, times(1)).createConnection();
-
+        reset(connectionFactory);
 
         outboundEndpoint.process(getTestEvent(TEST_MESSAGE));
 
-        verify(connectionFactory, times(1)).createConnection();
+        verify(connectionFactory, times(0)).createConnection();
         verify(connection, times(1)).createSession(anyBoolean(), anyInt());
 
         assertTrue(messageSentLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));

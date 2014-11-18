@@ -25,7 +25,8 @@ public class CachingConnectionFactoryDecorator extends AbstractConnectionFactory
     @Override
     protected ConnectionFactory doDecorate(ConnectionFactory connectionFactory, JmsConnector jmsConnector, MuleContext muleContext)
     {
-        if (!(jmsConnector.getJmsSupport() instanceof Jms102bSupport))
+        // CachingConnectionFactory only supports JMS 1.1 connection factories currently.
+        if ((jmsConnector.getJmsSupport() instanceof Jms11Support) && !(jmsConnector.getJmsSupport() instanceof Jms102bSupport))
         {
             cachingConnectionFactory = new CustomCachingConnectionFactory(connectionFactory, jmsConnector.getUsername(),
                                                                           jmsConnector.getPassword());
