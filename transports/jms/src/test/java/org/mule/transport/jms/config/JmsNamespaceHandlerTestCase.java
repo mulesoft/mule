@@ -82,7 +82,7 @@ public class JmsNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
         assertFalse(c.isNoLocal());
         assertFalse(c.isPersistentDelivery());
         assertEquals(0, c.getMaxRedelivery());
-        assertFalse(c.isCacheJmsSessions());
+        assertTrue(c.isCacheJmsSessions());
         assertTrue(c.isEagerConsumer());
         assertEquals(4, c.getNumberOfConcurrentTransactedReceivers());
         assertFalse(c.isEmbeddedMode());
