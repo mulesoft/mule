@@ -325,6 +325,14 @@ public class MuleObjectStoreManager
             {
                 logger.warn("Can not remove object store" + store.toString(), e);
             }
+            try
+            {
+                stores.values().remove(store);
+            }
+            catch(Exception e)
+            {
+                logger.warn("Can not remove object store" + store.toString(), e);
+            }
         }
 
         if (store instanceof Disposable)

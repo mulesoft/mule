@@ -239,7 +239,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends
     @Override
     public void disposePartition(String partitionName) throws ObjectStoreException
     {
-        this.getPartitionObjectStore(partitionName).clear();
+        clear(partitionName);
     }
 
     @Override

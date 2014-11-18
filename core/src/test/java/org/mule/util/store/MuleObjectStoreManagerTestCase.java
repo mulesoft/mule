@@ -28,7 +28,6 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.size.SmallTest;
-
 import java.io.Serializable;
 
 import org.junit.Rule;
