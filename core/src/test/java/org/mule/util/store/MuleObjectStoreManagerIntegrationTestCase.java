@@ -8,11 +8,14 @@ package org.mule.util.store;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.api.store.ObjectStoreManager.UNBOUNDED;
+
 import org.mule.api.config.MuleProperties;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStore;
-import org.mule.api.store.ObjectStoreException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.probe.JUnitProbe;
+import org.mule.tck.probe.PollingProber;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -20,7 +23,6 @@ import java.util.Collection;
 
 import org.hamcrest.core.Is;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -69,33 +71,68 @@ public class MuleObjectStoreManagerIntegrationTestCase extends AbstractMuleConte
         assertThat((String) os2.remove(OBJECT_KEY), is(OBJECT_KEY_VALUE_2));
     }
 
-    @Ignore //Behavior must be reviewed. It allows more than maxEntries objects.
-    @Test(expected = ObjectStoreException.class)
-    public void maxEntriesIshonored() throws Exception
+    @Test
+    public void maxEntriesIsHonored() throws Exception
     {
-        ObjectStore os = objectStoreFactory.createObjectStore("myOs", 5,0,60000);
-        int maxEntries = 5;
-        for (int i = 0; i < maxEntries; i++)
+        final int expirationInterval = 1000;
+        final int maxEntries = 5;
+        final ObjectStore os = objectStoreFactory.createObjectStore("myOs", 5, 0, expirationInterval);
+
+        for (int i = 0; i < maxEntries +1; i++)
         {
             os.store(i, i);
         }
-        os.store(OBJECT_KEY, OBJECT_KEY_VALUE_1);
+
+        PollingProber prober = new PollingProber(expirationInterval * 5, expirationInterval);
+        prober.check(new JUnitProbe()
+        {
+            @Override
+            public boolean test() throws Exception
+            {
+                for (int i = 0; i < maxEntries + 1; i++)
+                {
+                    assertThat(os.contains(i), is(true));
+                }
+
+                return true;
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "max entries were not honoured";
+            }
+        });
     }
 
     @Test
-    @Ignore("MULE-6926: Flaky Test")
     public void expirationIntervalWithLowTTL() throws Exception
     {
         int maxEntries = 5;
         int entryTTL = 10;
-        ListableObjectStore os = objectStoreFactory.createObjectStore("myOs", maxEntries, entryTTL,100);
+        int expirationInterval = 100;
+        final ListableObjectStore os = objectStoreFactory.createObjectStore("myOs", maxEntries, entryTTL, expirationInterval);
+
         for (int i = 0; i < maxEntries; i++)
         {
             os.store(i,i);
         }
-        os.store(OBJECT_KEY, OBJECT_KEY_VALUE_1);
-        Thread.sleep(entryTTL*30);
-        assertThat(os.allKeys().isEmpty(), is(true));
+
+        PollingProber prober = new PollingProber(1000, expirationInterval);
+        prober.check(new JUnitProbe()
+        {
+            @Override
+            public boolean test() throws Exception
+            {
+                return os.allKeys().isEmpty();
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "not all entries were evicted";
+            }
+        });
     }
 
     @Test
@@ -104,18 +141,61 @@ public class MuleObjectStoreManagerIntegrationTestCase extends AbstractMuleConte
         int maxEntries = 5;
         int entryTTL = 10000;
         ListableObjectStore os = objectStoreFactory.createObjectStore("myOs", maxEntries, entryTTL,100);
+
         for (int i = 0; i < maxEntries; i++)
         {
             os.store(i,i);
         }
+
         os.store(OBJECT_KEY, OBJECT_KEY_VALUE_1);
+
         Thread.sleep(entryTTL/5);
-        assertThat(os.allKeys().size(),is(maxEntries));
+
+        assertThat(os.allKeys().size(), is(maxEntries));
+
         for (int i = 1; i < maxEntries; i++)
         {
-            assertThat(os.contains(i),is(true));
+            assertThat(os.contains(i), is(true));
         }
+
         assertThat(os.contains(OBJECT_KEY), is(true));
+    }
+
+    @Test
+    public void onlySizeBoundedObjectStore() throws Exception
+    {
+        final int maxEntries = 5;
+        final int entryTTL = UNBOUNDED;
+
+        final ListableObjectStore os = objectStoreFactory.createObjectStore("myOs", maxEntries, entryTTL, 1000);
+
+        for (int i = 0; i < maxEntries + 1; i++)
+        {
+            os.store(i, i);
+        }
+
+        PollingProber prober = new PollingProber(5000000, 1000);
+        prober.check(new JUnitProbe()
+        {
+            @Override
+            public boolean test() throws Exception
+            {
+                assertThat(os.allKeys().size(), is(maxEntries));
+
+                for (int i = 1; i < maxEntries +1; i++)
+                {
+                    assertThat(os.contains(i), is(true));
+                }
+
+                return true;
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "objectStore was not trimmed";
+            }
+        });
     }
 
     @Test
@@ -130,6 +210,8 @@ public class MuleObjectStoreManagerIntegrationTestCase extends AbstractMuleConte
         os.store(bigKey.toString(),1);
         assertThat((Integer) os.retrieve(bigKey.toString()), Is.is(1));
     }
+
+
 
     private static class ObjectStoreFactory
     {
