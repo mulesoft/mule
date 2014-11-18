@@ -26,7 +26,7 @@
 
     <flow name="statusResponseBuilderOverrideFlow">
         <http:listener config-ref="listenerConfig" path="${statusResponseBuilderOverridePath}">
-            <http:response-builder statusCode="201" reasonPhrase="everything works!"/>
+            <http:response-builder reasonPhrase="everything works!"/>
         </http:listener>
         <set-property propertyName="http.status" value="202" />
         <echo-component/>

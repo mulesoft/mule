@@ -46,10 +46,11 @@ import org.slf4j.LoggerFactory;
 
 public class HttpResponseBuilder extends HttpMessageBuilder implements Initialisable, MuleContextAware
 {
+    private static final int DEFAULT_STATUS_CODE = 200;
 
     public static final String MULTIPART = "multipart";
     private Logger logger = LoggerFactory.getLogger(getClass());
-    private String statusCode = "200";
+    private String statusCode;
     private String reasonPhrase;
     private boolean disablePropertiesAsHeaders = false;
     private HttpStreamingType responseStreaming = HttpStreamingType.AUTO;
@@ -204,13 +205,17 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
     {
         Object statusCodeOutboundProperty = event.getMessage().getOutboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY);
 
-        if (statusCodeOutboundProperty != null)
+        if (statusCode != null)
+        {
+            return statusCodeEvaluator.resolveIntegerValue(event);
+        }
+        else if (statusCodeOutboundProperty != null)
         {
             return NumberUtils.toInt(statusCodeOutboundProperty);
         }
         else
         {
-            return statusCodeEvaluator.resolveIntegerValue(event);
+            return DEFAULT_STATUS_CODE;
         }
 
     }
