@@ -7,13 +7,23 @@
 
 package org.mule.transport.jms.config;
 
-import org.mule.transport.jms.CustomCachingConnectionFactory;
-
 import javax.jms.ConnectionFactory;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
-public class CachingConnectionFactoryFactoryBean extends AbstractFactoryBean<CustomCachingConnectionFactory>
+/**
+ * DEPRECATED: This element is deprecated from Mule 3.6.
+ * IMPORTANT: While this element is still permitted in configurations in Mule 3.6 for backwards compatibility, session and
+ * producer reuse for non-XA connection factories is now done by default so this element is no longer required.  This means
+ * that from Mule 3.6 the following attributes of this element will be ignored.
+ * <li> sessionCacheSize: the number of caches sessions will be unlimited regardless of this value.  In order to limit sessions,
+ * either reduce maximum number of JMS dispatcher threads for the connector threading profile or configure limit in provider
+ * connection factory or broker instance.
+ * <li> cacheProducers: producers will always be cached.
+ * <li> username/password: these should be configured on the jms connector element.
+ */
+@Deprecated
+public class CachingConnectionFactoryFactoryBean extends AbstractFactoryBean<ConnectionFactory>
 {
 
     public static final int DEFAULT_SESSION_CACHE_SIZE = 1;
@@ -28,24 +38,13 @@ public class CachingConnectionFactoryFactoryBean extends AbstractFactoryBean<Cus
     @Override
     public Class<?> getObjectType()
     {
-        return CustomCachingConnectionFactory.class;
+        return ConnectionFactory.class;
     }
 
     @Override
-    protected CustomCachingConnectionFactory createInstance() throws Exception
+    protected ConnectionFactory createInstance() throws Exception
     {
-        CustomCachingConnectionFactory cachingConnectionFactory = new CustomCachingConnectionFactory(connectionFactory, username, password);
-        cachingConnectionFactory.setCacheProducers(cacheProducers);
-        cachingConnectionFactory.setSessionCacheSize(sessionCacheSize);
-        cachingConnectionFactory.setCacheConsumers(false);
-
-        return cachingConnectionFactory;
-    }
-
-    @Override
-    protected void destroyInstance(CustomCachingConnectionFactory instance) throws Exception
-    {
-        instance.destroy();
+        return connectionFactory;
     }
 
     public String getName()

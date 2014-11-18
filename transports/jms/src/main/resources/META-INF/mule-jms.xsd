@@ -757,9 +757,11 @@
     <xsd:element name="caching-connection-factory" type="connectionFactoryPoolType" substitutionGroup="mule:abstract-shared-extension">
         <xsd:annotation>
             <xsd:documentation>
-                Allows to configure a connection factory that caches JMS sessions and producers for a single non-XA JMS connection. You must reference a connection factory though the
-                connectionFactory-ref attribute, and then use this element as the connection factory in the JMS connector.
-                NOTE: as there is a single JMS connection is not recommended to reference the same caching connection factory in multiple connectors.
+                DEPRECATED: This element is deprecated from Mule 3.6.
+                IMPORTANT: While this element is still permitted in configurations in Mule 3.6 for backwards compatibility, session and producer reuse for non-XA connection factories is now done by default so this element is no longer required.  This means that from Mule 3.6 the following attributes of this element will be ignored.
+                 - sessionCacheSize: the number of cached sessions will be unlimited regardless of this value.  In order to limit sessions, either reduce maximum number of JMS dispatcher threads for the connector threading profile or configure limit in provider connection factory or broker instance.
+                 - cacheProducers: producers will always be cached.
+                 - username/password: these should be configured on the jms connector element.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

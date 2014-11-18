@@ -11,7 +11,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.jms.DefaultJmsTopicResolver;
 import org.mule.transport.jms.JmsConnector;
@@ -24,6 +23,7 @@ import javax.jms.Session;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.junit.Test;
+import org.springframework.jms.connection.CachingConnectionFactory;
 
 public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
 {
@@ -84,9 +84,10 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
 
         assertNotNull(c);
         assertTrue(c instanceof ActiveMQJmsConnector);
-        
+
         assertNotNull(c.getConnectionFactory());
-        assertTrue(c.getConnectionFactory() instanceof ActiveMQConnectionFactory);
+        assertTrue(c.getConnectionFactory() instanceof CachingConnectionFactory);
+        assertTrue(((CachingConnectionFactory) c.getConnectionFactory()).getTargetConnectionFactory() instanceof ActiveMQConnectionFactory);
         assertEquals(Session.DUPS_OK_ACKNOWLEDGE, c.getAcknowledgementMode());
         assertNull(c.getUsername());
         assertNull(c.getPassword());

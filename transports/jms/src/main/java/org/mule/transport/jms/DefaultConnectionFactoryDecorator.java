@@ -7,12 +7,12 @@
 package org.mule.transport.jms;
 
 import org.mule.api.MuleContext;
-import org.mule.transport.jms.xa.ConnectionFactoryWrapper;
+import org.mule.transport.jms.xa.DefaultXAConnectionFactoryWrapper;
 
 import javax.jms.ConnectionFactory;
 
 /**
- * Decorates the jms ConnectionFactory with a {@link ConnectionFactoryWrapper} in order
+ * Decorates the jms ConnectionFactory with a {@link org.mule.transport.jms.xa.DefaultXAConnectionFactoryWrapper} in order
  * to avoid releasing jms resources before the XA transaction has ended.
  */
 public class DefaultConnectionFactoryDecorator extends AbstractConnectionFactoryDecorator
@@ -21,12 +21,7 @@ public class DefaultConnectionFactoryDecorator extends AbstractConnectionFactory
     @Override
     protected ConnectionFactory doDecorate(ConnectionFactory connectionFactory, JmsConnector jmsConnector, MuleContext muleContext)
     {
-        ConnectionFactory wrappedConnectionFactory = connectionFactory;
-        if (isXaConnectionFactory(connectionFactory) && muleContext.getTransactionManager() != null)
-        {
-            wrappedConnectionFactory = new ConnectionFactoryWrapper(connectionFactory, jmsConnector.getSameRMOverrideValue());
-        }
-        return wrappedConnectionFactory;
+        return new DefaultXAConnectionFactoryWrapper(connectionFactory, jmsConnector.getSameRMOverrideValue());
     }
 
     @Override
@@ -37,7 +32,7 @@ public class DefaultConnectionFactoryDecorator extends AbstractConnectionFactory
 
     private boolean isConnectionFactoryXaAndThereIsATxManager(ConnectionFactory connectionFactory, MuleContext muleContext)
     {
-        return (isXaConnectionFactory(connectionFactory) && muleContext.getTransactionFactoryManager() != null);
+        return (isXaConnectionFactory(connectionFactory) && muleContext.getTransactionManager() != null);
     }
 
 }
