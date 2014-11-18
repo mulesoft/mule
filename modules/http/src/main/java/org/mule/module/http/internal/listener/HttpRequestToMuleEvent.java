@@ -61,6 +61,7 @@ public class HttpRequestToMuleEvent
                 .setUri(request.getUri())
                 .setListenerPath(listenerPath)
                 .setRemoteHostAddress(requestContext.getRemoteHostAddress().toString())
+                .setScheme(requestContext.getScheme())
                 .addPropertiesTo(inboundProperties);
 
         final Map<String, DataHandler> inboundAttachments = new HashMap<>();

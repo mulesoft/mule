@@ -7,6 +7,7 @@
 package org.mule.module.http.internal.listener.grizzly;
 
 import org.mule.api.MuleRuntimeException;
+import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.internal.listener.HttpListenerRegistry;
 import org.mule.module.http.internal.listener.HttpServerManager;
 import org.mule.module.http.internal.listener.Server;
@@ -22,6 +23,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
+import org.glassfish.grizzly.filterchain.FilterChainContext;
+import org.glassfish.grizzly.filterchain.NextAction;
 import org.glassfish.grizzly.filterchain.TransportFilter;
 import org.glassfish.grizzly.http.HttpCodecFilter;
 import org.glassfish.grizzly.http.HttpServerFilter;
@@ -190,7 +193,14 @@ public class GrizzlyServerManager implements HttpServerManager
                 serverConfig.setEnabledCipherSuites(enabledCipherSuites);
             }
             final SSLEngineConfigurator clientConfig = serverConfig.copy().setClientMode(true);
-            final SSLFilter sslBaseFilter = new SSLFilter(serverConfig, clientConfig);
+            final SSLFilter sslBaseFilter = new SSLFilter(serverConfig, clientConfig) {
+                @Override
+                public NextAction handleRead(FilterChainContext ctx) throws IOException
+                {
+                    ctx.getAttributes().setAttribute(HttpConstants.Protocols.HTTPS, true);
+                    return super.handleRead(ctx);
+                }
+            };
             return sslBaseFilter;
         }
         catch (Exception e)

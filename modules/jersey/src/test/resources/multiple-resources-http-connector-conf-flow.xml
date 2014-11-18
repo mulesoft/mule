@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:jersey="http://www.mulesoft.org/schema/mule/jersey" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/jersey http://www.mulesoft.org/schema/mule/jersey/current/mule-jersey.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:listener-config host="localhost" port="${port}" name="httpConfig" />
+
+    <flow name="helloWorldResource">
+
+        <http:listener config-ref="httpConfig" path="*" />
+
+        <jersey:resources>
+            <component class="org.mule.module.jersey.HelloWorldResource" />
+            <component class="org.mule.module.jersey.AnotherWorldResource" />
+        </jersey:resources>
+    </flow>
+
+
+
+</mule>
+        

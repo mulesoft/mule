@@ -12,7 +12,7 @@
 
     <flow name="helloWorldResource">
 
-        <inbound-endpoint address="http://localhost:63081/" />
+        <inbound-endpoint address="http://localhost:${port}/" />
 
         <jersey:resources>
             <component class="org.mule.module.jersey.HelloWorldResource" />
