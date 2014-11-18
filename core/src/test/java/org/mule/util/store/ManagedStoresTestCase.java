@@ -54,7 +54,7 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase
         assertSame(baseStore,
             muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME));
         testObjectStore(store);
-        testObjectStoreExpiry(manager.getObjectStore("inMemoryExpPart1", false, -1, 500, 200));
+        testObjectStoreExpiry(manager.getObjectStore("inMemoryExpPart1", false, ObjectStoreManager.UNBOUNDED, 500, 200));
         testObjectStoreMaxEntries((ListableObjectStore) manager.getObjectStore("inMemoryMaxPart1", false, 10,
             10000, 200));
     }
@@ -76,7 +76,7 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase
         assertSame(baseStore,
             muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME));
         testObjectStore(store);
-        testObjectStoreExpiry(manager.getObjectStore("persistenceExpPart1", true, -1, 500, 200));
+        testObjectStoreExpiry(manager.getObjectStore("persistenceExpPart1", true, ObjectStoreManager.UNBOUNDED, 500, 200));
         testObjectStoreMaxEntries((ListableObjectStore) manager.getObjectStore("persistenceMaxPart1", true,
             10, 10000, 200));
     }
@@ -96,7 +96,7 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase
         assertSame(baseStore,
             muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME));
         testObjectStore(store);
-        testObjectStoreExpiry(manager.getObjectStore("inMemoryExpPart2", false, -1, 500, 200));
+        testObjectStoreExpiry(manager.getObjectStore("inMemoryExpPart2", false, ObjectStoreManager.UNBOUNDED, 500, 200));
         testObjectStoreMaxEntries((ListableObjectStore) manager.getObjectStore("inMemoryMaxPart2", false, 10,
             10000, 200));
     }
@@ -118,7 +118,7 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase
         assertSame(baseStore,
             muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME));
         testObjectStore(store);
-        testObjectStoreExpiry(manager.getObjectStore("persistenceExpPart2", true, -1, 1000, 200));
+        testObjectStoreExpiry(manager.getObjectStore("persistenceExpPart2", true, ObjectStoreManager.UNBOUNDED, 1000, 200));
         testObjectStoreMaxEntries((ListableObjectStore) manager.getObjectStore("persistenceMaxPart2", true,
             10, 10000, 200));
     }

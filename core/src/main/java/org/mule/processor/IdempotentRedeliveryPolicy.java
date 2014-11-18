@@ -22,16 +22,16 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.simple.ByteArrayToHexString;
 import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.util.lock.Lock;
+import org.mule.util.lock.LockManager;
 import org.mule.util.store.ObjectStorePartition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.mule.util.lock.LockManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implement a retry policy for Mule.  This is similar to JMS retry policies that will redeliver a message a maximum
@@ -108,7 +108,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
     {
         ObjectStoreManager objectStoreManager = (ObjectStoreManager) muleContext.getRegistry().get(
                                 MuleProperties.OBJECT_STORE_MANAGER);
-        return objectStoreManager.getObjectStore(flowConstruct.getName() + "." + getClass().getName(), false, -1,  60 * 5 * 1000, 6000 );
+        return objectStoreManager.getObjectStore(flowConstruct.getName() + "." + getClass().getName(), false, ObjectStoreManager.UNBOUNDED,  60 * 5 * 1000, 6000 );
     }
 
 

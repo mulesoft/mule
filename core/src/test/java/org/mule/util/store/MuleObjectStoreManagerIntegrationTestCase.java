@@ -89,7 +89,9 @@ public class MuleObjectStoreManagerIntegrationTestCase extends AbstractMuleConte
             @Override
             public boolean test() throws Exception
             {
-                for (int i = 0; i < maxEntries + 1; i++)
+                assertThat(os.contains(0), is(false));
+
+                for (int i = 1; i < maxEntries + 1; i++)
                 {
                     assertThat(os.contains(i), is(true));
                 }

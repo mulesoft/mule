@@ -135,7 +135,7 @@ public class EventCorrelator implements Startable, Stoppable
             storePrefix + ".expiredAndDispatchedGroups", persistentStores);
         processedGroups = (ListableObjectStore<Long>) objectStoreManager.getObjectStore(storePrefix
                                                                                         + ".processedGroups",
-            persistentStores, MAX_PROCESSED_GROUPS, -1, 1000);
+            persistentStores, MAX_PROCESSED_GROUPS, ObjectStoreManager.UNBOUNDED, 1000);
         eventGroups = (ListableObjectStore<EventGroup>) objectStoreManager.getObjectStore(storePrefix
                                                                                           + ".eventGroups",
                                                                                           persistentStores);

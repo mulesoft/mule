@@ -19,7 +19,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.lifecycle.Disposable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.store.ListableObjectStore;
@@ -164,7 +163,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
         when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
         when(mockObjectStoreManager.getObjectStore(OBJECT_STOR_NAME_PREFIX + ".eventGroups", USE_PERSISTENT_STORE)).thenReturn(mockObjectStore);
         when(mockObjectStoreManager.getObjectStore(OBJECT_STOR_NAME_PREFIX + ".expiredAndDispatchedGroups", USE_PERSISTENT_STORE)).thenReturn(mockExpireGroupsObjectStore);
-        when(mockObjectStoreManager.getObjectStore(OBJECT_STOR_NAME_PREFIX + ".processedGroups", USE_PERSISTENT_STORE, EventCorrelator.MAX_PROCESSED_GROUPS, -1, 1000)).thenReturn(mockProcessedGroups);
+        when(mockObjectStoreManager.getObjectStore(OBJECT_STOR_NAME_PREFIX + ".processedGroups", USE_PERSISTENT_STORE, EventCorrelator.MAX_PROCESSED_GROUPS, ObjectStoreManager.UNBOUNDED, 1000)).thenReturn(mockProcessedGroups);
         when(mockObjectStore.retrieve(TEST_GROUP_ID)).thenReturn(mockEventGroup);
         when(mockEventGroup.getGroupId()).thenReturn(TEST_GROUP_ID);
         when(mockEventGroup.toMessageCollection()).thenReturn(null);
