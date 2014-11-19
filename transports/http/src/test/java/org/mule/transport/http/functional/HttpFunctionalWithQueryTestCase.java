@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.expression.RequiredValueException;
@@ -48,7 +49,7 @@ public class HttpFunctionalWithQueryTestCase extends AbstractServiceAndFlowTestC
     public void testSend() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("clientEndpoint1", null, null);
+        MuleMessage result = client.send("clientEndpoint1", new DefaultMuleMessage(null, muleContext));
         assertEquals("boobar", result.getPayloadAsString());
     }
 

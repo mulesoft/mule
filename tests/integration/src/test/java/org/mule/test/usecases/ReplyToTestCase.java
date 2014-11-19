@@ -46,7 +46,7 @@ public class ReplyToTestCase extends FunctionalTestCase
         msg.setReplyTo("ReplyTo");
 
         // Send asynchronous request
-        client.dispatch("EchoVm", msg, null);
+        client.dispatch("EchoVm", msg);
 
         // Wait for asynchronous response
         MuleMessage result = client.request("ReplyTo", RECEIVE_DELAY);
@@ -68,7 +68,7 @@ public class ReplyToTestCase extends FunctionalTestCase
         msg.setReplyTo("ReplyTo");
 
         // Send asynchronous request
-        client.dispatch("EchoCxfSend", msg, null);
+        client.dispatch("EchoCxfSend", msg);
 
         // Wait for asynchronous response
         MuleMessage result = client.request("ReplyTo", RECEIVE_DELAY);

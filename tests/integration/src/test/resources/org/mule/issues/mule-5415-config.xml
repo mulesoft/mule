@@ -14,6 +14,8 @@
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
 
+    <configuration useHttpTransportByDefault="true"/>
+
     <http:body-to-parameter-map-transformer name="httpRequestToMapTransformer"/>
     
     <mulexml:jaxb-context name="myJaxb" packageNames="org.mule.test.issues"/>

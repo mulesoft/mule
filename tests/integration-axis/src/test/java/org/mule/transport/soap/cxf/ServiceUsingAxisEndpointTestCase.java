@@ -45,10 +45,8 @@ public class ServiceUsingAxisEndpointTestCase extends FunctionalTestCase
     public void testRequestWsdl() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put("http.method", "GET");
         MuleMessage reply = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/CxfService?wsdl",
-            "/services/CxfService?wsdl", props);
+           new DefaultMuleMessage("/services/CxfService?wsdl", muleContext));
 
         assertNotNull(reply);
         assertNotNull(reply.getPayload());

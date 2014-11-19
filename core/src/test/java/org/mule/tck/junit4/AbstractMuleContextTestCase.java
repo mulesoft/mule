@@ -6,11 +6,13 @@
  */
 package org.mule.tck.junit4;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.MuleConfiguration;
@@ -54,7 +56,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 
 /**
@@ -64,6 +65,7 @@ import org.junit.rules.TemporaryFolder;
 public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
 {
 
+    public static final String TEST_PAYLOAD = "test";
     public static final String WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY = "workingDirectory";
 
     public TemporaryFolder workingDirectory = new TemporaryFolder();
@@ -387,6 +389,14 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
                                                            List<Transformer> transformers, Filter filter, Map<Object, Object> properties, Connector connector) throws Exception
     {
         return MuleTestUtils.getTestOutboundEndpoint(name, muleContext, uri, transformers, filter, properties, connector);
+    }
+
+    /**
+     * @return creates a new {@link org.mule.api.MuleMessage} with a test payload
+     */
+    protected MuleMessage getTestMuleMessage()
+    {
+        return new DefaultMuleMessage(TEST_PAYLOAD, muleContext);
     }
 
     public static MuleEvent getTestEvent(Object data, FlowConstruct service) throws Exception

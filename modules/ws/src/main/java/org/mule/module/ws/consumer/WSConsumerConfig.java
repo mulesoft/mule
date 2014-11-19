@@ -7,8 +7,13 @@
 package org.mule.module.ws.consumer;
 
 
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -17,9 +22,10 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.module.http.api.requester.HttpRequesterBuilder;
+import org.mule.module.http.api.HttpConstants;
+import org.mule.module.http.api.client.HttpRequestOptions;
+import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
-import org.mule.module.http.internal.request.SuccessStatusCodeValidator;
 import org.mule.module.ws.security.WSSecurity;
 import org.mule.transport.http.HttpConnector;
 import org.mule.util.Preconditions;
@@ -108,19 +114,32 @@ public class WSConsumerConfig implements MuleContextAware
 
     private MessageProcessor createHttpRequester() throws MuleException
     {
-        HttpRequesterBuilder requesterBuilder = new HttpRequesterBuilder(muleContext);
-
-        requesterBuilder.setUrl(serviceAddress).setMethod("POST").setParseResponse(false);
-
-        // Do not throw exception on invalid status code, let CXF process it.
-        requesterBuilder.setResponseValidator(new SuccessStatusCodeValidator("0..599"));
-
-        if (connectorConfig != null)
+        return new MessageProcessor()
         {
-            requesterBuilder.setConfig(connectorConfig);
-        }
+            private HttpRequestOptions requestOptions;
 
-        return requesterBuilder.build();
+            @Override
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                final MuleMessage responseMessage = muleContext.getClient().send(serviceAddress, event.getMessage(), getRequestOptions());
+                event.setMessage(responseMessage);
+                return event;
+            }
+
+            private HttpRequestOptions getRequestOptions()
+            {
+                if (requestOptions == null)
+                {
+                    final HttpRequestOptionsBuilder builder = newOptions().method(POST.name()).disableStatusCodeValidation().disableParseResponse();
+                    if (connectorConfig != null)
+                    {
+                        builder.requestConfig(connectorConfig);
+                    }
+                    requestOptions = builder.build();
+                }
+                return requestOptions;
+            }
+        };
     }
 
     private boolean isHttp()

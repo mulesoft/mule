@@ -9,6 +9,7 @@ package org.mule.test.usecases.sync;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -53,7 +54,7 @@ public class HttpTransformTestCase extends AbstractServiceAndFlowTestCase
     public void testTransform() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send(String.format("http://localhost:%d/RemoteService", httpPort1.getNumber()), "payload", null);
+        MuleMessage message = client.send(String.format("http://localhost:%d/RemoteService", httpPort1.getNumber()), new DefaultMuleMessage("payload", muleContext));
         assertNotNull(message);
         GZipUncompressTransformer gu = new GZipUncompressTransformer();
         gu.setMuleContext(muleContext);
@@ -69,7 +70,7 @@ public class HttpTransformTestCase extends AbstractServiceAndFlowTestCase
         MuleClient client = muleContext.getClient();
         ArrayList<Integer> payload = new ArrayList<Integer>();
         payload.add(42);
-        MuleMessage message = client.send(String.format("http://localhost:%d/RemoteService", httpPort2.getNumber()), SerializationUtils.serialize(payload), null);
+        MuleMessage message = client.send(String.format("http://localhost:%d/RemoteService", httpPort2.getNumber()), new DefaultMuleMessage(SerializationUtils.serialize(payload), muleContext));
         assertNotNull(message);
         ByteArrayToSerializable bas = new ByteArrayToSerializable();
         bas.setMuleContext(muleContext);
@@ -83,7 +84,7 @@ public class HttpTransformTestCase extends AbstractServiceAndFlowTestCase
     {
         MuleClient client = muleContext.getClient();
         Object payload = Arrays.asList(42);
-        MuleMessage message = client.send("vm://LocalService", payload, null);
+        MuleMessage message = client.send("vm://LocalService", new DefaultMuleMessage(payload, muleContext));
         assertNotNull(message);
         ByteArrayToSerializable bas = new ByteArrayToSerializable();
         bas.setMuleContext(muleContext);

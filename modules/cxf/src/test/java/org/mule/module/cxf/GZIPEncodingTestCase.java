@@ -11,7 +11,9 @@ package org.mule.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
@@ -63,7 +65,7 @@ public class GZIPEncodingTestCase extends FunctionalTestCase
     @Test
     public void proxyWithGZIPResponse() throws Exception
     {
-        MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/proxy", getAllRequest, null);
+        MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/proxy", new DefaultMuleMessage(getAllRequest, muleContext));
         validateResponse(response);
     }
 
@@ -72,7 +74,7 @@ public class GZIPEncodingTestCase extends FunctionalTestCase
     {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(HttpConstants.HEADER_CONTENT_ENCODING, "gzip,deflate");
-        MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/proxy", gzip(getAllRequest), properties);
+        MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/proxy", new DefaultMuleMessage(gzip(getAllRequest), properties, muleContext));
         validateResponse(response);
     }
 

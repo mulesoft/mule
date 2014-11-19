@@ -10,10 +10,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.transport.NullPayload;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.IOUtils;
 
@@ -64,7 +66,7 @@ public class PayloadAnnotationTestCase extends AbstractServiceAndFlowTestCase
     public void testPayloadFailedTransform() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("vm://payload3", null, null);
+        MuleMessage message = client.send("vm://payload3", new DefaultMuleMessage(NullPayload.getInstance(), muleContext));
         assertNotNull(message);
         assertNotNull(message.getExceptionPayload());
         assertEquals(TransformerException.class,

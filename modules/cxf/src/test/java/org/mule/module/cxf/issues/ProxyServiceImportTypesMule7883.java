@@ -8,9 +8,12 @@ package org.mule.module.cxf.issues;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.NullPayload;
 
 import java.io.StringReader;
 import java.util.List;
@@ -50,7 +53,7 @@ public class ProxyServiceImportTypesMule7883 extends FunctionalTestCase
     private void testImportType(String targetUrl, String expectedImportUrl, String importType, String locationAttributeName) throws Exception
     {
         String proxyAddress = "http://localhost:" + httpPort.getNumber() + "/test";
-        MuleMessage response = muleContext.getClient().send(proxyAddress + targetUrl, null, null);
+        MuleMessage response = muleContext.getClient().send(proxyAddress + targetUrl, new DefaultMuleMessage(NullPayload.getInstance(), muleContext));
 
         Document wsdl = XMLUnit.buildTestDocument(new InputSource(new StringReader(response.getPayloadAsString())));
         List<Element> imports = DOMUtils.findAllElementsByTagName(wsdl.getDocumentElement(), importType + ":import");

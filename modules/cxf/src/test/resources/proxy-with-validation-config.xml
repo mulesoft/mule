@@ -9,6 +9,8 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
 
+    <configuration useHttpTransportByDefault="true"/>
+
     <flow name="testFlow">
         <http:inbound-endpoint host="localhost" port="${port1}">
             <cxf:proxy-service service="WebService2"

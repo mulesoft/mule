@@ -10,6 +10,8 @@
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
+    <configuration useHttpTransportByDefault="true"/>
+
     <model name="main">
 
         <service name="attachments1">

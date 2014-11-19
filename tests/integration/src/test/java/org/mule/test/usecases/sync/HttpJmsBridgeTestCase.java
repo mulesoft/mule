@@ -8,7 +8,10 @@ package org.mule.test.usecases.sync;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -53,7 +56,7 @@ public class HttpJmsBridgeTestCase extends AbstractServiceAndFlowTestCase
         final String customHeader = "X-Custom-Header";
         headers.put(customHeader, "value");
 
-        client.dispatch(String.format("http://localhost:%d/in", httpPort.getNumber()), payload, headers);
+        client.dispatch(String.format("http://localhost:%d/in", httpPort.getNumber()), new DefaultMuleMessage(payload, headers, muleContext), newOptions().method(POST.name()).build());
 
         MuleMessage msg = client.request("vm://out", 10000);
         assertNotNull(msg);

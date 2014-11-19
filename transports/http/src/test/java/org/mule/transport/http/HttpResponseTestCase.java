@@ -46,7 +46,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("errorMessage", "ERROR !!!! ");
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, properties, muleContext);
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/resources/error", muleMessage, properties);
+        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/resources/error", muleMessage);
         assertTrue(response.getPayloadAsString().contains("ERROR !!!!"));
         assertEquals("" + HttpConstants.SC_INTERNAL_SERVER_ERROR, response.getInboundProperty("http.status"));
     }
@@ -87,7 +87,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
         Map<String, Object> properties = populateProperties();
 
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, properties, muleContext);
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/resources/allExpressions",  muleMessage, properties);
+        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/resources/allExpressions",  muleMessage);
         assertEquals("" + HttpConstants.SC_NOT_FOUND, response.getInboundProperty("http.status"));
         assertEquals("max-age=3600", response.getInboundProperty("Cache-Control"));
         assertEquals("Thu, 01 Dec 2014 16:00:00 GMT", response.getInboundProperty("Expires"));

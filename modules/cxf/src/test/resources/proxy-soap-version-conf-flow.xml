@@ -8,6 +8,8 @@
                http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
+    <configuration useHttpTransportByDefault="true"/>
+
     <flow name="serverEcho">
         <inbound-endpoint address="http://localhost:${port1}/services/Echo"
                           exchange-pattern="request-response">

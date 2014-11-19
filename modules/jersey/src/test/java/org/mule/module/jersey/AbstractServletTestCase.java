@@ -7,10 +7,15 @@
 package org.mule.module.jersey;
 
 import static org.junit.Assert.assertEquals;
+import static org.mule.module.http.api.HttpConstants.Methods.DELETE;
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
+import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
@@ -72,20 +77,17 @@ public abstract class AbstractServletTestCase extends AbstractServiceAndFlowTest
     {
         MuleClient client = muleContext.getClient();
 
-        MuleMessage result = client.send(root + "/helloworld", "", null);
+        MuleMessage result = client.send(root + "/helloworld", new DefaultMuleMessage("", muleContext), newOptions().method(POST.name()).build());
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
         assertEquals("Hello World", result.getPayloadAsString());
 
-        result = client.send(root + "/hello", "", null);
+        result = client.send(root + "/hello", new DefaultMuleMessage("", muleContext), newOptions().disableStatusCodeValidation().build());
         assertEquals((Integer)404, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
 
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
-        result = client.send(root + "/helloworld", "", props);
+        result = client.send(root + "/helloworld", new DefaultMuleMessage("", muleContext), newOptions().disableStatusCodeValidation().build());
         assertEquals((Integer)405, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
 
-        props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_DELETE);
-        result = client.send(root + "/helloworld", "", props);
+        result = client.send(root + "/helloworld", new DefaultMuleMessage("", muleContext), newOptions().method(DELETE.name()).disableStatusCodeValidation().build());
         assertEquals("Hello World Delete", result.getPayloadAsString());
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
     }

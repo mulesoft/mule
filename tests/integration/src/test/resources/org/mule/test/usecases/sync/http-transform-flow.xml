@@ -12,6 +12,8 @@
        http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
+    <configuration useHttpTransportByDefault="true"/>
+
     <http:endpoint name="httpEndpoint" address="http://localhost:${port1}/RemoteService" exchange-pattern="request-response"
         contentType="text/plain"/>
     <endpoint name="httpEndpoint2" address="http://localhost:${port2}/RemoteService?method=post" exchange-pattern="request-response"/>
