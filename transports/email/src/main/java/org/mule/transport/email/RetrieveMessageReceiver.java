@@ -385,17 +385,16 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                 {
                     try
                     {
-                        folder.close(true); // close and expunge deleted messages
+                        closeFolder();
                     }
                     catch (Exception e)
                     {
-                        logger.error("Failed to close pop3  inbox: " + e.getMessage());
+                        logger.error("Failed to close pop3 inbox: " + e.getMessage());
                     }
                 }
             }
         }
     }
-
 
     @Override
     protected boolean pollOnPrimaryInstanceOnly()
@@ -411,18 +410,23 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
             if (null != folder)
             {
                 folder.removeMessageCountListener(this);
-                if (folder.isOpen())
+                try
                 {
-                    try
-                    {
-                        folder.close(true);
-                    }
-                    catch (Exception e)
-                    {
-                        logger.debug("ignoring exception: " + e.getMessage(), e);
-                    }
+                    closeFolder();
+                }
+                catch (Exception e)
+                {
+                    logger.debug("ignoring exception: " + e.getMessage(), e);
                 }
             }
+        }
+    }
+
+    private void closeFolder() throws MessagingException
+    {
+        if (folder != null && folder.isOpen())
+        {
+            folder.close(true); // close and expunge deleted messages
         }
     }
 
