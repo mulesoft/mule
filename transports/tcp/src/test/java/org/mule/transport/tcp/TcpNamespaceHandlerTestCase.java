@@ -7,6 +7,8 @@
 package org.mule.transport.tcp;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -139,6 +141,22 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void testDefaultServerSocketProperties()
+    {
+        TcpServerSocketProperties properties = muleContext.getRegistry().get("defaultServerSocketProperties");
+
+        assertThat(properties.getKeepAlive(), is(nullValue()));
+        assertThat(properties.getReceiveBacklog(), is(nullValue()));
+        assertThat(properties.getReceiveBufferSize(), is(nullValue()));
+        assertThat(properties.getReuseAddress(), is(nullValue()));
+        assertThat(properties.getSendBufferSize(), is(nullValue()));
+        assertThat(properties.getSendTcpNoDelay(), equalTo(true));
+        assertThat(properties.getServerTimeout(), equalTo(0));
+        assertThat(properties.getTimeout(), equalTo(0));
+        assertThat(properties.getLinger(), equalTo(-1));
+    }
+
+    @Test
     public void testServerSocketProperties()
     {
         TcpServerSocketProperties properties = muleContext.getRegistry().get("serverSocketProperties");
@@ -153,6 +171,21 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         assertThat(properties.getTimeout(), equalTo(800));
         assertThat(properties.getLinger(), equalTo(700));
     }
+
+    @Test
+    public void testDefaultClientSocketProperties()
+    {
+        TcpClientSocketProperties properties = muleContext.getRegistry().get("defaultClientSocketProperties");
+
+        assertThat(properties.getKeepAlive(), is(nullValue()));
+        assertThat(properties.getReceiveBufferSize(), is(nullValue()));
+        assertThat(properties.getSendBufferSize(), is(nullValue()));
+        assertThat(properties.getSendTcpNoDelay(), equalTo(true));
+        assertThat(properties.getTimeout(), equalTo(0));
+        assertThat(properties.getLinger(), equalTo(-1));
+        assertThat(properties.getConnectionTimeout(), equalTo(30000));
+    }
+
 
     @Test
     public void testClientSocketProperties()

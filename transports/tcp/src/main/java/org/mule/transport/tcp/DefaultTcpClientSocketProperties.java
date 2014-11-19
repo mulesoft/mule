@@ -11,18 +11,25 @@ package org.mule.transport.tcp;
  */
 public class DefaultTcpClientSocketProperties implements TcpClientSocketProperties
 {
+    // Use default sendTcpNoDelay=true by default, even though Socket default is false because optimizing to reduce
+    // amount of network traffic over latency is hardly ever a concern today.
     private static final boolean DEFAULT_SEND_TCP_NO_DELAY = true;
     private static final int DEFAULT_CONNECTION_TIMEOUT = 30000;
-    private static final int DEFAULT_TIMEOUT = 0;
-    private static final int DEFAULT_LINGER = -1;
 
     private String name;
-    private Integer sendBufferSize;
-    private Integer receiveBufferSize;
+
     private Boolean sendTcpNoDelay = DEFAULT_SEND_TCP_NO_DELAY;
     private Integer connectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
-    private Integer timeout = DEFAULT_TIMEOUT;
-    private Integer linger = DEFAULT_LINGER;
+
+    // These options are undefined by default so that java.net.Socket defaults are used.  We do however document the
+    // java.net.Socket defaults in the schema for usability.
+    private Integer timeout;
+    private Integer linger;
+
+    // These options are undefined by default so that by default it is the OS TCP/IP stack that configures, or dynamically
+    // manages, these values.
+    private Integer sendBufferSize;
+    private Integer receiveBufferSize;
     private Boolean keepAlive;
 
     public String getName()
