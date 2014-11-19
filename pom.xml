@@ -873,7 +873,7 @@
             </dependency>
             <dependency>
                 <groupId>org.codehaus.groovy</groupId>
-                <artifactId>groovy</artifactId>
+                <artifactId>groovy-all</artifactId>
                 <version>${groovyVersion}</version>
                 <classifier>indy</classifier>
                 <exclusions>
@@ -895,6 +895,34 @@
                         <artifactId>ant-launcher</artifactId>
                     </exclusion>
                     <exclusion>
+                        <groupId>jline</groupId>
+                        <artifactId>jline</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>axion</groupId>
+                        <artifactId>axion</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>bsf</groupId>
+                        <artifactId>bsf</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.tonicsystems</groupId>
+                        <artifactId>jarjar</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-lang</groupId>
+                        <artifactId>commons-lang</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-primitives</groupId>
+                        <artifactId>commons-primitives</artifactId>
+                    </exclusion>
+                    <exclusion>
                         <groupId>jmock</groupId>
                         <artifactId>jmock</artifactId>
                     </exclusion>
@@ -909,6 +937,34 @@
                     <exclusion>
                         <groupId>javax.servlet</groupId>
                         <artifactId>servlet-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>mx4j</groupId>
+                        <artifactId>mx4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>nekohtml</groupId>
+                        <artifactId>nekohtml</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>qdox</groupId>
+                        <artifactId>qdox</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>qdox</groupId>
+                        <artifactId>qdox</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>radeox</groupId>
+                        <artifactId>radeox</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>radeox</groupId>
+                        <artifactId>radeox-oro</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>regexp</groupId>
+                        <artifactId>regexp</artifactId>
                     </exclusion>
                     <!-- no XML -->
                     <exclusion>
