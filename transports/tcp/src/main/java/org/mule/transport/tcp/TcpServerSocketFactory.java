@@ -6,6 +6,7 @@
  */
 package org.mule.transport.tcp;
 
+import org.mule.util.NetworkUtils;
 import org.mule.util.StringUtils;
 
 import java.io.IOException;
@@ -22,7 +23,7 @@ public class TcpServerSocketFactory implements SimpleServerSocketFactory
         String host = StringUtils.defaultIfEmpty(uri.getHost(), "localhost");
         InetAddress inetAddress = InetAddress.getByName(host);
 
-        if (inetAddress.equals(InetAddress.getLocalHost())
+        if (inetAddress.equals(NetworkUtils.getLocalHost())
                 || inetAddress.isLoopbackAddress()
                 || host.trim().equals("localhost"))
         {

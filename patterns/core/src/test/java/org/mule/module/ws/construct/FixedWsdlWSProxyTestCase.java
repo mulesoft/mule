@@ -6,10 +6,10 @@
  */
 package org.mule.module.ws.construct;
 
-import java.net.InetAddress;
-import java.util.Collections;
-
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.util.NetworkUtils;
+
+import java.util.Collections;
 
 public class FixedWsdlWSProxyTestCase extends AbstractWSProxyTestCase
 {
@@ -19,6 +19,6 @@ public class FixedWsdlWSProxyTestCase extends AbstractWSProxyTestCase
     {
         return new WSProxy("fixed-wsdl-ws-proxy", muleContext, directInboundMessageSource,
             testOutboundEndpoint, Collections.EMPTY_LIST, Collections.EMPTY_LIST,
-            "fake_wsdl " + InetAddress.getLocalHost().getHostName());
+            "fake_wsdl " + NetworkUtils.getLocalHost().getHostName());
     }
 }

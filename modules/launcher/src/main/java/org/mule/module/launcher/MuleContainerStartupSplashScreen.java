@@ -10,6 +10,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.agent.Agent;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.util.NetworkUtils;
 import org.mule.util.SplashScreen;
 import org.mule.util.StringUtils;
 
@@ -60,7 +61,7 @@ public class MuleContainerStartupSplashScreen extends SplashScreen
                              System.getProperty("os.arch")));
         try
         {
-            InetAddress host = InetAddress.getLocalHost();
+            InetAddress host = NetworkUtils.getLocalHost();
             doBody(String.format("Host: %s (%s)", host.getHostName(), host.getHostAddress()));
         }
         catch (UnknownHostException e)

@@ -58,7 +58,7 @@ public class ServerStartupSplashScreen extends SplashScreen
                 + System.getProperty("os.version") + ", " + System.getProperty("os.arch") + ")");
         try
         {
-            InetAddress host = InetAddress.getLocalHost();
+            InetAddress host = NetworkUtils.getLocalHost();
             header.add("Host: " + host.getHostName() + " (" + host.getHostAddress() + ")");
         }
         catch (UnknownHostException e)

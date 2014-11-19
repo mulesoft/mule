@@ -6,6 +6,7 @@
  */
 package org.mule.module.ws.construct;
 
+import static org.junit.Assert.assertEquals;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
@@ -22,12 +23,9 @@ import org.mule.construct.AbstractFlowConstuctTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.transport.AbstractMessageRequester;
 import org.mule.transport.AbstractMessageRequesterFactory;
-
-import java.net.InetAddress;
+import org.mule.util.NetworkUtils;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public abstract class AbstractWSProxyTestCase extends AbstractFlowConstuctTestCase
 {
@@ -100,7 +98,7 @@ public abstract class AbstractWSProxyTestCase extends AbstractFlowConstuctTestCa
         event.getMessage().setProperty("http.request", "test://foo?wsdl", PropertyScope.INBOUND);
         final MuleEvent response = directInboundMessageSource.process(event);
 
-        assertEquals("fake_wsdl " + InetAddress.getLocalHost().getHostName(), response.getMessageAsString());
+        assertEquals("fake_wsdl " + NetworkUtils.getLocalHost().getHostName(), response.getMessageAsString());
     }
 
     @Test

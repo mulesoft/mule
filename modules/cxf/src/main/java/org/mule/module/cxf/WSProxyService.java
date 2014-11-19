@@ -22,10 +22,10 @@ import org.mule.api.service.ServiceAware;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.IOUtils;
+import org.mule.util.NetworkUtils;
 import org.mule.util.StringUtils;
 
 import java.io.IOException;
-import java.net.InetAddress;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -151,7 +151,7 @@ public class WSProxyService implements Callable, ServiceAware, Initialisable
             wsdlString = wsdlString.replaceAll(realWSDLURI, proxyWSDLURI);
             if (wsdlString.indexOf("localhost") > -1)
             {
-                wsdlString = wsdlString.replaceAll("localhost", InetAddress.getLocalHost().getHostName());
+                wsdlString = wsdlString.replaceAll("localhost", NetworkUtils.getLocalHost().getHostName());
             }
 
             DefaultMuleMessage modifiedWsdl = new DefaultMuleMessage(wsdlString, muleContext);

@@ -9,12 +9,12 @@ package org.mule.transport.udp;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.transformer.DataType;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.NullPayload;
+import org.mule.util.NetworkUtils;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -99,7 +99,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
             //TODO, check how expensive this operation is
             if("null".equalsIgnoreCase(endpoint.getEndpointURI().getHost()))
             {
-                inetAddress = InetAddress.getLocalHost();
+                inetAddress = NetworkUtils.getLocalHost();
             }
             else
             {

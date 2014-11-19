@@ -8,6 +8,7 @@ package org.mule.module.jboss.transaction;
 
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.transaction.TransactionManagerFactory;
+import org.mule.util.NetworkUtils;
 
 import com.arjuna.ats.arjuna.common.arjPropertyManager;
 
@@ -61,7 +62,7 @@ public class JBossArjunaTransactionManagerFactory implements TransactionManagerF
             {
                 try
                 {
-                    InetAddress address = InetAddress.getLocalHost();
+                    InetAddress address = NetworkUtils.getLocalHost();
                     final String xaNodeId = MessageFormat.format("Mule[{0}/{1}]",
                                                                  address.getHostName(), address.getHostAddress());
                     arjPropertyManager.getCoreEnvironmentBean().setNodeIdentifier(xaNodeId);

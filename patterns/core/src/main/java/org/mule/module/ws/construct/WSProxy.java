@@ -27,10 +27,10 @@ import org.mule.pattern.core.support.CopyInboundToOutboundPropertiesTransformerC
 import org.mule.processor.ResponseMessageProcessorAdapter;
 import org.mule.transformer.TransformerTemplate;
 import org.mule.transport.http.construct.HttpProxy;
+import org.mule.util.NetworkUtils;
 import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
 
-import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.List;
@@ -236,7 +236,7 @@ public class WSProxy extends AbstractConfigurationPattern
 
             if (wsdlContents.indexOf(LOCALHOST) > -1)
             {
-                wsdlContents = wsdlContents.replaceAll(LOCALHOST, InetAddress.getLocalHost().getHostName());
+                wsdlContents = wsdlContents.replaceAll(LOCALHOST, NetworkUtils.getLocalHost().getHostName());
             }
 
             if (logger.isDebugEnabled())

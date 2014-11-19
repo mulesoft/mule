@@ -6,13 +6,13 @@
  */
 package org.mule.el.context;
 
-import java.net.InetAddress;
+import org.mule.util.NetworkUtils;
+
 import java.net.UnknownHostException;
 import java.util.Calendar;
 import java.util.Locale;
 
 import junit.framework.Assert;
-
 import org.junit.Test;
 
 public class ServerContextTestCase extends AbstractELTestCase
@@ -25,7 +25,7 @@ public class ServerContextTestCase extends AbstractELTestCase
     @Test
     public void host() throws UnknownHostException
     {
-        Assert.assertEquals(InetAddress.getLocalHost().getCanonicalHostName(), evaluate("server.host"));
+        Assert.assertEquals(NetworkUtils.getLocalHost().getCanonicalHostName(), evaluate("server.host"));
     }
 
     public void assignValueToHost()
@@ -36,7 +36,7 @@ public class ServerContextTestCase extends AbstractELTestCase
     @Test
     public void ip() throws UnknownHostException
     {
-        Assert.assertEquals(InetAddress.getLocalHost().getHostAddress(), evaluate("server.ip"));
+        Assert.assertEquals(NetworkUtils.getLocalHost().getHostAddress(), evaluate("server.ip"));
     }
 
     @Test
