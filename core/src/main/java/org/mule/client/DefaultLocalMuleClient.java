@@ -7,6 +7,7 @@
 package org.mule.client;
 
 import static org.mule.api.client.SimpleOptionsBuilder.newOptions;
+import static org.mule.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -29,9 +30,9 @@ import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
-import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.transport.ReceiveException;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.SimpleEndpointCache;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.management.stats.FlowConstructStatistics;
@@ -54,13 +55,10 @@ public class DefaultLocalMuleClient implements LocalMuleClient
     {
         if (connectorOperatorLocator == null)
         {
-            try
+            this.connectorOperatorLocator = muleContext.getRegistry().get(OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR);
+            if (this.connectorOperatorLocator == null)
             {
-                this.connectorOperatorLocator = muleContext.getRegistry().lookupObject(ConnectorOperationLocator.class);
-            }
-            catch (RegistrationException e)
-            {
-                throw new MuleRuntimeException(e);
+                throw new MuleRuntimeException(CoreMessages.createStaticMessage("Could not find required %s in the registry under key %s", ConnectorOperationLocator.class.getName(), OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR));
             }
         }
         return connectorOperatorLocator;
@@ -105,7 +103,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
 
     public MuleMessage send(String url, MuleMessage message) throws MuleException
     {
-        final MessageProcessor connectorMessageProcessor = getConnectorMessageProcessLocator().locateConnectorOperation(url, newOptions().responseTimeout(muleContext.getConfiguration().getDefaultResponseTimeout()).build(), MessageExchangePattern.REQUEST_RESPONSE);
+        final MessageProcessor connectorMessageProcessor = getConnectorMessageProcessLocator().locateConnectorOperation(url, newOptions().build(), MessageExchangePattern.REQUEST_RESPONSE);
         if (connectorMessageProcessor != null)
         {
             return returnMessage(connectorMessageProcessor.process(createRequestResponseMuleEvent(message)));
@@ -151,7 +149,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
 
     public void dispatch(String url, MuleMessage message) throws MuleException
     {
-        final MessageProcessor connectorMessageProcessor = getConnectorMessageProcessLocator().locateConnectorOperation(url, newOptions().responseTimeout(muleContext.getConfiguration().getDefaultResponseTimeout()).build(), MessageExchangePattern.ONE_WAY);
+        final MessageProcessor connectorMessageProcessor = getConnectorMessageProcessLocator().locateConnectorOperation(url, newOptions().build(), MessageExchangePattern.ONE_WAY);
         if (connectorMessageProcessor != null)
         {
             connectorMessageProcessor.process(createRequestResponseMuleEvent(message));

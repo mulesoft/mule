@@ -16,7 +16,6 @@ import org.mule.module.http.api.requester.HttpStreamingType;
 public class DefaultHttpRequestOptions implements HttpRequestOptions
 {
 
-    private static final int HASHCODE_PRIME_NUMBER = 31;
     private final String method;
     private final Boolean followsRedirect;
     private final HttpStreamingType requestStreamingMode;
@@ -123,12 +122,13 @@ public class DefaultHttpRequestOptions implements HttpRequestOptions
     @Override
     public int hashCode()
     {
+        final int hashcodePrimerNumber = 31;
         int result = method != null ? method.hashCode() : 0;
-        result = HASHCODE_PRIME_NUMBER * result + (followsRedirect != null ? followsRedirect.hashCode() : 0);
-        result = HASHCODE_PRIME_NUMBER * result + (requestStreamingMode != null ? requestStreamingMode.hashCode() : 0);
-        result = HASHCODE_PRIME_NUMBER * result + (requestConfig != null ? requestConfig.hashCode() : 0);
-        result = HASHCODE_PRIME_NUMBER * result + (disableStatusCodeValidation ? 1 : 0);
-        result = HASHCODE_PRIME_NUMBER * result + (disableParseResponse ? 1 : 0);
+        result = hashcodePrimerNumber * result + (followsRedirect != null ? followsRedirect.hashCode() : 0);
+        result = hashcodePrimerNumber * result + (requestStreamingMode != null ? requestStreamingMode.hashCode() : 0);
+        result = hashcodePrimerNumber * result + (requestConfig != null ? requestConfig.hashCode() : 0);
+        result = hashcodePrimerNumber * result + (disableStatusCodeValidation ? 1 : 0);
+        result = hashcodePrimerNumber * result + (disableParseResponse ? 1 : 0);
         return result;
     }
 }

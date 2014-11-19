@@ -15,7 +15,7 @@ import org.mule.api.processor.MessageProcessor;
  * Provider of operation for a Mule connector.
  *
  * A Mule connector can provide an implementation of this interface in the registry and mule
- * will use it to create operations using an url and later executed them.
+ * will use it to create operations using an URL and later executed them.
  *
  * The implementation must be located in the mule registry before the start phase.
  */
