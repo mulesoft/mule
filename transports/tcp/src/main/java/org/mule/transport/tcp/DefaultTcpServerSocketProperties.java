@@ -11,21 +11,28 @@ package org.mule.transport.tcp;
  */
 public class DefaultTcpServerSocketProperties implements TcpServerSocketProperties
 {
+    // Use default value of 'true' even though Socket default is false because optimizing to reduce amount of network
+    // traffic over latency is hardly ever a concern today.
     private static final boolean DEFAULT_SEND_TCP_NO_DELAY = true;
-    private static final boolean DEFAULT_REUSE_ADDRESS = false;
-    private static final int DEFAULT_SERVER_TIMEOUT = 0;
-    private static final int DEFAULT_TIMEOUT = 0;
-    private static final int DEFAULT_LINGER = -1;
+    // Use default value of 'true' to avoid BindException's when restarting Mule applications.
+    private static final boolean DEFAULT_REUSE_ADDRESS = true;
 
     private String name;
+
+    private Boolean sendTcpNoDelay = DEFAULT_SEND_TCP_NO_DELAY;
+    private Boolean reuseAddress = DEFAULT_REUSE_ADDRESS;
+
+    // These options are undefined by default so that java.net.Socket/java.net.ServerSocket defaults are used.  We do
+    // however document the java.net.Socket/java.net.ServerSocket defaults in the schema for usability.
+    private Integer serverTimeout ;
+    private Integer timeout;
+    private Integer linger;
+
+    // These options are undefined by default so that by default it is the OS TCP/IP stack that configures, or dynamically
+    // manages, these values.
     private Integer sendBufferSize;
     private Integer receiveBufferSize;
     private Integer receiveBacklog;
-    private Boolean sendTcpNoDelay = DEFAULT_SEND_TCP_NO_DELAY;
-    private Boolean reuseAddress = DEFAULT_REUSE_ADDRESS;
-    private Integer serverTimeout = DEFAULT_SERVER_TIMEOUT;
-    private Integer timeout = DEFAULT_TIMEOUT;
-    private Integer linger = DEFAULT_LINGER;
     private Boolean keepAlive;
 
     public String getName()
