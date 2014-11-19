@@ -19,6 +19,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.module.http.api.client.HttpRequestOptions;
+import org.mule.module.http.internal.config.HttpConfiguration;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -56,7 +57,7 @@ public class HttpConnectorMessageProcessorProvider implements ConnectorOperation
     @Override
     public boolean supportsUrl(String url)
     {
-        if (muleContext.getConfiguration().useHttpTransportByDefault())
+        if (HttpConfiguration.useTransportForUris(muleContext))
         {
             return false;
         }

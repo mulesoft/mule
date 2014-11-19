@@ -14,7 +14,9 @@
     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd">
 
 
-    <configuration useHttpTransportByDefault="true"/>
+    <configuration>
+        <http:config useTransportForUris="true"/>
+    </configuration>
 
     <flow name="flowWithoutExceptionStrategySync">
         <http:inbound-endpoint name="httpInSync" port="${port1}" host="localhost" path="flowWithoutExceptionStrategySync" exchange-pattern="request-response"/>

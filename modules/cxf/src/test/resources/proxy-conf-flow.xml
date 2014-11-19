@@ -5,6 +5,7 @@
     xmlns:mule-xml="http://www.mulesoft.org/schema/mule/xml" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
     xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
     xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
     xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
@@ -13,9 +14,12 @@
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 
-    <configuration useHttpTransportByDefault="true"/>
+    <configuration>
+        <http:config useTransportForUris="true"/>
+    </configuration>
 
     <mule-xml:xslt-transformer xsl-file="proxy.xsl"
         name="TestXslt" returnClass="org.mule.module.xml.transformer.DelayedResult" />

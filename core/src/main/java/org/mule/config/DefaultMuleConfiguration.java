@@ -178,13 +178,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
      */
     private List<Object> extensions;
 
-    /**
-     * For the cases where HTTP needs to be used by default (no connector or endpoint is explicitly defined), this
-     * determines if the old HTTP transport should be used by default. If false, the new HTTP connector will be used.
-     * This applies, for example, when specifying an HTTP URI in MuleClient.
-     */
-    private boolean useHttpTransportByDefault;
-
     public DefaultMuleConfiguration()
     {
         this(false);
@@ -754,17 +747,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
             return Collections.emptyList();
         }
         return Collections.unmodifiableList(extensions);
-    }
-
-    @Override
-    public boolean useHttpTransportByDefault()
-    {
-        return useHttpTransportByDefault;
-    }
-
-    public void setUseHttpTransportByDefault(boolean useHttpTransportByDefault)
-    {
-        this.useHttpTransportByDefault = useHttpTransportByDefault;
     }
 
     @Override

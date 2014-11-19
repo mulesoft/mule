@@ -13,21 +13,19 @@ import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
-import org.mule.module.http.internal.HttpMessageBuilderRef;
-import org.mule.module.http.internal.request.DefaultHttpRequester;
-import org.mule.module.http.internal.request.FailureStatusCodeValidator;
 import org.mule.module.http.internal.HttpMapParam;
+import org.mule.module.http.internal.HttpMessageBuilderRef;
 import org.mule.module.http.internal.HttpParamType;
 import org.mule.module.http.internal.HttpSingleParam;
-import org.mule.module.http.internal.request.NtlmProxyConfig;
-import org.mule.module.http.internal.request.ProxyConfig;
 import org.mule.module.http.internal.listener.DefaultHttpListener;
 import org.mule.module.http.internal.listener.DefaultHttpListenerConfig;
+import org.mule.module.http.internal.request.DefaultHttpRequester;
+import org.mule.module.http.internal.request.FailureStatusCodeValidator;
 import org.mule.module.http.internal.request.HttpAuthenticationType;
+import org.mule.module.http.internal.request.NtlmProxyConfig;
+import org.mule.module.http.internal.request.ProxyConfig;
 import org.mule.module.http.internal.request.RamlApiConfiguration;
 import org.mule.module.http.internal.request.SuccessStatusCodeValidator;
-
-import java.util.concurrent.Executors;
 
 public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
 {
@@ -67,5 +65,6 @@ public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
 
         registerBeanDefinitionParser("raml-api-configuration", new ChildDefinitionParser("apiConfiguration", RamlApiConfiguration.class));
         registerBeanDefinitionParser("worker-threading-profile", new ThreadingProfileDefinitionParser("workerThreadingProfile",  MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE));
+        registerBeanDefinitionParser("config", new ChildDefinitionParser("extension", HttpConfiguration.class));
     }
 }

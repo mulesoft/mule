@@ -9,7 +9,9 @@
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
 
-    <configuration useHttpTransportByDefault="true"/>
+    <configuration>
+        <http:config useTransportForUris="true"/>
+    </configuration>
 
     <http:connector name="httpConnector" keepAlive="false" />
 

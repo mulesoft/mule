@@ -8,7 +8,9 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
 
-    <configuration useHttpTransportByDefault="true"/>
+    <configuration>
+        <http:config useTransportForUris="true"/>
+    </configuration>
 
     <flow name="proxy-body">
         <http:inbound-endpoint host="localhost" port="${port1}" path="body" exchange-pattern="request-response"/>
