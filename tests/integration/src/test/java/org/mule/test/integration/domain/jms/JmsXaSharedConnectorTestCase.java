@@ -10,7 +10,7 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 
 import org.mule.transport.jms.JmsConnector;
-import org.mule.transport.jms.xa.ConnectionFactoryWrapper;
+import org.mule.transport.jms.xa.DefaultXAConnectionFactoryWrapper;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -38,7 +38,7 @@ public class JmsXaSharedConnectorTestCase extends JmsSharedConnectorTestCase
     public void connectionFactoryWrapperIsUsed()
     {
         JmsConnector jmsConnector = (JmsConnector) getMuleContextForApp(CLIENT_APP).getRegistry().lookupConnector("sharedJmsConnector");
-        assertThat(jmsConnector.getConnectionFactory(), instanceOf(ConnectionFactoryWrapper.class));
+        assertThat(jmsConnector.getConnectionFactory(), instanceOf(DefaultXAConnectionFactoryWrapper.class));
     }
 
 }

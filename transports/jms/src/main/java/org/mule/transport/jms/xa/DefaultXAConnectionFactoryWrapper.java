@@ -11,7 +11,6 @@ import org.mule.util.xa.XaResourceFactoryHolder;
 import java.lang.reflect.Proxy;
 
 import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.QueueConnection;
 import javax.jms.QueueConnectionFactory;
@@ -27,23 +26,23 @@ import javax.jms.XATopicConnectionFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class ConnectionFactoryWrapper
-        implements ConnectionFactory, QueueConnectionFactory, TopicConnectionFactory
+public class DefaultXAConnectionFactoryWrapper
+        implements XAConnectionFactoryWrapper, QueueConnectionFactory, TopicConnectionFactory
 {
     /**
      * logger used by this class
      */
-    protected static final transient Log logger = LogFactory.getLog(ConnectionFactoryWrapper.class);
+    protected static final transient Log logger = LogFactory.getLog(DefaultXAConnectionFactoryWrapper.class);
 
     protected final Object factory;
     private Boolean sameRMOverrideValue;
 
-    public ConnectionFactoryWrapper(Object factory)
+    public DefaultXAConnectionFactoryWrapper(Object factory)
     {
         this(factory, null);
     }
 
-    public ConnectionFactoryWrapper(Object factory, Boolean sameRMOverrideValue)
+    public DefaultXAConnectionFactoryWrapper(Object factory, Boolean sameRMOverrideValue)
     {
         this.factory = factory;
         this.sameRMOverrideValue = sameRMOverrideValue;
