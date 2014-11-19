@@ -46,8 +46,6 @@ import org.slf4j.LoggerFactory;
 
 public class HttpResponseBuilder extends HttpMessageBuilder implements Initialisable, MuleContextAware
 {
-    private static final int DEFAULT_STATUS_CODE = 200;
-
     public static final String MULTIPART = "multipart";
     private Logger logger = LoggerFactory.getLogger(getClass());
     private String statusCode;
@@ -192,7 +190,11 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
             }
         }
 
-        httpResponseBuilder.setStatusCode(resolveStatusCode(event));
+        Integer resolvedStatusCode = resolveStatusCode(event);
+        if (resolvedStatusCode != null)
+        {
+            httpResponseBuilder.setStatusCode(resolvedStatusCode);
+        }
         if (this.reasonPhrase != null)
         {
             httpResponseBuilder.setReasonPhrase(reasonPhraseEvaluator.resolveStringValue(event));
@@ -201,23 +203,20 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         return httpResponseBuilder.build();
     }
 
-    private int resolveStatusCode(MuleEvent event)
+    private Integer resolveStatusCode(MuleEvent event)
     {
-        Object statusCodeOutboundProperty = event.getMessage().getOutboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY);
-
         if (statusCode != null)
         {
             return statusCodeEvaluator.resolveIntegerValue(event);
         }
-        else if (statusCodeOutboundProperty != null)
+
+        Object statusCodeOutboundProperty = event.getMessage().getOutboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY);
+        if (statusCodeOutboundProperty != null)
         {
             return NumberUtils.toInt(statusCodeOutboundProperty);
         }
-        else
-        {
-            return DEFAULT_STATUS_CODE;
-        }
 
+        return null;
     }
 
     private String createMultipartFormDataContentType()
