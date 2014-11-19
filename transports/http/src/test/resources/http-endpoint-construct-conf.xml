@@ -10,7 +10,9 @@
           http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/3.2/mule-https.xsd
           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
 
-    <configuration useHttpTransportByDefault="true"/>
+    <configuration>
+        <http:config useTransportForUris="true"/>
+    </configuration>
 
     <flow name="testA">
         <http:inbound-endpoint host="localhost" port="${port1}" path="/testA" exchange-pattern="request-response"/>

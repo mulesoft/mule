@@ -22,9 +22,9 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
+import org.mule.module.http.internal.config.HttpConfiguration;
 import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
 import org.mule.module.ws.security.WSSecurity;
 import org.mule.transport.http.HttpConnector;
@@ -87,7 +87,7 @@ public class WSConsumerConfig implements MuleContextAware
         {
             return false;
         }
-        if (muleContext.getConfiguration().useHttpTransportByDefault())
+        if (HttpConfiguration.useTransportForUris(muleContext))
         {
             return false;
         }
