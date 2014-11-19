@@ -92,10 +92,6 @@ public class HttpConnectorMessageProcessorProvider implements ConnectorOperation
             {
                 httpRequesterBuilder.responseTimeout(operationOptions.getResponseTimeout());
             }
-            else
-            {
-                httpRequesterBuilder.responseTimeout(muleContext.getConfiguration().getDefaultResponseTimeout());
-            }
         }
         MessageProcessor messageProcessor = httpRequesterBuilder.build();
         if (exchangePattern.equals(MessageExchangePattern.ONE_WAY))
