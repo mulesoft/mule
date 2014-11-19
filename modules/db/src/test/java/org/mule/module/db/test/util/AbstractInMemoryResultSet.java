@@ -54,6 +54,7 @@ public abstract class AbstractInMemoryResultSet implements ResultSet
      *
      * @param columns column definitions
      * @param records values for each record using the order defined in the columns
+     * @param statement statement to be returned by the {@Link getStatement}
      */
     public AbstractInMemoryResultSet(List<ColumnMetadata> columns, List<Map<String, Object>> records, Statement statement)
     {

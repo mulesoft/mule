@@ -8,6 +8,7 @@
 package org.mule.module.db.test.util;
 
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
@@ -22,9 +23,10 @@ public class InMemoryResultSet extends AbstractInMemoryResultSet
      *
      * @param columns column definitions
      * @param records values for each record using the order defined in the columns
+     * @param statement statement to be returned by the {@Link getStatement}
      */
-    public InMemoryResultSet(List<ColumnMetadata> columns, List<Map<String, Object>> records)
+    public InMemoryResultSet(List<ColumnMetadata> columns, List<Map<String, Object>> records, Statement statement)
     {
-        super(columns, records);
+        super(columns, records, statement);
     }
 }
