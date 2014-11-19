@@ -6,6 +6,7 @@
  */
 package org.mule.module.http.internal;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class ParameterMap implements Map<String, Object>
+public class ParameterMap implements Map<String, Object>, Serializable
 {
 
     private final Map paramsMap;

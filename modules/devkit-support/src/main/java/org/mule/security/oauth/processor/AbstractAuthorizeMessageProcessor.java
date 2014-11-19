@@ -34,7 +34,7 @@ public abstract class AbstractAuthorizeMessageProcessor extends DevkitBasedMessa
     private String accessTokenUrl = null;
     private HttpCallback oauthCallback;
     private String state;
-    private HttpCallbackFactory callbackFactory;
+    protected HttpCallbackFactory callbackFactory;
 
     public AbstractAuthorizeMessageProcessor()
     {
@@ -46,8 +46,10 @@ public abstract class AbstractAuthorizeMessageProcessor extends DevkitBasedMessa
     @Override
     public void start() throws MuleException
     {
-        if (this.callbackFactory == null) {
-            this.callbackFactory = new DefaultHttpCallbackFactory();
+        if (callbackFactory == null)
+        {
+            callbackFactory = new DefaultHttpCallbackFactory();
+            callbackFactory.forceOldHttpTransport(muleContext.getConfiguration().useHttpTransportByDefault());
         }
     }
     
@@ -59,6 +61,7 @@ public abstract class AbstractAuthorizeMessageProcessor extends DevkitBasedMessa
         {
             this.oauthCallback = this.callbackFactory.createCallback(adapter, this.getAuthCodeRegex(),
                 fetchAccessTokenMessageProcessor, this.listener, muleContext, flowConstruct);
+
             this.oauthCallback.start();
         }
         

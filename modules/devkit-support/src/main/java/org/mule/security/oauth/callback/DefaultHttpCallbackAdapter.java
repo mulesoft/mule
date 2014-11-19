@@ -8,20 +8,24 @@ package org.mule.security.oauth.callback;
 
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transport.Connector;
 import org.mule.util.NumberUtils;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class DefaultHttpCallbackAdapter implements Initialisable, HttpCallbackAdapter
 {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(DefaultHttpCallbackAdapter.class);
+    private static final int DEFAULT_LOCAL_PORT = 8080;
+    private static final int DEFAULT_REMOTE_PORT = 80;
 
     private Integer localPort;
     private Integer remotePort;
     private String domain;
     private String path;
-    private Connector connector;
-    private final static Logger LOGGER = Logger.getLogger(DefaultHttpCallbackAdapter.class);
+    private Object connector;
     private Boolean async = false;
 
     /**
@@ -91,7 +95,7 @@ public class DefaultHttpCallbackAdapter implements Initialisable, HttpCallbackAd
     /**
      * {@inheritDoc}
      */
-    public Connector getConnector()
+    public Object getConnector()
     {
         return this.connector;
     }
@@ -99,7 +103,7 @@ public class DefaultHttpCallbackAdapter implements Initialisable, HttpCallbackAd
     /**
      * {@inheritDoc}
      */
-    public void setConnector(Connector value)
+    public void setConnector(Object value)
     {
         this.connector = value;
     }
@@ -132,13 +136,13 @@ public class DefaultHttpCallbackAdapter implements Initialisable, HttpCallbackAd
             else
             {
                 LOGGER.warn("Environment variable 'http.port' not found, using default localPort: 8080");
-                localPort = 8080;
+                localPort = DEFAULT_LOCAL_PORT;
             }
         }
         if (remotePort == null)
         {
             LOGGER.info("Using default remotePort: 80");
-            remotePort = 80;
+            remotePort = DEFAULT_REMOTE_PORT;
         }
         if (domain == null)
         {

@@ -11,6 +11,7 @@ import org.mule.api.MuleException;
 import org.mule.security.oauth.OAuth1Adapter;
 import org.mule.security.oauth.OAuth1Manager;
 import org.mule.security.oauth.OAuthProperties;
+import org.mule.security.oauth.callback.HttpCallbackAdapter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,6 +60,13 @@ public abstract class BaseOAuth1AuthorizeMessageProcessor extends AbstractAuthor
         }
 
         this.startCallback(manager, fetchAccessTokenMessageProcessor);
+    }
+
+    @Override
+    protected void startCallback(HttpCallbackAdapter adapter, FetchAccessTokenMessageProcessor fetchAccessTokenMessageProcessor) throws MuleException
+    {
+        callbackFactory.forceOldHttpTransport(true);
+        super.startCallback(adapter, fetchAccessTokenMessageProcessor);
     }
 
     /**
