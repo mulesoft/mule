@@ -873,4 +873,26 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="config" type="httpConfigType" substitutionGroup="mule:abstract-configuration-extension">
+        <xsd:annotation>
+            <xsd:documentation>
+                HTTP global configuration
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="httpConfigType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractConfigurationExtensionType">
+                <xsd:attribute name="useTransportForUris" type="mule:substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Backwards Compatabilty Flag: Since Mule 3.6, default HTTP URIs are resolved with the new HTTP connector (for example when using MuleClient). If set to true, this behavior is changed so that the HTTP transport is used.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
 </xsd:schema>

@@ -16,8 +16,10 @@ import org.mule.api.MuleException;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.DefaultMuleConfiguration;
+import org.mule.module.http.internal.config.HttpConfiguration;
 import org.mule.module.http.internal.listener.DefaultHttpListenerConfig;
 import org.mule.security.oauth.DefaultHttpCallback;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
@@ -148,12 +150,15 @@ public class DefaultHttpCallbackTestCase extends AbstractMuleContextTestCase
     @Test
     public void withOldHttpTransportByDefault() throws Exception
     {
-        newOldHttpTransport();
-        DefaultMuleConfiguration configuration = (DefaultMuleConfiguration) muleContext.getConfiguration();
-        configuration.setUseHttpTransportByDefault(true);
-
-        callback = createCallback(null);
-        sendCallbackRequest();
+        MuleTestUtils.testWithSystemProperty(HttpConfiguration.USE_HTTP_TRANSPORT_FOR_URIS, Boolean.TRUE.toString(), new MuleTestUtils.TestCallback()
+        {
+            @Override
+            public void run() throws Exception
+            {
+                newOldHttpTransport();
+                callback = createCallback(null);
+                sendCallbackRequest();         }
+        });
     }
 
     private void sendCallbackRequest() throws Exception

@@ -9,7 +9,9 @@
 		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 		http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <configuration shutdownTimeout="${contextShutdownTimeout}" useHttpTransportByDefault="true" />
+    <configuration shutdownTimeout="${contextShutdownTimeout}">
+        <http:config useTransportForUris="true"/>
+    </configuration>
 
     <flow name="staticComponentFlow">
         <http:inbound-endpoint host="localhost" port="${httpPort}" path="staticComponent" exchange-pattern="request-response"/>
