@@ -33,7 +33,7 @@ public class FilterTest extends FunctionalTestCase
 
         MuleMessage result;
         result = client.send("http://localhost:9002/baz", getTestMuleMessage(),
-                             newOptions().method(org.mule.module.http.api.HttpConstants.Methods.POST).build());
+                             newOptions().method(org.mule.module.http.api.HttpConstants.Methods.POST.name()).build());
         assertEquals("test received", result.getPayloadAsString());
     }
 
@@ -43,11 +43,11 @@ public class FilterTest extends FunctionalTestCase
         LocalMuleClient client = muleContext.getClient();
 
         MuleMessage result = client.send("http://localhost:9002/baz", getTestMuleMessage(),
-                                         newOptions().disableStatusCodeValidation().method(org.mule.module.http.api.HttpConstants.Methods.HEAD).build());
+                                         newOptions().disableStatusCodeValidation().method(org.mule.module.http.api.HttpConstants.Methods.HEAD.name()).build());
         //assertEquals(new Integer(0), result.getInboundProperty(HttpConstants.HEADER_CONTENT_LENGTH, new Integer(-1)));
         assertEquals(new Integer(HttpConstants.SC_NOT_ACCEPTABLE), result.getInboundProperty(org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY, new Integer(-1)));
 
-        result = client.send("http://localhost:9002/quo", getTestMuleMessage(), newOptions().disableStatusCodeValidation().method(org.mule.module.http.api.HttpConstants.Methods.POST).build());
+        result = client.send("http://localhost:9002/quo", getTestMuleMessage(), newOptions().disableStatusCodeValidation().method(org.mule.module.http.api.HttpConstants.Methods.POST.name()).build());
         //assertEquals(new Integer(0), result.getInboundProperty(HttpConstants.HEADER_CONTENT_LENGTH, new Integer(-1)));
         assertEquals(new Integer(HttpConstants.SC_NOT_ACCEPTABLE), result.getInboundProperty(org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY, new Integer(-1)));
     }

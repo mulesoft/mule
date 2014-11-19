@@ -227,7 +227,7 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
     {
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = null;
-        final HttpRequestOptions httpRequestOptions = newOptions().method(POST).disableStatusCodeValidation().responseTimeout(TIMEOUT).build();
+        final HttpRequestOptions httpRequestOptions = newOptions().method(POST.name()).disableStatusCodeValidation().responseTimeout(TIMEOUT).build();
         for (int i = 1; i <= EXPECTED_SHORT_DELIVERED_TIMES; i++)
         {
             response = client.send(String.format("http://localhost:%s", dynamicPort2.getNumber()), new DefaultMuleMessage(MESSAGE, muleContext), httpRequestOptions);

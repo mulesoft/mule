@@ -19,7 +19,7 @@ public interface ConnectorOperationLocator
 {
 
     /**
-     * Lookup for a request response operation from a connector
+     * Lookup for an operation from a connector
      *
      * @param url the URL that identifies the operation
      * @param operationOptions the options to use to execute the operation

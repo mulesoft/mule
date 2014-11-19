@@ -27,6 +27,9 @@ public abstract class AbstractBaseOptionsBuilder<BuilderType extends AbstractBas
         return (BuilderType) this;
     }
 
+    /**
+     * @return the options object holding all the configuration.
+     */
     public abstract OptionsType build();
 
     /**

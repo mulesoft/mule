@@ -7,6 +7,7 @@
 package org.mule.module.http.functional.listener;
 
 import static org.junit.Assert.assertThat;
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.DefaultMuleMessage;
@@ -39,7 +40,7 @@ public class HttpListenerRequestStreamingTestCase extends FunctionalTestCase
     @Test
     public void listenerReceivedChunckedRequest() throws Exception
     {
-        final HttpRequestOptions requestOptions = newOptions().method(HttpConstants.Methods.POST).build();
+        final HttpRequestOptions requestOptions = newOptions().method(POST.name()).build();
         muleContext.getClient().send(String.format("http://localhost:%s/", listenPort.getNumber()), new DefaultMuleMessage(new ByteArrayInputStream(getPayload().getBytes()), muleContext), requestOptions);
         final MuleMessage message = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
         assertThat(message.getPayloadAsString(), Is.is(getPayload()));

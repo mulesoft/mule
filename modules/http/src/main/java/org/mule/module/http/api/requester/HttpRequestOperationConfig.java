@@ -38,18 +38,11 @@ public interface HttpRequestOperationConfig<BuilderType> extends OperationOption
     BuilderType disableFollowsRedirect();
 
     /**
-     * Calling this method will make the HTTP request to always be sent using streaming (transfer-encoding chunk).
+     * Configures if the HTTP request should do streaming (transfer-encoding chunk).
      *
      * @return the builder
      */
-    BuilderType alwaysStreamRequest();
-
-    /**
-     * Calling this method will make the HTTP request never to be sent using streaming (transfer-encoding chunk).
-     *
-     * @return the builder
-     */
-    BuilderType neverStreamRequest();
+    BuilderType requestStreamingMode(HttpStreamingType mode);
 
     /**
      * @param requestConfig the config to use for the requester

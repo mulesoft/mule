@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 public class HttpConnectorMessageProcessorProvider implements ConnectorOperationProvider, MuleContextAware, Disposable
 {
 
-    private static final int MAX_NUMBER_OF_MP_CACHED = 1000;
+    private static final int CACHE_SIZE = 1000;
     private static final int EXPIRATION_TIME_IN_MINUTES = 10;
     private final LoadingCache<HttpRequestCacheKey, MessageProcessor> cachedMessageProcessors;
     private MuleContext muleContext;
@@ -41,7 +41,7 @@ public class HttpConnectorMessageProcessorProvider implements ConnectorOperation
     public HttpConnectorMessageProcessorProvider()
     {
         cachedMessageProcessors = CacheBuilder.newBuilder()
-            .maximumSize(MAX_NUMBER_OF_MP_CACHED)
+            .maximumSize(CACHE_SIZE)
             .expireAfterWrite(EXPIRATION_TIME_IN_MINUTES, TimeUnit.MINUTES)
             .build(
                     new CacheLoader<HttpRequestCacheKey, MessageProcessor>()
@@ -66,10 +66,6 @@ public class HttpConnectorMessageProcessorProvider implements ConnectorOperation
     @Override
     public MessageProcessor getMessageProcessor(final String url, final OperationOptions operationOptions, final MessageExchangePattern exchangePattern) throws MuleException
     {
-        if (muleContext.getConfiguration().useHttpTransportByDefault())
-        {
-            return null;
-        }
         try
         {
             return cachedMessageProcessors.get(new HttpRequestCacheKey(url, operationOptions, exchangePattern));
@@ -104,7 +100,7 @@ public class HttpConnectorMessageProcessorProvider implements ConnectorOperation
         MessageProcessor messageProcessor = httpRequesterBuilder.build();
         if (exchangePattern.equals(MessageExchangePattern.ONE_WAY))
         {
-            messageProcessor = new OneWayHttpRequester(messageProcessor);
+            messageProcessor = new OneWayHttpRequesterAdapter(messageProcessor);
         }
         return messageProcessor;
     }

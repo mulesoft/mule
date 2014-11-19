@@ -12,14 +12,9 @@ package org.mule.module.http.api;
 public abstract class HttpConstants
 {
 
-    public static final class Methods
+    public enum Methods
     {
-        public static final String POST = "POST";
-        public static final String GET = "GET";
-        public static final String PUT = "PUT";
-        public static final String OPTIONS = "OPTIONS";
-        public static final String HEAD = "HEAD";
-        public static final String DELETE = "DELETE";
+        POST, GET, PUT, OPTIONS, HEAD, DELETE;
     }
 
     public static final class Protocols

@@ -13,8 +13,6 @@ import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptio
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.module.http.api.HttpConstants;
-import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
@@ -60,7 +58,7 @@ public class JettyHttpStemTestCase extends AbstractServiceAndFlowTestCase
 
     protected void doTest(MuleClient client, String url, String value) throws Exception
     {
-        MuleMessage result = client.send(url, new DefaultMuleMessage("Hello", muleContext), newOptions().method(POST).build());
+        MuleMessage result = client.send(url, new DefaultMuleMessage("Hello", muleContext), newOptions().method(POST.name()).build());
         assertEquals(value, result.getPayloadAsString());
         final int status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
         assertEquals(200, status);

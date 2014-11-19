@@ -15,7 +15,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
@@ -55,7 +54,7 @@ public class BasicJerseyTestCase extends AbstractServiceAndFlowTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        final HttpRequestOptions httpPostRequestOptions = newOptions().method(org.mule.module.http.api.HttpConstants.Methods.POST).disableStatusCodeValidation().build();
+        final HttpRequestOptions httpPostRequestOptions = newOptions().method(org.mule.module.http.api.HttpConstants.Methods.POST.name()).disableStatusCodeValidation().build();
         MuleMessage result = client.send(String.format(URL, "/helloworld"), new DefaultMuleMessage("", muleContext), httpPostRequestOptions);
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
         assertEquals("Hello World", result.getPayloadAsString());
@@ -68,7 +67,7 @@ public class BasicJerseyTestCase extends AbstractServiceAndFlowTestCase
         result = client.send(String.format(URL, "/helloworld"), new DefaultMuleMessage("", muleContext), disableValidationOptions);
         assertEquals((Integer)405, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
 
-        result = client.send(String.format(URL, "/helloworld"), new DefaultMuleMessage("", muleContext), newOptions().method(org.mule.module.http.api.HttpConstants.Methods.DELETE).build());
+        result = client.send(String.format(URL, "/helloworld"), new DefaultMuleMessage("", muleContext), newOptions().method(org.mule.module.http.api.HttpConstants.Methods.DELETE.name()).build());
         assertEquals("Hello World Delete", result.getPayloadAsString());
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
     }

@@ -40,7 +40,7 @@ public class EchoTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + port.getNumber() +"/" + MESSAGE, new DefaultMuleMessage("", muleContext),
-                                         newOptions().method(HttpConstants.Methods.GET).build());
+                                         newOptions().method(HttpConstants.Methods.GET.name()).build());
         assertNotNull(result);
         assertFalse(result.getPayload() instanceof NullPayload);
         assertEquals("/" + MESSAGE, result.getPayloadAsString());

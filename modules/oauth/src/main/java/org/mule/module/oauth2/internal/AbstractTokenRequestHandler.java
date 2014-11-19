@@ -6,6 +6,8 @@
  */
 package org.mule.module.oauth2.internal;
 
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -20,7 +22,7 @@ public abstract class AbstractTokenRequestHandler implements MuleContextAware
     private MuleContext muleContext;
     private String refreshTokenWhen = OAuthConstants.DEFAULT_REFRESH_TOKEN_WHEN_EXPRESSION;
     private String tokenUrl;
-    private HttpRequestOptions httpRequestOptions = HttpRequestOptionsBuilder.newOptions().method(HttpConstants.Methods.POST).build();
+    private HttpRequestOptions httpRequestOptions = HttpRequestOptionsBuilder.newOptions().method(POST.name()).build();
 
     /**
      * @param refreshTokenWhen expression to use to determine if the response from a request to the API requires a new token

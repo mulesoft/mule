@@ -24,7 +24,7 @@ public interface ConnectorOperationProvider
 
     /**
      * @param url an URL for creating an operation
-     * @return true if the provider can handle the url, false otherwise
+     * @return true if the provider can handle the URL, false otherwise
      */
     boolean supportsUrl(String url);
 

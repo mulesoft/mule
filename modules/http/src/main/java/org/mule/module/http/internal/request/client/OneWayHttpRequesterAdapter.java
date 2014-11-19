@@ -18,15 +18,15 @@ import java.io.InputStream;
 import org.apache.commons.io.IOUtils;
 
 /**
- * Simulates a one way HTTP request operation.
+ * Adapts an HTTP operation to be one-way.
  */
-public class OneWayHttpRequester implements MessageProcessor
+public class OneWayHttpRequesterAdapter implements MessageProcessor
 {
 
     private MessageProcessor httpRequester;
 
 
-    public OneWayHttpRequester(final MessageProcessor httpRequester)
+    public OneWayHttpRequesterAdapter(final MessageProcessor httpRequester)
     {
         this.httpRequester = httpRequester;
     }
@@ -35,6 +35,12 @@ public class OneWayHttpRequester implements MessageProcessor
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         final MuleEvent result = this.httpRequester.process(event);
+        consumePayload(event, result);
+        return VoidMuleEvent.getInstance();
+    }
+
+    private void consumePayload(MuleEvent event, MuleEvent result) throws MessagingException
+    {
         final Object payload = result.getMessage().getPayload();
         if (payload instanceof InputStream)
         {
@@ -47,6 +53,5 @@ public class OneWayHttpRequester implements MessageProcessor
                 throw new MessagingException(event, e);
             }
         }
-        return VoidMuleEvent.getInstance();
     }
 }

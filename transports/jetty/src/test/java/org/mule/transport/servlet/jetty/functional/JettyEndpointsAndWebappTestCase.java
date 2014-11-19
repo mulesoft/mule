@@ -13,9 +13,7 @@ import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptio
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.servlet.jetty.AbstractWebappsTestCase;
 
@@ -54,7 +52,7 @@ public class JettyEndpointsAndWebappTestCase extends AbstractWebappsTestCase
     public void listensInEndpointsPorts() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        final HttpRequestOptions httpRequestOptions = newOptions().method(POST).build();
+        final HttpRequestOptions httpRequestOptions = newOptions().method(POST.name()).build();
         MuleMessage response = client.send(String.format("http://localhost:%d/contextA", port2.getNumber()), new DefaultMuleMessage(TEST_MESSAGE, muleContext), httpRequestOptions);
         assertEquals(TEST_MESSAGE, response.getPayloadAsString());
         response = client.send(String.format("http://localhost:%d/contextB", port3.getNumber()), new DefaultMuleMessage(TEST_MESSAGE, muleContext), httpRequestOptions);

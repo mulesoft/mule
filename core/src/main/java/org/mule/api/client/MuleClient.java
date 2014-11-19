@@ -100,6 +100,7 @@ public interface MuleClient
      * @param url the Mule URL used to determine the destination and transport of the
      *            message
      * @param message the Message for the event
+     * @param operationOptions the options to configure the operation
      * @return A return message, this could be <code>null</code> if the the
      *         components invoked explicitly sets a return as <code>null</code>.
      * @throws org.mule.api.MuleException

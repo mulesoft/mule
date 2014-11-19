@@ -8,7 +8,8 @@ package org.mule.module.http.api.client;
 
 import org.mule.api.client.AbstractBaseOptionsBuilder;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
-import org.mule.module.http.internal.HttpStreamingType;
+import org.mule.module.http.api.requester.HttpStreamingType;
+import org.mule.module.http.internal.request.client.DefaultHttpRequestOptions;
 
 /**
  * Builder object for {@link org.mule.module.http.api.client.HttpRequestOptions}
@@ -60,24 +61,13 @@ public class HttpRequestOptionsBuilder extends AbstractBaseOptionsBuilder<HttpRe
     }
 
     /**
-     * Calling this method will make the HTTP request to always be sent using streaming (transfer-encoding chunk).
+     * Configures the streaming mode for sending the HTTP request.
      *
      * @return the builder
      */
-    public HttpRequestOptionsBuilder alwaysStreamRequest()
+    public HttpRequestOptionsBuilder requestStreamingMode(HttpStreamingType mode)
     {
-        this.requestStreamingMode = requestStreamingMode.ALWAYS;
-        return this;
-    }
-
-    /**
-     * Calling this method will make the HTTP request never to be sent using streaming (transfer-encoding chunk).
-     *
-     * @return the builder
-     */
-    public HttpRequestOptionsBuilder neverStreamRequest()
-    {
-        this.requestStreamingMode = requestStreamingMode.NEVER;
+        this.requestStreamingMode = mode;
         return this;
     }
 
@@ -114,113 +104,7 @@ public class HttpRequestOptionsBuilder extends AbstractBaseOptionsBuilder<HttpRe
     @Override
     public HttpRequestOptions build()
     {
-        return new HttpRequestOptions()
-        {
-            @Override
-            public String getMethod()
-            {
-                return method;
-            }
-
-            public boolean alwaysStreamRequest()
-            {
-                return HttpStreamingType.ALWAYS.equals(requestStreamingMode);
-            }
-
-            public boolean neverStreamRequest()
-            {
-                return HttpStreamingType.NEVER.equals(requestStreamingMode);
-            }
-
-            @Override
-            public boolean isParseResponseDisabled()
-            {
-                return disableParseResponse;
-            }
-
-            @Override
-            public HttpRequesterConfig getRequesterConfig()
-            {
-                return requestConfig;
-            }
-
-            @Override
-            public Boolean isFollowsRedirect()
-            {
-                return followsRedirect;
-            }
-
-            @Override
-            public Long getResponseTimeout()
-            {
-                return HttpRequestOptionsBuilder.this.getResponseTimeout();
-            }
-
-            @Override
-            public boolean isStatusCodeValidationDisabled()
-            {
-                return disableStatusCodeValidation;
-            }
-
-            @Override
-            public boolean equals(Object o)
-            {
-                if (this == o)
-                {
-                    return true;
-                }
-                if (!(o instanceof HttpRequestOptions))
-                {
-                    return false;
-                }
-
-                HttpRequestOptions that = (HttpRequestOptions) o;
-
-                if (disableStatusCodeValidation != that.isStatusCodeValidationDisabled())
-                {
-                    return false;
-                }
-                if (followsRedirect != null ? !followsRedirect.equals(that.isFollowsRedirect()) : that.isFollowsRedirect() != null)
-                {
-                    return false;
-                }
-                if (method != null ? !method.equals(that.getMethod()) : that.getMethod() != null)
-                {
-                    return false;
-                }
-                if (requestConfig != null ? !requestConfig.equals(that.getRequesterConfig()) : that.getRequesterConfig() != null)
-                {
-                    return false;
-                }
-                if (that.alwaysStreamRequest() && requestStreamingMode.equals(HttpStreamingType.ALWAYS))
-                {
-                    return false;
-                }
-                if (that.neverStreamRequest() && requestStreamingMode.equals(HttpStreamingType.NEVER))
-                {
-                    return false;
-                }
-                if (disableParseResponse != that.isParseResponseDisabled())
-                {
-                    return false;
-                }
-
-                return true;
-            }
-
-            @Override
-            public int hashCode()
-            {
-                int result = method != null ? method.hashCode() : 0;
-                result = 31 * result + (followsRedirect != null ? followsRedirect.hashCode() : 0);
-                result = 31 * result + (requestStreamingMode != null ? requestStreamingMode.hashCode() : 0);
-                result = 31 * result + (requestConfig != null ? requestConfig.hashCode() : 0);
-                result = 31 * result + (disableStatusCodeValidation ? 1 : 0);
-                result = 31 * result + (disableParseResponse ? 1 : 0);
-                return result;
-            }
-
-        };
+        return new DefaultHttpRequestOptions(method, followsRedirect, requestStreamingMode, requestConfig, disableStatusCodeValidation, disableParseResponse, getResponseTimeout());
     }
 
     /**

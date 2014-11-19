@@ -15,7 +15,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.HttpMessageBuilder;
 import org.mule.module.http.internal.HttpParser;
-import org.mule.module.http.internal.HttpStreamingType;
+import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.ParameterMap;
 import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
 import org.mule.module.http.internal.domain.EmptyHttpEntity;

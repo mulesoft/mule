@@ -13,8 +13,6 @@ import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptio
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.module.http.api.HttpConstants;
-import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -44,7 +42,7 @@ public class DiscoverProvidersTestCase extends FunctionalTestCase
     public void cleanApple() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send(url + "/tasteApple", getTestEvent("false:true").getMessage(), newOptions().method(POST).disableStatusCodeValidation().build());
+        MuleMessage response = client.send(url + "/tasteApple", getTestEvent("false:true").getMessage(), newOptions().method(POST.name()).disableStatusCodeValidation().build());
         assertThat(response.getPayloadAsString(), equalTo("The apple is not bitten but clean"));
     }
 
@@ -52,7 +50,7 @@ public class DiscoverProvidersTestCase extends FunctionalTestCase
     public void dirtyApple() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send(url + "/tasteApple", getTestEvent("true:false").getMessage(), newOptions().method(POST).disableStatusCodeValidation().build());
+        MuleMessage response = client.send(url + "/tasteApple", getTestEvent("true:false").getMessage(), newOptions().method(POST.name()).disableStatusCodeValidation().build());
         assertThat(response.getPayloadAsString(), equalTo("The apple is bitten but dirty"));
     }
 }

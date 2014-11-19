@@ -7,6 +7,7 @@
 package org.mule.module.ws.consumer;
 
 
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.api.MuleContext;
@@ -129,7 +130,7 @@ public class WSConsumerConfig implements MuleContextAware
             {
                 if (requestOptions == null)
                 {
-                    final HttpRequestOptionsBuilder builder = newOptions().method(HttpConstants.Methods.POST).disableStatusCodeValidation().disableParseResponse();
+                    final HttpRequestOptionsBuilder builder = newOptions().method(POST.name()).disableStatusCodeValidation().disableParseResponse();
                     if (connectorConfig != null)
                     {
                         builder.requestConfig(connectorConfig);

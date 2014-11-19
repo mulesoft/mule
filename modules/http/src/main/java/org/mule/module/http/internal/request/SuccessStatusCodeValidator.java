@@ -14,9 +14,9 @@ public class SuccessStatusCodeValidator extends RangeStatusCodeValidator
 {
 
     /**
-     * an status code validator that allows any status code.
+     * An status code validator that allows any status code.
      */
-    public static SuccessStatusCodeValidator ALWAYS_SUCCESS = new SuccessStatusCodeValidator("0..599");
+    public static SuccessStatusCodeValidator NULL_VALIDATOR = new SuccessStatusCodeValidator("0..599");
 
     public SuccessStatusCodeValidator()
     {

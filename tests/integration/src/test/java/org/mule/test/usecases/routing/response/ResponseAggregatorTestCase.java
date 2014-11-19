@@ -9,6 +9,7 @@ package org.mule.test.usecases.routing.response;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.DefaultMuleMessage;
@@ -51,7 +52,7 @@ public class ResponseAggregatorTestCase extends AbstractServiceAndFlowTestCase
     public void testSyncResponse() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        final HttpRequestOptions httpRequestOptions = newOptions().method(HttpConstants.Methods.POST).build();
+        final HttpRequestOptions httpRequestOptions = newOptions().method(POST.name()).build();
         MuleMessage message = client.send("http://localhost:28081", new DefaultMuleMessage("request", muleContext), httpRequestOptions);
         assertNotNull(message);
         assertEquals("Received: request", new String(message.getPayloadAsBytes()));

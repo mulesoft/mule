@@ -7,6 +7,7 @@
 package org.mule.module.sxc;
 
 import static org.junit.Assert.assertTrue;
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.DefaultMuleMessage;
@@ -43,7 +44,7 @@ public class HttpRoutingTestCase extends FunctionalTestCase
         IOUtils.copy(getClass().getResourceAsStream("/purchase-order.xml"), out);
 
         String address = "http://localhost:" + dynamicPort.getNumber() + "/proxy";
-        final HttpRequestOptions httpRequestOptions = newOptions().method(HttpConstants.Methods.POST).disableStatusCodeValidation().build();
+        final HttpRequestOptions httpRequestOptions = newOptions().method(POST.name()).disableStatusCodeValidation().build();
         MuleMessage res = client.send(address, new DefaultMuleMessage(out.toByteArray(), muleContext), httpRequestOptions);
         System.out.println(res.getPayloadAsString());
         assertTrue(res.getPayloadAsString().contains("purchaseOrder"));

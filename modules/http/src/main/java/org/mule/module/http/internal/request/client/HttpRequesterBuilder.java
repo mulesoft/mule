@@ -6,19 +6,16 @@
  */
 package org.mule.module.http.internal.request.client;
 
-import static org.mule.module.http.internal.request.SuccessStatusCodeValidator.ALWAYS_SUCCESS;
+import static org.mule.module.http.internal.request.SuccessStatusCodeValidator.NULL_VALIDATOR;
 
-import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.requester.HttpRequestOperationConfig;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
-import org.mule.module.http.internal.HttpStreamingType;
+import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.request.DefaultHttpRequester;
 import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
-import org.mule.module.http.internal.request.SuccessStatusCodeValidator;
 
 public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequesterBuilder>
 {
@@ -74,16 +71,9 @@ public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequ
     }
 
     @Override
-    public HttpRequesterBuilder alwaysStreamRequest()
+    public HttpRequesterBuilder requestStreamingMode(HttpStreamingType mode)
     {
-        httpRequester.setRequestStreamingMode(HttpStreamingType.ALWAYS.name());
-        return this;
-    }
-
-    @Override
-    public HttpRequesterBuilder neverStreamRequest()
-    {
-        httpRequester.setRequestStreamingMode(HttpStreamingType.NEVER.name());
+        httpRequester.setRequestStreamingMode(mode.name());
         return this;
     }
 
@@ -97,7 +87,7 @@ public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequ
     @Override
     public HttpRequesterBuilder disableStatusCodeValidation()
     {
-        httpRequester.setResponseValidator(ALWAYS_SUCCESS);
+        httpRequester.setResponseValidator(NULL_VALIDATOR);
         return this;
     }
 
@@ -123,27 +113,20 @@ public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequ
 
     public DefaultHttpRequester build() throws MuleException
     {
-        try
+        if (httpRequester.getConfig() == null)
         {
-            if (httpRequester.getConfig() == null)
+            DefaultHttpRequesterConfig requestConfig = muleContext.getRegistry().get(DEFAULT_HTTP_REQUEST_CONFIG_NAME);
+
+            if (requestConfig == null)
             {
-                DefaultHttpRequesterConfig requestConfig = muleContext.getRegistry().get(DEFAULT_HTTP_REQUEST_CONFIG_NAME);
-
-                if (requestConfig == null)
-                {
-                    requestConfig = new DefaultHttpRequesterConfig();
-                    muleContext.getRegistry().registerObject(DEFAULT_HTTP_REQUEST_CONFIG_NAME, requestConfig);
-                }
-
-                httpRequester.setConfig(requestConfig);
+                requestConfig = new DefaultHttpRequesterConfig();
+                muleContext.getRegistry().registerObject(DEFAULT_HTTP_REQUEST_CONFIG_NAME, requestConfig);
             }
-            httpRequester.initialise();
-            return httpRequester;
+
+            httpRequester.setConfig(requestConfig);
         }
-        catch (InitialisationException e)
-        {
-            throw new DefaultMuleException(e);
-        }
+        httpRequester.initialise();
+        return httpRequester;
     }
 
     public HttpRequesterBuilder setOperationConfig(HttpRequestOptions operationOptions)
@@ -156,13 +139,9 @@ public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequ
         {
             httpRequester.setFollowRedirects(operationOptions.isFollowsRedirect().toString());
         }
-        if (operationOptions.alwaysStreamRequest())
+        if (operationOptions.getRequestStreamingMode() != null)
         {
-            httpRequester.setRequestStreamingMode(HttpStreamingType.ALWAYS.name());
-        }
-        else if (operationOptions.neverStreamRequest())
-        {
-            httpRequester.setRequestStreamingMode(HttpStreamingType.NEVER.name());
+            httpRequester.setRequestStreamingMode(operationOptions.getRequestStreamingMode().name());
         }
         if (operationOptions.getRequesterConfig() != null)
         {
@@ -170,7 +149,7 @@ public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequ
         }
         if (operationOptions.isStatusCodeValidationDisabled())
         {
-            httpRequester.setResponseValidator(ALWAYS_SUCCESS);
+            httpRequester.setResponseValidator(NULL_VALIDATOR);
         }
         if (operationOptions.isParseResponseDisabled())
         {

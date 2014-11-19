@@ -11,6 +11,7 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import static org.mule.module.http.api.requester.HttpStreamingType.NEVER;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.DefaultMuleException;
@@ -22,6 +23,7 @@ import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
+import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -77,7 +79,7 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
     @Test
     public void dispatchWithStreamingDisabled() throws Exception
     {
-        final HttpRequestOptions options = newOptions().method(PUT_HTTP_METHOD).neverStreamRequest().build();
+        final HttpRequestOptions options = newOptions().method(PUT_HTTP_METHOD).requestStreamingMode(NEVER).build();
         muleContext.getClient().dispatch(getUrl(), new DefaultMuleMessage(TEST_MESSAGE, muleContext), options);
         final MuleMessage vmMessage = getMessageReceivedByFlow();
         assertThat(vmMessage.getInboundProperty(HttpHeaders.Names.TRANSFER_ENCODING), nullValue());

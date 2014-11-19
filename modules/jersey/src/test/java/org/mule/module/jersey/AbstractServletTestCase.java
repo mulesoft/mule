@@ -77,7 +77,7 @@ public abstract class AbstractServletTestCase extends AbstractServiceAndFlowTest
     {
         MuleClient client = muleContext.getClient();
 
-        MuleMessage result = client.send(root + "/helloworld", new DefaultMuleMessage("", muleContext), newOptions().method(POST).build());
+        MuleMessage result = client.send(root + "/helloworld", new DefaultMuleMessage("", muleContext), newOptions().method(POST.name()).build());
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
         assertEquals("Hello World", result.getPayloadAsString());
 
@@ -87,7 +87,7 @@ public abstract class AbstractServletTestCase extends AbstractServiceAndFlowTest
         result = client.send(root + "/helloworld", new DefaultMuleMessage("", muleContext), newOptions().disableStatusCodeValidation().build());
         assertEquals((Integer)405, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
 
-        result = client.send(root + "/helloworld", new DefaultMuleMessage("", muleContext), newOptions().method(DELETE).disableStatusCodeValidation().build());
+        result = client.send(root + "/helloworld", new DefaultMuleMessage("", muleContext), newOptions().method(DELETE.name()).disableStatusCodeValidation().build());
         assertEquals("Hello World Delete", result.getPayloadAsString());
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
     }

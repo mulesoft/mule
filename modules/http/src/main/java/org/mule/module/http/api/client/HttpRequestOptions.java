@@ -8,9 +8,10 @@ package org.mule.module.http.api.client;
 
 import org.mule.api.client.OperationOptions;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
+import org.mule.module.http.api.requester.HttpStreamingType;
 
 /**
- * Options that can be configured for making an http request using {@link org.mule.api.client.MuleClient}
+ * Options that can be configured for making an HTTP request using {@link org.mule.api.client.MuleClient}
  *
  * Implementations of this class must redefine {@link Object#hashCode()} and {@link java.lang.Object#equals(Object)} since the may be used as key in a map
  */
@@ -23,14 +24,9 @@ public interface HttpRequestOptions extends OperationOptions
     String getMethod();
 
     /**
-     * @return true if the request must always send the request using streaming
+     * @return the streaming mode for sending the HTTP request.
      */
-    boolean alwaysStreamRequest();
-
-    /**
-     * @return true if the request must never send the request using streaming
-     */
-    boolean neverStreamRequest();
+    HttpStreamingType getRequestStreamingMode();
 
     /**
      * @return true if the response from the request should not be parsed and return plain as an input stream.

@@ -13,15 +13,18 @@ import org.mule.util.Preconditions;
 /**
  * Cache key used to locale an {@link org.mule.module.http.internal.request.DefaultHttpRequester} in a map
  * based on a URL and operation options.
+ *
+ * @param <OptionsType> the expected type for the operation options
  */
-public class HttpRequestCacheKey
+
+public class HttpRequestCacheKey<OptionsType extends OperationOptions>
 {
 
     private final String url;
-    private final OperationOptions operationOptions;
+    private final OptionsType operationOptions;
     private final MessageExchangePattern exchangePattern;
 
-    public HttpRequestCacheKey(final String url, final OperationOptions operationOptions, final MessageExchangePattern exchangePattern)
+    public HttpRequestCacheKey(final String url, final OptionsType operationOptions, final MessageExchangePattern exchangePattern)
     {
         Preconditions.checkArgument(url != null, "URL cannot be null");
         Preconditions.checkArgument(operationOptions != null, "Operation options cannot be null");
@@ -75,7 +78,7 @@ public class HttpRequestCacheKey
         return url;
     }
 
-    public OperationOptions getOperationOptions()
+    public OptionsType getOperationOptions()
     {
         return operationOptions;
     }
