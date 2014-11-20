@@ -141,7 +141,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
         return send(url, message, newOptions().responseTimeout(timeout).build());
     }
 
-    private MuleMessage internalSend(String url, MuleMessage message, long timeout) throws MuleException
+    private MuleMessage internalSend(String url, MuleMessage message, Long timeout) throws MuleException
     {
         OutboundEndpoint endpoint = endpointCache.getOutboundEndpoint(url, MessageExchangePattern.REQUEST_RESPONSE, timeout);
         return returnMessage(endpoint.process(createMuleEvent(message, endpoint)));
