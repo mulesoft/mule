@@ -9,6 +9,7 @@ package org.mule.example.notifications;
 import org.mule.api.MuleContext;
 import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.context.notification.CustomNotification;
+import org.mule.util.NetworkUtils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -37,7 +38,7 @@ public class HeartbeatNotification extends CustomNotification implements Blockin
     {
         try
         {
-            InetAddress host = InetAddress.getLocalHost();
+            InetAddress host = NetworkUtils.getLocalHost();
             return host.getHostName() + " (" + host.getHostAddress() + ")";
         }
         catch (UnknownHostException e)

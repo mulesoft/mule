@@ -12,9 +12,9 @@ import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 import org.mule.util.DateUtils;
+import org.mule.util.NetworkUtils;
 import org.mule.util.UUID;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -94,7 +94,7 @@ public class FunctionExpressionEvaluator implements ExpressionEvaluator
         {
             try
             {
-                return InetAddress.getLocalHost().getHostName();
+                return NetworkUtils.getLocalHost().getHostName();
             }
             catch (UnknownHostException e)
             {
@@ -105,7 +105,7 @@ public class FunctionExpressionEvaluator implements ExpressionEvaluator
         {
             try
             {
-                return InetAddress.getLocalHost().getHostAddress();
+                return NetworkUtils.getLocalHost().getHostAddress();
             }
             catch (UnknownHostException e)
             {

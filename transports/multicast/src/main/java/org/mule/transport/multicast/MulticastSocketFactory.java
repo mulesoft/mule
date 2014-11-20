@@ -9,6 +9,7 @@ package org.mule.transport.multicast;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.Connector;
 import org.mule.transport.udp.UdpSocketFactory;
+import org.mule.util.NetworkUtils;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
@@ -43,7 +44,7 @@ public class MulticastSocketFactory extends UdpSocketFactory
         String host = ep.getEndpointURI().getHost();
         if("null".equalsIgnoreCase(host))
         {
-            inetAddress = InetAddress.getLocalHost();
+            inetAddress = NetworkUtils.getLocalHost();
         }
         else
         {
