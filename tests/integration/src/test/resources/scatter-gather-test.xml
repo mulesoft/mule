@@ -228,12 +228,37 @@
     </flow>
 
     <flow name="doesThreading">
+
         <scatter-gather>
             <flow-ref name="captureThreadAndWait" />
             <flow-ref name="captureThreadAndWait" />
             <flow-ref name="captureThreadAndWait" />
         </scatter-gather>
+
     </flow>
+
+    <flow name="setsVariablesAfterRouting">
+        <scatter-gather>
+            <set-payload value="data 1"/>
+            <set-payload value="data 2"/>
+        </scatter-gather>
+        <set-variable variableName="myVar" value="foo" />
+        <set-variable variableName="myVar2" value="bar" />
+        
+        <flow-ref name="assertFlowVars" />
+
+        <foreach collection="#[payload]">
+            <test:assert expression="#[flowVars.myVar.equals('foo')]" count="2" />
+            <test:assert expression="#[flowVars.myVar2.equals('bar')]" count="2" />
+        </foreach>
+
+        <flow-ref name="assertFlowVars" />
+    </flow>
+
+    <sub-flow name="assertFlowVars">
+        <test:assert expression="#[flowVars.myVar.equals('foo')]" />
+        <test:assert expression="#[flowVars.myVar2.equals('bar')]" />
+    </sub-flow>
 
     <flow name="log">
         <vm:inbound-endpoint exchange-pattern="one-way" path="log"/>
