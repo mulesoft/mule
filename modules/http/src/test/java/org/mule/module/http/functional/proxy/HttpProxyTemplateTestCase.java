@@ -67,6 +67,16 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
     }
 
     @Test
+    public void failIfTargetServiceIsDown() throws Exception
+    {
+        handlerExtender = null;
+        stopServer();
+        Response response = Request.Get(getProxyUrl("")).connectTimeout(1000).execute();
+        HttpResponse httpResponse = response.returnResponse();
+        assertThat(httpResponse.getStatusLine().getStatusCode(), is(500));
+    }
+
+    @Test
     public void proxyMethod() throws Exception
     {
         handlerExtender = new EchoRequestHandlerExtender()
