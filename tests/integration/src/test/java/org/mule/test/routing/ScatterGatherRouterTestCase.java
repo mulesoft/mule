@@ -197,7 +197,8 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
     @Test
     public void setsVariablesAfterRouting() throws Exception
     {
-        testFlow("setsVariablesAfterRouting");
+        runFlow("setsVariablesAfterRouting");
+        FlowAssert.verify("setsVariablesAfterRouting");
     }
 
     public static class TestAggregationStrategy implements AggregationStrategy
