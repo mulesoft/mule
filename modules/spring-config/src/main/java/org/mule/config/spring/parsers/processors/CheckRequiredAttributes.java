@@ -46,20 +46,15 @@ public class CheckRequiredAttributes implements PreProcessor
 
     public void preProcess(PropertyConfiguration config, Element element)
     {
-        Collection<List<String>> matchingSets = new ArrayList<List<String>>();
-        
         for (List<String> currentSet : attributeSets)
         {
             if (containsAllRequiredAttributes(currentSet, element))
             {
-                matchingSets.add(currentSet);
+                return;
             }
         }
         
-        if (matchingSets.size() == 0)
-        {
-            throw new CheckRequiredAttributesException(element, attributeSets);
-        }
+        throw new CheckRequiredAttributesException(element, attributeSets);
     }
 
     private boolean containsAllRequiredAttributes(List<String> currentSet, Element element)
