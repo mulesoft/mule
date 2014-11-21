@@ -6,18 +6,12 @@
  */
 package org.mule.module.db.integration.config;
 
-import static org.mule.module.db.integration.TestRecordUtil.assertMessageContains;
-import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;
-import org.junit.Test;
 
-public abstract class AbstractHostPortConfigTestCase extends AbstractDbIntegrationTestCase
+public abstract class AbstractHostPortConfigTestCase extends AbstractDatabaseConfigTestCase
 {
 
     @Rule
@@ -28,21 +22,5 @@ public abstract class AbstractHostPortConfigTestCase extends AbstractDbIntegrati
     public AbstractHostPortConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
     {
         super(dataSourceConfigResource, testDatabase);
-    }
-
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/config/simple-select-config.xml"};
-    }
-
-    @Test
-    public void usesDatasourceConfig() throws Exception
-    {
-        LocalMuleClient client = muleContext.getClient();
-
-        MuleMessage response = client.send("vm://simpleSelect", TEST_MESSAGE, null);
-
-        assertMessageContains(response, getAllPlanetRecords());
     }
 }
