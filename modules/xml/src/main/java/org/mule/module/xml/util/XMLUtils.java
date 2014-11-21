@@ -264,9 +264,8 @@ public class XMLUtils extends org.mule.util.XMLUtils
 
     private static org.w3c.dom.Document parseXML(InputSource source) throws Exception
     {
-        DocumentBuilderFactory factory =
-                DocumentBuilderFactory.newInstance();
-
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
         return factory.newDocumentBuilder().parse(source);
     }
 
