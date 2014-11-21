@@ -9,6 +9,21 @@ package org.mule.test.integration.exceptions;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.lang.mutable.MutableInt;
+import org.hamcrest.core.IsNull;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
+
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -17,6 +32,9 @@ import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.module.http.api.HttpConstants;
+import org.mule.module.http.api.client.HttpRequestOptions;
+import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConnector;
 import org.mule.util.CharSetUtils;
@@ -197,9 +215,8 @@ public class RollbackExceptionStrategyTestCase extends FunctionalTestCase
     public void testHttpAlwaysRollbackUsingMuleClient() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send(String.format("http://localhost:%s", dynamicPort1.getNumber()), JSON_REQUEST, null, TIMEOUT);
-        assertThat(response.<String>getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY),is("500"));
-        assertThat(response.getExceptionPayload(),IsNull.<Object>notNullValue());
+        MuleMessage response = client.send(String.format("http://localhost:%s", dynamicPort1.getNumber()), new DefaultMuleMessage(JSON_REQUEST, muleContext), newOptions().disableStatusCodeValidation().responseTimeout(TIMEOUT).build());
+        assertThat(response.<Integer>getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY),is(500));
     }
 
     @Test
@@ -217,13 +234,14 @@ public class RollbackExceptionStrategyTestCase extends FunctionalTestCase
     {
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = null;
+        final HttpRequestOptions httpRequestOptions = newOptions().method(POST.name()).disableStatusCodeValidation().responseTimeout(TIMEOUT).build();
         for (int i = 1; i <= EXPECTED_SHORT_DELIVERED_TIMES; i++)
         {
-            response = client.send(String.format("http://localhost:%s", dynamicPort2.getNumber()), MESSAGE, null, TIMEOUT);
-            assertThat(response.<String>getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY),is("500"));
+            response = client.send(String.format("http://localhost:%s", dynamicPort2.getNumber()), new DefaultMuleMessage(MESSAGE, muleContext), httpRequestOptions);
+            assertThat(response.<Integer>getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY),is(500));
         }
-        response = client.send(String.format("http://localhost:%s", dynamicPort2.getNumber()), MESSAGE, null, TIMEOUT);
-        assertThat(response.<String>getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY),is("200"));
+        response = client.send(String.format("http://localhost:%s", dynamicPort2.getNumber()), new DefaultMuleMessage(MESSAGE, muleContext), httpRequestOptions);
+        assertThat(response.<Integer>getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY),is(200));
         assertThat(response.getExceptionPayload(),IsNull.<Object>nullValue());
         assertThat(response.getPayloadAsString(), is(MESSAGE_EXPECTED));
     }

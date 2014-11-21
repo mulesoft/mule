@@ -7,18 +7,24 @@
 package org.mule.module.http.internal.listener.grizzly;
 
 import org.mule.api.MuleRuntimeException;
+import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.internal.listener.HttpListenerRegistry;
 import org.mule.module.http.internal.listener.HttpServerManager;
 import org.mule.module.http.internal.listener.Server;
 import org.mule.module.http.internal.listener.ServerAddress;
 import org.mule.transport.ssl.TlsContextFactory;
 import org.mule.transport.tcp.TcpServerSocketProperties;
+import org.mule.util.concurrent.NamedThreadFactory;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
+import org.glassfish.grizzly.filterchain.FilterChainContext;
+import org.glassfish.grizzly.filterchain.NextAction;
 import org.glassfish.grizzly.filterchain.TransportFilter;
 import org.glassfish.grizzly.http.HttpCodecFilter;
 import org.glassfish.grizzly.http.HttpServerFilter;
@@ -29,31 +35,38 @@ import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.grizzly.ssl.SSLFilter;
 import org.glassfish.grizzly.strategies.SameThreadIOStrategy;
+import org.glassfish.grizzly.utils.ChunkingFilter;
+import org.glassfish.grizzly.utils.DelayedExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class GrizzlyServerManager implements HttpServerManager
 {
 
-    private final GrizzlyHttpsSslDelegateFilter sslFilterDelegate;
+    private static final int MAX_KEEP_ALIVE_REQUESTS = -1;
+    private static final String IDLE_TIMEOUT_THREADS_PREFIX_NAME = "HttpIdleConnectionCloser";
+    private final GrizzlyAddressDelegateFilter<SSLFilter> sslFilterDelegate;
+    private final GrizzlyAddressDelegateFilter<HttpServerFilter> httpServerFilterDelegate;
     private final TCPNIOTransport transport;
     private final GrizzlyRequestDispatcherFilter requestHandlerFilter;
     private final HttpListenerRegistry httpListenerRegistry;
     private Logger logger = LoggerFactory.getLogger(GrizzlyServerManager.class);
     private Map<ServerAddress, GrizzlyServer> servers = new ConcurrentHashMap<>();
+    private ExecutorService idleTimeoutExecutorService;
+    private DelayedExecutor idleTimeoutDelayedExecutor;
 
-    public GrizzlyServerManager(HttpListenerRegistry httpListenerRegistry, TcpServerSocketProperties serverSocketProperties) throws IOException
+    public GrizzlyServerManager(final String appName, HttpListenerRegistry httpListenerRegistry, TcpServerSocketProperties serverSocketProperties) throws IOException
     {
         this.httpListenerRegistry = httpListenerRegistry;
-        this.requestHandlerFilter = new GrizzlyRequestDispatcherFilter(httpListenerRegistry);
-        FilterChainBuilder serverFilterChainBuilder = FilterChainBuilder.stateless();
+        requestHandlerFilter = new GrizzlyRequestDispatcherFilter(httpListenerRegistry);
+        sslFilterDelegate = new GrizzlyAddressDelegateFilter<>();
+        httpServerFilterDelegate = new GrizzlyAddressDelegateFilter<>();
 
+        FilterChainBuilder serverFilterChainBuilder = FilterChainBuilder.stateless();
         serverFilterChainBuilder.add(new TransportFilter());
-        sslFilterDelegate = new GrizzlyHttpsSslDelegateFilter();
         serverFilterChainBuilder.add(sslFilterDelegate);
-        KeepAlive ka = new KeepAlive();
-        ka.setMaxRequestsCount(-1);
-        serverFilterChainBuilder.add(new HttpServerFilter(true, HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE, ka, null));
+        serverFilterChainBuilder.add(new ChunkingFilter(1024));
+        serverFilterChainBuilder.add(httpServerFilterDelegate);
         serverFilterChainBuilder.add(requestHandlerFilter);
 
         //Initialize Transport
@@ -70,6 +83,10 @@ public class GrizzlyServerManager implements HttpServerManager
         // Set filterchain as a Transport Processor
         transport.setProcessor(serverFilterChainBuilder.build());
         transport.start();
+
+        idleTimeoutExecutorService = Executors.newCachedThreadPool(new NamedThreadFactory(appName + IDLE_TIMEOUT_THREADS_PREFIX_NAME));
+        idleTimeoutDelayedExecutor = new DelayedExecutor(idleTimeoutExecutorService);
+        idleTimeoutDelayedExecutor.start();
     }
 
     private void configureServerSocketProperties(TCPNIOTransportBuilder transportBuilder, TcpServerSocketProperties serverSocketProperties)
@@ -118,7 +135,7 @@ public class GrizzlyServerManager implements HttpServerManager
         return servers.containsKey(serverAddress);
     }
 
-    public Server createSslServerFor(TlsContextFactory tlsContextFactory, final ServerAddress serverAddress) throws IOException
+    public Server createSslServerFor(TlsContextFactory tlsContextFactory, final ServerAddress serverAddress, boolean usePersistentConnections, int connectionIdleTimeout) throws IOException
     {
         if (logger.isDebugEnabled())
         {
@@ -128,14 +145,14 @@ public class GrizzlyServerManager implements HttpServerManager
         {
             throw new IllegalStateException(String.format("Could not create a server for %s since there's already one.", serverAddress));
         }
-        final SSLFilter sslFilter = createSslFilter(tlsContextFactory);
-        sslFilterDelegate.addSslFilterForAddress(serverAddress, sslFilter);
+        sslFilterDelegate.addFilterForAddress(serverAddress, createSslFilter(tlsContextFactory));
+        httpServerFilterDelegate.addFilterForAddress(serverAddress, createHttpServerFilter(usePersistentConnections, connectionIdleTimeout));
         final GrizzlyServer grizzlyServer = new GrizzlyServer(serverAddress, transport, httpListenerRegistry);
         servers.put(serverAddress, grizzlyServer);
         return grizzlyServer;
     }
 
-    public Server createServerFor(ServerAddress serverAddress) throws IOException
+    public Server createServerFor(ServerAddress serverAddress, boolean usePersistentConnections, int connectionIdleTimeout) throws IOException
     {
         if (logger.isDebugEnabled())
         {
@@ -145,6 +162,7 @@ public class GrizzlyServerManager implements HttpServerManager
         {
             throw new IllegalStateException(String.format("Could not create a server for %s since there's already one.", serverAddress));
         }
+        httpServerFilterDelegate.addFilterForAddress(serverAddress, createHttpServerFilter(usePersistentConnections, connectionIdleTimeout));
         final GrizzlyServer grizzlyServer = new GrizzlyServer(serverAddress, transport, httpListenerRegistry);
         servers.put(serverAddress, grizzlyServer);
         return grizzlyServer;
@@ -155,6 +173,8 @@ public class GrizzlyServerManager implements HttpServerManager
     {
         transport.shutdown();
         servers.clear();
+        idleTimeoutDelayedExecutor.destroy();
+        idleTimeoutExecutorService.shutdown();
     }
 
     private SSLFilter createSslFilter(final TlsContextFactory tlsContextFactory)
@@ -173,13 +193,38 @@ public class GrizzlyServerManager implements HttpServerManager
                 serverConfig.setEnabledCipherSuites(enabledCipherSuites);
             }
             final SSLEngineConfigurator clientConfig = serverConfig.copy().setClientMode(true);
-            final SSLFilter sslBaseFilter = new SSLFilter(serverConfig, clientConfig);
+            final SSLFilter sslBaseFilter = new SSLFilter(serverConfig, clientConfig) {
+                @Override
+                public NextAction handleRead(FilterChainContext ctx) throws IOException
+                {
+                    ctx.getAttributes().setAttribute(HttpConstants.Protocols.HTTPS, true);
+                    return super.handleRead(ctx);
+                }
+            };
             return sslBaseFilter;
         }
         catch (Exception e)
         {
             throw new MuleRuntimeException(e);
         }
+    }
+
+    private HttpServerFilter createHttpServerFilter(boolean usePersistentConnections, int connectionIdleTimeout)
+    {
+        KeepAlive ka = null;
+        if (usePersistentConnections)
+        {
+            ka = new KeepAlive();
+            ka.setMaxRequestsCount(MAX_KEEP_ALIVE_REQUESTS);
+            ka.setIdleTimeoutInSeconds(convertToSeconds(connectionIdleTimeout));
+        }
+        return new HttpServerFilter(true, HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE, ka, idleTimeoutDelayedExecutor);
+    }
+
+    private int convertToSeconds(int milliseconds)
+    {
+        return (int) Math.ceil((double) milliseconds / 1000.0);
+
     }
 
 }

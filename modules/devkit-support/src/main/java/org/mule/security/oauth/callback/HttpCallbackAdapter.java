@@ -6,8 +6,6 @@
  */
 package org.mule.security.oauth.callback;
 
-import org.mule.api.transport.Connector;
-
 /**
  * Adapter interface for Http callbacks
  */
@@ -32,7 +30,7 @@ public interface HttpCallbackAdapter
     /**
      * Retrieves connector
      */
-    public Connector getConnector();
+    public Object getConnector();
 
     /**
      * Retrieves async
@@ -77,7 +75,7 @@ public interface HttpCallbackAdapter
      * 
      * @param value Value to set
      */
-    public void setConnector(Connector value);
+    public void setConnector(Object value);
 
     /**
      * Sets async

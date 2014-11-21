@@ -47,9 +47,9 @@ public class ConnectionInvocationHandler implements TargetInvocationHandler
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
     {
-        if (ConnectionFactoryWrapper.logger.isDebugEnabled())
+        if (DefaultXAConnectionFactoryWrapper.logger.isDebugEnabled())
         {
-            ConnectionFactoryWrapper.logger.debug("Invoking " + method);
+            DefaultXAConnectionFactoryWrapper.logger.debug("Invoking " + method);
         }
         
         Transaction tx = TransactionCoordination.getInstance().getTransaction();

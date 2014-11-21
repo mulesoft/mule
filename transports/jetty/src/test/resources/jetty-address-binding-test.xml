@@ -3,10 +3,16 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:jetty="http://www.mulesoft.org/schema/mule/jetty"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xsi:schemaLocation="
       http://www.mulesoft.org/schema/mule/jetty http://www.mulesoft.org/schema/mule/jetty/current/mule-jetty.xsd
       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+      http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <configuration>
+        <http:config useTransportForUris="true"/>
+    </configuration>
 
     <jetty:connector name="httpConnector"/>
 

@@ -448,7 +448,7 @@
 # /lib/mule
 #
 /mule-standalone-${productVersion}/lib/mule
-/mule-standalone-${productVersion}/lib/mule/mule-common-3.5.0-M5-SNAPSHOT.jar
+/mule-standalone-${productVersion}/lib/mule/mule-common-3.7.0-M1-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-core-${productVersion}-tests.jar
 /mule-standalone-${productVersion}/lib/mule/mule-core-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-annotations-${productVersion}.jar
@@ -537,7 +537,7 @@
 /mule-standalone-${productVersion}/lib/opt/cglib-nodep-2.2.jar
 /mule-standalone-${productVersion}/lib/opt/cometd-api-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/cometd-server-6.1.26.jar
-/mule-standalone-${productVersion}/lib/opt/commons-beanutils-1.8.0.jar
+/mule-standalone-${productVersion}/lib/opt/commons-beanutils-1.9.2.jar
 /mule-standalone-${productVersion}/lib/opt/commons-codec-1.9.jar
 /mule-standalone-${productVersion}/lib/opt/commons-collections-3.2.1.jar
 /mule-standalone-${productVersion}/lib/opt/commons-dbutils-1.2.jar
@@ -587,8 +587,7 @@
 /mule-standalone-${productVersion}/lib/opt/grizzly-http-2.3.16.jar
 /mule-standalone-${productVersion}/lib/opt/grizzly-http-server-2.3.16.jar
 /mule-standalone-${productVersion}/lib/opt/grizzly-websockets-2.3.16.jar
-/mule-standalone-${productVersion}/lib/opt/groovy-2.3.7-indy.jar
-/mule-standalone-${productVersion}/lib/opt/groovy-jsr223-2.3.7.jar
+/mule-standalone-${productVersion}/lib/opt/groovy-all-2.3.7-indy.jar
 /mule-standalone-${productVersion}/lib/opt/guava-18.0.jar
 /mule-standalone-${productVersion}/lib/opt/hamcrest-core-1.3.jar
 /mule-standalone-${productVersion}/lib/opt/hamcrest-library-1.3.jar
@@ -656,6 +655,7 @@
 /mule-standalone-${productVersion}/lib/opt/js-engine-1.1-jdk14.jar
 /mule-standalone-${productVersion}/lib/opt/json-schema-core-1.2.4.jar
 /mule-standalone-${productVersion}/lib/opt/json-schema-validator-2.2.5.jar
+/mule-standalone-${productVersion}/lib/opt/json-20140107.jar
 /mule-standalone-${productVersion}/lib/opt/jsp-api-6.0.29.jar
 /mule-standalone-${productVersion}/lib/opt/jta-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/juel-engine-2.1.0.jar

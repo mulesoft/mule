@@ -120,6 +120,7 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
                 httpListenerBuilder.setTlsContextFactory(getOauthConfig().getTlsContextFactory());
             }
             this.redirectUrlListener = httpListenerBuilder.build();
+            this.redirectUrlListener.initialise();
             this.redirectUrlListener.start();
         }
         catch (MalformedURLException e)

@@ -1,94 +1,23 @@
 MIGRATION GUIDE
 ===============
 
-The following is a list of changes you have to execute to migrate from Mule ESB Community edition version 3.4.x to version 4.x.
+The following is a list of changes you have to execute to migrate from Mule ESB Community edition to version 4.x.
 Please check http://www.mulesoft.org/documentation/display/current/Mule+Release+Notes for more details.
 
-Migration changes from 3.5.x to 3.6.x
-
-MULE-7774: All date related headers for the HTTP transport are now in GMT following RFC2616. To maintain the previous behaviour where the Date header was in the server's time zone, you can set system property mule.http.dateheaderservertimezone to true.
-MULE-7755: Patterns module is deprecated and will be removed in Mule 4.0.
-MULE-7857: The RemoteDispatcher and related classes in the client module have been deprecated and will be removed in Mule 4.0.
-MULE-7858: Support for spring events and related classes in the spring-extras module has been deprecated and will be removed in Mule 4.0.
-MULE-7723: ScriptConfigurationBuilder and related resources have been deprecated and will be removed in Mule 4.0.
-MULE-7842: Jersey was upgraded to version 2.11 which implements jax-rs 2.0. Applications using the jersey module will need upgrading. For further reference see Jersey's migration guide at https://jersey.java.net/documentation/latest/migration.html#mig-1.x
-MULE-7842: javax.annotation:javax.annotation-api was upgraded to version 1.2. We're now importing this dependency directly while before we did it through the geronimo-specs project
-MULE-6866: Groovy was upgraded to version 2.3.7-indy. If this produces any compatibility issues with an existing script you should either update your script (recommended) or go back to a prior version by replacing the groovy jar at MULE_HOME/lib/opt. Also, additional modules are no longer included. If you need them you should app them to your application.
-MULE-7906: Jython 2.7.3b3 is now part of the distribution. You no longer need to install the scripting pack or include it on your app. If this produces any compatibility issues with an existing script you should either update your application/installation (recommended) or replace/delete the jython jar at MULE_HOME/lib/opt
-MULE-7740: Rhino 1.7R4 is now part of the distribution. You no longer need to install the scripting pack or include it on your app. If this produces any compatibility issues with an existing script you should either update your application/installation (recommended) or replace/delete the rhino and js-engine jars at MULE_HOME/lib/opt
-MULE-7946: The following dependencies were removed from the distribution since they're no longer necessary as 1.7 is now the minimum required JDK version for running mule:
-    * geronimo-j2ee-management_1.0_spec-1.1.jar
-    * jaxb-api-2.1.jar
-    * jaxws-api-2.2.1.jar
-    * jsr250-api-1.0.jar
-    * jsr181-api-1.0-MR1.jar
-    * saaj-api-1.3.jar
-    * saaj-impl-1.3.jar
-
-MULE-7949: Guava has been upgraded to version 18.0
-MULE-7950: The following Apache Commons dependencies were upgraded:
-    * commons-codec: from version 1.3 to 1.9
-    * commons-exec: from version 1.1 to 1.2
-    * commons-net: from version 2.0 to 2.2
-MULE-7951: xmlunit has been upgraded to version 1.5
-MULE-7919: json-schema-validation-filter in the json module was deprecated and will be removed in Mule 4.0. Use the new validate-schema message processor instead.
-MULE-7919: The following classes have been deprecated. Use JsonSchemaValidator instead
-    * JsonSchemaFilter
-    * JsonSchemaJsonValidationFilter
-    * JsonSchemaValidationFilter
-    * JsonSChemaXsdValidationFilter
-MULE-7919: The following dependencies were upgraded:
-    * jackson-databind: from version 2.1.1 to 2.4.3
-    * joda-time: from version 1.6 to 2.5
-MULE-7919: The dependency org.kitchen-eel:json-schema-validator was removed and replaced with com.github.fge:json-schema-validator:2.2.5. If you still need to use that dependency, you can safely add it back to your application/runtime.
-MULE-7987: The following dependencies were upgraded:
-    * saxon: from version 9.1.0.8 to 9.6.0.1-HE
-    * woodstox-core-asl: from version 4.1.4 to 4.4.1
-    * stax2-api: from version 3.1.1 to 3.1.4
-MULE-7030: The following features have been deprecated in favor of <expression-filter>:
-    * jaxen-filter
-    * jxpath-filter
-MULE-7030: The following features have been deprecated in favor of <expression-transformer>:
-    * jxpath-extractor-transformer
-    * bean: expression evaluator
-MULE-7030: The following features have been deprecated in favor of the new xpath3() MEL Function
-    * xpath: expression evaluator
-    * xpath2: expression evaluator (in favor of the xpath3() MEL function)
-    * xpath() MEL Function
-MULE-7030: The xpath-filter element is now namespace aware. If you're using it with XPath expressions which reference custom namespaces, you now have to declare them in a namespace-manager element or use a wildcard (*:/title instead of book:title)
-MULE-8001: The xquery-transformer element will now always return a java List when no return type has explicitly been specified
-
-
-Migration changes from 3.4.x to 3.5.x
-
-MULE-6968: In the previous version, requests to "/" were only received by an HTTP endpoint when no path was defined, and rejected if path was set to "" or "/". Now requests are received by the endpoint in any of the three cases.
-MULE-7013: keepSendSocketOpen attribute in the HTTP/S connector is deprecated. It is inherited from TCP Connector but has no effect on outbound HTTP connections and will be removed in the future.
-MULE-7023: The keep-alive attribute in inbound and outbound HTTP/S endpoints is renamed to keepAlive.
-MULE-7011: org.mule.util.queue.Queue class now has a clear() method to discard all elements in the queue while leaving the queue still usable. If you have your own implementation of a Mule Queue you'll need to implement it
-MULE-7010: ObjectStore class now has a clear() method which discards all elements while leaving the store still usable. If you have your own implementation of ObjectStore you'll need to implement this method
-MULE-7090: Mule will use the default security provider and TLSv1 as default algorithm for secure socket connections
-           tlsProtocolHandler attribute from TLS configuration in SSL/TLS/smtps/jettry https transports is deprecated and will
-           be ignored. Mule uses the default settings defined in the JVM platform. This parameter is no longer needed in
-           supported JDKs.
-MULE-7061: Jetty transport is now using Jetty 8. Applications using a custom jetty.xml configuration file must update the Jetty classes referenced in this file due to package names changed from version 6 to 7, as explained here: http://wiki.eclipse.org/Jetty/Starting/Porting_to_Jetty_7/Packages_and_Classes
-MULE-7138: MD5MuleEventKeyGenerator is now deprecated, a new implementation is provided: SHA256MuleEventKeyGenerator.
-MULE-7097: A new configuration file 'conf/tls-default.conf' has been added. This file defines two properties, that allow to limit the cipher suites and protocols used by Mule in SSL sockets.
-MULE-7103: There is now a new system property 'mule.security.model' that may be used to alter the security setup of Mule and its modules. If not defined, or defined with the value 'default',
-            no restrictions will apply and Mule will read the TLS configuration from the file 'conf/tls-default.conf'.
-            If defined with the value 'fips140-2' Mule will work with a Fips compliant security model: any cryptographic modes of operation not approved in the standard will be disabled
-            (the pgp module will be disabled, and the TLS configuration properties will be read from 'conf/tls-fips140-2.conf'). Note that full compliance also requires a certified JCE provider installed.
-MULE-7390: The following transformers no longer support external entities out of the box: xslt-transformer, dom-to-xml-transformer, xml-to-dom-transformer
-            dom-to-output-handler-transformer, xquery-transformer. For cases in which external entities processing is needed, the attribute acceptExternalEntities has been added
-            as optional (defaults to false). Use this attribute with extreme care in cases in which you trust the source only.
-MULE-7425: xpath() MEL function no longer changes the message payload when a source is provided. So for example, the expression xpath('catalog/cd/title') may change the message payload, while xpath('catalog/cd/title', flowVars['xml']) will never do
-MULE-7439: org.mule.transport.http.servlet.MuleHttpServletResponse.formatDate now receives a StringBuilder instead of a StringBuffer
-MULE-7428: Mule queues underlying implementation has changed. To get previous behaviour you can set system property mule.queue.objectstoremode=true. Old classes were deprecated and moved to package org.mule.util.queue.objectstore
-MULE-7362: MEL expressions now propagate nulls instead of raising an exception. For example a.b.c would previously raise a NPE if a.b was null. It will return null now.
-MULE-7513: Attribute secondsBetweenRetries has been deprecated in favor of a new attribute called millisBetweenRetries. This change is backwards compatible, you can still use secondsBetweenRetries although it's not recommended. Setting both attributes at the same time will result in a configuration error
-MULE-7386: Class org.mule.module.management.agent.JmxAgent has been renamed to org.mule.module.management.agent.JmxApplicationAgent
-MULE-7536: Mule distribution does not provide a lib/shared/default domain for sharing class loading. Now we provide a default mule domains under domains/default which serves the same purpose and more. You can still use the old shared class loading mechanism by creating the folder lib/shared/default
-MULE-7524: Encoded mule expressions in dynamic endpoints address components are not supported anymore (ie: %23[expression] must be #[expression])
-MULE-7546: Implementations of org.mule.api.MuleMessage now need to implement clearAttachments() which was added to the interface. Implementations that extend org.mule.el.context.AbstractMapContext must now implement clear() given this method has been removed from the abstract implementation.
-MULE-7612: maps returned by queries using the Database connector can have different keys as now column's aliases are used instead of column's names.
-MULE-7842: Jersey was upgraded to version 2.11 which implements jax-rs 2.0. Applications using the jersey module will need upgrading. For further reference see Jersey's migration guide at https://jersey.java.net/documentation/latest/migration.html#mig-1.x
-MULE-7842: javax.annotation:javax.annotation-api was upgraded to version 1.2. We're now importing this dependency directly while before we did it through the geronimo-specs project
+MULE-7757: The OGNL module has been removed. You can obtain the same functionality by using MEL expressions.
+MULE-7756: The Guice module has been removed.
+MULE-7755: The Patterns project has been removed.
+MULE-7473: The deprecated methods in the Transformer interface have been removed:
+           Use isSourceDataTypeSupported instead of isSourceTypeSupported
+           Use getSourceDataTypes instead of getSourceTypes
+           Use setReturnDataType instead of setReturnClass
+           Use getReturnDataType instead of getReturnClass
+           Use the DataTypeFactory class to create the DataTypes required for the above methods.
+MULE-7753: The maven archetypes and maven archetype builder projects have been removed.
+           The Mule ESB Maven Tools project contains archetypes superceeding these ones.
+           The project is hosted at https://github.com/mulesoft/mule-esb-maven-tools
+MULE-7857: The RemoteDispatcher and related classes in the client module have been removed.
+MULE-7858: Support for spring events and related classes in the spring-extras module have been removed.
+MULE-7470: Model/Service interfaces and implementations have been removed, as have the associated configuration elements.
+           Use Mule Flow's which provide the same functionality with more flexibility.
+MULE-7723: ScriptConfigurationBuilder and related resources have been removed

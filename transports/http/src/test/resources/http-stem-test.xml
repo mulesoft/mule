@@ -20,5 +20,8 @@
         <test:component appendString=" Received"/>
     </flow>
 
+    <configuration>
+        <http:config useTransportForUris="true"/>
+    </configuration>
 </mule>
 

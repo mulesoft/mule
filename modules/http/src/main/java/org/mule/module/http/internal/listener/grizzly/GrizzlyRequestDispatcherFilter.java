@@ -6,6 +6,7 @@
  */
 package org.mule.module.http.internal.listener.grizzly;
 
+import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequestContext;
@@ -41,6 +42,7 @@ public class GrizzlyRequestDispatcherFilter extends BaseFilter
     @Override
     public NextAction handleRead(final FilterChainContext ctx) throws IOException
     {
+        final String scheme = (ctx.getAttributes().getAttribute(HttpConstants.Protocols.HTTPS) == null) ? HttpConstants.Protocols.HTTP : HttpConstants.Protocols.HTTPS;
         final String hostName = ((InetSocketAddress) ctx.getConnection().getLocalAddress()).getHostName();
         final int port = ((InetSocketAddress) ctx.getConnection().getLocalAddress()).getPort();
         final HttpContent httpContent = ctx.getMessage();
@@ -54,7 +56,7 @@ public class GrizzlyRequestDispatcherFilter extends BaseFilter
             contentLengthAsInt = Integer.parseInt(contentLength);
         }
         final GrizzlyHttpRequestAdapter httpRequest = new GrizzlyHttpRequestAdapter(request, contentInputStream, contentLengthAsInt);
-        HttpRequestContext requestContext = new HttpRequestContext(httpRequest, (InetSocketAddress) ctx.getConnection().getPeerAddress());
+        HttpRequestContext requestContext = new HttpRequestContext(httpRequest, (InetSocketAddress) ctx.getConnection().getPeerAddress(), scheme);
         final RequestHandler requestHandler = requestHandlerProvider.getRequestHandler(hostName, port, httpRequest);
         requestHandler.handleRequest(requestContext, new HttpResponseReadyCallback()
         {

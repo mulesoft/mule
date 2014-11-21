@@ -14,6 +14,10 @@
        http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/current/mule-spring-security.xsd
        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-current.xsd">
 
+    <configuration>
+        <http:config useTransportForUris="true"/>
+    </configuration>
+
     <spring:beans>
         <ss:authentication-manager alias="authenticationManager">
             <ss:authentication-provider>

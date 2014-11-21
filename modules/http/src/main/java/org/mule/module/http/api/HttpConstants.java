@@ -12,6 +12,11 @@ package org.mule.module.http.api;
 public abstract class HttpConstants
 {
 
+    public enum Methods
+    {
+        POST, GET, PUT, OPTIONS, HEAD, DELETE;
+    }
+
     public static final class Protocols
     {
 
@@ -31,6 +36,8 @@ public abstract class HttpConstants
         public static final String HTTP_REQUEST_PATH_PROPERTY = HTTP_PREFIX + "request.path";
         public static final String HTTP_REQUEST_URI = HTTP_PREFIX + "request.uri";
         public static final String HTTP_REMOTE_ADDRESS = HTTP_PREFIX + "remote.address";
+        public static final String HTTP_LISTENER_PATH = HTTP_PREFIX + "listener.path";
+        public static final String HTTP_SCHEME = HTTP_PREFIX + "scheme";
     }
 
     public static final class ResponseProperties

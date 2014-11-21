@@ -9,6 +9,8 @@ package org.mule.test.integration.domain.lifecycle;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
+
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.Connector;
@@ -49,7 +51,7 @@ public class  AppAndDomainLifecycleTestCase extends AbstractMuleTestCase
             ApplicationContextBuilder secondApp = new ApplicationContextBuilder().setRegistryBootstrapService(registryBootstrapService);
             secondAppContext = secondApp.setApplicationResources(new String[] {"domain/http/transport/http-hello-world-app.xml"}).setDomainContext(domainContext).build();
             firstAppContext.stop();
-            MuleMessage response = secondAppContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/service/helloWorld", "test", null);
+            MuleMessage response = secondAppContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/service/helloWorld", new DefaultMuleMessage("test", firstAppContext));
             assertThat(response, notNullValue());
             assertThat(response.getPayloadAsString(), is("hello world"));
             assertThat((domainContext.getRegistry().<Connector>get("sharedHttpConnector")).isStarted(), Is.is(true));

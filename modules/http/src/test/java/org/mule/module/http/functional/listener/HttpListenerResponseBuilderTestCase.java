@@ -8,7 +8,6 @@ package org.mule.module.http.functional.listener;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -28,7 +27,6 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.hamcrest.Matchers;
 import org.hamcrest.core.Is;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -41,6 +39,8 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
     public SystemProperty emptyResponseBuilderPath = new SystemProperty("emptyResponseBuilderPath","emptyResponseBuilderPath");
     @Rule
     public SystemProperty statusResponseBuilderPath = new SystemProperty("statusResponseBuilderPath","statusResponseBuilderPath");
+    @Rule
+    public SystemProperty statusResponseBuilderOverridePath = new SystemProperty("statusResponseBuilderOverridePath","statusResponseBuilderOverridePath");
     @Rule
     public SystemProperty headerResponseBuilderPath = new SystemProperty("headerResponseBuilderPath","headerResponseBuilderPath");
     @Rule
@@ -77,7 +77,14 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
     public void statusLineResponseBuilder() throws Exception
     {
         final String url = String.format("http://localhost:%s/%s", listenPort.getNumber(), statusResponseBuilderPath.getValue());
-        statusLineResponseBuilderTest(url);
+        statusLineResponseBuilderTest(url, 201);
+    }
+
+    @Test
+    public void statusLineWithCodeOverrideResponseBuilder() throws Exception
+    {
+        final String url = String.format("http://localhost:%s/%s", listenPort.getNumber(), statusResponseBuilderOverridePath.getValue());
+        statusLineResponseBuilderTest(url, 202);
     }
 
     @Test
@@ -112,7 +119,7 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
     public void errorStatusLineResponseBuilder() throws Exception
     {
         final String url = String.format("http://localhost:%s/%s", listenPort.getNumber(), errorStatusResponseBuilderPath.getValue());
-        statusLineResponseBuilderTest(url);
+        statusLineResponseBuilderTest(url, 201);
     }
 
     @Test
@@ -147,13 +154,13 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
     }
 
 
-    private void statusLineResponseBuilderTest(String url) throws IOException
+    private void statusLineResponseBuilderTest(String url, int expectedStatus) throws IOException
     {
         final Response response = Request.Get(url).connectTimeout(1000).execute();
         final HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getAllHeaders().length, is(2));
         assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.CONTENT_LENGTH).getValue(), is("0"));
-        assertThat(httpResponse.getStatusLine().getStatusCode(), is(201));
+        assertThat(httpResponse.getStatusLine().getStatusCode(), is(expectedStatus));
         assertThat(httpResponse.getStatusLine().getReasonPhrase(), is("everything works!"));
     }
 
@@ -199,6 +206,4 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
         }
         return true;
     }
-
-
 }

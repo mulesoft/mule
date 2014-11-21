@@ -6,6 +6,8 @@
  */
 package org.mule.transport.jms;
 
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doReturn;
@@ -16,12 +18,11 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mule.api.MuleException;
 import org.mule.api.transaction.Transaction;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.transport.jms.xa.ConnectionFactoryWrapper;
+import org.mule.transport.jms.xa.DefaultXAConnectionFactoryWrapper;
 
 import java.lang.reflect.UndeclaredThrowableException;
 
@@ -32,10 +33,9 @@ import javax.jms.Session;
 import javax.jms.XAConnectionFactory;
 import javax.transaction.TransactionManager;
 
-import org.hamcrest.core.Is;
-import org.hamcrest.core.IsInstanceOf;
 import org.junit.Test;
 import org.mockito.Matchers;
+import org.springframework.jms.connection.CachingConnectionFactory;
 
 public class JmsConnectorTestCase extends AbstractMuleContextTestCase
 {
@@ -179,7 +179,9 @@ public class JmsConnectorTestCase extends AbstractMuleContextTestCase
         muleContext.setTransactionManager(mock(TransactionManager.class));
         ConnectionFactory mockConnectionFactory = mock(ConnectionFactory.class);
         JmsConnector connector = createConnectionFactoryWhenGettingConnection(mockConnectionFactory);
-        assertThat(connector.getConnectionFactory(), Is.is(mockConnectionFactory));
+        assertThat(connector.getConnectionFactory(), instanceOf(CustomCachingConnectionFactory.class));
+        assertThat(((CachingConnectionFactory) connector.getConnectionFactory()).getTargetConnectionFactory(),
+                   is(mockConnectionFactory));
     }
 
     @Test
@@ -187,7 +189,7 @@ public class JmsConnectorTestCase extends AbstractMuleContextTestCase
     {
         ConnectionFactory mockConnectionFactory = mock(TestXAConnectionFactory.class);
         JmsConnector connector = createConnectionFactoryWhenGettingConnection(mockConnectionFactory);
-        assertThat(connector.getConnectionFactory(), Is.is(mockConnectionFactory));
+        assertThat(connector.getConnectionFactory(), is(mockConnectionFactory));
     }
 
     @Test
@@ -195,14 +197,14 @@ public class JmsConnectorTestCase extends AbstractMuleContextTestCase
     {
         muleContext.setTransactionManager(mock(TransactionManager.class));
         JmsConnector connector = createConnectionFactoryWhenGettingConnection(mock(TestXAConnectionFactory.class));
-        assertThat(connector.getConnectionFactory(), IsInstanceOf.instanceOf(ConnectionFactoryWrapper.class));
+        assertThat(connector.getConnectionFactory(), instanceOf(DefaultXAConnectionFactoryWrapper.class));
     }
 
     private JmsConnector createConnectionFactoryWhenGettingConnection(ConnectionFactory mockConnectionFactory) throws JMSException, MuleException
     {
         final Connection connection = mock(Connection.class);
 
-        JmsSupport jmsSupport = mock(JmsSupport.class);
+        JmsSupport jmsSupport = mock(Jms11Support.class);
         when(jmsSupport.createConnection(Matchers.<ConnectionFactory>any())).thenReturn(connection);
 
         JmsConnector connector = new JmsConnector(muleContext);

@@ -9,10 +9,15 @@ package org.mule.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.module.http.api.HttpConstants.Methods;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.config.i18n.LocaleMessageHandler;
+import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -66,8 +71,9 @@ public class CxfBasicTestCase extends FunctionalTestCase
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("Content-Type", "application/soap+xml");
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
+        final HttpRequestOptions httpRequestOptions = newOptions().method(Methods.POST.name()).build();
         MuleMessage result = client.send(((InboundEndpoint) muleContext.getRegistry()
-            .lookupObject("httpInbound")).getAddress(), xml, props);
+            .lookupObject("httpInbound")).getAddress(), new DefaultMuleMessage(xml, props, muleContext), httpRequestOptions);
         assertTrue(result.getPayloadAsString().contains("Hello!"));
         String ct = result.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE, "");
         assertEquals("text/xml; charset=UTF-8", ct);
@@ -80,7 +86,7 @@ public class CxfBasicTestCase extends FunctionalTestCase
         String message = LocaleMessageHandler.getString("test-data",
             Locale.JAPAN, "CxfBasicTestCase.testEchoServiceEncoding", new Object[]{});
         MuleMessage result = client.send("cxf:" + ((InboundEndpoint) muleContext.getRegistry()
-                        .lookupObject("httpInbound")).getAddress() + "?method=echo", message, null);
+                        .lookupObject("httpInbound")).getAddress() + "?method=echo", new DefaultMuleMessage(message, muleContext));
         String ct = result.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE, "");
 
         assertEquals(message, result.getPayload());

@@ -12,6 +12,10 @@
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
+    <configuration>
+        <http:config useTransportForUris="true"/>
+    </configuration>
+
     <custom-transformer name="throwsException" class="org.mule.module.cxf.CatchExceptionStrategyTestCase$CxfTransformerThrowsExceptions"/>
 
     <!-- Test Service -->

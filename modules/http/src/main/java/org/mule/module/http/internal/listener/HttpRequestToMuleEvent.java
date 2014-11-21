@@ -11,6 +11,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.HttpParser;
@@ -27,7 +28,6 @@ import com.google.common.net.MediaType;
 
 import java.nio.charset.Charset;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,6 +41,7 @@ public class HttpRequestToMuleEvent
         final HttpRequest request = requestContext.getRequest();
         final Collection<String> headerNames = request.getHeaderNames();
         Map<String, Object> inboundProperties = new HashMap<>();
+        Map<String, Object> outboundProperties = new HashMap<>();
         for (String headerName : headerNames)
         {
             final Collection<String> values = request.getHeaderValues(headerName);
@@ -60,6 +61,7 @@ public class HttpRequestToMuleEvent
                 .setUri(request.getUri())
                 .setListenerPath(listenerPath)
                 .setRemoteHostAddress(requestContext.getRemoteHostAddress().toString())
+                .setScheme(requestContext.getScheme())
                 .addPropertiesTo(inboundProperties);
 
         final Map<String, DataHandler> inboundAttachments = new HashMap<>();
@@ -79,10 +81,11 @@ public class HttpRequestToMuleEvent
                     if (contentTypeValue != null)
                     {
                         final MediaType mediaType = MediaType.parse(contentTypeValue);
+                        String encoding = mediaType.charset().isPresent() ? mediaType.charset().get().name() : Charset.defaultCharset().name();
+                        outboundProperties.put(MuleProperties.MULE_ENCODING_PROPERTY, encoding);
                         if ((mediaType.type() + "/" + mediaType.subtype()).equals(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED))
                         {
-                            Charset charset = mediaType.charset().isPresent() ? mediaType.charset().get() : Charset.defaultCharset();
-                            payload = HttpParser.decodeUrlEncodedBody(IOUtils.toString(((InputStreamHttpEntity) entity).getInputStream()), charset.name());
+                            payload = HttpParser.decodeUrlEncodedBody(IOUtils.toString(((InputStreamHttpEntity) entity).getInputStream()), encoding);
                         }
                         else if (entity instanceof InputStreamHttpEntity)
                         {
@@ -104,7 +107,7 @@ public class HttpRequestToMuleEvent
                 payload = inputStreamEntity.getInputStream();
             }
         }
-        final DefaultMuleMessage defaultMuleMessage = new DefaultMuleMessage(payload, inboundProperties, Collections.<String, Object>emptyMap(), inboundAttachments, muleContext);
+        final DefaultMuleMessage defaultMuleMessage = new DefaultMuleMessage(payload, inboundProperties, outboundProperties, inboundAttachments, muleContext);
         return new DefaultMuleEvent(defaultMuleMessage, MessageExchangePattern.REQUEST_RESPONSE, flowConstruct);
     }
 

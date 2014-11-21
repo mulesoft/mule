@@ -10,6 +10,7 @@ import org.mule.module.oauth2.asserter.OAuthContextFunctionAsserter;
 import org.mule.module.oauth2.internal.OAuthConstants;
 
 import org.apache.http.client.fluent.Request;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class AuthorizationCodeMinimalConfigTestCase extends AbstractAuthorizationCodeBasicTestCase
@@ -21,6 +22,7 @@ public class AuthorizationCodeMinimalConfigTestCase extends AbstractAuthorizatio
         return "authorization-code/authorization-code-minimal-config.xml";
     }
 
+    @Ignore("MULE-6926: flaky test")
     @Test
     public void hitRedirectUrlAndGetToken() throws Exception
     {

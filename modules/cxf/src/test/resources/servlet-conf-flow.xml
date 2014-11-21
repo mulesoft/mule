@@ -3,11 +3,17 @@
     xmlns:spring="http://www.springframework.org/schema/beans"
     xmlns:servlet="http://www.mulesoft.org/schema/mule/servlet"
     xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
     xsi:schemaLocation="
       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
       http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+      http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
       http://www.mulesoft.org/schema/mule/servlet http://www.mulesoft.org/schema/mule/servlet/current/mule-servlet.xsd">
+
+    <configuration>
+        <http:config useTransportForUris="true"/>
+    </configuration>
 
     <servlet:connector name="servlet"
         servletUrl="http://localhost:${port1}/services" />

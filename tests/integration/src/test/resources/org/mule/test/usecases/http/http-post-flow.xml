@@ -6,6 +6,10 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
+    <configuration>
+        <http:config useTransportForUris="true"/>
+    </configuration>
+
     <http:endpoint name="httpRequest" address="http://localhost:${port}/RemoteService" exchange-pattern="request-response"
                    method="POST">
         <property key="http.post.body.param" value="IncidentData"/>

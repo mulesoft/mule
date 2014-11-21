@@ -13,17 +13,22 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.callback.HttpCallback;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
-import org.mule.api.registry.MuleRegistry;
+import org.mule.api.source.MessageSource;
 import org.mule.api.transport.Connector;
 import org.mule.config.spring.factories.AsyncMessageProcessorsFactoryBean;
 import org.mule.construct.Flow;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.module.http.api.HttpConstants;
+import org.mule.module.http.api.listener.HttpListener;
+import org.mule.module.http.api.listener.HttpListenerBuilder;
+import org.mule.module.http.api.listener.HttpListenerConfig;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 
@@ -32,6 +37,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -85,10 +91,17 @@ public class DefaultHttpCallback implements HttpCallback
      * asynchronous
      */
     private Boolean async;
+
+    private Object connector;
+
     /**
-     * HTTP connector
+     * HTTP connector delegate. Allows to handle different connector implementations
+     * transparently
      */
-    private Connector connector;
+    private ConnectorDelegate connectorDelegate;
+
+    private boolean forceOldHttpTransport = false;
+
     /**
      * Exception Handler
      */
@@ -107,8 +120,6 @@ public class DefaultHttpCallback implements HttpCallback
         this.remotePort = remotePort;
         this.domain = callbackDomain;
         this.async = async;
-        this.connector = null;
-        this.url = buildUrl();
     }
 
     public DefaultHttpCallback(MessageProcessor callbackMessageProcessor,
@@ -124,8 +135,6 @@ public class DefaultHttpCallback implements HttpCallback
         this.remotePort = remotePort;
         this.domain = callbackDomain;
         this.async = async;
-        this.connector = null;
-        this.url = buildUrl();
     }
 
     public DefaultHttpCallback(MessageProcessor callbackMessageProcessor,
@@ -143,8 +152,6 @@ public class DefaultHttpCallback implements HttpCallback
         this.remotePort = remotePort;
         this.callbackPath = callbackPath;
         this.async = async;
-        this.connector = null;
-        this.url = buildUrl();
     }
 
     public DefaultHttpCallback(Flow callbackFlow,
@@ -153,7 +160,7 @@ public class DefaultHttpCallback implements HttpCallback
                                Integer localPort,
                                Integer remotePort,
                                Boolean async,
-                               Connector connector)
+                               Object connector)
     {
         this.callbackFlow = callbackFlow;
         this.muleContext = muleContext;
@@ -162,7 +169,6 @@ public class DefaultHttpCallback implements HttpCallback
         this.domain = callbackDomain;
         this.async = async;
         this.connector = connector;
-        this.url = buildUrl();
     }
 
     public DefaultHttpCallback(MessageProcessor callbackMessageProcessor,
@@ -171,7 +177,7 @@ public class DefaultHttpCallback implements HttpCallback
                                Integer localPort,
                                Integer remotePort,
                                Boolean async,
-                               Connector connector)
+                               Object connector)
     {
         this.callbackMessageProcessor = callbackMessageProcessor;
         this.muleContext = muleContext;
@@ -180,7 +186,6 @@ public class DefaultHttpCallback implements HttpCallback
         this.domain = callbackDomain;
         this.async = async;
         this.connector = connector;
-        this.url = buildUrl();
     }
 
     public DefaultHttpCallback(MessageProcessor callbackMessageProcessor,
@@ -190,7 +195,7 @@ public class DefaultHttpCallback implements HttpCallback
                                Integer remotePort,
                                String callbackPath,
                                Boolean async,
-                               Connector connector)
+                               Object connector)
     {
         this.callbackMessageProcessor = callbackMessageProcessor;
         this.muleContext = muleContext;
@@ -200,7 +205,6 @@ public class DefaultHttpCallback implements HttpCallback
         this.callbackPath = callbackPath;
         this.async = async;
         this.connector = connector;
-        this.url = buildUrl();
     }
 
     public DefaultHttpCallback(List<MessageProcessor> callbackMessageProcessors,
@@ -209,7 +213,7 @@ public class DefaultHttpCallback implements HttpCallback
                                Integer localPort,
                                Integer remotePort,
                                Boolean async,
-                               Connector connector) throws MuleException
+                               Object connector) throws MuleException
     {
         this.callbackMessageProcessor = buildChain(callbackMessageProcessors);
         this.muleContext = muleContext;
@@ -218,7 +222,6 @@ public class DefaultHttpCallback implements HttpCallback
         this.domain = callbackDomain;
         this.async = async;
         this.connector = connector;
-        this.url = buildUrl();
     }
 
     public DefaultHttpCallback(List<MessageProcessor> callbackMessageProcessors,
@@ -228,7 +231,7 @@ public class DefaultHttpCallback implements HttpCallback
                                Integer remotePort,
                                String callbackPath,
                                Boolean async,
-                               Connector connector) throws MuleException
+                               Object connector) throws MuleException
     {
         this.callbackMessageProcessor = buildChain(callbackMessageProcessors);
         this.muleContext = muleContext;
@@ -238,7 +241,6 @@ public class DefaultHttpCallback implements HttpCallback
         this.callbackPath = callbackPath;
         this.async = async;
         this.connector = connector;
-        this.url = buildUrl();
     }
 
     public DefaultHttpCallback(List<MessageProcessor> callbackMessageProcessors,
@@ -254,8 +256,6 @@ public class DefaultHttpCallback implements HttpCallback
         this.remotePort = remotePort;
         this.domain = callbackDomain;
         this.async = async;
-        this.connector = null;
-        this.url = buildUrl();
     }
 
     public DefaultHttpCallback(List<MessageProcessor> callbackMessageProcessors,
@@ -273,8 +273,6 @@ public class DefaultHttpCallback implements HttpCallback
         this.remotePort = remotePort;
         this.callbackPath = callbackPath;
         this.async = async;
-        this.connector = null;
-        this.url = buildUrl();
     }
 
     public DefaultHttpCallback(List<MessageProcessor> callbackMessageProcessors,
@@ -293,11 +291,10 @@ public class DefaultHttpCallback implements HttpCallback
         this.remotePort = remotePort;
         this.callbackPath = callbackPath;
         this.async = async;
-        this.connector = null;
+        this.connectorDelegate = null;
         this.exceptionHandler = exceptionHandler;
-        this.url = buildUrl();
     }
-    
+
     public DefaultHttpCallback(List<MessageProcessor> callbackMessageProcessors,
                                MuleContext muleContext,
                                String callbackDomain,
@@ -306,7 +303,7 @@ public class DefaultHttpCallback implements HttpCallback
                                String callbackPath,
                                Boolean async,
                                MessagingExceptionHandler exceptionHandler,
-                               Connector connector) throws MuleException
+                               Object connector) throws MuleException
     {
         this.callbackMessageProcessor = buildChain(callbackMessageProcessors);
         this.muleContext = muleContext;
@@ -315,10 +312,9 @@ public class DefaultHttpCallback implements HttpCallback
         this.remotePort = remotePort;
         this.callbackPath = callbackPath;
         this.async = async;
-        this.connector = null;
+        this.connectorDelegate = null;
         this.exceptionHandler = exceptionHandler;
         this.connector = connector;
-        this.url = buildUrl();
     }
 
     public DefaultHttpCallback(MessageProcessor callbackMessageProcessor,
@@ -329,7 +325,7 @@ public class DefaultHttpCallback implements HttpCallback
                                String callbackPath,
                                Boolean async,
                                MessagingExceptionHandler exceptionHandler,
-                               Connector connector) throws MuleException
+                               Object connector) throws MuleException
     {
         this.callbackMessageProcessor = callbackMessageProcessor;
         this.muleContext = muleContext;
@@ -338,10 +334,9 @@ public class DefaultHttpCallback implements HttpCallback
         this.remotePort = remotePort;
         this.callbackPath = callbackPath;
         this.async = async;
-        this.connector = null;
+        this.connectorDelegate = null;
         this.exceptionHandler = exceptionHandler;
         this.connector = connector;
-        this.url = buildUrl();
     }
 
     /**
@@ -354,7 +349,7 @@ public class DefaultHttpCallback implements HttpCallback
 
     /**
      * Sets muleContext
-     * 
+     *
      * @param value Value to set
      */
     public void setMuleContext(MuleContext value)
@@ -362,14 +357,58 @@ public class DefaultHttpCallback implements HttpCallback
         this.muleContext = value;
     }
 
+    private ConnectorDelegate getConnectorDelegate(Object connector) throws MuleException
+    {
+        if (connector != null)
+        {
+            if (connector instanceof Connector)
+            {
+                return new OldTransportDelegate((Connector) connector);
+            }
+            else if (connector instanceof HttpListenerConfig)
+            {
+                return new HttpConnectorDelegate((HttpListenerConfig) connector);
+            }
+            else
+            {
+                throw new IllegalArgumentException(String.format("Could not create OAuth callback at url %s because a connector of class %s was supplied. Valid types are '%s' and '%s' ",
+                                                                 url, connector.getClass().getName(), HttpListenerConfig.class.getName(), Connector.class));
+            }
+        }
+        else
+        {
+            if (forceOldHttpTransport)
+            {
+                return new OldTransportDelegate(lookupDefaultHttpTransport());
+            }
+            else
+            {
+                return new HttpConnectorDelegate();
+            }
+        }
+    }
+
+    private Connector lookupDefaultHttpTransport() throws MuleException
+    {
+        Connector httpConnector = muleContext.getRegistry().lookupConnector("connector.http.mule.default");
+        if (httpConnector != null)
+        {
+            return httpConnector;
+        }
+        else
+        {
+            throw new DefaultMuleException("Could not find connector with name 'connector.http.mule.default'");
+        }
+    }
+
     private String buildUrl()
     {
         StringBuilder urlBuilder = new StringBuilder();
         if (!domain.contains("://"))
         {
-            if (connector != null)
+            if (connectorDelegate != null)
             {
-                urlBuilder.append((connector.getProtocol() + "://"));
+                urlBuilder.append((connectorDelegate.getScheme() + "://"));
             }
             else
             {
@@ -394,8 +433,13 @@ public class DefaultHttpCallback implements HttpCallback
         return urlBuilder.toString();
     }
 
+    public void setForceOldHttpTransport(boolean forceOldHttpTransport)
+    {
+        this.forceOldHttpTransport = forceOldHttpTransport;
+    }
+
     private MessageProcessor wrapMessageProcessorInAsyncChain(MessageProcessor messageProcessor)
-        throws MuleException
+            throws MuleException
     {
         AsyncMessageProcessorsFactoryBean asyncMessageProcessorsFactoryBean = new AsyncMessageProcessorsFactoryBean();
         asyncMessageProcessorsFactoryBean.setMuleContext(muleContext);
@@ -411,29 +455,10 @@ public class DefaultHttpCallback implements HttpCallback
         }
     }
 
-    private Connector createConnector() throws MuleException
-    {
-        if (connector != null)
-        {
-            return this.connector;
-        }
-        MuleRegistry muleRegistry = muleContext.getRegistry();
-        Connector httpConnector = muleRegistry.lookupConnector("connector.http.mule.default");
-        if (httpConnector != null)
-        {
-            return httpConnector;
-        }
-        else
-        {
-            LOGGER.error("Could not find connector with name 'connector.http.mule.default'");
-            throw new DefaultMuleException("Could not find connector with name 'connector.http.mule.default'");
-        }
-    }
-
     private InboundEndpoint createHttpInboundEndpoint() throws MuleException
     {
         EndpointURIEndpointBuilder inBuilder = new EndpointURIEndpointBuilder(localUrl, muleContext);
-        inBuilder.setConnector(createConnector());
+        inBuilder.setConnector((Connector) connectorDelegate.getConnector());
         inBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
         EndpointFactory endpointFactory = muleContext.getEndpointFactory();
         return endpointFactory.getInboundEndpoint(inBuilder);
@@ -445,6 +470,11 @@ public class DefaultHttpCallback implements HttpCallback
      */
     public void start() throws MuleException
     {
+        String dynamicFlowName = String.format("DynamicFlow-%s:%d/%s", domain, localPort, callbackPath);
+        flow = new Flow(dynamicFlowName, muleContext);
+
+        connectorDelegate = getConnectorDelegate(connector);
+        url = buildUrl();
         this.localUrl = url.replaceFirst(domain, "localhost");
         if (localUrl.indexOf((":" + String.valueOf(remotePort))) == -1)
         {
@@ -454,9 +484,15 @@ public class DefaultHttpCallback implements HttpCallback
         {
             this.localUrl = localUrl.replaceFirst(String.valueOf(remotePort), String.valueOf(localPort));
         }
-        String dynamicFlowName = String.format("DynamicFlow-%s", localUrl);
-        flow = new Flow(dynamicFlowName, muleContext);
-        flow.setMessageSource(createHttpInboundEndpoint());
+
+        MessageSource source = connectorDelegate.getMessageSource();
+
+        if (source instanceof FlowConstructAware)
+        {
+            ((FlowConstructAware) source).setFlowConstruct(flow);
+        }
+
+        flow.setMessageSource(source);
         MessageProcessor messageProcessor;
         if (callbackFlow != null)
         {
@@ -470,7 +506,7 @@ public class DefaultHttpCallback implements HttpCallback
         {
             messageProcessor = wrapMessageProcessorInAsyncChain(messageProcessor);
         }
-        List<MessageProcessor> messageProcessors = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> messageProcessors = new ArrayList<>();
         messageProcessors.add(messageProcessor);
         flow.setMessageProcessors(messageProcessors);
         if (exceptionHandler != null)
@@ -527,6 +563,97 @@ public class DefaultHttpCallback implements HttpCallback
             return callbackFlow.process(event);
         }
 
+    }
+
+    private interface ConnectorDelegate<T>
+    {
+
+        String getScheme();
+
+        MessageSource getMessageSource() throws MuleException;
+
+        T getConnector();
+
+    }
+
+    private class OldTransportDelegate implements ConnectorDelegate<Connector>
+    {
+
+        private final Connector connector;
+
+        private OldTransportDelegate(Connector connector)
+        {
+            this.connector = connector;
+        }
+
+        @Override
+        public String getScheme()
+        {
+            return connector.getProtocol();
+        }
+
+        @Override
+        public MessageSource getMessageSource() throws MuleException
+        {
+            return createHttpInboundEndpoint();
+        }
+
+        @Override
+        public Connector getConnector()
+        {
+            return connector;
+        }
+    }
+
+    private class HttpConnectorDelegate implements ConnectorDelegate<HttpListenerConfig>
+    {
+
+        private final HttpListenerConfig listenerConfig;
+        private final HttpListener messageSource;
+
+        private HttpConnectorDelegate(HttpListenerConfig listenerConfig) throws MuleException
+        {
+            this.listenerConfig = listenerConfig;
+            messageSource = new HttpListenerBuilder(muleContext)
+                    .setListenerConfig(listenerConfig)
+                    .setPath(sanitizeCallbackPath())
+                    .setFlow(flow)
+                    .build();
+        }
+
+        public HttpConnectorDelegate() throws MuleException
+        {
+            messageSource = new HttpListenerBuilder(muleContext)
+                    .setPath(sanitizeCallbackPath())
+                    .setFlow(flow)
+                    .setHost(domain)
+                    .setPort(localPort)
+                    .build();
+            listenerConfig = messageSource.getConfig();
+        }
+
+        private String sanitizeCallbackPath()
+        {
+            return StringUtils.isBlank(callbackPath) ? "/" : callbackPath;
+        }
+
+        @Override
+        public String getScheme()
+        {
+            return listenerConfig.hasTlsConfig() ? HttpConstants.Protocols.HTTPS : HttpConstants.Protocols.HTTP;
+        }
+
+        @Override
+        public MessageSource getMessageSource() throws MuleException
+        {
+            return this.messageSource;
+        }
+
+        @Override
+        public HttpListenerConfig getConnector()
+        {
+            return listenerConfig;
+        }
     }
 
 }

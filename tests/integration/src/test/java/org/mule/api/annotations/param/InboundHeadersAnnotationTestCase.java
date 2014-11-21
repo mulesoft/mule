@@ -11,6 +11,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
@@ -19,6 +21,7 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.transport.NullPayload;
 import org.mule.util.ExceptionUtils;
 
 import java.util.HashMap;
@@ -117,7 +120,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         props.remove("foo");
 
         MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("vm://headers", null, null);
+        MuleMessage message = client.send("vm://headers", new DefaultMuleMessage(NullPayload.getInstance(), muleContext));
         assertNotNull(message);
         assertNotNull(message.getExceptionPayload());
         assertEquals(RequiredValueException.class,

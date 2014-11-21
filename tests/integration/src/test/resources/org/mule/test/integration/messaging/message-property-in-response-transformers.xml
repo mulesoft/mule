@@ -8,6 +8,10 @@
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
        http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
 
+    <configuration>
+        <http:config useTransportForUris="true"/>
+    </configuration>
+    
     <flow name="test">
         <cxf:inbound-endpoint address="http://localhost:63081/ser"
                               exchange-pattern="request-response" frontend="simple">

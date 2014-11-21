@@ -14,6 +14,10 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd ">
 
+    <configuration>
+        <http:config useTransportForUris="true"/>
+    </configuration>
+
 	<flow name="soap11Flow" doc:name="SOAP 1.1 Flow">
 		<http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="${port1}" path="EchoService11" doc:name="HTTP" />
 		<cxf:proxy-service bindingId="EchoBinding" namespace="http://new.webservice.namespace" service="EchoService" payload="body"

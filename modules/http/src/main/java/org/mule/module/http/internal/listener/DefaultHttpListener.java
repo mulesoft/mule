@@ -9,7 +9,6 @@ package org.mule.module.http.internal.listener;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
@@ -21,7 +20,7 @@ import org.mule.execution.MessageProcessingManager;
 import org.mule.module.http.api.listener.HttpListener;
 import org.mule.module.http.api.listener.HttpListenerConfig;
 import org.mule.module.http.internal.HttpParser;
-import org.mule.module.http.internal.HttpStreamingType;
+import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.domain.request.HttpRequestContext;
 import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
 import org.mule.module.http.internal.listener.async.RequestHandler;
@@ -29,7 +28,6 @@ import org.mule.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMa
 import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.module.http.internal.listener.matcher.MethodRequestMatcher;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 

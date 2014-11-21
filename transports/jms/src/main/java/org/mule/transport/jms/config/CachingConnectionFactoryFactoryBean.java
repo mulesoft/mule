@@ -13,6 +13,12 @@ import javax.jms.ConnectionFactory;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
+/**
+ * DEPRECATED: This element is deprecated from Mule 3.6.
+ * This can still but used in 3.6, but it not necessary given that from Mule 3.6 JMS connections cache Sessions/Producers
+ * by default when a CachingConnectionFactory has not been configured explicitly.
+ */
+@Deprecated
 public class CachingConnectionFactoryFactoryBean extends AbstractFactoryBean<CustomCachingConnectionFactory>
 {
 
@@ -34,7 +40,9 @@ public class CachingConnectionFactoryFactoryBean extends AbstractFactoryBean<Cus
     @Override
     protected CustomCachingConnectionFactory createInstance() throws Exception
     {
-        CustomCachingConnectionFactory cachingConnectionFactory = new CustomCachingConnectionFactory(connectionFactory, username, password);
+        CustomCachingConnectionFactory cachingConnectionFactory = new CustomCachingConnectionFactory(connectionFactory,
+                                                                                                     username,
+                                                                                                     password);
         cachingConnectionFactory.setCacheProducers(cacheProducers);
         cachingConnectionFactory.setSessionCacheSize(sessionCacheSize);
         cachingConnectionFactory.setCacheConsumers(false);

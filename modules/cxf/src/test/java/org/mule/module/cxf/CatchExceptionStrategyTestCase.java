@@ -132,7 +132,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
     public void testServerClientProxyWithTransformerExceptionCatchStrategy() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithTransformerExceptionCatchStrategy", requestPayload, null);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithTransformerExceptionCatchStrategy", new DefaultMuleMessage(requestPayload, muleContext));
         String resString = result.getPayloadAsString();
         assertEquals(String.valueOf(HttpConstants.SC_OK), result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
         assertTrue(resString.contains("Anonymous"));

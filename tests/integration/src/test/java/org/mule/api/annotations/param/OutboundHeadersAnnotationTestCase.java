@@ -9,8 +9,11 @@ package org.mule.api.annotations.param;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.transport.NullPayload;
 import org.mule.util.ExceptionUtils;
 
 import java.util.Map;
@@ -34,7 +37,7 @@ public class OutboundHeadersAnnotationTestCase extends FunctionalTestCase
     @Test
     public void testProcessHeader() throws Exception
     {
-        MuleMessage message = muleContext.getClient().send("vm://header", null, null);
+        MuleMessage message = muleContext.getClient().send("vm://header", new DefaultMuleMessage(NullPayload.getInstance(), muleContext));
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
         Map<?, ?> result = (Map<?, ?>) message.getPayload();
@@ -44,7 +47,7 @@ public class OutboundHeadersAnnotationTestCase extends FunctionalTestCase
     @Test
     public void testProcessHeaderWithExistingOutHeaders() throws Exception
     {
-        MuleMessage message = muleContext.getClient().send("vm://header2", null, null);
+        MuleMessage message = muleContext.getClient().send("vm://header2", new DefaultMuleMessage(NullPayload.getInstance(), muleContext));
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
         Map<?, ?> result = (Map<?, ?>) message.getPayload();
@@ -55,7 +58,7 @@ public class OutboundHeadersAnnotationTestCase extends FunctionalTestCase
     @Test
     public void testInvalidParamType() throws Exception
     {
-        MuleMessage message = muleContext.getClient().send("vm://invalid", null, null);
+        MuleMessage message = muleContext.getClient().send("vm://invalid", new DefaultMuleMessage(NullPayload.getInstance(), muleContext));
         assertNotNull(message);
         assertNotNull(message.getExceptionPayload());
         assertEquals(IllegalArgumentException.class,

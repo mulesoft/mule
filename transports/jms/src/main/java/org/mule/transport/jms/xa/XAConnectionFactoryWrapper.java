@@ -4,17 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.api.requester;
+package org.mule.transport.jms.xa;
 
-import org.mule.api.processor.MessageProcessor;
+import javax.jms.ConnectionFactory;
 
-
-public interface HttpRequester extends MessageProcessor
+/**
+ * Wraps a XAConnectionFactory to support integration with XA transaction manager.
+ */
+public interface XAConnectionFactoryWrapper extends ConnectionFactory
 {
-
-    /**
-     * @return the config for this requester.
-     */
-    public HttpRequesterConfig getConfig();
 
 }

@@ -11,16 +11,21 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.ExceptionUtils;
 
 import java.net.SocketTimeoutException;
 import java.util.Date;
+import java.util.concurrent.TimeoutException;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -65,7 +70,7 @@ public class HttpResponseTimeoutTestCase extends FunctionalTestCase
     public void testDecreaseOutboundEndpointResponseTimeout() throws Exception
     {
         Date beforeCall = new Date();
-        MuleMessage result = muleClient.send("vm://decreaseTimeoutRequest", getPayload(), null);
+        MuleMessage result = muleClient.send("vm://decreaseTimeoutRequest", getTestMessage());
         assertNotNull(result);
         assertNotNull(result.getExceptionPayload());
         assertEquals(DispatchException.class, result.getExceptionPayload().getException().getClass());
@@ -75,6 +80,11 @@ public class HttpResponseTimeoutTestCase extends FunctionalTestCase
         // message.
         Date afterCall = new Date();
         assertTrue((afterCall.getTime() - beforeCall.getTime()) < DEFAULT_RESPONSE_TIMEOUT);
+    }
+
+    private DefaultMuleMessage getTestMessage()
+    {
+        return new DefaultMuleMessage(getPayload(), muleContext);
     }
 
     @Test
@@ -100,12 +110,12 @@ public class HttpResponseTimeoutTestCase extends FunctionalTestCase
 
         try
         {
-            muleClient.send(((InboundEndpoint) muleContext.getRegistry().lookupObject("inDelayService")).getAddress(), getPayload(), null, 1000);
+            muleClient.send(((InboundEndpoint) muleContext.getRegistry().lookupObject("inDelayService")).getAddress(), getTestMessage(), newOptions().responseTimeout(1000).build());
             fail("SocketTimeoutException expected");
         }
         catch (Exception e)
         {
-            assertTrue(ExceptionUtils.getRootCause(e) instanceof SocketTimeoutException);
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof TimeoutException);
         }
 
         // Exception should have been thrown after timeout specified which is
@@ -118,7 +128,7 @@ public class HttpResponseTimeoutTestCase extends FunctionalTestCase
     public void testIncreaseMuleClientSendResponseTimeout() throws Exception
     {
         Date beforeCall = new Date();
-        MuleMessage message = muleClient.send(((InboundEndpoint) muleContext.getRegistry().lookupObject("inDelayService")).getAddress(), getPayload(), null, 3000);
+        MuleMessage message = muleClient.send(((InboundEndpoint) muleContext.getRegistry().lookupObject("inDelayService")).getAddress(), getTestMessage(), 3000);
         Date afterCall = new Date();
 
         // If everything is good the we'll have received a result after more than 10s

@@ -12,10 +12,11 @@ import org.mule.api.MuleEvent;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.HttpMessageBuilder;
 import org.mule.module.http.internal.HttpParser;
-import org.mule.module.http.internal.HttpStreamingType;
+import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.ParameterMap;
 import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
 import org.mule.module.http.internal.domain.EmptyHttpEntity;
@@ -29,6 +30,7 @@ import org.mule.module.http.internal.HttpParamType;
 import org.mule.transport.NullPayload;
 import org.mule.util.AttributeEvaluator;
 import org.mule.util.IOUtils;
+import org.mule.util.NumberUtils;
 import org.mule.util.UUID;
 
 import java.io.InputStream;
@@ -44,10 +46,11 @@ import org.slf4j.LoggerFactory;
 
 public class HttpResponseBuilder extends HttpMessageBuilder implements Initialisable, MuleContextAware
 {
+    private static final int DEFAULT_STATUS_CODE = 200;
 
     public static final String MULTIPART = "multipart";
     private Logger logger = LoggerFactory.getLogger(getClass());
-    private String statusCode = "200";
+    private String statusCode;
     private String reasonPhrase;
     private boolean disablePropertiesAsHeaders = false;
     private HttpStreamingType responseStreaming = HttpStreamingType.AUTO;
@@ -76,8 +79,11 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
             final Set<String> outboundProperties = event.getMessage().getOutboundPropertyNames();
             for (String outboundPropertyName : outboundProperties)
             {
-                final Object outboundPropertyValue = event.getMessage().getOutboundProperty(outboundPropertyName);
-                httpResponseHeaderBuilder.addHeader(outboundPropertyName, outboundPropertyValue);
+                if (!outboundPropertyName.equals(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY))
+                {
+                    final Object outboundPropertyValue = event.getMessage().getOutboundProperty(outboundPropertyName);
+                    httpResponseHeaderBuilder.addHeader(outboundPropertyName, outboundPropertyValue);
+                }
             }
         }
 
@@ -186,13 +192,32 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
             }
         }
 
-        httpResponseBuilder.setStatusCode(statusCodeEvaluator.resolveIntegerValue(event));
+        httpResponseBuilder.setStatusCode(resolveStatusCode(event));
         if (this.reasonPhrase != null)
         {
             httpResponseBuilder.setReasonPhrase(reasonPhraseEvaluator.resolveStringValue(event));
         }
         httpResponseBuilder.setEntity(httpEntity);
         return httpResponseBuilder.build();
+    }
+
+    private int resolveStatusCode(MuleEvent event)
+    {
+        Object statusCodeOutboundProperty = event.getMessage().getOutboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY);
+
+        if (statusCode != null)
+        {
+            return statusCodeEvaluator.resolveIntegerValue(event);
+        }
+        else if (statusCodeOutboundProperty != null)
+        {
+            return NumberUtils.toInt(statusCodeOutboundProperty);
+        }
+        else
+        {
+            return DEFAULT_STATUS_CODE;
+        }
+
     }
 
     private String createMultipartFormDataContentType()

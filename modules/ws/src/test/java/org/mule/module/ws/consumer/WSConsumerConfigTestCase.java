@@ -9,11 +9,12 @@ package org.mule.module.ws.consumer;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.config.DefaultMuleConfiguration;
-import org.mule.module.http.api.requester.HttpRequester;
+import org.mule.module.http.internal.config.HttpConfiguration;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.transport.http.HttpConnector;
@@ -27,22 +28,19 @@ public class WSConsumerConfigTestCase extends AbstractMuleContextTestCase
     private static final String SERVICE_ADDRESS = "http://localhost";
 
     @Test
-    public void createOutboundEndpointWithDefaultConnectorFromHttpTransport() throws MuleException
+    public void createOutboundEndpointWithDefaultConnectorFromHttpTransport() throws Exception
     {
-        DefaultMuleConfiguration muleConfiguration = (DefaultMuleConfiguration) muleContext.getConfiguration();
-        muleConfiguration.setUseHttpTransportByDefault(true);
-
-        WSConsumerConfig config = createConsumerConfig();
-        MessageProcessor mp = config.createOutboundMessageProcessor();
-        assertThat(mp, instanceOf(OutboundEndpoint.class));
-    }
-
-    @Test
-    public void createHttpRequesterWithDefaultConfigFromHttpModule() throws MuleException
-    {
-        WSConsumerConfig config = createConsumerConfig();
-        MessageProcessor mp = config.createOutboundMessageProcessor();
-        assertThat(mp, instanceOf(HttpRequester.class));
+        MuleTestUtils.testWithSystemProperty(HttpConfiguration.USE_HTTP_TRANSPORT_FOR_URIS, Boolean.TRUE.toString(),
+                                             new MuleTestUtils.TestCallback()
+                                             {
+                                                 @Override
+                                                 public void run() throws Exception
+                                                 {
+                                                     WSConsumerConfig config = createConsumerConfig();
+                                                     MessageProcessor mp = config.createOutboundMessageProcessor();
+                                                     assertThat(mp, instanceOf(OutboundEndpoint.class));
+                                                 }
+                                             });
     }
 
     @Test

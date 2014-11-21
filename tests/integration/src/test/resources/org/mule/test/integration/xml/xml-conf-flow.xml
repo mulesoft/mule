@@ -7,6 +7,10 @@
                http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
+    <configuration>
+        <http:config useTransportForUris="true"/>
+    </configuration>
+
     <mule-xml:namespace-manager includeConfigNamespaces="true">
         <mule-xml:namespace prefix="simple" uri="http://simple.component.mule.org/"/>
     </mule-xml:namespace-manager>

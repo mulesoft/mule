@@ -14,6 +14,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -63,6 +64,8 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
     private MuleException mockException;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private WorkManager mockWorkManager;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private DefaultMuleEvent mockMuleEvent;
 
 
     @Before
@@ -100,6 +103,7 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
                 return null;
             }
         }).when(mockWorkManager).scheduleWork(any(Work.class));
+        when(mockTemplate.getMuleEvent()).thenReturn(mockMuleEvent);
     }
 
 

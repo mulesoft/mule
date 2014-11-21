@@ -8,6 +8,7 @@ package org.mule.test.properties;
 
 import static org.junit.Assert.assertThat;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -44,7 +45,7 @@ public class HttpVmSessionPropertiesTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
 
         Map<String, Object> properties = Collections.emptyMap();
-        MuleMessage message = client.send("http://localhost:" + dynamicPort1.getNumber() + "/http-inbound-flow", "some message", properties);
+        MuleMessage message = client.send("http://localhost:" + dynamicPort1.getNumber() + "/http-inbound-flow", new DefaultMuleMessage("some message", properties, muleContext));
         assertThat(message, IsNull.<Object>notNullValue());
         assertThat(message.getExceptionPayload(), IsNull.<Object>nullValue());
     }
@@ -58,7 +59,7 @@ public class HttpVmSessionPropertiesTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
 
         Map<String, Object> properties = Collections.emptyMap();
-        MuleMessage message = client.send("vm://vm-inbound-flow", "some message", properties);
+        MuleMessage message = client.send("vm://vm-inbound-flow", new DefaultMuleMessage("some message", properties, muleContext));
         assertThat(message, IsNull.<Object>notNullValue());
         assertThat(message.getExceptionPayload(), IsNull.<Object>nullValue());
     }
