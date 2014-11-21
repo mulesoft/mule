@@ -6,9 +6,14 @@
  */
 package org.mule.config.spring.parsers.processors;
 
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import org.mule.config.spring.parsers.PreProcessor;
+import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 
 import org.junit.Test;
+import org.w3c.dom.Element;
 
 public class CheckExclusiveAttributesTestCase extends AbstractPreProcessorTestCase
 {
@@ -107,6 +112,19 @@ public class CheckExclusiveAttributesTestCase extends AbstractPreProcessorTestCa
         };
         
         assertOk(groups, "id name recipient subject type");
+    }
+
+    @Test
+    public void testDocumentationAllowed() throws Exception
+    {
+        PropertyConfiguration config = mock(PropertyConfiguration.class);
+        when(config.isIgnored(anyString())).thenReturn(false);
+
+        Element element = createElement("value");
+        element.setAttributeNS("http://www.some.namespace", "namespace", "namespace");
+
+        CheckExclusiveAttribute check = new CheckExclusiveAttribute("value");
+        check.preProcess(config, element);
     }
     
     @Override
