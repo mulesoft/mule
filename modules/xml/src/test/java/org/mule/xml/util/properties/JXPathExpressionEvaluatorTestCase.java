@@ -6,6 +6,13 @@
  */
 package org.mule.xml.util.properties;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.registry.RegistrationException;
@@ -15,17 +22,14 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBowl;
+import org.mule.util.IOUtils;
+import org.mule.util.StringUtils;
 
 import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings("deprecation") // we're testing a deprecated class
 public class JXPathExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
@@ -124,5 +128,22 @@ public class JXPathExpressionEvaluatorTestCase extends AbstractMuleContextTestCa
         Object value = e.evaluate("//f:table/f:name", msg);
         assertTrue(value instanceof String);
         assertEquals("African Coffee Table", value);
+    }
+
+    @Test
+    public void assertNoXXEVulnerable() throws Exception
+    {
+        String xxe = String.format("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                                   "<!DOCTYPE spi_doc_type[ <!ENTITY spi_entity_ref SYSTEM 'file:%s'>]>\n" +
+                                   "<root>\n" +
+                                   "<elem>&spi_entity_ref;</elem>\n" +
+                                   "<something/>\n" +
+                                   "</root>", IOUtils.getResourceAsUrl("xxe-passwd.txt", this.getClass()).getPath());
+
+        JXPathExpressionEvaluator evaluator = new JXPathExpressionEvaluator();
+        evaluator.setMuleContext(muleContext);
+        Object value = evaluator.evaluate(".", getTestEvent(xxe).getMessage());
+        assertThat(value, instanceOf(String.class));
+        assertThat(StringUtils.isBlank((String) value), is(true));
     }
 }
