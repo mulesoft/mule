@@ -16,10 +16,10 @@ import java.util.List;
 
 import org.junit.runners.Parameterized;
 
-public class OracleDatasourceConfigTestCase extends AbstractDatabaseConfigTestCase
+public class OracleUrlWithUserPasswordConfigTestCase extends AbstractDatabaseConfigTestCase
 {
 
-    public OracleDatasourceConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
+    public OracleUrlWithUserPasswordConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
     {
         super(dataSourceConfigResource, testDatabase);
     }
@@ -33,7 +33,7 @@ public class OracleDatasourceConfigTestCase extends AbstractDatabaseConfigTestCa
         }
         else
         {
-            return Collections.singletonList(new Object[] {"integration/config/oracle-datasource-config.xml", new OracleTestDatabase()});
+            return Collections.singletonList(new Object[] {"integration/config/oracle-url-user-and-password-config.xml", new OracleTestDatabase()});
         }
     }
 }
