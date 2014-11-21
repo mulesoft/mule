@@ -40,14 +40,15 @@ public class CheckExclusiveAttribute implements PreProcessor
         NamedNodeMap attributes = element.getAttributes();
         for (int i = 0; i < attributes.getLength(); i++)
         {
-            String alias = SpringXMLUtils.attributeName((Attr) attributes.item(i));
+            Attr attribute = (Attr) attributes.item(i);
+            String alias = SpringXMLUtils.attributeName(attribute);
             if (! config.isIgnored(alias))
             {
                 if (attribute.equals(alias))
                 {
                     found = true;
                 }
-                else
+                else if (!SpringXMLUtils.isDocsNamespace(attribute))
                 {
                     foundAttributes.add(alias);
                 }
