@@ -10,13 +10,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.NullPayload;
@@ -47,7 +45,7 @@ public class FlowUseCaseProcessingStrategyTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         final HttpRequestOptions httpRequestOptions = newOptions().disableStatusCodeValidation().build();
         MuleMessage exception = client.send("http://localhost:" + dynamicPort.getNumber(), new DefaultMuleMessage(NullPayload.getInstance(), muleContext), httpRequestOptions);
-        assertEquals(500, exception.getInboundProperty("http.status", "0"));
+        assertEquals("500", exception.getInboundProperty("http.status", "0"));
     }
 
     @Test
