@@ -14,6 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * These only depend on standard (JSE) XML classes and are used by Spring config code.
@@ -26,6 +27,7 @@ public class SpringXMLUtils extends XMLUtils
 
     public static final String MULE_DEFAULT_NAMESPACE = "http://www.mulesoft.org/schema/mule/core";
     public static final String MULE_NAMESPACE_PREFIX = "http://www.mulesoft.org/schema/mule/";
+    public static final String MULE_DOCS_NAMESPACE = "http://www.mulesoft.org/schema/mule/documentation";
 
     public static boolean isMuleNamespace(Element element)
     {
@@ -37,6 +39,11 @@ public class SpringXMLUtils extends XMLUtils
     {
         String ns = element.getNamespaceURI();
         return ns != null && ns.equals(BeanDefinitionParserDelegate.BEANS_NAMESPACE_URI);
+    }
+
+    public static boolean isDocsNamespace(Node node)
+    {
+        return MULE_DOCS_NAMESPACE.equals(node.getNamespaceURI());
     }
 
     public static String getNameOrId(Element element)

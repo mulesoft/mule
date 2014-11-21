@@ -6,8 +6,11 @@
  */
 package org.mule.config.spring.parsers.processors;
 
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.mule.config.spring.parsers.PreProcessor;
+import org.mule.config.spring.util.SpringXMLUtils;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.ArrayUtils;
 
 import java.util.StringTokenizer;
@@ -18,9 +21,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public abstract class AbstractPreProcessorTestCase extends AbstractMuleTestCase
 {
@@ -55,6 +55,13 @@ public abstract class AbstractPreProcessorTestCase extends AbstractMuleTestCase
         {
             element.setAttribute(tokens.nextToken(), "value");
         }
+        return element;
+    }
+
+    protected Element createDocumentedElement(String attributes, String documentation) throws ParserConfigurationException
+    {
+        Element element = createElement(attributes);
+        element.setAttributeNS(SpringXMLUtils.MULE_DOCS_NAMESPACE, "documentation", documentation);
         return element;
     }
 
