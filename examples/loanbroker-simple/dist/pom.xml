@@ -60,11 +60,6 @@
             <artifactId>mule-module-scripting</artifactId>
             <version>${muleVersion}</version>
         </dependency>
-        <dependency>
-            <groupId>org.mule.patterns</groupId>
-            <artifactId>mule-pattern-core</artifactId>
-            <version>${muleVersion}</version>
-        </dependency>
 
         <!-- test dependencies -->
         <dependency>
