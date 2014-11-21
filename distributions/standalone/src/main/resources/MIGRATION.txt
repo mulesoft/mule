@@ -62,6 +62,7 @@ MULE-7983: Devkit based Cloud Connectors with OAuth support will now use the new
 MULE-7731: The default value of the 'cacheJmsSessions' attribute in the JMS connector element is now 'true' to provide better out of the box performance.  This attribute can be set 'false' to disable caching as in 3.5.
 MULE-7731: The <jms:caching-connection-factory> has been deprecated.  It can still but used in 3.6, but it not necessary given that from Mule 3.6 JMS connections cache Sessions/Producers by default when a CachingConnectionFactory has not been configured explicitly.
 MULE-7731: org.mule.transport.jms.xa.ConnectionFactoryWrapper has been renamed to org.mule.transport.jms.xa.DefaultXAConnectionFactoryWrapper.
+MULE-8082: XStream was upgraded from version 1.4.2 to 1.4.7
 
 Migration changes from 3.4.x to 3.5.x
 
